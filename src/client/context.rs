@@ -1,5 +1,4 @@
 use crate::builder::EditProfile;
-use crate::CACHE;
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::error::Result;
 use crate::gateway::InterMessage;
@@ -14,6 +13,10 @@ use std::sync::{
 use typemap::ShareMap;
 use crate::utils::VecMap;
 use crate::utils::vecmap_to_json_map;
+#[cfg(feature = "cache")]
+pub use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -41,6 +44,8 @@ pub struct Context {
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
     pub shard_id: u64,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<RwLock<Cache>>,
 }
 
 impl Context {
@@ -49,11 +54,14 @@ impl Context {
         data: Arc<Mutex<ShareMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
+        cache: Arc<RwLock<Cache>>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
+            #[cfg(feature = "cache")]
+            cache,
         }
     }
 
@@ -94,7 +102,7 @@ impl Context {
 
         feature_cache! {
             {
-                let cache = CACHE.read();
+                let cache = self.cache.read();
 
                 map.insert("username", Value::String(cache.user.name.clone()));
 

@@ -14,7 +14,7 @@ use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+use crate::cache::Cache;
 
 pub fn default_true() -> bool {
     true
@@ -206,8 +206,8 @@ pub fn serialize_gen_locked_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub fn user_has_perms(channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
-    let cache = CACHE.read();
+pub fn user_has_perms(cache: &Arc<RwLock<Cache>>, channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
+    let cache = cache.read();
     let current_user = &cache.user;
 
     let channel = match cache.channel(channel_id) {

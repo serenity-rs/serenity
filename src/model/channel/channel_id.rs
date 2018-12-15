@@ -1,6 +1,7 @@
-use crate::internal::RwLockExt;
-use crate::model::prelude::*;
+use crate::{internal::RwLockExt, model::prelude::*};
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
@@ -13,9 +14,9 @@ use crate::builder::{
     GetMessages
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::Cache;
+use parking_lot::RwLock;
 #[cfg(feature = "model")]
 use crate::http::{self, AttachmentType};
 #[cfg(feature = "model")]
@@ -236,8 +237,11 @@ impl ChannelId {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn edit<F: FnOnce(EditChannel) -> EditChannel>(&self, f: F) -> Result<GuildChannel> {
-        let map = utils::vecmap_to_json_map(f(EditChannel::default()).0);
+    pub fn edit<F: FnOnce(&mut EditChannel) -> &mut EditChannel>(&self, f: F) -> Result<GuildChannel> {
+        let mut channel = EditChannel::default();
+        f(&mut channel);
+
+        let map = utils::vecmap_to_json_map(channel.0);
 
         http::edit_channel(self.0, &map)
     }
@@ -290,8 +294,8 @@ impl ChannelId {
     /// [`Channel`]: ../channel/enum.Channel.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_channel_cached(self) -> Option<Channel> {
-        self._to_channel_cached(&CACHE)
+    pub fn to_channel_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Channel> {
+        self._to_channel_cached(&cache)
     }
 
     /// To allow testing pass their own cache instead of using the globale one.
@@ -304,15 +308,15 @@ impl ChannelId {
     /// First attempts to find a [`Channel`] by its Id in the cache,
     /// upon failure requests it via the REST API.
     ///
-    /// **Note**: If the cache is not enabled,
-    /// REST API will be used only.
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
+    /// owning the required permissions the HTTP-request will be issued.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
     #[inline]
-    pub fn to_channel(self) -> Result<Channel> {
+    pub fn to_channel(self, context: &Context) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            if let Some(channel) = CACHE.read().channel(self) {
+            if let Some(channel) = context.cache.read().channel(self) {
                 return Ok(channel);
             }
         }
@@ -382,11 +386,11 @@ impl ChannelId {
 
     /// Returns the name of whatever channel this id holds.
     #[cfg(feature = "model")]
-    pub fn name(&self) -> Option<String> {
+    pub fn name(&self, context: &Context) -> Option<String> {
         use self::Channel::*;
 
         let finding = feature_cache! {{
-            Some(self.to_channel_cached())
+            Some(self.to_channel_cached(&context.cache))
         } else {
             None
         }};

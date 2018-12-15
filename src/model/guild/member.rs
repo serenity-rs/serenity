@@ -1,4 +1,4 @@
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{
     Display,
@@ -7,6 +7,8 @@ use std::fmt::{
 };
 use super::deserialize_sync_user;
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use crate::builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -16,7 +18,7 @@ use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{CACHE, http, utils};
+use crate::{cache::Cache, http, utils};
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
@@ -169,8 +171,8 @@ impl Member {
 
     /// Determines the member's colour.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn colour(&self) -> Option<Colour> {
-        let cache = CACHE.read();
+    pub fn colour(&self, cache: &Arc<RwLock<Cache>>) -> Option<Colour> {
+        let cache = cache.read();
         let guild = cache.guilds.get(&self.guild_id)?.read();
 
         let mut roles = self.roles
@@ -191,8 +193,8 @@ impl Member {
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
     #[cfg(feature = "cache")]
-    pub fn default_channel(&self) -> Option<Arc<RwLock<GuildChannel>>> {
-        let guild = match self.guild_id.to_guild_cached() {
+    pub fn default_channel(&self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<GuildChannel>>> {
+        let guild = match self.guild_id.to_guild_cached(&cache) {
             Some(guild) => guild,
             None => return None,
         };
@@ -257,8 +259,8 @@ impl Member {
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub fn highest_role_info(&self) -> Option<(RoleId, i64)> {
-        let guild = self.guild_id.to_guild_cached()?;
+    pub fn highest_role_info(&self, cache: &Arc<RwLock<Cache>>) -> Option<(RoleId, i64)> {
+        let guild = self.guild_id.to_guild_cached(&cache)?;
         let reader = guild.try_read()?;
 
         let mut highest = None;
@@ -315,20 +317,20 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    pub fn kick(&self) -> Result<()> {
+    pub fn kick(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let cache = CACHE.read();
+            let locked_cache = context.cache.read();
 
-            if let Some(guild) = cache.guilds.get(&self.guild_id) {
+            if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
                 let req = Permissions::KICK_MEMBERS;
                 let reader = guild.read();
 
-                if !reader.has_perms(req) {
+                if !reader.has_perms(&context.cache, req) {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
 
-                reader.check_hierarchy(self.user.read().id)?;
+                reader.check_hierarchy(&context.cache, self.user.read().id)?;
             }
         }
 
@@ -356,8 +358,8 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
-    pub fn permissions(&self) -> Result<Permissions> {
-        let guild = match self.guild_id.to_guild_cached() {
+    pub fn permissions(&self, cache: &Arc<RwLock<Cache>>) -> Result<Permissions> {
+        let guild = match self.guild_id.to_guild_cached(&cache) {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
@@ -426,10 +428,10 @@ impl Member {
     ///
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
-    pub fn roles(&self) -> Option<Vec<Role>> {
+    pub fn roles(&self, cache: &Arc<RwLock<Cache>>) -> Option<Vec<Role>> {
         self
             .guild_id
-            .to_guild_cached()
+            .to_guild_cached(&cache)
             .map(|g| g
                 .read()
                 .roles

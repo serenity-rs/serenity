@@ -1,6 +1,8 @@
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{EditGuild, EditMember, EditRole};
 
@@ -333,7 +335,9 @@ impl PartialGuild {
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`Member`]: struct.Member.html
-    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> { self.id.member(user_id) }
+    pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
+        self.id.member(&context, user_id)
+    }
 
     /// Gets a list of the guild's members.
     ///
@@ -380,7 +384,7 @@ impl PartialGuild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
+    pub fn shard_id(&self, context: &Context) -> u64 { self.id.shard_id(&context.cache) }
 
     /// Returns the Id of the shard associated with the guild.
     ///

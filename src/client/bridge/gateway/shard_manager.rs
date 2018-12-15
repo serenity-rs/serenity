@@ -26,6 +26,10 @@ use typemap::ShareMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -151,6 +155,8 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: Arc::clone(opt.voice_manager),
             ws_url: Arc::clone(opt.ws_url),
+            #[cfg(feature = "cache")]
+            cache: Arc::clone(opt.cache),
         };
 
         thread::spawn(move || {
@@ -362,4 +368,6 @@ pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
     #[cfg(feature = "voice")]
     pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
     pub ws_url: &'a Arc<Mutex<String>>,
+    #[cfg(feature = "cache")]
+    pub cache: &'a Arc<RwLock<Cache>>,
 }

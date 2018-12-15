@@ -15,7 +15,11 @@ use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{CACHE, http};
+use crate::{cache::Cache, http};
+#[cfg(all(feature = "cache", feature = "model"))]
+use parking_lot::RwLock;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::sync::Arc;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -52,7 +56,7 @@ impl Emoji {
     ///
     /// **Note**: Only user accounts may use this method.
     ///
-    /// [Manage Emojis]: 
+    /// [Manage Emojis]:
     /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     ///
     /// # Examples
@@ -79,8 +83,8 @@ impl Emoji {
     /// }
     /// ```
     #[cfg(feature = "cache")]
-    pub fn delete(&self) -> Result<()> {
-        match self.find_guild_id() {
+    pub fn delete(&self, cache: &Arc<RwLock<Cache>>) -> Result<()> {
+        match self.find_guild_id(&cache) {
             Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
@@ -116,8 +120,8 @@ impl Emoji {
     /// assert_eq!(emoji.name, "blobuwu");
     /// ```
     #[cfg(feature = "cache")]
-    pub fn edit(&mut self, name: &str) -> Result<()> {
-        match self.find_guild_id() {
+    pub fn edit(&mut self, cache: &Arc<RwLock<Cache>>, name: &str) -> Result<()> {
+        match self.find_guild_id(&cache) {
             Some(guild_id) => {
                 let map = json!({
                     "name": name,
@@ -163,8 +167,8 @@ impl Emoji {
     /// }
     /// ```
     #[cfg(feature = "cache")]
-    pub fn find_guild_id(&self) -> Option<GuildId> {
-        for guild in CACHE.read().guilds.values() {
+    pub fn find_guild_id(&self, cache: &Arc<RwLock<Cache>>) -> Option<GuildId> {
+        for guild in cache.read().guilds.values() {
             let guild = guild.read();
 
             if guild.emojis.contains_key(&self.id) {

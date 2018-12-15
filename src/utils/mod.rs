@@ -38,7 +38,7 @@ use std::{
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
-use crate::CACHE;
+use std::sync::Arc;
 
 /// Converts a HashMap into a final `serde_json::Map` representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
@@ -467,9 +467,9 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 /// assert_eq!(1234, utils::with_cache(|cache| cache.user.id));
 /// ```
 #[cfg(feature = "cache")]
-pub fn with_cache<T, F>(f: F) -> T
+pub fn with_cache<T, F>(cache: &Arc<RwLock<Cache>>, f: F) -> T
     where F: Fn(&Cache) -> T {
-    let cache = CACHE.read();
+    let cache = cache.read();
     f(&cache)
 }
 
@@ -488,9 +488,9 @@ pub fn with_cache<T, F>(f: F) -> T
 ///
 /// [`with_cache`]: #fn.with_cache
 #[cfg(feature = "cache")]
-pub fn with_cache_mut<T, F>(mut f: F) -> T
+pub fn with_cache_mut<T, F>(cache: &Arc<RwLock<Cache>>, mut f: F) -> T
     where F: FnMut(&mut Cache) -> T {
-    let mut cache = CACHE.write();
+    let mut cache = cache.write();
     f(&mut cache)
 }
 
@@ -609,7 +609,7 @@ impl Default for ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_roles(cache: &RwLock<Cache>, s: &mut String) {
+fn clean_roles(cache: &Arc<RwLock<Cache>>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@&") {
@@ -782,15 +782,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(s: &str, options: &ContentSafeOptions) -> String {
-    let cache = &CACHE;
-
-    _content_safe(&cache, s, options)
-}
-
-
-#[cfg(feature = "cache")]
-fn _content_safe(cache: &RwLock<Cache>, s: &str, options: &ContentSafeOptions) -> String {
+pub fn content_safe(cache: &Arc<RwLock<Cache>>, s: &str, options: &ContentSafeOptions) -> String {
     let mut s = s.to_string();
 
     if options.clean_role {
@@ -944,7 +936,7 @@ mod test {
             slow_mode_rate: 0,
         };
 
-        let cache = RwLock::new(Cache::default());
+        let cache = Arc::new(RwLock::new(Cache::default()));
 
         {
             let mut cache = cache.try_write().unwrap();
@@ -969,31 +961,31 @@ mod test {
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, _content_safe(&cache, with_user_metions, &options));
+        assert_eq!(without_user_mentions, content_safe(&cache, with_user_metions, &options));
 
         let options = ContentSafeOptions::default();
         assert_eq!(format!("@{}#{:04}", user.name, user.discriminator),
-            _content_safe(&cache, "<@!100000000000000000>", &options));
+            content_safe(&cache, "<@!100000000000000000>", &options));
 
         let options = ContentSafeOptions::default();
         assert_eq!(format!("@{}#{:04}", user.name, user.discriminator),
-            _content_safe(&cache, "<@100000000000000000>", &options));
+            content_safe(&cache, "<@100000000000000000>", &options));
 
         let options = options.show_discriminator(false);
         assert_eq!(format!("@{}", user.name),
-            _content_safe(&cache, "<@!100000000000000000>", &options));
+            content_safe(&cache, "<@!100000000000000000>", &options));
 
         let options = options.show_discriminator(false);
         assert_eq!(format!("@{}", user.name),
-            _content_safe(&cache, "<@100000000000000000>", &options));
+            content_safe(&cache, "<@100000000000000000>", &options));
 
         let options = options.display_as_member_from(guild.id);
         assert_eq!(format!("@{}", member.nick.unwrap()),
-            _content_safe(&cache, "<@!100000000000000000>", &options));
+            content_safe(&cache, "<@!100000000000000000>", &options));
 
         let options = options.clean_user(false);
         assert_eq!(with_user_metions,
-            _content_safe(&cache, with_user_metions, &options));
+            content_safe(&cache, with_user_metions, &options));
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \
@@ -1005,11 +997,11 @@ mod test {
         #deleted-channel";
 
         assert_eq!(without_channel_mentions,
-            _content_safe(&cache, with_channel_mentions, &options));
+            content_safe(&cache, with_channel_mentions, &options));
 
         let options = options.clean_channel(false);
         assert_eq!(with_channel_mentions,
-            _content_safe(&cache, with_channel_mentions, &options));
+            content_safe(&cache, with_channel_mentions, &options));
 
         // Role mentions
         let with_role_mentions = "<@&> @deleted-role <@&9829> \
@@ -1019,11 +1011,11 @@ mod test {
         @ferris-club-member @deleted-role";
 
         assert_eq!(without_role_mentions,
-            _content_safe(&cache, with_role_mentions, &options));
+            content_safe(&cache, with_role_mentions, &options));
 
         let options = options.clean_role(false);
         assert_eq!(with_role_mentions,
-            _content_safe(&cache, with_role_mentions, &options));
+            content_safe(&cache, with_role_mentions, &options));
 
         // Everyone mentions
         let with_everyone_mention = "@everyone";
@@ -1031,11 +1023,11 @@ mod test {
         let without_everyone_mention = "@\u{200B}everyone";
 
         assert_eq!(without_everyone_mention,
-            _content_safe(&cache, with_everyone_mention, &options));
+            content_safe(&cache, with_everyone_mention, &options));
 
         let options = options.clean_everyone(false);
         assert_eq!(with_everyone_mention,
-            _content_safe(&cache, with_everyone_mention, &options));
+            content_safe(&cache, with_everyone_mention, &options));
 
         // Here mentions
         let with_here_mention = "@here";
@@ -1043,10 +1035,10 @@ mod test {
         let without_here_mention = "@\u{200B}here";
 
         assert_eq!(without_here_mention,
-            _content_safe(&cache, with_here_mention, &options));
+            content_safe(&cache, with_here_mention, &options));
 
         let options = options.clean_here(false);
         assert_eq!(with_here_mention,
-            _content_safe(&cache, with_here_mention, &options));
+            content_safe(&cache, with_here_mention, &options));
     }
 }

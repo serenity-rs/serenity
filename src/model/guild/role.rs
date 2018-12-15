@@ -6,10 +6,10 @@ use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{CACHE, Cache, http};
+use crate::{cache::Cache, http};
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use std::str::FromStr;
+use crate::cache::FromStrAndCache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::RoleParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -75,7 +75,9 @@ impl Role {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn delete(&self) -> Result<()> { http::delete_role(self.find_guild()?.0, self.id.0) }
+    pub fn delete(&self, cache: &Arc<RwLock<Cache>>) -> Result<()> {
+        http::delete_role(self.find_guild(&cache)?.0, self.id.0)
+    }
 
     /// Edits a [`Role`], optionally setting its new fields.
     ///
@@ -100,8 +102,8 @@ impl Role {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "builder", feature = "cache"))]
-    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, f: F) -> Result<Role> {
-        self.find_guild()
+    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, cache: &Arc<RwLock<Cache>>, f: F) -> Result<Role> {
+        self.find_guild(&cache)
             .and_then(|guild_id| guild_id.edit_role(self.id, f))
     }
 
@@ -114,8 +116,8 @@ impl Role {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
-    pub fn find_guild(&self) -> Result<GuildId> {
-        for guild in CACHE.read().guilds.values() {
+    pub fn find_guild(&self, cache: &Arc<RwLock<Cache>>) -> Result<GuildId> {
+        for guild in cache.read().guilds.values() {
             let guild = guild.read();
 
             if guild.roles.contains_key(&RoleId(self.id.0)) {
@@ -178,12 +180,12 @@ impl RoleId {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
-    pub fn to_role_cached(self) -> Option<Role> {
-        self._to_role_cached(&CACHE)
+    pub fn to_role_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Role> {
+        self._to_role_cached(&cache)
     }
 
     #[cfg(feature = "cache")]
-    pub(crate) fn _to_role_cached(self, cache: &RwLock<Cache>) -> Option<Role> {
+    pub(crate) fn _to_role_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Role> {
         for guild in cache.read().guilds.values() {
             let guild = guild.read();
 
@@ -211,12 +213,12 @@ impl<'a> From<&'a Role> for RoleId {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl FromStr for Role {
+impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+    fn from_str(cache: &Arc<RwLock<Cache>>, s: &str) -> StdResult<Self, Self::Err> {
         match parse_role(s) {
-            Some(x) => match RoleId(x).to_role_cached() {
+            Some(x) => match RoleId(x).to_role_cached(&cache) {
                 Some(role) => Ok(role),
                 _ => Err(RoleParseError::NotPresentInCache),
             },

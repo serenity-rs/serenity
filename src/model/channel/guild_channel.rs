@@ -1,8 +1,14 @@
 use chrono::{DateTime, FixedOffset};
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
+#[cfg(feature = "cache")]
+use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInvite,
@@ -119,16 +125,17 @@ impl GuildChannel {
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
     #[cfg(feature = "utils")]
-    pub fn create_invite<F>(&self, f: F) -> Result<RichInvite>
+    pub fn create_invite<F>(&self, context: &Context, f: F) -> Result<RichInvite>
         where F: FnOnce(&mut CreateInvite) -> &mut CreateInvite {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CREATE_INVITE;
 
-            if !utils::user_has_perms(self.id, req)? {
+            if !utils::user_has_perms(&context.cache, self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
+
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
@@ -247,12 +254,15 @@ impl GuildChannel {
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
-    pub fn delete(&self) -> Result<Channel> {
+    ///
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
+    /// owning the required permissions the HTTP-request will be issued.
+    pub fn delete(&self, context: &Context) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
+            if !utils::user_has_perms(&context.cache, self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -322,13 +332,13 @@ impl GuildChannel {
     /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(feature = "utils")]
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
+            if !utils::user_has_perms(&context.cache, self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -380,7 +390,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self.guild_id) }
+    pub fn guild(&self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<Guild>>> { cache.read().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -526,13 +536,13 @@ impl GuildChannel {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn permissions_for<U: Into<UserId>>(&self, user_id: U) -> Result<Permissions> {
-        self._permissions_for(user_id.into())
+    pub fn permissions_for<U: Into<UserId>>(&self, cache: &Arc<RwLock<Cache>>, user_id: U) -> Result<Permissions> {
+        self._permissions_for(&cache, user_id.into())
     }
 
     #[cfg(feature = "cache")]
-    fn _permissions_for(&self, user_id: UserId) -> Result<Permissions> {
-        self.guild()
+    fn _permissions_for(&self, cache: &Arc<RwLock<Cache>>, user_id: UserId) -> Result<Permissions> {
+        self.guild(&cache)
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
             .map(|g| g.read().permissions_in(self.id, user_id))
     }
@@ -628,13 +638,13 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    pub fn send_message<F>(&self, f: F) -> Result<Message>
+    pub fn send_message<F>(&self, context: &Context, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::SEND_MESSAGES;
 
-            if !utils::user_has_perms(self.id, req)? {
+            if !utils::user_has_perms(&context.cache, self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }

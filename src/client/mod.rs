@@ -37,7 +37,9 @@ pub use crate::gateway;
 pub use crate::http as rest;
 
 #[cfg(feature = "cache")]
-pub use crate::CACHE;
+pub use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 
 use crate::http;
 use crate::internal::prelude::*;
@@ -295,6 +297,8 @@ pub struct Client {
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
     pub ws_uri: Arc<Mutex<String>>,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<RwLock<Cache>>,
 }
 
 impl Client {
@@ -354,6 +358,9 @@ impl Client {
             UserId(0),
         )));
 
+        #[cfg(feature = "cache")]
+        let cache = Arc::new(RwLock::new(Cache::default()));
+
         let (shard_manager, shard_manager_worker) = {
             ShardManager::new(ShardManagerOptions {
                 data: &data,
@@ -368,6 +375,8 @@ impl Client {
                 #[cfg(feature = "voice")]
                 voice_manager: &voice_manager,
                 ws_url: &url,
+                #[cfg(feature = "cache")]
+                cache: &cache,
             })
         };
 
@@ -382,6 +391,8 @@ impl Client {
             threadpool,
             #[cfg(feature = "voice")]
             voice_manager,
+            #[cfg(feature = "cache")]
+            cache,
         })
     }
 

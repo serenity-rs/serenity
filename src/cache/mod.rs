@@ -42,6 +42,7 @@
 //! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
+use std::str::FromStr;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
 use std::collections::{
@@ -63,6 +64,35 @@ pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
 
 type MessageCache = HashMap<ChannelId, HashMap<MessageId, Message>>;
+
+pub trait FromStrAndCache: Sized {
+    type Err;
+
+    fn from_str(cache: &Arc<RwLock<Cache>>, s: &str) -> Result<Self, Self::Err>;
+}
+
+pub trait StrExt: Sized {
+    fn parse_cached<F: FromStrAndCache>(&self, cache: &Arc<RwLock<Cache>>) -> Result<F, F::Err>;
+}
+
+impl<'a> StrExt for &'a str {
+    fn parse_cached<F: FromStrAndCache>(&self, cache: &Arc<RwLock<Cache>>) -> Result<F, F::Err> {
+        F::from_str(&cache, &self)
+    }
+}
+
+impl<F: FromStr> FromStrAndCache for F {
+    type Err = F::Err;
+
+    fn from_str(_cache: &Arc<RwLock<Cache>>, s: &str) -> Result<Self, Self::Err> {
+        s.parse::<F>()
+    }
+}
+
+pub struct CacheAndHttp {
+    #[cfg(feature = "cache")]
+    pub cache: Arc<RwLock<Cache>>,
+}
 
 /// A cache of all events received over a [`Shard`], where storing at least
 /// some data from the event is possible.

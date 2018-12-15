@@ -20,22 +20,29 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
-use crate::internal::RwLockExt;
-use crate::model::prelude::*;
+use crate::{internal::RwLockExt, model::prelude::*};
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use super::utils::deserialize_u64;
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use std::str::FromStr;
+use crate::cache::FromStrAndCache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::ChannelParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use std::sync::Arc;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -221,24 +228,27 @@ impl Channel {
 
     /// Deletes the inner channel.
     ///
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
+    /// owning the required permissions the HTTP-request will be issued.
+    ///
     /// **Note**: There is no real function as _deleting_ a [`Group`]. The
     /// closest functionality is leaving it.
     ///
     /// [`Group`]: struct.Group.html
     #[cfg(feature = "model")]
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self, context: &Context) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
                 let _ = group.read().leave()?;
             },
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.read().delete()?;
+                let _ = public_channel.read().delete(&context)?;
             },
             Channel::Private(ref private_channel) => {
                 let _ = private_channel.read().delete()?;
             },
             Channel::Category(ref category) => {
-                category.read().delete()?;
+                category.read().delete(&context)?;
             },
         }
 
@@ -564,12 +574,12 @@ mod test {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-impl FromStr for Channel {
+impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
+    fn from_str(cache: &Arc<RwLock<Cache>>, s: &str) -> StdResult<Self, Self::Err> {
         match parse_channel(s) {
-            Some(x) => match ChannelId(x).to_channel_cached() {
+            Some(x) => match ChannelId(x).to_channel_cached(&cache) {
                 Some(channel) => Ok(channel),
                 _ => Err(ChannelParseError::NotPresentInCache),
             },

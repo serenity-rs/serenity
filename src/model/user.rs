@@ -4,11 +4,10 @@ use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
-use crate::internal::prelude::*;
-use crate::model::misc::Mentionable;
+use crate::{internal::prelude::*, model::misc::Mentionable};
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
@@ -21,6 +20,8 @@ use parking_lot::RwLock;
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
@@ -483,7 +484,7 @@ impl User {
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(clippy::let_and_return)]
     #[cfg(feature = "builder")]
-    pub fn direct_message<F>(&self, f: F) -> Result<Message>
+    pub fn direct_message<F>(&self, context: &Context, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
@@ -492,7 +493,7 @@ impl User {
         let private_channel_id = feature_cache! {
             {
                 let finding = {
-                    let cache = CACHE.read();
+                    let cache = context.cache.read();
 
                     let finding = cache.private_channels
                         .values()
@@ -545,9 +546,9 @@ impl User {
     /// [direct_message]: #method.direct_message
     #[cfg(feature = "builder")]
     #[inline]
-    pub fn dm<F>(&self, f: F) -> Result<Message>
+    pub fn dm<F>(&self, context: &Context, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
-        self.direct_message(f)
+        self.direct_message(&context, f)
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default
@@ -585,17 +586,17 @@ impl User {
     /// [`Role`]: ../guild/struct.Role.html
     /// [`Cache`]: ../../cache/struct.Cache.html
     // no-cache would warn on guild_id.
-    pub fn has_role<G, R>(&self, guild: G, role: R) -> bool
+    pub fn has_role<G, R>(&self, context: &Context, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
-        self._has_role(guild.into(), role.into())
+        self._has_role(&context, guild.into(), role.into())
     }
 
-    fn _has_role(&self, guild: GuildContainer, role: RoleId) -> bool {
+    fn _has_role(&self, context: &Context, guild: GuildContainer, role: RoleId) -> bool {
         match guild {
             GuildContainer::Guild(guild) => guild.roles.contains_key(&role),
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
-                    CACHE.read()
+                    context.cache.read()
                         .guilds
                         .get(&_guild_id)
                         .map(|g| {
@@ -665,8 +666,8 @@ impl User {
     ///
     /// println!("{:?}", client.start());
     /// ```
-    pub fn refresh(&mut self) -> Result<()> {
-        self.id.to_user().map(|replacement| {
+    pub fn refresh_cached(&mut self, context: &Context) -> Result<()> {
+        self.id.to_user(&context).map(|replacement| {
             mem::replace(self, replacement);
 
             ()
@@ -722,15 +723,15 @@ impl User {
     ///
     /// If none is used, it returns `None`.
     #[inline]
-    pub fn nick_in<G>(&self, guild_id: G) -> Option<String>
+    pub fn nick_in<G>(&self, context: &Context, guild_id: G) -> Option<String>
     where G: Into<GuildId> {
-        self._nick_in(guild_id.into())
+        self._nick_in(&context, guild_id.into())
     }
 
-    fn _nick_in(&self, guild_id: GuildId) -> Option<String> {
+    fn _nick_in(&self, context: &Context, guild_id: GuildId) -> Option<String> {
         #[cfg(feature = "cache")]
         {
-            guild_id.to_guild_cached().and_then(|guild| {
+            guild_id.to_guild_cached(&context.cache).and_then(|guild| {
                 guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
             })
         }
@@ -769,7 +770,7 @@ impl UserId {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_user_cached(self) -> Option<Arc<RwLock<User>>> { CACHE.read().user(self) }
+    pub fn to_user_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<User>>> { cache.read().user(self) }
 
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.
@@ -779,10 +780,10 @@ impl UserId {
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
-    pub fn to_user(self) -> Result<User> {
+    pub fn to_user(self, context: &Context) -> Result<User> {
         #[cfg(feature = "cache")]
         {
-            if let Some(user) = CACHE.read().user(self) {
+            if let Some(user) = context.cache.read().user(self) {
                 return Ok(user.read().clone());
             }
         }

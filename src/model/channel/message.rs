@@ -1,13 +1,19 @@
 //! Models relating to Discord channels.
 
 use chrono::{DateTime, FixedOffset};
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 use serde_json::Value;
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+use crate::cache::Cache;
+#[cfg(all(feature = "cache", feature = "model"))]
+use parking_lot::RwLock;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::sync::Arc;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
@@ -120,12 +126,12 @@ impl Message {
     /// ```
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn channel(&self) -> Option<Channel> { CACHE.read().channel(self.channel_id) }
+    pub fn channel(&self, cache: &Arc<RwLock<Cache>>) -> Option<Channel> { cache.read().channel(self.channel_id) }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn is_own(&self) -> bool { self.author.id == CACHE.read().user.id }
+    pub fn is_own(&self, cache: &Arc<RwLock<Cache>>) -> bool { self.author.id == cache.read().user.id }
 
     /// Deletes the message.
     ///
@@ -141,12 +147,12 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_MESSAGES;
-            let is_author = self.author.id == CACHE.read().user.id;
-            let has_perms = utils::user_has_perms(self.channel_id, req)?;
+            let is_author = self.author.id == context.cache.read().user.id;
+            let has_perms = utils::user_has_perms(&context.cache, self.channel_id, req)?;
 
             if !is_author && !has_perms {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -169,12 +175,12 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    pub fn delete_reactions(&self) -> Result<()> {
+    pub fn delete_reactions(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_MESSAGES;
 
-            if !utils::user_has_perms(self.channel_id, req)? {
+            if !utils::user_has_perms(&context.cache, self.channel_id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -214,11 +220,11 @@ impl Message {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(&mut EditMessage) -> &mut EditMessage {
         #[cfg(feature = "cache")]
         {
-            if self.author.id != CACHE.read().user.id {
+            if self.author.id != context.cache.read().user.id {
                 return Err(Error::Model(ModelError::InvalidUser));
             }
         }
@@ -276,7 +282,7 @@ impl Message {
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
-    pub fn content_safe(&self) -> String {
+    pub fn content_safe(&self, cache: &Arc<RwLock<Cache>>) -> String {
         let mut result = self.content.clone();
 
         // First replace all user mentions.
@@ -293,7 +299,7 @@ impl Message {
         for id in &self.mention_roles {
             let mention = id.mention();
 
-            if let Some(role) = id.to_role_cached() {
+            if let Some(role) = id.to_role_cached(&cache) {
                 result = result.replace(&mention, &format!("@{}", role.name));
             } else {
                 result = result.replace(&mention, "@deleted-role");
@@ -342,8 +348,8 @@ impl Message {
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
-    pub fn guild(&self) -> Option<Arc<RwLock<Guild>>> {
-        CACHE.read().guild(self.guild_id?)
+    pub fn guild(&self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<Guild>>> {
+        cache.read().guild(self.guild_id?)
     }
 
     /// True if message was sent using direct messages.
@@ -360,8 +366,8 @@ impl Message {
     ///
     /// [`Guild::members`]: ../guild/struct.Guild.html#structfield.members
     #[cfg(feature = "cache")]
-    pub fn member(&self) -> Option<Member> {
-        self.guild().and_then(|g| g.read().members.get(&self.author.id).cloned())
+    pub fn member(&self, cache: &Arc<RwLock<Cache>>) -> Option<Member> {
+        self.guild(&cache).and_then(|g| g.read().members.get(&self.author.id).cloned())
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
@@ -395,13 +401,13 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES.html
-    pub fn pin(&self) -> Result<()> {
+    pub fn pin(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if self.guild_id.is_some() {
                 let req = Permissions::MANAGE_MESSAGES;
 
-                if !utils::user_has_perms(self.channel_id, req)? {
+                if !utils::user_has_perms(&context.cache, self.channel_id, req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -426,17 +432,17 @@ impl Message {
     /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     /// [permissions]: ../permissions/index.html
     #[inline]
-    pub fn react<R: Into<ReactionType>>(&self, reaction_type: R) -> Result<()> {
-        self._react(&reaction_type.into())
+    pub fn react<R: Into<ReactionType>>(&self, context: &Context, reaction_type: R) -> Result<()> {
+        self._react(&context, &reaction_type.into())
     }
 
-    fn _react(&self, reaction_type: &ReactionType) -> Result<()> {
+    fn _react(&self, context: &Context, reaction_type: &ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if self.guild_id.is_some() {
                 let req = Permissions::ADD_REACTIONS;
 
-                if !utils::user_has_perms(self.channel_id, req)? {
+                if !utils::user_has_perms(&context.cache, self.channel_id, req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -467,7 +473,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    pub fn reply(&self, content: &str) -> Result<Message> {
+    pub fn reply(&self, context: &Context, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
         }
@@ -477,7 +483,7 @@ impl Message {
             if self.guild_id.is_some() {
                 let req = Permissions::SEND_MESSAGES;
 
-                if !utils::user_has_perms(self.channel_id, req)? {
+                if !utils::user_has_perms(&context.cache, self.channel_id, req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -526,13 +532,13 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    pub fn unpin(&self) -> Result<()> {
+    pub fn unpin(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if self.guild_id.is_some() {
                 let req = Permissions::MANAGE_MESSAGES;
 
-                if !utils::user_has_perms(self.channel_id, req)? {
+                if !utils::user_has_perms(&context.cache, self.channel_id, req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -546,8 +552,8 @@ impl Message {
     /// **Note**:
     /// If message was sent in a private channel, then the function will return
     /// `None`.
-    pub fn author_nick(&self) -> Option<String> {
-        self.guild_id.as_ref().and_then(|guild_id| self.author.nick_in(*guild_id))
+    pub fn author_nick(&self, context: &Context) -> Option<String> {
+        self.guild_id.as_ref().and_then(|guild_id| self.author.nick_in(&context, *guild_id))
     }
 
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {

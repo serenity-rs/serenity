@@ -31,6 +31,12 @@ use typemap::ShareMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use crate::cache::CacheAndHttp;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -49,6 +55,8 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    #[cfg(feature = "cache")]
+    cache: Arc<RwLock<Cache>>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
@@ -68,6 +76,8 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
+            #[cfg(feature = "cache")]
+            cache: opt.cache,
         }
     }
 
@@ -212,6 +222,10 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             &self.runner_tx,
             &self.threadpool,
             self.shard.shard_info()[0],
+            CacheAndHttp {
+                #[cfg(feature = "cache")]
+                cache: Arc::clone(&self.cache),
+            },
         );
     }
 
@@ -493,4 +507,6 @@ pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
     pub threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    #[cfg(feature = "cache")]
+    pub cache: Arc<RwLock<Cache>>,
 }
