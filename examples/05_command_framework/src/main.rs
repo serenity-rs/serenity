@@ -261,7 +261,7 @@ command!(commands(ctx, msg, _args) {
 // Repeats what the user passed as argument but ensures that user and role
 // mentions are replaced with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
-command!(say(_ctx, msg, args) {
+command!(say(ctx, msg, args) {
     let mut settings = if let Some(guild_id) = msg.guild_id {
        // By default roles, users, and channel mentions are cleaned.
        ContentSafeOptions::default()
@@ -277,7 +277,7 @@ command!(say(_ctx, msg, args) {
             .clean_role(false)
     };
 
-    let mut content = content_safe(&args.full(), &settings);
+    let mut content = content_safe(&ctx.cache, &args.full(), &settings);
 
     if let Err(why) = msg.channel_id.say(&content) {
         println!("Error sending message: {:?}", why);
@@ -298,10 +298,10 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
 //
 // This check analyses whether a guild member permissions has
 // administrator-permissions.
-fn admin_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
-    if let Some(member) = msg.member() {
+fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
+    if let Some(member) = msg.member(&ctx.cache) {
 
-        if let Ok(permissions) = member.permissions() {
+        if let Ok(permissions) = member.permissions(&ctx.cache) {
             return permissions.administrator();
         }
     }
@@ -315,10 +315,10 @@ command!(some_long_command(_ctx, msg, args) {
     }
 });
 
-command!(about_role(_ctx, msg, args) {
+command!(about_role(ctx, msg, args) {
     let potential_role_name = args.full();
 
-    if let Some(guild) = msg.guild() {
+    if let Some(guild) = msg.guild(&ctx.cache) {
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
         if let Some(role) = guild.read().role_by_name(&potential_role_name) {
@@ -330,8 +330,7 @@ command!(about_role(_ctx, msg, args) {
         }
     }
 
-    if let Err(why) = msg.channel_id.say(
-                      &format!("Could not find role named: {:?}", potential_role_name)) {
+    if let Err(why) = msg.channel_id.say(&format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -381,7 +380,7 @@ command!(latency(ctx, msg, _args) {
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
         None => {
-            let _ = msg.reply("There was a problem getting the shard manager");
+            let _ = msg.reply(&ctx, "There was a problem getting the shard manager");
 
             return Ok(());
         },
@@ -396,13 +395,13 @@ command!(latency(ctx, msg, _args) {
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
-            let _ = msg.reply("No shard found");
+            let _ = msg.reply(&ctx,  "No shard found");
 
             return Ok(());
         },
     };
 
-    let _ = msg.reply(&format!("The shard latency is {:?}", runner.latency));
+    let _ = msg.reply(&ctx,  &format!("The shard latency is {:?}", runner.latency));
 });
 
 command!(ping(_ctx, msg, _args) {
@@ -441,7 +440,7 @@ command!(bird(_ctx, msg, args) {
     }
 });
 
-command!(slow_mode(_ctx, msg, args) {
+command!(slow_mode(ctx, msg, args) {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
 
         if let Err(why) = msg.channel_id.edit(|c| c.slow_mode_rate(slow_mode_rate_seconds)) {
@@ -451,7 +450,7 @@ command!(slow_mode(_ctx, msg, args) {
         } else {
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
-    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached() {
+    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
         format!("Current slow mode rate is `{}` seconds.", channel.read().slow_mode_rate)
     } else {
         "Failed to find channel in cache.".to_string()
