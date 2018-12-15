@@ -88,7 +88,7 @@ default = [
     "utils"
 ]
 builder = ["utils"]
-cache = ["lazy_static"]
+cache = []
 client = [
     "gateway",
     "http",
