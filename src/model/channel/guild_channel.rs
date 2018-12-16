@@ -160,10 +160,15 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::{ChannelId, UserId};
-    /// # use std::error::Error;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # use serenity::{cache::Cache, model::id::{ChannelId, UserId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::{error::Error, sync::Arc};
+    /// #
+    /// # fn main() -> Result<(), Box<Error>> {
+    /// #     let cache = Arc::new(RwLock::new(Cache::default()));
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -171,8 +176,6 @@ impl GuildChannel {
     ///     PermissionOverwriteType,
     /// };
     /// use serenity::model::{ModelError, Permissions};
-    /// use serenity::CACHE;
-    ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
     /// let overwrite = PermissionOverwrite {
@@ -180,18 +183,14 @@ impl GuildChannel {
     ///     deny: deny,
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
-    ///
-    /// let cache = CACHE.read();
+    /// # let cache = cache.read();
+    /// // assuming the cache has been unlocked
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
     /// channel.read().create_permission(&overwrite)?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
+    /// # Ok(())
     /// # }
     /// ```
     ///
@@ -201,18 +200,22 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::{ChannelId, UserId};
-    /// # use std::error::Error;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    ///
+    /// # use serenity::{cache::Cache, model::id::{ChannelId, UserId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
+    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
     /// };
     /// use serenity::model::{ModelError, Permissions};
-    /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
@@ -222,7 +225,7 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read();
+    /// let cache = cache.read();
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
@@ -453,16 +456,14 @@ impl GuildChannel {
     /// use serenity::model::prelude::*;
     /// struct Handler;
     ///
-    /// use serenity::CACHE;
-    ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
+    ///     fn message(&self, context: Context, msg: Message) {
+    ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let permissions = channel.read().permissions_for(&msg.author).unwrap();
+    ///         let permissions = channel.read().permissions_for(&context.cache, &msg.author).unwrap();
     ///
     ///         println!("The user's permissions: {:?}", permissions);
     ///     }
@@ -477,7 +478,6 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::CACHE;
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
     /// use std::fs::File;
@@ -485,15 +485,15 @@ impl GuildChannel {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, mut msg: Message) {
-    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
+    ///     fn message(&self, context: Context, mut msg: Message) {
+    ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = CACHE.read().user.id;
+    ///         let current_user_id = context.cache.read().user.id;
     ///         let permissions =
-    ///             channel.read().permissions_for(current_user_id).unwrap();
+    ///             channel.read().permissions_for(&context.cache, current_user_id).unwrap();
     ///
     ///         if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///             return;

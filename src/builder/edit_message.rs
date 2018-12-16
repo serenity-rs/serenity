@@ -10,13 +10,14 @@ use crate::utils::{self, VecMap};
 /// Editing the content of a [`Message`] to `"hello"`:
 ///
 /// ```rust,no_run
-/// # use serenity::model::id::{ChannelId, MessageId};
+/// # use serenity::{command, model::id::{ChannelId, MessageId}};
 /// #
+/// # command!(example(context) {
 /// # let mut message = ChannelId(7).message(MessageId(8)).unwrap();
-/// #
-/// let _ = message.edit(|m| {
+/// let _ = message.edit(&context, |m| {
 ///     m.content("hello")
 /// });
+/// # });
 /// ```
 ///
 /// [`Message`]: ../model/channel/struct.Message.html

@@ -769,13 +769,21 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 /// Sanitise an `@everyone` mention.
 ///
 /// ```rust
+/// # extern crate serenity;
+/// # extern crate parking_lot;
+/// #
+/// # use std::sync::Arc;
+/// # use serenity::client::Cache;
+/// # use parking_lot::RwLock;
+/// #
+/// # let cache = Arc::new(RwLock::new(Cache::default()));
 /// use serenity::utils::{
 ///     content_safe,
 ///     ContentSafeOptions,
 /// };
 ///
 /// let with_mention = "@everyone";
-/// let without_mention = content_safe(&with_mention, &ContentSafeOptions::default());
+/// let without_mention = content_safe(&cache, &with_mention, &ContentSafeOptions::default());
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
 /// ```

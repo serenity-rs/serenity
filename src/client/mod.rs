@@ -32,6 +32,8 @@ pub use self::{
     event_handler::EventHandler
 };
 
+pub use crate::cache::CacheAndHttp;
+
 // Note: the following re-exports are here for backwards compatibility
 pub use crate::gateway;
 pub use crate::http as rest;
@@ -45,7 +47,7 @@ use crate::http;
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
-use std::sync::Arc;
+use std::{sync::Arc, time::Duration};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 
@@ -297,8 +299,7 @@ pub struct Client {
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
     pub ws_uri: Arc<Mutex<String>>,
-    #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
+    pub cache_and_http: Arc<CacheAndHttp>,
 }
 
 impl Client {
@@ -358,8 +359,12 @@ impl Client {
             UserId(0),
         )));
 
-        #[cfg(feature = "cache")]
-        let cache = Arc::new(RwLock::new(Cache::default()));
+        let cache_and_http = Arc::new(CacheAndHttp {
+            #[cfg(feature = "cache")]
+            cache: Arc::new(RwLock::new(Cache::default())),
+            #[cfg(feature = "cache")]
+            update_cache_timeout: None,
+        });
 
         let (shard_manager, shard_manager_worker) = {
             ShardManager::new(ShardManagerOptions {
@@ -375,8 +380,7 @@ impl Client {
                 #[cfg(feature = "voice")]
                 voice_manager: &voice_manager,
                 ws_url: &url,
-                #[cfg(feature = "cache")]
-                cache: &cache,
+                cache_and_http: &cache_and_http,
             })
         };
 
@@ -391,8 +395,107 @@ impl Client {
             threadpool,
             #[cfg(feature = "voice")]
             voice_manager,
-            #[cfg(feature = "cache")]
-            cache,
+            cache_and_http,
+        })
+    }
+
+    /// Creates a Client for a bot user and sets a cache update timeout.
+    /// If set to some duration, updating the cache will try to claim a
+    /// write-lock for given duration and skip received event but also
+    /// issue a deadlock-warning upon failure.
+    /// If `duration` is set to `None`, updating the cache will try to claim
+    /// a write-lock until success and potentially deadlock.
+    ///
+    /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
+    /// this function will automatically do for you if not already included.
+    ///
+    /// # Examples
+    ///
+    /// Create a Client, using a token from an environment variable:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::EventHandler;
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {}
+    /// # use std::error::Error;
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// use serenity::Client;
+    /// use std::env;
+    ///
+    /// let token = env::var("DISCORD_TOKEN")?;
+    /// let client = Client::new_with_cache_update_timeout(&token, Handler, None)?;
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {
+    /// #    try_main().unwrap();
+    /// # }
+    /// ```
+    #[cfg(feature = "cache")]
+    pub fn new_with_cache_update_timeout<H>(token: &str, handler: H, duration: Option<Duration>) -> Result<Self>
+        where H: EventHandler + Send + Sync + 'static {
+        let token = token.trim();
+
+        let token = if token.starts_with("Bot ") {
+            token.to_string()
+        } else {
+            format!("Bot {}", token)
+        };
+
+        http::set_token(&token);
+        let locked = Arc::new(Mutex::new(token));
+
+        let name = "serenity client".to_owned();
+        let threadpool = ThreadPool::with_name(name, 5);
+        let url = Arc::new(Mutex::new(http::get_gateway()?.url));
+        let data = Arc::new(Mutex::new(ShareMap::custom()));
+        let event_handler = Arc::new(handler);
+
+        #[cfg(feature = "framework")]
+        let framework = Arc::new(Mutex::new(None));
+        #[cfg(feature = "voice")]
+        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
+            0,
+            UserId(0),
+        )));
+
+        let cache_and_http = Arc::new(CacheAndHttp {
+            cache: Arc::new(RwLock::new(Cache::default())),
+            update_cache_timeout: duration,
+        });
+
+        let (shard_manager, shard_manager_worker) = {
+            ShardManager::new(ShardManagerOptions {
+                data: &data,
+                event_handler: &event_handler,
+                #[cfg(feature = "framework")]
+                framework: &framework,
+                shard_index: 0,
+                shard_init: 0,
+                shard_total: 0,
+                threadpool: threadpool.clone(),
+                token: &locked,
+                #[cfg(feature = "voice")]
+                voice_manager: &voice_manager,
+                ws_url: &url,
+                cache_and_http: &cache_and_http,
+            })
+        };
+
+        Ok(Client {
+            token: locked,
+            ws_uri: url,
+            #[cfg(feature = "framework")]
+            framework,
+            data,
+            shard_manager,
+            shard_manager_worker,
+            threadpool,
+            #[cfg(feature = "voice")]
+            voice_manager,
+            cache_and_http,
         })
     }
 

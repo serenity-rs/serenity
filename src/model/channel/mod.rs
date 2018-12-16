@@ -78,13 +78,17 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use self::serenity::model::id::ChannelId;
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).to_channel().unwrap();
+    /// #     let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #     let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.group() {
     ///     Some(group_lock) => {
@@ -120,13 +124,17 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use self::serenity::model::id::ChannelId;
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).to_channel().unwrap();
+    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.guild() {
     ///     Some(guild_lock) => {
@@ -158,13 +166,17 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use self::serenity::model::id::ChannelId;
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// #     let channel = ChannelId(0).to_channel().unwrap();
+    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.private() {
     ///     Some(private_lock) => {
@@ -199,13 +211,17 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use self::serenity::model::id::ChannelId;
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
     /// #
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// # let channel = ChannelId(0).to_channel().unwrap();
+    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.category() {
     ///     Some(category_lock) => {

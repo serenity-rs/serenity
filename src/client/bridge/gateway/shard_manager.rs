@@ -51,14 +51,17 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # use serenity::client::bridge::voice::ClientVoiceManager;
 /// # #[cfg(feature = "voice")]
 /// # use serenity::model::id::UserId;
+/// # #[cfg(feature = "cache")]
+/// # use serenity::cache::Cache;
 /// #
 /// # #[cfg(feature = "framework")]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// #
-/// use parking_lot::Mutex;
+/// use parking_lot::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::EventHandler;
 /// use serenity::http;
+/// use serenity::cache::CacheAndHttp;
 /// use std::sync::Arc;
 /// use std::env;
 /// use threadpool::ThreadPool;
@@ -77,6 +80,12 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// let event_handler = Arc::new(Handler);
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
+/// let cache_and_http = Arc::new(CacheAndHttp {
+///     # #[cfg(feature = "cache")]
+///     cache: Arc::new(RwLock::new(Cache::default())),
+///     # #[cfg(feature = "cache")]
+///     update_cache_timeout: Settings::default(),
+/// });
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
@@ -93,6 +102,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
+///     cache_and_http: &cache_and_http,
 /// });
 /// #     Ok(())
 /// # }

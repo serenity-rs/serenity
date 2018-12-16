@@ -58,8 +58,8 @@
 //!     }
 //! }
 //!
-//! command!(ping(_context, message) {
-//!     let _ = message.reply("Pong!");
+//! command!(ping(context, message) {
+//!     let _ = message.reply(&context, "Pong!");
 //! });
 //! #
 //! # }

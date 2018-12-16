@@ -87,9 +87,9 @@ impl Role {
     ///
     /// Make a role hoisted:
     ///
-    /// ```rust,no_run
+    /// ```rust,ignore
     /// # use serenity::model::id::RoleId;
-    /// # let role = RoleId(7).to_role_cached().unwrap();
+    /// # let role = RoleId(7).to_role_cached(&cache).unwrap();
     /// // assuming a `role` has already been bound
     //
     /// role.edit(|mut r| {

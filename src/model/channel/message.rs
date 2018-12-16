@@ -108,18 +108,18 @@ impl Message {
     ///     .configure(|c| c.prefix("~"))
     ///     .cmd("channelname", channel_name));
     ///
-    /// command!(channel_name(_ctx, msg) {
-    ///     let _ = match msg.channel() {
-    ///         Some(Channel::Category(c)) => msg.reply(&c.read().name),
-    ///         Some(Channel::Group(c)) => msg.reply(&c.read().name()),
-    ///         Some(Channel::Guild(c)) => msg.reply(&c.read().name),
+    /// command!(channel_name(ctx, msg) {
+    ///     let _ = match msg.channel(&ctx.cache) {
+    ///         Some(Channel::Category(c)) => msg.reply(&ctx, &c.read().name),
+    ///         Some(Channel::Group(c)) => msg.reply(&ctx, &c.read().name()),
+    ///         Some(Channel::Guild(c)) => msg.reply(&ctx, &c.read().name),
     ///         Some(Channel::Private(c)) => {
     ///             let channel = c.read();
     ///             let user = channel.recipient.read();
     ///
-    ///             msg.reply(&format!("DM with {}", user.name.clone()))
+    ///             msg.reply(&ctx, &format!("DM with {}", user.name.clone()))
     ///         },
-    ///         None => msg.reply("Unknown"),
+    ///         None => msg.reply(&ctx, "Unknown"),
     ///     };
     /// });
     /// # }

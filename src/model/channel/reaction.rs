@@ -327,19 +327,13 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
-    /// # use std::error::Error;
+    /// # use serenity::{command, model::id::ChannelId};
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let message = ChannelId(0).message(0)?;
+    /// # command!(example(context) {
+    /// #   let message = ChannelId(0).message(0)?;
     /// #
-    /// message.react('🍎')?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// message.react(&context, '🍎')?;
+    /// # });
     /// ```
     fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
 }

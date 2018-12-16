@@ -469,8 +469,6 @@ impl PartialGuild {
     ///
     /// struct Handler;
     ///
-    /// use serenity::CACHE;
-    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
     ///         let guild = msg.guild_id.unwrap().to_partial_guild().unwrap();

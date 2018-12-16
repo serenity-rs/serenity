@@ -882,8 +882,8 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .before(|_, msg, cmd_name| {
-    ///         if let Ok(channel) = msg.channel_id.to_channel() {
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         if let Ok(channel) = msg.channel_id.to_channel(&ctx) {
     ///             //  Don't run unless in nsfw channel
     ///             if !channel.is_nsfw() {
     ///                 return false;

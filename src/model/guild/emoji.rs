@@ -64,8 +64,14 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,
@@ -77,7 +83,7 @@ impl Emoji {
     /// # };
     /// #
     /// // assuming emoji has been set already
-    /// match emoji.delete() {
+    /// match emoji.delete(&cache) {
     ///     Ok(()) => println!("Emoji deleted."),
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
@@ -103,9 +109,9 @@ impl Emoji {
     /// Change the name of an emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # use serenity::{command, model::{guild::Emoji, id::EmojiId}};
     /// #
+    /// # command!(example(context) {
     /// # let mut emoji = Emoji {
     /// #     animated: false,
     /// #     id: EmojiId(7),
@@ -114,10 +120,10 @@ impl Emoji {
     /// #     require_colons: false,
     /// #     roles: vec![],
     /// # };
-    /// #
     /// // assuming emoji has been set already
-    /// let _ = emoji.edit("blobuwu");
+    /// let _ = emoji.edit(&context.cache, "blobuwu");
     /// assert_eq!(emoji.name, "blobuwu");
+    /// # });
     /// ```
     #[cfg(feature = "cache")]
     pub fn edit(&mut self, cache: &Arc<RwLock<Cache>>, name: &str) -> Result<()> {
@@ -149,8 +155,14 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,
@@ -162,7 +174,7 @@ impl Emoji {
     /// # };
     /// #
     /// // assuming emoji has been set already
-    /// if let Some(guild_id) = emoji.find_guild_id() {
+    /// if let Some(guild_id) = emoji.find_guild_id(&cache) {
     ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
     /// ```
@@ -186,8 +198,7 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # use serenity::model::{guild::Emoji, id::EmojiId};
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,
