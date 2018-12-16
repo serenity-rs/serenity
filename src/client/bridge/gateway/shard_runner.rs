@@ -2,7 +2,7 @@ use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
-use crate::cache::CacheAndHttp;
+use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use serde::Deserialize;
 use std::{

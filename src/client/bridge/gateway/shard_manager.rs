@@ -1,6 +1,6 @@
 use crate::gateway::InterMessage;
 use crate::internal::prelude::*;
-use crate::cache::CacheAndHttp;
+use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use std::{
     collections::{HashMap, VecDeque},
@@ -61,7 +61,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::EventHandler;
 /// use serenity::http;
-/// use serenity::cache::CacheAndHttp;
+/// use serenity::CacheAndHttp;
 /// use std::sync::Arc;
 /// use std::env;
 /// use threadpool::ThreadPool;
@@ -84,7 +84,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     # #[cfg(feature = "cache")]
 ///     cache: Arc::new(RwLock::new(Cache::default())),
 ///     # #[cfg(feature = "cache")]
-///     update_cache_timeout: Settings::default(),
+///     update_cache_timeout: None,
 /// });
 ///
 /// ShardManager::new(ShardManagerOptions {

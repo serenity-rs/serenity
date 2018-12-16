@@ -21,7 +21,7 @@ use crate::model::id::GuildId;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
-use crate::cache::CacheAndHttp;
+use crate::CacheAndHttp;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
 

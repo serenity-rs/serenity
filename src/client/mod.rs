@@ -32,7 +32,7 @@ pub use self::{
     event_handler::EventHandler
 };
 
-pub use crate::cache::CacheAndHttp;
+pub use crate::CacheAndHttp;
 
 // Note: the following re-exports are here for backwards compatibility
 pub use crate::gateway;

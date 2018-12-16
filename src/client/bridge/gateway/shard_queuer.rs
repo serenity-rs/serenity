@@ -1,6 +1,6 @@
 use crate::gateway::Shard;
 use crate::internal::prelude::*;
-use crate::cache::CacheAndHttp;
+use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use std::{
     collections::{HashMap, VecDeque},

@@ -187,3 +187,17 @@ pub use crate::error::{Error, Result};
 
 #[cfg(feature = "client")]
 pub use crate::client::Client;
+
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
+#[cfg(feature = "cache")]
+use std::{time::Duration, sync::Arc};
+
+pub struct CacheAndHttp {
+    #[cfg(feature = "cache")]
+    pub cache: Arc<RwLock<Cache>>,
+    #[cfg(feature = "cache")]
+    pub update_cache_timeout: Option<Duration>,
+}

@@ -54,7 +54,6 @@ use std::collections::{
 use std::{
     default::Default,
     sync::Arc,
-    time::Duration,
 };
 
 mod cache_update;
@@ -87,13 +86,6 @@ impl<F: FromStr> FromStrAndCache for F {
     fn from_str(_cache: &Arc<RwLock<Cache>>, s: &str) -> Result<Self, Self::Err> {
         s.parse::<F>()
     }
-}
-
-pub struct CacheAndHttp {
-    #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
-    #[cfg(feature = "cache")]
-    pub update_cache_timeout: Option<Duration>,
 }
 
 /// A cache of all events received over a [`Shard`], where storing at least
