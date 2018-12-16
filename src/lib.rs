@@ -200,4 +200,5 @@ pub struct CacheAndHttp {
     pub cache: Arc<RwLock<Cache>>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
+    __nonexhaustive: (),
 }
