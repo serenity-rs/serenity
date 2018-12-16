@@ -85,6 +85,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     cache: Arc::new(RwLock::new(Cache::default())),
 ///     # #[cfg(feature = "cache")]
 ///     update_cache_timeout: None,
+///     __nonexhaustive: (),
+///
 /// });
 ///
 /// ShardManager::new(ShardManagerOptions {

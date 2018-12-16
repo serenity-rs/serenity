@@ -364,6 +364,7 @@ impl Client {
             cache: Arc::new(RwLock::new(Cache::default())),
             #[cfg(feature = "cache")]
             update_cache_timeout: None,
+            __nonexhaustive: (),
         });
 
         let (shard_manager, shard_manager_worker) = {
@@ -464,6 +465,7 @@ impl Client {
         let cache_and_http = Arc::new(CacheAndHttp {
             cache: Arc::new(RwLock::new(Cache::default())),
             update_cache_timeout: duration,
+            __nonexhaustive: (),
         });
 
         let (shard_manager, shard_manager_worker) = {
