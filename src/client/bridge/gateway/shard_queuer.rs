@@ -1,5 +1,6 @@
 use crate::gateway::Shard;
 use crate::internal::prelude::*;
+use crate::cache::CacheAndHttp;
 use parking_lot::Mutex;
 use std::{
     collections::{HashMap, VecDeque},
@@ -30,10 +31,6 @@ use crate::gateway::ConnectionStage;
 use crate::client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
@@ -89,8 +86,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
     /// A copy of the URI to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
-    #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
+    pub cache_and_http: Arc<CacheAndHttp>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
@@ -194,8 +190,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
             #[cfg(feature = "voice")]
             voice_manager: Arc::clone(&self.voice_manager),
             shard,
-            #[cfg(feature = "cache")]
-            cache: Arc::clone(&self.cache),
+            cache_and_http: Arc::clone(&self.cache_and_http),
         });
 
         let runner_info = ShardRunnerInfo {

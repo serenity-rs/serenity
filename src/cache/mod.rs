@@ -92,6 +92,8 @@ impl<F: FromStr> FromStrAndCache for F {
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<RwLock<Cache>>,
+    #[cfg(feature = "cache")]
+    pub update_cache_timeout: Option<Duration>,
 }
 
 /// A cache of all events received over a [`Shard`], where storing at least

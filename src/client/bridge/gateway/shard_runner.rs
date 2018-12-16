@@ -2,6 +2,7 @@ use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
+use crate::cache::CacheAndHttp;
 use parking_lot::Mutex;
 use serde::Deserialize;
 use std::{
@@ -31,12 +32,7 @@ use typemap::ShareMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use crate::cache::CacheAndHttp;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
+
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -55,8 +51,7 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     voice_manager: Arc<Mutex<ClientVoiceManager>>,
-    #[cfg(feature = "cache")]
-    cache: Arc<RwLock<Cache>>,
+    cache_and_http: Arc<CacheAndHttp>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
@@ -76,8 +71,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
-            #[cfg(feature = "cache")]
-            cache: opt.cache,
+            cache_and_http: opt.cache_and_http,
         }
     }
 
@@ -222,10 +216,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             &self.runner_tx,
             &self.threadpool,
             self.shard.shard_info()[0],
-            CacheAndHttp {
-                #[cfg(feature = "cache")]
-                cache: Arc::clone(&self.cache),
-            },
+            Arc::clone(&self.cache_and_http),
         );
     }
 
@@ -508,5 +499,5 @@ pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
     #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
+    pub cache_and_http: Arc<CacheAndHttp>,
 }

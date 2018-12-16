@@ -30,7 +30,18 @@ macro_rules! update {
         {
             #[cfg(feature = "cache")]
             {
-                $cache_and_http.cache.write().update(&mut $event)
+                if let Some(millis_timeout) = $cache_and_http.update_cache_timeout {
+
+                    if let Some(mut lock) = $cache_and_http.cache.try_write_for(millis_timeout) {
+                        lock.update(&mut $event)
+                    } else {
+                        warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", $event);
+
+                        None
+                    }
+                } else {
+                    $cache_and_http.cache.write().update(&mut $event)
+                }
             }
         }
     }
@@ -70,7 +81,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
-    cache_and_http: CacheAndHttp,
+    cache_and_http: Arc<CacheAndHttp>,
 ) {
     match event {
         DispatchEvent::Model(Event::MessageCreate(mut event)) => {
@@ -113,7 +124,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
-    cache_and_http: CacheAndHttp,
+    cache_and_http: Arc<CacheAndHttp>,
 ) {
     match event {
         DispatchEvent::Model(Event::MessageCreate(mut event)) => {
@@ -160,7 +171,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
-    cache_and_http: CacheAndHttp,
+    cache_and_http: Arc<CacheAndHttp>,
 ) {
     #[cfg(feature = "cache")]
     let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
