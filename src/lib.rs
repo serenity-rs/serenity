@@ -195,6 +195,7 @@ use parking_lot::RwLock;
 #[cfg(feature = "cache")]
 use std::{time::Duration, sync::Arc};
 
+#[derive(Default)]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<RwLock<Cache>>,

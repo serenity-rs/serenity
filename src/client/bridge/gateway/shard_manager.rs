@@ -80,14 +80,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// let event_handler = Arc::new(Handler);
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
-/// let cache_and_http = Arc::new(CacheAndHttp {
-///     # #[cfg(feature = "cache")]
-///     cache: Arc::new(RwLock::new(Cache::default())),
-///     # #[cfg(feature = "cache")]
-///     update_cache_timeout: None,
-///     __nonexhaustive: (),
-///
-/// });
+/// let cache_and_http = Arc::new(CacheAndHttp::default());
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
