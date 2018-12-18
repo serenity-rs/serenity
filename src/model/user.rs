@@ -574,6 +574,12 @@ impl User {
     /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
+    /// # Note
+    ///
+    /// Currently if Cache is disabled it will get the member with http, if it
+    /// fails it will only log a warning and return false, if both cache and
+    /// http is disabled it will always return false.
+    ///
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`GuildId`]: ../id/struct.GuildId.html
     /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
@@ -587,7 +593,26 @@ impl User {
 
     fn _has_role(&self, guild: GuildContainer, role: RoleId) -> bool {
         match guild {
-            GuildContainer::Guild(guild) => guild.roles.contains_key(&role),
+            GuildContainer::Guild(guild) => {
+                feature_cache! {{
+                    self.has_role(guild.id, role)
+                } else {
+                    if cfg!(feature = "http") {
+                        info!("[has_role] Getting the member with http");
+                        #[cfg(feature = "http")]
+                        use http::raw::get_member;
+                        if let Ok(m) = get_member(guild.id, self.id) {
+                            m.roles.contains(&role)
+                        } else {
+                            error!("[has_role] Error getting the member");
+                            false
+                        }
+                    } else {
+                        warn!("[has_role] Does not work without either cache or http.");
+                        false
+                    }
+                }}
+            },
             GuildContainer::Id(_guild_id) => {
                 feature_cache! {{
                     CACHE.read()
@@ -600,7 +625,20 @@ impl User {
                         })
                         .unwrap_or(false)
                 } else {
-                    true
+                    if cfg!(feature = "http") {
+                        info!("[has_role] Getting the member with http");
+                        #[cfg(feature = "http")]
+                        use http::raw::get_member;
+                        if let Ok(m) = get_member(guild.id, self.id) {
+                            m.roles.contains(&role)
+                        } else {
+                            error!("[has_role] Error getting the member");
+                            false
+                        }
+                    } else {
+                        warn!("[has_role] Does not work without either cache or http.");
+                        false
+                    }
                 }}
             },
         }
