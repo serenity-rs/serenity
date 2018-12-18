@@ -198,7 +198,10 @@ impl Emoji {
     /// println!("Direct link to emoji image: {}", emoji.url());
     /// ```
     #[inline]
-    pub fn url(&self) -> String { format!(cdn!("/emojis/{}.png"), self.id) }
+    pub fn url(&self) -> String {
+        let extension = if self.animated {"gif"} else {"png"};
+        format!(cdn!("/emojis/{}.{}"), self.id, extension)
+    }
 }
 
 impl Display for Emoji {
