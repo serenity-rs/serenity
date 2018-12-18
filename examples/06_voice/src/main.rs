@@ -23,7 +23,7 @@ use serenity::{client::{Context}, prelude::Mutex};
 
 use serenity::{
     command,
-    client::{CACHE, Client, EventHandler},
+    client::{Client, EventHandler},
     framework::StandardFramework,
     model::{channel::Message, gateway::Ready, misc::Mentionable},
     Result as SerenityResult,
@@ -77,7 +77,7 @@ fn main() {
 }
 
 command!(deafen(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
@@ -92,7 +92,7 @@ command!(deafen(ctx, msg) {
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply("Not in a voice channel"));
+            check_msg(msg.reply(&ctx, "Not in a voice channel"));
 
             return Ok(());
         },
@@ -108,7 +108,7 @@ command!(deafen(ctx, msg) {
 });
 
 command!(join(ctx, msg) {
-    let guild = match msg.guild() {
+    let guild = match msg.guild(&ctx.cache) {
         Some(guild) => guild,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
@@ -128,7 +128,7 @@ command!(join(ctx, msg) {
     let connect_to = match channel_id {
         Some(channel) => channel,
         None => {
-            check_msg(msg.reply("Not in a voice channel"));
+            check_msg(msg.reply(&ctx, "Not in a voice channel"));
 
             return Ok(());
         }
@@ -145,7 +145,7 @@ command!(join(ctx, msg) {
 });
 
 command!(leave(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
@@ -163,12 +163,12 @@ command!(leave(ctx, msg) {
 
         check_msg(msg.channel_id.say("Left voice channel"));
     } else {
-        check_msg(msg.reply("Not in a voice channel"));
+        check_msg(msg.reply(&ctx, "Not in a voice channel"));
     }
 });
 
 command!(mute(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
@@ -183,7 +183,7 @@ command!(mute(ctx, msg) {
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply("Not in a voice channel"));
+            check_msg(msg.reply(&ctx, "Not in a voice channel"));
 
             return Ok(());
         },
@@ -218,7 +218,7 @@ command!(play(ctx, msg, args) {
         return Ok(());
     }
 
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Error finding channel info"));
@@ -251,7 +251,7 @@ command!(play(ctx, msg, args) {
 });
 
 command!(undeafen(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Error finding channel info"));
@@ -273,7 +273,7 @@ command!(undeafen(ctx, msg) {
 });
 
 command!(unmute(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Error finding channel info"));

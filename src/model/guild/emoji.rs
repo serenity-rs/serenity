@@ -15,7 +15,11 @@ use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{CACHE, http};
+use crate::{cache::Cache, http};
+#[cfg(all(feature = "cache", feature = "model"))]
+use parking_lot::RwLock;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::sync::Arc;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -52,7 +56,7 @@ impl Emoji {
     ///
     /// **Note**: Only user accounts may use this method.
     ///
-    /// [Manage Emojis]: 
+    /// [Manage Emojis]:
     /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     ///
     /// # Examples
@@ -60,8 +64,14 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,
@@ -73,14 +83,14 @@ impl Emoji {
     /// # };
     /// #
     /// // assuming emoji has been set already
-    /// match emoji.delete() {
+    /// match emoji.delete(&cache) {
     ///     Ok(()) => println!("Emoji deleted."),
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
     /// ```
     #[cfg(feature = "cache")]
-    pub fn delete(&self) -> Result<()> {
-        match self.find_guild_id() {
+    pub fn delete(&self, cache: &Arc<RwLock<Cache>>) -> Result<()> {
+        match self.find_guild_id(&cache) {
             Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
@@ -99,9 +109,9 @@ impl Emoji {
     /// Change the name of an emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # use serenity::{command, model::{guild::Emoji, id::EmojiId}};
     /// #
+    /// # command!(example(context) {
     /// # let mut emoji = Emoji {
     /// #     animated: false,
     /// #     id: EmojiId(7),
@@ -110,14 +120,14 @@ impl Emoji {
     /// #     require_colons: false,
     /// #     roles: vec![],
     /// # };
-    /// #
     /// // assuming emoji has been set already
-    /// let _ = emoji.edit("blobuwu");
+    /// let _ = emoji.edit(&context.cache, "blobuwu");
     /// assert_eq!(emoji.name, "blobuwu");
+    /// # });
     /// ```
     #[cfg(feature = "cache")]
-    pub fn edit(&mut self, name: &str) -> Result<()> {
-        match self.find_guild_id() {
+    pub fn edit(&mut self, cache: &Arc<RwLock<Cache>>, name: &str) -> Result<()> {
+        match self.find_guild_id(&cache) {
             Some(guild_id) => {
                 let map = json!({
                     "name": name,
@@ -145,8 +155,14 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,
@@ -158,13 +174,13 @@ impl Emoji {
     /// # };
     /// #
     /// // assuming emoji has been set already
-    /// if let Some(guild_id) = emoji.find_guild_id() {
+    /// if let Some(guild_id) = emoji.find_guild_id(&cache) {
     ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
     /// ```
     #[cfg(feature = "cache")]
-    pub fn find_guild_id(&self) -> Option<GuildId> {
-        for guild in CACHE.read().guilds.values() {
+    pub fn find_guild_id(&self, cache: &Arc<RwLock<Cache>>) -> Option<GuildId> {
+        for guild in cache.read().guilds.values() {
             let guild = guild.read();
 
             if guild.emojis.contains_key(&self.id) {
@@ -182,8 +198,7 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::guild::Emoji;
-    /// # use serenity::model::id::EmojiId;
+    /// # use serenity::model::{guild::Emoji, id::EmojiId};
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,

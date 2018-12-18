@@ -49,9 +49,11 @@ use super::Framework;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
-use crate::client::CACHE;
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 
 /// A convenience macro for generating a struct fulfilling the [`Command`][command trait] trait.
 ///
@@ -472,14 +474,14 @@ impl StandardFramework {
     }
 
     #[cfg(feature = "cache")]
-    fn is_blocked_guild(&self, message: &Message) -> bool {
-        if let Some(Channel::Guild(channel)) = CACHE.read().channel(message.channel_id) {
+    fn is_blocked_guild(&self, cache: &Arc<RwLock<Cache>>, message: &Message) -> bool {
+        if let Some(Channel::Guild(channel)) = cache.read().channel(message.channel_id) {
             let guild_id = channel.with(|g| g.guild_id);
             if self.configuration.blocked_guilds.contains(&guild_id) {
                 return true;
             }
 
-            if let Some(guild) = guild_id.to_guild_cached() {
+            if let Some(guild) = guild_id.to_guild_cached(&cache) {
                 return self.configuration
                     .blocked_users
                     .contains(&guild.with(|g| g.owner_id));
@@ -560,7 +562,7 @@ impl StandardFramework {
 
             #[cfg(feature = "cache")]
             {
-                if self.is_blocked_guild(message) {
+                if self.is_blocked_guild(&context.cache, message) {
                     return Some(DispatchError::BlockedGuild);
                 }
 
@@ -568,7 +570,7 @@ impl StandardFramework {
                     return Some(DispatchError::BlockedChannel);
                 }
 
-                if !has_correct_permissions(command, message) {
+                if !has_correct_permissions(&context.cache, command, message) {
                     return Some(DispatchError::LackOfPermissions(
                         command.required_permissions,
                     ));
@@ -598,11 +600,11 @@ impl StandardFramework {
 
                 #[cfg(feature = "cache")] {
                     if !command.allowed_roles.is_empty() {
-                        if let Some(guild) = message.guild() {
+                        if let Some(guild) = message.guild(&context.cache) {
                             let guild = guild.read();
 
                             if let Some(member) = guild.members.get(&message.author.id) {
-                                if let Ok(permissions) = member.permissions() {
+                                if let Ok(permissions) = member.permissions(&context.cache) {
 
                                     if !permissions.administrator()
                                         && !has_correct_roles(command, &guild, member) {
@@ -880,8 +882,8 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .before(|_, msg, cmd_name| {
-    ///         if let Ok(channel) = msg.channel_id.to_channel() {
+    ///     .before(|ctx, msg, cmd_name| {
+    ///         if let Ok(channel) = msg.channel_id.to_channel(&ctx) {
     ///             //  Don't run unless in nsfw channel
     ///             if !channel.is_nsfw() {
     ///                 return false;
@@ -1318,11 +1320,11 @@ impl Framework for StandardFramework {
 }
 
 #[cfg(feature = "cache")]
-pub fn has_correct_permissions(command: &Arc<CommandOptions>, message: &Message) -> bool {
+pub fn has_correct_permissions(cache: &Arc<RwLock<Cache>>, command: &Arc<CommandOptions>, message: &Message) -> bool {
     if command.required_permissions.is_empty() {
         true
     } else {
-        if let Some(guild) = message.guild() {
+        if let Some(guild) = message.guild(&cache) {
             let perms = guild
                 .with(|g| g.permissions_in(message.channel_id, message.author.id));
 

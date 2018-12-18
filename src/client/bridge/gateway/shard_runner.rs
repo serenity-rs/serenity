@@ -2,6 +2,7 @@ use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
+use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use serde::Deserialize;
 use std::{
@@ -32,6 +33,7 @@ use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
 
+
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
 /// [`Shard`]: ../../../gateway/struct.Shard.html
@@ -49,6 +51,7 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    cache_and_http: Arc<CacheAndHttp>,
 }
 
 impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
@@ -68,6 +71,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
+            cache_and_http: opt.cache_and_http,
         }
     }
 
@@ -212,6 +216,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             &self.runner_tx,
             &self.threadpool,
             self.shard.shard_info()[0],
+            Arc::clone(&self.cache_and_http),
         );
     }
 
@@ -493,4 +498,6 @@ pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
     pub threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    #[cfg(feature = "cache")]
+    pub cache_and_http: Arc<CacheAndHttp>,
 }

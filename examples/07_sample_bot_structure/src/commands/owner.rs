@@ -3,5 +3,5 @@ use serenity::command;
 command!(quit(ctx, msg, _args) {
     ctx.quit();
 
-    let _ = msg.reply("Shutting down!");
+    let _ = msg.reply(&ctx, "Shutting down!");
 });

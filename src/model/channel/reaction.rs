@@ -1,4 +1,4 @@
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::{
@@ -11,10 +11,11 @@ use std::{
     },
     str::FromStr
 };
+
 use crate::internal::prelude::*;
 
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::http;
 
@@ -50,8 +51,8 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    pub fn channel(&self) -> Result<Channel> {
-        self.channel_id.to_channel()
+    pub fn channel(&self, context: &Context) -> Result<Channel> {
+        self.channel_id.to_channel(&context)
     }
 
     /// Deletes the reaction, but only if the current user is the user who made
@@ -69,10 +70,10 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self, context: &Context) -> Result<()> {
         let user_id = feature_cache! {
             {
-                let user = if self.user_id == CACHE.read().user.id {
+                let user = if self.user_id == context.cache.read().user.id {
                     None
                 } else {
                     Some(self.user_id.0)
@@ -87,7 +88,7 @@ impl Reaction {
                 if user.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(self.channel_id, req).unwrap_or(true) {
+                    if !utils::user_has_perms(&context.cache, self.channel_id, req).unwrap_or(true) {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -122,8 +123,8 @@ impl Reaction {
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
     #[inline]
-    pub fn user(&self) -> Result<User> {
-        self.user_id.to_user()
+    pub fn user(&self, context: &Context) -> Result<User> {
+        self.user_id.to_user(&context)
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -326,19 +327,13 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
-    /// # use std::error::Error;
+    /// # use serenity::{command, model::id::ChannelId};
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let message = ChannelId(0).message(0)?;
+    /// # command!(example(context) {
+    /// #   let message = ChannelId(0).message(0)?;
     /// #
-    /// message.react('🍎')?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// message.react(&context, '🍎')?;
+    /// # });
     /// ```
     fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
 }
