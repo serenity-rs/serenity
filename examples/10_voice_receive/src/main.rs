@@ -10,7 +10,7 @@ use std::{env, sync::Arc};
 
 use serenity::{
     command,
-    client::{bridge::voice::ClientVoiceManager, CACHE, Client, Context, EventHandler},
+    client::{bridge::voice::ClientVoiceManager, Client, Context, EventHandler},
     framework::StandardFramework,
     model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
     prelude::*,
@@ -92,13 +92,13 @@ command!(join(ctx, msg, args) {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
-            check_msg(msg.reply("Requires a valid voice channel ID be given"));
+            check_msg(msg.reply(&ctx, "Requires a valid voice channel ID be given"));
 
             return Ok(());
         },
     };
 
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
@@ -119,7 +119,7 @@ command!(join(ctx, msg, args) {
 });
 
 command!(leave(ctx, msg) {
-    let guild_id = match CACHE.read().guild_channel(msg.channel_id) {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
             check_msg(msg.channel_id.say("Groups and DMs not supported"));
@@ -137,7 +137,7 @@ command!(leave(ctx, msg) {
 
         check_msg(msg.channel_id.say("Left voice channel"));
     } else {
-        check_msg(msg.reply("Not in a voice channel"));
+        check_msg(msg.reply(&ctx, "Not in a voice channel"));
     }
 });
 

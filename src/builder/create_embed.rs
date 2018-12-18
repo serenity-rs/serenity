@@ -271,7 +271,8 @@ impl CreateEmbed {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn guild_member_addition(&self, _: Context, guild_id: GuildId, member: Member) {
+    ///     fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
+    ///         let cache = context.cache.read();
     ///
     ///         if let Ok(guild) = guild_id.to_partial_guild() {
     ///
@@ -284,7 +285,7 @@ impl CreateEmbed {
     ///             if let Some(channel) = channel_search {
     ///                 let user = member.user.read();
     ///
-    ///                 let _ = channel.write().send_message(|m| {
+    ///                 let _ = channel.write().send_message(&context, |m| {
     ///                     m.embed(|e| {
     ///                         e.author(|a| {
     ///                             a.icon_url(&user.face()).name(&user.name)

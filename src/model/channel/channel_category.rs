@@ -1,5 +1,7 @@
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(all(feature = "builder", feature = "model"))]
 use crate::builder::EditChannel;
 #[cfg(all(feature = "builder", feature = "model"))]
@@ -55,14 +57,18 @@ impl ChannelCategory {
         self.id.delete_permission(permission_type)
     }
 
-    /// Deletes this category.
+
+    /// Deletes this category if required permissions are met.
+    ///
+    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
+    /// owning the required permissions the HTTP-request will be issued.
     #[inline]
-    pub fn delete(&self) -> Result<()> {
+    pub fn delete(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
+            if !utils::user_has_perms(&context.cache, self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -82,13 +88,13 @@ impl ChannelCategory {
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils"))]
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(self.id, req)? {
+            if !utils::user_has_perms(&context.cache, self.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }

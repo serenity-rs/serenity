@@ -17,13 +17,19 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 use serde::de::Error as DeError;
 use serde_json;
 use super::utils::*;
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+use crate::cache::Cache;
+#[cfg(all(feature = "cache", feature = "model"))]
+use parking_lot::RwLock;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::http;
 #[cfg(feature = "model")]
@@ -146,10 +152,10 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
-    fn check_hierarchy(&self, other_user: UserId) -> Result<()> {
-        let current_id = CACHE.read().user.id;
+    fn check_hierarchy(&self, cache: &Arc<RwLock<Cache>>, other_user: UserId) -> Result<()> {
+        let current_id = cache.read().user.id;
 
-        if let Some(higher) = self.greater_member_hierarchy(other_user, current_id) {
+        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }
@@ -189,8 +195,8 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    fn has_perms(&self, mut permissions: Permissions) -> bool {
-        let user_id = CACHE.read().user.id;
+    fn has_perms(&self, cache: &Arc<RwLock<Cache>>, mut permissions: Permissions) -> bool {
+        let user_id = cache.read().user.id;
 
         let perms = self.member_permissions(user_id);
         permissions.remove(perms);
@@ -228,20 +234,20 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, user: U, options: &BO) -> Result<()> {
-        self._ban(user.into(), options)
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, context: &Context, user: U, options: &BO) -> Result<()> {
+        self._ban(&context, user.into(), options)
     }
 
-    fn _ban<BO: BanOptions>(&self, user: UserId, options: &BO) -> Result<()> {
+    fn _ban<BO: BanOptions>(&self, context: &Context, user: UserId, options: &BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
 
-            self.check_hierarchy(user)?;
+            self.check_hierarchy(&context.cache, user)?;
         }
 
         self.id.ban(user, options)
@@ -259,12 +265,12 @@ impl Guild {
     /// [`Ban`]: struct.Ban.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    pub fn bans(&self) -> Result<Vec<Ban>> {
+    pub fn bans(&self, context: &Context) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -346,13 +352,13 @@ impl Guild {
     /// [`Channel`]: ../channel/enum.Channel.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    pub fn create_channel<C>(&self, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+    pub fn create_channel<C>(&self, context: &Context, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -417,13 +423,13 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    pub fn create_role<F>(&self, f: F) -> Result<Role>
+    pub fn create_role<F>(&self, context: &Context, f: F) -> Result<Role>
         where F: FnOnce(&mut EditRole) -> &mut EditRole {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_ROLES;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -442,10 +448,10 @@ impl Guild {
     /// if the current user is not the guild owner.
     ///
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    pub fn delete(&self) -> Result<PartialGuild> {
+    pub fn delete(&self, context: &Context) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
-            if self.owner_id != CACHE.read().user.id {
+            if self.owner_id != context.cache.read().user.id {
                 let req = Permissions::MANAGE_GUILD;
 
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -519,13 +525,13 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(&mut EditGuild) -> &mut EditGuild {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -600,12 +606,12 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
-    pub fn edit_nickname(&self, new_nickname: Option<&str>) -> Result<()> {
+    pub fn edit_nickname(&self, context: &Context, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CHANGE_NICKNAME;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -673,14 +679,15 @@ impl Guild {
     /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn greater_member_hierarchy<T, U>(&self, lhs_id: T, rhs_id: U)
+    pub fn greater_member_hierarchy<T, U>(&self, cache: &Arc<RwLock<Cache>>, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
-        self._greater_member_hierarchy(lhs_id.into(), rhs_id.into())
+        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
     }
 
     #[cfg(feature = "cache")]
     fn _greater_member_hierarchy(
         &self,
+        cache: &Arc<RwLock<Cache>>,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -697,10 +704,10 @@ impl Guild {
         }
 
         let lhs = self.members.get(&lhs_id)?
-            .highest_role_info()
+            .highest_role_info(&cache)
             .unwrap_or((RoleId(0), 0));
         let rhs = self.members.get(&rhs_id)?
-            .highest_role_info()
+            .highest_role_info(&cache)
             .unwrap_or((RoleId(0), 0));
 
         // If LHS and RHS both have no top position or have the same role ID,
@@ -754,12 +761,12 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    pub fn invites(&self) -> Result<Vec<RichInvite>> {
+    pub fn invites(&self, context: &Context) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -790,7 +797,9 @@ impl Guild {
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: struct.Member.html
     #[inline]
-    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> { self.id.member(user_id) }
+    pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
+        self.id.member(&context, user_id)
+    }
 
     /// Gets a list of the guild's members.
     ///
@@ -1339,12 +1348,12 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    pub fn prune_count(&self, days: u16) -> Result<GuildPrune> {
+    pub fn prune_count(&self, context: &Context, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1374,7 +1383,7 @@ impl Guild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
+    pub fn shard_id(&self, cache: &Arc<RwLock<Cache>>) -> u64 { self.id.shard_id(&cache) }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -1432,12 +1441,12 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    pub fn start_prune(&self, days: u16) -> Result<GuildPrune> {
+    pub fn start_prune(&self, context: &Context, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1457,12 +1466,12 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    pub fn unban<U: Into<UserId>>(&self, user_id: U) -> Result<()> {
+    pub fn unban<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(req) {
+            if !self.has_perms(&context.cache, req) {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -1505,8 +1514,8 @@ impl Guild {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached() {
+    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached(&ctx.cache) {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }

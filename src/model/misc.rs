@@ -112,20 +112,6 @@ impl StdError for UserParseError {
     }
 }
 
-#[cfg(all(feature = "model", feature = "utils"))]
-impl FromStr for User {
-    type Err = UserParseError;
-
-    fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-        match utils::parse_username(s) {
-            Some(x) => UserId(x as u64)
-                .to_user()
-                .map_err(|e| UserParseError::Rest(Box::new(e))),
-            _ => Err(UserParseError::InvalidUsername),
-        }
-    }
-}
-
 macro_rules! impl_from_str {
     (id: $($id:tt, $err:ident;)*) => {
         $(

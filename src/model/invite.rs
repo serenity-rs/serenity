@@ -3,6 +3,8 @@
 use chrono::{DateTime, FixedOffset};
 use super::prelude::*;
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
 #[cfg(feature = "model")]
@@ -11,6 +13,12 @@ use crate::internal::prelude::*;
 use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use crate::{http, utils};
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
+#[cfg(feature = "cache")]
+use std::sync::Arc;
 
 /// Information about an invite code.
 ///
@@ -70,18 +78,18 @@ impl Invite {
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
     /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
     /// [permission]: ../permissions/index.html
-    pub fn create<C, F>(channel_id: C, f: F) -> Result<RichInvite>
+    pub fn create<C, F>(context: &Context, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
-        Self::_create(channel_id.into(), f)
+        Self::_create(&context, channel_id.into(), f)
     }
 
-    fn _create<F>(channel_id: ChannelId, f: F) -> Result<RichInvite>
+    fn _create<F>(context: &Context, channel_id: ChannelId, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::CREATE_INVITE;
 
-            if !model_utils::user_has_perms(channel_id, req)? {
+            if !model_utils::user_has_perms(&context.cache, channel_id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -103,12 +111,12 @@ impl Invite {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [permission]: ../permissions/index.html
-    pub fn delete(&self) -> Result<Invite> {
+    pub fn delete(&self, context: &Context) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !model_utils::user_has_perms(self.channel.id, req)? {
+            if !model_utils::user_has_perms(&context.cache, self.channel.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }
@@ -195,7 +203,7 @@ impl InviteGuild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 { self.id.shard_id() }
+    pub fn shard_id(&self, cache: &Arc<RwLock<Cache>>) -> u64 { self.id.shard_id(&cache) }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -288,12 +296,12 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
-    pub fn delete(&self) -> Result<Invite> {
+    pub fn delete(&self, context: &Context) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_GUILD;
 
-            if !model_utils::user_has_perms(self.channel.id, req)? {
+            if !model_utils::user_has_perms(&context.cache, self.channel.id, req)? {
                 return Err(Error::Model(ModelError::InvalidPermissions(req)));
             }
         }

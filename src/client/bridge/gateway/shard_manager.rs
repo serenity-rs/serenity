@@ -1,5 +1,6 @@
 use crate::gateway::InterMessage;
 use crate::internal::prelude::*;
+use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use std::{
     collections::{HashMap, VecDeque},
@@ -50,16 +51,19 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # use serenity::client::bridge::voice::ClientVoiceManager;
 /// # #[cfg(feature = "voice")]
 /// # use serenity::model::id::UserId;
+/// # #[cfg(feature = "cache")]
+/// # use serenity::cache::Cache;
 /// #
 /// # #[cfg(feature = "framework")]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// #
-/// use parking_lot::Mutex;
+/// use parking_lot::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::EventHandler;
 /// use serenity::http;
 /// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
+/// use serenity::CacheAndHttp;
 /// use std::sync::Arc;
 /// use std::env;
 /// use threadpool::ThreadPool;
@@ -77,6 +81,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// let event_handler = Arc::new(Handler);
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
+/// let cache_and_http = Arc::new(CacheAndHttp::default());
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
@@ -93,6 +98,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
+///     cache_and_http: &cache_and_http,
 /// });
 /// #     Ok(())
 /// # }
@@ -152,6 +158,7 @@ impl ShardManager {
             #[cfg(feature = "voice")]
             voice_manager: Arc::clone(opt.voice_manager),
             ws_url: Arc::clone(opt.ws_url),
+            cache_and_http: Arc::clone(&opt.cache_and_http),
         };
 
         thread::spawn(move || {
@@ -363,4 +370,5 @@ pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
     #[cfg(feature = "voice")]
     pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
     pub ws_url: &'a Arc<Mutex<String>>,
+    pub cache_and_http: &'a Arc<CacheAndHttp>,
 }

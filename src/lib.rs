@@ -58,8 +58,8 @@
 //!     }
 //! }
 //!
-//! command!(ping(_context, message) {
-//!     let _ = message.reply("Pong!");
+//! command!(ping(context, message) {
+//!     let _ = message.reply(&context, "Pong!");
 //! });
 //! #
 //! # }
@@ -192,44 +192,14 @@ pub use crate::client::Client;
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
-
 #[cfg(feature = "cache")]
-lazy_static! {
-    /// A mutable and lazily-initialized static binding. It can be accessed
-    /// across any function and in any context.
-    ///
-    /// This [`Cache`] instance is updated for every event received, so you do
-    /// not need to maintain your own cache.
-    ///
-    /// See the [cache module documentation] for more details.
-    ///
-    /// The Cache itself is wrapped within an `RwLock`, which allows for
-    /// multiple readers or at most one writer at a time across threads. This
-    /// means that you may have multiple commands reading from the Cache
-    /// concurrently.
-    ///
-    /// # Examples
-    ///
-    /// Retrieve the [current user][`CurrentUser`]'s Id, by opening a Read
-    /// guard:
-    ///
-    /// ```rust,ignore
-    /// use serenity::CACHE;
-    ///
-    /// println!("{}", CACHE.read().user.id);
-    /// ```
-    ///
-    /// Update the cache's settings to enable caching of channels' messages:
-    ///
-    /// ```rust
-    /// use serenity::CACHE;
-    ///
-    /// // Cache up to the 10 most recent messages per channel.
-    /// CACHE.write().settings_mut().max_messages(10);
-    /// ```
-    ///
-    /// [`CurrentUser`]: model/user/struct.CurrentUser.html
-    /// [`Cache`]: cache/struct.Cache.html
-    /// [cache module documentation]: cache/index.html
-    pub static ref CACHE: RwLock<Cache> = RwLock::new(Cache::default());
+use std::{time::Duration, sync::Arc};
+
+#[derive(Default)]
+pub struct CacheAndHttp {
+    #[cfg(feature = "cache")]
+    pub cache: Arc<RwLock<Cache>>,
+    #[cfg(feature = "cache")]
+    pub update_cache_timeout: Option<Duration>,
+    __nonexhaustive: (),
 }

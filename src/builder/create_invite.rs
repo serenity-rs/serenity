@@ -21,12 +21,12 @@ use crate::utils::VecMap;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn message(&self, _: Context, msg: Message) {
+///     fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
-///             let channel = match msg.channel_id.to_channel() {
-///                 Ok(channel) => channel,
-///                 Err(why) => {
-///                     let _ = msg.channel_id.say(&format!("Error creating invite: {:?}", why));
+///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
+///                 Some(channel) => channel,
+///                 None => {
+///                     let _ = msg.channel_id.say("Error creating invite");
 ///
 ///                     return;
 ///                 },
@@ -35,7 +35,7 @@ use crate::utils::VecMap;
 ///             if let Channel::Guild(channel) = channel {
 ///                 let channel = channel.read();
 ///
-///             let creation = reader.create_invite(|i| {
+///             let creation = reader.create_invite(&context, |i| {
 ///                 i.max_age(3600).max_uses(10)
 ///             });
 ///
@@ -84,27 +84,17 @@ impl CreateInvite {
     /// Create an invite with a max age of `3600` seconds, or 1 hour:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
-    /// # use serenity::model::channel::Channel;
-    /// # use std::error::Error;
+    /// # use serenity::{command, model::id::ChannelId};
+    /// # use std::{error::Error, sync::Arc};
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = ChannelId(81384788765712384).to_channel().unwrap();
+    /// # command!(example(context) {
+    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
-    /// #     if let Channel::Guild(guild_channel) = channel {
-    /// #         let guild_channel = guild_channel.read();
-    /// let invite = guild_channel.create_invite(|i| i.max_age(3600))?;
-    /// #     }
-    /// #
-    /// let invite = channel.create_invite(|i| {
+    /// let invite = channel.create_invite(&context, |i| {
     ///     i.max_age(3600)
     /// })?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// # });
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
         self.0.insert("max_age", Value::Number(Number::from(max_age)));
@@ -122,22 +112,16 @@ impl CreateInvite {
     /// Create an invite with a max use limit of `5`:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
-    /// # use serenity::model::channel::Channel;
-    /// # use std::error::Error;
+    /// # use serenity::{command, model::id::ChannelId};
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = ChannelId(81384788765712384).to_channel().unwrap();
+    /// # command!(example(context) {
+    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(|i| {
+    /// let invite = channel.create_invite(&context, |i| {
     ///     i.max_uses(5)
     /// })?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// # });
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
         self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
@@ -153,25 +137,17 @@ impl CreateInvite {
     /// Create an invite which is temporary:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
-    /// # use serenity::model::channel::Channel;
+    /// # use serenity::{command, model::id::ChannelId};
     /// # use std::error::Error;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = ChannelId(81384788765712384).to_channel().unwrap();
+    /// # command!(example(context) {
+    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
-    /// #     if let Channel::Guild(channel) = channel {
-    /// #         let channel = channel.read();
-    /// #
-    /// let invite = channel.create_invite(|i| {
+    /// let invite = channel.create_invite(&context, |i| {
     ///     i.temporary(true)
     /// })?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// # });
     /// ```
     pub fn temporary(&mut self, temporary: bool) -> &mut Self {
         self.0.insert("temporary", Value::Bool(temporary));
@@ -187,22 +163,16 @@ impl CreateInvite {
     /// Create an invite which is unique:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::ChannelId;
-    /// # use std::error::Error;
-    /// # use serenity::model::channel::Channel;
+    /// # use serenity::{command, Error, model::id::ChannelId};
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let channel = ChannelId(81384788765712384).to_channel().unwrap();
+    /// # command!(example(context) {
+    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(|i| {
+    /// let invite = channel.create_invite(&context, |i| {
     ///     i.unique(true)
     /// })?;
-    /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// # });
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
         self.0.insert("unique", Value::Bool(unique));

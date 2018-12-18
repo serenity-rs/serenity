@@ -1,7 +1,9 @@
-use crate::model::prelude::*;
+use crate::{model::prelude::*};
 
+#[cfg(feature = "client")]
+use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::CACHE;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
@@ -407,7 +409,7 @@ impl GuildId {
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_guild_cached(self) -> Option<Arc<RwLock<Guild>>> { CACHE.read().guild(self) }
+    pub fn to_guild_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<Guild>>> { cache.read().guild(self) }
 
     /// Requests [`PartialGuild`] over REST API.
     ///
@@ -456,14 +458,14 @@ impl GuildId {
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: ../guild/struct.Member.html
     #[inline]
-    pub fn member<U: Into<UserId>>(&self, user_id: U) -> Result<Member> {
-        self._member(user_id.into())
+    pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
+        self._member(&context, user_id.into())
     }
 
-    fn _member(&self, user_id: UserId) -> Result<Member> {
+    fn _member(&self, context: &Context, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {
-            if let Some(member) = CACHE.read().member(self.0, user_id) {
+            if let Some(member) = context.cache.read().member(self.0, user_id) {
                 return Ok(member);
             }
         }
@@ -563,7 +565,9 @@ impl GuildId {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self) -> u64 { crate::utils::shard_id(self.0, CACHE.read().shard_count) }
+    pub fn shard_id(&self, cache: &Arc<RwLock<Cache>>) -> u64 {
+        crate::utils::shard_id(self.0, cache.read().shard_count)
+    }
 
     /// Returns the Id of the shard associated with the guild.
     ///

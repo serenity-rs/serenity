@@ -26,6 +26,10 @@
 use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::framework::standard::{has_correct_roles, has_correct_permissions};
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
 use crate::model::{
     channel::Message,
     id::ChannelId,
@@ -237,18 +241,18 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
 #[cfg(feature = "cache")]
-pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
-    if let Some(guild) = msg.guild() {
+pub fn has_all_requirements(cache: &Arc<RwLock<Cache>>, cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
+    if let Some(guild) = msg.guild(&cache) {
         let guild = guild.read();
 
         if let Some(member) = guild.members.get(&msg.author.id) {
 
-            if let Ok(permissions) = member.permissions() {
+            if let Ok(permissions) = member.permissions(&cache) {
 
                 return if cmd.allowed_roles.is_empty() {
-                    permissions.administrator() || has_correct_permissions(cmd, msg)
+                    permissions.administrator() || has_correct_permissions(&cache, cmd, msg)
                 } else {
-                    permissions.administrator() || (has_correct_roles(cmd, &guild, member) && has_correct_permissions(cmd, msg))
+                    permissions.administrator() || (has_correct_roles(cmd, &guild, member) && has_correct_permissions(&cache, cmd, msg))
                 }
             }
         }
@@ -262,20 +266,22 @@ pub fn has_all_requirements(cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
 /// **Note**: A command is visible when it is either normally displayed or
 /// strikethrough upon requested help by a user.
 #[cfg(feature = "cache")]
-pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, help_options: &HelpOptions) -> bool {
+pub fn is_command_visible(cache: &Arc<RwLock<Cache>>, command_options: &Arc<CommandOptions>, msg: &Message,
+    help_options: &HelpOptions) -> bool {
+
     if !command_options.dm_only && !command_options.guild_only
         || command_options.dm_only && msg.is_private()
         || command_options.guild_only && !msg.is_private()
     {
 
-        if let Some(guild) = msg.guild() {
+        if let Some(guild) = msg.guild(&cache) {
             let guild = guild.read();
 
             if let Some(member) = guild.members.get(&msg.author.id) {
 
                 if command_options.help_available {
 
-                    return if has_correct_permissions(command_options, msg) {
+                    return if has_correct_permissions(&cache, command_options, msg) {
 
                         if has_correct_roles(command_options, &guild, &member) {
                             true
@@ -288,7 +294,7 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
                 }
             }
         } else if command_options.help_available {
-            return if has_correct_permissions(command_options, msg) {
+            return if has_correct_permissions(&cache, command_options, msg) {
                 true
             } else {
                 help_options.lacking_permissions != HelpBehaviour::Hide
@@ -305,6 +311,7 @@ pub fn is_command_visible(command_options: &Arc<CommandOptions>, msg: &Message, 
 /// returns similar commands.
 #[cfg(feature = "cache")]
 fn fetch_single_command<'a, H: BuildHasher>(
+    cache: &Arc<RwLock<Cache>>,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     name: &str,
     help_options: &'a HelpOptions,
@@ -329,7 +336,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
                 match *command {
                     CommandOrAlias::Command(ref cmd) => {
-                        if is_command_visible(&cmd.options(), msg, help_options) {
+                        if is_command_visible(&cache, &cmd.options(), msg, help_options) {
                             found = Some((command_name, cmd));
                         } else {
                             break;
@@ -340,7 +347,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
                         match *actual_command {
                             CommandOrAlias::Command(ref cmd) => {
-                                if is_command_visible(&cmd.options(), msg, help_options) {
+                                if is_command_visible(&cache, &cmd.options(), msg, help_options) {
                                     found = Some((name, cmd));
                                 } else {
                                     break;
@@ -374,7 +381,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                     let levenshtein_distance = levenshtein_distance(&command_name, &name);
 
                     if levenshtein_distance <= help_options.max_levenshtein_distance
-                        && is_command_visible(&cmd.options(), &msg, &help_options) {
+                        && is_command_visible(&cache, &cmd.options(), &msg, &help_options) {
 
                         similar_commands.push(SuggestedCommandName {
                             name: command_name,
@@ -426,6 +433,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
 /// Tries to extract a single command matching searched command name.
 #[cfg(feature = "cache")]
 fn fetch_all_eligible_commands_in_group<'a>(
+    cache: &Arc<RwLock<Cache>>,
     commands: &HashMap<&String, &InternalCommand>,
     command_names: &[&&String],
     help_options: &'a HelpOptions,
@@ -442,9 +450,9 @@ fn fetch_all_eligible_commands_in_group<'a>(
             || cmd.dm_only && msg.is_private()
             || cmd.guild_only && !msg.is_private()
         {
-            if cmd.help_available && has_correct_permissions(&cmd, msg) {
+            if cmd.help_available && has_correct_permissions(&cache, &cmd, msg) {
 
-                if let Some(guild) = msg.guild() {
+                if let Some(guild) = msg.guild(&cache) {
                     let guild = guild.read();
 
                     if let Some(member) = guild.members.get(&msg.author.id) {
@@ -475,6 +483,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
 fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
+    cache: &Arc<RwLock<Cache>>,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     group_names: &[&'a String],
     msg: &Message,
@@ -486,6 +495,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
         let group = &groups[&**group_name];
 
         let group_with_cmds = create_single_group(
+            &cache,
             group,
             group_name,
             &msg,
@@ -503,6 +513,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
 /// Fetches a single group with its commands.
 #[cfg(feature = "cache")]
 fn create_single_group<'a>(
+    cache: &Arc<RwLock<Cache>>,
     group: &CommandGroup,
     group_name: &'a str,
     msg: &Message,
@@ -513,6 +524,7 @@ let commands = remove_aliases(&group.commands);
     command_names.sort();
 
     let mut group_with_cmds = fetch_all_eligible_commands_in_group(
+        &cache,
         &commands,
         &command_names,
         &help_options,
@@ -533,6 +545,7 @@ let commands = remove_aliases(&group.commands);
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
 pub fn create_customised_help_data<'a, H: BuildHasher>(
+    cache: &Arc<RwLock<Cache>>,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     args: &'a Args,
     help_options: &'a HelpOptions,
@@ -541,7 +554,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     if !args.is_empty() {
         let name = args.full();
 
-        return match fetch_single_command(&groups, &name, &help_options, &msg) {
+        return match fetch_single_command(&cache, &groups, &name, &help_options, &msg) {
             Ok(single_command) => single_command,
             Err(suggestions) => {
                 let searched_named_lowercase = name.to_lowercase();
@@ -554,6 +567,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                             *prefix == searched_named_lowercase)) {
 
                         let mut single_group = create_single_group(
+                            &cache,
                             &group,
                             &key,
                             &msg,
@@ -602,7 +616,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     group_names.sort();
 
     let listed_groups =
-        create_command_group_commands_pair_from_groups(&groups, &group_names, &msg, &help_options);
+        create_command_group_commands_pair_from_groups(&cache, &groups, &group_names, &msg, &help_options);
 
     return if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
@@ -745,13 +759,13 @@ fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Resul
 /// ```
 #[cfg(feature = "cache")]
 pub fn with_embeds<H: BuildHasher>(
-    _: &mut Context,
+    context: &mut Context,
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_customised_help_data(&groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&context.cache, &groups, args, help_options, msg);
 
     if let Err(why) = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
@@ -858,13 +872,13 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
 /// ```
 #[cfg(feature = "cache")]
 pub fn plain<H: BuildHasher>(
-    _: &mut Context,
+    context: &mut Context,
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_customised_help_data(&groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&context.cache, &groups, args, help_options, msg);
 
     let result = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
