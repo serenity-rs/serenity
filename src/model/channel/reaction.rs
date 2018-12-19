@@ -168,11 +168,16 @@ impl Reaction {
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
+        let mut limit = limit.unwrap_or(50);
+        if limit > 100 {
+            limit = 100;
+            warn!("Rection users limit clamped to 100! (API Restriction)");
+        }
         http::get_reaction_users(
             self.channel_id.0,
             self.message_id.0,
             reaction_type,
-            limit.unwrap_or(50),
+            limit,
             after.map(|u| u.0),
         )
     }
