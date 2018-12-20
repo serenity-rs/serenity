@@ -268,7 +268,10 @@ impl Connection {
         self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
 
         let mutexed_client = Arc::new(Mutex::new(client));
-        start_ws_thread(mutexed_client, &mut self.thread_items)?;
+        let (ws_close_sender, ws_thread) = start_ws_thread(mutexed_client, &self.thread_items.tx)?;
+
+        self.thread_items.ws_close_sender = ws_close_sender;
+        self.thread_items.ws_thread = ws_thread;
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
@@ -642,13 +645,11 @@ where T: for<'a> PartialEq<&'a str>,
 #[inline]
 fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<ThreadItems> {
     let (udp_close_sender, udp_close_reader) = mpsc::channel();
-    let (ws_close_sender, ws_close_reader) = mpsc::channel();
 
     let current_thread = thread::current();
     let thread_name = current_thread.name().unwrap_or("serenity voice");
 
     let (tx, rx) = mpsc::channel();
-    let tx_ws = tx.clone();
     let tx_udp = tx.clone();
     let udp_clone = udp.try_clone()?;
 
@@ -673,28 +674,7 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
             }
         })?;
 
-    let ws_thread = ThreadBuilder::new()
-        .name(format!("{} WS", thread_name))
-        .spawn(move || loop {
-            info!("[Voice] taking lock, looping...");
-            while let Ok(Some(value)) = client.lock().try_recv_json() {
-                let msg = match VoiceEvent::deserialize(value) {
-                    Ok(msg) => msg,
-                    Err(_) => break,
-                };
-
-                if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
-                    return;
-                }
-            } 
-            info!("[Voice] releasing lock...");
-
-            if ws_close_reader.try_recv().is_ok() {
-                return;
-            }
-
-            thread::sleep(Duration::from_millis(25));
-        })?;
+    let (ws_close_sender, ws_thread) = start_ws_thread(client, &tx)?;
 
     Ok(ThreadItems {
         rx,
@@ -707,32 +687,26 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
 }
 
 #[inline]
-fn start_ws_thread(client: Arc<Mutex<WsClient>>, t_items: &mut ThreadItems) -> Result<()> {
+fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>) -> Result<(MpscSender<i32>, JoinHandle<()>)> {
     let current_thread = thread::current();
     let thread_name = current_thread.name().unwrap_or("serenity voice");
 
-    let tx_ws = t_items.tx.clone();
+    let tx_ws = tx.clone();
     let (ws_close_sender, ws_close_reader) = mpsc::channel();
 
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-            info!("[Voice] taking lock, looping...");
-            while let Ok(Some(value)) = client.lock().recv_json() {
+            while let Ok(Some(value)) = client.lock().try_recv_json() {
                 let msg = match VoiceEvent::deserialize(value) {
                     Ok(msg) => msg,
-                    Err(why) => {
-                        warn!("Error deserializing voice event: {:?}", why);
-
-                        break;
-                    },
+                    Err(_) => break,
                 };
 
                 if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
                     return;
                 }
-            }
-            info!("[Voice] released lock, looping...");
+            } 
 
             if ws_close_reader.try_recv().is_ok() {
                 return;
@@ -741,8 +715,5 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, t_items: &mut ThreadItems) -> R
             thread::sleep(Duration::from_millis(25));
         })?;
 
-    t_items.ws_close_sender = ws_close_sender;
-    t_items.ws_thread = ws_thread;
-
-    Ok(())
+    Ok((ws_close_sender, ws_thread))
 }
