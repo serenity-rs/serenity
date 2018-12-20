@@ -175,6 +175,14 @@ impl Connection {
 
         let key = encryption_key(&mut client)?;
 
+        {
+            let stream = match client.get_mut() {
+                tungstenite::stream::Stream::Plain(s) => s,
+                tungstenite::stream::Stream::Tls(s) => s.get_mut(),
+            };
+            stream.set_nonblocking(true)?;
+            //stream.set_read_timeout(Some(Duration::from_millis(1)))?;
+        }
         let mutexed_client = Arc::new(Mutex::new(client));
         let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
 
@@ -188,6 +196,11 @@ impl Connection {
         // Per discord dev team's current recommendations:
         // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
         let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+        info!(
+            "[Voice] WS heartbeat duration given as {}ms, adjusted to {}ms.",
+            hello.heartbeat_interval,
+            temp_heartbeat,
+        );
 
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
@@ -282,10 +295,10 @@ impl Connection {
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
         let mut nonce = secretbox::Nonce([0; 24]);
 
-        if let Some(receiver) = receiver.as_mut() {
-            while let Ok(status) = self.thread_items.rx.try_recv() {
-                match status {
-                    ReceiverStatus::Udp(packet) => {
+        while let Ok(status) = self.thread_items.rx.try_recv() {
+            match status {
+                ReceiverStatus::Udp(packet) => {
+                    if let Some(receiver) = receiver.as_mut() {
                         let mut handle = &packet[2..];
                         let seq = handle.read_u16::<BigEndian>()?;
                         let timestamp = handle.read_u32::<BigEndian>()?;
@@ -334,47 +347,47 @@ impl Connection {
                             receiver
                                 .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
                         }
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                    if let Some(receiver) = receiver.as_mut() {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                        match self.last_heartbeat_nonce {
-                            Some(nonce) => {
-                                if ev.nonce != nonce {
-                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                                }
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                    match self.last_heartbeat_nonce {
+                        Some(nonce) => {
+                            if ev.nonce != nonce {
+                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            }
 
-                                self.last_heartbeat_nonce = None;
-                            },
-                            None => {},
-                        }
-                    },
-                    ReceiverStatus::Websocket(other) => {
-                        info!("[Voice] Received other websocket data: {:?}", other);
-                    },
-                }
-            }
-        } else {
-            loop {
-                if self.thread_items.rx.try_recv().is_err() {
-                    break;
-                }
+                            self.last_heartbeat_nonce = None;
+                        },
+                        None => {},
+                    }
+                },
+                ReceiverStatus::Websocket(other) => {
+                    info!("[Voice] Received other websocket data: {:?}", other);
+                },
             }
         }
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
+            info!("[Voice] WS keepalive");
             let nonce = random::<u64>();
             self.last_heartbeat_nonce = Some(nonce);
             self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
+            info!("[Voice] WS keepalive sent");
         }
 
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
+            info!("[Voice] UDP keepalive");
             let mut bytes = [0; 4];
             (&mut bytes[..]).write_u32::<BigEndian>(self.ssrc)?;
             self.udp.send_to(&bytes, self.destination)?;
+            info!("[Voice] UDP keepalive sent");
         }
 
         // Reconfigure encoder bitrate.
@@ -548,7 +561,10 @@ impl Connection {
 
         self.speaking = speaking;
 
-        self.client.lock().send_json(&payload::build_speaking(speaking))
+        info!("[Voice] Speaking update: {}", speaking);
+        let o = self.client.lock().send_json(&payload::build_speaking(speaking));
+        info!("[Voice] Speaking update confirmed.");
+        o
     }
 }
 
@@ -661,7 +677,8 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
-            while let Ok(Some(value)) = client.lock().recv_json() {
+            info!("[Voice] taking lock, looping...");
+            while let Ok(Some(value)) = client.lock().try_recv_json() {
                 let msg = match VoiceEvent::deserialize(value) {
                     Ok(msg) => msg,
                     Err(_) => break,
@@ -670,7 +687,8 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
                 if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
                     return;
                 }
-            }
+            } 
+            info!("[Voice] releasing lock...");
 
             if ws_close_reader.try_recv().is_ok() {
                 return;
@@ -700,6 +718,7 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, t_items: &mut ThreadItems) -> R
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
         .spawn(move || loop {
+            info!("[Voice] taking lock, looping...");
             while let Ok(Some(value)) = client.lock().recv_json() {
                 let msg = match VoiceEvent::deserialize(value) {
                     Ok(msg) => msg,
@@ -714,6 +733,7 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, t_items: &mut ThreadItems) -> R
                     return;
                 }
             }
+            info!("[Voice] released lock, looping...");
 
             if ws_close_reader.try_recv().is_ok() {
                 return;
