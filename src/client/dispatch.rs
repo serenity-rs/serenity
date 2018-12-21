@@ -49,7 +49,7 @@ macro_rules! update {
 
 #[cfg(feature = "cache")]
 fn context(
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     cache: &Arc<RwLock<Cache>>,
@@ -59,7 +59,7 @@ fn context(
 
 #[cfg(not(feature = "cache"))]
 fn context(
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
 ) -> Context {
@@ -76,7 +76,7 @@ pub(crate) enum DispatchEvent {
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     event_handler: &Arc<H>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
@@ -119,7 +119,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 #[allow(clippy::unused_mut)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     event_handler: &Arc<H>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
@@ -166,7 +166,7 @@ fn dispatch_message<H>(
 #[allow(clippy::cyclomatic_complexity, unused_assignments, unused_mut)]
 fn handle_event<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     event_handler: &Arc<H>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
