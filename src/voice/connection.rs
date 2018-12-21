@@ -174,14 +174,7 @@ impl Connection {
 
         let key = encryption_key(&mut client)?;
 
-        {
-            let stream = match client.get_mut() {
-                tungstenite::stream::Stream::Plain(s) => s,
-                tungstenite::stream::Stream::Tls(s) => s.get_mut(),
-            };
-            stream.set_nonblocking(true)?;
-            //stream.set_read_timeout(Some(Duration::from_millis(1)))?;
-        }
+        unset_blocking(&mut client)?;
         let mutexed_client = Arc::new(Mutex::new(client));
         let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
 
@@ -267,6 +260,7 @@ impl Connection {
 
         self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
 
+        unset_blocking(&mut client)?;
         let mutexed_client = Arc::new(Mutex::new(client));
         let (ws_close_sender, ws_thread) = start_ws_thread(mutexed_client, &self.thread_items.tx)?;
 
@@ -660,18 +654,20 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
 
             let mut buffer = [0; 512];
 
-            loop {
+            'outer: loop {
                 if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
                     let piece = buffer[..len].to_vec();
                     let send = tx_udp.send(ReceiverStatus::Udp(piece));
 
                     if send.is_err() {
-                        return;
+                        break 'outer;
                     }
                 } else if udp_close_reader.try_recv().is_ok() {
-                    return;
+                    break 'outer;
                 }
             }
+
+            info!("[Voice] UDP thread exited.");
         })?;
 
     let (ws_close_sender, ws_thread) = start_ws_thread(client, &tx)?;
@@ -696,24 +692,37 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>
 
     let ws_thread = ThreadBuilder::new()
         .name(format!("{} WS", thread_name))
-        .spawn(move || loop {
-            while let Ok(Some(value)) = client.lock().try_recv_json() {
-                let msg = match VoiceEvent::deserialize(value) {
-                    Ok(msg) => msg,
-                    Err(_) => break,
-                };
-
-                if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
-                    return;
+        .spawn(move || {
+            'outer: loop {
+                while let Ok(Some(value)) = client.lock().try_recv_json() {
+                    let msg = match VoiceEvent::deserialize(value) {
+                        Ok(msg) => msg,
+                        Err(_) => break,
+                    };
+    
+                    if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
+                        break 'outer;
+                    }
+                } 
+    
+                if ws_close_reader.try_recv().is_ok() {
+                    break 'outer;
                 }
-            } 
-
-            if ws_close_reader.try_recv().is_ok() {
-                return;
+    
+                thread::sleep(Duration::from_millis(25));
             }
-
-            thread::sleep(Duration::from_millis(25));
+            info!("[Voice] WS thread exited.");
         })?;
 
     Ok((ws_close_sender, ws_thread))
+}
+
+#[inline]
+fn unset_blocking(client: &mut WsClient) -> Result<()> {
+    let stream = match client.get_mut() {
+        tungstenite::stream::Stream::Plain(s) => s,
+        tungstenite::stream::Stream::Tls(s) => s.get_mut(),
+    };
+    stream.set_nonblocking(true)
+        .map_err(Into::into)
 }
