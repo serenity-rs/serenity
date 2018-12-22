@@ -54,7 +54,7 @@ fn main() {
     let mut client = Client::new(&token, Handler).expect("Err creating client");
 
     {
-        let mut data = client.data.lock();
+        let mut data = client.data.write();
         data.insert::<CommandCounter>(HashMap::default());
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
@@ -106,7 +106,7 @@ fn main() {
             // Increment the number of times this command has been run once. If
             // the command's name does not exist in the counter, add a default
             // value of 0.
-            let mut data = ctx.data.lock();
+            let mut data = ctx.data.write();
             let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in ShareMap.");
             let entry = counter.entry(command_name.to_string()).or_insert(0);
             *entry += 1;
@@ -246,7 +246,7 @@ fn main() {
 command!(commands(ctx, msg, _args) {
     let mut contents = "Commands used:\n".to_string();
 
-    let data = ctx.data.lock();
+    let data = ctx.data.read();
     let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in ShareMap.");
 
     for (k, v) in counter {
@@ -375,7 +375,7 @@ command!(about(_ctx, msg, _args) {
 command!(latency(ctx, msg, _args) {
     // The shard manager is an interface for mutating, stopping, restarting, and
     // retrieving information about shards.
-    let data = ctx.data.lock();
+    let data = ctx.data.read();
 
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,

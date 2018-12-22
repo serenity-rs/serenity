@@ -2,6 +2,7 @@ use crate::gateway::InterMessage;
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
 use parking_lot::Mutex;
+use parking_lot::RwLock;
 use std::{
     collections::{HashMap, VecDeque},
     sync::{
@@ -77,7 +78,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// let token = Arc::new(Mutex::new(token));
 ///
 /// let gateway_url = Arc::new(Mutex::new(http::get_gateway()?.url));
-/// let data = Arc::new(Mutex::new(ShareMap::custom()));
+/// let data = Arc::new(RwLock::new(ShareMap::custom()));
 /// let event_handler = Arc::new(Handler);
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
@@ -358,7 +359,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
-    pub data: &'a Arc<Mutex<ShareMap>>,
+    pub data: &'a Arc<RwLock<ShareMap>>,
     pub event_handler: &'a Arc<H>,
     #[cfg(feature = "framework")]
     pub framework: &'a Arc<Mutex<Option<Box<Framework + Send>>>>,

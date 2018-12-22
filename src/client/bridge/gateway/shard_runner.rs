@@ -4,6 +4,7 @@ use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 use crate::CacheAndHttp;
 use parking_lot::Mutex;
+use parking_lot::RwLock;
 use serde::Deserialize;
 use std::{
     borrow::Cow,
@@ -38,7 +39,7 @@ use super::super::voice::ClientVoiceManager;
 ///
 /// [`Shard`]: ../../../gateway/struct.Shard.html
 pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
-    data: Arc<Mutex<ShareMap>>,
+    data: Arc<RwLock<ShareMap>>,
     event_handler: Arc<H>,
     #[cfg(feature = "framework")]
     framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
@@ -489,7 +490,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 ///
 /// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
 pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
-    pub data: Arc<Mutex<ShareMap>>,
+    pub data: Arc<RwLock<ShareMap>>,
     pub event_handler: Arc<H>,
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<Framework + Send>>>>,

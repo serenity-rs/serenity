@@ -73,7 +73,7 @@ fn main() {
     // voice manager into it. This allows the voice manager to be accessible by
     // event handlers and framework commands.
     {
-        let mut data = client.data.lock();
+        let mut data = client.data.write();
         data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
     }
 
@@ -107,7 +107,7 @@ command!(join(ctx, msg, args) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
@@ -128,7 +128,7 @@ command!(leave(ctx, msg) {
         },
     };
 
-    let mut manager_lock = ctx.data.lock().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
     let has_handler = manager.get(guild_id).is_some();
 

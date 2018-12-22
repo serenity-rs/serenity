@@ -40,12 +40,11 @@ pub use crate::http as rest;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
 
 use crate::http;
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
+use parking_lot::RwLock;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::{sync::Arc, time::Duration};
 use threadpool::ThreadPool;
@@ -144,7 +143,7 @@ pub struct Client {
     /// fn reg<S>(ctx: Context, name: S)
     ///   where S: Into<std::string::String>
     /// {
-    ///     let mut data = ctx.data.lock();
+    ///     let mut data = ctx.data.write();
     ///     let counter = data.get_mut::<MessageEventCounter>().unwrap();
     ///     let entry = counter.entry(name.into()).or_insert(0);
     ///     *entry += 1;
@@ -170,7 +169,7 @@ pub struct Client {
     ///     .expect("Could not create client.");
     ///
     /// {
-    ///     let mut data = client.data.lock();
+    ///     let mut data = client.data.write();
     ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
@@ -186,7 +185,7 @@ pub struct Client {
     /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
-    pub data: Arc<Mutex<ShareMap>>,
+    pub data: Arc<RwLock<ShareMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was
     /// configured.
@@ -357,7 +356,7 @@ impl Client {
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http::get_gateway()?.url));
-        let data = Arc::new(Mutex::new(ShareMap::custom()));
+        let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = Arc::new(handler);
 
         #[cfg(feature = "framework")]
@@ -460,7 +459,7 @@ impl Client {
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http::get_gateway()?.url));
-        let data = Arc::new(Mutex::new(ShareMap::custom()));
+        let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = Arc::new(handler);
 
         #[cfg(feature = "framework")]
