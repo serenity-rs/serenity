@@ -4,7 +4,7 @@ use crate::error::Result;
 use crate::gateway::InterMessage;
 use crate::http;
 use crate::model::prelude::*;
-use parking_lot::Mutex;
+use parking_lot::RwLock;
 use serde_json::Value;
 use std::sync::{
     Arc,
@@ -15,8 +15,6 @@ use crate::utils::VecMap;
 use crate::utils::vecmap_to_json_map;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -39,7 +37,7 @@ pub struct Context {
     /// information.
     ///
     /// [`Client::data`]: struct.Client.html#structfield.data
-    pub data: Arc<Mutex<ShareMap>>,
+    pub data: Arc<RwLock<ShareMap>>,
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
@@ -51,7 +49,7 @@ pub struct Context {
 impl Context {
     /// Create a new Context to be passed to an event handler.
     pub(crate) fn new(
-        data: Arc<Mutex<ShareMap>>,
+        data: Arc<RwLock<ShareMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         cache: Arc<RwLock<Cache>>,

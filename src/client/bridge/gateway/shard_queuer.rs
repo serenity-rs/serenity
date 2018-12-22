@@ -2,6 +2,7 @@ use crate::gateway::Shard;
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
 use parking_lot::Mutex;
+use parking_lot::RwLock;
 use std::{
     collections::{HashMap, VecDeque},
     sync::{
@@ -45,7 +46,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     /// dispatching.
     ///
     /// [`Client::data`]: ../../struct.Client.html#structfield.data
-    pub data: Arc<Mutex<ShareMap>>,
+    pub data: Arc<RwLock<ShareMap>>,
     /// A reference to an `EventHandler`, such as the one given to the
     /// [`Client`].
     ///
