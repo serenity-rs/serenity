@@ -1,7 +1,7 @@
 use crate::internal::prelude::*;
+use crate::utils::VecMap;
 use serde_json::Value;
 use std::default::Default;
-use crate::utils::VecMap;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -82,23 +82,29 @@ impl CreateInvite {
     /// Create an invite with a max age of `3600` seconds, or 1 hour:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::command;
-    /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
-    /// # command!(example(context) {
+    /// # #[command]
+    /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(&context, |i| {
     ///     i.max_age(3600)
     /// })?;
-    /// # });
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
-        self.0.insert("max_age", Value::Number(Number::from(max_age)));
+        self.0
+            .insert("max_age", Value::Number(Number::from(max_age)));
         self
     }
 
@@ -113,23 +119,29 @@ impl CreateInvite {
     /// Create an invite with a max use limit of `5`:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::command;
-    /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
-    /// # command!(example(context) {
+    /// # #[command]
+    /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(&context, |i| {
     ///     i.max_uses(5)
     /// })?;
-    /// # });
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
-        self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
+        self.0
+            .insert("max_uses", Value::Number(Number::from(max_uses)));
         self
     }
 
@@ -142,20 +154,25 @@ impl CreateInvite {
     /// Create an invite which is temporary:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::command;
-    /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
-    /// # command!(example(context) {
+    /// # #[command]
+    /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(&context, |i| {
     ///     i.temporary(true)
     /// })?;
-    /// # });
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
     /// ```
     pub fn temporary(&mut self, temporary: bool) -> &mut Self {
         self.0.insert("temporary", Value::Bool(temporary));
@@ -171,20 +188,25 @@ impl CreateInvite {
     /// Create an invite which is unique:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::command;
-    /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
-    /// # command!(example(context) {
+    /// # #[command]
+    /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(&context, |i| {
     ///     i.unique(true)
     /// })?;
-    /// # });
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
         self.0.insert("unique", Value::Bool(unique));

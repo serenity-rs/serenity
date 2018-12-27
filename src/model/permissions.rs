@@ -158,7 +158,12 @@ pub const PRESET_VOICE: Permissions = Permissions {
 ///
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct Permissions {
-    bits: u64
+    /// The flags making up the permissions.
+    ///
+    /// # Note
+    /// Do not modify this yourself; use the provided methods.
+    /// Do the same when creating, unless you're absolutely certain that you're giving valid permission flags.
+    pub bits: u64
 }
 
 __impl_bitflags! {

@@ -518,23 +518,38 @@ impl Client {
     /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
     /// #
-    /// use serenity::framework::StandardFramework;
-    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
+    ///
     /// use std::env;
+    ///
+    /// use serenity::framework::StandardFramework;
+    /// use serenity::client::{Client, Context};
+    /// use serenity::model::channel::Message;
+    /// use serenity::framework::standard::{CommandResult, macros::{group, command}};
+    ///
+    /// #[command]
+    /// fn ping(_ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say("Pong!")?;
+    ///     Ok(())
+    /// }
+    ///
+    /// // Commands must be intermediately handled through groups.
+    /// group!({
+    ///     name: "pingpong",
+    ///     options: {},
+    ///     commands: [ping],
+    /// });
+    /// #
+    /// # fn try_main() -> Result<(), Box<Error>> {
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .on("ping", |context, msg, _| {
-    ///         msg.channel_id.say(&context.http, "Pong!")?;
-    ///
-    ///         Ok(())
-    ///      }));
+    ///     // The macros generate instances of command and group structs, which reside as `static` variables.
+    ///     // Hence the uppercase name, and the suffix for distinguishment.
+    ///     .group(&PINGPONG_GROUP));
     /// # Ok(())
     /// # }
     /// #
@@ -942,29 +957,11 @@ impl Client {
         #[cfg(feature = "voice")]
         self.voice_manager.lock().set_shard_count(shard_data[2]);
 
-        // This is kind of gross, but oh well.
-        //
-        // Both the framework and voice bridge need the user's ID, so we'll only
-        // retrieve it over REST if at least one of those are enabled.
-        #[cfg(any(all(feature = "standard_framework", feature = "framework"),
-                  feature = "voice"))]
+        #[cfg(feature = "voice")]
         {
             let user = self.cache_and_http.http.get_current_user()?;
 
-            // Update the framework's current user if the feature is enabled.
-            //
-            // This also acts as a form of check to ensure the token is correct.
-            #[cfg(all(feature = "standard_framework", feature = "framework"))]
-            {
-                if let Some(ref mut framework) = *self.framework.lock() {
-                    framework.update_current_user(user.id);
-                }
-            }
-
-            #[cfg(feature = "voice")]
-            {
-                self.voice_manager.lock().set_user_id(user.id);
-            }
+            self.voice_manager.lock().set_user_id(user.id);
         }
 
         {

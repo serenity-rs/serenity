@@ -25,49 +25,6 @@
 //! need to be sure that some information piece is sanctioned by Discord, refer
 //! to their own documentation.
 //!
-//! # Example Bot
-//!
-//! A basic ping-pong bot looks like:
-//!
-//! ```rust,no_run
-//! # #[cfg(all(feature = "client", feature = "standard_framework"))]
-//! # mod inner {
-//! #
-//! use serenity::{command, client::{Client, EventHandler},
-//!     framework::standard::StandardFramework};
-//! use std::env;
-//!
-//! struct Handler;
-//!
-//! impl EventHandler for Handler {}
-//!
-//! pub fn main() {
-//!     // Login with a bot token from the environment
-//!     let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
-//!         .expect("Error creating client");
-//!
-//!     client.with_framework(StandardFramework::new()
-//!         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-//!         .cmd("ping", ping));
-//!
-//!     // start listening for events by starting a single shard
-//!     if let Err(why) = client.start() {
-//!         println!("An error occurred while running the client: {:?}", why);
-//!     }
-//! }
-//!
-//! command!(ping(context, message) {
-//!     let _ = message.reply(&context, "Pong!");
-//! });
-//! #
-//! # }
-//! #
-//! # #[cfg(all(feature = "client", feature = "standard_framework"))]
-//! # fn main() { inner::main() }
-//! # #[cfg(not(all(feature = "client", feature = "standard_framework")))]
-//! # fn main() {}
-//! ```
-//!
 //! ### Full Examples
 //!
 //! Full examples, detailing and explaining usage of the basic functionality of the
@@ -102,7 +59,7 @@
 #![deny(rust_2018_idioms)]
 
 #[macro_use]
-extern crate serde_derive;
+extern crate serde;
 
 #[macro_use]
 mod internal;

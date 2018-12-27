@@ -1,0 +1,13 @@
+[package]
+name = "command_attr"
+version = "0.1.0"
+authors = ["acdenisSK <acdenissk69@gmail.com>"]
+edition = "2018"
+
+[lib]
+proc-macro = true
+
+[dependencies]
+quote = "^0.6"
+syn = { version = "^0.15", features = ["full", "derive", "extra-traits"] }
+proc-macro2 = "^0.4"

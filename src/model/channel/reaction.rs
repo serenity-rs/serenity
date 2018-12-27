@@ -343,17 +343,22 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::command;
-    /// #
     /// # #[cfg(all(feature = "client", feature = "framework"))]
-    /// # command!(example(context) {
-    /// #   let message = ChannelId(0).message(&context.http, 0)?;
+    /// # #[command]
+    /// # fn example(context: &mut Context) -> CommandResult {
+    /// #   let message = ChannelId(0).message(0)?;
     /// #
     /// message.react(&context, '🍎')?;
-    /// # });
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
     /// ```
     fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
 }
