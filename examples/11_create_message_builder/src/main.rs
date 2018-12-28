@@ -8,13 +8,13 @@ use serenity::{
 struct Handler;
 
 impl EventHandler for Handler {
-    fn message(&self, _: Context, msg: Message) {
+    fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!hello" {
             // The create message builder allows you to easily create embeds and messages
             // using a builder syntax.
             // This example will create a message that says "Hello, World!", with an embed that has
             // a title, description, three fields, and a footer.
-            let msg = msg.channel_id.send_message(|m| {
+            let msg = msg.channel_id.send_message(&ctx.http, |m| {
                 m.content("Hello, World!");
                 m.embed(|e| {
                     e.title("This is a title");

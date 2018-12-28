@@ -16,7 +16,6 @@ use serenity::{
     framework::StandardFramework,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
-    http,
 };
 
 use log::{error, info};
@@ -49,7 +48,7 @@ fn main() {
 
     let mut client = Client::new(&token, Handler).expect("Err creating client");
 
-    let owners = match http::get_current_application_info() {
+    let owners = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
             let mut set = HashSet::new();
             set.insert(info.owner.id);

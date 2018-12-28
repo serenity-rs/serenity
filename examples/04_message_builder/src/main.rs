@@ -32,7 +32,7 @@ impl EventHandler for Handler {
                 .push(" channel")
                 .build();
 
-            if let Err(why) = msg.channel_id.say(&response) {
+            if let Err(why) = msg.channel_id.say(&context.http, &response) {
                 println!("Error sending message: {:?}", why);
             }
         }
