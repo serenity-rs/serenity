@@ -39,13 +39,10 @@ use reqwest::{
     Method,
 };
 use crate::model::prelude::*;
-use parking_lot::Mutex;
 use self::{request::Request};
 use std::{
-    default::Default,
     fs::File,
     path::{Path, PathBuf},
-    sync::Arc
 };
 
 lazy_static! {
@@ -79,10 +76,6 @@ impl LightMethod {
             LightMethod::Put => Method::PUT,
         }
     }
-}
-
-lazy_static! {
-    static ref TOKEN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::default()));
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`

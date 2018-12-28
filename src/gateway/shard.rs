@@ -89,7 +89,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason -
     // not started within a decent amount of time.
     pub started: Instant,
-    pub token: Arc<Mutex<String>>,
+    pub token: String,
     ws_url: Arc<Mutex<String>>,
 }
 
@@ -133,7 +133,7 @@ impl Shard {
     /// ```
     pub fn new(
         ws_url: Arc<Mutex<String>>,
-        token: Arc<Mutex<String>>,
+        token: &str,
         shard_info: [u64; 2],
     ) -> Result<Shard> {
         let mut client = connect(&*ws_url.lock())?;
@@ -158,7 +158,7 @@ impl Shard {
             seq,
             stage,
             started: Instant::now(),
-            token,
+            token: token.to_string(),
             session_id,
             shard_info,
             ws_url,
@@ -751,7 +751,7 @@ impl Shard {
     // - the time that the last heartbeat sent as being now
     // - the `stage` to `Identifying`
     pub fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token.lock())?;
+        self.client.send_identify(&self.shard_info, &self.token)?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
@@ -805,7 +805,7 @@ impl Shard {
                     &self.shard_info,
                     session_id,
                     &self.seq,
-                    &self.token.lock(),
+                    &self.token,
                 )
             },
             None => Err(Error::Gateway(GatewayError::NoSessionId)),

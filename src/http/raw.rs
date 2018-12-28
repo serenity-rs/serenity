@@ -10,7 +10,6 @@ use reqwest::{
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use super::{
-    TOKEN,
     ratelimiting,
     request::Request,
     routing::RouteInfo,
@@ -27,38 +26,14 @@ use std::{
 
 pub struct Http {
     client: Client,
+    pub token: String,
 }
 
-/// Sets the token to be used across all requests which require authentication.
-///
-/// If you are using the client module, you don't need to use this. If you're
-/// using serenity solely for HTTP, you need to use this.
-///
-/// # Examples
-///
-/// Setting the token from an environment variable:
-///
-/// ```rust,no_run
-/// # use std::error::Error;
-/// #
-/// # fn try_main() -> Result<(), Box<Error>> {
-/// #
-/// use serenity::http;
-/// use std::env;
-///
-/// http::set_token(&env::var("DISCORD_TOKEN")?);
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     try_main().unwrap();
-/// # }
-pub fn set_token(token: &str) { TOKEN.lock().clone_from(&token.to_string()); }
-
 impl Http {
-    pub fn new(client: Client) -> Self {
+    pub fn new(client: Client, token: String) -> Self {
         Http {
-            client
+            client,
+            token
         }
     }
 
@@ -674,17 +649,6 @@ impl Http {
     }
 
     /// Edits the current user's profile settings.
-    ///
-    /// For bot users, the password is optional.
-    ///
-    /// # User Accounts
-    ///
-    /// If a new token is received due to a password change, then the stored token
-    /// internally will be updated.
-    ///
-    /// **Note**: this token change may cause requests made between the actual token
-    /// change and when the token is internally changed to be invalid requests, as
-    /// the token may be outdated.
     pub fn edit_profile(&self, map: &JsonMap) -> Result<CurrentUser> {
         let body = serde_json::to_vec(map)?;
 
@@ -694,15 +658,7 @@ impl Http {
             route: RouteInfo::EditProfile,
         })?;
 
-        let mut value = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
-
-        if let Some(map) = value.as_object_mut() {
-            if !TOKEN.lock().starts_with("Bot ") {
-                if let Some(Value::String(token)) = map.remove("token") {
-                    set_token(&token);
-                }
-            }
-        }
+        let value = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
 
         serde_json::from_value::<CurrentUser>(value).map_err(From::from)
     }
@@ -1517,7 +1473,7 @@ impl Http {
 
         let response = self.client
             .post(url)
-            .header(AUTHORIZATION, HeaderValue::from_str(&TOKEN.lock())?)
+            .header(AUTHORIZATION, HeaderValue::from_str(&self.token)?)
             .header(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT))
             .multipart(multipart).send()?;
 
@@ -1727,7 +1683,7 @@ impl Http {
         // If it doesn't and the loop breaks, try one last time.
         for _ in 0..3 {
 
-            match request.build(&self.client)?.send() {
+            match request.build(&self.client, &self.token)?.send() {
                 Ok(response) => return Ok(response),
                 Err(reqwest_error) => {
                     if let Some(io_error) = reqwest_error.get_ref().and_then(|e| e.downcast_ref::<std::io::Error>()) {
@@ -1742,7 +1698,7 @@ impl Http {
             }
         }
 
-        request.build(&self.client)
+        request.build(&self.client, &self.token)
             .map_err(Into::into)
             .and_then(|b| Ok(b.send()?))
     }

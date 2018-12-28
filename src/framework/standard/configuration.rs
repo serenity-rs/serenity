@@ -323,7 +323,10 @@ impl Configuration {
             return self;
         }
 
-        let http = Http::new(reqwest::Client::builder().build().expect("Could not construct Reqwest-Client."));
+        let http = Http::new(
+            reqwest::Client::builder().build().expect("Could not construct Reqwest-Client."),
+            "".to_string(),
+        );
 
         if let Ok(current_user) = http.get_current_user() {
             self.on_mention = Some(vec![

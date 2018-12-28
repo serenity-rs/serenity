@@ -80,8 +80,6 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     /// [`Client`]: ../../struct.Client.html
     /// [`Client::threadpool`]: ../../struct.Client.html#structfield.threadpool
     pub threadpool: ThreadPool,
-    /// A copy of the token to connect with.
-    pub token: Arc<Mutex<String>>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
@@ -177,7 +175,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
 
         let shard = Shard::new(
             Arc::clone(&self.ws_url),
-            Arc::clone(&self.token),
+            &self.cache_and_http.http.token,
             shard_info,
         )?;
 
