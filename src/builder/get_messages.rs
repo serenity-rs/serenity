@@ -26,15 +26,19 @@ use crate::utils::VecMap;
 /// message with an Id of `158339864557912064`:
 ///
 /// ```rust,no_run
-/// # use std::error::Error;
+/// # extern crate serenity;
+/// #
+/// # use serenity::http::Http;
+/// # use std::{error::Error, sync::Arc};
 /// #
 /// # fn try_main() -> Result<(), Box<Error>> {
+/// # let http = Arc::new(Http::default());
 /// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:
 /// let channel_id = ChannelId(81384788765712384);
 ///
-/// let _messages = channel_id.messages(|retriever| {
+/// let _messages = channel_id.messages(&http, |retriever| {
 ///     retriever.after(MessageId(158339864557912064)).limit(25)
 /// })?;
 /// #     Ok(())

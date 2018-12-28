@@ -114,7 +114,7 @@ impl Context {
                     map.insert("email", Value::String(email));
                 }
             } else {
-                let user = http::get_current_user()?;
+                let user = http.get_current_user()?;
 
                 map.insert("username", Value::String(user.name));
 

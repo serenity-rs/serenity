@@ -163,11 +163,12 @@ impl GuildChannel {
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use serenity::{cache::Cache, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn main() -> Result<(), Box<Error>> {
+    /// #     let http = Arc::new(Http::default());
     /// #     let cache = Arc::new(RwLock::new(Cache::default()));
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
@@ -189,7 +190,7 @@ impl GuildChannel {
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().create_permission(&overwrite)?;
+    /// channel.read().create_permission(&http, &overwrite)?;
     /// # Ok(())
     /// # }
     /// ```
@@ -202,12 +203,13 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # extern crate parking_lot;
     /// # extern crate serenity;
-    ///
-    /// # use serenity::{cache::Cache, model::id::{ChannelId, UserId}};
+    /// #
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
+    /// #   let http = Arc::new(Http::default());
     /// #   let cache = Arc::new(RwLock::new(Cache::default()));
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
@@ -230,7 +232,7 @@ impl GuildChannel {
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().create_permission(&overwrite)?;
+    /// channel.read().create_permission(&http, &overwrite)?;
     /// #     Ok(())
     /// # }
     /// #
@@ -517,7 +519,7 @@ impl GuildChannel {
     ///             },
     ///         };
     ///
-    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |mut m| {
+    ///         let _ = msg.channel_id.send_files(&context.http, vec![(&file, "cat.png")], |mut m| {
     ///             m.content("here's a cat");
     ///
     ///             m

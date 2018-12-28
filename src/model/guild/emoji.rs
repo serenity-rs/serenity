@@ -69,12 +69,9 @@ impl Emoji {
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::{command, model::{guild::Emoji, id::EmojiId}};
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
-    /// #
+    /// # command!(example(context) {
     /// # let mut emoji = Emoji {
     /// #     animated: false,
     /// #     id: EmojiId(7),
@@ -83,12 +80,12 @@ impl Emoji {
     /// #     require_colons: false,
     /// #     roles: vec![],
     /// # };
-    /// #
     /// // assuming emoji has been set already
-    /// match emoji.delete(&cache) {
+    /// match emoji.delete(&context) {
     ///     Ok(()) => println!("Emoji deleted."),
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
+    /// # });
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn delete(&self, context: &Context) -> Result<()> {
@@ -123,7 +120,7 @@ impl Emoji {
     /// #     roles: vec![],
     /// # };
     /// // assuming emoji has been set already
-    /// let _ = emoji.edit(&context.cache, "blobuwu");
+    /// let _ = emoji.edit(&context, "blobuwu");
     /// assert_eq!(emoji.name, "blobuwu");
     /// # });
     /// ```

@@ -16,14 +16,15 @@ use crate::utils::VecMap;
 /// payload of [`Webhook::execute`]:
 ///
 /// ```rust,no_run
-/// use serenity::http;
+/// use serenity::http::Http;
 /// use serenity::model::channel::Embed;
 /// use serenity::utils::Colour;
 ///
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-///
-/// let webhook = http::get_webhook_with_token(id, token)
+/// # use std::sync::Arc;
+/// # let http = Arc::new(Http::default());
+/// let webhook = http.get_webhook_with_token(id, token)
 ///     .expect("valid webhook");
 ///
 /// let website = Embed::fake(|e| {
@@ -39,7 +40,7 @@ use crate::utils::VecMap;
 ///         .field("Rust by Example", "A collection of Rust examples", false)
 /// });
 ///
-/// let _ = webhook.execute(false, |w| {
+/// let _ = webhook.execute(&http, false, |w| {
 ///     w.content("Here's some information on Rust:").embeds(vec![website, resources])
 /// });
 /// ```
@@ -58,13 +59,15 @@ impl ExecuteWebhook {
     /// Overriding the default avatar:
     ///
     /// ```rust,no_run
-    /// # use serenity::http;
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
     /// #
-    /// # let webhook = http::get_webhook_with_token(0, "").unwrap();
+    /// # let http = Arc::new(Http::default());
+    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
-    /// let _ = webhook.execute(false, |w| {
+    /// let _ = webhook.execute(&http, false, |w| {
     ///     w.avatar_url(avatar_url).content("Here's a webhook")
     /// });
     /// ```
@@ -83,11 +86,15 @@ impl ExecuteWebhook {
     /// Sending a webhook with a content of `"foo"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::rest;
+    /// # extern crate serenity;
     /// #
-    /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
     /// #
-    /// let execution = webhook.execute(false, |w| {
+    /// # let http = Arc::new(Http::default());
+    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
+    /// #
+    /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("foo")
     /// });
     ///
@@ -127,11 +134,13 @@ impl ExecuteWebhook {
     /// Sending a webhook with text-to-speech enabled:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::rest;
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
     /// #
-    /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
+    /// # let http = Arc::new(Http::default());
+    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
     /// #
-    /// let execution = webhook.execute(false, |w| {
+    /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").tts(true)
     /// });
     ///
@@ -151,11 +160,15 @@ impl ExecuteWebhook {
     /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
-    /// # use serenity::client::rest;
+    /// # extern crate serenity;
     /// #
-    /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
     /// #
-    /// let execution = webhook.execute(false, |w| {
+    /// # let http = Arc::new(Http::default());
+    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
+    /// #
+    /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").username("hakase")
     /// });
     ///

@@ -343,7 +343,7 @@ impl From<char> for ReactionType {
     /// # use serenity::{command, model::id::ChannelId};
     /// #
     /// # command!(example(context) {
-    /// #   let message = ChannelId(0).message(0)?;
+    /// #   let message = ChannelId(0).message(&context.http, 0)?;
     /// #
     /// message.react(&context, '🍎')?;
     /// # });

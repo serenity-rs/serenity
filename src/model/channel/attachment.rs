@@ -53,13 +53,13 @@ impl Attachment {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, mut message: Message) {
+    ///     fn message(&self, context: Context, mut message: Message) {
     ///         for attachment in message.attachments {
     ///             let content = match attachment.download() {
     ///                 Ok(content) => content,
     ///                 Err(why) => {
     ///                     println!("Error downloading attachment: {:?}", why);
-    ///                     let _ = message.channel_id.say("Error downloading attachment");
+    ///                     let _ = message.channel_id.say(&context.http, "Error downloading attachment");
     ///
     ///                     return;
     ///                 },
@@ -69,7 +69,7 @@ impl Attachment {
     ///                 Ok(file) => file,
     ///                 Err(why) => {
     ///                     println!("Error creating file: {:?}", why);
-    ///                     let _ = message.channel_id.say("Error creating file");
+    ///                     let _ = message.channel_id.say(&context.http, "Error creating file");
     ///
     ///                     return;
     ///                 },
@@ -81,7 +81,7 @@ impl Attachment {
     ///                 return;
     ///             }
     ///
-    ///             let _ = message.channel_id.say(&format!("Saved {:?}", attachment.filename));
+    ///             let _ = message.channel_id.say(&context.http, &format!("Saved {:?}", attachment.filename));
     ///         }
     ///     }
     ///

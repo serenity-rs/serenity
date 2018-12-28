@@ -61,7 +61,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use parking_lot::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::EventHandler;
-/// use serenity::http;
+/// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
 /// use std::sync::Arc;
 /// use std::env;
@@ -72,16 +72,13 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// impl EventHandler for Handler { }
 ///
-/// let token = env::var("DISCORD_TOKEN")?;
-/// http::set_token(&token);
-/// let token = Arc::new(Mutex::new(token));
-///
-/// let gateway_url = Arc::new(Mutex::new(http::get_gateway()?.url));
+/// # let cache_and_http = Arc::new(CacheAndHttp::default());
+/// # let http = &cache_and_http.http;
+/// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
 /// let data = Arc::new(RwLock::new(ShareMap::custom()));
 /// let event_handler = Arc::new(Handler);
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
-/// let cache_and_http = Arc::new(CacheAndHttp::default());
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
@@ -93,12 +90,11 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     shard_init: 3,
 ///     // the total number of shards in use
 ///     shard_total: 5,
-///     token: &token,
 ///     threadpool,
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
-///     cache_and_http: &cache_and_http,
+///     # cache_and_http: &cache_and_http,
 /// });
 /// #     Ok(())
 /// # }

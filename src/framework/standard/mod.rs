@@ -301,8 +301,8 @@ impl StandardFramework {
     ///     .bucket("basic", 2, 10, 3)
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec(|_, msg, _| {
-    ///             msg.channel_id.say("pong!")?;
+    ///         .exec(|context, msg, _| {
+    ///             msg.channel_id.say(&context.http, "pong!")?;
     ///
     ///             Ok(())
     ///         })));
@@ -345,8 +345,8 @@ impl StandardFramework {
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec(|_, msg, _| {
-    ///             msg.channel_id.say("pong!")?;
+    ///         .exec(|context, msg, _| {
+    ///             msg.channel_id.say(&context.http, "pong!")?;
     ///
     ///             Ok(())
     ///         })
@@ -402,8 +402,8 @@ impl StandardFramework {
     ///     })
     ///     .command("ping", |c| c
     ///         .bucket("basic")
-    ///         .exec(|_, mut msg, _| {
-    ///             msg.channel_id.say("pong!")?;
+    ///         .exec(|context, mut msg, _| {
+    ///             msg.channel_id.say(&context.http, "pong!")?;
     ///
     ///             Ok(())
     ///         })
@@ -455,7 +455,7 @@ impl StandardFramework {
     ///     .simple_bucket("simple", 2)
     ///     .command("ping", |c| c
     ///         .bucket("simple")
-    ///         .exec(|_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })));
+    ///         .exec(|context, msg, _| { msg.channel_id.say(&context.http, "pong!")?; Ok(()) })));
     /// ```
     pub fn simple_bucket(mut self, s: &str, delay: i64) -> Self {
         self.buckets.insert(
@@ -672,8 +672,8 @@ impl StandardFramework {
     /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().on("ping", |_, mut msg, _| {
-    ///     msg.channel_id.say("pong!")?;
+    /// client.with_framework(StandardFramework::new().on("ping", |context, mut msg, _| {
+    ///     msg.channel_id.say(&context.http, "pong!")?;
     ///
     ///     Ok(())
     /// }));
@@ -791,8 +791,8 @@ impl StandardFramework {
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .group("ping-pong", |g| g
-    ///         .on("ping", |_, msg, _| { msg.channel_id.say("pong!")?; Ok(()) })
-    ///         .on("pong", |_, msg, _| { msg.channel_id.say("ping!")?; Ok(()) })));
+    ///         .on("ping", |context, msg, _| { msg.channel_id.say(&context.http, "pong!")?; Ok(()) })
+    ///         .on("pong", |context, msg, _| { msg.channel_id.say(&context.http, "ping!")?; Ok(()) })));
     /// ```
     pub fn group<F>(mut self, group_name: &str, f: F) -> Self
         where F: FnOnce(CreateGroup) -> CreateGroup {
@@ -824,17 +824,17 @@ impl StandardFramework {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .on_dispatch_error(|_, msg, error| {
+    ///     .on_dispatch_error(|context, msg, error| {
     ///         match error {
     ///             NotEnoughArguments { min, given } => {
     ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
     ///
-    ///                 let _ = msg.channel_id.say(&s);
+    ///                 let _ = msg.channel_id.say(&context.http, &s);
     ///             },
     ///             TooManyArguments { max, given } => {
     ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
     ///
-    ///                 let _ = msg.channel_id.say(&s);
+    ///                 let _ = msg.channel_id.say(&context.http, &s);
     ///             },
     ///             _ => println!("Unhandled dispatch error."),
     ///         }

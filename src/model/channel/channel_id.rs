@@ -540,13 +540,19 @@ impl ChannelId {
     /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
     ///
     /// ```rust,no_run
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::model::id::ChannelId;
     ///
     /// let channel_id = ChannelId(7);
     ///
     /// let paths = vec!["/path/to/file.jpg", "path/to/file2.jpg"];
     ///
-    /// let _ = channel_id.send_files(paths, |m| {
+    /// let _ = channel_id.send_files(&http, paths, |m| {
     ///     m.content("a file")
     /// });
     /// ```
@@ -554,6 +560,11 @@ impl ChannelId {
     /// Send files using `File`:
     ///
     /// ```rust,no_run
+    /// # extern crate serenity;
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::model::id::ChannelId;
     /// use std::fs::File;
     ///
@@ -564,7 +575,7 @@ impl ChannelId {
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
-    /// let _ = channel_id.send_files(files, |m| {
+    /// let _ = channel_id.send_files(&http, files, |m| {
     ///     m.content("a file")
     /// });
     /// ```

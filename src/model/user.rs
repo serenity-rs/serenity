@@ -140,16 +140,17 @@ impl CurrentUser {
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// # let cache = cache.read();
+    /// # let http = Arc::new(Http::default());
     /// // assuming the cache has been unlocked
     /// let user = &cache.user;
     ///
-    /// if let Ok(guilds) = user.guilds() {
+    /// if let Ok(guilds) = user.guilds(&http) {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
     ///         println!("{}: {}", index, guild.name);
     ///     }
@@ -173,17 +174,18 @@ impl CurrentUser {
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// # let mut cache = cache.write();
+    /// # let http = Arc::new(Http::default());
     ///
     /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(Permissions::empty()) {
+    /// let url = match cache.user.invite_url(&http, Permissions::empty()) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -202,16 +204,17 @@ impl CurrentUser {
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// # let mut cache = cache.write();
+    /// # let http = Arc::new(Http::default());
     /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
+    /// let url = match cache.user.invite_url(&http, Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -455,7 +458,7 @@ impl User {
     ///         if msg.content == "~help" {
     ///             let cache = ctx.cache.read();
     ///
-    ///             let url = match cache.user.invite_url(Permissions::empty()) {
+    ///             let url = match cache.user.invite_url(&ctx.http, Permissions::empty()) {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -738,14 +741,14 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, msg: Message) {
+    ///     fn message(&self, context: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")
     ///                 .push(Bold + msg.author.tag())
     ///                 .build();
     ///
-    ///             let _ = msg.channel_id.say(&content);
+    ///             let _ = msg.channel_id.say(&context.http, &content);
     ///         }
     ///     }
     /// }

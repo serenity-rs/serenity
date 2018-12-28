@@ -198,6 +198,7 @@ use std::{time::Duration, sync::Arc};
 use crate::http::Http;
 
 #[cfg(feature = "client")]
+#[derive(Default)]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<RwLock<Cache>>,

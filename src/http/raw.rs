@@ -30,10 +30,17 @@ pub struct Http {
 }
 
 impl Http {
-    pub fn new(client: Client, token: String) -> Self {
+    pub fn new(client: Client, token: &str) -> Self {
         Http {
             client,
-            token
+            token: token.to_string(),
+        }
+    }
+
+    pub fn new_with_token(token: &str) -> Self {
+        Http {
+            client: Client::builder().build().expect("Cannot build Reqwest::Client."),
+            token: token.to_string(),
         }
     }
 
@@ -207,14 +214,14 @@ impl Http {
     ///
     /// use serde_json::builder::ObjectBuilder;
     /// use serde_json::Value;
-    /// use serenity::http;
+    /// use serenity::http::Http;
     ///
     /// let map = ObjectBuilder::new()
     ///     .insert("name", "test")
     ///     .insert("region", "us-west")
     ///     .build();
     ///
-    /// let _result = http::create_guild(map);
+    /// let _result = http.create_guild(map);
     /// ```
     ///
     /// [`Guild`]: ../../model/guild/struct.Guild.html
@@ -344,12 +351,12 @@ impl Http {
     /// extern crate serenity;
     ///
     /// use serde_json::builder::ObjectBuilder;
-    /// use serenity::http;
+    /// use serenity::http::Http;
     ///
     /// let channel_id = 81384788765712384;
     /// let map = ObjectBuilder::new().insert("name", "test").build();
     ///
-    /// let webhook = http::create_webhook(channel_id, map).expect("Error creating");
+    /// let webhook = http.create_webhook(channel_id, map).expect("Error creating");
     /// ```
     ///
     /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
@@ -432,13 +439,18 @@ impl Http {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// use serenity::http;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::model::id::{ChannelId, MessageId};
     ///
     /// let channel_id = ChannelId(7);
     /// let message_id = MessageId(8);
     ///
-    /// let _ = http::delete_message_reactions(channel_id.0, message_id.0)
+    /// let _ = http.delete_message_reactions(channel_id.0, message_id.0)
     ///     .expect("Error deleting reactions");
     /// ```
     ///
@@ -504,14 +516,14 @@ impl Http {
     /// Deletes a webhook given its Id:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
-    /// use std::env;
+    /// use serenity::http::Http;
+    /// use std::{env, sync::Arc};
     ///
     /// // Due to the `delete_webhook` function requiring you to authenticate, you
     /// // must have set the token first.
-    /// http::set_token(&env::var("DISCORD_TOKEN").unwrap());
+    /// let http = Arc::new(Http::default());
     ///
-    /// http::delete_webhook(245037420704169985).expect("Error deleting webhook");
+    /// http.delete_webhook(245037420704169985).expect("Error deleting webhook");
     /// ```
     ///
     /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
@@ -533,12 +545,16 @@ impl Http {
     /// Deletes a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
-    ///
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// http::delete_webhook_with_token(id, token).expect("Error deleting webhook");
+    /// http.delete_webhook_with_token(id, token).expect("Error deleting webhook");
     /// ```
     ///
     /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
@@ -711,7 +727,7 @@ impl Http {
     /// extern crate serenity;
     ///
     /// use serde_json::builder::ObjectBuilder;
-    /// use serenity::http;
+    /// use serenity::http::Http;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
@@ -719,7 +735,7 @@ impl Http {
     ///     .expect("Error reading image");
     /// let map = ObjectBuilder::new().insert("avatar", image).build();
     ///
-    /// let edited = http::edit_webhook_with_token(id, token, map)
+    /// let edited = http.edit_webhook_with_token(id, token, map)
     ///     .expect("Error editing webhook");
     /// ```
     ///
@@ -750,13 +766,13 @@ impl Http {
     /// extern crate serenity;
     ///
     /// use serde_json::builder::ObjectBuilder;
-    /// use serenity::http;
+    /// use serenity::http::Http;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let map = ObjectBuilder::new().insert("name", "new name").build();
     ///
-    /// let edited = http::edit_webhook_with_token(id, token, map)
+    /// let edited = http.edit_webhook_with_token(id, token, map)
     ///     .expect("Error editing webhook");
     /// ```
     ///
@@ -807,13 +823,13 @@ impl Http {
     /// extern crate serenity;
     ///
     /// use serde_json::builder::ObjectBuilder;
-    /// use serenity::http;
+    /// use serenity::http::Http;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let map = ObjectBuilder::new().insert("content", "test").build();
     ///
-    /// let message = match http::execute_webhook(id, token, true, map) {
+    /// let message = match http.execute_webhook(id, token, true, map) {
     ///     Ok(Some(message)) => message,
     ///     Ok(None) => {
     ///         println!("Expected a webhook message");
@@ -932,11 +948,16 @@ impl Http {
     /// Retrieve all of the webhooks owned by a channel:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     ///
     /// let channel_id = 81384788765712384;
     ///
-    /// let webhooks = http::get_channel_webhooks(channel_id)
+    /// let webhooks = http.get_channel_webhooks(channel_id)
     ///     .expect("Error getting channel webhooks");
     /// ```
     ///
@@ -1128,11 +1149,15 @@ impl Http {
     /// Retrieve all of the webhooks owned by a guild:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
-    ///
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// let guild_id = 81384788765712384;
     ///
-    /// let webhooks = http::get_guild_webhooks(guild_id)
+    /// let webhooks = http.get_guild_webhooks(guild_id)
     ///     .expect("Error getting guild webhooks");
     /// ```
     ///
@@ -1156,12 +1181,17 @@ impl Http {
     /// Get the first 10 guilds after a certain guild's Id:
     ///
     /// ```rust,no_run
-    /// use serenity::http::{GuildPagination, get_guilds};
-    /// use serenity::model::id::GuildId;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
+    /// use serenity::{http::GuildPagination, model::id::GuildId};
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// let guilds = get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
+    /// let guilds = http.get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
     /// ```
     ///
     /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
@@ -1338,10 +1368,15 @@ impl Http {
     /// Retrieve a webhook by Id:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     ///
     /// let id = 245037420704169985;
-    /// let webhook = http::get_webhook(id).expect("Error getting webhook");
+    /// let webhook = http.get_webhook(id).expect("Error getting webhook");
     /// ```
     ///
     /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
@@ -1362,12 +1397,16 @@ impl Http {
     /// Retrieve a webhook by Id and its unique token:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
-    ///
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let webhook = http::get_webhook_with_token(id, token)
+    /// let webhook = http.get_webhook_with_token(id, token)
     ///     .expect("Error getting webhook");
     /// ```
     pub fn get_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<Webhook> {
@@ -1586,11 +1625,16 @@ impl Http {
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::{
-    ///  http.{
-    ///         self,
-    ///         request::RequestBuilder,
+    ///     http::{
     ///         routing::RouteInfo,
+    ///         request::RequestBuilder,
     ///     },
     ///     model::channel::Message,
     /// };
@@ -1604,7 +1648,7 @@ impl Http {
     /// let mut request = RequestBuilder::new(route_info);
     /// request.body(Some(&bytes));
     ///
-    /// let message = http::fire::<Message>(request.build())?;
+    /// let message = http.fire::<Message>(request.build())?;
     ///
     /// println!("Message content: {}", message.content);
     /// #
@@ -1635,10 +1679,11 @@ impl Http {
     /// ```rust,no_run
     /// # extern crate serenity;
     /// #
-    /// # use std::error::Error;
+    /// # use serenity::http::Http;
+    /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::http::{
     ///     self,
     ///     request::RequestBuilder,
@@ -1654,7 +1699,7 @@ impl Http {
     /// let mut request = RequestBuilder::new(route_info);
     /// request.body(Some(&bytes));
     ///
-    /// let response = http::request(request.build())?;
+    /// let response = http.request(request.build())?;
     ///
     /// println!("Response successful?: {}", response.status().is_success());
     /// #
@@ -1720,5 +1765,13 @@ impl Http {
 
         Err(Error::Http(HttpError::UnsuccessfulRequest(resp)))
     }
+}
 
+impl Default for Http {
+    fn default() -> Self {
+        Self {
+            client: Client::builder().build().expect("Cannot build Reqwest::Client."),
+            token: "".to_string(),
+        }
+    }
 }

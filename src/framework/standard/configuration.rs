@@ -221,8 +221,8 @@ impl Configuration {
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .on("ping", |_, msg, _| {
-    ///         msg.channel_id.say("Pong!")?;
+    ///     .on("ping", |context, msg, _| {
+    ///         msg.channel_id.say(&context.http, "Pong!")?;
     ///
     ///         Ok(())
     ///     })
@@ -255,8 +255,8 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
-    ///     .on("ping", |_, msg, _| {
-    ///         msg.channel_id.say("Pong!")?;
+    ///     .on("ping", |context, msg, _| {
+    ///         msg.channel_id.say(&context.http, "Pong!")?;
     ///
     ///         Ok(())
     ///      })
@@ -325,7 +325,7 @@ impl Configuration {
 
         let http = Http::new(
             reqwest::Client::builder().build().expect("Could not construct Reqwest-Client."),
-            "".to_string(),
+            "",
         );
 
         if let Ok(current_user) = http.get_current_user() {

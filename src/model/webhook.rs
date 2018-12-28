@@ -84,32 +84,40 @@ impl Webhook {
     /// Editing a webhook's name:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
+    /// # extern crate serenity;
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = http.get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.edit(Some("new name"), None).expect("Error editing");
+    /// let _ = webhook.edit(&http, Some("new name"), None).expect("Error editing");
     /// ```
     ///
     /// Setting a webhook's avatar:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
-    ///
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = http.get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let image = serenity::utils::read_image("./webhook_img.png")
     ///     .expect("Error reading image");
     ///
-    /// let _ = webhook.edit(None, Some(&image)).expect("Error editing");
+    /// let _ = webhook.edit(&http, None, Some(&image)).expect("Error editing");
     /// ```
     ///
     /// [`http::edit_webhook`]: ../../http/fn.edit_webhook.html
@@ -156,15 +164,18 @@ impl Webhook {
     /// Execute a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
-    ///
+    /// # extern crate serenity;
+    /// use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = http.get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
-    /// let _ = webhook.execute(false, |mut w| {
+    /// let _ = webhook.execute(&http, false, |mut w| {
     ///     w.content("test");
     ///
     ///     w
@@ -175,13 +186,17 @@ impl Webhook {
     /// username to `serenity`, and sending an embed:
     ///
     /// ```rust,no_run
-    /// use serenity::http;
+    /// # extern crate serenity;
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::model::channel::Embed;
     ///
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http::get_webhook_with_token(id, token)
+    /// let mut webhook = http.get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let embed = Embed::fake(|mut e| {
@@ -194,7 +209,7 @@ impl Webhook {
     ///     e
     /// });
     ///
-    /// let _ = webhook.execute(false, |mut w| {
+    /// let _ = webhook.execute(&http, false, |mut w| {
     ///     w.content("test");
     ///     w.username("serenity");
     ///     w.embeds(vec![embed]);
