@@ -15,7 +15,9 @@ use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{cache::Cache, http};
+use crate::cache::Cache;
+#[cfg(all(feature = "cache", feature = "model", feature = "http"))]
+use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -88,10 +90,10 @@ impl Emoji {
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
     /// ```
-    #[cfg(feature = "cache")]
-    pub fn delete(&self, cache: &Arc<RwLock<Cache>>) -> Result<()> {
-        match self.find_guild_id(&cache) {
-            Some(guild_id) => http::delete_emoji(guild_id.0, self.id.0),
+    #[cfg(all(feature = "cache", feature = "http"))]
+    pub fn delete(&self, context: &Context) -> Result<()> {
+        match self.find_guild_id(&context.cache) {
+            Some(guild_id) => context.http.delete_emoji(guild_id.0, self.id.0),
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
@@ -125,15 +127,15 @@ impl Emoji {
     /// assert_eq!(emoji.name, "blobuwu");
     /// # });
     /// ```
-    #[cfg(feature = "cache")]
-    pub fn edit(&mut self, cache: &Arc<RwLock<Cache>>, name: &str) -> Result<()> {
-        match self.find_guild_id(&cache) {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    pub fn edit(&mut self, context: &Context, name: &str) -> Result<()> {
+        match self.find_guild_id(&context.cache) {
             Some(guild_id) => {
                 let map = json!({
                     "name": name,
                 });
 
-                match http::edit_emoji(guild_id.0, self.id.0, &map) {
+                match context.http.edit_emoji(guild_id.0, self.id.0, &map) {
                     Ok(emoji) => {
                         mem::replace(self, emoji);
 

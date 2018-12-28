@@ -4,8 +4,8 @@ use reqwest::{
     header::{AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
     Url,
 };
+use reqwest::Client as Http;
 use super::{
-    CLIENT,
     TOKEN,
     HttpError,
     routing::RouteInfo,
@@ -63,7 +63,7 @@ impl<'a> Request<'a> {
         Self { body, headers, route }
     }
 
-    pub fn build(&'a self) -> Result<ReqwestRequestBuilder, HttpError> {
+    pub fn build(&'a self, client: &Http) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
             headers: ref request_headers,
@@ -72,7 +72,7 @@ impl<'a> Request<'a> {
 
         let (method, _, path) = route_info.deconstruct();
 
-        let mut builder = CLIENT.request(
+        let mut builder = client.request(
             method.reqwest_method(),
             Url::parse(&path)?,
         );

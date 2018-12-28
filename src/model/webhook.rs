@@ -18,7 +18,11 @@ use std::mem;
 #[cfg(feature = "model")]
 use super::channel::Message;
 #[cfg(feature = "model")]
-use crate::{http, utils};
+use crate::utils;
+#[cfg(feature = "http")]
+use std::sync::Arc;
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -62,7 +66,7 @@ impl Webhook {
     ///
     /// [`http::delete_webhook_with_token`]: ../../http/fn.delete_webhook_with_token.html
     #[inline]
-    pub fn delete(&self) -> Result<()> { http::delete_webhook_with_token(self.id.0, &self.token) }
+    pub fn delete(&self, http: &Http) -> Result<()> { http.delete_webhook_with_token(self.id.0, &self.token) }
 
     ///
     /// Edits the webhook in-place. All fields are optional.
@@ -110,7 +114,7 @@ impl Webhook {
     ///
     /// [`http::edit_webhook`]: ../../http/fn.edit_webhook.html
     /// [`http::edit_webhook_with_token`]: ../../http/fn.edit_webhook_with_token.html
-    pub fn edit(&mut self, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
+    pub fn edit(&mut self, http: &Arc<Http>, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
         }
@@ -132,7 +136,7 @@ impl Webhook {
             map.insert("name".to_string(), Value::String(name.to_string()));
         }
 
-        match http::edit_webhook_with_token(self.id.0, &self.token, &map) {
+        match http.edit_webhook_with_token(self.id.0, &self.token, &map) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 
@@ -199,13 +203,13 @@ impl Webhook {
     /// });
     /// ```
     #[inline]
-    pub fn execute<F>(&self, wait: bool, f: F) -> Result<Option<Message>>
+    pub fn execute<F>(&self, http: &Arc<Http>, wait: bool, f: F) -> Result<Option<Message>>
     where F: FnOnce(&mut ExecuteWebhook) -> &mut ExecuteWebhook {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
         let map = utils::vecmap_to_json_map(execute_webhook.0);
 
-        http::execute_webhook(self.id.0, &self.token, wait, &map)
+     http.execute_webhook(self.id.0, &self.token, wait, &map)
     }
 
     /// Retrieves the latest information about the webhook, editing the
@@ -215,8 +219,8 @@ impl Webhook {
     /// authentication is not required.
     ///
     /// [`http::get_webhook_with_token`]: ../../http/fn.get_webhook_with_token.html
-    pub fn refresh(&mut self) -> Result<()> {
-        match http::get_webhook_with_token(self.id.0, &self.token) {
+    pub fn refresh(&mut self, http: &Http) -> Result<()> {
+        match http.get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {
                 let _ = mem::replace(self, replacement);
 
@@ -236,5 +240,5 @@ impl WebhookId {
     /// [`Webhook`]: struct.Webhook.html
     /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
-    pub fn to_webhook(self) -> Result<Webhook> { http::get_webhook(self.0) }
+    pub fn to_webhook(self, http: &Http) -> Result<Webhook> { http.get_webhook(self.0) }
 }

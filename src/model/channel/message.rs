@@ -19,7 +19,9 @@ use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(feature = "model")]
-use crate::{constants, http, utils as serenity_utils};
+use crate::{constants, utils as serenity_utils};
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -147,6 +149,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    #[cfg(feature = "http")]
     pub fn delete(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -159,7 +162,7 @@ impl Message {
             }
         }
 
-        self.channel_id.delete_message(self.id)
+        self.channel_id.delete_message(&context.http, self.id)
     }
 
     /// Deletes all of the [`Reaction`]s associated with the message.
@@ -175,6 +178,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    #[cfg(feature = "http")]
     pub fn delete_reactions(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -185,7 +189,7 @@ impl Message {
             }
         }
 
-        http::delete_message_reactions(self.channel_id.0, self.id.0)
+        context.http.delete_message_reactions(self.channel_id.0, self.id.0)
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -220,6 +224,7 @@ impl Message {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
+    #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(&mut EditMessage) -> &mut EditMessage {
         #[cfg(feature = "cache")]
@@ -247,7 +252,7 @@ impl Message {
 
         let map = serenity_utils::vecmap_to_json_map(builder.0);
 
-        match http::edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
+        match context.http.edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {
                 mem::replace(self, edited);
 
@@ -328,15 +333,17 @@ impl Message {
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    #[cfg(feature = "http")]
     #[inline]
     pub fn reaction_users<R, U>(
         &self,
+        http: &Arc<Http>,
         reaction_type: R,
         limit: Option<u8>,
         after: U,
     ) -> Result<Vec<User>> where R: Into<ReactionType>,
                                  U: Into<Option<UserId>> {
-        self.channel_id.reaction_users(self.id, reaction_type, limit, after)
+        self.channel_id.reaction_users(&http, self.id, reaction_type, limit, after)
     }
 
     /// Returns the associated `Guild` for the message if one is in the cache.
@@ -413,7 +420,7 @@ impl Message {
             }
         }
 
-        self.channel_id.pin(self.id.0)
+        self.channel_id.pin(&context.http, self.id.0)
     }
 
     /// React to the message with a custom [`Emoji`] or unicode character.
@@ -436,6 +443,7 @@ impl Message {
         self._react(&context, &reaction_type.into())
     }
 
+    #[cfg(feature = "http")]
     fn _react(&self, context: &Context, reaction_type: &ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -448,7 +456,7 @@ impl Message {
             }
         }
 
-        http::create_reaction(self.channel_id.0, self.id.0, reaction_type)
+        context.http.create_reaction(self.channel_id.0, self.id.0, reaction_type)
     }
 
     /// Replies to the user, mentioning them prior to the content in the form
@@ -473,6 +481,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    #[cfg(feature = "http")]
     pub fn reply(&self, context: &Context, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -498,7 +507,7 @@ impl Message {
             "tts": false,
         });
 
-        http::send_message(self.channel_id.0, &map)
+        context.http.send_message(self.channel_id.0, &map)
     }
 
     /// Checks whether the message mentions passed [`UserId`].
@@ -532,6 +541,7 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    #[cfg(feature = "http")]
     pub fn unpin(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -544,7 +554,7 @@ impl Message {
             }
         }
 
-        http::unpin_message(self.channel_id.0, self.id.0)
+        context.http.unpin_message(self.channel_id.0, self.id.0)
     }
 
     /// Tries to return author's nickname in the current channel's guild.

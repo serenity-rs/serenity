@@ -13,7 +13,7 @@ use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use chrono::NaiveDateTime;
 #[cfg(feature = "model")]
-use crate::http::{self, GuildPagination};
+use crate::http::GuildPagination;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(feature = "model")]
@@ -26,6 +26,8 @@ use crate::cache::Cache;
 use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::utils::{self, VecMap};
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
@@ -94,7 +96,7 @@ impl CurrentUser {
     /// ```
     ///
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
-    pub fn edit<F>(&mut self, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, http: &Arc<Http>, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = VecMap::new();
         map.insert("username", Value::String(self.name.clone()));
@@ -105,7 +107,7 @@ impl CurrentUser {
 
         let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
 
-        match http::edit_profile(&map) {
+        match http.edit_profile(&map) {
             Ok(new) => {
                 let _ = mem::replace(self, new);
 
@@ -153,8 +155,8 @@ impl CurrentUser {
     ///     }
     /// }
     /// ```
-    pub fn guilds(&self) -> Result<Vec<GuildInfo>> {
-        http::get_guilds(&GuildPagination::After(GuildId(1)), 100)
+    pub fn guilds(&self, http: &Http) -> Result<Vec<GuildInfo>> {
+     http.get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -233,9 +235,9 @@ impl CurrentUser {
     ///
     /// [`Error::Format`]: ../../enum.Error.html#variant.Format
     /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
-    pub fn invite_url(&self, permissions: Permissions) -> Result<String> {
+    pub fn invite_url(&self, http: &Arc<Http>, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
-        let client_id = http::get_current_application_info().map(|v| v.id)?;
+        let client_id = http.get_current_application_info().map(|v| v.id)?;
 
         let mut url = format!(
             "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
@@ -420,7 +422,7 @@ impl User {
     ///
     /// [current user]: struct.CurrentUser.html
     #[inline]
-    pub fn create_dm_channel(&self) -> Result<PrivateChannel> { self.id.create_dm_channel() }
+    pub fn create_dm_channel(&self, http: &Http) -> Result<PrivateChannel> { self.id.create_dm_channel(&http) }
 
     /// Retrieves the time that this user was created at.
     #[inline]
@@ -511,7 +513,7 @@ impl User {
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(clippy::let_and_return)]
-    #[cfg(feature = "builder")]
+    #[cfg(all(feature = "builder", feature = "http"))]
     pub fn direct_message<F>(&self, context: &Context, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         if self.bot {
@@ -539,18 +541,18 @@ impl User {
                         "recipient_id": self.id.0,
                     });
 
-                    http::create_private_channel(&map)?.id
+                    context.http.create_private_channel(&map)?.id
                 }
             } else {
                 let map = json!({
                     "recipient_id": self.id.0,
                 });
 
-                http::create_private_channel(&map)?.id
+                context.http.create_private_channel(&map)?.id
             }
         };
 
-        private_channel_id.send_message(f)
+        private_channel_id.send_message(&context.http, f)
     }
 
     /// This is an alias of [direct_message].
@@ -792,12 +794,12 @@ impl UserId {
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: ../user/struct.CurrentUser.html
-    pub fn create_dm_channel(&self) -> Result<PrivateChannel> {
+    pub fn create_dm_channel(&self, http: &Http) -> Result<PrivateChannel> {
         let map = json!({
             "recipient_id": self.0,
         });
 
-        http::create_private_channel(&map)
+        http.create_private_channel(&map)
     }
 
     /// Attempts to find a [`User`] by its Id in the cache.
@@ -814,6 +816,7 @@ impl UserId {
     /// REST API will be used only.
     ///
     /// [`User`]: ../user/struct.User.html
+    #[cfg(feature = "http")]
     #[inline]
     pub fn to_user(self, context: &Context) -> Result<User> {
         #[cfg(feature = "cache")]
@@ -823,7 +826,7 @@ impl UserId {
             }
         }
 
-        http::get_user(self.0)
+        context.http.get_user(self.0)
     }
 }
 

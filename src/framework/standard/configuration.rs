@@ -1,5 +1,4 @@
 use crate::client::Context;
-use crate::http;
 use crate::model::{
     channel::Message,
     id::{ChannelId, GuildId, UserId}
@@ -10,6 +9,9 @@ use std::{
     sync::Arc,
 };
 use super::command::{Command, InternalCommand, PrefixCheck};
+
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// The configuration to use for a [`StandardFramework`] associated with a [`Client`]
 /// instance.
@@ -315,12 +317,15 @@ impl Configuration {
     /// encourages you to ignore differentiating between the two.
     ///
     /// [`prefix`]: #method.prefix
+    #[cfg(feature = "http")]
     pub fn on_mention(mut self, on_mention: bool) -> Self {
         if !on_mention {
             return self;
         }
 
-        if let Ok(current_user) = http::get_current_user() {
+        let http = Http::new(reqwest::Client::builder().build().expect("Could not construct Reqwest-Client."));
+
+        if let Ok(current_user) = http.get_current_user() {
             self.on_mention = Some(vec![
                 format!("<@{}>", current_user.id),  // Regular mention
                 format!("<@!{}>", current_user.id), // Nickname mention

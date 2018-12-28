@@ -16,8 +16,8 @@ use crate::internal::prelude::*;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
-#[cfg(feature = "model")]
-use crate::http;
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -70,6 +70,7 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
+    #[cfg(feature = "http")]
     pub fn delete(&self, context: &Context) -> Result<()> {
         let user_id = feature_cache! {
             {
@@ -99,7 +100,7 @@ impl Reaction {
             }
         };
 
-        http::delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+        context.http.delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -112,9 +113,10 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [`Message`]: struct.Message.html
+    #[cfg(feature = "http")]
     #[inline]
-    pub fn message(&self) -> Result<Message> {
-        self.channel_id.message(self.message_id)
+    pub fn message(&self, http: &Arc<Http>) -> Result<Message> {
+        self.channel_id.message(&http, self.message_id)
     }
 
     /// Retrieves the user that made the reaction.
@@ -152,28 +154,34 @@ impl Reaction {
     /// [`User`]: ../user/struct.User.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [permissions]: ../permissions/index.html
+    #[cfg(feature = "http")]
     #[inline]
     pub fn users<R, U>(&self,
+                       http: &Arc<Http>,
                        reaction_type: R,
                        limit: Option<u8>,
                        after: Option<U>)
                        -> Result<Vec<User>>
         where R: Into<ReactionType>, U: Into<UserId> {
-        self._users(&reaction_type.into(), limit, after.map(Into::into))
+        self._users(&http, &reaction_type.into(), limit, after.map(Into::into))
     }
 
+    #[cfg(feature = "http")]
     fn _users(
         &self,
+        http: &Arc<Http>,
         reaction_type: &ReactionType,
         limit: Option<u8>,
         after: Option<UserId>,
     ) -> Result<Vec<User>> {
         let mut limit = limit.unwrap_or(50);
+
         if limit > 100 {
             limit = 100;
             warn!("Rection users limit clamped to 100! (API Restriction)");
         }
-        http::get_reaction_users(
+
+        http.get_reaction_users(
             self.channel_id.0,
             self.message_id.0,
             reaction_type,

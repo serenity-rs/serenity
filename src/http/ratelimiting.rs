@@ -58,7 +58,7 @@ use std::{
     thread,
     i64,
 };
-use super::{HttpError, Request};
+use super::{Http, HttpError, Request};
 
 /// Refer to [`offset`].
 ///
@@ -106,7 +106,7 @@ lazy_static! {
     };
 }
 
-pub(super) fn perform(req: Request) -> Result<Response> {
+pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
     loop {
         // This will block if another thread already has the global
         // unlocked already (due to receiving an x-ratelimit-global).
@@ -144,7 +144,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
         let mut lock = bucket.lock();
         lock.pre_hook(&route);
 
-        let response = super::raw::retry(&req)?;
+        let response = http.retry(&req)?;
 
         // Check if an offset has been calculated yet to determine the time
         // difference from Discord can the client.
