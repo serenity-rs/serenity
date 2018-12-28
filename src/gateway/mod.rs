@@ -62,15 +62,20 @@ use crate::model::{
 };
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use tungstenite::{
-    client::AutoStream,
-    protocol::WebSocket,
-};
+use tungstenite::protocol::WebSocket;
+
+#[cfg(not(feature = "rustls_support"))]
+use tungstenite::client::AutoStream;
 
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
+
+#[cfg(feature = "rustls_support")]
+pub type WsClient = WebSocket<rustls::StreamOwned<rustls::ClientSession, std::net::TcpStream>>;
+
+#[cfg(not(feature = "rustls_support"))]
 pub type WsClient = WebSocket<AutoStream>;
 
 /// Indicates the current connection stage of a [`Shard`].

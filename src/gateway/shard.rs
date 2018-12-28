@@ -23,9 +23,14 @@ use super::{
 use tungstenite::{
     self,
     error::Error as TungsteniteError,
-    handshake::client::Request,
 };
 use url::Url;
+
+#[cfg(feature = "rustls_support")]
+use std::net::TcpStream;
+
+#[cfg(any(not(feature = "rustls_support"), feature = "native_tls"))]
+use tungstenite::handshake::client::Request;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -827,6 +832,33 @@ impl Shard {
     }
 }
 
+#[cfg(feature = "rustls_support")]
+fn connect(base_url: &str) -> Result<WsClient> {
+    let mut config = rustls::ClientConfig::new();
+    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
+
+    let url = build_gateway_url(base_url)?;
+
+    let base_host = if let Some(h) = url.host_str() {
+        let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
+        let (_, base) = h.split_at(dot + 1); //We do not want the leading '.'
+        base.to_owned()
+    } else { "discord.gg".to_owned() };
+
+    let dns_name = webpki::DNSNameRef::try_from_ascii_str(&base_host)
+                    .map_err(|_| GatewayError::WebPKI)?;
+    let session = rustls::ClientSession::new(&Arc::new(config), dns_name);
+    let socket = TcpStream::connect(format!("{}:443", url.host_str()
+                                        .unwrap_or("gateway.discord.gg")))?;
+    let tls = rustls::StreamOwned::new(session, socket);
+
+    let client = tungstenite::client(url, tls)
+                    .map_err(|_| GatewayError::HandshakeError)?;
+
+    Ok(client.0)
+}
+
+#[cfg(not(feature = "rustls_support"))]
 fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
     let client = tungstenite::connect(Request::from(url))?;
@@ -835,6 +867,10 @@ fn connect(base_url: &str) -> Result<WsClient> {
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
+    #[cfg(feature = "rustls_support")]
+    let stream = &client.get_mut().sock;
+
+    #[cfg(not(feature = "rustls_support"))]
     let stream = match client.get_mut() {
         tungstenite::stream::Stream::Plain(stream) => stream,
         tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),

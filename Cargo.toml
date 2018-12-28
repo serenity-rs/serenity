@@ -18,6 +18,8 @@ serde = "^1.0"
 serde_derive = "^1.0"
 serde_json = "^1.0"
 
+
+
 [dependencies.base64]
 optional = true
 version = "0.10"
@@ -50,6 +52,10 @@ version = "0.2"
 optional = true
 version = "^0.4"
 
+[dependencies.rustls]
+optional = true
+version = "0.14.0"
+
 [dependencies.sodiumoxide]
 default-features = false
 features = ["std"]
@@ -72,6 +78,14 @@ version = "~0.3"
 optional = true
 version = "^1.0"
 
+[dependencies.webpki]
+optional = true
+version = "0.18.1"
+
+[dependencies.webpki-roots]
+optional = true
+version = "0.15.0"
+
 [dev-dependencies.matches]
 version = "0.1.6"
 
@@ -84,6 +98,7 @@ default = [
     "gateway",
     "model",
     "http",
+    "rustls_support",
     "standard_framework",
     "utils"
 ]
@@ -101,7 +116,9 @@ framework = ["client", "model", "utils"]
 gateway = ["flate2", "http", "tungstenite", "url", "utils"]
 http = ["reqwest", "lazy_static"]
 model = ["builder", "http"]
+rustls_support = ["rustls", "webpki", "webpki-roots"]
 standard_framework = ["framework"]
+native_tsl = []
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
