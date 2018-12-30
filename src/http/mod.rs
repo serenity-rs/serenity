@@ -45,10 +45,6 @@ use std::{
     path::{Path, PathBuf},
 };
 
-lazy_static! {
-    static ref CLIENT: ReqwestClient = ReqwestClient::new();
-}
-
 /// An method used for ratelimiting special routes.
 ///
 /// This is needed because `reqwest`'s `Method` enum does not derive Copy.
