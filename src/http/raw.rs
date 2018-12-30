@@ -17,16 +17,19 @@ use super::{
     GuildPagination,
     HttpError,
 };
+use parking_lot::Mutex;
 use serde::de::DeserializeOwned;
 use serde_json;
 use std::{
     collections::BTreeMap,
     io::ErrorKind as IoErrorKind,
+    sync::Arc,
 };
 
 pub struct Http {
     client: Client,
     pub token: String,
+    pub limiter: Arc<Mutex<()>>,
 }
 
 impl Http {
@@ -34,6 +37,7 @@ impl Http {
         Http {
             client,
             token: token.to_string(),
+            limiter: Arc::new(Mutex::new(())),
         }
     }
 
@@ -41,6 +45,7 @@ impl Http {
         Http {
             client: Client::builder().build().expect("Cannot build Reqwest::Client."),
             token: token.to_string(),
+            limiter: Arc::new(Mutex::new(())),
         }
     }
 
@@ -1772,6 +1777,7 @@ impl Default for Http {
         Self {
             client: Client::builder().build().expect("Cannot build Reqwest::Client."),
             token: "".to_string(),
+            limiter: Arc::new(Mutex::new(())),
         }
     }
 }

@@ -66,21 +66,6 @@ use super::{Http, HttpError, Request};
 static mut OFFSET: Option<i64> = None;
 
 lazy_static! {
-    /// The global mutex is a mutex unlocked and then immediately re-locked
-    /// prior to every request, to abide by Discord's global ratelimit.
-    ///
-    /// The global ratelimit is the total number of requests that may be made
-    /// across the entirety of the API within an amount of time. If this is
-    /// reached, then the global mutex is unlocked for the amount of time
-    /// present in the "Retry-After" header.
-    ///
-    /// While locked, all requests are blocked until each request can acquire
-    /// the lock.
-    ///
-    /// The only reason that you would need to use the global mutex is to
-    /// block requests yourself. This has the side-effect of potentially
-    /// blocking many of your event handlers or framework commands.
-    pub static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
     /// The routes mutex is a HashMap of each [`Route`] and their respective
     /// ratelimit information.
     ///
@@ -108,9 +93,9 @@ lazy_static! {
 
 pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
     loop {
-        // This will block if another thread already has the global
-        // unlocked already (due to receiving an x-ratelimit-global).
-        let _ = GLOBAL.lock();
+        // This will block if another thread is trying to send
+        // an HTTP-request already (due to receiving an x-ratelimit-global).
+        let _ = http.limiter.lock();
 
         // Destructure the tuple instead of retrieving the third value to
         // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -174,7 +159,7 @@ pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
             return Ok(response);
         } else {
             let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                let _ = GLOBAL.lock();
+                let _ = http.limiter.lock();
 
                 Ok(
                     if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
