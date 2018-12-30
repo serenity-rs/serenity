@@ -10,9 +10,9 @@ use reqwest::{
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use super::{
-    ratelimiting,
+    ratelimiting::{perform, RateLimit},
     request::Request,
-    routing::RouteInfo,
+    routing::{Route, RouteInfo},
     AttachmentType,
     GuildPagination,
     HttpError,
@@ -21,7 +21,7 @@ use parking_lot::Mutex;
 use serde::de::DeserializeOwned;
 use serde_json;
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, HashMap},
     io::ErrorKind as IoErrorKind,
     sync::Arc,
 };
@@ -30,6 +30,30 @@ pub struct Http {
     client: Client,
     pub token: String,
     pub limiter: Arc<Mutex<()>>,
+    /// The routes mutex is a HashMap of each [`Route`] and their respective
+    /// ratelimit information.
+    ///
+    /// See the documentation for [`RateLimit`] for more information on how the
+    /// library handles ratelimiting.
+    ///
+    /// # Examples
+    ///
+    /// View the `reset` time of the route for `ChannelsId(7)`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::http::{ratelimiting::{Route}};
+    /// # use serenity::http::Http;
+    /// # let http = Http::default();
+    /// let routes = http.routes.lock();
+    ///
+    /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
+    ///     println!("Reset time at: {}", route.lock().reset);
+    /// }
+    /// ```
+    ///
+    /// [`RateLimit`]: struct.RateLimit.html
+    /// [`Route`]: ../routing/enum.Route.html
+    pub routes: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>>,
 }
 
 impl Http {
@@ -38,6 +62,7 @@ impl Http {
             client,
             token: token.to_string(),
             limiter: Arc::new(Mutex::new(())),
+            routes: Arc::new(Mutex::new(HashMap::default())),
         }
     }
 
@@ -46,6 +71,7 @@ impl Http {
             client: Client::builder().build().expect("Cannot build Reqwest::Client."),
             token: token.to_string(),
             limiter: Arc::new(Mutex::new(())),
+            routes: Arc::new(Mutex::new(HashMap::default())),
         }
     }
 
@@ -1718,7 +1744,7 @@ impl Http {
     ///
     /// [`fire`]: fn.fire.html
     pub fn request(&self, req: Request) -> Result<ReqwestResponse> {
-        let response = ratelimiting::perform(&self, req)?;
+        let response = perform(&self, req)?;
 
         if response.status().is_success() {
             Ok(response)
@@ -1778,6 +1804,7 @@ impl Default for Http {
             client: Client::builder().build().expect("Cannot build Reqwest::Client."),
             token: "".to_string(),
             limiter: Arc::new(Mutex::new(())),
+            routes: Arc::new(Mutex::new(HashMap::default())),
         }
     }
 }

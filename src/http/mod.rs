@@ -35,7 +35,6 @@ pub use self::error::Error as HttpError;
 pub use self::raw::*;
 
 use reqwest::{
-    Client as ReqwestClient,
     Method,
 };
 use crate::model::prelude::*;

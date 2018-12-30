@@ -51,7 +51,6 @@ use reqwest::{
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
-    collections::HashMap,
     sync::Arc,
     time::Duration,
     str,
@@ -64,32 +63,6 @@ use super::{Http, HttpError, Request};
 ///
 /// [`offset`]: fn.offset.html
 static mut OFFSET: Option<i64> = None;
-
-lazy_static! {
-    /// The routes mutex is a HashMap of each [`Route`] and their respective
-    /// ratelimit information.
-    ///
-    /// See the documentation for [`RateLimit`] for more information on how the
-    /// library handles ratelimiting.
-    ///
-    /// # Examples
-    ///
-    /// View the `reset` time of the route for `ChannelsId(7)`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::ratelimiting::{ROUTES, Route};
-    ///
-    /// if let Some(route) = ROUTES.lock().get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().reset);
-    /// }
-    /// ```
-    ///
-    /// [`RateLimit`]: struct.RateLimit.html
-    /// [`Route`]: ../routing/enum.Route.html
-    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
-        Arc::new(Mutex::new(HashMap::default()))
-    };
-}
 
 pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
     loop {
@@ -115,7 +88,7 @@ pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        let bucket = Arc::clone(ROUTES
+        let bucket = Arc::clone(http.routes
             .lock()
             .entry(route)
             .or_insert_with(|| {
@@ -183,14 +156,14 @@ pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
 }
 
 /// A set of data containing information about the ratelimits for a particular
-/// [`Route`], which is stored in the [`ROUTES`] mutex.
+/// [`Route`], which is stored in [`Http`].
 ///
 /// See the [Discord docs] on ratelimits for more information.
 ///
 /// **Note**: You should _not_ mutate any of the fields, as this can help cause
 /// 429s.
 ///
-/// [`ROUTES`]: struct.ROUTES.html
+/// [`Http`]: ../raw/struct.Http.html#structfield.routes
 /// [`Route`]: ../routing/enum.Route.html
 /// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
 #[derive(Clone, Debug, Default)]
