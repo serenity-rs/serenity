@@ -490,11 +490,16 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
-            update!(cache_and_http, event);
+            let _before = update!(cache_and_http, event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.message_update(context, event);
+                feature_cache! {{
+                    let _after = cache_and_http.cache.read().message(event.channel_id, event.id);
+                    event_handler.message_update(context, _before, _after, event);
+                } else {
+                    event_handler.message_update(context, event);
+                }}
             });
         },
         DispatchEvent::Model(Event::PresencesReplace(mut event)) => {
