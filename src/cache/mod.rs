@@ -621,12 +621,17 @@ impl Cache {
     /// [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
-    /// use serenity::CACHE;
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
     ///
-    /// # use serenity::model::id::{ChannelId, MessageId};
+    /// # use serenity::{cache::Cache, model::id::{ChannelId, MessageId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
+    ///
     /// # let message = ChannelId(0).message(MessageId(1)).unwrap();
+    /// # let cache = Arc::new(RwLock::new(Cache::default()));
     ///
-    /// let cache = CACHE.read();
+    /// let cache = cache.read();
     /// let fetched_message = cache.message(message.channel_id, message.id);
     /// match fetched_message {
     ///     Some(m) => {
