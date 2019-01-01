@@ -12,10 +12,8 @@ use crate::internal::{
     ws_impl::{ReceiverExt, SenderExt},
     Timer
 };
-use crate::model::{
-    event::VoiceEvent,
-    id::UserId
-};
+use crate::model::event::VoiceEvent;
+
 use opus::{
     packet as opus_packet,
     Application as CodingMode,
@@ -62,6 +60,7 @@ enum ReceiverStatus {
 #[allow(clippy::dead_code)]
 struct ThreadItems {
     rx: MpscReceiver<ReceiverStatus>,
+    tx: MpscSender<ReceiverStatus>,
     udp_close_sender: MpscSender<i32>,
     udp_thread: JoinHandle<()>,
     ws_close_sender: MpscSender<i32>,
@@ -72,6 +71,7 @@ struct ThreadItems {
 pub struct Connection {
     audio_timer: Timer,
     client: Arc<Mutex<WsClient>>,
+    connection_info: ConnectionInfo,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
     encoder: OpusEncoder,
@@ -87,7 +87,6 @@ pub struct Connection {
     thread_items: ThreadItems,
     timestamp: u32,
     udp: UdpSocket,
-    user_id: UserId,
 }
 
 impl Connection {
@@ -176,6 +175,7 @@ impl Connection {
 
         let key = encryption_key(&mut client)?;
 
+        unset_blocking(&mut client)?;
         let mutexed_client = Arc::new(Mutex::new(client));
         let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
 
@@ -189,10 +189,16 @@ impl Connection {
         // Per discord dev team's current recommendations:
         // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
         let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
+        info!(
+            "[Voice] WS heartbeat duration given as {}ms, adjusted to {}ms.",
+            hello.heartbeat_interval,
+            temp_heartbeat,
+        );
 
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             client: mutexed_client,
+            connection_info: info,
             decoder_map: HashMap::new(),
             destination,
             encoder,
@@ -208,8 +214,62 @@ impl Connection {
             ssrc: ready.ssrc,
             thread_items,
             timestamp: 0,
-            user_id: info.user_id,
         })
+    }
+
+    pub fn reconnect(&mut self) -> Result<()> {
+        let url = generate_url(&mut self.connection_info.endpoint)?;
+
+        // Thread may have died, we want to send to prompt a clean exit
+        // (if at all possible) and then proceed as normal.
+        let _ = self.thread_items.ws_close_sender.send(0);
+
+        let mut client = tungstenite::connect(Request::from(url))?.0;
+        client.send_json(&payload::build_resume(&self.connection_info))?;
+
+        let mut hello = None;
+        let mut resumed = None;
+
+        loop {
+            let value = match client.recv_json()? {
+                Some(value) => value,
+                None => continue,
+            };
+
+            match VoiceEvent::deserialize(value)? {
+                VoiceEvent::Resumed => {
+                    resumed = Some(());
+                    if hello.is_some(){
+                        break;
+                    }
+                },
+                VoiceEvent::Hello(h) => {
+                    hello = Some(h);
+                    if resumed.is_some() {
+                        break;
+                    }
+                },
+                other => {
+                    debug!("[Voice] Expected resumed/hello; got: {:?}", other);
+
+                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
+                },
+            }
+        };
+
+        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+
+        self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
+
+        unset_blocking(&mut client)?;
+        let mutexed_client = Arc::new(Mutex::new(client));
+        let (ws_close_sender, ws_thread) = start_ws_thread(mutexed_client, &self.thread_items.tx)?;
+
+        self.thread_items.ws_close_sender = ws_close_sender;
+        self.thread_items.ws_thread = ws_thread;
+
+        info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
+        Ok(())
     }
 
     #[allow(clippy::unused_variables)]
@@ -232,10 +292,10 @@ impl Connection {
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
         let mut nonce = secretbox::Nonce([0; 24]);
 
-        if let Some(receiver) = receiver.as_mut() {
-            while let Ok(status) = self.thread_items.rx.try_recv() {
-                match status {
-                    ReceiverStatus::Udp(packet) => {
+        while let Ok(status) = self.thread_items.rx.try_recv() {
+            match status {
+                ReceiverStatus::Udp(packet) => {
+                    if let Some(receiver) = receiver.as_mut() {
                         let mut handle = &packet[2..];
                         let seq = handle.read_u16::<BigEndian>()?;
                         let timestamp = handle.read_u32::<BigEndian>()?;
@@ -284,47 +344,47 @@ impl Connection {
                             receiver
                                 .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
                         }
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                    if let Some(receiver) = receiver.as_mut() {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                    },
-                    ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                        match self.last_heartbeat_nonce {
-                            Some(nonce) => {
-                                if ev.nonce != nonce {
-                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                                }
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                    match self.last_heartbeat_nonce {
+                        Some(nonce) => {
+                            if ev.nonce != nonce {
+                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            }
 
-                                self.last_heartbeat_nonce = None;
-                            },
-                            None => {},
-                        }
-                    },
-                    ReceiverStatus::Websocket(other) => {
-                        info!("[Voice] Received other websocket data: {:?}", other);
-                    },
-                }
-            }
-        } else {
-            loop {
-                if self.thread_items.rx.try_recv().is_err() {
-                    break;
-                }
+                            self.last_heartbeat_nonce = None;
+                        },
+                        None => {},
+                    }
+                },
+                ReceiverStatus::Websocket(other) => {
+                    info!("[Voice] Received other websocket data: {:?}", other);
+                },
             }
         }
 
         // Send the voice websocket keepalive if it's time
         if self.keepalive_timer.check() {
+            info!("[Voice] WS keepalive");
             let nonce = random::<u64>();
             self.last_heartbeat_nonce = Some(nonce);
             self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
+            info!("[Voice] WS keepalive sent");
         }
 
         // Send UDP keepalive if it's time
         if self.audio_timer.check() {
+            info!("[Voice] UDP keepalive");
             let mut bytes = [0; 4];
             (&mut bytes[..]).write_u32::<BigEndian>(self.ssrc)?;
             self.udp.send_to(&bytes, self.destination)?;
+            info!("[Voice] UDP keepalive sent");
         }
 
         // Reconfigure encoder bitrate.
@@ -498,7 +558,10 @@ impl Connection {
 
         self.speaking = speaking;
 
-        self.client.lock().send_json(&payload::build_speaking(speaking))
+        info!("[Voice] Speaking update: {}", speaking);
+        let o = self.client.lock().send_json(&payload::build_speaking(speaking));
+        info!("[Voice] Speaking update confirmed.");
+        o
     }
 }
 
@@ -577,13 +640,12 @@ where T: for<'a> PartialEq<&'a str>,
 #[inline]
 fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<ThreadItems> {
     let (udp_close_sender, udp_close_reader) = mpsc::channel();
-    let (ws_close_sender, ws_close_reader) = mpsc::channel();
 
     let current_thread = thread::current();
     let thread_name = current_thread.name().unwrap_or("serenity voice");
 
     let (tx, rx) = mpsc::channel();
-    let tx_clone = tx.clone();
+    let tx_udp = tx.clone();
     let udp_clone = udp.try_clone()?;
 
     let udp_thread = ThreadBuilder::new()
@@ -593,46 +655,75 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
 
             let mut buffer = [0; 512];
 
-            loop {
+            'outer: loop {
                 if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
                     let piece = buffer[..len].to_vec();
-                    let send = tx.send(ReceiverStatus::Udp(piece));
+                    let send = tx_udp.send(ReceiverStatus::Udp(piece));
 
                     if send.is_err() {
-                        return;
+                        break 'outer;
                     }
                 } else if udp_close_reader.try_recv().is_ok() {
-                    return;
-                }
-            }
-        })?;
-
-    let ws_thread = ThreadBuilder::new()
-        .name(format!("{} WS", thread_name))
-        .spawn(move || loop {
-            while let Ok(Some(value)) = client.lock().recv_json() {
-                let msg = match VoiceEvent::deserialize(value) {
-                    Ok(msg) => msg,
-                    Err(_) => break,
-                };
-
-                if tx_clone.send(ReceiverStatus::Websocket(msg)).is_err() {
-                    return;
+                    break 'outer;
                 }
             }
 
-            if ws_close_reader.try_recv().is_ok() {
-                return;
-            }
-
-            thread::sleep(Duration::from_millis(25));
+            info!("[Voice] UDP thread exited.");
         })?;
+
+    let (ws_close_sender, ws_thread) = start_ws_thread(client, &tx)?;
 
     Ok(ThreadItems {
         rx,
+        tx,
         udp_close_sender,
         udp_thread,
         ws_close_sender,
         ws_thread,
     })
+}
+
+#[inline]
+fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>) -> Result<(MpscSender<i32>, JoinHandle<()>)> {
+    let current_thread = thread::current();
+    let thread_name = current_thread.name().unwrap_or("serenity voice");
+
+    let tx_ws = tx.clone();
+    let (ws_close_sender, ws_close_reader) = mpsc::channel();
+
+    let ws_thread = ThreadBuilder::new()
+        .name(format!("{} WS", thread_name))
+        .spawn(move || {
+            'outer: loop {
+                while let Ok(Some(value)) = client.lock().try_recv_json() {
+                    let msg = match VoiceEvent::deserialize(value) {
+                        Ok(msg) => msg,
+                        Err(_) => break,
+                    };
+    
+                    if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
+                        break 'outer;
+                    }
+                } 
+    
+                if ws_close_reader.try_recv().is_ok() {
+                    break 'outer;
+                }
+    
+                thread::sleep(Duration::from_millis(25));
+            }
+            info!("[Voice] WS thread exited.");
+        })?;
+
+    Ok((ws_close_sender, ws_thread))
+}
+
+#[inline]
+fn unset_blocking(client: &mut WsClient) -> Result<()> {
+    let stream = match client.get_mut() {
+        tungstenite::stream::Stream::Plain(s) => s,
+        tungstenite::stream::Stream::Tls(s) => s.get_mut(),
+    };
+    stream.set_nonblocking(true)
+        .map_err(Into::into)
 }
