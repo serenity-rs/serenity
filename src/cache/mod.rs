@@ -630,7 +630,7 @@ impl Cache {
      /// #
     /// # let message = ChannelId(0).message(MessageId(1)).unwrap();
     /// # let cache = Arc::new(RwLock::new(Cache::default()));
-    ///
+    /// #
     /// let cache = cache.read();
     /// let fetched_message = cache.message(message.channel_id, message.id);
      ///
