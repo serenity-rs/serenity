@@ -410,7 +410,7 @@ impl Route {
         reason: &str,
     ) -> String {
         format!(
-            api!("/guilds/{}/bans/{}?delete_message_days={}&reason={}"),
+            api!("/guilds/{}/bans/{}?delete-message-days={}&reason={}"),
             guild_id,
             user_id,
             delete_message_days,
