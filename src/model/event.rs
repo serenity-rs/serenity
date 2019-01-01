@@ -851,6 +851,7 @@ impl CacheUpdate for MessageUpdateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
         if let Some(messages) = cache.messages.get_mut(&self.channel_id) {
+
             if let Some(message) = messages.get_mut(&self.id) {
                 let item = message.clone();
 
