@@ -20,14 +20,11 @@ use super::{
     WsClient,
     WebSocketGatewayClientExt,
 };
-use tungstenite::{
-    self,
-    error::Error as TungsteniteError,
-};
+use tungstenite::error::Error as TungsteniteError;
 use url::Url;
 
 #[cfg(feature = "rustls_support")]
-use std::net::TcpStream;
+use internal::ws_impl::create_rustls_client;
 
 #[cfg(any(not(feature = "rustls_support"), feature = "native_tls"))]
 use tungstenite::handshake::client::Request;
@@ -834,28 +831,8 @@ impl Shard {
 
 #[cfg(feature = "rustls_support")]
 fn connect(base_url: &str) -> Result<WsClient> {
-    let mut config = rustls::ClientConfig::new();
-    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
-
     let url = build_gateway_url(base_url)?;
-
-    let base_host = if let Some(h) = url.host_str() {
-        let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
-        let (_, base) = h.split_at(dot + 1); // We do not want the leading '.'
-        base.to_owned()
-    } else { "discord.gg".to_owned() };
-
-    let dns_name = webpki::DNSNameRef::try_from_ascii_str(&base_host)
-                    .map_err(|_| GatewayError::WebPKI)?;
-    let session = rustls::ClientSession::new(&Arc::new(config), dns_name);
-    let socket = TcpStream::connect(format!("{}:443", url.host_str()
-                                        .unwrap_or("gateway.discord.gg")))?;
-    let tls = rustls::StreamOwned::new(session, socket);
-
-    let client = tungstenite::client(url, tls)
-                    .map_err(|_| GatewayError::HandshakeError)?;
-
-    Ok(client.0)
+    Ok(create_rustls_client(url)?)
 }
 
 #[cfg(not(feature = "rustls_support"))]

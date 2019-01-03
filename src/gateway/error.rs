@@ -50,12 +50,6 @@ pub enum Error {
     OverloadedShard,
     /// Failed to reconnect after a number of attempts.
     ReconnectFailure,
-    /// WebPKI X.509 Certificate Validation Error.
-    #[cfg(feature = "rustls_support")]
-    WebPKI,
-    /// An error with the handshake in tungstenite
-    #[cfg(feature = "rustls_support")]
-    HandshakeError,
 }
 
 impl Display for Error {
@@ -79,10 +73,6 @@ impl StdError for Error {
             NoSessionId => "No Session Id present when required",
             OverloadedShard => "Shard has too many guilds",
             ReconnectFailure => "Failed to Reconnect",
-            #[cfg(feature = "rustls_support")]
-            WebPKI => "Failed to validate X.509 certificate",
-            #[cfg(feature = "rustls_support")]
-            HandshakeError => "TLS handshake failed when making the websocket connection",
         }
     }
 }

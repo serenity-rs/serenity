@@ -7,6 +7,21 @@ use tungstenite::{
     Message,
 };
 
+#[cfg(feature = "rustls_support")]
+use std::{
+    error::Error as StdError,
+    fmt::{
+        Display,
+        Formatter,
+        Result as FmtResult,
+    },
+    io::Error as IoError,
+    net::TcpStream,
+    sync::Arc,
+};
+#[cfg(feature = "rustls_support")]
+use url::Url;
+
 pub trait ReceiverExt {
     fn recv_json(&mut self) -> Result<Option<Value>>;
     fn try_recv_json(&mut self) -> Result<Option<Value>>;
@@ -61,4 +76,66 @@ fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>>{
         // Ping/Pong message behaviour is internally handled by tungstenite.
         _ => None,
     })
+}
+
+/// An error that occured while connecting over rustls
+#[derive(Debug)]
+#[cfg(feature = "rustls_support")]
+pub enum RustlsError {
+    /// WebPKI X.509 Certificate Validation Error.
+    WebPKI,
+    /// An error with the handshake in tungstenite
+    HandshakeError,
+    /// Standard IO error happening while creating the tcp stream
+    Io(IoError),
+}
+
+impl From<IoError> for RustlsError {
+    fn from(e: IoError) -> Self {
+        RustlsError::Io(e)
+    }
+}
+
+impl Display for RustlsError {
+    fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.description()) }
+}
+
+impl StdError for RustlsError {
+    fn description(&self) -> &str {
+        use self::RustlsError::*;
+
+        match *self {
+            WebPKI => "Failed to validate X.509 certificate",
+            HandshakeError => "TLS handshake failed when making the websocket connection",
+            Io(ref inner) => inner.description(),
+        }
+    }
+}
+
+// Create a tungstenite client with a rustls stream.
+#[cfg(feature = "rustls_support")]
+pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
+    let mut config = rustls::ClientConfig::new();
+    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
+
+    let base_host = if let Some(h) = url.host_str() {
+        let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
+        // We do not want the leading '.', but if there is no leading we do not
+        // want to remove the leading character.
+        let split_at_index = if dot == 0 { 0 } else { dot + 1 };
+        let (_, base) = h.split_at(split_at_index);
+        base.to_owned()
+    } else { "discord.gg".to_owned() };
+
+    let dns_name = webpki::DNSNameRef::try_from_ascii_str(&base_host)
+        .map_err(|_| RustlsError::WebPKI)?;
+
+    let session = rustls::ClientSession::new(&Arc::new(config), dns_name);
+    let socket = TcpStream::connect(&url)?;
+    let tls = rustls::StreamOwned::new(session, socket);
+
+    let client = tungstenite::client(url, tls)
+        .map_err(|_| RustlsError::HandshakeError)?;
+
+    Ok(client.0)
 }

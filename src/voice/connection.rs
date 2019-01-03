@@ -46,11 +46,14 @@ use std::{
     },
     time::Duration
 };
+
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
-use tungstenite::{self, handshake::client::Request};
 use url::Url;
+
+#[cfg(feature = "rustls_support")]
+use crate::internal::ws_impl::create_rustls_client;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -93,6 +96,10 @@ impl Connection {
     pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
+        #[cfg(feature = "rustls_support")]
+        let mut client = create_rustls_client(url)?;
+
+        #[cfg(not(feature = "rustls_support"))]
         let mut client = tungstenite::connect(Request::from(url))?.0;
         let mut hello = None;
         let mut ready = None;
@@ -224,7 +231,12 @@ impl Connection {
         // (if at all possible) and then proceed as normal.
         let _ = self.thread_items.ws_close_sender.send(0);
 
+        #[cfg(feature = "rustls_support")]
+        let mut client = create_rustls_client(url)?;
+
+        #[cfg(not(feature = "rustls_support"))]
         let mut client = tungstenite::connect(Request::from(url))?.0;
+
         client.send_json(&payload::build_resume(&self.connection_info))?;
 
         let mut hello = None;
@@ -720,10 +732,15 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>
 
 #[inline]
 fn unset_blocking(client: &mut WsClient) -> Result<()> {
+    #[cfg(feature = "rustls_support")]
+    let stream = &client.get_mut().sock;
+
+    #[cfg(not(feature = "rustls_support"))]
     let stream = match client.get_mut() {
-        tungstenite::stream::Stream::Plain(s) => s,
-        tungstenite::stream::Stream::Tls(s) => s.get_mut(),
+        tungstenite::stream::Stream::Plain(stream) => stream,
+        tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
     };
+
     stream.set_nonblocking(true)
         .map_err(Into::into)
 }
