@@ -841,7 +841,7 @@ fn connect(base_url: &str) -> Result<WsClient> {
 
     let base_host = if let Some(h) = url.host_str() {
         let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
-        let (_, base) = h.split_at(dot + 1); //We do not want the leading '.'
+        let (_, base) = h.split_at(dot + 1); // We do not want the leading '.'
         base.to_owned()
     } else { "discord.gg".to_owned() };
 
