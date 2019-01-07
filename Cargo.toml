@@ -40,7 +40,7 @@ version = "~0.10"
 
 [dependencies.hyper-native-tls]
 optional = true
-version = "0.2.4"
+version = "0.3"
 
 [dependencies.lazy_static]
 optional = true
@@ -54,7 +54,7 @@ version = "0.13"
 
 [dependencies.native-tls]
 optional = true
-version = "0.1"
+version = "0.2"
 
 [dependencies.opus]
 optional = true
@@ -74,11 +74,11 @@ version = "~1.7"
 optional = true
 version = "~0.3"
 
-[dependencies.evzht9h3nznqzwl]
+[dependencies.websocket]
 default-features = false
 features = ["sync-ssl"]
 optional = true
-version = "0.0.3"
+version = "0.22"
 
 [dev-dependencies.matches]
 version = "0.1.6"
@@ -112,7 +112,6 @@ model = ["builder", "http"]
 standard_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "sodiumoxide"]
-websocket = ["evzht9h3nznqzwl"]
 
 [package.metadata.docs.rs]
 all-features = true
