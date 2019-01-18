@@ -90,16 +90,19 @@ pub enum RustlsError {
     Io(IoError),
 }
 
+#[cfg(feature = "rustls_support")]
 impl From<IoError> for RustlsError {
     fn from(e: IoError) -> Self {
         RustlsError::Io(e)
     }
 }
 
+#[cfg(feature = "rustls_support")]
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.description()) }
 }
 
+#[cfg(feature = "rustls_support")]
 impl StdError for RustlsError {
     fn description(&self) -> &str {
         use self::RustlsError::*;
@@ -120,8 +123,8 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
 
     let base_host = if let Some(h) = url.host_str() {
         let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
-        // We do not want the leading '.', but if there is no leading we do not
-        // want to remove the leading character.
+        // We do not want the leading '.', but if there is no leading '.' we do
+        // not want to remove the leading character.
         let split_at_index = if dot == 0 { 0 } else { dot + 1 };
         let (_, base) = h.split_at(split_at_index);
         base.to_owned()

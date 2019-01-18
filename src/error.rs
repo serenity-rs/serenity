@@ -195,7 +195,7 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "tungstenite")]
+            #[cfg(feature = "rustls_support")]
             Error::Rustls(ref inner) => inner.description(),
             #[cfg(feature = "tungstenite")]
             Error::Tungstenite(ref inner) => inner.description(),

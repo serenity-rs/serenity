@@ -100,7 +100,7 @@ impl Connection {
         let mut client = create_rustls_client(url)?;
 
         #[cfg(not(feature = "rustls_support"))]
-        let mut client = tungstenite::connect(Request::from(url))?.0;
+        let mut client = tungstenite::connect(url)?.0;
         let mut hello = None;
         let mut ready = None;
         client.send_json(&payload::build_identify(&info))?;
@@ -235,7 +235,7 @@ impl Connection {
         let mut client = create_rustls_client(url)?;
 
         #[cfg(not(feature = "rustls_support"))]
-        let mut client = tungstenite::connect(Request::from(url))?.0;
+        let mut client = tungstenite::connect(url)?.0;
 
         client.send_json(&payload::build_resume(&self.connection_info))?;
 
