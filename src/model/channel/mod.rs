@@ -425,6 +425,21 @@ impl Channel {
         }
     }
 
+    /// Retrieves the position of the inner [`GuildChannel`] or
+    /// [`ChannelCategory`].
+    ///
+    /// If other channel types are used it will return None.
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    /// [`CatagoryChannel`]: struct.ChannelCategory.html
+    pub fn position(&self) -> Option<i64> {
+        match self {
+            Channel::Guild(ref channel) => Some(channel.with(|c| c.position)),
+            Channel::Category(ref catagory) => Some(catagory.with(|c| c.position)),
+            _ => None
+        }
+    }
+
     /// Sends a message with just the given message content in the channel.
     ///
     /// # Errors
