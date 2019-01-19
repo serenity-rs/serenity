@@ -122,25 +122,25 @@ pub trait EventHandler {
     /// Provides the guild's id and the user's member data.
     fn guild_member_addition(&self, _ctx: Context, _guild_id: GuildId, _new_member: Member) {}
 
-    /// Dispatched when a user is removed (kicked).
+    /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
     /// Provides the guild's id, the user's data, and the user's member data if available.
     #[cfg(feature = "cache")]
     fn guild_member_removal(&self, _ctx: Context, _guild: GuildId, _user: User, _member_data_if_available: Option<Member>) {}
 
-    /// Dispatched when a user is removed (kicked).
+    /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
     /// Provides the guild's id, the user's data.
     #[cfg(not(feature = "cache"))]
     fn guild_member_removal(&self, _ctx: Context, _guild_id: GuildId, _kicked: User) {}
 
-    /// Dispatched when a member is updated (e.g their nickname is updated)
+    /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
     /// Provides the member's old data (if available) and the new data.
     #[cfg(feature = "cache")]
     fn guild_member_update(&self, _ctx: Context, _old_if_available: Option<Member>, _new: Member) {}
 
-    /// Dispatched when a member is updated (e.g their nickname is updated)
+    /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
     /// Provides the new data.
     #[cfg(not(feature = "cache"))]
