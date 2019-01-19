@@ -54,7 +54,7 @@ use std::{
         HashSet,
     },
     default::Default,
-    rc::Rc,
+    sync::Arc,
 };
 
 /// A cache of all events received over a [`Shard`], where storing at least
@@ -81,21 +81,21 @@ pub struct Cache {
     /// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html
     /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
     /// [`Guild`]: ../model/guild/struct.Guild.html
-    pub channels: HashMap<ChannelId, Rc<RefCell<GuildChannel>>>,
+    pub channels: HashMap<ChannelId, Arc<RefCell<GuildChannel>>>,
     /// A map of channel categories.
-    pub categories: HashMap<ChannelId, Rc<RefCell<ChannelCategory>>>,
+    pub categories: HashMap<ChannelId, Arc<RefCell<ChannelCategory>>>,
     /// A map of the groups that the current user is in.
     ///
     /// For bot users this will always be empty, except for in [special cases].
     ///
     /// [special cases]: index.html#special-cases-in-the-cache
-    pub groups: HashMap<ChannelId, Rc<RefCell<Group>>>,
+    pub groups: HashMap<ChannelId, Arc<RefCell<Group>>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
     /// [`Emoji`]: ../model/guild/struct.Emoji.html
     /// [`Role`]: ../model/guild/struct.Role.html
-    pub guilds: HashMap<GuildId, Rc<RefCell<Guild>>>,
+    pub guilds: HashMap<GuildId, Arc<RefCell<Guild>>>,
     /// A map of notes that a user has made for individual users.
     ///
     /// An empty note is equivalent to having no note, and creating an empty
@@ -106,10 +106,10 @@ pub struct Cache {
     /// A map of users' presences. This is updated in real-time. Note that
     /// status updates are often "eaten" by the gateway, and this should not
     /// be treated as being entirely 100% accurate.
-    pub presences: HashMap<UserId, Rc<RefCell<Presence>>>,
+    pub presences: HashMap<UserId, Arc<RefCell<Presence>>>,
     /// A map of direct message channels that the current user has open with
     /// other users.
-    pub private_channels: HashMap<ChannelId, Rc<RefCell<PrivateChannel>>>,
+    pub private_channels: HashMap<ChannelId, Arc<RefCell<PrivateChannel>>>,
     /// The total number of shards being used by the bot.
     pub shard_count: u64,
     /// A list of guilds which are "unavailable". Refer to the documentation for
@@ -158,7 +158,7 @@ pub struct Cache {
     /// [`GuildSyncEvent`]: ../model/event/struct.GuildSyncEvent.html
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
-    pub users: HashMap<UserId, Rc<RefCell<User>>>,
+    pub users: HashMap<UserId, Arc<RefCell<User>>>,
 }
 
 impl Cache {
@@ -323,15 +323,15 @@ impl Cache {
         let id = id.into();
 
         if let Some(channel) = self.channels.get(&id) {
-            return Some(Channel::Guild(Rc::clone(channel)));
+            return Some(Channel::Guild(Arc::clone(channel)));
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(Rc::clone(private_channel)));
+            return Some(Channel::Private(Arc::clone(private_channel)));
         }
 
         if let Some(group) = self.groups.get(&id) {
-            return Some(Channel::Group(Rc::clone(group)));
+            return Some(Channel::Group(Arc::clone(group)));
         }
 
         None
@@ -365,7 +365,7 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Rc<RefCell<Guild>>> {
+    pub fn guild<G: Into<GuildId>>(&self, id: G) -> Option<Arc<RefCell<Guild>>> {
         self.guilds.get(&id.into()).cloned()
     }
 
@@ -422,7 +422,7 @@ impl Cache {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`channel`]: #method.channel
     #[inline]
-    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Rc<RefCell<GuildChannel>>> {
+    pub fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RefCell<GuildChannel>>> {
         self.channels.get(&id.into()).cloned()
     }
 
@@ -456,7 +456,7 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Rc<RefCell<Group>>> {
+    pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RefCell<Group>>> {
         self.groups.get(&id.into()).cloned()
     }
 
@@ -509,7 +509,7 @@ impl Cache {
         &self,
         guild_id: G,
         user_id: U,
-    ) -> Option<Rc<RefCell<Member>>> {
+    ) -> Option<Arc<RefCell<Member>>> {
         self.guilds.get(&guild_id.into()).and_then(|guild| {
             guild.borrow().members.get(&user_id.into()).cloned()
         })
@@ -550,7 +550,7 @@ impl Cache {
     #[inline]
     pub fn private_channel<C: Into<ChannelId>>(&self,
                                                channel_id: C)
-                                               -> Option<Rc<RefCell<PrivateChannel>>> {
+                                               -> Option<Arc<RefCell<PrivateChannel>>> {
         self.private_channels.get(&channel_id.into()).cloned()
     }
 
@@ -583,7 +583,7 @@ impl Cache {
     /// # }
     /// ```
     pub fn role<G: Into<GuildId>, R: Into<RoleId>>(&self, guild_id: G, role_id: R)
-        -> Option<Rc<RefCell<Role>>> {
+        -> Option<Arc<RefCell<Role>>> {
         self.guilds
             .get(&guild_id.into())
             .and_then(|g| g.borrow().roles.get(&role_id.into()).cloned())
@@ -618,13 +618,13 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Rc<RefCell<User>>> {
+    pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RefCell<User>>> {
         self.users.get(&user_id.into()).cloned()
     }
 
     #[inline]
     pub fn category<C: Into<ChannelId>>(&self, channel_id: C)
-        -> Option<Rc<RefCell<ChannelCategory>>> {
+        -> Option<Arc<RefCell<ChannelCategory>>> {
         self.categories.get(&channel_id.into()).cloned()
     }
 
@@ -635,7 +635,7 @@ impl Cache {
     pub(crate) fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
-                e.insert(Rc::new(RefCell::new(user.clone())));
+                e.insert(Arc::new(RefCell::new(user.clone())));
             },
             Entry::Occupied(e) => {
                 e.get().borrow_mut().clone_from(user);
