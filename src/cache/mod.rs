@@ -300,7 +300,7 @@ impl Cache {
 
     /// Retrieves a [`Channel`] from the cache based on the given Id.
     ///
-    /// This will seaArch the [`channels`] map, the [`private_channels`] map, and
+    /// This will search the [`channels`] map, the [`private_channels`] map, and
     /// then the map of [`groups`] to find the channel.
     ///
     /// If you know what type of channel you're looking for, you should instead
@@ -370,7 +370,7 @@ impl Cache {
     }
 
     /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
-    /// this will only seaArch guilds for the given channel.
+    /// this will only search guilds for the given channel.
     ///
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`ChannelId`].
