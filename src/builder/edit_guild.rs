@@ -59,18 +59,19 @@ impl EditGuild {
     /// from the cwd and encode it in base64 to send to Discord.
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::GuildId;
-    /// # use std::error::Error;
+    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let mut guild = GuildId(0).to_partial_guild()?;
+    /// #     let http = Arc::new(Http::default());
+    /// #     let mut guild = GuildId(0).to_partial_guild(&http)?;
     /// use serenity::utils;
     ///
     /// // assuming a `guild` has already been bound
     ///
     /// let base64_icon = utils::read_image("./guild_icon.png")?;
     ///
-    /// guild.edit(|mut g| {
+    /// guild.edit(&http, |mut g| {
     ///     g.icon(Some(&base64_icon))
     /// })?;
     /// #     Ok(())
@@ -119,16 +120,17 @@ impl EditGuild {
     /// Setting the region to [`Region::UsWest`]:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::id::GuildId;
-    /// # use std::error::Error;
+    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #     let mut guild = GuildId(0).to_partial_guild()?;
+    /// #     let http = Arc::new(Http::default());
+    /// #     let mut guild = GuildId(0).to_partial_guild(&http)?;
     /// use serenity::model::guild::Region;
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// guild.edit(|g| {
+    /// guild.edit(&http, |g| {
     ///     g.region(Region::UsWest)
     /// })?;
     /// #     Ok(())
@@ -169,11 +171,17 @@ impl EditGuild {
     /// Setting the verification level to [`High`][`VerificationLevel::High`]:
     ///
     /// ```rust,ignore
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let http = Arc::new(Http::default());
     /// use serenity::model::guild::VerificationLevel;
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let edit = guild.edit(|g| {
+    /// let edit = guild.edit(&http, |g| {
     ///     g.verification_level(VerificationLevel::High)
     /// });
     ///
@@ -184,7 +192,7 @@ impl EditGuild {
     /// // additionally, you may pass in just an integer of the verification
     /// // level
     ///
-    /// let edit = guild.edit(|g| {
+    /// let edit = guild.edit(&http, |g| {
     ///     g.verification_level(3)
     /// });
     ///

@@ -91,9 +91,9 @@ impl CreateCommand {
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
-    /// fn ping(_context: &mut Context, message: &Message, _args: Args) -> Result<(),
+    /// fn ping(context: &mut Context, message: &Message, _args: Args) -> Result<(),
     /// CommandError> {
-    ///     message.channel_id.say("Pong!")?;
+    ///     message.channel_id.say(&context.http, "Pong!")?;
     ///
     ///     Ok(())
     /// }

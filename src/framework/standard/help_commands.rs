@@ -24,12 +24,7 @@
 //! [`with_embeds`]: fn.with_embeds.html
 
 use crate::client::Context;
-#[cfg(feature = "cache")]
-use crate::framework::standard::{has_correct_roles, has_correct_permissions};
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
+
 use crate::model::{
     channel::Message,
     id::ChannelId,
@@ -54,6 +49,15 @@ use super::{
     HelpBehaviour,
 };
 use crate::utils::Colour;
+
+#[cfg(feature = "cache")]
+use crate::framework::standard::{has_correct_roles, has_correct_permissions};
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use parking_lot::RwLock;
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
@@ -631,14 +635,16 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
 }
 
 /// Sends an embed listing all groups with their commands.
+#[cfg(feature = "http")]
 fn send_grouped_commands_embed(
+    http: &Arc<Http>,
     help_options: &HelpOptions,
     channel_id: ChannelId,
     help_description: &str,
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|m| {
+    channel_id.send_message(&http, |m| {
         m.embed(|embed| {
             embed.colour(colour);
             embed.description(help_description);
@@ -666,13 +672,15 @@ fn send_grouped_commands_embed(
 }
 
 /// Sends embed showcasing information about a single command.
+#[cfg(feature = "http")]
 fn send_single_command_embed(
+    http: &Arc<Http>,
     help_options: &HelpOptions,
     channel_id: ChannelId,
     command: &Command,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(|m| {
+    channel_id.send_message(&http, |m| {
         m.embed(|embed| {
             embed.title(&command.name);
             embed.colour(colour);
@@ -709,7 +717,9 @@ fn send_single_command_embed(
 }
 
 /// Sends embed listing commands that are similar to the sent one.
+#[cfg(feature = "http")]
 fn send_suggestion_embed(
+    http: &Arc<Http>,
     channel_id: ChannelId,
     help_description: &str,
     suggestions: &Suggestions,
@@ -717,7 +727,7 @@ fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = format!("{}", help_description.replace("{}", &suggestions.join("`, `")));
 
-    channel_id.send_message(|m| {
+    channel_id.send_message(&http, |m| {
         m.embed(|e|  {
             e.colour(colour);
             e.description(text);
@@ -728,8 +738,9 @@ fn send_suggestion_embed(
 }
 
 /// Sends an embed explaining fetching commands failed.
-fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
-    channel_id.send_message(|m| {
+#[cfg(feature = "http")]
+fn send_error_embed(http: &Arc<Http>, channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
+    channel_id.send_message(&http, |m| {
         m.embed(|e| {
             e.colour(colour);
             e.description(input);
@@ -757,7 +768,7 @@ fn send_error_embed(channel_id: ChannelId, input: &str, colour: Colour) -> Resul
 /// client.with_framework(StandardFramework::new()
 ///     .help(help_commands::with_embeds));
 /// ```
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "http"))]
 pub fn with_embeds<H: BuildHasher>(
     context: &mut Context,
     msg: &Message,
@@ -770,6 +781,7 @@ pub fn with_embeds<H: BuildHasher>(
     if let Err(why) = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
             send_suggestion_embed(
+                &context.http,
                 msg.channel_id,
                 &help_description,
                 &suggestions,
@@ -777,12 +789,14 @@ pub fn with_embeds<H: BuildHasher>(
             ),
         CustomisedHelpData::NoCommandFound { ref help_error_message } =>
             send_error_embed(
+                &context.http,
                 msg.channel_id,
                 help_error_message,
                 help_options.embed_error_colour,
             ),
         CustomisedHelpData::GroupedCommands { ref help_description, ref groups } =>
             send_grouped_commands_embed(
+                &context.http,
                 &help_options,
                 msg.channel_id,
                 &help_description,
@@ -791,6 +805,7 @@ pub fn with_embeds<H: BuildHasher>(
             ),
         CustomisedHelpData::SingleCommand { ref command } =>
             send_single_command_embed(
+                &context.http,
                 &help_options,
                 msg.channel_id,
                 &command,
@@ -870,7 +885,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
 /// client.with_framework(StandardFramework::new()
 ///     .help(help_commands::plain));
 /// ```
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "http"))]
 pub fn plain<H: BuildHasher>(
     context: &mut Context,
     msg: &Message,
@@ -892,7 +907,7 @@ pub fn plain<H: BuildHasher>(
         },
     };
 
-    if let Err(why) = msg.channel_id.say(result) {
+    if let Err(why) = msg.channel_id.say(&context.http, result) {
         warn_about_failed_send!(&formatted_help, why);
     };
 

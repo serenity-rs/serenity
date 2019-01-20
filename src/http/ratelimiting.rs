@@ -51,66 +51,24 @@ use reqwest::{
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use std::{
-    collections::HashMap,
     sync::Arc,
     time::Duration,
     str,
     thread,
     i64,
 };
-use super::{HttpError, Request};
+use super::{Http, HttpError, Request};
 
 /// Refer to [`offset`].
 ///
 /// [`offset`]: fn.offset.html
 static mut OFFSET: Option<i64> = None;
 
-lazy_static! {
-    /// The global mutex is a mutex unlocked and then immediately re-locked
-    /// prior to every request, to abide by Discord's global ratelimit.
-    ///
-    /// The global ratelimit is the total number of requests that may be made
-    /// across the entirety of the API within an amount of time. If this is
-    /// reached, then the global mutex is unlocked for the amount of time
-    /// present in the "Retry-After" header.
-    ///
-    /// While locked, all requests are blocked until each request can acquire
-    /// the lock.
-    ///
-    /// The only reason that you would need to use the global mutex is to
-    /// block requests yourself. This has the side-effect of potentially
-    /// blocking many of your event handlers or framework commands.
-    pub static ref GLOBAL: Arc<Mutex<()>> = Arc::new(Mutex::new(()));
-    /// The routes mutex is a HashMap of each [`Route`] and their respective
-    /// ratelimit information.
-    ///
-    /// See the documentation for [`RateLimit`] for more information on how the
-    /// library handles ratelimiting.
-    ///
-    /// # Examples
-    ///
-    /// View the `reset` time of the route for `ChannelsId(7)`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::ratelimiting::{ROUTES, Route};
-    ///
-    /// if let Some(route) = ROUTES.lock().get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().reset);
-    /// }
-    /// ```
-    ///
-    /// [`RateLimit`]: struct.RateLimit.html
-    /// [`Route`]: ../routing/enum.Route.html
-    pub static ref ROUTES: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>> = {
-        Arc::new(Mutex::new(HashMap::default()))
-    };
-}
-
-pub(super) fn perform(req: Request) -> Result<Response> {
+pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
     loop {
-        // This will block if another thread already has the global
-        // unlocked already (due to receiving an x-ratelimit-global).
-        let _ = GLOBAL.lock();
+        // This will block if another thread is trying to send
+        // an HTTP-request already (due to receiving an x-ratelimit-global).
+        let _ = http.limiter.lock();
 
         // Destructure the tuple instead of retrieving the third value to
         // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -130,7 +88,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
         // - get the global rate;
         // - sleep if there is 0 remaining
         // - then, perform the request
-        let bucket = Arc::clone(ROUTES
+        let bucket = Arc::clone(http.routes
             .lock()
             .entry(route)
             .or_insert_with(|| {
@@ -144,7 +102,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
         let mut lock = bucket.lock();
         lock.pre_hook(&route);
 
-        let response = super::raw::retry(&req)?;
+        let response = http.retry(&req)?;
 
         // Check if an offset has been calculated yet to determine the time
         // difference from Discord can the client.
@@ -174,7 +132,7 @@ pub(super) fn perform(req: Request) -> Result<Response> {
             return Ok(response);
         } else {
             let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                let _ = GLOBAL.lock();
+                let _ = http.limiter.lock();
 
                 Ok(
                     if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
@@ -198,14 +156,14 @@ pub(super) fn perform(req: Request) -> Result<Response> {
 }
 
 /// A set of data containing information about the ratelimits for a particular
-/// [`Route`], which is stored in the [`ROUTES`] mutex.
+/// [`Route`], which is stored in [`Http`].
 ///
 /// See the [Discord docs] on ratelimits for more information.
 ///
 /// **Note**: You should _not_ mutate any of the fields, as this can help cause
 /// 429s.
 ///
-/// [`ROUTES`]: struct.ROUTES.html
+/// [`Http`]: ../raw/struct.Http.html#structfield.routes
 /// [`Route`]: ../routing/enum.Route.html
 /// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
 #[derive(Clone, Debug, Default)]

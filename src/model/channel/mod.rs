@@ -255,13 +255,13 @@ impl Channel {
     pub fn delete(&self, context: &Context) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = group.read().leave()?;
+                let _ = group.read().leave(&context.http)?;
             },
             Channel::Guild(ref public_channel) => {
                 let _ = public_channel.read().delete(&context)?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.read().delete()?;
+                let _ = private_channel.read().delete(&context.http)?;
             },
             Channel::Category(ref category) => {
                 category.read().delete(&context)?;

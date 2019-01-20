@@ -53,8 +53,8 @@
 //!     .cmd("ping", ping));
 //!
 //!
-//! command!(ping(_context, message) {
-//!     message.channel_id.say("Pong!")?;
+//! command!(ping(context, message) {
+//!     message.channel_id.say(&context.http, "Pong!")?;
 //! });
 //! ```
 //!

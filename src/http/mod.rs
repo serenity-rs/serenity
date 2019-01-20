@@ -35,22 +35,14 @@ pub use self::error::Error as HttpError;
 pub use self::raw::*;
 
 use reqwest::{
-    Client as ReqwestClient,
     Method,
 };
 use crate::model::prelude::*;
-use parking_lot::Mutex;
 use self::{request::Request};
 use std::{
-    default::Default,
     fs::File,
     path::{Path, PathBuf},
-    sync::Arc
 };
-
-lazy_static! {
-    static ref CLIENT: ReqwestClient = ReqwestClient::new();
-}
 
 /// An method used for ratelimiting special routes.
 ///
@@ -79,10 +71,6 @@ impl LightMethod {
             LightMethod::Put => Method::PUT,
         }
     }
-}
-
-lazy_static! {
-    static ref TOKEN: Arc<Mutex<String>> = Arc::new(Mutex::new(String::default()));
 }
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`

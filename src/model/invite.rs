@@ -12,13 +12,15 @@ use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
-use crate::{http, utils};
+use crate::utils;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
 #[cfg(feature = "cache")]
 use std::sync::Arc;
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// Information about an invite code.
 ///
@@ -78,11 +80,13 @@ impl Invite {
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
     /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
     /// [permission]: ../permissions/index.html
+    #[cfg(feature = "http")]
     pub fn create<C, F>(context: &Context, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         Self::_create(&context, channel_id.into(), f)
     }
 
+    #[cfg(feature = "http")]
     fn _create<F>(context: &Context, channel_id: ChannelId, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
@@ -96,7 +100,7 @@ impl Invite {
 
         let map = utils::vecmap_to_json_map(f(CreateInvite::default()).0);
 
-        http::create_invite(channel_id.0, &map)
+        context.http.create_invite(channel_id.0, &map)
     }
 
     /// Deletes the invite.
@@ -111,6 +115,7 @@ impl Invite {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [permission]: ../permissions/index.html
+    #[cfg(feature = "http")]
     pub fn delete(&self, context: &Context) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
@@ -121,12 +126,13 @@ impl Invite {
             }
         }
 
-        http::delete_invite(&self.code)
+        context.http.delete_invite(&self.code)
     }
 
     /// Gets the information about an invite.
+    #[cfg(feature = "http")]
     #[allow(clippy::unused_mut)]
-    pub fn get(code: &str, stats: bool) -> Result<Invite> {
+    pub fn get(http: &Arc<Http>, code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
         #[cfg(feature = "utils")]
@@ -134,7 +140,7 @@ impl Invite {
             invite = crate::utils::parse_invite(invite);
         }
 
-        http::get_invite(invite, stats)
+        http.get_invite(invite, stats)
     }
 
     /// Returns a URL to use for the invite.
@@ -296,6 +302,7 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
+    #[cfg(feature = "http")]
     pub fn delete(&self, context: &Context) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
@@ -306,7 +313,7 @@ impl RichInvite {
             }
         }
 
-        http::delete_invite(&self.code)
+        context.http.delete_invite(&self.code)
     }
 
     /// Returns a URL to use for the invite.

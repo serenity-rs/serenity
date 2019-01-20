@@ -4,10 +4,10 @@ use crate::{model::prelude::*};
 use crate::client::Context;
 #[cfg(all(feature = "builder", feature = "model"))]
 use crate::builder::EditChannel;
-#[cfg(all(feature = "builder", feature = "model"))]
-use crate::http;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils::{self as serenity_utils, VecMap};
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// A category of [`GuildChannel`]s.
 ///
@@ -42,9 +42,10 @@ pub struct ChannelCategory {
 #[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
+    #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(target)
+    pub fn create_permission(&self, http: &Arc<Http>, target: &PermissionOverwrite) -> Result<()> {
+        self.id.create_permission(&http, target)
     }
 
     /// Deletes all permission overrides in the category from the channels.
@@ -52,9 +53,10 @@ impl ChannelCategory {
     /// **Note**: Requires the [Manage Channel] permission.
     ///
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission(&self, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(permission_type)
+    pub fn delete_permission(&self, http: &Arc<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+        self.id.delete_permission(&http, permission_type)
     }
 
 
@@ -62,6 +64,7 @@ impl ChannelCategory {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
+    #[cfg(feature = "http")]
     #[inline]
     pub fn delete(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
@@ -73,7 +76,7 @@ impl ChannelCategory {
             }
         }
 
-        self.id.delete().map(|_| ())
+        self.id.delete(&context.http).map(|_| ())
     }
 
     /// Modifies the category's settings, such as its position or name.
@@ -87,7 +90,7 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(all(feature = "builder", feature = "model", feature = "utils"))]
+    #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "http"))]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
@@ -105,7 +108,7 @@ impl ChannelCategory {
 
         let map = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
 
-        http::edit_channel(self.id.0, &map).map(|channel| {
+        context.http.edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {
                 id,
                 category_id,

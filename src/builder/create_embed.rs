@@ -239,9 +239,9 @@ impl CreateEmbed {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, mut msg: Message) {
+    ///     fn message(&self, context: Context, mut msg: Message) {
     ///         if msg.content == "~embed" {
-    ///             let _ = msg.channel_id.send_message(|m| {
+    ///             let _ = msg.channel_id.send_message(&context.http, |m| {
     ///                 m.embed(|e| {
     ///                     e.title("hello").timestamp("2004-06-08T16:04:23")
     ///                 });

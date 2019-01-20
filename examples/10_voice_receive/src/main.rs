@@ -101,7 +101,7 @@ command!(join(ctx, msg, args) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
 
             return Ok(());
         },
@@ -112,9 +112,9 @@ command!(join(ctx, msg, args) {
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
         handler.listen(Some(Box::new(Receiver::new())));
-        check_msg(msg.channel_id.say(&format!("Joined {}", connect_to.mention())));
+        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
     } else {
-        check_msg(msg.channel_id.say("Error joining the channel"));
+        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
     }
 });
 
@@ -122,7 +122,7 @@ command!(leave(ctx, msg) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
 
             return Ok(());
         },
@@ -135,14 +135,14 @@ command!(leave(ctx, msg) {
     if has_handler {
         manager.remove(guild_id);
 
-        check_msg(msg.channel_id.say("Left voice channel"));
+        check_msg(msg.channel_id.say(&ctx.http,"Left voice channel"));
     } else {
         check_msg(msg.reply(&ctx, "Not in a voice channel"));
     }
 });
 
-command!(ping(_context, msg) {
-    check_msg(msg.channel_id.say("Pong!"));
+command!(ping(ctx, msg) {
+    check_msg(msg.channel_id.say(&ctx.http,"Pong!"));
 });
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.

@@ -133,9 +133,9 @@ fn main() {
         // Set a function that's called whenever a command's execution didn't complete for one
         // reason or another. For example, when a user has exceeded a rate-limit or a command
         // can only be performed by the bot owner.
-        .on_dispatch_error(|_ctx, msg, error| {
+        .on_dispatch_error(|ctx, msg, error| {
             if let DispatchError::RateLimited(seconds) = error {
-                let _ = msg.channel_id.say(&format!("Try this again in {} seconds.", seconds));
+                let _ = msg.channel_id.say(&ctx.http, &format!("Try this again in {} seconds.", seconds));
             }
         })
         // Can't be used more than once per 5 seconds:
@@ -253,7 +253,7 @@ command!(commands(ctx, msg, _args) {
         let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);
     }
 
-    if let Err(why) = msg.channel_id.say(&contents) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &contents) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -279,7 +279,7 @@ command!(say(ctx, msg, args) {
 
     let mut content = content_safe(&ctx.cache, &args.full(), &settings);
 
-    if let Err(why) = msg.channel_id.say(&content) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &content) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -309,8 +309,8 @@ fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOption
     false
 }
 
-command!(some_long_command(_ctx, msg, args) {
-    if let Err(why) = msg.channel_id.say(&format!("Arguments: {:?}", args)) {
+command!(some_long_command(ctx, msg, args) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -322,7 +322,7 @@ command!(about_role(ctx, msg, args) {
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
         if let Some(role) = guild.read().role_by_name(&potential_role_name) {
-            if let Err(why) = msg.channel_id.say(&format!("Role-ID: {}", role.id)) {
+            if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Role-ID: {}", role.id)) {
                 println!("Error sending message: {:?}", why);
             }
 
@@ -330,7 +330,7 @@ command!(about_role(ctx, msg, args) {
         }
     }
 
-    if let Err(why) = msg.channel_id.say(&format!("Could not find role named: {:?}", potential_role_name)) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -355,19 +355,19 @@ command!(about_role(ctx, msg, args) {
 // will be ignored.
 //
 // Argument type overloading is currently not supported.
-command!(multiply(_ctx, msg, args) {
+command!(multiply(ctx, msg, args) {
     let first = args.single::<f64>()?;
     let second = args.single::<f64>()?;
 
     let res = first * second;
 
-    if let Err(why) = msg.channel_id.say(&res.to_string()) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &res.to_string()) {
         println!("Err sending product of {} and {}: {:?}", first, second, why);
     }
 });
 
-command!(about(_ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say("This is a small test-bot! : )") {
+command!(about(ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )") {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -401,41 +401,41 @@ command!(latency(ctx, msg, _args) {
         },
     };
 
-    let _ = msg.reply(&ctx,  &format!("The shard latency is {:?}", runner.latency));
+    let _ = msg.reply(&ctx, &format!("The shard latency is {:?}", runner.latency));
 });
 
-command!(ping(_ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say("Pong! : )") {
+command!(ping(ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )") {
         println!("Error sending message: {:?}", why);
     }
 });
 
-command!(am_i_admin(_ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say("Yes you are.") {
+command!(am_i_admin(ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "Yes you are.") {
         println!("Error sending message: {:?}", why);
     }
 });
 
-command!(dog(_ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say(":dog:") {
+command!(dog(ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:") {
         println!("Error sending message: {:?}", why);
     }
 });
 
-command!(cat(_ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say(":cat:") {
+command!(cat(ctx, msg, _args) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, ":cat:") {
         println!("Error sending message: {:?}", why);
     }
 });
 
-command!(bird(_ctx, msg, args) {
+command!(bird(ctx, msg, args) {
     let say_content = if args.is_empty() {
         ":bird: can find animals for you.".to_string()
     } else {
         format!(":bird: could not find animal named: `{}`.", args.full())
     };
 
-    if let Err(why) = msg.channel_id.say(say_content) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -443,7 +443,7 @@ command!(bird(_ctx, msg, args) {
 command!(slow_mode(ctx, msg, args) {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
 
-        if let Err(why) = msg.channel_id.edit(|c| c.slow_mode_rate(slow_mode_rate_seconds)) {
+        if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)) {
             println!("Error setting channel's slow mode rate: {:?}", why);
 
             format!("Failed to set slow mode to `{}` seconds.", slow_mode_rate_seconds)
@@ -456,7 +456,7 @@ command!(slow_mode(ctx, msg, args) {
         "Failed to find channel in cache.".to_string()
     };
 
-    if let Err(why) = msg.channel_id.say(say_content) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
         println!("Error sending message: {:?}", why);
     }
 });

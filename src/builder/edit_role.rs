@@ -23,12 +23,17 @@ use crate::utils::VecMap;
 /// Create a hoisted, mentionable role named `"a test role"`:
 ///
 /// ```rust,no_run
-/// # use serenity::model::id::{ChannelId, GuildId};
+/// # extern crate serenity;
+/// #
+/// # use serenity::{model::id::{ChannelId, GuildId}, http::Http};
+/// # use std::sync::Arc;
+/// #
+/// # let http = Arc::new(Http::default());
 /// # let (channel_id, guild_id) = (ChannelId(1), GuildId(2));
 /// #
 /// // assuming a `channel_id` and `guild_id` has been bound
 ///
-/// let role = guild_id.create_role(|r| {
+/// let role = guild_id.create_role(&http, |r| {
 ///     r.hoist(true).mentionable(true).name("a test role")
 /// });
 /// ```
