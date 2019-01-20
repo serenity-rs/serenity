@@ -12,11 +12,11 @@ use std::{
     num::ParseIntError
 };
 
-#[cfg(feature = "reqwest")]
+#[cfg(any(feature = "reqwest_default_tls", feature = "reqwest_rustls_tls"))]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
-#[cfg(feature = "tungstenite")]
+#[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
 use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use crate::client::ClientError;
@@ -98,7 +98,7 @@ pub enum Error {
     #[cfg(feature = "rustls_support")]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
-    #[cfg(feature = "tungstenite")]
+    #[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
     Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "voice")]
@@ -150,7 +150,7 @@ impl From<RustlsError> for Error {
     fn from(e: RustlsError) -> Error { Error::Rustls(e) }
 }
 
-#[cfg(feature = "tungstenite")]
+#[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
 }
@@ -197,7 +197,7 @@ impl StdError for Error {
             Error::Opus(ref inner) => inner.description(),
             #[cfg(feature = "rustls_support")]
             Error::Rustls(ref inner) => inner.description(),
-            #[cfg(feature = "tungstenite")]
+            #[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",

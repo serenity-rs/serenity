@@ -34,9 +34,18 @@ version = "~0.4"
 optional = true
 version = "^1.0"
 
-[dependencies.reqwest]
+[dependencies.reqwest_default_tls]
+package = "reqwest"
 optional = true
 version = "0.9"
+
+[dependencies.reqwest_rustls_tls]
+default-features = false
+features = ["rustls-tls"]
+package = "reqwest"
+optional = true
+version = "0.9"
+
 
 [dependencies.lazy_static]
 optional = true
@@ -64,8 +73,15 @@ version = "0.2"
 optional = true
 version = "~1.7"
 
-[dependencies.tungstenite]
+[dependencies.tungstenite_native_tls]
 optional = true
+package = "tungstenite"
+version = "0.6"
+
+[dependencies.tungstenite_rustls_tls]
+default-features = false
+optional = true
+package = "tungstenite"
 version = "0.6"
 
 [dependencies.typemap]
@@ -111,12 +127,13 @@ client = [
 ]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = ["flate2", "http", "tungstenite", "url", "utils"]
-http = ["reqwest", "lazy_static"]
+gateway = ["flate2", "http", "tungstenite_rustls_tls", "url", "utils"]
+http = ["reqwest_rustls_tls", "lazy_static"]
+http_native_tls = ["reqwest_default_tls", "lazy_static"]
 model = ["builder", "http"]
-rustls_support = ["rustls", "webpki", "webpki-roots"]
+rustls_support = ["rustls", "webpki", "webpki-roots", "reqwest_rustls_tls"]
 standard_framework = ["framework"]
-native_tsl = []
+native_tsl = ["reqwest_default_tls", "tungstenite_native_tls"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
