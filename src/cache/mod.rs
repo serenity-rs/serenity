@@ -475,7 +475,7 @@ impl Cache {
     ///         let channel = match cache.guild_channel(message.channel_id) {
     ///             Some(channel) => channel,
     ///             None => {
-    /// if let Err(why) = message.channel_id.say("Could not find guild's
+    /// if let Err(why) = message.channel_id.say(&context.http, "Could not find guild's
     /// channel data") {
     ///                     println!("Error sending message: {:?}", why);
     ///                 }

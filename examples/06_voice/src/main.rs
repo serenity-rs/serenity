@@ -80,7 +80,7 @@ command!(deafen(ctx, msg) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
 
             return Ok(());
         },
@@ -99,11 +99,11 @@ command!(deafen(ctx, msg) {
     };
 
     if handler.self_deaf {
-        check_msg(msg.channel_id.say("Already deafened"));
+        check_msg(msg.channel_id.say(&ctx.http, "Already deafened"));
     } else {
         handler.deafen(true);
 
-        check_msg(msg.channel_id.say("Deafened"));
+        check_msg(msg.channel_id.say(&ctx.http, "Deafened"));
     }
 });
 
@@ -111,7 +111,7 @@ command!(join(ctx, msg) {
     let guild = match msg.guild(&ctx.cache) {
         Some(guild) => guild,
         None => {
-            check_msg(msg.channel_id.say("Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
 
             return Ok(());
         }
@@ -138,9 +138,9 @@ command!(join(ctx, msg) {
     let mut manager = manager_lock.lock();
 
     if manager.join(guild_id, connect_to).is_some() {
-        check_msg(msg.channel_id.say(&format!("Joined {}", connect_to.mention())));
+        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
     } else {
-        check_msg(msg.channel_id.say("Error joining the channel"));
+        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
     }
 });
 
@@ -148,7 +148,7 @@ command!(leave(ctx, msg) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
 
             return Ok(());
         },
@@ -161,7 +161,7 @@ command!(leave(ctx, msg) {
     if has_handler {
         manager.remove(guild_id);
 
-        check_msg(msg.channel_id.say("Left voice channel"));
+        check_msg(msg.channel_id.say(&ctx.http, "Left voice channel"));
     } else {
         check_msg(msg.reply(&ctx, "Not in a voice channel"));
     }
@@ -171,7 +171,7 @@ command!(mute(ctx, msg) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
 
             return Ok(());
         },
@@ -190,30 +190,30 @@ command!(mute(ctx, msg) {
     };
 
     if handler.self_mute {
-        check_msg(msg.channel_id.say("Already muted"));
+        check_msg(msg.channel_id.say(&ctx.http, "Already muted"));
     } else {
         handler.mute(true);
 
-        check_msg(msg.channel_id.say("Now muted"));
+        check_msg(msg.channel_id.say(&ctx.http, "Now muted"));
     }
 });
 
-command!(ping(_context, msg) {
-    check_msg(msg.channel_id.say("Pong!"));
+command!(ping(context, msg) {
+    check_msg(msg.channel_id.say(&context.http, "Pong!"));
 });
 
 command!(play(ctx, msg, args) {
     let url = match args.single::<String>() {
         Ok(url) => url,
         Err(_) => {
-            check_msg(msg.channel_id.say("Must provide a URL to a video or audio"));
+            check_msg(msg.channel_id.say(&ctx.http, "Must provide a URL to a video or audio"));
 
             return Ok(());
         },
     };
 
     if !url.starts_with("http") {
-        check_msg(msg.channel_id.say("Must provide a valid URL"));
+        check_msg(msg.channel_id.say(&ctx.http, "Must provide a valid URL"));
 
         return Ok(());
     }
@@ -221,7 +221,7 @@ command!(play(ctx, msg, args) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Error finding channel info"));
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
 
             return Ok(());
         },
@@ -236,7 +236,7 @@ command!(play(ctx, msg, args) {
             Err(why) => {
                 println!("Err starting source: {:?}", why);
 
-                check_msg(msg.channel_id.say("Error sourcing ffmpeg"));
+                check_msg(msg.channel_id.say(&ctx.http, "Error sourcing ffmpeg"));
 
                 return Ok(());
             },
@@ -244,9 +244,9 @@ command!(play(ctx, msg, args) {
 
         handler.play(source);
 
-        check_msg(msg.channel_id.say("Playing song"));
+        check_msg(msg.channel_id.say(&ctx.http, "Playing song"));
     } else {
-        check_msg(msg.channel_id.say("Not in a voice channel to play in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
     }
 });
 
@@ -254,7 +254,7 @@ command!(undeafen(ctx, msg) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Error finding channel info"));
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
 
             return Ok(());
         },
@@ -266,9 +266,9 @@ command!(undeafen(ctx, msg) {
     if let Some(handler) = manager.get_mut(guild_id) {
         handler.deafen(false);
 
-        check_msg(msg.channel_id.say("Undeafened"));
+        check_msg(msg.channel_id.say(&ctx.http, "Undeafened"));
     } else {
-        check_msg(msg.channel_id.say("Not in a voice channel to undeafen in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in"));
     }
 });
 
@@ -276,7 +276,7 @@ command!(unmute(ctx, msg) {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
-            check_msg(msg.channel_id.say("Error finding channel info"));
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
 
             return Ok(());
         },
@@ -287,9 +287,9 @@ command!(unmute(ctx, msg) {
     if let Some(handler) = manager.get_mut(guild_id) {
         handler.mute(false);
 
-        check_msg(msg.channel_id.say("Unmuted"));
+        check_msg(msg.channel_id.say(&ctx.http, "Unmuted"));
     } else {
-        check_msg(msg.channel_id.say("Not in a voice channel to undeafen in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in"));
     }
 });
 

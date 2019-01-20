@@ -5,8 +5,10 @@ use std::cmp::Ordering;
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::{cache::Cache, http};
+#[cfg(all(feature = "cache", feature = "model", feature = "http"))]
+use crate::client::Context;
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::cache::FromStrAndCache;
@@ -73,10 +75,10 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn delete(&self, cache: &Arc<RwLock<Cache>>) -> Result<()> {
-        http::delete_role(self.find_guild(&cache)?.0, self.id.0)
+    pub fn delete(&self, context: &Context) -> Result<()> {
+        context.http.delete_role(self.find_guild(&context.cache)?.0, self.id.0)
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -101,10 +103,10 @@ impl Role {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "builder", feature = "cache"))]
-    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, cache: &Arc<RwLock<Cache>>, f: F) -> Result<Role> {
-        self.find_guild(&cache)
-            .and_then(|guild_id| guild_id.edit_role(self.id, f))
+    #[cfg(all(feature = "builder", feature = "cache", feature = "http"))]
+    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, context: &Context, f: F) -> Result<Role> {
+        self.find_guild(&context.cache)
+            .and_then(|guild_id| guild_id.edit_role(&context.http, self.id, f))
     }
 
     /// Searches the cache for the guild that owns the role.

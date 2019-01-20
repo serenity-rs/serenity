@@ -41,7 +41,6 @@ pub use crate::http as rest;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
 
-use crate::http;
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use parking_lot::RwLock;
@@ -56,6 +55,8 @@ use crate::framework::Framework;
 use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -282,8 +283,6 @@ pub struct Client {
     /// Defaults to 5 threads, which should suffice small bots. Consider
     /// increasing this number as your bot grows.
     pub threadpool: ThreadPool,
-    /// The token in use by the client.
-    pub token: Arc<Mutex<String>>,
     /// The voice manager for the client.
     ///
     /// This is an ergonomic structure for interfacing over shards' voice
@@ -341,12 +340,11 @@ impl Client {
             format!("Bot {}", token)
         };
 
-        http::set_token(&token);
-        let locked = Arc::new(Mutex::new(token));
+        let http = Http::new(reqwest::Client::builder().build()?, &token);
 
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
-        let url = Arc::new(Mutex::new(http::get_gateway()?.url));
+        let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = Arc::new(handler);
 
@@ -363,6 +361,8 @@ impl Client {
             cache: Arc::new(RwLock::new(Cache::default())),
             #[cfg(feature = "cache")]
             update_cache_timeout: None,
+            #[cfg(feature = "http")]
+            http: Arc::new(http),
             __nonexhaustive: (),
         });
 
@@ -376,7 +376,6 @@ impl Client {
                 shard_init: 0,
                 shard_total: 0,
                 threadpool: threadpool.clone(),
-                token: &locked,
                 #[cfg(feature = "voice")]
                 voice_manager: &voice_manager,
                 ws_url: &url,
@@ -385,7 +384,6 @@ impl Client {
         };
 
         Ok(Client {
-            token: locked,
             ws_uri: url,
             #[cfg(feature = "framework")]
             framework,
@@ -433,7 +431,7 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "http"))]
     pub fn new_with_cache_update_timeout<H>(token: &str, handler: H, duration: Option<Duration>) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
         let token = token.trim();
@@ -444,12 +442,11 @@ impl Client {
             format!("Bot {}", token)
         };
 
-        http::set_token(&token);
-        let locked = Arc::new(Mutex::new(token));
+        let http = Http::new(reqwest::Client::builder().build()?, &token);
 
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
-        let url = Arc::new(Mutex::new(http::get_gateway()?.url));
+        let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = Arc::new(handler);
 
@@ -464,6 +461,8 @@ impl Client {
         let cache_and_http = Arc::new(CacheAndHttp {
             cache: Arc::new(RwLock::new(Cache::default())),
             update_cache_timeout: duration,
+            #[cfg(feature = "http")]
+            http: Arc::new(http),
             __nonexhaustive: (),
         });
 
@@ -477,7 +476,6 @@ impl Client {
                 shard_init: 0,
                 shard_total: 0,
                 threadpool: threadpool.clone(),
-                token: &locked,
                 #[cfg(feature = "voice")]
                 voice_manager: &voice_manager,
                 ws_url: &url,
@@ -486,7 +484,6 @@ impl Client {
         };
 
         Ok(Client {
-            token: locked,
             ws_uri: url,
             #[cfg(feature = "framework")]
             framework,
@@ -527,8 +524,8 @@ impl Client {
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
-    ///     .on("ping", |_, msg, _| {
-    ///         msg.channel_id.say("Pong!")?;
+    ///     .on("ping", |context, msg, _| {
+    ///         msg.channel_id.say(&context.http, "Pong!")?;
     ///
     ///         Ok(())
     ///      }));
@@ -649,6 +646,7 @@ impl Client {
     /// ```
     ///
     /// [gateway docs]: ../gateway/index.html#sharding
+    #[cfg(feature = "http")]
     pub fn start(&mut self) -> Result<()> {
         self.start_connection([0, 0, 1])
     }
@@ -701,9 +699,10 @@ impl Client {
     ///
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [gateway docs]: ../gateway/index.html#sharding
+    #[cfg(feature = "http")]
     pub fn start_autosharded(&mut self) -> Result<()> {
         let (x, y) = {
-            let res = http::get_bot_gateway()?;
+            let res = self.cache_and_http.http.get_bot_gateway()?;
 
             (res.shards as u64 - 1, res.shards as u64)
         };
@@ -788,6 +787,7 @@ impl Client {
     /// [`start`]: #method.start
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: ../gateway/index.html#sharding
+    #[cfg(feature = "http")]
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
         self.start_connection([shard, shard, shards])
     }
@@ -842,6 +842,7 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: ../gateway/index.html#sharding
+    #[cfg(feature = "http")]
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
         self.start_connection([0, total_shards - 1, total_shards])
     }
@@ -912,6 +913,7 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: ../gateway/index.html#sharding
+    #[cfg(feature = "http")]
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
         self.start_connection([range[0], range[1], total_shards])
     }
@@ -929,6 +931,7 @@ impl Client {
     // an error.
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
+    #[cfg(feature = "http")]
     fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         #[cfg(feature = "voice")]
         self.voice_manager.lock().set_shard_count(shard_data[2]);
@@ -940,7 +943,7 @@ impl Client {
         #[cfg(any(all(feature = "standard_framework", feature = "framework"),
                   feature = "voice"))]
         {
-            let user = http::get_current_user()?;
+            let user = self.cache_and_http.http.get_current_user()?;
 
             // Update the framework's current user if the feature is enabled.
             //

@@ -18,7 +18,9 @@ use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{cache::Cache, http, utils};
+use crate::{cache::Cache, utils};
+#[cfg(all(feature = "http"))]
+use crate::http::Http;
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
@@ -86,19 +88,19 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn add_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        self._add_role(role_id.into())
+    pub fn add_role<R: Into<RoleId>>(&mut self, http: &Arc<Http>, role_id: R) -> Result<()> {
+        self._add_role(&http, role_id.into())
     }
 
-    #[cfg(feature = "cache")]
-    fn _add_role(&mut self, role_id: RoleId) -> Result<()> {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    fn _add_role(&mut self, http: &Arc<Http>, role_id: RoleId) -> Result<()> {
         if self.roles.contains(&role_id) {
             return Ok(());
         }
 
-        match http::add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
+        match http.add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -115,15 +117,15 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(feature = "cache")]
-    pub fn add_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    pub fn add_roles(&mut self, http: &Arc<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
         let map = utils::vecmap_to_json_map(builder.0);
 
-        match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
+        match http.edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -145,14 +147,14 @@ impl Member {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn ban<BO: BanOptions>(&self, ban_options: &BO) -> Result<()> {
-        self._ban(ban_options.dmd(), ban_options.reason())
+    pub fn ban<BO: BanOptions>(&self, http: &Arc<Http>, ban_options: &BO) -> Result<()> {
+        self._ban(&http, ban_options.dmd(), ban_options.reason())
     }
 
-    #[cfg(feature = "cache")]
-    fn _ban(&self, dmd: u8, reason: &str) -> Result<()> {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    fn _ban(&self, http: &Arc<Http>, dmd: u8, reason: &str) -> Result<()> {
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
@@ -161,7 +163,7 @@ impl Member {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
-        http::ban_user(
+        http.ban_user(
             self.guild_id.0,
             self.user.read().id.0,
             dmd,
@@ -240,10 +242,10 @@ impl Member {
     /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
-    pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, f: F) -> Result<()> {
+    pub fn edit<F: FnOnce(EditMember) -> EditMember>(&self, http: &Arc<Http>, f: F) -> Result<()> {
         let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
 
-        http::edit_member(self.guild_id.0, self.user.read().id.0, &map)
+        http.edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -334,7 +336,7 @@ impl Member {
             }
         }
 
-        self.guild_id.kick(self.user.read().id)
+        self.guild_id.kick(&context.http, self.user.read().id)
     }
 
     /// Returns the guild-level permissions for the member.
@@ -376,19 +378,19 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn remove_role<R: Into<RoleId>>(&mut self, role_id: R) -> Result<()> {
-        self._remove_role(role_id.into())
+    pub fn remove_role<R: Into<RoleId>>(&mut self, http: &Arc<Http>, role_id: R) -> Result<()> {
+        self._remove_role(&http, role_id.into())
     }
 
-    #[cfg(feature = "cache")]
-    fn _remove_role(&mut self, role_id: RoleId) -> Result<()> {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    fn _remove_role(&mut self, http: &Arc<Http>, role_id: RoleId) -> Result<()> {
         if !self.roles.contains(&role_id) {
             return Ok(());
         }
 
-        match http::remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
+        match http.remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -404,15 +406,15 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(feature = "cache")]
-    pub fn remove_roles(&mut self, role_ids: &[RoleId]) -> Result<()> {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    pub fn remove_roles(&mut self, http: &Arc<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
         let map = utils::vecmap_to_json_map(builder.0);
 
-        match http::edit_member(self.guild_id.0, self.user.read().id.0, &map) {
+        match http.edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -453,9 +455,9 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(feature = "cache")]
-    pub fn unban(&self) -> Result<()> {
-        http::remove_ban(self.guild_id.0, self.user.read().id.0)
+    #[cfg(all(feature = "cache", feature = "http"))]
+    pub fn unban(&self, http: &Http) -> Result<()> {
+        http.remove_ban(self.guild_id.0, self.user.read().id.0)
     }
 
     /// Retrieves the member's user ID.

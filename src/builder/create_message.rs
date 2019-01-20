@@ -24,10 +24,14 @@ use crate::utils::{self, VecMap};
 ///
 /// ```rust,no_run
 /// use serenity::model::id::ChannelId;
+/// # use serenity::http::Http;
+/// # use std::sync::Arc;
+/// #
+/// # let http = Arc::new(Http::default());
 ///
 /// let channel_id = ChannelId(7);
 ///
-/// let _ = channel_id.send_message(|m| {
+/// let _ = channel_id.send_message(&http, |m| {
 ///     m.content("test");
 ///     m.tts(true);
 ///

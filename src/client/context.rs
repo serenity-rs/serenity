@@ -2,7 +2,6 @@ use crate::builder::EditProfile;
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::error::Result;
 use crate::gateway::InterMessage;
-use crate::http;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
 use serde_json::Value;
@@ -15,6 +14,8 @@ use crate::utils::VecMap;
 use crate::utils::vecmap_to_json_map;
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
+#[cfg(feature = "http")]
+use crate::http::Http;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -44,6 +45,8 @@ pub struct Context {
     pub shard_id: u64,
     #[cfg(feature = "cache")]
     pub cache: Arc<RwLock<Cache>>,
+    #[cfg(feature = "http")]
+    pub http: Arc<Http>,
 }
 
 impl Context {
@@ -53,6 +56,7 @@ impl Context {
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         cache: Arc<RwLock<Cache>>,
+        http: Arc<Http>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner_tx),
@@ -60,6 +64,8 @@ impl Context {
             data,
             #[cfg(feature = "cache")]
             cache,
+            #[cfg(feature = "http")]
+            http,
         }
     }
 
@@ -108,7 +114,7 @@ impl Context {
                     map.insert("email", Value::String(email));
                 }
             } else {
-                let user = http::get_current_user()?;
+                let user = http.get_current_user()?;
 
                 map.insert("username", Value::String(user.name));
 
@@ -123,7 +129,7 @@ impl Context {
 
         let edited = vecmap_to_json_map(edit_profile.0);
 
-        http::edit_profile(&edited)
+        self.http.edit_profile(&edited)
     }
 
 

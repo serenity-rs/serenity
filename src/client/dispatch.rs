@@ -14,6 +14,8 @@ use super::{
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 
+#[cfg(feature = "http")]
+use crate::http::Http;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "cache")]
@@ -47,17 +49,38 @@ macro_rules! update {
     }
 }
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn context(
     data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     cache: &Arc<RwLock<Cache>>,
+    http: &Arc<Http>,
 ) -> Context {
-    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, cache.clone())
+    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, cache.clone(), Arc::clone(http))
 }
 
-#[cfg(not(feature = "cache"))]
+#[cfg(all(feature = "cache", not(feature = "http")))]
+fn context(
+    data: &Arc<Mutex<ShareMap>>,
+    runner_tx: &Sender<InterMessage>,
+    shard_id: u64,
+    cache: &Arc<RwLock<Cache>>,
+) -> Context {
+    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(cache))
+}
+
+#[cfg(all(not(feature = "cache"), feature = "http"))]
+fn context(
+    data: &Arc<Mutex<ShareMap>>,
+    runner_tx: &Sender<InterMessage>,
+    shard_id: u64,
+    http: &Arc<Http>,
+) -> Context {
+    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http))
+}
+
+#[cfg(not(any(feature = "cache", feature = "http")))]
 fn context(
     data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
@@ -87,10 +110,14 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::MessageCreate(mut event)) => {
             update!(cache_and_http, event);
 
-            #[cfg(feature = "cache")]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
-            #[cfg(not(feature = "cache"))]
+            #[cfg(not(any(feature = "cache", feature = "http")))]
             let context = context(data, runner_tx, shard_id);
+            #[cfg(all(feature = "cache", not(feature = "http")))]
+            let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+            #[cfg(all(not(feature = "cache"), feature = "http"))]
+            let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+            #[cfg(all(feature = "cache", feature = "http"))]
+            let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
             dispatch_message(
                 context.clone(),
@@ -173,10 +200,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     shard_id: u64,
     cache_and_http: Arc<CacheAndHttp>,
 ) {
-    #[cfg(feature = "cache")]
-    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
-    #[cfg(not(feature = "cache"))]
+    #[cfg(not(any(feature = "cache", feature = "http")))]
     let context = context(data, runner_tx, shard_id);
+    #[cfg(all(feature = "cache", not(feature = "http")))]
+    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+    #[cfg(all(not(feature = "cache"), feature = "http"))]
+    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+    #[cfg(all(feature = "cache", feature = "http"))]
+    let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
     match event {
         DispatchEvent::Client(ClientEvent::ShardStageUpdate(event)) => {

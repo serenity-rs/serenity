@@ -89,7 +89,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason -
     // not started within a decent amount of time.
     pub started: Instant,
-    pub token: Arc<Mutex<String>>,
+    pub token: String,
     ws_url: Arc<Mutex<String>>,
 }
 
@@ -106,21 +106,20 @@ impl Shard {
     /// ```rust,no_run
     /// extern crate parking_lot;
     /// extern crate serenity;
+    ///
+    /// use serenity::gateway::Shard;
+    /// use parking_lot::Mutex;
+    /// use std::{env, sync::Arc};
     /// #
-    /// # use std::error::Error;
+    /// # use serenity::http::Http;
+    /// # use std::{error::Error};
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #
-    /// use parking_lot::Mutex;
-    /// use serenity::gateway::Shard;
-    /// use serenity::http;
-    /// use std::env;
-    /// use std::sync::Arc;
-    ///
-    /// let token = Arc::new(Mutex::new(env::var("DISCORD_BOT_TOKEN")?));
+    /// #     let http = Arc::new(Http::default());
+    /// let token = env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = Arc::new(Mutex::new(http::get_gateway()?.url));
-    /// let shard = Shard::new(gateway, token, [0, 1])?;
+    /// let gateway = Arc::new(Mutex::new(http.get_gateway()?.url));
+    /// let shard = Shard::new(gateway, &token, [0, 1])?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -133,7 +132,7 @@ impl Shard {
     /// ```
     pub fn new(
         ws_url: Arc<Mutex<String>>,
-        token: Arc<Mutex<String>>,
+        token: &str,
         shard_info: [u64; 2],
     ) -> Result<Shard> {
         let mut client = connect(&*ws_url.lock())?;
@@ -158,7 +157,7 @@ impl Shard {
             seq,
             stage,
             started: Instant::now(),
-            token,
+            token: token.to_string(),
             session_id,
             shard_info,
             ws_url,
@@ -264,13 +263,12 @@ impl Shard {
     /// ```rust,no_run
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::{client::gateway::Shard, prelude::Mutex};
     /// # use std::sync::Arc;
-    /// # use serenity::prelude::Mutex;
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), mutex, [0, 1]).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1]).unwrap();
     /// #
     /// use serenity::model::gateway::Activity;
     ///
@@ -322,7 +320,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let shard = Shard::new(mutex.clone(), mutex, [1, 2]).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1]).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
@@ -682,7 +680,7 @@ impl Shard {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -712,7 +710,7 @@ impl Shard {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), mutex, [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -751,7 +749,7 @@ impl Shard {
     // - the time that the last heartbeat sent as being now
     // - the `stage` to `Identifying`
     pub fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token.lock())?;
+        self.client.send_identify(&self.shard_info, &self.token)?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
@@ -805,7 +803,7 @@ impl Shard {
                     &self.shard_info,
                     session_id,
                     &self.seq,
-                    &self.token.lock(),
+                    &self.token,
                 )
             },
             None => Err(Error::Gateway(GatewayError::NoSessionId)),

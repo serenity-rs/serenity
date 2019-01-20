@@ -30,7 +30,7 @@ impl EventHandler for Handler {
        if msg.content == "!ping" {
             println!("Shard {}", ctx.shard_id);
 
-            if let Err(why) = msg.channel_id.say("Pong!") {
+            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!") {
                 println!("Error sending message: {:?}", why);
             }
         }
