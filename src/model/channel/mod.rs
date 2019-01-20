@@ -433,7 +433,7 @@ impl Channel {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`CatagoryChannel`]: struct.ChannelCategory.html
     pub fn position(&self) -> Option<i64> {
-        match self {
+        match *self {
             Channel::Guild(ref channel) => Some(channel.with(|c| c.position)),
             Channel::Category(ref catagory) => Some(catagory.with(|c| c.position)),
             _ => None
