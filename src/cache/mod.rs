@@ -610,6 +610,54 @@ impl Cache {
         })
     }
 
+    /// Retrieves a [`Channel`]'s message from the cache based on the channel's and
+    /// message's given Ids.
+    ///
+    /// **Note**: This will clone the entire message.
+    ///
+    /// # Examples
+    ///
+    /// Retrieving the message object from a channel, in a
+    /// [`EventHandler::message`] context:
+    ///
+    /// ```rust,no_run
+    /// # extern crate parking_lot;
+    /// # extern crate serenity;
+    /// #
+    /// # use serenity::{cache::Cache, model::id::{ChannelId, MessageId}};
+    /// # use parking_lot::RwLock;
+    /// # use std::sync::Arc;
+    /// #
+    /// # let message = ChannelId(0).message(MessageId(1)).unwrap();
+    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #
+    /// let cache = cache.read();
+    /// let fetched_message = cache.message(message.channel_id, message.id);
+    ///
+    /// match fetched_message {
+    ///     Some(m) => {
+    ///         assert_eq!(message.content, m.content);
+    ///     },
+    ///     None => {
+    ///         println!("No message found in cache.");
+    ///     },
+    /// }
+    /// ```
+    ///
+    /// [`EventHandler::message`]: ../client/trait.EventHandler.html#method.message
+    /// [`Channel`]: ../model/channel/struct.Channel.html
+    #[inline]
+    pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<Message>
+        where C: Into<ChannelId>, M: Into<MessageId> {
+        self._message(channel_id.into(), message_id.into())
+    }
+
+    fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
+        self.messages.get(&channel_id).and_then(|messages| {
+            messages.get(&message_id).cloned()
+        })
+    }
+
     /// Retrieves a [`PrivateChannel`] from the cache's [`private_channels`]
     /// map, if it exists.
     ///
