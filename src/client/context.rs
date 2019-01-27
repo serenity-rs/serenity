@@ -373,7 +373,7 @@ impl Context {
     /// [`Playing`]: ../model/gateway/enum.ActivityType.html#variant.Playing
     /// [`reset_presence`]: #method.reset_presence
     /// [`set_presence`]: #method.set_presence
-    #[deprecated(since = "0.5.5", note = "Use Context::set_game")]
+    #[deprecated(since = "0.5.5", note = "Use Context::set_activity")]
     #[inline]
     pub fn set_game_name(&self, game_name: &str) {
         let activity = Activity::playing(game_name);
