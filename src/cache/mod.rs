@@ -624,11 +624,12 @@ impl Cache {
     /// # extern crate parking_lot;
     /// # extern crate serenity;
     /// #
-    /// # use serenity::{cache::Cache, model::id::{ChannelId, MessageId}};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, MessageId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
-    /// #
-    /// # let message = ChannelId(0).message(MessageId(1)).unwrap();
+    /// # 
+    /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
+    /// # let message = ChannelId(0).message(&http, MessageId(1)).unwrap();
     /// # let cache = Arc::new(RwLock::new(Cache::default()));
     /// #
     /// let cache = cache.read();
