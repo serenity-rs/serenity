@@ -74,6 +74,18 @@ macro_rules! id_u64 {
                     deserializer.deserialize_any(U64Visitor).map($name)
                 }
             }
+
+            impl From<$name> for u64 {
+                fn from(id: $name) -> u64 {
+                    id.0 as u64
+                }
+            }
+
+            impl From<$name> for i64 {
+                fn from(id: $name) -> i64 {
+                    id.0 as i64
+                }
+            }
         )*
     }
 }
