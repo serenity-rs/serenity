@@ -68,11 +68,11 @@ impl Http {
 
     pub fn new_with_token(token: &str) -> Self {
         Http {
-            #[cfg(feature = "rustls_support")]
+            #[cfg(not(feature = "native_tls"))]
             client: Client::builder()
                 .use_rustls_tls()
                 .build().expect("Cannot build Reqwest::Client."),
-            #[cfg(not(feature = "rustls_support"))]
+            #[cfg(feature = "native_tls")]
             client: Client::builder()
                 .use_default_tls()
                 .build().expect("Cannot build Reqwest::Client."),

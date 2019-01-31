@@ -137,18 +137,14 @@ extern crate flate2;
 extern crate opus;
 #[cfg(feature = "rand")]
 extern crate rand;
-#[cfg(feature = "rustls_support")]
-extern crate reqwest_rustls_tls as reqwest;
-#[cfg(not(feature = "rustls_support"))]
-extern crate reqwest_default_tls as reqwest;
+#[cfg(feature = "http")]
+extern crate reqwest;
 #[cfg(feature = "sodiumoxide")]
 extern crate sodiumoxide;
 #[cfg(feature = "threadpool")]
 extern crate threadpool;
-#[cfg(all(feature = "rustls_support", any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls")))]
-extern crate tungstenite_rustls_tls as tungstenite;
-#[cfg(all(not(feature = "rustls_support"), any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls")))]
-extern crate tungstenite_native_tls as tungstenite;
+#[cfg(feature = "gateway")]
+extern crate tungstenite;
 #[cfg(feature = "typemap")]
 extern crate typemap;
 #[cfg(feature = "url")]

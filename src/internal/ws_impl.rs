@@ -7,7 +7,7 @@ use tungstenite::{
     Message,
 };
 
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 use std::{
     error::Error as StdError,
     fmt::{
@@ -19,7 +19,7 @@ use std::{
     net::TcpStream,
     sync::Arc,
 };
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 use url::Url;
 
 pub trait ReceiverExt {
@@ -80,7 +80,7 @@ fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>>{
 
 /// An error that occured while connecting over rustls
 #[derive(Debug)]
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 pub enum RustlsError {
     /// WebPKI X.509 Certificate Validation Error.
     WebPKI,
@@ -90,19 +90,19 @@ pub enum RustlsError {
     Io(IoError),
 }
 
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 impl From<IoError> for RustlsError {
     fn from(e: IoError) -> Self {
         RustlsError::Io(e)
     }
 }
 
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.description()) }
 }
 
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 impl StdError for RustlsError {
     fn description(&self) -> &str {
         use self::RustlsError::*;
@@ -116,7 +116,7 @@ impl StdError for RustlsError {
 }
 
 // Create a tungstenite client with a rustls stream.
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     let mut config = rustls::ClientConfig::new();
     config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);

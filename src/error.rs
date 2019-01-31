@@ -12,11 +12,11 @@ use std::{
     num::ParseIntError
 };
 
-#[cfg(any(feature = "reqwest_default_tls", feature = "reqwest_rustls_tls"))]
+#[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
-#[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
+#[cfg(feature = "gateway")]
 use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use crate::client::ClientError;
@@ -24,7 +24,7 @@ use crate::client::ClientError;
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
 use crate::voice::VoiceError;
@@ -95,10 +95,10 @@ pub enum Error {
     #[cfg(feature = "http")]
     Http(HttpError),
     /// An error occuring in rustls
-    #[cfg(feature = "rustls_support")]
+    #[cfg(not(feature = "native_tls"))]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
-    #[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
+    #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "voice")]
@@ -145,12 +145,12 @@ impl From<VoiceError> for Error {
     fn from(e: VoiceError) -> Error { Error::Voice(e) }
 }
 
-#[cfg(feature = "rustls_support")]
+#[cfg(not(feature = "native_tls"))]
 impl From<RustlsError> for Error {
     fn from(e: RustlsError) -> Error { Error::Rustls(e) }
 }
 
-#[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
+#[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
 }
@@ -195,9 +195,9 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "rustls_support")]
+            #[cfg(not(feature = "native_tls"))]
             Error::Rustls(ref inner) => inner.description(),
-            #[cfg(any(feature = "tungstenite_rustls_tls", feature = "tungstenite_native_tls"))]
+            #[cfg(feature = "gateway")]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
