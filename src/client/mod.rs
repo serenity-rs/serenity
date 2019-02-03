@@ -127,17 +127,16 @@ pub struct Client {
     ///
     /// ```no_run
     /// extern crate serenity;
-    /// extern crate typemap;
     ///
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
-    /// use serenity::model::prelude::*;
-    /// use typemap::Key;
-    /// use std::{collections::HashMap, env};
+    /// use serenity::model::*;
+    /// use std::collections::HashMap;
+    /// use std::env;
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl Key for MessageEventCounter {
+    /// impl TypeMapKey for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///

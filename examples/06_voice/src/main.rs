@@ -30,7 +30,8 @@ use serenity::{
     voice,
 };
 
-use typemap::Key;
+// This imports `typemap`'s `Key` as `TypeMapKey`.
+use serenity::prelude::*;
 
 struct VoiceManager;
 
