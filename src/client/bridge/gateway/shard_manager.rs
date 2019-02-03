@@ -63,10 +63,11 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use serenity::client::EventHandler;
 /// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
+/// // Of note, this imports `typemap`'s `ShareMap` type.
+/// use serenity::prelude::*;
 /// use std::sync::Arc;
 /// use std::env;
 /// use threadpool::ThreadPool;
-/// use typemap::ShareMap;
 ///
 /// struct Handler;
 ///
