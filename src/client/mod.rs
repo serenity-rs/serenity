@@ -129,7 +129,7 @@ pub struct Client {
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl Key for MessageEventCounter {
+    /// impl TypeMapKey for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
