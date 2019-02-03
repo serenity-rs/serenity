@@ -26,5 +26,7 @@ pub use gateway::GatewayError;
 pub use http::HttpError;
 #[cfg(feature = "model")]
 pub use model::ModelError;
+#[cfg(feature = "typemap")]
+pub use typemap::{Key as TypeMapKey, ShareMap};
 #[cfg(feature = "voice")]
 pub use voice::VoiceError;
