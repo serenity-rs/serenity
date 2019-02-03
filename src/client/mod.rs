@@ -120,13 +120,12 @@ pub struct Client {
     ///
     /// ```rust,ignore
     /// extern crate serenity;
-    /// extern crate typemap;
     ///
+    /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::*;
     /// use std::collections::HashMap;
     /// use std::env;
-    /// use typemap::Key;
     ///
     /// struct MessageEventCounter;
     ///

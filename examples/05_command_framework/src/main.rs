@@ -11,7 +11,6 @@
 
 #[macro_use]
 extern crate serenity;
-extern crate typemap;
 
 use std::{collections::HashMap, env, fmt::Write, sync::Arc};
 
@@ -25,20 +24,21 @@ use serenity::{
     utils::{content_safe, ContentSafeOptions},
 };
 
-use typemap::Key;
+// This imports `typemap`'s `Key` as `TypeMapKey`.
+use serenity::prelude::*;
 
 // A container type is created for inserting into the Client's `data`, which
 // allows for data to be accessible across all events and framework commands, or
 // anywhere else that has a copy of the `data` Arc.
 struct ShardManagerContainer;
 
-impl Key for ShardManagerContainer {
+impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 
 struct CommandCounter;
 
-impl Key for CommandCounter {
+impl TypeMapKey for CommandCounter {
     type Value = HashMap<String, u64>;
 }
 
