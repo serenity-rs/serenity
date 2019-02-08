@@ -357,6 +357,15 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a spoiler'd inline text to the content.
+    pub fn push_spoiler<D: I>(mut self, content: D) -> Self {
+        self.0.push_str("||");
+        self.0.push_str(&content.into().to_string());
+        self.0.push_str("||");
+
+        self
+    }
+
     /// Pushes the given text with a newline appended to the content.
     ///
     /// # Examples
@@ -477,6 +486,26 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a spoiler'd inline text with a newline added to the content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_spoiler_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "||hello||\nworld");
+    /// ```
+    pub fn push_spoiler_line<D: I>(mut self, content: D) -> Self {
+        self = self.push_spoiler(content);
+        self.0.push('\n');
+
+        self
+    }
+
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe<C: I>(mut self, content: C) -> Self {
@@ -574,6 +603,19 @@ impl MessageBuilder {
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("~~");
+
+        self
+    }
+
+    /// Pushes a spoiler'd inline text to the content normalizing content.
+    pub fn push_spoiler_safe<D: I>(mut self, content: D) -> Self {
+        self.0.push_str("||");
+        {
+            let mut c = content.into();
+            c.inner = normalize(&c.inner).replace("||", " ");
+            self.0.push_str(&c.to_string());
+        }
+        self.0.push_str("||");
 
         self
     }
@@ -711,6 +753,29 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a spoiler'd inline text with added newline to the content normalizing
+    /// content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_spoiler_line_safe("@everyone")
+    ///                 .push("Isn't a mention.").build();
+    ///
+    /// assert_eq!(content, "||@\u{200B}everyone||\nIsn't a mention.");
+    /// ```
+    pub fn push_spoiler_line_safe<D: I>(mut self, content: D) -> Self {
+        self = self.push_spoiler_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
     /// Mentions the [`Role`] in the built message.
     ///
     /// This accepts anything that converts _into_ a [`RoleId`]. Refer to
@@ -785,6 +850,7 @@ pub enum ContentModifier {
     Strikethrough,
     Code,
     Underline,
+    Spoiler,
 }
 
 /// Describes formatting on string content
@@ -796,6 +862,7 @@ pub struct Content {
     pub inner: String,
     pub code: bool,
     pub underline: bool,
+    pub spoiler: bool,
 }
 
 impl<T: ToString> Add<T> for Content {
@@ -867,18 +934,41 @@ impl Content {
             ContentModifier::Underline => {
                 self.underline = true;
             },
+            ContentModifier::Spoiler => {
+                self.spoiler = true;
+            }
         }
     }
 
     pub fn to_string(&self) -> String {
+        trait UnwrapWith {
+            fn unwrap_with(&self, n: usize) -> usize;
+        }
+
+        impl UnwrapWith for bool {
+            fn unwrap_with(&self, n: usize) -> usize {
+                if *self {
+                    n
+                } else {
+                    0
+                }
+            }
+        }
+
         let capacity =
-            self.inner.len() + if self.bold { 4 } else { 0 } + if self.italic { 2 } else { 0 } +
-            if self.strikethrough { 4 } else { 0 } + if self.underline {
-                4
-            } else {
-                0
-            } + if self.code { 2 } else { 0 };
+            self.inner.len() +
+            self.spoiler.unwrap_with(4) +
+            self.bold.unwrap_with(4) +
+            self.italic.unwrap_with(2) +
+            self.strikethrough.unwrap_with(4) +
+            self.underline.unwrap_with(4) +
+            self.code.unwrap_with(2);
+
         let mut new_str = String::with_capacity(capacity);
+
+        if self.spoiler {
+            new_str.push_str("||");
+        }
 
         if self.bold {
             new_str.push_str("**");
@@ -922,6 +1012,10 @@ impl Content {
             new_str.push_str("**");
         }
 
+        if self.spoiler {
+            new_str.push_str("||");
+        }
+
         new_str
     }
 }
@@ -942,9 +1036,7 @@ mod private {
 }
 
 
-/// This trait only exists as way to bypass the shouting of the compiler. Specifically "conflicting
-/// implementations in core" and alike.
-/// However is not meant to be used outside.
+/// This trait exists for the purpose of bypassing the "conflicting implementations" error from the compiler.
 pub trait I: self::private::A {
     fn into(self) -> Content;
 }
@@ -958,6 +1050,7 @@ impl<T: fmt::Display> I for T {
             inner: self.to_string(),
             code: false,
             underline: false,
+            spoiler: false,
         }
     }
 }
@@ -1058,6 +1151,10 @@ mod test {
         let content = Bold + Italic + Code + "Fun!";
 
         assert_eq!(content.to_string(), "***`Fun!`***");
+
+        let content = Spoiler + Bold + "Divert your eyes elsewhere";
+
+        assert_eq!(content.to_string(), "||**Divert your eyes elsewhere**||");
     }
 
     #[test]
@@ -1163,6 +1260,12 @@ mod test {
                 "foo _" => "__foo ___",
                 "__foo__ bar" => "__ foo  bar__"
             ],
+            push_spoiler_safe => [
+                "" => "||||",
+                "foo" => "||foo||",
+                "foo |" => "||foo |||",
+                "||foo|| bar" =>"|| foo  bar||"
+            ],
             push_line_safe => [
                 "" => "\n",
                 "foo" => "foo\n",
@@ -1187,6 +1290,10 @@ mod test {
             push_strike_line_safe => [
                 "" => "~~~~\n",
                 "a ~~ f" => "~~a   f~~\n"
+            ],
+            push_spoiler_line_safe => [
+                "" => "||||\n",
+                "a || f" => "||a   f||\n"
             ]
         };
     }
@@ -1252,6 +1359,16 @@ mod test {
             push_underline_line => [
                 "" => "____\n",
                 "foo" => "__foo__\n"
+            ],
+            push_spoiler => [
+                "a" => "||a||",
+                "" => "||||",
+                "|" => "|||||",
+                "||" => "||||||"
+            ],
+            push_spoiler_line => [
+                "" => "||||\n",
+                "foo" => "||foo||\n"
             ]
         };
     }
