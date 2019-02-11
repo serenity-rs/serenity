@@ -15,7 +15,7 @@ impl EventHandler for Handler {
             // The create message builder allows you to easily create embeds and messages
             // using a builder syntax.
             // This example will create a message that says "Hello, World!", with an embed that has
-            // a title, description, three fields, and footer.
+            // a title, description, three fields, footer and colour.
             if let Err(why) = msg.channel_id.send_message(|m| m
                 .content("Hello, World!")
                 .embed(|e| e
@@ -27,7 +27,8 @@ impl EventHandler for Handler {
                     ])
                     .field("This is the third field", "This is not an inline field", false)
                     .footer(|f| f
-                        .text("This is a footer")))) {
+                        .text("This is a footer"))
+                    .colour((246, 111, 0)))) {
                 println!("Error sending message: {:?}", why);
             }
         }
