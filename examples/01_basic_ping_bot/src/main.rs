@@ -97,6 +97,7 @@ async fn main_future() -> Result<(), Error> {
                             println!("Failed to autoreconnect shard. {:?}", reason);
                             break;
                         }
+                        messages = shard.messages()?.compat();
                     }
                     Action::Reconnect => {
                         println!("Shard 0 told us to reconnect!");
