@@ -1,25 +1,24 @@
 #![feature(
-    async_await,
-    await_macro,
-    futures_api,
-    generators,
-    try_blocks,
-    try_trait,
+async_await,
+await_macro,
+futures_api,
+generators,
+try_blocks,
+try_trait,
 )]
 
-extern crate env_logger;
-extern crate futures;
-extern crate serde_json;
 extern crate serenity;
+extern crate futures;
+extern crate env_logger;
 extern crate tokio;
 extern crate tungstenite;
 
 use futures::{
-    compat::{Future01CompatExt, Stream01CompatExt, TokioDefaultSpawner},
+    compat::{Future01CompatExt, Stream01CompatExt},
     prelude::*,
 };
 use serde_json::Error as JsonError;
-use serenity::gateway::Shard;
+use serenity::gateway::{Shard, Action};
 use serenity::model::event::{Event, GatewayEvent};
 use serenity::Error as SerenityError;
 use std::env;
@@ -59,54 +58,68 @@ impl From<TungsteniteError> for Error {
 }
 
 fn main() {
-    tokio::run(try_main().map_err(|why| {
-        println!("Error running shard: {:?}", why);
-    }).boxed().compat(TokioDefaultSpawner));
+    tokio::run(main_future().map_err(|reason| {
+        eprintln!("Error when running shard {:?}:", reason);
+    }).boxed().compat());
 }
 
-async fn try_main() -> Result<(), Error> {
+async fn main_future() -> Result<(), Error> {
     env_logger::init();
-
-    // Configure the client with your Discord bot token in the environment.
-    let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
-
-    // Create a new shard, specifying the token, the ID of the shard (0 of 1),
-    // and a handle to the event loop
-    let mut shard = await!(Shard::new(token, [0, 1]).compat())?;
-    println!("Connected shard");
-    let mut messages = shard.messages().compat();
+    let token = env::var("DISCORD_TOKEN").expect("No token was provided for the bot.");
+    // Create new shard.
+    let mut shard = await!(Shard::new(token, [0, 1]).compat()).unwrap();
+    let mut messages = shard.messages().expect("No shard messages found.").compat();
+    println!("Shard is connected.");
 
     loop {
-        // Loop over websocket messages.
         let result: Result<_, Error> = try {
-            println!("Getting message");
             let message = await!(messages.next())??;
-
-            // Parse the websocket message into a serenity GatewayEvent.
+            println!("Receiving shard message {:?}", message);
+            // Parse websocket event.
             let event = shard.parse(&message)?;
+            let process = shard.process(&event);
+            if let Ok(Some(action)) = process {
+                match action {
+                    Action::Identify => {
+                        println!("Identify Requested from Shard 0.");
+                        if let Err(why) = shard.identify() {
+                            println!("There was an error when identifiying: {:?}", why);
+                            break;
+                        }
+                    },
+                    Action::Autoreconnect => {
+                        println!("Shard 0 told us to autoreconnect.");
+                        if let Err(reason) = await!(shard.autoreconnect().compat()) {
+                            println!("Failed to autoreconnect shard. {:?}", reason);
+                            break;
+                        }
+                    }
+                    Action::Reconnect => {
+                        println!("Shard 0 told us to reconnect!");
+                        break;
+                    },
+                    Action::Resume => {
+                        println!("Shard 0 told us to resume!");
+                        if let Err(reason) = await!(shard.resume().compat()) {
+                            println!("Error resuming shard. {:?}", reason);
+                            break;
+                        }
+                        messages = shard.messages()?.compat();
+                    },
 
-            // Have the shard process the WebSocket event, in case it needs
-            // to mutate its state, send a packet, etc.
-            //
-            // This can give back a future in the event something needs to
-            // be done, such as waiting for a reconnection.
-            if let Some(future) = shard.process(&event) {
-                await!(future.compat())?;
-            }
+                }
+            };
 
-            // Now you can do whatever you want with the event.
             match event {
                 GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
-                    if ev.message.content == "!ping" {
+                    if ev.message.content == "!pingo" {
                         println!("Pong!");
                     }
-                },
+                }
                 GatewayEvent::Dispatch(_, Event::Ready(_)) => {
-                    println!("Connected to Discord!");
-                },
-                _ => {
-                    // Ignore all other messages.
-                },
+                    println!("I am is connected to Discord.");
+                }
+                _ => {}
             }
         };
 
@@ -120,18 +133,19 @@ async fn try_main() -> Result<(), Error> {
                         close.code,
                         close.reason,
                     );
-                },
+                }
                 other => {
                     println!("Shard error: {:?}", other);
 
                     continue;
-                },
+                }
             }
-
-            println!("Autoreconnecting");
+            println!("Autoreconnecting shard.");
 
             await!(shard.autoreconnect().compat())?;
-            messages = shard.messages().compat();
+            messages = shard.messages()?.compat();
         }
     }
+
+    Ok(())
 }
