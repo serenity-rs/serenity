@@ -65,6 +65,7 @@ fn main() {
 
 async fn main_future() -> Result<(), Error> {
     env_logger::init();
+    // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("No token was provided for the bot.");
     // Create new shard.
     let mut shard = await!(Shard::new(token, [0, 1]).compat()).unwrap();
@@ -72,12 +73,15 @@ async fn main_future() -> Result<(), Error> {
     println!("Shard is connected.");
 
     loop {
+        // Loop over websocket messages.
         let result: Result<_, Error> = try {
             let message = await!(messages.next())??;
             println!("Receiving shard message {:?}", message);
-            // Parse websocket event.
+            // Parse websocket event to Serenity Gateway Event.
             let event = shard.parse(&message)?;
+            //Process websocket event.
             let process = shard.process(&event);
+            // Handle websocket actions, such as identifying and auto-reconnecting.
             if let Ok(Some(action)) = process {
                 match action {
                     Action::Identify => {
@@ -110,6 +114,7 @@ async fn main_future() -> Result<(), Error> {
                 }
             };
 
+            // Now you may handle the Shard Events.
             match event {
                 GatewayEvent::Dispatch(_, Event::MessageCreate(ev)) => {
                     if ev.message.content == "!pingo" {
