@@ -699,7 +699,6 @@ pub enum Route<'a> {
     CreateGuild,
     CreateGuildIntegration {
         guild_id: u64,
-        integration_id: u64,
     },
     CreateInvite {
         channel_id: u64,
@@ -803,6 +802,9 @@ pub enum Route<'a> {
     EditRole {
         guild_id: u64,
         role_id: u64,
+    },
+    EditRolePosition {
+        guild_id: u64,
     },
     EditWebhook {
         webhook_id: u64,
@@ -1014,10 +1016,10 @@ impl<'a> Route<'a> {
                 Path::Guilds,
                 Cow::from(Path::guilds()),
             ),
-            Route::CreateGuildIntegration { guild_id, integration_id } => (
+            Route::CreateGuildIntegration { guild_id } => (
                 LightMethod::Post,
                 Path::GuildsIdIntegrationsId(guild_id),
-                Cow::from(Path::guild_integration(guild_id, integration_id)),
+                Cow::from(Path::guild_integrations(guild_id)),
             ),
             Route::CreateInvite { channel_id } => (
                 LightMethod::Post,
@@ -1178,6 +1180,11 @@ impl<'a> Route<'a> {
                 LightMethod::Patch,
                 Path::GuildsIdRolesId(guild_id),
                 Cow::from(Path::guild_role(guild_id, role_id)),
+            ),
+            Route::EditRolePosition { guild_id } => (
+                LightMethod::Patch,
+                Path::GuildsId(guild_id),
+                Cow::from(Path::guild_roles(guild_id)),
             ),
             Route::EditWebhook { webhook_id } => (
                 LightMethod::Patch,

@@ -50,12 +50,12 @@ use model::id::MessageId;
 /// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
 #[derive(Clone, Debug)]
 pub struct GetMessages {
-    pub(crate) message_anchor: Option<MessageAnchor>,
+    pub(crate) message_pagination: Option<MessagePagination>,
     pub(crate) limit: u64,
 }
 
 #[derive(Clone, Copy, Debug)]
-pub(crate) enum MessageAnchor {
+pub(crate) enum MessagePagination {
     After(MessageId),
     Around(MessageId),
     Before(MessageId),
@@ -65,7 +65,7 @@ impl Default for GetMessages {
     fn default() -> Self {
         GetMessages {
             limit: 50,
-            message_anchor: None
+            message_pagination: None
         }
     }
 }
@@ -74,19 +74,19 @@ impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
     pub fn after<M: Into<MessageId>>(&mut self, message_id: M) {
-        self.message_anchor = Some(MessageAnchor::After(message_id.into()))
+        self.message_pagination = Some(MessagePagination::After(message_id.into()))
     }
 
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
     pub fn around<M: Into<MessageId>>(&mut self, message_id: M) {
-        self.message_anchor = Some(MessageAnchor::Around(message_id.into()))
+        self.message_pagination = Some(MessagePagination::Around(message_id.into()))
     }
 
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
     pub fn before<M: Into<MessageId>>(&mut self, message_id: M) {
-        self.message_anchor = Some(MessageAnchor::Before(message_id.into()))
+        self.message_pagination = Some(MessagePagination::Before(message_id.into()))
     }
 
     /// The maximum number of messages to retrieve for the query.
@@ -104,6 +104,6 @@ impl GetMessages {
     /// call this - except to clear previous calls to `after`, `around`, and
     /// `before` - as it is the default value.
     pub fn most_recent(&mut self) {
-        self.message_anchor = None
+        self.message_pagination = None
     }
 }
