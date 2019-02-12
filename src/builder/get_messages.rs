@@ -1,5 +1,4 @@
 use model::id::MessageId;
-use utils::VecMap;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///
@@ -49,26 +48,45 @@ use utils::VecMap;
 /// ```
 ///
 /// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
-#[derive(Clone, Debug, Default)]
-pub struct GetMessages(pub VecMap<&'static str, u64>);
+#[derive(Clone, Debug)]
+pub struct GetMessages {
+    pub(crate) message_anchor: Option<MessageAnchor>,
+    pub(crate) limit: u64,
+}
+
+#[derive(Clone, Copy, Debug)]
+pub(crate) enum MessageAnchor {
+    After(MessageId),
+    Around(MessageId),
+    Before(MessageId),
+}
+
+impl Default for GetMessages {
+    fn default() -> Self {
+        GetMessages {
+            limit: 50,
+            message_anchor: None
+        }
+    }
+}
 
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
     /// its Id.
     pub fn after<M: Into<MessageId>>(&mut self, message_id: M) {
-        self.0.insert("after", message_id.into().0);
+        self.message_anchor = Some(MessageAnchor::After(message_id.into()))
     }
 
     /// Indicates to retrieve the messages _around_ a specific message in either
     /// direction (before+after) the given message.
     pub fn around<M: Into<MessageId>>(&mut self, message_id: M) {
-        self.0.insert("around", message_id.into().0);
+        self.message_anchor = Some(MessageAnchor::Around(message_id.into()))
     }
 
     /// Indicates to retrieve the messages before a specific message, given by
     /// its Id.
     pub fn before<M: Into<MessageId>>(&mut self, message_id: M) {
-        self.0.insert("before", message_id.into().0);
+        self.message_anchor = Some(MessageAnchor::Before(message_id.into()))
     }
 
     /// The maximum number of messages to retrieve for the query.
@@ -79,11 +97,13 @@ impl GetMessages {
     /// limitation. If an amount larger than 100 is supplied, it will be
     /// reduced.
     pub fn limit(&mut self, limit: u64) {
-        self.0.insert("limit", if limit > 100 { 100 } else { limit });
+        self.limit = limit.min(100)
     }
 
     /// This is a function that is here for completeness. You do not need to
     /// call this - except to clear previous calls to `after`, `around`, and
     /// `before` - as it is the default value.
-    pub fn most_recent(&self) { }
+    pub fn most_recent(&mut self) {
+        self.message_anchor = None
+    }
 }

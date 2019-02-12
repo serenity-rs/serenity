@@ -10,7 +10,7 @@ use gateway::{
 };
 use model::event::{Event, GatewayEvent};
 use tokio::{
-    executor::current_thread,
+    runtime::current_thread,
     timer::Delay,
 };
 use futures::sync::mpsc::{

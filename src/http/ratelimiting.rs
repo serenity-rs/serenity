@@ -57,7 +57,7 @@ use std::time::{Duration, Instant};
 use std::{i64, str, u8};
 use super::{Error, Path, Result};
 use tokio::{
-    executor::current_thread,
+    runtime::current_thread,
     timer::Delay,
 };
 
@@ -255,7 +255,7 @@ impl RateLimiter {
     }
 
     pub fn take(&mut self, route: &Path)
-        -> Box<Future<Item = (), Error = Error> + Send> {
+        -> impl Future<Item = (), Error = Error> + Send {
         // TODO: handle global
         let mut routes = self.routes.lock();
         let bucket = routes.entry(*route).or_insert_with(Default::default);
@@ -283,14 +283,14 @@ impl RateLimiter {
                     current_thread::spawn(done);
                 }
 
-                Box::new(rx.from_err())
+                future::Either::A(rx.from_err())
             },
-            None => Box::new(future::ok(())),
+            None => future::Either::B(future::ok(())),
         }
     }
 
     pub fn handle<'a>(&'a mut self, route: &'a Path, response: &'a Response<Vec<u8>>)
-        -> Result<Option<Box<Future<Item = (), Error = ()> + Send>>> {
+        -> Result<Option<impl Future<Item = (), Error = ()> + Send>> {
         let mut routes = self.routes.lock();
         let bucket = routes.entry(*route).or_insert_with(Default::default);
 
@@ -298,7 +298,7 @@ impl RateLimiter {
             return Ok(None);
         }
 
-        Ok(match RateLimit::from_headers(&response.headers())? {
+        match RateLimit::from_headers(&response.headers())? {
             RateLimit::Global(millis) => {
                 debug!("Globally ratelimited for {:?}ms", millis);
 
@@ -318,7 +318,7 @@ impl RateLimiter {
                         ()
                     });
 
-                Some(Box::new(done))
+                Ok(Some(future::Either::A(done)))
             },
             RateLimit::NotReached(headers) => {
                 let RateLimitHeaders { limit, remaining, reset } = headers;
@@ -337,7 +337,7 @@ impl RateLimiter {
                     }
                 }
 
-                None
+                Ok(None)
             },
             RateLimit::Reached(millis) => {
                 debug!("Ratelimited on route {:?} for {:?}ms", route, millis);
@@ -351,9 +351,9 @@ impl RateLimiter {
                         ()
                     });
 
-                Some(Box::new(done))
+                Ok(Some(future::Either::B(done)))
             },
-        })
+        }
     }
 }
 

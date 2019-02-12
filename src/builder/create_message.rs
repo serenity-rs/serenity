@@ -1,5 +1,4 @@
 use internal::prelude::*;
-use http::AttachmentType;
 use model::channel::ReactionType;
 use std::fmt::Display;
 use super::CreateEmbed;
@@ -48,14 +47,17 @@ use utils::{self, VecMap};
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Debug)]
-pub struct CreateMessage(pub VecMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType>);
+pub struct CreateMessage {
+    pub(crate) data: VecMap<&'static str, Value>,
+    pub(crate) reactions: Option<Vec<ReactionType>>,
+}
 
 impl CreateMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     pub fn content<D: Display>(&mut self, content: D) {
-        self.0.insert("content", Value::String(content.to_string()));
+        self.data.insert("content", Value::String(content.to_string()));
     }
 
     /// Set an embed for the message.
@@ -63,7 +65,7 @@ impl CreateMessage {
         let map = utils::vecmap_to_json_map(f(CreateEmbed::default()).0);
         let embed = Value::Object(map);
 
-        self.0.insert("embed", embed);
+        self.data.insert("embed", embed);
     }
 
     /// Set whether the message is text-to-speech.
@@ -72,30 +74,12 @@ impl CreateMessage {
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) {
-        self.0.insert("tts", Value::Bool(tts));
+        self.data.insert("tts", Value::Bool(tts));
     }
 
     /// Adds a list of reactions to create after the message's sent.
     pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(&mut self, reactions: It) {
-        self.1 = Some(reactions.into_iter().map(|r| r.into()).collect());
-    }
-
-    /// Appends a file to the message.
-    pub fn add_file<T: Into<AttachmentType>>(&mut self, file: T) {
-        self.2.push(file.into());
-    }
-
-    /// Appends a list of files to the message.
-    pub fn add_files<T: Into<AttachmentType>, It: IntoIterator<Item=T>>(&mut self, files: It) {
-        self.2.extend(files.into_iter().map(|f| f.into()));
-    }
-
-    /// Sets a list of files to include in the message.
-    ///
-    /// Calling this multiple times will overwrite the file list.
-    /// To append files, call `add_file` or `add_files` instead.
-    pub fn files<T: Into<AttachmentType>, It: IntoIterator<Item=T>>(&mut self, files: It) {
-        self.2 = files.into_iter().map(|f| f.into()).collect();
+        self.reactions = Some(reactions.into_iter().map(|r| r.into()).collect());
     }
 }
 
@@ -109,6 +93,9 @@ impl Default for CreateMessage {
         let mut map = VecMap::new();
         map.insert("tts", Value::Bool(false));
 
-        CreateMessage(map, None, Vec::new())
+        CreateMessage {
+            data: map,
+            reactions: None,
+        }
     }
 }

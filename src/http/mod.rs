@@ -883,7 +883,7 @@ impl Client {
         token: &str,
         wait: bool,
         f: F,
-    ) -> Box<Future<Item = Option<Message>, Error = Error> + Send> {
+    ) -> impl Future<Item = Option<Message>, Error = Error> + Send {
         let execution = f(ExecuteWebhook::default()).0;
         let map = Value::Object(serenity_utils::vecmap_to_json_map(execution));
 
@@ -894,9 +894,9 @@ impl Client {
         };
 
         if wait {
-            Box::new(self.post(route, Some(&map)))
+            future::Either::A(self.post(route, Some(&map)))
         } else {
-            Box::new(self.verify(route, Some(&map)).map(|_| None))
+            future::Either::B(self.verify(route, Some(&map)).map(|_| None))
         }
     }
 
@@ -1036,7 +1036,7 @@ impl Client {
         limit: Option<u64>,
         after: Option<u64>
     ) -> impl Future<Item = Vec<Member>, Error = Error> + Send {
-        let done = self.get(Route::GetGuildMembers { after, guild_id, limit })
+        self.get(Route::GetGuildMembers { after, guild_id, limit })
             .and_then(move |mut v: Value| {
                 if let Some(values) = v.as_array_mut() {
                     let num = Value::Number(Number::from(guild_id));
@@ -1049,9 +1049,7 @@ impl Client {
                 }
 
                 serde_json::from_value::<Vec<Member>>(v).map_err(From::from)
-            });
-
-        Box::new(done)
+            })
     }
 
     /// Gets the amount of users that can be pruned.
@@ -1089,13 +1087,11 @@ impl Client {
             code: String,
         }
 
-        let done = self.get::<GuildVanityUrl>(
+        self.get::<GuildVanityUrl>(
             Route::GetGuildVanityUrl { guild_id },
         ).map(|resp| {
             resp.code
-        });
-
-        Box::new(done)
+        })
     }
 
     /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -1160,16 +1156,14 @@ impl Client {
     /// Gets member of a guild.
     pub fn get_member(&self, guild_id: u64, user_id: u64)
         -> impl Future<Item = Member, Error = Error> + Send {
-        let done = self.get::<Value>(Route::GetMember { guild_id, user_id })
+        self.get::<Value>(Route::GetMember { guild_id, user_id })
             .and_then(move |mut v| {
                 if let Some(map) = v.as_object_mut() {
                     map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
                 }
 
                 serde_json::from_value(v).map_err(From::from)
-            });
-
-        Box::new(done)
+            })
     }
 
     /// Gets a message by an Id, bots only.
@@ -1183,28 +1177,23 @@ impl Client {
         &self,
         channel_id: u64,
         f: F,
-    ) -> Box<Future<Item = Vec<Message>, Error = Error> + Send> {
-        let mut map = f(GetMessages::default()).0;
+    ) -> impl Future<Item = Vec<Message>, Error = Error> + Send {
+        let builder = f(GetMessages::default());
+        let mut query = format!("?limit={}", builder.limit);
 
-        let limit = map.remove(&"limit").unwrap_or(50);
-        let mut query = format!("?limit={}", limit);
-
-        if let Some(after) = map.remove(&"after") {
-            ftry!(write!(query, "&after={}", after));
+        use crate::builder::get_messages::MessageAnchor;
+        if let Some(anchor) = builder.message_anchor {
+            match anchor {
+                MessageAnchor::After(message) => write!(query, "&after={}", message),
+                MessageAnchor::Around(message) => write!(query, "&around={}", message),
+                MessageAnchor::Before(message) => write!(query, "&before={}", message),
+            }.unwrap() // query is a String, so this won't fail
         }
 
-        if let Some(around) = map.remove(&"around") {
-            ftry!(write!(query, "&around={}", around));
-        }
-
-        if let Some(before) = map.remove(&"before") {
-            ftry!(write!(query, "&before={}", before));
-        }
-
-        Box::new(self.get(Route::GetMessages {
+        self.get(Route::GetMessages {
             channel_id,
             query,
-        }))
+        })
     }
 
     /// Gets all pins of a channel.
@@ -1420,12 +1409,25 @@ impl Client {
     */
 
     /// Sends a message to a channel.
-    pub fn send_message<F>(&self, channel_id: u64, f: F) -> impl Future<Item = Message, Error = Error>
-        where F: FnOnce(CreateMessage) -> CreateMessage {
+    pub fn send_message<'s, F>(&'s self, channel_id: u64, f: F)
+        -> impl Future<Item = Message, Error = Error> + 's
+    where
+        F: FnOnce(CreateMessage) -> CreateMessage
+    {
         let msg = f(CreateMessage::default());
-        let map = Value::Object(serenity_utils::vecmap_to_json_map(msg.0));
+        let map = Value::Object(serenity_utils::vecmap_to_json_map(msg.data));
+        let reactions = msg.reactions;
 
-        self.post(Route::CreateMessage { channel_id }, Some(&map))
+        self.post(Route::CreateMessage { channel_id }, Some(&map)).and_then(move |msg: Message| {
+            if let Some(reactions) = reactions {
+                let msg_id = msg.id.0;
+                future::Either::A(futures::stream::iter_ok(reactions).for_each(move |reaction| {
+                    self.create_reaction(channel_id, msg_id, &reaction)
+                }).map(|()| msg))
+            } else {
+                future::Either::B(futures::future::ok(msg))
+            }
+        })
     }
 
     /// Pins a message in a channel.
@@ -1518,77 +1520,61 @@ impl Client {
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = T, Error = Error> + Send> {
-        let (method, path, url) = route.deconstruct();
-
-        let uri = match Uri::from_str(&format!("{}/{}", self.base, url.as_ref())) {
-            Ok(uri) => uri,
-            Err(why) => return Box::new(future::err(Error::Http(HttpError::InvalidUri(why)))),
-        };
-        let mut request_builder = Request::builder();
-        request_builder.method(method.hyper_method())
-            .header(AUTHORIZATION, &self.token()[..])
-            .header(CONTENT_TYPE, "Application/json")
-            .uri(uri);
-
-        let request = match map {
-            Some(value) => {
-                let body = match serde_json::to_vec(value) {
-                    Ok(body) => body,
-                    Err(why) => return Box::new(future::err(Error::Json(why))),
-                };
-
-                match request_builder.body(body.into()) {
-                    Ok(body) => body,
-                    Err(why) => return Box::new(future::err(Error::HttpCrate(why))),
-                }
-            },
-            None => ftry!(request_builder.body(vec![].into())),
-        };
-
-        let client = Arc::clone(&self.client);
-
-        Box::new(self.ratelimiter.as_ref().map(|r| r.lock().take(&path).boxed()).unwrap_or(Box::new(future::ok(())))
-            .and_then(move |_| client.request(request).map_err(From::from))
-            .from_err()
-            .and_then(verify_status)
+    ) -> impl Future<Item = T, Error = Error> + Send {
+        self.request_common(route, map)
             .and_then(|res| res.into_body().concat2().map_err(From::from))
-            .and_then(|body| serde_json::from_slice(&body).map_err(From::from)))
+            .and_then(|body| serde_json::from_slice(&body).map_err(From::from))
     }
 
     fn verify<'a>(
         &self,
         route: Route<'a>,
         map: Option<&Value>,
-    ) -> Box<Future<Item = (), Error = Error> + Send> {
+    ) -> impl Future<Item = (), Error = Error> + Send {
+        self.request_common(route, map).map(|_| ())
+    }
+
+    fn request_common<'a>(
+        &self,
+        route: Route<'a>,
+        map: Option<&Value>,
+    ) -> impl Future<Item = Response<Body>, Error = Error> + Send {
         let (method, path, url) = route.deconstruct();
 
         let uri = match Uri::from_str(&format!("{}/{}", self.base, url.as_ref())) {
             Ok(uri) => uri,
-            Err(why) => return Box::new(future::err(Error::Http(HttpError::InvalidUri(why)))),
+            Err(why) => return future::Either::A(future::err(Error::Http(HttpError::InvalidUri(why)))),
         };
-        let mut request_builder = Request::builder();
-        request_builder.method(method.hyper_method())
+
+        let body = match map {
+            Some(value) => match serde_json::to_vec(value) {
+                Ok(body) => body,
+                Err(why) => return future::Either::A(future::err(Error::Json(why))),
+            },
+            None => vec![],
+        };
+
+        let request = match Request::builder()
+            .method(method.hyper_method())
             .header(AUTHORIZATION, &self.token()[..])
             .header(CONTENT_TYPE, "Application/json")
-            .uri(uri);
-
-        let request = match map {
-            Some(value) => {
-                let body = ftry!(serde_json::to_vec(value));
-
-                ftry!(request_builder.body(body.into()))
-            },
-            None => ftry!(request_builder.body(vec![].into())),
+            .uri(uri)
+            .body(body.into()) {
+            Ok(request) => request,
+            Err(why) => return future::Either::A(future::err(Error::HttpCrate(why))),
         };
 
         let client = Arc::clone(&self.client);
 
-        Box::new(self.ratelimiter.as_ref().map(|r| r.lock().take(&path).boxed()).unwrap_or(Box::new(future::ok(())))
+        let ratelimit = match self.ratelimiter.as_ref() {
+            Some(ratelimiter) => future::Either::A(ratelimiter.lock().take(&path)),
+            None => future::Either::B(future::ok(())),
+        };
+
+        future::Either::B(ratelimit
             .and_then(move |_| client.request(request).map_err(From::from))
-            .map_err(From::from)
-            .and_then(verify_status)
-            .map(|_| ()))
+            .from_err()
+            .and_then(verify_status))
     }
 
     fn token(&self) -> String {
@@ -1619,13 +1605,13 @@ impl Client {
 ///
 /// [`Error::InvalidRequest`]: enum.Error.html#variant.InvalidRequest
 fn verify_status(response: Response<Body>) ->
-    Box<Future<Item = Response<Body>, Error = Error> + Send> {
+    impl Future<Item = Response<Body>, Error = Error> + Send {
     if response.status().is_success() {
-        Box::new(future::ok(response))
+        future::ok(response)
     } else {
         let (parts, _) = response.into_parts();
         let resp = Response::from_parts(parts, ());
-        Box::new(future::err(Error::Http(HttpError::InvalidRequest(resp))))
+        future::err(Error::Http(HttpError::InvalidRequest(resp)))
     }
 }
 

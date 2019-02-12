@@ -360,13 +360,14 @@ impl Shard {
         send(&self.tx, msg)
     }
 
-    pub fn autoreconnect(&mut self) -> Box<Future<Item = (), Error = Error> + Send> {
+    pub fn autoreconnect(&mut self) -> impl Future<Item = (), Error = Error> + Send {
         info!("[Shard {:?}] Autoreconnecting", self.shard_info);
 
+        use futures::future::Either;
         if self.session_id.is_some() && self.seq() > 0 {
-            Box::new(self.resume())
+            Either::A(self.resume())
         } else {
-            Box::new(self.reconnect())
+            Either::B(self.reconnect())
         }
     }
 
@@ -398,8 +399,8 @@ impl Shard {
                 "token": *self.token,
                 "v": GATEWAY_VERSION,
                 "properties": {
-                    "$browser": "test",
-                    "$device": "test",
+                    "$browser": "serenity.rs",
+                    "$device": "likely some water aerosol in the sky",
                     "$os": consts::OS,
                 },
             },
@@ -556,14 +557,14 @@ mod encryption {
     pub type AutoStream<S> = MaybeTlsStream<S>;
 
     pub fn wrap_stream<S>(socket: S, domain: String, mode: Mode)
-        -> Box<Future<Item=AutoStream<S>, Error=Error> + Send>
+        -> impl Future<Item=AutoStream<S>, Error=Error> + Send
     where
         S: 'static + AsyncRead + AsyncWrite + Send,
     {
         match mode {
-            Mode::Plain => Box::new(future::ok(StreamSwitcher::Plain(socket))),
+            Mode::Plain => future::Either::A(future::ok(StreamSwitcher::Plain(socket))),
             Mode::Tls => {
-                Box::new(future::result(TlsConnector::new())
+                future::Either::B(future::result(TlsConnector::new())
                             .map(TokioTlsConnector::from)
                             .and_then(move |connector| connector.connect(&domain, socket))
                             .map(|s| StreamSwitcher::Tls(s))
@@ -585,7 +586,7 @@ fn domain(request: &Request) -> Result<String> {
 
 fn connect(
     uri: &str,
-) -> Box<Future<Item = (UnboundedSender<TungsteniteMessage>, ShardStream), Error = Error> + Send> {
+) -> impl Future<Item = (UnboundedSender<TungsteniteMessage>, ShardStream), Error = Error> + Send {
     extern crate tokio_dns;
 
     use futures::future;
@@ -603,16 +604,16 @@ fn connect(
     let request = Request::from(url);
     let domain = match domain(&request) {
         Ok(domain) => domain,
-        Err(why) => return Box::new(future::err(Error::from(why))),
+        Err(why) => return future::Either::A(future::err(Error::from(why))),
     };
     let port = request.url.port_or_known_default().expect("Bug: port unknown");
 
     let mode = match tokio_tungstenite::tungstenite::client::url_mode(&request.url) {
         Ok(mode) => mode,
-        Err(why) => return Box::new(future::err(Error::from(why))),
+        Err(why) => return future::Either::A(future::err(Error::from(why))),
     };
 
-    let done = tokio_dns::TcpStream::connect((domain.as_str(), port)).map_err(|why| {
+    future::Either::B(tokio_dns::TcpStream::connect((domain.as_str(), port)).map_err(|why| {
         warn!("Err connecting to remote: {:?}", why);
 
         why
@@ -650,9 +651,7 @@ fn connect(
         tokio::spawn(done);
 
         (tx, stream)
-    }).from_err();
-
-    Box::new(done)
+    }).from_err())
 }
 
 fn heartbeat(

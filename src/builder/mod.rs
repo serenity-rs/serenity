@@ -5,17 +5,17 @@
 //! optional, and/or sane default values for required parameters can be applied
 //! by a builder.
 
-mod create_embed;
-mod create_invite;
-mod create_message;
-mod edit_channel;
-mod edit_guild;
-mod edit_member;
-mod edit_message;
-mod edit_profile;
-mod edit_role;
-mod execute_webhook;
-mod get_messages;
+pub(crate) mod create_embed;
+pub(crate) mod create_invite;
+pub(crate) mod create_message;
+pub(crate) mod edit_channel;
+pub(crate) mod edit_guild;
+pub(crate) mod edit_member;
+pub(crate) mod edit_message;
+pub(crate) mod edit_profile;
+pub(crate) mod edit_role;
+pub(crate) mod execute_webhook;
+pub(crate) mod get_messages;
 
 pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
