@@ -1456,7 +1456,7 @@ impl<'a> Route<'a> {
                 Path::ChannelsIdPinsMessageId(channel_id),
                 Cow::from(Path::channel_pin(channel_id, message_id)),
             ),
-            _ => unreachable!(), // TODO: finish 5 unconvered variants
+            _ => unimplemented!(), // TODO: finish 5 unconvered variants
         }
     }
 }

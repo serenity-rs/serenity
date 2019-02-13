@@ -41,6 +41,7 @@ use http_crate::uri::Uri;
 use hyper::client::{Client as HyperClient, HttpConnector};
 use hyper::header::{AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH};
 use hyper::{Body, Method, Request, Response};
+use hyper::body::Payload;
 use hyper_tls::HttpsConnector;
 use model::prelude::*;
 use parking_lot::Mutex;
