@@ -39,7 +39,7 @@ pub use self::routing::{Path, Route};
 use futures::{Future, Stream, future};
 use http_crate::uri::Uri;
 use hyper::client::{Client as HyperClient, HttpConnector};
-use hyper::header::{AUTHORIZATION, CONTENT_TYPE};
+use hyper::header::{AUTHORIZATION, CONTENT_TYPE, CONTENT_LENGTH};
 use hyper::{Body, Method, Request, Response};
 use hyper_tls::HttpsConnector;
 use model::prelude::*;
@@ -1593,20 +1593,21 @@ impl Client {
             Err(why) => return future::Either::A(future::err(Error::Http(HttpError::InvalidUri(why)))),
         };
 
-        let body = match map {
+        let body: Body = match map {
             Some(value) => match serde_json::to_vec(value) {
                 Ok(body) => body,
                 Err(why) => return future::Either::A(future::err(Error::Json(why))),
             },
             None => vec![],
-        };
+        }.into();
 
         let request = match Request::builder()
             .method(method.hyper_method())
             .header(AUTHORIZATION, &self.token()[..])
-            .header(CONTENT_TYPE, "Application/json")
+            .header(CONTENT_TYPE, "application/json")
+            .header(CONTENT_LENGTH, body.content_length().unwrap())
             .uri(uri)
-            .body(body.into()) {
+            .body(body) {
             Ok(request) => request,
             Err(why) => return future::Either::A(future::err(Error::HttpCrate(why))),
         };
