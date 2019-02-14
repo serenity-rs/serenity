@@ -106,6 +106,7 @@ pub struct Command<'a> {
     description: Option<String>,
     usage: Option<String>,
     usage_sample: Option<String>,
+    checks: Vec<String>,
 }
 
 /// Contains possible suggestions in case a command could not be found
@@ -415,6 +416,21 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
             similar_commands.sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
 
+            let mut check_names: Vec<String> = command.checks.iter().filter_map(|check|
+                if check.display_in_help {
+                    Some(check.name.to_string())
+                } else {
+                    None
+                }).collect();
+            let group_checks: Vec<String> = group.checks.iter().filter_map(|check|
+                if check.display_in_help {
+                    Some(check.name.to_string())
+                } else {
+                    None
+                }).collect();
+
+            check_names.extend_from_slice(&group_checks[..]);
+
             return Ok(CustomisedHelpData::SingleCommand {
                 command: Command {
                     name: command_name,
@@ -424,6 +440,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                     availability: available_text,
                     usage: command.usage.clone(),
                     usage_sample: command.example.clone(),
+                    checks: check_names,
                 },
             });
         }
@@ -437,10 +454,11 @@ fn fetch_single_command<'a, H: BuildHasher>(
 /// Tries to extract a single command matching searched command name.
 #[cfg(feature = "cache")]
 fn fetch_all_eligible_commands_in_group<'a>(
-    cache: &Arc<RwLock<Cache>>,
+    context: &Context,
     commands: &HashMap<&String, &InternalCommand>,
     command_names: &[&&String],
     help_options: &'a HelpOptions,
+    group: &CommandGroup,
     msg: &Message,
 ) -> GroupCommandsPair<'a> {
     let mut group_with_cmds = GroupCommandsPair::default();
@@ -454,15 +472,47 @@ fn fetch_all_eligible_commands_in_group<'a>(
             || cmd.dm_only && msg.is_private()
             || cmd.guild_only && !msg.is_private()
         {
-            if cmd.help_available && has_correct_permissions(&cache, &cmd, msg) {
+            if cmd.help_available && has_correct_permissions(&context.cache, &cmd, msg) {
 
-                if let Some(guild) = msg.guild(&cache) {
+                if let Some(guild) = msg.guild(&context.cache) {
                     let guild = guild.read();
 
                     if let Some(member) = guild.members.get(&msg.author.id) {
 
                         if has_correct_roles(&cmd, &guild, &member) {
-                            group_with_cmds.command_names.push(format!("`{}`", &name));
+
+                            if help_options.handle_checks {
+                                let mut fake_args = Args::new("", &["".to_string()]);
+                                let mut context = context.clone();
+
+                                let all_groups_checks_passed =
+                                    group.checks.iter()
+                                        .all(|check|
+                                            if check.check_in_help {
+                                                (check.function)(&mut context, msg, &mut fake_args, &cmd).is_success()
+                                            } else {
+                                                true
+                                            });
+
+                                let all_command_checks_passed =
+                                    cmd.checks.iter()
+                                        .all(|check|
+                                            if check.check_in_help {
+                                                (check.function)(&mut context, msg, &mut fake_args, &cmd).is_success()
+                                            } else {
+                                                true
+                                            });
+
+                                if !all_groups_checks_passed || !all_command_checks_passed {
+                                    let name = format_command_name!(&help_options.failed_check, &name);
+                                    dbg!(&name);
+                                    group_with_cmds.command_names.push(name);
+
+                                    break;
+                                }
+                            }
+
+                            group_with_cmds.command_names.push(format!("`{}`", &name))
                         } else {
                             let name = format_command_name!(&help_options.lacking_role, &name);
                             group_with_cmds.command_names.push(name);
@@ -487,7 +537,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
 fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
-    cache: &Arc<RwLock<Cache>>,
+    context: &Context,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     group_names: &[&'a String],
     msg: &Message,
@@ -499,7 +549,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
         let group = &groups[&**group_name];
 
         let group_with_cmds = create_single_group(
-            &cache,
+            &context,
             group,
             group_name,
             &msg,
@@ -517,7 +567,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
 /// Fetches a single group with its commands.
 #[cfg(feature = "cache")]
 fn create_single_group<'a>(
-    cache: &Arc<RwLock<Cache>>,
+    context: &Context,
     group: &CommandGroup,
     group_name: &'a str,
     msg: &Message,
@@ -528,10 +578,11 @@ let commands = remove_aliases(&group.commands);
     command_names.sort();
 
     let mut group_with_cmds = fetch_all_eligible_commands_in_group(
-        &cache,
+        &context,
         &commands,
         &command_names,
         &help_options,
+        &group,
         &msg,
     );
 
@@ -549,12 +600,14 @@ let commands = remove_aliases(&group.commands);
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
 pub fn create_customised_help_data<'a, H: BuildHasher>(
-    cache: &Arc<RwLock<Cache>>,
+    context: &Context,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
 ) -> CustomisedHelpData<'a> {
+    let cache = &context.cache;
+
     if !args.is_empty() {
         let name = args.full();
 
@@ -571,7 +624,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                             *prefix == searched_named_lowercase)) {
 
                         let mut single_group = create_single_group(
-                            &cache,
+                            &context,
                             &group,
                             &key,
                             &msg,
@@ -620,7 +673,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     group_names.sort();
 
     let listed_groups =
-        create_command_group_commands_pair_from_groups(&cache, &groups, &group_names, &msg, &help_options);
+        create_command_group_commands_pair_from_groups(&context, &groups, &group_names, &msg, &help_options);
 
     return if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
@@ -710,6 +763,15 @@ fn send_single_command_embed(
             }
 
             embed.field(&help_options.available_text, &command.availability, true);
+
+            if !command.checks.is_empty() {
+                embed.field(
+                    &help_options.checks_label,
+                    format!("`{}`", command.checks.join("`, `")),
+                    true,
+                );
+            }
+
             embed
         });
         m
@@ -776,7 +838,7 @@ pub fn with_embeds<H: BuildHasher>(
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_customised_help_data(&context.cache, &groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&context, &groups, args, help_options, msg);
 
     if let Err(why) = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
@@ -893,7 +955,7 @@ pub fn plain<H: BuildHasher>(
     groups: HashMap<String, Arc<CommandGroup>, H>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_customised_help_data(&context.cache, &groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&context, &groups, args, help_options, msg);
 
     let result = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
