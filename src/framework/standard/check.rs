@@ -146,11 +146,11 @@ impl Check {
 
 impl Debug for Check {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        f.debug_tuple("Check")
-            .field(&format!("name: {}", self.name))
-            .field(&"function: <fn>")
-            .field(&format!("check_in_help: {}", self.check_in_help))
-            .field(&format!("display_in_help: {}", self.display_in_help))
+        f.debug_struct("Check")
+            .field("name", &self.name)
+            .field("function", &"<fn>")
+            .field("check_in_help", &self.check_in_help)
+            .field("display_in_help", &self.display_in_help)
             .finish()
     }
 }
