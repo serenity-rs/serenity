@@ -298,7 +298,7 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
     // `false` will convert into `CheckResult::Failure(Reason::Unknown)`,
     //
     // and if you want to pass a reason alongside failure you can do:
-    // `CheckResult::new_reason("Lacked admin permission.")`,
+    // `CheckResult::new_user("Lacked admin permission.")`,
     //
     // if you want to mark it as something you want to log only:
     // `CheckResult::new_log("User lacked admin permission.")`,
