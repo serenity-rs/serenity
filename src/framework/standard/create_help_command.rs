@@ -157,6 +157,14 @@ impl CreateHelpCommand {
         self
     }
 
+    /// Sets how a command requiring bot-ownership should be treated in the
+    /// help-menu.
+    pub fn lacking_ownership(mut self, behaviour: HelpBehaviour) -> Self {
+        self.0.lacking_ownership = behaviour;
+
+        self
+    }
+
     /// Sets the tip (or legend) explaining why some commands are striked,
     /// given text will be used in guilds and direct messages.
     ///
@@ -256,11 +264,23 @@ impl CreateHelpCommand {
                 strike_text.push_str(&format!(", or are limited to {}", dm_or_guild));
             } else {
                 strike_text.push_str(&format!(" are limited to {}", dm_or_guild));
+                concat_with_comma = true;
             }
         }
-        let _ = write!(strike_text, ".");
+
+        if self.0.lacking_ownership == HelpBehaviour::Strike {
+            is_any_option_strike = true;
+
+            if concat_with_comma {
+                let _ = write!(strike_text, ", require ownership");
+            } else {
+                let _ = write!(strike_text, " require ownership");
+            }
+        }
 
         if is_any_option_strike {
+            let _ = write!(strike_text, ".");
+
             Some(strike_text)
         } else {
             None
