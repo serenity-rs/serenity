@@ -11,7 +11,7 @@ pub use super::{
     Args,
     Check,
 };
-use framework::standard::check::CheckResult;
+use crate::framework::standard::check::CheckResult;
 use crate::client::Context;
 use crate::model::{
     channel::Message,
