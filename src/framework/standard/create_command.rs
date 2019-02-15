@@ -90,7 +90,10 @@ impl CreateCommand {
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c
-    ///         .check("Bot Owner", owner_check, true, true)
+    ///         .check_customised(owner_check, |c|
+    ///             c.name("Owner Check")
+    ///              .check_in_help(true)
+    ///              .display_in_help(true))
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
@@ -108,15 +111,15 @@ impl CreateCommand {
     /// }
     /// ```
     pub fn check_customised<C, F>(mut self, function: F, create: C) -> Self
-        where C: FnOnce(&mut CreateCheck) -> CreateCheck,
+        where C: FnOnce(&mut CreateCheck) -> &mut CreateCheck,
         F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> CheckResult
         + Send
         + Sync
         + 'static {
         let mut create_check = CreateCheck::new(function);
-        let check = create(&mut create_check).0;
+        create(&mut create_check);
 
-        self.0.checks.push(check);
+        self.0.checks.push(create_check.0);
 
         self
     }
