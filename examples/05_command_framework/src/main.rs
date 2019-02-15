@@ -14,7 +14,8 @@ use serenity::{
     command,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
-        help_commands, Args, CommandOptions, DispatchError, HelpBehaviour, StandardFramework,
+        Args, CheckResult, CommandOptions, DispatchError, HelpBehaviour,
+        help_commands, StandardFramework,
     },
     model::{channel::{Channel, Message}, gateway::Ready, Permissions},
     prelude::*,
@@ -213,7 +214,7 @@ fn main() {
         .command("latency", |c| c
             .cmd(latency))
         .command("ping", |c| c
-            .check(owner_check) // User needs to pass this test to run command
+            .check("owner check", owner_check) // User needs to pass this test to run command
             .cmd(ping))
         .command("role", |c| c
             .cmd(about_role)
@@ -223,7 +224,7 @@ fn main() {
         .group("Owner", |g| g
             // This check applies to every command on this group.
             // User needs to pass the test for the command to execute.
-            .check(admin_check)
+            .check("admin check", admin_check)
             .command("am i admin", |c| c
                 .cmd(am_i_admin)
                 .guild_only(true))
@@ -290,24 +291,37 @@ command!(say(ctx, msg, args) {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
-fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
-    // Replace 7 with your ID
-    msg.author.id == 7
+fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+    // Replace 7 with your ID to make this check pass.
+    //
+    // `true` will convert into `CheckResult::Success`,
+    //
+    // `false` will convert into `CheckResult::Failure(Reason::Unknown)`,
+    //
+    // and if you want to pass a reason alongside failure you can do:
+    // `CheckResult::new_user("Lacked admin permission.")`,
+    //
+    // if you want to mark it as something you want to log only:
+    // `CheckResult::new_log("User lacked admin permission.")`,
+    //
+    // and if the check's failure origin is unknown you can mark it as such (same as using `false.into`):
+    // `CheckResult::new_unknown()`
+    (msg.author.id == 7).into()
 }
 
 // A function which acts as a "check", to determine whether to call a command.
 //
 // This check analyses whether a guild member permissions has
 // administrator-permissions.
-fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> bool {
+fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
     if let Some(member) = msg.member(&ctx.cache) {
 
         if let Ok(permissions) = member.permissions(&ctx.cache) {
-            return permissions.administrator();
+            return permissions.administrator().into();
         }
     }
 
-    false
+    false.into()
 }
 
 command!(some_long_command(ctx, msg, args) {

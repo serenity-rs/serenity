@@ -4,39 +4,17 @@ use crate::model::{
         Message,
         Channel,
     },
-    Permissions
+    Permissions,
 };
 use std::{
     collections::HashMap,
     fmt,
     fmt::{Debug, Formatter},
-    sync::Arc
+    sync::Arc,
 };
 use crate::utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
-
-type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
-                     + Send
-                     + Sync
-                     + 'static;
-
-pub struct Check(pub(crate) Box<CheckFunction>);
-
-impl Check {
-    pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
-    {
-        Check(Box::new(f))
-    }
-}
-
-impl Debug for Check {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.debug_tuple("Check")
-            .field(&"<fn>")
-            .finish()
-    }
-}
+use super::check::Check;
 
 pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
                    -> Result<(), Error>;
@@ -186,6 +164,8 @@ pub struct HelpOptions {
     pub aliases_label: String,
     /// Text specifying that a command is only usable in a guild.
     pub guild_only_text: String,
+    /// Text labeling a command's names of checks.
+    pub checks_label: String,
     /// Text specifying that a command is only usable in via DM.
     pub dm_only_text: String,
     /// Text specifying that a command can be used via DM and in guilds.
@@ -216,6 +196,10 @@ pub struct HelpOptions {
     pub lacking_role: HelpBehaviour,
     /// If a user lacks permissions, this will treat how these commands will be displayed.
     pub lacking_permissions: HelpBehaviour,
+    /// If a user dispatches a command and a check fails, this will treat how these command will be displayed.
+    /// This behaviour is bypassed if `handle_checks` is set to `CheckEvaluation::Ignore` and otherwise adjusts its
+    /// behaviour based on `handle_checks`.
+    pub failed_check: HelpBehaviour,
     /// If a user is using the help-command in a channel where a command is not available,
     /// this behaviour will be executed.
     pub wrong_channel: HelpBehaviour,
@@ -225,6 +209,8 @@ pub struct HelpOptions {
     pub embed_success_colour: Colour,
     /// If not 0, help will check whether a command is similar to searched named.
     pub max_levenshtein_distance: usize,
+    /// Decides whether help should consider checks.
+    pub handle_checks: bool,
 }
 
 pub trait HelpCommand: Send + Sync + 'static {
@@ -252,6 +238,7 @@ impl Default for HelpOptions {
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
             description_label: "Description".to_string(),
+            checks_label: "Checks".to_string(),
             guild_only_text: "Only in guilds".to_string(),
             dm_only_text: "Only in DM".to_string(),
             dm_and_guild_text: "In DM and guilds".to_string(),
@@ -268,6 +255,8 @@ impl Default for HelpOptions {
             embed_error_colour: Colour::DARK_RED,
             embed_success_colour: Colour::ROSEWATER,
             max_levenshtein_distance: 0,
+            failed_check: HelpBehaviour::Strike,
+            handle_checks: true,
         }
     }
 }

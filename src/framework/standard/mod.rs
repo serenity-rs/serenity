@@ -2,6 +2,7 @@
 pub mod help_commands;
 
 mod command;
+mod check;
 mod configuration;
 mod create_command;
 mod create_help_command;
@@ -17,19 +18,19 @@ pub use self::args::{
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
 pub use self::command::{
-    Check,
     HelpFunction,
     HelpOptions,
     Command,
     CommandGroup,
     CommandOptions,
-    Error as CommandError
+    Error as CommandError,
 };
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_help_command::CreateHelpCommand;
 pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
+pub use self::check::{Check, CreateCheck, CheckResult, Reason};
 
 use crate::client::Context;
 use crate::internal::RwLockExt;
@@ -167,7 +168,7 @@ pub enum DispatchError {
     /// When a custom function check has failed.
     //
     // TODO: Bring back `Arc<Command>` as `CommandOptions` in 0.6.x.
-    CheckFailed,
+    CheckFailed(String, Reason),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -616,25 +617,21 @@ impl StandardFramework {
                     }
                 }
 
-                let all_group_checks_passed = group
-                    .checks
-                    .iter()
-                    .all(|check| (check.0)(&mut context, message, args, command));
+                for check in &group.checks {
 
-                if !all_group_checks_passed {
-                    return Some(DispatchError::CheckFailed);
+                    if let CheckResult::Failure(reason) = (check.function)(&mut context, message, args, command) {
+                        return Some(DispatchError::CheckFailed(check.name.clone(), reason));
+                    }
                 }
 
-                let all_command_checks_passed = command
-                    .checks
-                    .iter()
-                    .all(|check| (check.0)(&mut context, message, args, command));
+                for check in &command.checks {
 
-                if all_command_checks_passed {
-                    None
-                } else {
-                    Some(DispatchError::CheckFailed)
+                    if let CheckResult::Failure(reason) = (check.function)(&mut context, message, args, command) {
+                        return Some(DispatchError::CheckFailed(check.name.clone(), reason));
+                    }
                 }
+
+                None
             }
         }
     }
