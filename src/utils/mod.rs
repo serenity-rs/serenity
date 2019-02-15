@@ -703,7 +703,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
             }
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
-                let mut replacement = if let Some(guild) = guild {
+                let replacement = if let Some(guild) = guild {
 
                     if let Some(guild) = cache.read().guild(&guild) {
 

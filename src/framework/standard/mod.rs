@@ -1159,7 +1159,7 @@ impl Framework for StandardFramework {
                         if let Some(help) = help {
                             let groups = self.groups.clone();
                             let owners = self.configuration.owners.clone();
-                            let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
+                            let args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             threadpool.execute(move || {
 
@@ -1286,7 +1286,7 @@ impl Framework for StandardFramework {
                 // `Message`, else we can avoid it.
                 if let Some(ref message_without_command) = self.message_without_command {
                     let mut context_unrecognised = context.clone();
-                    let mut message_unrecognised = message.clone();
+                    let message_unrecognised = message.clone();
 
                     let unrecognised_command = unrecognised_command.clone();
                     threadpool.execute(move || {

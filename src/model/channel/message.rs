@@ -241,7 +241,7 @@ impl Message {
         }
 
         if let Some(embed) = self.embeds.get(0) {
-            let mut embed = CreateEmbed::from(embed.clone());
+            let embed = CreateEmbed::from(embed.clone());
             builder.embed( |e| {
                 *e = embed;
                 e
