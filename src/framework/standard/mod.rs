@@ -1159,6 +1159,7 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
+                            let owners = self.configuration.owners.clone();
                             let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             threadpool.execute(move || {
@@ -1170,7 +1171,8 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+                                let result = (help.0)
+                                    (&mut context, &message, &help.1, groups, owners, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
@@ -1356,7 +1358,7 @@ pub enum HelpBehaviour {
     /// Does not list a command in the help-menu.
     Hide,
     /// The command will be displayed, hence nothing will be done.
-    Nothing
+    Nothing,
 }
 
 use std::fmt;

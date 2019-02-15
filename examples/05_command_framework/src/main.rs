@@ -8,7 +8,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::{collections::HashMap, env, fmt::Write, sync::Arc};
+use std::{collections::{HashMap, HashSet}, env, fmt::Write, sync::Arc};
 
 use serenity::{
     command,
@@ -61,6 +61,18 @@ fn main() {
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
+    // We will fetch your bot's owners
+    let owners = match client.cache_and_http.http.get_current_application_info() {
+        Ok(info) => {
+            let mut owners = HashSet::new();
+            owners.insert(info.owner.id);
+
+            owners
+        },
+        Err(why) => panic!("Could not access application info: {:?}", why),
+    };
+
+
     // Commands are equivalent to:
     // "~about"
     // "~emoji cat"
@@ -91,7 +103,10 @@ fn main() {
             // In this case, if "," would be first, a message would never
             // be delimited at ", ", forcing you to trim your arguments if you
             // want to avoid whitespaces at the start of each.
-            .delimiters(vec![", ", ","]))
+            .delimiters(vec![", ", ","])
+            // Sets the bot's owners. These will be used for commands that
+            // are owners only.
+            .owners(owners))
 
         // Set a function to be called prior to each command execution. This
         // provides the context of the command, the message that was received,
@@ -214,7 +229,14 @@ fn main() {
         .command("latency", |c| c
             .cmd(latency))
         .command("ping", |c| c
-            .check("owner check", owner_check) // User needs to pass this test to run command
+            // User needs to pass the test for the command to execute.
+            .check_customised(admin_check, |c| c
+                .name("Admin")
+                // Whether the check shall be tested in the help-system.
+                .check_in_help(true)
+                // Whether the check shall be displayed in the help-system.
+                .display_in_help(true))
+            .guild_only(true)
             .cmd(ping))
         .command("role", |c| c
             .cmd(about_role)
@@ -222,9 +244,7 @@ fn main() {
             .allowed_roles(vec!["mods", "ultimate neko"]))
         .command("some long command", |c| c.cmd(some_long_command))
         .group("Owner", |g| g
-            // This check applies to every command on this group.
-            // User needs to pass the test for the command to execute.
-            .check("admin check", admin_check)
+            .owners_only(true)
             .command("am i admin", |c| c
                 .cmd(am_i_admin)
                 .guild_only(true))

@@ -27,12 +27,12 @@ use crate::client::Context;
 
 use crate::model::{
     channel::Message,
-    id::ChannelId,
+    id::{ChannelId, UserId},
 };
 use crate::Error;
 use std::{
     borrow::Borrow,
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     hash::BuildHasher,
     ops::{Index, IndexMut},
     sync::Arc,
@@ -457,6 +457,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
     context: &Context,
     commands: &HashMap<&String, &InternalCommand>,
     command_names: &[&&String],
+    owners: &HashSet<UserId>,
     help_options: &'a HelpOptions,
     group: &CommandGroup,
     msg: &Message,
@@ -468,10 +469,18 @@ fn fetch_all_eligible_commands_in_group<'a>(
         let cmd = &commands[&*name];
         let cmd = cmd.options();
 
+
         if !cmd.dm_only && !cmd.guild_only
             || cmd.dm_only && msg.is_private()
             || cmd.guild_only && !msg.is_private()
         {
+            if cmd.owners_only && !owners.contains(&msg.author.id) {
+                let name = format_command_name!(&help_options.lacking_ownership, &name);
+                group_with_cmds.command_names.push(name);
+
+                continue;
+            }
+
             if cmd.help_available && has_correct_permissions(&context.cache, &cmd, msg) {
 
                 if let Some(guild) = msg.guild(&context.cache) {
@@ -540,6 +549,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
     context: &Context,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     group_names: &[&'a String],
+    owners: &HashSet<UserId>,
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair<'a>> {
@@ -552,6 +562,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
             &context,
             group,
             group_name,
+            &owners,
             &msg,
             &help_options,
         );
@@ -570,6 +581,7 @@ fn create_single_group<'a>(
     context: &Context,
     group: &CommandGroup,
     group_name: &'a str,
+    owners: &HashSet<UserId>,
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> GroupCommandsPair<'a> {
@@ -581,6 +593,7 @@ let commands = remove_aliases(&group.commands);
         &context,
         &commands,
         &command_names,
+        &owners,
         &help_options,
         &group,
         &msg,
@@ -602,6 +615,7 @@ let commands = remove_aliases(&group.commands);
 pub fn create_customised_help_data<'a, H: BuildHasher>(
     context: &Context,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
+    owners: &HashSet<UserId>,
     args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
@@ -627,6 +641,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                             &context,
                             &group,
                             &key,
+                            &owners,
                             &msg,
                             &help_options
                         );
@@ -673,7 +688,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     group_names.sort();
 
     let listed_groups =
-        create_command_group_commands_pair_from_groups(&context, &groups, &group_names, &msg, &help_options);
+        create_command_group_commands_pair_from_groups(&context, &groups, &group_names, &owners, &msg, &help_options);
 
     return if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
@@ -836,9 +851,10 @@ pub fn with_embeds<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_customised_help_data(&context, &groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&context, &groups, &owners, args, help_options, msg);
 
     if let Err(why) = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
@@ -953,9 +969,10 @@ pub fn plain<H: BuildHasher>(
     msg: &Message,
     help_options: &HelpOptions,
     groups: HashMap<String, Arc<CommandGroup>, H>,
+    owners: HashSet<UserId>,
     args: &Args
 ) -> Result<(), CommandError> {
-    let formatted_help = create_customised_help_data(&context, &groups, args, help_options, msg);
+    let formatted_help = create_customised_help_data(&context, &groups, &owners, args, help_options, msg);
 
     let result = match formatted_help {
         CustomisedHelpData::SuggestedCommands { ref help_description, ref suggestions } =>
