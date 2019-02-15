@@ -11,7 +11,7 @@ pub use super::{
     Args,
     Check,
 };
-
+use framework::standard::check::CheckResult;
 use crate::client::Context;
 use crate::model::{
     channel::Message,
@@ -212,12 +212,12 @@ impl CreateGroup {
     /// commands should be called.
     ///
     /// **Note**: These checks are bypassed for commands sent by the application owner.
-    pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
-                     + Send
-                     + Sync
-                     + 'static {
-        self.0.checks.push(Check::new(check));
+    pub fn check<F>(mut self, name: &str, check: F, check_in_help: bool, display_in_help: bool) -> Self
+        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> CheckResult
+        + Send
+        + Sync
+        + 'static {
+        self.0.checks.push(Check::new(name, check, check_in_help, display_in_help));
 
         self
     }
