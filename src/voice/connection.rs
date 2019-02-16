@@ -51,6 +51,7 @@ use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use tungstenite::{self, handshake::client::Request};
 use url::Url;
+use log::{debug, info, warn};
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -700,16 +701,16 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>
                         Ok(msg) => msg,
                         Err(_) => break,
                     };
-    
+
                     if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
                         break 'outer;
                     }
-                } 
-    
+                }
+
                 if ws_close_reader.try_recv().is_ok() {
                     break 'outer;
                 }
-    
+
                 thread::sleep(Duration::from_millis(25));
             }
             info!("[Voice] WS thread exited.");
