@@ -6,6 +6,7 @@ use tungstenite::{
     util::NonBlockingResult,
     Message,
 };
+use log::warn;
 
 pub trait ReceiverExt {
     fn recv_json(&mut self) -> Result<Option<Value>>;

@@ -4,6 +4,7 @@ use std::sync::{
     Arc
 };
 use super::{ShardManager, ShardManagerMessage};
+use log::debug;
 
 /// The shard manager monitor does what it says on the tin -- it monitors the
 /// shard manager and performs actions on it as received.

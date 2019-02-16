@@ -26,8 +26,6 @@ use crate::utils::VecMap;
 /// message with an Id of `158339864557912064`:
 ///
 /// ```rust,no_run
-/// # extern crate serenity;
-/// #
 /// # use serenity::http::Http;
 /// # use std::{error::Error, sync::Arc};
 /// #

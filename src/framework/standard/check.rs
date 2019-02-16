@@ -1,8 +1,8 @@
 use std::fmt::Debug;
 use std::fmt;
-use model::channel::Message;
-use client::Context;
-use framework::standard::{Args, CommandOptions};
+use crate::model::channel::Message;
+use crate::client::Context;
+use crate::framework::standard::{Args, CommandOptions};
 
 pub type CheckFunction = dyn Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> CheckResult
     + Send

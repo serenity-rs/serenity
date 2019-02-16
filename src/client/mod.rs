@@ -48,6 +48,7 @@ use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptio
 use std::{sync::Arc, time::Duration};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
+use log::{error, debug, info};
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -125,9 +126,7 @@ pub struct Client {
     /// - [`Event::MessageDeleteBulk`]
     /// - [`Event::MessageUpdate`]
     ///
-    /// ```no_run
-    /// extern crate serenity;
-    ///
+    /// ```rust,ignore
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::*;

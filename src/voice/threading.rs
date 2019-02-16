@@ -10,6 +10,7 @@ use super::{
     Status,
     audio,
 };
+use log::{error, warn};
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);

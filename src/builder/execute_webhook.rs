@@ -86,8 +86,6 @@ impl ExecuteWebhook {
     /// Sending a webhook with a content of `"foo"`:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -162,8 +160,6 @@ impl ExecuteWebhook {
     /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #

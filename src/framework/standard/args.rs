@@ -1060,6 +1060,7 @@ fn quotes_extract(token: &Token) -> &str {
 #[cfg(test)]
 mod test {
     use super::{Args, Error as ArgError};
+    use matches::assert_matches;
 
     #[test]
     fn single_with_empty_message() {

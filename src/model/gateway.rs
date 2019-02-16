@@ -7,6 +7,7 @@ use serde_json;
 use std::sync::Arc;
 use super::utils::*;
 use super::prelude::*;
+use bitflags::bitflags;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -75,6 +76,7 @@ impl Activity {
     /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// use serenity::framework::standard::Args;
     /// use serenity::model::gateway::Activity;
+    /// use serenity::command;
     ///
     /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(game(ctx, _msg, args) {

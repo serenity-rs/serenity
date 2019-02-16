@@ -9,6 +9,7 @@ name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
 version = "0.5.11"
+edition = "2018"
 
 [dependencies]
 bitflags = "^1.0"

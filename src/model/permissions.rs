@@ -47,6 +47,7 @@
 use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use super::utils::U64Visitor;
+use bitflags::__impl_bitflags;
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.

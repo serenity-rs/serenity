@@ -1,7 +1,5 @@
 #![allow(unused_imports)]
 
-extern crate serenity;
-
 use serenity::prelude::{Mentionable, SerenityError};
 
 #[cfg(feature = "client")]

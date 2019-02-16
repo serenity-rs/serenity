@@ -15,6 +15,7 @@ use std::sync::{
 };
 use super::connection_info::ConnectionInfo;
 use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
+use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
