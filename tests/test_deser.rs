@@ -1,7 +1,3 @@
-extern crate serde;
-extern crate serde_json;
-extern crate serenity;
-
 use serde::de::Deserialize;
 use serde_json::Value;
 use serenity::model::prelude::*;

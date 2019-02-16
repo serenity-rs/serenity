@@ -171,8 +171,6 @@ impl EditGuild {
     /// Setting the verification level to [`High`][`VerificationLevel::High`]:
     ///
     /// ```rust,ignore
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #

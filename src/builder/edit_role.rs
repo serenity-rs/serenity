@@ -23,8 +23,6 @@ use crate::utils::VecMap;
 /// Create a hoisted, mentionable role named `"a test role"`:
 ///
 /// ```rust,no_run
-/// # extern crate serenity;
-/// #
 /// # use serenity::{model::id::{ChannelId, GuildId}, http::Http};
 /// # use std::sync::Arc;
 /// #

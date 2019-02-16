@@ -58,6 +58,7 @@ use std::{
     i64,
 };
 use super::{Http, HttpError, Request};
+use log::debug;
 
 /// Refer to [`offset`].
 ///

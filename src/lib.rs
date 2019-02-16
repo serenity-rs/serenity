@@ -30,13 +30,11 @@
 //! A basic ping-pong bot looks like:
 //!
 //! ```rust,no_run
-//! #[macro_use] extern crate serenity;
-//!
 //! # #[cfg(all(feature = "client", feature = "standard_framework"))]
 //! # mod inner {
 //! #
-//! use serenity::client::{Client, EventHandler};
-//! use serenity::framework::standard::StandardFramework;
+//! use serenity::{command, client::{Client, EventHandler},
+//!     framework::standard::StandardFramework};
 //! use std::env;
 //!
 //! struct Handler;
@@ -84,12 +82,6 @@
 //! serenity = "0.5"
 //! ```
 //!
-//! and to the top of your `main.rs`:
-//!
-//! ```rs
-//! #[macro_use] extern crate serenity;
-//! ```
-//!
 //! [`Cache`]: cache/struct.Cache.html
 //! [`Client::new`]: client/struct.Client.html#method.new
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
@@ -109,53 +101,7 @@
 #![warn(clippy::enum_glob_use, clippy::if_not_else)]
 
 #[macro_use]
-extern crate bitflags;
-#[allow(clippy::unused_imports)]
-#[macro_use]
-extern crate log;
-#[macro_use]
 extern crate serde_derive;
-#[allow(clippy::unused_imports)]
-#[macro_use]
-extern crate serde_json;
-
-#[cfg(feature = "lazy_static")]
-#[macro_use]
-extern crate lazy_static;
-
-extern crate chrono;
-extern crate parking_lot;
-extern crate serde;
-
-#[cfg(feature = "base64")]
-extern crate base64;
-#[cfg(feature = "byteorder")]
-extern crate byteorder;
-#[cfg(feature = "flate2")]
-extern crate flate2;
-#[cfg(feature = "reqwest")]
-extern crate reqwest;
-
-
-#[cfg(feature = "opus")]
-extern crate opus;
-#[cfg(feature = "rand")]
-extern crate rand;
-#[cfg(feature = "sodiumoxide")]
-extern crate sodiumoxide;
-#[cfg(feature = "threadpool")]
-extern crate threadpool;
-#[cfg(feature = "tungstenite")]
-extern crate tungstenite;
-#[cfg(feature = "typemap")]
-extern crate typemap;
-#[cfg(feature = "url")]
-extern crate url;
-
-#[allow(clippy::unused_imports)]
-#[cfg(test)]
-#[macro_use]
-extern crate matches;
 
 #[macro_use]
 mod internal;

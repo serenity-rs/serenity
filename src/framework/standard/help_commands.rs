@@ -59,6 +59,8 @@ use parking_lot::RwLock;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
+use log::warn;
+
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
 macro_rules! format_command_name {
@@ -637,7 +639,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                             .map_or(false, |v| v.iter().any(|prefix|
                             *prefix == searched_named_lowercase)) {
 
-                        let mut single_group = create_single_group(
+                        let single_group = create_single_group(
                             &context,
                             &group,
                             &key,

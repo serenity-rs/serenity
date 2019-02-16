@@ -160,9 +160,6 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
@@ -201,9 +198,6 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};

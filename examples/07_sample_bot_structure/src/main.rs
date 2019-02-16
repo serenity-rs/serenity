@@ -11,13 +11,11 @@
 mod commands;
 
 use std::{collections::HashSet, env};
-
 use serenity::{
     framework::StandardFramework,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
-
 use log::{error, info};
 
 struct Handler;

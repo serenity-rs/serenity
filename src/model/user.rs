@@ -5,6 +5,7 @@ use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
 use crate::{internal::prelude::*, model::misc::Mentionable};
+use serde_json::json;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -53,9 +54,6 @@ impl CurrentUser {
     /// Print out the current user's avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -137,9 +135,6 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -171,9 +166,6 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -201,9 +193,6 @@ impl CurrentUser {
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -263,9 +252,6 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -292,9 +278,6 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -656,9 +639,6 @@ impl User {
     /// out-of-sync:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;

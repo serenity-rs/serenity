@@ -1,4 +1,4 @@
-use framework::standard::check::CreateCheck;
+use crate::framework::standard::check::CreateCheck;
 pub use super::{
     Args,
     Command,
@@ -9,7 +9,7 @@ pub use super::{
 };
 
 use crate::client::Context;
-use framework::standard::CheckResult;
+use crate::framework::standard::CheckResult;
 use crate::model::{
     channel::Message,
     Permissions

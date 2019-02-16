@@ -16,6 +16,8 @@ use std::{
 use crate::utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 use super::check::Check;
+#[cfg(feature = "lazy_static")]
+use lazy_static::lazy_static;
 
 pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, HashSet<UserId>, &Args)
     -> Result<(), Error>;

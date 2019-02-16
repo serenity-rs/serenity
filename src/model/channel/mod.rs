@@ -78,9 +78,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -124,9 +121,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -166,9 +160,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -211,9 +202,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;

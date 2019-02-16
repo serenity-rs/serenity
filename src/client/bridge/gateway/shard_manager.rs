@@ -23,6 +23,7 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
+use log::{info, warn};
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -41,11 +42,6 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// 2, of 5 total shards:
 ///
 /// ```rust,no_run
-/// extern crate parking_lot;
-/// extern crate serenity;
-/// extern crate threadpool;
-/// extern crate typemap;
-///
 /// # use std::error::Error;
 /// #
 /// # #[cfg(feature = "voice")]
