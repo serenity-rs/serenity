@@ -27,6 +27,7 @@ use super::{
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
+use log::{info, warn};
 
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;

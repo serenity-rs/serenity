@@ -13,6 +13,7 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
+use log::warn;
 
 #[cfg(feature = "http")]
 use crate::http::Http;

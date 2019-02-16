@@ -2,7 +2,7 @@
 
 use chrono::{DateTime, FixedOffset};
 use crate::{model::prelude::*};
-use serde_json::Value;
+use serde_json::{json, Value};
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -94,10 +94,8 @@ impl Message {
     /// On command, print the name of the channel that a message took place in:
     ///
     /// ```rust,no_run
-    /// # #[macro_use] extern crate serenity;
-    /// #
     /// # fn main() {
-    /// #   use serenity::prelude::*;
+    /// #   use serenity::{command, prelude::*};
     /// #   struct Handler;
     /// #
     /// #   impl EventHandler for Handler {}

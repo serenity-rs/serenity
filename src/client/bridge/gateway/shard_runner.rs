@@ -33,7 +33,7 @@ use typemap::ShareMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
-
+use log::{error, debug, warn};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///

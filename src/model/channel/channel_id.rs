@@ -1,4 +1,5 @@
 use crate::{internal::RwLockExt, model::prelude::*};
+use serde_json::json;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -540,8 +541,6 @@ impl ChannelId {
     /// Send files with the paths `/path/to/file.jpg` and `/path/to/file2.jpg`:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -560,7 +559,6 @@ impl ChannelId {
     /// Send files using `File`:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #

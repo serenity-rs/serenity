@@ -2,10 +2,9 @@
 
 #[cfg(test)]
 mod benches {
-    extern crate serenity;
     extern crate test;
 
-    use self::serenity::framework::standard::Args;
+    use serenity::framework::standard::Args;
     use self::test::Bencher;
 
     #[bench]

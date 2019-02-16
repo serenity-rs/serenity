@@ -26,6 +26,7 @@ use tungstenite::{
     handshake::client::Request,
 };
 use url::Url;
+use log::{error, debug, info, trace, warn};
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -104,9 +105,6 @@ impl Shard {
     /// then listening for events:
     ///
     /// ```rust,no_run
-    /// extern crate parking_lot;
-    /// extern crate serenity;
-    ///
     /// use serenity::gateway::Shard;
     /// use parking_lot::Mutex;
     /// use std::{env, sync::Arc};
@@ -311,7 +309,6 @@ impl Shard {
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # #[cfg(feature = "model")]
     /// # fn main() {
     /// # use serenity::client::gateway::Shard;
@@ -669,9 +666,6 @@ impl Shard {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
@@ -699,9 +693,6 @@ impl Shard {
     /// query parameter of `"do"`:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;

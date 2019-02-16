@@ -59,6 +59,8 @@ use parking_lot::RwLock;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
+use log::warn;
+
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
 macro_rules! format_command_name {

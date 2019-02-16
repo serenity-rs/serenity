@@ -657,10 +657,9 @@ impl StandardFramework {
     /// Create and use a simple command:
     ///
     /// ```rust,no_run
-    /// # #[macro_use] extern crate serenity;
-    /// #
     /// # fn main() {
     /// # use serenity::prelude::*;
+    /// # use serenity::command;
     /// # use serenity::framework::standard::Args;
     /// # struct Handler;
     /// #

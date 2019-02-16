@@ -19,7 +19,8 @@ use super::{
 };
 use parking_lot::Mutex;
 use serde::de::DeserializeOwned;
-use serde_json;
+use serde_json::json;
+use log::{debug, trace};
 use std::{
     collections::{BTreeMap, HashMap},
     io::ErrorKind as IoErrorKind,
@@ -241,8 +242,6 @@ impl Http {
     /// Create a guild called `"test"` in the [US West region]:
     ///
     /// ```rust,ignore
-    /// extern crate serde_json;
-    ///
     /// use serde_json::builder::ObjectBuilder;
     /// use serde_json::Value;
     /// use serenity::http::Http;
@@ -378,9 +377,6 @@ impl Http {
     /// Creating a webhook named `test`:
     ///
     /// ```rust,ignore
-    /// extern crate serde_json;
-    /// extern crate serenity;
-    ///
     /// use serde_json::builder::ObjectBuilder;
     /// use serenity::http::Http;
     ///
@@ -470,8 +466,6 @@ impl Http {
     /// # Examples
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -576,8 +570,6 @@ impl Http {
     /// Deletes a webhook given its Id and unique token:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -754,9 +746,6 @@ impl Http {
     /// Edit the image of a webhook given its Id and unique token:
     ///
     /// ```rust,ignore
-    /// extern crate serde_json;
-    /// extern crate serenity;
-    ///
     /// use serde_json::builder::ObjectBuilder;
     /// use serenity::http::Http;
     ///
@@ -793,9 +782,6 @@ impl Http {
     /// Edit the name of a webhook given its Id and unique token:
     ///
     /// ```rust,ignore
-    /// extern crate serde_json;
-    /// extern crate serenity;
-    ///
     /// use serde_json::builder::ObjectBuilder;
     /// use serenity::http::Http;
     ///
@@ -850,9 +836,6 @@ impl Http {
     /// Sending a webhook with message content of `test`:
     ///
     /// ```rust,ignore
-    /// extern crate serde_json;
-    /// extern crate serenity;
-    ///
     /// use serde_json::builder::ObjectBuilder;
     /// use serenity::http::Http;
     ///
@@ -979,8 +962,6 @@ impl Http {
     /// Retrieve all of the webhooks owned by a channel:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -1180,8 +1161,6 @@ impl Http {
     /// Retrieve all of the webhooks owned by a guild:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -1212,8 +1191,6 @@ impl Http {
     /// Get the first 10 guilds after a certain guild's Id:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -1399,8 +1376,6 @@ impl Http {
     /// Retrieve a webhook by Id:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -1428,8 +1403,6 @@ impl Http {
     /// Retrieve a webhook by Id and its unique token:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -1650,14 +1623,9 @@ impl Http {
     /// deserialize the response into a [`Message`]:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -1708,8 +1676,6 @@ impl Http {
     /// Send a body of bytes over the [`RouteInfo::CreateMessage`] endpoint:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::{error::Error, sync::Arc};
     /// #

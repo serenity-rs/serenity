@@ -5,6 +5,7 @@ use std::fmt::{
     Write as FmtWrite
 };
 use super::super::id::{EmojiId, RoleId};
+use serde_json::json;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
@@ -66,9 +67,6 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{command, model::{guild::Emoji, id::EmojiId}};
     /// #
     /// # command!(example(context) {
@@ -154,9 +152,6 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
