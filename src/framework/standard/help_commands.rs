@@ -472,8 +472,8 @@ fn fetch_all_eligible_commands_in_group<'a>(
 
         if !cmd.dm_only && !cmd.guild_only
             || cmd.dm_only && msg.is_private()
-            || cmd.guild_only && !msg.is_private()
-        {
+            || cmd.guild_only && !msg.is_private() {
+
             if cmd.owners_only && !owners.contains(&msg.author.id) {
                 let name = format_command_name!(&help_options.lacking_ownership, &name);
                 group_with_cmds.command_names.push(name);
@@ -585,7 +585,7 @@ fn create_single_group<'a>(
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> GroupCommandsPair<'a> {
-let commands = remove_aliases(&group.commands);
+    let commands = remove_aliases(&group.commands);
     let mut command_names = commands.keys().collect::<Vec<_>>();
     command_names.sort();
 
@@ -605,7 +605,7 @@ let commands = remove_aliases(&group.commands);
     group_with_cmds
 }
 
-/// Iterates over all commands and forges them into a `CustomisedHelpData`
+/// Iterates over all commands and forges them into a `CustomisedHelpData`.
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
@@ -936,9 +936,6 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
         } else {
             let _ = writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage);
         }
-
-    if let Some(ref usage_sample) = command.usage_sample {
-        let _ = writeln!(result, "**{}**: `{} {}`", help_options.usage_sample_label, command.name, usage_sample);
     }
 
     let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
