@@ -60,19 +60,19 @@ impl CreateGroup {
 
         for alias in &cmd.options().aliases {
 
-            if let Some(ref prefixes) = self.0.prefixes {
+            if self.0.prefixes.is_empty() {
+                self.0.commands.insert(
+                    alias.to_string(),
+                    CommandOrAlias::Alias(command_name.to_string()),
+                );
 
-                for prefix in prefixes {
+            } else {
+                for prefix in &self.0.prefixes {
                     self.0.commands.insert(
                         format!("{} {}", prefix, alias.to_string()),
                         CommandOrAlias::Alias(format!("{} {}", prefix, command_name.to_string())),
                     );
                 }
-            } else {
-                self.0.commands.insert(
-                    alias.to_string(),
-                    CommandOrAlias::Alias(command_name.to_string()),
-                );
             }
         }
 
@@ -99,19 +99,19 @@ impl CreateGroup {
 
         for alias in &cmd.options().aliases {
 
-            if let Some(ref prefixes) = self.0.prefixes {
+            if self.0.prefixes.is_empty() {
+                self.0.commands.insert(
+                    alias.to_string(),
+                    CommandOrAlias::Alias(name.to_string()),
+                );
 
-                for prefix in prefixes {
+            } else {
+               for prefix in &self.0.prefixes {
                     self.0.commands.insert(
                         format!("{} {}", prefix, alias.to_string()),
                         CommandOrAlias::Alias(format!("{} {}", prefix, name.to_string())),
                     );
                 }
-            } else {
-                self.0.commands.insert(
-                    alias.to_string(),
-                    CommandOrAlias::Alias(name.to_string()),
-                );
             }
         }
 
@@ -132,7 +132,7 @@ impl CreateGroup {
     ///
     /// **Note**: It's suggested to call this first when making a group.
     pub fn prefix(mut self, prefix: &str) -> Self {
-        self.0.prefixes = Some(vec![prefix.to_string()]);
+        self.0.prefixes = vec![prefix.to_string()];
 
         self
     }
@@ -144,7 +144,7 @@ impl CreateGroup {
     ///
     /// **Note**: It's suggested to call this first when making a group.
     pub fn prefixes<T: ToString, I: IntoIterator<Item=T>>(mut self, prefixes: I) -> Self {
-        self.0.prefixes = Some(prefixes.into_iter().map(|prefix| prefix.to_string()).collect());
+        self.0.prefixes = prefixes.into_iter().map(|prefix| prefix.to_string()).collect();
 
         self
     }

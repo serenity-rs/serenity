@@ -72,7 +72,7 @@ impl<D: fmt::Display> From<D> for Error {
 
 #[derive(Debug)]
 pub struct CommandGroup {
-    pub prefixes: Option<Vec<String>>,
+    pub prefixes: Vec<String>,
     pub commands: HashMap<String, CommandOrAlias>,
     /// Some fields taken from Command
     pub bucket: Option<String>,
@@ -94,7 +94,7 @@ pub struct CommandGroup {
 impl Default for CommandGroup {
     fn default() -> CommandGroup {
         CommandGroup {
-            prefixes: None,
+            prefixes: Vec::new(),
             commands: HashMap::new(),
             bucket: None,
             required_permissions: Permissions::empty(),
@@ -155,8 +155,6 @@ pub struct HelpOptions {
     pub no_help_available_text: String,
     /// How to use a command, `{usage_label}: {command_name} {args}`
     pub usage_label: String,
-    /// Actual sample label, `{usage_sample_label}: {command_name} {args}`
-    pub usage_sample_label: String,
     /// Text labeling ungrouped commands, `{ungrouped_label}: ...`
     pub ungrouped_label: String,
     /// Text labeling the start of the description.
@@ -237,8 +235,7 @@ impl Default for HelpOptions {
         HelpOptions {
             suggestion_text: "Did you mean `{}`?".to_string(),
             no_help_available_text: "**Error**: No help available.".to_string(),
-            usage_label: "Usage".to_string(),
-            usage_sample_label: "Sample usage".to_string(),
+            usage_label: "Sample usage".to_string(),
             ungrouped_label: "Ungrouped".to_string(),
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
