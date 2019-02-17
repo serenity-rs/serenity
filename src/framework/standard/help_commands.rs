@@ -49,6 +49,7 @@ use super::{
     HelpBehaviour,
 };
 use crate::utils::Colour;
+use log::warn;
 
 #[cfg(feature = "cache")]
 use crate::framework::standard::{has_correct_roles, has_correct_permissions};
@@ -58,8 +59,6 @@ use crate::cache::Cache;
 use parking_lot::RwLock;
 #[cfg(feature = "http")]
 use crate::http::Http;
-
-use log::warn;
 
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
