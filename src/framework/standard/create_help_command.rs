@@ -46,13 +46,6 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets a label for the usage examples of a command.
-    pub fn usage_sample_label(mut self, text: &str) -> Self {
-        self.0.usage_sample_label = text.to_string();
-
-        self
-    }
-
     /// Sets a label for ungrouped-commands
     pub fn ungrouped_label(mut self, text: &str) -> Self {
         self.0.ungrouped_label = text.to_string();
