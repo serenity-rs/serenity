@@ -121,12 +121,13 @@ pub struct Client {
     /// - [`Event::MessageDeleteBulk`]
     /// - [`Event::MessageUpdate`]
     ///
-    /// ```rust,ignore
+    /// ```no_run
+    /// # fn main() -> Result<(), Box<std::error::Error>> {
     /// extern crate serenity;
     ///
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use std::collections::HashMap;
     /// use std::env;
     ///
@@ -136,37 +137,36 @@ pub struct Client {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
-    /// macro_rules! reg {
-    ///     ($ctx:ident $name:expr) => {
-    ///         {
-    ///             let mut data = $ctx.data.lock();
-    ///             let counter = data.get_mut::<MessageEventCounter>().unwrap();
-    ///             let entry = counter.entry($name).or_insert(0);
-    ///             *entry += 1;
-    ///         }
-    ///     };
+    /// fn reg<S>(ctx: Context, name: S)
+    ///   where S: Into<std::string::String>
+    /// {
+    ///     let mut data = ctx.data.lock();
+    ///     let counter = data.get_mut::<MessageEventCounter>().unwrap();
+    ///     let entry = counter.entry(name.into()).or_insert(0);
+    ///     *entry += 1;
     /// }
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn on_message(&self, ctx: Context, _: Message) { reg!(ctx "MessageCreate") }
-    ///     fn on_message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
-    ///         reg!(ctx "MessageDelete") }
-    ///     fn on_message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
-    ///         reg!(ctx "MessageDeleteBulk") }
-    ///     fn on_message_update(&self, ctx: Context, _: ChannelId, _: MessageId) {
-    ///         reg!(ctx "MessageUpdate") }
+    ///     fn message(&self, ctx: Context, _: Message) { reg(ctx, "MessageCreate") }
+    ///     fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
+    ///         reg(ctx, "MessageDelete") }
+    ///     fn message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
+    ///         reg(ctx, "MessageDeleteBulk") }
+    ///     fn message_update(&self, ctx: Context, _: MessageUpdateEvent) {
+    ///         reg(ctx, "MessageUpdate") }
     /// }
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler);
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     ///
     /// {
     ///     let mut data = client.data.lock();
     ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
-    /// client.start().unwrap();
+    /// client.start()?;
+    /// # Ok(()) }
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.
