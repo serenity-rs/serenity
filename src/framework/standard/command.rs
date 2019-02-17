@@ -235,7 +235,7 @@ impl Default for HelpOptions {
         HelpOptions {
             suggestion_text: "Did you mean `{}`?".to_string(),
             no_help_available_text: "**Error**: No help available.".to_string(),
-            usage_label: "Sample usage".to_string(),
+            usage_label: "Usage".to_string(),
             ungrouped_label: "Ungrouped".to_string(),
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
