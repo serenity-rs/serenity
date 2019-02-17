@@ -750,7 +750,7 @@ impl Client {
     ///
     /// For a bot using a total of 10 shards, initialize shards 4 through 7:
     ///
-    /// ```rust,ignore
+    /// ```no_run
     /// # use serenity::prelude::EventHandler;
     /// struct Handler;
     ///
@@ -759,7 +759,7 @@ impl Client {
     /// use std::env;
     ///
     /// let token = env::var("DISCORD_TOKEN").unwrap();
-    /// let mut client = Client::new(&token, Handler);
+    /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// let _ = client.start_shard_range([4, 7], 10);
     /// ```
