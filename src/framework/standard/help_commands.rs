@@ -102,6 +102,7 @@ struct SuggestedCommandName {
 pub struct Command<'a> {
     name: &'a str,
     group_name: &'a str,
+    group_prefixes: &'a Vec<String>,
     aliases: Vec<String>,
     availability: &'a str,
     description: Option<String>,
@@ -330,12 +331,12 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
         for (command_name, command) in &group.commands {
 
-            let search_command_name_matched = if let Some(ref prefixes) = group.prefixes {
-                prefixes.iter().any(|prefix| {
+            let search_command_name_matched = if group.prefixes.is_empty() {
+                name == *command_name
+            } else {
+                group.prefixes.iter().any(|prefix| {
                     format!("{} {}", prefix, command_name) == name
                 })
-            } else {
-                name == *command_name
             };
 
             if search_command_name_matched {
@@ -374,12 +375,8 @@ fn fetch_single_command<'a, H: BuildHasher>(
 
                 if let &CommandOrAlias::Command(ref cmd) = command {
 
-                    let command_name = if let Some(ref prefixes) = group.prefixes {
-                        if let Some(first_prefix) = prefixes.get(0) {
-                            format!("{} {}",  &first_prefix, &command_name).to_string()
-                        } else {
-                            command_name.to_string()
-                        }
+                    let command_name = if let Some(first_prefix) = group.prefixes.get(0) {
+                        format!("{} {}",  &first_prefix, &command_name).to_string()
                     } else {
                         command_name.to_string()
                     };
@@ -437,6 +434,7 @@ fn fetch_single_command<'a, H: BuildHasher>(
                     name: command_name,
                     description: command.desc.clone(),
                     group_name,
+                    group_prefixes: &group.prefixes,
                     aliases: command.aliases.clone(),
                     availability: available_text,
                     usage: command.usage.clone(),
@@ -460,10 +458,11 @@ fn fetch_all_eligible_commands_in_group<'a>(
     command_names: &[&&String],
     owners: &HashSet<UserId>,
     help_options: &'a HelpOptions,
-    group: &CommandGroup,
+    group: &'a CommandGroup,
     msg: &Message,
 ) -> GroupCommandsPair<'a> {
     let mut group_with_cmds = GroupCommandsPair::default();
+    group_with_cmds.prefixes = group.prefixes.clone();
 
     for name in command_names {
         let name = **name;
@@ -580,7 +579,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
 #[cfg(feature = "cache")]
 fn create_single_group<'a>(
     context: &Context,
-    group: &CommandGroup,
+    group: &'a CommandGroup,
     group_name: &'a str,
     owners: &HashSet<UserId>,
     msg: &Message,
@@ -601,10 +600,7 @@ let commands = remove_aliases(&group.commands);
     );
 
     group_with_cmds.name = group_name;
-
-    if let Some(ref prefixes) = group.prefixes {
-        group_with_cmds.prefixes.extend_from_slice(&prefixes);
-    }
+    group_with_cmds.prefixes.extend_from_slice(&group.prefixes);
 
     group_with_cmds
 }
@@ -634,9 +630,8 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
                 for (key, group) in groups {
 
                     if key.to_lowercase() == searched_named_lowercase
-                        || group.prefixes.as_ref()
-                            .map_or(false, |v| v.iter().any(|prefix|
-                            *prefix == searched_named_lowercase)) {
+                        || group.prefixes.iter().any(|prefix|
+                            *prefix == searched_named_lowercase) {
 
                         let single_group = create_single_group(
                             &context,
@@ -759,13 +754,14 @@ fn send_single_command_embed(
             }
 
             if let Some(ref usage) = command.usage {
-                embed.field(&help_options.usage_label, usage, true);
-            }
 
-            if let Some(ref usage_sample) = command.usage_sample {
-                let value = format!("`{} {}`", command.name, usage_sample);
+                let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0) {
+                    format!("`{} {} {}`", first_prefix, command.name, usage)
+                } else {
+                    format!("`{} {}`", command.name, usage)
+                };
 
-                embed.field(&help_options.usage_sample_label, value, true);
+                embed.field(&help_options.usage_label, full_usage_text, true);
             }
 
             embed.field(&help_options.grouped_label, command.group_name, true);
@@ -933,8 +929,13 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command)
     };
 
     if let Some(ref usage) = command.usage {
-        let _ = writeln!(result, "**{}**: {}", help_options.usage_label, usage);
-    }
+
+        if let Some(first_prefix) = command.group_prefixes.get(0) {
+            let _ = writeln!(result, "**{}**: `{} {} {}`",
+                help_options.usage_label, first_prefix, command.name, usage);
+        } else {
+            let _ = writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage);
+        }
 
     if let Some(ref usage_sample) = command.usage_sample {
         let _ = writeln!(result, "**{}**: `{} {}`", help_options.usage_sample_label, command.name, usage_sample);
