@@ -736,22 +736,23 @@ impl StandardFramework {
                 let cmd = f(CreateCommand::default()).finish();
                 let name = command_name.to_string();
 
-                if let Some(ref prefixes) = group.prefixes {
+                if group.prefixes.is_empty() {
+
+                    for v in &cmd.options().aliases {
+                        group
+                            .commands
+                            .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
+                    }
+                } else {
 
                     for v in &cmd.options().aliases {
 
-                        for prefix in prefixes {
+                        for prefix in &group.prefixes {
                             group.commands.insert(
                                 format!("{} {}", prefix, v),
                                 CommandOrAlias::Alias(format!("{} {}", prefix, name)),
                             );
                         }
-                    }
-                } else {
-                    for v in &cmd.options().aliases {
-                        group
-                            .commands
-                            .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
                     }
                 }
 
@@ -1121,15 +1122,18 @@ impl Framework for StandardFramework {
 
                     let mut check_contains_group_prefix = false;
                     let mut longest_matching_prefix_len = 0;
-                    let to_check = if let Some(ref prefixes) = group.prefixes {
+                    let to_check = if group.prefixes.is_empty() {
+                        built.clone()
+                    } else {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
                         // than the last matching one, this prevents picking a wrong prefix,
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
-                        longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
+                        longest_matching_prefix_len = group.prefixes.iter().fold(0, |longest_prefix_len, prefix|
                             if prefix.len() > longest_prefix_len
                             && built.starts_with(prefix)
-                            && (orginal_round.len() == prefix.len() || built.get(prefix.len()..prefix.len() + 1) == Some(" ")) {
+                            && (orginal_round.len() == prefix.len()
+                            || built.get(prefix.len()..prefix.len() + 1) == Some(" ")) {
                                 prefix.len()
                             } else {
                                 longest_prefix_len
@@ -1145,8 +1149,6 @@ impl Framework for StandardFramework {
                         } else {
                             continue;
                         }
-                    } else {
-                        built.clone()
                     };
 
                     let before = self.before.clone();
