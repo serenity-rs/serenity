@@ -666,15 +666,15 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     }
 
     let strikethrough_command_tip = if msg.is_private() {
-        &help_options.striked_commands_tip_in_guild
+        &help_options.strikethrough_commands_tip_guild
     } else {
-        &help_options.striked_commands_tip_in_dm
+        &help_options.strikethrough_commands_tip_dm
     };
 
-    let description = if let Some(ref striked_command_text) = strikethrough_command_tip {
+    let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
         format!(
             "{}\n{}",
-            &help_options.individual_command_tip, &striked_command_text
+            &help_options.individual_command_tip, &strikethrough_command_text
         )
     } else {
         help_options.individual_command_tip.clone()
