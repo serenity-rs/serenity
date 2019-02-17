@@ -1,7 +1,7 @@
 use crate::constants;
 use reqwest::{
     RequestBuilder as ReqwestRequestBuilder,
-    header::{AUTHORIZATION, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
+    header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
     Url,
 };
 use reqwest::Client;
@@ -80,11 +80,12 @@ impl<'a> Request<'a> {
             builder = builder.body(Vec::from(*bytes));
         }
 
-        let mut headers = Headers::with_capacity(3);
+        let mut headers = Headers::with_capacity(4);
         headers.insert(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT));
         headers.insert(AUTHORIZATION,
             HeaderValue::from_str(&token).map_err(|e| HttpError::InvalidHeader(e))?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
+        headers.insert(CONTENT_LENGTH, HeaderValue::from_static(&"0"));
 
         if let Some(ref request_headers) = request_headers {
             headers.extend(request_headers.clone());
