@@ -73,23 +73,26 @@ use self::bridge::voice::ClientVoiceManager;
 /// Creating a Client instance and adding a handler on every message
 /// receive, acting as a "ping-pong" bot is simple:
 ///
-/// ```rust,ignore
+/// ```no_run
+/// # fn main() -> Result<(), Box<std::error::Error>> {
 /// use serenity::prelude::*;
-/// use serenity::model::*;
+/// use serenity::model::prelude::*;
+/// use serenity::Client;
 ///
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn on_message(&self, _: Context, msg: Message) {
+///     fn message(&self, _: Context, msg: Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say("Pong!");
 ///         }
 ///     }
 /// }
 ///
-/// let mut client = Client::new("my token here", Handler);
+/// let mut client = Client::new("my token here", Handler)?;
 ///
 /// client.start();
+/// # Ok(()) }
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
