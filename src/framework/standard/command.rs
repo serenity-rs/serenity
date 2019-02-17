@@ -72,7 +72,7 @@ impl<D: fmt::Display> From<D> for Error {
 
 #[derive(Debug)]
 pub struct CommandGroup {
-    pub prefixes: Option<Vec<String>>,
+    pub prefixes: Vec<String>,
     pub commands: HashMap<String, CommandOrAlias>,
     /// Some fields taken from Command
     pub bucket: Option<String>,
@@ -94,7 +94,7 @@ pub struct CommandGroup {
 impl Default for CommandGroup {
     fn default() -> CommandGroup {
         CommandGroup {
-            prefixes: None,
+            prefixes: Vec::new(),
             commands: HashMap::new(),
             bucket: None,
             required_permissions: Permissions::empty(),
@@ -155,8 +155,6 @@ pub struct HelpOptions {
     pub no_help_available_text: String,
     /// How to use a command, `{usage_label}: {command_name} {args}`
     pub usage_label: String,
-    /// Actual sample label, `{usage_sample_label}: {command_name} {args}`
-    pub usage_sample_label: String,
     /// Text labeling ungrouped commands, `{ungrouped_label}: ...`
     pub ungrouped_label: String,
     /// Text labeling the start of the description.
@@ -186,13 +184,13 @@ pub struct HelpOptions {
     /// inside of `CreateHelpCommand`.
     ///
     /// **Note**: Text is only used in direct messages.
-    pub striked_commands_tip_in_dm: Option<String>,
+    pub strikethrough_commands_tip_dm: Option<String>,
     /// Explains reasoning behind strikethrough-commands, see fields requiring `HelpBehaviour` for further information.
     /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
     /// inside of `CreateHelpCommand`.
     ///
     /// **Note**: Text is only used in guilds.
-    pub striked_commands_tip_in_guild: Option<String>,
+    pub strikethrough_commands_tip_guild: Option<String>,
     /// Announcing a group's prefix as in: {group_prefix} {prefix}.
     pub group_prefix: String,
     /// If a user lacks required roles, this will treat how these commands will be displayed.
@@ -238,7 +236,6 @@ impl Default for HelpOptions {
             suggestion_text: "Did you mean `{}`?".to_string(),
             no_help_available_text: "**Error**: No help available.".to_string(),
             usage_label: "Usage".to_string(),
-            usage_sample_label: "Sample usage".to_string(),
             ungrouped_label: "Ungrouped".to_string(),
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
@@ -252,8 +249,8 @@ impl Default for HelpOptions {
             individual_command_tip: "To get help with an individual command, pass its \
                  name as an argument to this command.".to_string(),
             group_prefix: "Prefix".to_string(),
-            striked_commands_tip_in_dm: Some(String::new()),
-            striked_commands_tip_in_guild: Some(String::new()),
+            strikethrough_commands_tip_dm: Some(String::new()),
+            strikethrough_commands_tip_guild: Some(String::new()),
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
             lacking_ownership: HelpBehaviour::Hide,

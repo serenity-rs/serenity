@@ -185,7 +185,7 @@ fn main() {
                 .wrong_channel(HelpBehaviour::Strike)
                 // Serenity will automatically analyse and generate a hint/tip explaining the possible
                 // cases of ~~strikethrough-commands~~, but only if
-                // `striked_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
+                // `strikethrough_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
                 // If the `String` is not empty, your given `String` will be used instead.
                 // If you pass in a `None`, no hint will be displayed at all.
                  })
