@@ -74,6 +74,8 @@ use self::bridge::voice::ClientVoiceManager;
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```no_run
+/// extern crate serenity;
+///
 /// # fn try_main() -> Result<(), Box<std::error::Error>> {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
@@ -94,7 +96,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// client.start();
 /// # Ok(()) }
 /// #
-/// # fn main() { try_main().unwrap(); } 
+/// # fn main() { try_main().unwrap(); }
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
@@ -124,18 +126,19 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```no_run
-    /// # fn try_main() -> Result<(), Box<std::error::Error>> {
     /// extern crate serenity;
+    /// extern crate typemap;
     ///
+    /// # fn try_main() -> Result<(), Box<std::error::Error>> {
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
-    /// use std::collections::HashMap;
-    /// use std::env;
+    /// use typemap::Key;
+    /// use std::{collections::HashMap, env};
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl TypeMapKey for MessageEventCounter {
+    /// impl Key for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
@@ -170,7 +173,7 @@ pub struct Client {
     /// client.start()?;
     /// # Ok(()) }
     /// #
-    /// # fn main() { try_main().unwrap(); } 
+    /// # fn main() { try_main().unwrap(); }
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.
@@ -207,6 +210,8 @@ pub struct Client {
     /// 5 seconds:
     ///
     /// ```rust,no_run
+    /// # extern crate serenity;
+    /// #
     /// # use serenity::client::{Client, EventHandler};
     /// # use std::error::Error;
     /// # use std::time::Duration;
