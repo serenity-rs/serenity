@@ -74,7 +74,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```no_run
-/// # fn main() -> Result<(), Box<std::error::Error>> {
+/// # fn try_main() -> Result<(), Box<std::error::Error>> {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
 /// use serenity::Client;
@@ -93,6 +93,8 @@ use self::bridge::voice::ClientVoiceManager;
 ///
 /// client.start();
 /// # Ok(()) }
+/// #
+/// # fn main() { try_main().unwrap(); } 
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
@@ -122,7 +124,7 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```no_run
-    /// # fn main() -> Result<(), Box<std::error::Error>> {
+    /// # fn try_main() -> Result<(), Box<std::error::Error>> {
     /// extern crate serenity;
     ///
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
@@ -167,6 +169,8 @@ pub struct Client {
     ///
     /// client.start()?;
     /// # Ok(()) }
+    /// #
+    /// # fn main() { try_main().unwrap(); } 
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.
