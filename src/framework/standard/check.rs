@@ -145,7 +145,7 @@ impl Check {
 }
 
 impl Debug for Check {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Check")
             .field("name", &self.name)
             .field("function", &"<fn>")

@@ -232,7 +232,7 @@ impl<'de> Deserialize<'de> for ReactionType {
         impl<'de> Visitor<'de> for ReactionTypeVisitor {
             type Value = ReactionType;
 
-            fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+            fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
                 formatter.write_str("enum ReactionType")
             }
 
@@ -412,7 +412,7 @@ impl<'a> From<&'a str> for ReactionType {
 pub enum NeverFails {}
 
 impl Display for NeverFails {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "never fails")
     }
 }
@@ -443,7 +443,7 @@ impl Display for ReactionType {
     /// [`Emoji::fmt`]: ../guild/struct.Emoji.html#method.fmt
     /// [`ReactionType::Custom`]: enum.ReactionType.html#variant.Custom
     /// [`ReactionType::Unicode`]: enum.ReactionType.html#variant.Unicode
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
             ReactionType::Custom {
                 id,

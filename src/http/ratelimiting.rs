@@ -65,7 +65,7 @@ use log::debug;
 /// [`offset`]: fn.offset.html
 static mut OFFSET: Option<i64> = None;
 
-pub(super) fn perform(http: &Http, req: Request) -> Result<Response> {
+pub(super) fn perform(http: &Http, req: Request<'_>) -> Result<Response> {
     loop {
         // This will block if another thread is trying to send
         // an HTTP-request already (due to receiving an x-ratelimit-global).

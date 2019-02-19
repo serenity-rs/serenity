@@ -203,7 +203,7 @@ pub enum DispatchError {
     WebhookAuthor,
 }
 
-type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
+type DispatchErrorHook = dyn Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -693,7 +693,7 @@ impl StandardFramework {
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd: Arc<Command> = Arc::new(c);
+                let cmd: Arc<dyn Command> = Arc::new(c);
 
                 for alias in &cmd.options().aliases {
                      group.commands.insert(
@@ -1365,7 +1365,7 @@ pub enum HelpBehaviour {
 use std::fmt;
 
 impl fmt::Display for HelpBehaviour {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
        fmt::Debug::fmt(self, f)
     }
 }

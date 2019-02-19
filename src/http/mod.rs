@@ -85,21 +85,21 @@ pub enum AttachmentType<'a> {
 }
 
 impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &'a str)) -> AttachmentType { AttachmentType::Bytes(params) }
+    fn from(params: (&'a [u8], &'a str)) -> AttachmentType<'_> { AttachmentType::Bytes(params) }
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
-    fn from(s: &'a str) -> AttachmentType { AttachmentType::Path(Path::new(s)) }
+    fn from(s: &'a str) -> AttachmentType<'_> { AttachmentType::Path(Path::new(s)) }
 }
 
 impl<'a> From<&'a Path> for AttachmentType<'a> {
-    fn from(path: &'a Path) -> AttachmentType {
+    fn from(path: &'a Path) -> AttachmentType<'_> {
         AttachmentType::Path(path)
     }
 }
 
 impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
-    fn from(pathbuf: &'a PathBuf) -> AttachmentType { AttachmentType::Path(pathbuf.as_path()) }
+    fn from(pathbuf: &'a PathBuf) -> AttachmentType<'_> { AttachmentType::Path(pathbuf.as_path()) }
 }
 
 impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {

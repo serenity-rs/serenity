@@ -42,7 +42,7 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     data: Arc<RwLock<ShareMap>>,
     event_handler: Arc<H>,
     #[cfg(feature = "framework")]
-    framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<InterMessage>,
@@ -493,7 +493,7 @@ pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
     pub data: Arc<RwLock<ShareMap>>,
     pub event_handler: Arc<H>,
     #[cfg(feature = "framework")]
-    pub framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     pub threadpool: ThreadPool,

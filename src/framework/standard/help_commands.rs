@@ -553,7 +553,7 @@ fn create_command_group_commands_pair_from_groups<'a, H: BuildHasher>(
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair<'a>> {
-    let mut listed_groups: Vec<GroupCommandsPair> = Vec::default();
+    let mut listed_groups: Vec<GroupCommandsPair<'_>> = Vec::default();
 
     for group_name in group_names {
         let group = &groups[&**group_name];
@@ -705,7 +705,7 @@ fn send_grouped_commands_embed(
     help_options: &HelpOptions,
     channel_id: ChannelId,
     help_description: &str,
-    groups: &[GroupCommandsPair],
+    groups: &[GroupCommandsPair<'_>],
     colour: Colour,
 ) -> Result<Message, Error> {
     channel_id.send_message(&http, |m| {
@@ -741,7 +741,7 @@ fn send_single_command_embed(
     http: &Arc<Http>,
     help_options: &HelpOptions,
     channel_id: ChannelId,
-    command: &Command,
+    command: &Command<'_>,
     colour: Colour,
 ) -> Result<Message, Error> {
     channel_id.send_message(&http, |m| {
@@ -897,7 +897,7 @@ pub fn with_embeds<H: BuildHasher>(
 fn grouped_commands_to_plain_string(
     help_options: &HelpOptions,
     help_description: &str,
-    groups: &[GroupCommandsPair]) -> String
+    groups: &[GroupCommandsPair<'_>]) -> String
 {
     let mut result = "__**Commands**__\n".to_string();
     let _ = writeln!(result, "{}", &help_description);
@@ -916,7 +916,7 @@ fn grouped_commands_to_plain_string(
 }
 
 /// Turns a single command into a `String` taking plain help format into account.
-fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command) -> String {
+fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::default();
     let _ = writeln!(result, "__**{}**__", command.name);
 

@@ -109,7 +109,7 @@ impl<'a> Request<'a> {
         &mut self.headers
     }
 
-    pub fn route_ref(&self) -> &RouteInfo {
+    pub fn route_ref(&self) -> &RouteInfo<'_> {
         &self.route
     }
 

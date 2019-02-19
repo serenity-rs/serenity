@@ -18,8 +18,8 @@ use std::sync::Arc;
 
 pub enum FnOrCommand {
     Fn(fn(&mut Context, &Message, Args) -> Result<(), CommandError>),
-    Command(Arc<Command>),
-    CommandWithOptions(Arc<Command>),
+    Command(Arc<dyn Command>),
+    CommandWithOptions(Arc<dyn Command>),
 }
 
 impl Default for FnOrCommand {
@@ -28,9 +28,9 @@ impl Default for FnOrCommand {
     }
 }
 
-type Init = Fn() + Send + Sync + 'static;
-type Before = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
-type After = Fn(&mut Context, &Message, &Result<(), CommandError>) + Send + Sync + 'static;
+type Init = dyn Fn() + Send + Sync + 'static;
+type Before = dyn Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
+type After = dyn Fn(&mut Context, &Message, &Result<(), CommandError>) + Send + Sync + 'static;
 
 #[derive(Default)]
 pub struct Handlers {
@@ -287,7 +287,7 @@ impl CreateCommand {
         self
     }
 
-    pub(crate) fn finish(self) -> Arc<Command> {
+    pub(crate) fn finish(self) -> Arc<dyn Command> {
         struct A<C: Command>(Arc<CommandOptions>, C, Handlers);
 
         impl<C: Command> Command for A<C> {

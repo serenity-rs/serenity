@@ -25,7 +25,7 @@ pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String,
 pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
 
 impl Debug for Help {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("Help")
             .field("options", &self.1)
             .finish()
@@ -38,12 +38,12 @@ impl HelpCommand for Help {
     }
 }
 
-pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
-pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
-pub type UnrecognisedCommandHook = Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
-pub type MessageWithoutCommandHook = Fn(&mut Context, &Message) + Send + Sync + 'static;
-pub(crate) type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
+pub type BeforeHook = dyn Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
+pub type AfterHook = dyn Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
+pub type UnrecognisedCommandHook = dyn Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
+pub type MessageWithoutCommandHook = dyn Fn(&mut Context, &Message) + Send + Sync + 'static;
+pub(crate) type InternalCommand = Arc<dyn Command>;
+pub type PrefixCheck = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 pub enum CommandOrAlias {
     Alias(String),
@@ -51,7 +51,7 @@ pub enum CommandOrAlias {
 }
 
 impl fmt::Debug for CommandOrAlias {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             CommandOrAlias::Alias(ref s) => f.debug_tuple("CommandOrAlias::Alias").field(&s).finish(),
             CommandOrAlias::Command(ref arc) => f.debug_tuple("CommandOrAlias::Command").field(&arc.options()).finish(),
@@ -224,7 +224,7 @@ pub trait HelpCommand: Send + Sync + 'static {
     }
 }
 
-impl HelpCommand for Arc<HelpCommand> {
+impl HelpCommand for Arc<dyn HelpCommand> {
     fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, owners: HashSet<UserId>, a: &Args) -> Result<(), Error> {
         (**self).execute(c, m, ho, hm, owners, a)
     }
@@ -286,7 +286,7 @@ pub trait Command: Send + Sync + 'static {
     fn after(&self, _: &mut Context, _: &Message, _: &Result<(), Error>) { }
 }
 
-impl Command for Arc<Command> {
+impl Command for Arc<dyn Command> {
     fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
         (**self).execute(c, m, a)
     }

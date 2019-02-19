@@ -191,7 +191,7 @@ pub struct Client {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.

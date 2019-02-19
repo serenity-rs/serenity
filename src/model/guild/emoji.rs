@@ -218,7 +218,7 @@ impl Display for Emoji {
     /// render the emoji.
     ///
     /// This is in the format of: `<:NAME:EMOJI_ID>`.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         f.write_str("<:")?;
         f.write_str(&self.name)?;
         FmtWrite::write_char(f, ':')?;
