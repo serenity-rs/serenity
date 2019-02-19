@@ -156,7 +156,7 @@ impl ConnectionStage {
 }
 
 impl Display for ConnectionStage {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         use self::ConnectionStage::*;
 
         f.write_str(match *self {

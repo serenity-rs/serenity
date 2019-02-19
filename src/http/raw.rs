@@ -1660,7 +1660,7 @@ impl Http {
     /// ```
     ///
     /// [`request`]: fn.request.html
-    pub fn fire<T: DeserializeOwned>(&self, req: Request) -> Result<T> {
+    pub fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req)?;
 
         serde_json::from_reader(response).map_err(From::from)
@@ -1709,7 +1709,7 @@ impl Http {
     /// ```
     ///
     /// [`fire`]: fn.fire.html
-    pub fn request(&self, req: Request) -> Result<ReqwestResponse> {
+    pub fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let response = perform(&self, req)?;
 
         if response.status().is_success() {
@@ -1719,7 +1719,7 @@ impl Http {
         }
     }
 
-    pub(super) fn retry(&self, request: &Request) -> Result<ReqwestResponse> {
+    pub(super) fn retry(&self, request: &Request<'_>) -> Result<ReqwestResponse> {
         // Retry the request twice in a loop until it succeeds.
         //
         // If it doesn't and the loop breaks, try one last time.
@@ -1750,7 +1750,7 @@ impl Http {
     ///
     /// This is a function that performs a light amount of work and returns an
     /// empty tuple, so it's called "self.wind" to denote that it's lightweight.
-    pub(super) fn wind(&self, expected: u16, req: Request) -> Result<()> {
+    pub(super) fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
         let resp = self.request(req)?;
 
         if resp.status().as_u16() == expected {

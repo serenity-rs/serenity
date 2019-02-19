@@ -766,7 +766,7 @@ impl User {
 impl fmt::Display for User {
     /// Formats a string which will mention the user.
     // This is in the format of: `<@USER_ID>`
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         fmt::Display::fmt(&self.id.mention(), f)
     }
 }

@@ -97,7 +97,7 @@ pub enum UserParseError {
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for UserParseError {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -123,7 +123,7 @@ macro_rules! impl_from_str {
 
             #[cfg(all(feature = "model", feature = "utils"))]
             impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
             }
 
             #[cfg(all(feature = "model", feature = "utils"))]
@@ -162,7 +162,7 @@ macro_rules! impl_from_str {
 
             #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
             impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { write!(f, "{}", self.description()) }
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
             }
 
             #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
