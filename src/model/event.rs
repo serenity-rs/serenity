@@ -174,7 +174,7 @@ impl Serialize for ChannelDeleteEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct ChannelPinsUpdateEvent {
     pub channel_id: ChannelId,
     pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
@@ -1138,7 +1138,7 @@ pub struct ResumedEvent {
     #[serde(rename = "_trace")] pub trace: Vec<Option<String>>,
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct TypingStartEvent {
     pub channel_id: ChannelId,
     pub timestamp: u64,

@@ -4,7 +4,10 @@ use crate::model::{
     event::Event,
     guild::Member,
 };
-use std::{sync::{Arc, mpsc::Sender}};
+use std::{
+    ops::Deref,
+    sync::{Arc, mpsc::Sender}
+};
 use parking_lot::{Mutex, RwLock};
 use super::{
     bridge::gateway::event::ClientEvent,
@@ -195,7 +198,7 @@ fn dispatch_message<H>(
     let event_handler = Arc::clone(event_handler);
 
     threadpool.execute(move || {
-        event_handler.message(context, message);
+        event_handler.message(&context, &message);
     });
 }
 
@@ -223,7 +226,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.shard_stage_update(context, event);
+                event_handler.shard_stage_update(&context, event);
             });
         }
         DispatchEvent::Model(Event::ChannelCreate(mut event)) => {
@@ -236,7 +239,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.private_channel_create(context, channel);
+                        event_handler.private_channel_create(&context, &channel);
                     });
                 },
                 Channel::Group(_) => {},
@@ -244,14 +247,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.channel_create(context, channel);
+                        event_handler.channel_create(&context, &channel);
                     });
                 },
                 Channel::Category(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.category_create(context, channel);
+                        event_handler.category_create(&context, &channel);
                     });
                 },
             }
@@ -265,14 +268,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.channel_delete(context, channel);
+                        event_handler.channel_delete(&context, &channel);
                     });
                 },
                 Channel::Category(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.category_delete(context, channel);
+                        event_handler.category_delete(&context, &channel);
                     });
                 },
             }
@@ -282,7 +285,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.channel_pins_update(context, event);
+                event_handler.channel_pins_update(&context, event);
             });
         },
         DispatchEvent::Model(Event::ChannelRecipientAdd(mut event)) => {
@@ -292,9 +295,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 event_handler.channel_recipient_addition(
-                    context,
+                    &context,
                     event.channel_id,
-                    event.user,
+                    &event.user,
                 );
             });
         },
@@ -305,9 +308,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 event_handler.channel_recipient_removal(
-                    context,
+                    &context,
                     event.channel_id,
-                    event.user,
+                    &event.user,
                 );
             });
         },
@@ -320,7 +323,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 feature_cache! {{
                     let before = cache_and_http.cache.as_ref().read().channel(event.channel.id());
 
-                    event_handler.channel_update(context, before, event.channel);
+                    event_handler.channel_update(&context, before.as_ref(), &event.channel);
                 } else {
                     event_handler.channel_update(context, event.channel);
                 }}
@@ -330,7 +333,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_ban_addition(context, event.guild_id, event.user);
+                event_handler.guild_ban_addition(&context, event.guild_id, &event.user);
             });
         },
         DispatchEvent::Model(Event::GuildBanRemove(mut event)) => {
@@ -338,7 +341,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_ban_removal(context, event.guild_id, event.user);
+                event_handler.guild_ban_removal(&context, event.guild_id, &event.user);
             });
         },
         DispatchEvent::Model(Event::GuildCreate(mut event)) => {
@@ -365,7 +368,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.cached(context, guild_amount);
+                        event_handler.cached(&context, &guild_amount);
                     });
                 }
             }
@@ -374,7 +377,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.guild_create(context, event.guild, _is_new);
+                    event_handler.guild_create(&context, &event.guild, _is_new);
                 } else {
                     event_handler.guild_create(context, event.guild);
                 }}
@@ -386,7 +389,8 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.guild_delete(context, event.guild, _full);
+                    let full = _full.as_ref().map(|full| full.deref()); // Option::deref currently unstable
+                    event_handler.guild_delete(&context, &event.guild, full);
                 } else {
                     event_handler.guild_delete(context, event.guild);
                 }}
@@ -397,14 +401,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_emojis_update(context, event.guild_id, event.emojis);
+                event_handler.guild_emojis_update(&context, event.guild_id, &event.emojis);
             });
         },
         DispatchEvent::Model(Event::GuildIntegrationsUpdate(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_integrations_update(context, event.guild_id);
+                event_handler.guild_integrations_update(&context, event.guild_id);
             });
         },
         DispatchEvent::Model(Event::GuildMemberAdd(mut event)) => {
@@ -413,7 +417,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_member_addition(context, event.guild_id, event.member);
+                event_handler.guild_member_addition(&context, event.guild_id, &event.member);
             });
         },
         DispatchEvent::Model(Event::GuildMemberRemove(mut event)) => {
@@ -422,7 +426,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.guild_member_removal(context, event.guild_id, event.user, _member);
+                    event_handler.guild_member_removal(&context, event.guild_id, &event.user, _member.as_ref());
                 } else {
                     event_handler.guild_member_removal(context, event.guild_id, event.user);
                 }}
@@ -441,7 +445,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             threadpool.execute(move || {
                 feature_cache! {{
                     if let Some(after) = _after {
-                        event_handler.guild_member_update(context, _before, after);
+                        event_handler.guild_member_update(&context, _before.as_ref(), &after);
                     }
                 } else {
                     event_handler.guild_member_update(context, event);
@@ -453,7 +457,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_members_chunk(context, event.guild_id, event.members);
+                event_handler.guild_members_chunk(&context, event.guild_id, &event.members);
             });
         },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {
@@ -461,7 +465,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_role_create(context, event.guild_id, event.role);
+                event_handler.guild_role_create(&context, event.guild_id, &event.role);
             });
         },
         DispatchEvent::Model(Event::GuildRoleDelete(mut event)) => {
@@ -470,7 +474,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.guild_role_delete(context, event.guild_id, event.role_id, _role);
+                    event_handler.guild_role_delete(&context, event.guild_id, event.role_id, _role.as_ref());
                 } else {
                     event_handler.guild_role_delete(context, event.guild_id, event.role_id);
                 }}
@@ -482,7 +486,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.guild_role_update(context, event.guild_id, _before, event.role);
+                    event_handler.guild_role_update(&context, event.guild_id, _before.as_ref(), &event.role);
                 } else {
                     event_handler.guild_role_update(context, event.guild_id, event.role);
                 }}
@@ -493,7 +497,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_unavailable(context, event.guild_id);
+                event_handler.guild_unavailable(&context, event.guild_id);
             });
         },
         DispatchEvent::Model(Event::GuildUpdate(mut event)) => {
@@ -506,8 +510,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                         .guilds
                         .get(&event.guild.id)
                         .cloned();
+                    let before = before.as_ref().map(|full| full.deref()); // Option::deref currently unstable
 
-                    event_handler.guild_update(context, before, event.guild);
+                    event_handler.guild_update(&context, before, &event.guild);
                 } else {
                     event_handler.guild_update(context, event.guild);
                 }}
@@ -519,14 +524,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.message_delete_bulk(context, event.channel_id, event.ids);
+                event_handler.message_delete_bulk(&context, event.channel_id, &event.ids);
             });
         },
         DispatchEvent::Model(Event::MessageDelete(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.message_delete(context, event.channel_id, event.message_id);
+                event_handler.message_delete(&context, event.channel_id, event.message_id);
             });
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
@@ -547,7 +552,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.presence_replace(context, event.presences);
+                event_handler.presence_replace(&context, &event.presences);
             });
         },
         DispatchEvent::Model(Event::PresenceUpdate(mut event)) => {
@@ -556,28 +561,28 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.presence_update(context, event);
+                event_handler.presence_update(&context, &event);
             });
         },
         DispatchEvent::Model(Event::ReactionAdd(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.reaction_add(context, event.reaction);
+                event_handler.reaction_add(&context, &event.reaction);
             });
         },
         DispatchEvent::Model(Event::ReactionRemove(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.reaction_remove(context, event.reaction);
+                event_handler.reaction_remove(&context, &event.reaction);
             });
         },
         DispatchEvent::Model(Event::ReactionRemoveAll(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.reaction_remove_all(context, event.channel_id, event.message_id);
+                event_handler.reaction_remove_all(&context, event.channel_id, event.message_id);
             });
         },
         DispatchEvent::Model(Event::Ready(mut event)) => {
@@ -585,24 +590,24 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(&event_handler);
 
             threadpool.execute(move || {
-                event_handler.ready(context, event.ready);
+                event_handler.ready(&context, &event.ready);
             });
         },
         DispatchEvent::Model(Event::Resumed(mut event)) => {
-            event_handler.resume(context, event);
+            event_handler.resume(&context, &event);
         },
         DispatchEvent::Model(Event::TypingStart(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.typing_start(context, event);
+                event_handler.typing_start(&context, event);
             });
         },
         DispatchEvent::Model(Event::Unknown(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.unknown(context, event.kind, event.value);
+                event_handler.unknown(&context, &event.kind, &event.value);
             });
         },
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
@@ -611,7 +616,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.user_update(context, _before.unwrap(), event.current_user);
+                    event_handler.user_update(&context, &_before.unwrap(), &event.current_user);
                 } else {
                     event_handler.user_update(context, event.current_user);
                 }}
@@ -621,7 +626,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.voice_server_update(context, event);
+                event_handler.voice_server_update(&context, &event);
             });
         },
         DispatchEvent::Model(Event::VoiceStateUpdate(mut event)) => {
@@ -630,9 +635,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.voice_state_update(context, event.guild_id, _before, event.voice_state);
+                    event_handler.voice_state_update(context, event.guild_id, _before, &event.voice_state);
                 } else {
-                    event_handler.voice_state_update(context, event.guild_id, event.voice_state);
+                    event_handler.voice_state_update(context, event.guild_id, &event.voice_state);
                 }}
             });
         },
@@ -640,7 +645,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.webhook_update(context, event.guild_id, event.channel_id);
+                event_handler.webhook_update(&context, event.guild_id, event.channel_id);
             });
         },
     }

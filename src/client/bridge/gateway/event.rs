@@ -18,7 +18,7 @@ pub(crate) enum ClientEvent {
 ///
 /// [`ConnectionStage::Connected`]: ../../../../gateway/enum.ConnectionStage.html#variant.Connected
 /// [`ConnectionStage::Identifying`]: ../../../../gateway/enum.ConnectionStage.html#variant.Identifying
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug)]
 pub struct ShardStageUpdateEvent {
     /// The new connection stage.
     pub new: ConnectionStage,
