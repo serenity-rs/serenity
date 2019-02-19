@@ -66,7 +66,7 @@ macro_rules! enum_number {
                 impl<'de> ::serde::de::Visitor<'de> for Visitor {
                     type Value = $name;
 
-                    fn expecting(&self, formatter: &mut ::std::fmt::Formatter)
+                    fn expecting(&self, formatter: &mut ::std::fmt::Formatter<'_>)
                         -> ::std::fmt::Result {
                         formatter.write_str("positive integer")
                     }

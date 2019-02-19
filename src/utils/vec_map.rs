@@ -95,7 +95,7 @@ impl<'a, K, V> Entry<'a, K, V> {
     }
 }
 
-pub struct VacantEntry<'a, K: 'a, V: 'a> {
+pub struct VacantEntry<'a, K, V> {
     vec: &'a mut Vec<(K, V)>,
     key: K,
 }
@@ -108,7 +108,7 @@ impl<'a, K, V> VacantEntry<'a, K, V> {
     }
 }
 
-pub struct OccupiedEntry<'a, K: 'a, V: 'a> {
+pub struct OccupiedEntry<'a, K, V> {
     vec: &'a mut Vec<(K, V)>,
     pos: usize,
 }
