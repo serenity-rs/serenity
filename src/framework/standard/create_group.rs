@@ -95,7 +95,7 @@ impl CreateGroup {
     ///
     /// [`on`]: #method.on
     pub fn cmd<C: Command + 'static>(mut self, name: &str, c: C) -> Self {
-        let cmd: Arc<Command> = Arc::new(c);
+        let cmd: Arc<dyn Command> = Arc::new(c);
 
         for alias in &cmd.options().aliases {
 

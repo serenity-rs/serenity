@@ -363,7 +363,7 @@ impl Display for Channel {
     /// [`Group::name`]: struct.Group.html#method.name
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
             Channel::Group(ref group) => Display::fmt(&group.read().name(), f),
             Channel::Guild(ref ch) => Display::fmt(&ch.read().id.mention(), f),

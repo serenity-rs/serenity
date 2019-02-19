@@ -226,7 +226,7 @@ impl Group {
     /// If there are no recipients in the group, the name will be "Empty Group".
     /// Otherwise, the name is generated in a Comma Separated Value list, such
     /// as "person 1, person 2, person 3".
-    pub fn name(&self) -> Cow<str> {
+    pub fn name(&self) -> Cow<'_, str> {
         match self.name {
             Some(ref name) => Cow::Borrowed(name),
             None => {

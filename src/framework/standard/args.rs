@@ -29,7 +29,7 @@ impl<E: StdError> StdError for Error<E> {
         }
     }
 
-    fn cause(&self) -> Option<&StdError> {
+    fn cause(&self) -> Option<&dyn StdError> {
         use self::Error::*;
 
         match *self {
@@ -40,7 +40,7 @@ impl<E: StdError> StdError for Error<E> {
 }
 
 impl<E: StdError> fmt::Display for Error<E> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use self::Error::*;
 
         match *self {
@@ -513,7 +513,7 @@ impl Args {
     ///
     /// assert!(args.is_empty());
     /// ```
-    pub fn iter<T: FromStr>(&mut self) -> Iter<T>
+    pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T>
         where T::Err: StdError {
         Iter::new(self)
     }
@@ -641,7 +641,7 @@ impl Args {
     /// ```
     ///
     /// [`iter`]: #method.iter
-    pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<T>
+    pub fn iter_quoted<T: FromStr>(&mut self) -> IterQuoted<'_, T>
         where T::Err: StdError {
         IterQuoted::new(self)
     }

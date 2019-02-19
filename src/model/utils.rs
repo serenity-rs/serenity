@@ -255,7 +255,7 @@ macro_rules! num_visitors {
             impl<'de> Visitor<'de> for $visitor {
                 type Value = $type;
 
-                fn expecting(&self, formatter: &mut Formatter) -> FmtResult {
+                fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
                     formatter.write_str("identifier")
                 }
 

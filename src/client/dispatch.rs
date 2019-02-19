@@ -99,7 +99,7 @@ pub(crate) enum DispatchEvent {
 #[clippy::too_many_arguments]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
-    framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
+    framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     data: &Arc<RwLock<ShareMap>>,
     event_handler: &Arc<H>,
     runner_tx: &Sender<InterMessage>,
