@@ -483,8 +483,8 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    /// #   #[cfg(feature = "cache")]
-    ///     fn message(&self, ctx: Context, msg: Message) {
+/// #   #[cfg(feature = "cache")]
+    ///     fn message(&self, ctx: &Context, msg: &Message) {
     ///         if msg.content == "~help" {
     ///             let cache = ctx.cache.read();
     ///
@@ -694,7 +694,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, _: Message) {
+    ///     fn message(&self, _: &Context, _: &Message) {
     ///         // normal message handling here
     ///     }
     /// }
@@ -776,7 +776,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
+    ///     fn message(&self, context: &Context, msg: &Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")

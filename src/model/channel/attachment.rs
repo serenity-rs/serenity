@@ -55,8 +55,8 @@ impl Attachment {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, mut message: Message) {
-    ///         for attachment in message.attachments {
+    ///     fn message(&self, context: &Context, mut message: &Message) {
+    ///         for attachment in &message.attachments {
     ///             let content = match attachment.download() {
     ///                 Ok(content) => content,
     ///                 Err(why) => {
@@ -87,7 +87,7 @@ impl Attachment {
     ///         }
     ///     }
     ///
-    ///     fn ready(&self, _: Context, ready: Ready) {
+    ///     fn ready(&self, _: &Context, ready: &Ready) {
     ///         println!("{} is connected!", ready.user.name);
     ///     }
     /// }

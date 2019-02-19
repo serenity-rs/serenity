@@ -479,7 +479,7 @@ impl GuildChannel {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
+    ///     fn message(&self, context: &Context, msg: &Message) {
     ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
@@ -507,7 +507,7 @@ impl GuildChannel {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, mut msg: Message) {
+    ///     fn message(&self, context: &Context, mut msg: &Message) {
     ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,

@@ -502,7 +502,7 @@ impl PartialGuild {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
+    ///     fn message(&self, context: &Context, msg: &Message) {
     ///         let guild = msg.guild_id.unwrap().to_partial_guild(&context.http).unwrap();
     ///         let possible_role = guild.role_by_name("role_name");
     ///

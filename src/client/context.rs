@@ -129,7 +129,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     fn message(&self, ctx: &Context, msg: &Message) {
     ///         if msg.content == "!changename" {
     ///             ctx.edit_profile(|mut e| {
     ///                 e.username("Edward Elric");
@@ -192,7 +192,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     fn message(&self, ctx: &Context, msg: &Message) {
     ///         if msg.content == "!online" {
     ///             ctx.online();
     ///         }
@@ -224,7 +224,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     fn message(&self, ctx: &Context, msg: &Message) {
     ///         if msg.content == "!idle" {
     ///             ctx.idle();
     ///         }
@@ -255,7 +255,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     fn message(&self, ctx: &Context, msg: &Message) {
     ///         if msg.content == "!dnd" {
     ///             ctx.dnd();
     ///         }
@@ -287,7 +287,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
+    ///     fn ready(&self, ctx: &Context, _: &Ready) {
     ///         ctx.invisible();
     ///     }
     /// }
@@ -320,7 +320,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn resume(&self, ctx: Context, _: ResumedEvent) {
+    ///     fn resume(&self, ctx: &Context, _: &ResumedEvent) {
     ///         ctx.reset_presence();
     ///     }
     /// }
@@ -356,7 +356,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     fn message(&self, ctx: &Context, msg: &Message) {
     ///         let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
     ///
     ///         if args.len() < 2 || *unsafe { args.get_unchecked(0) } != "~setgame" {
@@ -402,7 +402,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
+    ///     fn ready(&self, ctx: &Context, _: &Ready) {
     ///         ctx.set_game_name("test");
     ///     }
     /// }
@@ -438,7 +438,7 @@ impl Context {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
+    ///     fn ready(&self, ctx: &Context, _: &Ready) {
     ///         use serenity::model::user::OnlineStatus;
     ///
     ///         ctx.set_presence(None, OnlineStatus::Idle);

@@ -21,7 +21,7 @@ use crate::utils::VecMap;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn message(&self, context: Context, msg: Message) {
+///     fn message(&self, context: &Context, msg: &Message) {
 ///         if msg.content == "!createinvite" {
 ///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
 ///                 Some(channel) => channel,

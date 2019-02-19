@@ -253,7 +253,7 @@ impl Cache {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
+    ///     fn ready(&self, ctx: &Context, _: &Ready) {
     ///          // Wait some time for guilds to be received.
     ///         //
     ///         // You should keep track of this in a better fashion by tracking how
@@ -346,7 +346,7 @@ impl Cache {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, context: Context, _: Ready) {
+    ///     fn ready(&self, context: &Context, _: &Ready) {
     ///         let guilds = context.cache.read().guilds.len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
@@ -464,7 +464,7 @@ impl Cache {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, message: Message) {
+    ///     fn message(&self, context: &Context, message: &Message) {
     ///         let cache = context.cache.read();
     ///
     ///         let channel = match cache.guild_channel(message.channel_id) {

@@ -28,7 +28,7 @@ impl EditProfile {
     /// # struct Handler;
     ///
     /// # impl EventHandler for Handler {
-    ///    # fn message(&self, context: Context, _: Message) {
+    ///    # fn message(&self, context: &Context, _: &Message) {
     ///         use serenity::utils;
     ///
     ///         // assuming a `context` has been bound
