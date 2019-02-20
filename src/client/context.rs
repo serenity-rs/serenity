@@ -51,6 +51,7 @@ pub struct Context {
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
+    #[cfg(all(feature = "cache", feature = "http"))]
     pub(crate) fn new(
         data: Arc<RwLock<ShareMap>>,
         runner_tx: Sender<InterMessage>,
@@ -62,10 +63,54 @@ impl Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
-            #[cfg(feature = "cache")]
             cache,
-            #[cfg(feature = "http")]
             http,
+        }
+    }
+
+    /// Create a new Context to be passed to an event handler.
+    #[cfg(all(not(feature = "cache"), feature = "http"))]
+    pub(crate) fn new(
+        data: Arc<RwLock<ShareMap>>,
+        runner_tx: Sender<InterMessage>,
+        shard_id: u64,
+        http: Arc<Http>,
+    ) -> Context {
+        Context {
+            shard: ShardMessenger::new(runner_tx),
+            shard_id,
+            data,
+            http,
+        }
+    }
+
+    /// Create a new Context to be passed to an event handler.
+    #[cfg(all(feature = "cache", not(feature = "http")))]
+    pub(crate) fn new(
+        data: Arc<RwLock<ShareMap>>,
+        runner_tx: Sender<InterMessage>,
+        shard_id: u64,
+        cache: Arc<RwLock<Cache>>,
+    ) -> Context {
+        Context {
+            shard: ShardMessenger::new(runner_tx),
+            shard_id,
+            data,
+            cache,
+        }
+    }
+
+    /// Create a new Context to be passed to an event handler.
+    #[cfg(all(not(feature = "cache"), not(feature = "http")))]
+    pub(crate) fn new(
+        data: Arc<RwLock<ShareMap>>,
+        runner_tx: Sender<InterMessage>,
+        shard_id: u64,
+    ) -> Context {
+        Context {
+            shard: ShardMessenger::new(runner_tx),
+            shard_id,
+            data,
         }
     }
 
@@ -114,7 +159,7 @@ impl Context {
                     map.insert("email", Value::String(email));
                 }
             } else {
-                let user = http.get_current_user()?;
+                let user = self.http.get_current_user()?;
 
                 map.insert("username", Value::String(user.name));
 
