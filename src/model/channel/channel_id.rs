@@ -287,13 +287,14 @@ impl ChannelId {
     #[cfg(all(feature = "utils", feature = "http"))]
     #[inline]
     pub fn edit_message<F, M>(&self, http: &Arc<Http>, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId> {
         self._edit_message(&http, message_id.into(), f)
     }
 
     fn _edit_message<F>(self, http: &Arc<Http>, message_id: MessageId, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage {
-        let msg = f(EditMessage::default());
+        where F: FnOnce(&mut EditMessage) -> &mut EditMessage {
+        let mut msg = EditMessage::default();
+        f(&mut msg);
 
         if let Some(content) = msg.0.get(&"content") {
             if let Value::String(ref content) = *content {
