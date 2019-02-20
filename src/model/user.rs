@@ -758,7 +758,7 @@ impl User {
 
         #[cfg(not(feature = "cache"))]
         {
-            guild_id.member(&self.id).ok().and_then(|member| member.nick.clone())
+            guild_id.member(&context, &self.id).ok().and_then(|member| member.nick.clone())
         }
     }
 }
