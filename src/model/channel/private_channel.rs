@@ -154,7 +154,7 @@ impl PrivateChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_message<F, M>(&self, http: &Arc<Http>, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId> {
         self.id.edit_message(&http, message_id, f)
     }
 
