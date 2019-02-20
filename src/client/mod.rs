@@ -32,6 +32,7 @@ pub use self::{
     event_handler::EventHandler
 };
 
+#[cfg(any(feature = "cache", feature = "http"))]
 pub use crate::CacheAndHttp;
 
 // Note: the following re-exports are here for backwards compatibility

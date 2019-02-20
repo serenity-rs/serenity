@@ -72,6 +72,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
+            #[cfg(any(feature = "cache", feature = "http"))]
             cache_and_http: opt.cache_and_http,
         }
     }
@@ -499,6 +500,6 @@ pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
     pub threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
-    #[cfg(feature = "cache")]
+    #[cfg(any(feature = "cache", feature = "http"))]
     pub cache_and_http: Arc<CacheAndHttp>,
 }
