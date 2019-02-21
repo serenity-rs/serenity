@@ -325,7 +325,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
                     event_handler.channel_update(&context, before.as_ref(), &event.channel);
                 } else {
-                    event_handler.channel_update(context, event.channel);
+                    event_handler.channel_update(&context, &event.channel);
                 }}
             });
         },
@@ -379,7 +379,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 feature_cache! {{
                     event_handler.guild_create(&context, &event.guild, _is_new);
                 } else {
-                    event_handler.guild_create(context, event.guild);
+                    event_handler.guild_create(&context, &event.guild);
                 }}
             });
         },
@@ -392,7 +392,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let full = _full.as_ref().map(|full| full.deref()); // Option::deref currently unstable
                     event_handler.guild_delete(&context, &event.guild, full);
                 } else {
-                    event_handler.guild_delete(context, event.guild);
+                    event_handler.guild_delete(&context, &event.guild);
                 }}
             });
         },
@@ -428,7 +428,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 feature_cache! {{
                     event_handler.guild_member_removal(&context, event.guild_id, &event.user, _member.as_ref());
                 } else {
-                    event_handler.guild_member_removal(context, event.guild_id, event.user);
+                    event_handler.guild_member_removal(&context, event.guild_id, &event.user);
                 }}
             });
         },
@@ -448,7 +448,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                         event_handler.guild_member_update(&context, _before.as_ref(), &after);
                     }
                 } else {
-                    event_handler.guild_member_update(context, event);
+                    event_handler.guild_member_update(&context, &event);
                 }}
             });
         },
@@ -476,7 +476,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 feature_cache! {{
                     event_handler.guild_role_delete(&context, event.guild_id, event.role_id, _role.as_ref());
                 } else {
-                    event_handler.guild_role_delete(context, event.guild_id, event.role_id);
+                    event_handler.guild_role_delete(&context, event.guild_id, event.role_id);
                 }}
             });
         },
@@ -488,7 +488,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 feature_cache! {{
                     event_handler.guild_role_update(&context, event.guild_id, _before.as_ref(), &event.role);
                 } else {
-                    event_handler.guild_role_update(context, event.guild_id, event.role);
+                    event_handler.guild_role_update(&context, event.guild_id, &event.role);
                 }}
             });
         },
@@ -514,7 +514,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
                     event_handler.guild_update(&context, before, &event.guild);
                 } else {
-                    event_handler.guild_update(context, event.guild);
+                    event_handler.guild_update(&context, &event.guild);
                 }}
             });
         },
@@ -543,7 +543,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let _after = cache_and_http.cache.as_ref().read().message(event.channel_id, event.id);
                     event_handler.message_update(context, _before, _after, event);
                 } else {
-                    event_handler.message_update(context, event);
+                    event_handler.message_update(&context, &event);
                 }}
             });
         },
@@ -618,7 +618,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 feature_cache! {{
                     event_handler.user_update(&context, &_before.unwrap(), &event.current_user);
                 } else {
-                    event_handler.user_update(context, event.current_user);
+                    event_handler.user_update(&context, &event.current_user);
                 }}
             });
         },

@@ -166,7 +166,7 @@ pub trait EventHandler {
     ///
     /// Provides the new data.
     #[cfg(not(feature = "cache"))]
-    fn guild_member_update(&self, _ctx: &Context, _new: GuildMemberUpdateEvent) {}
+    fn guild_member_update(&self, _ctx: &Context, _new: &GuildMemberUpdateEvent) {}
 
     /// Dispatched when the data for offline members was requested.
     ///
