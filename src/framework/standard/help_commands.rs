@@ -491,7 +491,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
                         if has_correct_roles(&cmd, &guild, &member) {
 
                             if help_options.handle_checks {
-                                let mut fake_args = Args::new("", &["".to_string()]);
+                                let mut fake_args = Args::new("", &[]);
                                 let mut context = context.clone();
 
                                 let all_groups_checks_passed =
@@ -620,7 +620,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
     let cache = &context.cache;
 
     if !args.is_empty() {
-        let name = args.full();
+        let name = args.message();
 
         return match fetch_single_command(&cache, &groups, &name, &help_options, &msg) {
             Ok(single_command) => single_command,

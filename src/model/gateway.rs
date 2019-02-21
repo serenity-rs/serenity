@@ -80,7 +80,7 @@ impl Activity {
     ///
     /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(game(ctx, _msg, args) {
-    ///     let name = args.full();
+    ///     let name = args.message();
     ///     ctx.set_activity(Activity::playing(&name));
     /// });
     /// #
@@ -123,7 +123,7 @@ impl Activity {
     /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(stream(ctx, _msg, args) {
     ///     # let stream_url = String::from("");
-    ///     let name = args.full();
+    ///     let name = args.message();
     ///     ctx.set_activity(Activity::streaming(&name, &stream_url));
     /// });
     /// #
@@ -163,7 +163,7 @@ impl Activity {
     ///
     /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(listen(ctx, _msg, args) {
-    ///     let name = args.full();
+    ///     let name = args.message();
     ///     ctx.set_activity(Activity::listening(&name));
     /// });
     /// #

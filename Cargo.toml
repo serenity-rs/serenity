@@ -73,6 +73,10 @@ version = "~0.3"
 optional = true
 version = "^1.0"
 
+[dependencies.uwl]
+optional = true
+version = "^0.2"
+
 [dev-dependencies.matches]
 version = "0.1.6"
 
@@ -102,7 +106,7 @@ framework = ["client", "model", "utils"]
 gateway = ["flate2", "http", "tungstenite", "url", "utils"]
 http = ["reqwest", "lazy_static"]
 model = ["builder", "http"]
-standard_framework = ["framework"]
+standard_framework = ["framework", "uwl"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
 
