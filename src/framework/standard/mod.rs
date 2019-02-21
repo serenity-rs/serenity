@@ -12,8 +12,9 @@ mod args;
 
 pub use self::args::{
     Args,
+    Delimiter,
     Iter,
-    Error as ArgError
+    Error as ArgError,
 };
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
@@ -1254,7 +1255,7 @@ impl Framework for StandardFramework {
 
                             threadpool.execute(move || {
                                 if let Some(before) = before {
-                                    if !(before)(&mut context, &message, &args.full()) {
+                                    if !(before)(&mut context, &message, &args.message()) {
                                         return;
                                     }
                                 }
