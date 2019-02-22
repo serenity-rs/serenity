@@ -1,5 +1,5 @@
 parameters:
-  name: ''  # defaults for any parameters that aren't specified
+  name: ''
   vmImage: ''
   toolchain: 'stable'
 
