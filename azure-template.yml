@@ -12,7 +12,7 @@ jobs:
     os: ${{ parameters.vmImage }}
   steps: 
   - bash: |
-      if [[ "$OS" == "xcode9-macos10.13" ]]; then 
+      if [[ "$OS" == "macos10.13" ]]; then
         HOMEBREW_NO_AUTO_UPDATE=1 brew install libtool autoconf automake pkg-config
       fi
       git clone 'git://github.com/jedisct1/libsodium.git'

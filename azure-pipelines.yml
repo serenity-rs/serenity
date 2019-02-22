@@ -2,7 +2,7 @@ jobs:
 - template: 'azure-template.yml'
   parameters:
     name: 'macOS_stable'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macos10.13'
     toolchain: 'stable'
 
 - template: 'azure-template.yml'
