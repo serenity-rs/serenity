@@ -2,25 +2,25 @@ jobs:
 - template: 'azure-template.yml'
   parameters:
     name: 'macOS_stable'
-    vmImage: 'macos10.13'
+    vmImage: 'xcode9-macos10.13'
     toolchain: 'stable'
 
 - template: 'azure-template.yml'
   parameters:
     name: 'macOS_beta'
-    vmImage: 'macOS-10.13'
+    vmImage: 'xcode9-macos10.13'
     toolchain: 'beta'
 
 - template: 'azure-template.yml'
   parameters:
     name: 'macOS_nightly'
-    vmImage: 'macos10.13'
+    vmImage: 'xcode9-macos10.13'
     toolchain: 'nightly'
 
 - template: 'azure-template.yml'
   parameters:
     name: 'macOS_1_25_0'
-    vmImage: 'macos10.13'
+    vmImage: 'xcode9-macos10.13'
     toolchain: '1.25.0'
 
 - template: 'azure-template.yml'
