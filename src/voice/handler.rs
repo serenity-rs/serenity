@@ -212,7 +212,7 @@ impl Handler {
         // Only send an update if we were in a voice channel.
         if self.channel_id.is_some() {
             self.channel_id = None;
-            self.send(VoiceState::Disconnect);
+            self.send(VoiceStatus::Disconnect);
 
             self.update();
         }
