@@ -24,14 +24,14 @@ jobs:
   - bash: |
       curl -o rustup-init.sh https://sh.rustup.rs -sSf
       sh rustup-init.sh --default-toolchain $(tc) -y
-    displayName: 'Install rust'
+    displayName: 'Install Rust'
 
   - bash: |
       source $HOME/.cargo/env
       cargo build --all-features
-    displayName: 'Build serenity'
+    displayName: 'Build Serenity'
 
   - bash: |
       source $HOME/.cargo/env
       cargo test --all-features
-    displayName: 'Test serenity'
+    displayName: 'Test Serenity'
