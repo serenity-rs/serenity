@@ -31,18 +31,21 @@ jobs:
 
 - template: 'azure-template.yml'
   parameters:
-    name: 'Linux_beta'
-    vmImage: 'ubuntu-16.04'
-    toolchain: 'beta'
-
-- template: 'azure-template.yml'
-  parameters:
-    name: 'Linux_nightly'
-    vmImage: 'ubuntu-16.04'
-    toolchain: 'nightly'
-
-- template: 'azure-template.yml'
-  parameters:
-    name: 'Linux_1_25_0'
-    vmImage: 'ubuntu-16.04'
+    name: 'macOS_1_25_no_cache'
+    vmImage: 'xcode9-macos10.13'
     toolchain: '1.25.0'
+    features: 'builder client framework gateway model http standard_framework utils'
+
+- template: 'azure-template.yml'
+  parameters:
+    name: 'macOS_no_gateway'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: '1.25.0'
+    features: 'model http'
+
+- template: 'azure-template-win.yml'
+  parameters:
+    name: 'Windows_default_features'
+    vmImage: 'vs2017-win2016'
+    toolchain: 'stable'
+    features: 'default'
