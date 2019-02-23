@@ -2,6 +2,7 @@ parameters:
   name: ''
   vmImage: ''
   toolchain: 'stable'
+  features: 'all'
 
 jobs:
 - job: ${{ parameters.name }}
@@ -10,16 +11,16 @@ jobs:
   variables:
     tc: ${{ parameters.toolchain }}
     os: ${{ parameters.vmImage }}
+    features: ${{ parameters.features }}
   steps: 
   - bash: |
       if [[ "$OS" == "xcode9-macos10.13" ]]; then
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install libtool autoconf automake pkg-config
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install libsodium pkg-config
       fi
-      git clone 'git://github.com/jedisct1/libsodium.git'
-      cd libsodium
-      ./autogen.sh
-      ./configure && make
-      sudo make install
+      if [[ "$OS" == "ubuntu-16.04" ]]; then
+        sudo apt-get install -y --allow-downgrades libsodium-dev libssl-dev=1.0.2g-1ubuntu4.14
+      fi
+    displayName: 'Install dependencies'
 
   - bash: |
       curl -o rustup-init.sh https://sh.rustup.rs -sSf
@@ -28,10 +29,18 @@ jobs:
 
   - bash: |
       source $HOME/.cargo/env
-      cargo build --all-features
+      if [[ "$(features)" == "all" ]]; then
+        cargo build --all-features
+      else
+        cargo build --no-default-features --features "$(features)"
+      fi
     displayName: 'Build Serenity'
 
   - bash: |
       source $HOME/.cargo/env
-      cargo test --all-features
+      if [[ "$(features)" == "all" ]]; then
+        cargo test --all-features
+      else
+        cargo test --no-default-features --features "$(features)"
+      fi
     displayName: 'Test Serenity'
