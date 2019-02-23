@@ -55,6 +55,7 @@ impl Game {
     /// Create a command that sets the current game being played:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))] {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
@@ -66,6 +67,7 @@ impl Game {
     /// });
     /// #
     /// # fn main() {}
+    /// # }
     /// ```
     pub fn playing(name: &str) -> Game {
         Game {
@@ -84,6 +86,7 @@ impl Game {
     /// Create a command that sets the current game and stream:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))] {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
@@ -97,6 +100,7 @@ impl Game {
     /// });
     /// #
     /// # fn main() {}
+    /// # }
     /// ```
     pub fn streaming(name: &str, url: &str) -> Game {
         Game {
@@ -115,6 +119,7 @@ impl Game {
     /// Create a command that sets the current game being played:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))] {
     /// # #[macro_use] extern crate serenity;
     /// #
     /// use serenity::framework::standard::Args;
@@ -126,6 +131,7 @@ impl Game {
     /// });
     /// #
     /// # fn main() {}
+    /// # }
     /// ```
     pub fn listening(name: &str) -> Game {
         Game {

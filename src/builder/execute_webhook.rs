@@ -83,6 +83,7 @@ impl ExecuteWebhook {
     /// Sending a webhook with a content of `"foo"`:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// # use serenity::client::rest;
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
@@ -90,6 +91,7 @@ impl ExecuteWebhook {
     /// if let Err(why) = webhook.execute(false, |w| w.content("foo")) {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// # }
     /// ```
     ///
     /// [`embeds`]: #method.embeds
@@ -125,6 +127,7 @@ impl ExecuteWebhook {
     /// Sending a webhook with text-to-speech enabled:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// # use serenity::client::rest;
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
@@ -132,6 +135,7 @@ impl ExecuteWebhook {
     /// if let Err(why) = webhook.execute(false, |w| w.content("hello").tts(true)) {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// # }
     /// ```
     pub fn tts(mut self, tts: bool) -> Self {
         self.0.insert("tts", Value::Bool(tts));
@@ -146,6 +150,7 @@ impl ExecuteWebhook {
     /// Overriding the username to `"hakase"`:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// # use serenity::client::rest;
     /// #
     /// # let webhook = rest::get_webhook_with_token(0, "").unwrap();
@@ -153,6 +158,7 @@ impl ExecuteWebhook {
     /// if let Err(why) = webhook.execute(false, |w| w.content("hello").username("hakase")) {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// # }
     /// ```
     pub fn username(mut self, username: &str) -> Self {
         self.0.insert("username", Value::String(username.to_string()));

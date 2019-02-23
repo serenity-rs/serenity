@@ -1509,6 +1509,7 @@ impl Guild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
@@ -1530,7 +1531,10 @@ impl Guild {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }

@@ -43,6 +43,7 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     /// use std::env;
@@ -93,6 +94,7 @@ impl Attachment {
     /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
     ///
     /// # Errors

@@ -409,6 +409,7 @@ impl User {
     /// help message, and then react with `'👌'` to verify message sending:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature="client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -459,6 +460,7 @@ impl User {
     /// }
     ///
     /// let mut client = Client::new("token", Handler);
+    /// # }
     /// ```
     ///
     /// # Examples
@@ -737,6 +739,7 @@ impl User {
     /// Make a command to tell the user what their tag is:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature="client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -760,6 +763,7 @@ impl User {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }

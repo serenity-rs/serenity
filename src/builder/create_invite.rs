@@ -13,6 +13,7 @@ use utils::VecMap;
 /// Create an invite with a max age of 3600 seconds and 10 max uses:
 ///
 /// ```rust,no_run
+/// # #[cfg(feature = "client")] {
 /// # use serenity::prelude::*;
 /// # use serenity::model::prelude::*;
 /// # use serenity::model::channel::Channel;
@@ -59,6 +60,7 @@ use utils::VecMap;
 /// let mut client = Client::new("token", Handler).unwrap();
 ///
 /// client.start().unwrap();
+/// # }
 /// ```
 ///
 /// [`GuildChannel::create_invite`]: ../model/channel/struct.GuildChannel.html#method.create_invite

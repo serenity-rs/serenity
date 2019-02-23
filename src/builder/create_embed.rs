@@ -227,6 +227,7 @@ impl CreateEmbed {
     /// Passing a string timestamp:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// use serenity::prelude::*;
     /// use serenity::model::channel::Message;
     ///
@@ -246,6 +247,7 @@ impl CreateEmbed {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
     ///
     /// Creating a join-log:
@@ -253,6 +255,7 @@ impl CreateEmbed {
     /// Note: this example isn't efficient and is for demonstrative purposes.
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// use serenity::prelude::*;
     /// use serenity::model::guild::Member;
     /// use serenity::model::id::GuildId;
@@ -293,6 +296,7 @@ impl CreateEmbed {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(self, timestamp: T) -> Self {
