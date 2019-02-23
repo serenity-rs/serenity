@@ -32,7 +32,7 @@ impl GuildId {
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
     /// ```rust,ignore
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     ///
     /// // assuming a `user` has already been bound
     /// let _ = GuildId(81384788765712384).ban(user, 4);
@@ -593,7 +593,7 @@ impl GuildId {
     /// using 17 shards:
     ///
     /// ```rust
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     /// use serenity::utils;
     ///
     /// let guild_id = GuildId(81384788765712384);

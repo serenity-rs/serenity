@@ -1514,12 +1514,13 @@ impl Guild {
     ///
     /// struct Handler;
     ///
-    /// use serenity::CACHE;
-    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id().unwrap().to_guild_cached() {
-    ///             if let Some(role) = arc.read().role_by_name("role_name") {
+    ///         // If you are using the `cache`-feature, consider using
+    ///         // `to_guild_cached` instead of `to_partial_guild()` to avoid
+    ///         // a REST-request.
+    ///         if let Ok(guild) = msg.guild_id.unwrap().to_partial_guild() {
+    ///             if let Some(role) = guild.role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }
     ///         }

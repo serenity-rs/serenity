@@ -464,11 +464,9 @@ impl PartialGuild {
     ///
     /// struct Handler;
     ///
-    /// use serenity::CACHE;
-    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         let guild = msg.guild_id().unwrap().to_partial_guild().unwrap();
+    ///         let guild = msg.guild_id.unwrap().to_partial_guild().unwrap();
     ///         let possible_role = guild.role_by_name("role_name");
     ///
     ///         if let Some(role) = possible_role {

@@ -149,6 +149,7 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// # use serenity::model::id::{ChannelId, UserId};
+    /// # use serenity::model::channel::Channel;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -159,7 +160,6 @@ impl GuildChannel {
     ///     PermissionOverwriteType,
     /// };
     /// use serenity::model::{ModelError, Permissions};
-    /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
@@ -169,12 +169,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read();
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = channel_id.to_channel().expect("Could not request channel via REST.");
     ///
-    /// channel.read().create_permission(&overwrite)?;
+    /// if let Channel::Guild(channel) = channel {
+    ///     let channel = channel.read();
+    ///     channel.create_permission(&overwrite)?;
+    /// }
     /// #     Ok(())
     /// # }
     /// #
@@ -199,8 +199,7 @@ impl GuildChannel {
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
     /// };
-    /// use serenity::model::{ModelError, Permissions};
-    /// use serenity::CACHE;
+    /// use serenity::model::{ModelError, Permissions, channel::Channel};
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
@@ -210,12 +209,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read();
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = channel_id.to_channel().expect("Could not request channel via REST.");
     ///
-    /// channel.read().create_permission(&overwrite)?;
+    /// if let Channel::Guild(channel) = channel {
+    ///     let channel = channel.read();
+    ///     channel.create_permission(&overwrite)?;
+    /// }
     /// #     Ok(())
     /// # }
     /// #
@@ -462,7 +461,6 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::CACHE;
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
     /// use std::fs::File;
@@ -471,9 +469,13 @@ impl GuildChannel {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
-    ///             Some(channel) => channel,
-    ///             None => return,
+    ///         let channel = match msg.guild_id.to_partial_guild() {
+    ///             Ok(channel) => channel,
+    ///             Err(why) => {
+    ///                 println!("Could not request guild via REST.");
+    ///
+    ///                 return;
+    ///             }
     ///         };
     ///
     ///         let current_user_id = CACHE.read().user.id;
