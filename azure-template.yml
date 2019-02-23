@@ -13,13 +13,12 @@ jobs:
   steps: 
   - bash: |
       if [[ "$OS" == "xcode9-macos10.13" ]]; then
-        HOMEBREW_NO_AUTO_UPDATE=1 brew install libtool autoconf automake pkg-config
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install libsodium
       fi
-      git clone 'git://github.com/jedisct1/libsodium.git'
-      cd libsodium
-      ./autogen.sh
-      ./configure && make
-      sudo make install
+      if [[ "$OS" == "ubuntu-16.04" ]]; then
+        sudo apt-get install libsodium-dev libssl1.0.0
+      fi
+    displayName: 'Install dependencies'
 
   - bash: |
       curl -o rustup-init.sh https://sh.rustup.rs -sSf
