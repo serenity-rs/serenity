@@ -123,16 +123,18 @@ pub struct Client {
     ///
     /// ```no_run
     /// extern crate serenity;
+    /// extern crate typemap;
     ///
+    /// # fn try_main() -> Result<(), Box<std::error::Error>> {
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
-    /// use std::collections::HashMap;
-    /// use std::env;
+    /// use typemap::Key;
+    /// use std::{collections::HashMap, env};
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl TypeMapKey for MessageEventCounter {
+    /// impl Key for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
@@ -207,6 +209,8 @@ pub struct Client {
     /// 5 seconds:
     ///
     /// ```rust,no_run
+    /// # extern crate serenity;
+    /// #
     /// # use serenity::client::{Client, EventHandler};
     /// # use std::error::Error;
     /// # use std::time::Duration;
