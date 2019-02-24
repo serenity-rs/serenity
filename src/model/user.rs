@@ -50,7 +50,6 @@ impl CurrentUser {
     /// Print out the current user's avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::model::id::UserId;
     /// #
     /// # let user = UserId(0).to_user().unwrap();
@@ -132,8 +131,6 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # let user = CurrentUser::default();
@@ -159,7 +156,6 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # let user = CurrentUser::default();
@@ -182,7 +178,6 @@ impl CurrentUser {
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::model::user::CurrentUser;
     /// #
     /// # let user = CurrentUser::default();
@@ -238,7 +233,6 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::model::id::UserId;
     /// #
     /// # let user = UserId(0).to_user().unwrap();
@@ -260,7 +254,6 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::model::id::UserId;
     /// #
     /// # let user = UserId(0).to_user().unwrap();
