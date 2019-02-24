@@ -147,6 +147,7 @@ pub struct Client {
     ///
     /// struct Handler;
     ///
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// impl EventHandler for Handler {
     ///     fn message(&self, ctx: Context, _: Message) { reg(ctx, "MessageCreate") }
     ///     fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
