@@ -149,6 +149,7 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// # use serenity::model::id::{ChannelId, UserId};
+    /// # use serenity::model::channel::Channel;
     /// # use std::error::Error;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
@@ -159,7 +160,6 @@ impl GuildChannel {
     ///     PermissionOverwriteType,
     /// };
     /// use serenity::model::{ModelError, Permissions};
-    /// use serenity::CACHE;
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
@@ -169,12 +169,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read();
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = channel_id.to_channel().expect("Could not request channel via REST.");
     ///
-    /// channel.read().create_permission(&overwrite)?;
+    /// if let Channel::Guild(channel) = channel {
+    ///     let channel = channel.read();
+    ///     channel.create_permission(&overwrite)?;
+    /// }
     /// #     Ok(())
     /// # }
     /// #
@@ -199,8 +199,7 @@ impl GuildChannel {
     ///     PermissionOverwrite,
     ///     PermissionOverwriteType,
     /// };
-    /// use serenity::model::{ModelError, Permissions};
-    /// use serenity::CACHE;
+    /// use serenity::model::{ModelError, Permissions, channel::Channel};
     ///
     /// let allow = Permissions::SEND_MESSAGES;
     /// let deny = Permissions::SEND_TTS_MESSAGES | Permissions::ATTACH_FILES;
@@ -210,12 +209,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = CACHE.read();
-    /// let channel = cache
-    ///     .guild_channel(channel_id)
-    ///     .ok_or(ModelError::ItemMissing)?;
+    /// let channel = channel_id.to_channel().expect("Could not request channel via REST.");
     ///
-    /// channel.read().create_permission(&overwrite)?;
+    /// if let Channel::Guild(channel) = channel {
+    ///     let channel = channel.read();
+    ///     channel.create_permission(&overwrite)?;
+    /// }
     /// #     Ok(())
     /// # }
     /// #
@@ -462,39 +461,38 @@ impl GuildChannel {
     /// for demonstrative purposes):
     ///
     /// ```rust,no_run
-    /// use serenity::CACHE;
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
+    /// use serenity::model::channel::Channel;
+    /// use serenity::CACHE;
     /// use std::fs::File;
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         let channel = match CACHE.read().guild_channel(msg.channel_id) {
-    ///             Some(channel) => channel,
-    ///             None => return,
-    ///         };
+    ///         if let Ok(Channel::Guild(guild_channel)) = msg.channel_id.to_channel() {
     ///
-    ///         let current_user_id = CACHE.read().user.id;
-    ///         let permissions =
-    ///             channel.read().permissions_for(current_user_id).unwrap();
+    ///             let current_user_id = CACHE.read().user.id;
+    ///             let guild_channel = guild_channel.read();
+    ///             let permissions = guild_channel.permissions_for(current_user_id).unwrap();
     ///
-    ///         if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
-    ///             return;
-    ///         }
-    ///
-    ///         let file = match File::open("./cat.png") {
-    ///             Ok(file) => file,
-    ///             Err(why) => {
-    ///                 println!("Err opening file: {:?}", why);
-    ///
+    ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
-    ///             },
-    ///         };
+    ///             }
     ///
-    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
-    ///             m.content("here's a cat"));
+    ///             let file = match File::open("./cat.png") {
+    ///                 Ok(file) => file,
+    ///                 Err(why) => {
+    ///                     println!("Err opening file: {:?}", why);
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
+    ///                 m.content("here's a cat"));
+    ///         }
     ///     }
     /// }
     ///

@@ -74,9 +74,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```no_run
-/// extern crate serenity;
-///
-/// # fn try_main() -> Result<(), Box<std::error::Error>> {
+/// # fn main() {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
 /// use serenity::Client;
@@ -91,12 +89,10 @@ use self::bridge::voice::ClientVoiceManager;
 ///     }
 /// }
 ///
-/// let mut client = Client::new("my token here", Handler)?;
+/// let mut client = Client::new("my token here", Handler).expect("Could not create new client.");
 ///
-/// client.start();
-/// # Ok(()) }
-/// #
-/// # fn main() { try_main().unwrap(); }
+/// client.start().expect("Could not start client.");
+/// # }
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
@@ -129,7 +125,6 @@ pub struct Client {
     /// extern crate serenity;
     /// extern crate typemap;
     ///
-    /// # fn try_main() -> Result<(), Box<std::error::Error>> {
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
@@ -153,6 +148,7 @@ pub struct Client {
     ///
     /// struct Handler;
     ///
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// impl EventHandler for Handler {
     ///     fn message(&self, ctx: Context, _: Message) { reg(ctx, "MessageCreate") }
     ///     fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
@@ -163,17 +159,19 @@ pub struct Client {
     ///         reg(ctx, "MessageUpdate") }
     /// }
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// # fn main() {
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("Could not find token."), Handler)
+    ///     .expect("Could not create client.");
     ///
     /// {
     ///     let mut data = client.data.lock();
     ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
-    /// client.start()?;
-    /// # Ok(()) }
-    /// #
-    /// # fn main() { try_main().unwrap(); }
+    /// client.start().expect("Could not start client.");
+    /// # }
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.

@@ -20,6 +20,7 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -43,6 +44,7 @@ impl EditProfile {
     /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// # client.start().unwrap();
+    /// # }
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html

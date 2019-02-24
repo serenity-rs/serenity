@@ -1509,17 +1509,19 @@ impl Guild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "client")] {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
-    /// use serenity::CACHE;
-    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id().unwrap().to_guild_cached() {
-    ///             if let Some(role) = arc.read().role_by_name("role_name") {
+    ///         // If you are using the `cache`-feature, consider using
+    ///         // `to_guild_cached` instead of `to_partial_guild()` to avoid
+    ///         // a REST-request.
+    ///         if let Ok(guild) = msg.guild_id.unwrap().to_partial_guild() {
+    ///             if let Some(role) = guild.role_by_name("role_name") {
     ///                 println!("{:?}", role);
     ///             }
     ///         }
@@ -1529,7 +1531,10 @@ impl Guild {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }

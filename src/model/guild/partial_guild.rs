@@ -459,16 +459,15 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature="client")] {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
-    /// use serenity::CACHE;
-    ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         let guild = msg.guild_id().unwrap().to_partial_guild().unwrap();
+    ///         let guild = msg.guild_id.unwrap().to_partial_guild().unwrap();
     ///         let possible_role = guild.role_by_name("role_name");
     ///
     ///         if let Some(role) = possible_role {
@@ -480,7 +479,10 @@ impl PartialGuild {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
     }

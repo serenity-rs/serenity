@@ -50,13 +50,10 @@ impl CurrentUser {
     /// Print out the current user's avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # use serenity::CACHE;
+    /// # use serenity::model::id::UserId;
     /// #
-    /// # let cache = CACHE.read();
+    /// # let user = UserId(0).to_user().unwrap();
     /// #
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
-    ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
     ///     None => println!("{} does not have an avatar set.", user.name)
@@ -82,11 +79,14 @@ impl CurrentUser {
     /// Change the avatar:
     ///
     /// ```rust,ignore
-    /// use serenity::CACHE;
-    ///
+    /// # extern crate serenity;
+    /// # use serenity::model::id::UserId;
+    /// #
+    /// # let user = UserId(0).to_user().unwrap();
+    /// #
     /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
     ///
-    /// CACHE.write().user.edit(|p| p.avatar(Some(&avatar)));
+    /// user.edit(|p| p.avatar(Some(&avatar)));
     /// ```
     ///
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
@@ -131,13 +131,10 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # use serenity::CACHE;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache = CACHE.read();
+    /// # let user = CurrentUser::default();
     /// #
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
-    ///
     /// if let Ok(guilds) = user.guilds() {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
     ///         println!("{}: {}", index, guild.name);
@@ -159,14 +156,13 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # use serenity::CACHE;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let mut cache = CACHE.write();
-    ///
+    /// # let user = CurrentUser::default();
+    /// #
     /// use serenity::model::Permissions;
     ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(Permissions::empty()) {
+    /// let url = match user.invite_url(Permissions::empty()) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -182,14 +178,13 @@ impl CurrentUser {
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # use serenity::CACHE;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let mut cache = CACHE.write();
-    ///
+    /// # let user = CurrentUser::default();
+    /// #
     /// use serenity::model::Permissions;
     ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
+    /// let url = match user.invite_url(Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -238,13 +233,10 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # use serenity::CACHE;
+    /// # use serenity::model::id::UserId;
     /// #
-    /// # let cache = CACHE.read();
+    /// # let user = UserId(0).to_user().unwrap();
     /// #
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
-    ///
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
     ///     None => println!("Could not get static avatar for {}.", user.name)
@@ -262,12 +254,11 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # use serenity::CACHE;
+    /// # use serenity::model::id::UserId;
     /// #
-    /// # let cache = CACHE.read();
+    /// # let user = UserId(0).to_user().unwrap();
     /// #
-    /// // assuming the cache has been unlocked
-    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// println!("The current user's distinct identifier is {}", user.tag());
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
@@ -411,20 +402,29 @@ impl User {
     /// help message, and then react with `'👌'` to verify message sending:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature="client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::model::Permissions;
-    /// use serenity::CACHE;
+    /// use serenity::http::raw::get_current_user;
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let cache = CACHE.read();
     ///
-    ///             let url = match cache.user.invite_url(Permissions::empty()) {
+    ///             let user = match get_current_user() {
+    ///                 Ok(user) => user,
+    ///                 Err(why) => {
+    ///                     println!("Error accessing current user.");
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             let url = match user.invite_url(Permissions::empty()) {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -453,6 +453,7 @@ impl User {
     /// }
     ///
     /// let mut client = Client::new("token", Handler);
+    /// # }
     /// ```
     ///
     /// # Examples
@@ -661,6 +662,7 @@ impl User {
     /// out-of-sync:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -673,7 +675,6 @@ impl User {
     /// }
     ///
     /// let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::model::id::UserId;
     /// use serenity::CACHE;
     /// use std::thread;
@@ -703,6 +704,7 @@ impl User {
     /// });
     ///
     /// println!("{:?}", client.start());
+    /// # }
     /// ```
     pub fn refresh(&mut self) -> Result<()> {
         self.id.to_user().map(|replacement| {
@@ -730,6 +732,7 @@ impl User {
     /// Make a command to tell the user what their tag is:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature="client")] {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -753,6 +756,7 @@ impl User {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }

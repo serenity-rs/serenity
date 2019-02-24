@@ -911,6 +911,7 @@ mod test {
         assert!(is_nsfw("nsfw-général"));
     }
 
+    #[cfg(feature = "cache")]
     #[test]
     fn test_content_safe() {
         use model::{
