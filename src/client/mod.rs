@@ -122,7 +122,6 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```no_run
-    /// # fn main() -> Result<(), Box<std::error::Error>> {
     /// extern crate serenity;
     ///
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
