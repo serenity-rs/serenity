@@ -160,9 +160,6 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
@@ -201,9 +198,6 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
@@ -393,7 +387,7 @@ impl GuildChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_message<F, M>(&self, http: &Arc<Http>, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId> {
         self.id.edit_message(&http, message_id, f)
     }
 
@@ -695,5 +689,5 @@ impl GuildChannel {
 #[cfg(feature = "model")]
 impl Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { Display::fmt(&self.id.mention(), f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { Display::fmt(&self.id.mention(), f) }
 }

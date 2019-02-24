@@ -27,6 +27,7 @@ use super::{
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
+use log::{info, warn};
 
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
@@ -54,7 +55,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     pub event_handler: Arc<H>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.

@@ -1,4 +1,5 @@
 use crate::{model::prelude::*};
+use serde_json::json;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -637,7 +638,7 @@ impl GuildId {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { ::utils::shard_id(self.0, shard_count) }
+    pub fn shard_id(&self, shard_count: u64) -> u64 { crate::utils::shard_id(self.0, shard_count) }
 
     /// Starts an integration sync for the given integration Id.
     ///

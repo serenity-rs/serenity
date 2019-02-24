@@ -144,7 +144,7 @@ pub enum ShardQueuerMessage {
 pub struct ShardId(pub u64);
 
 impl Display for ShardId {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         write!(f, "{}", self.0)
     }
 }

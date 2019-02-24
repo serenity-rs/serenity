@@ -22,6 +22,7 @@ use super::{
 };
 use tungstenite::error::Error as TungsteniteError;
 use url::Url;
+use log::{error, debug, info, trace, warn};
 
 #[cfg(not(feature = "native_tls"))]
 use internal::ws_impl::create_rustls_client;
@@ -106,9 +107,6 @@ impl Shard {
     /// then listening for events:
     ///
     /// ```rust,no_run
-    /// extern crate parking_lot;
-    /// extern crate serenity;
-    ///
     /// use serenity::gateway::Shard;
     /// use parking_lot::Mutex;
     /// use std::{env, sync::Arc};
@@ -313,7 +311,6 @@ impl Shard {
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # #[cfg(feature = "model")]
     /// # fn main() {
     /// # use serenity::client::gateway::Shard;
@@ -671,9 +668,6 @@ impl Shard {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
@@ -701,9 +695,6 @@ impl Shard {
     /// query parameter of `"do"`:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;

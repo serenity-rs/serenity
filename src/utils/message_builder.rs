@@ -762,7 +762,7 @@ impl Display for MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     ///
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
 }
 
 
@@ -996,7 +996,7 @@ fn normalize(text: &str) -> String {
 mod test {
     use crate::model::prelude::*;
     use super::{
-        ContentModifier::*,
+        ContentModifier::{Bold, Code, Italic},
         MessageBuilder,
     };
 

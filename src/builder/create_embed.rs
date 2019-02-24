@@ -18,7 +18,7 @@
 use chrono::{DateTime, TimeZone};
 use crate::internal::prelude::*;
 use crate::model::channel::Embed;
-use serde_json::Value;
+use serde_json::{json, Value};
 use std::{
     default::Default,
     fmt::Display
@@ -522,10 +522,10 @@ impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
 
 #[cfg(test)]
 mod test {
-    use crate::model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo};
-    use serde_json::Value;
+    use crate::{model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
+        utils::{self, Colour}};
+    use serde_json::{json, Value};
     use super::CreateEmbed;
-    use crate::utils::{self, Colour};
 
     #[test]
     fn test_from_embed() {

@@ -33,7 +33,7 @@ use typemap::ShareMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
-
+use log::{error, debug, warn};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -42,7 +42,7 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     data: Arc<RwLock<ShareMap>>,
     event_handler: Arc<H>,
     #[cfg(feature = "framework")]
-    framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<InterMessage>,
@@ -72,6 +72,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
+            #[cfg(any(feature = "cache", feature = "http"))]
             cache_and_http: opt.cache_and_http,
         }
     }
@@ -493,12 +494,12 @@ pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
     pub data: Arc<RwLock<ShareMap>>,
     pub event_handler: Arc<H>,
     #[cfg(feature = "framework")]
-    pub framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     pub threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
-    #[cfg(feature = "cache")]
+    #[cfg(any(feature = "cache", feature = "http"))]
     pub cache_and_http: Arc<CacheAndHttp>,
 }

@@ -2,6 +2,7 @@
 pub mod help_commands;
 
 mod command;
+mod check;
 mod configuration;
 mod create_command;
 mod create_help_command;
@@ -11,25 +12,26 @@ mod args;
 
 pub use self::args::{
     Args,
+    Delimiter,
     Iter,
-    Error as ArgError
+    Error as ArgError,
 };
 pub(crate) use self::buckets::{Bucket, Ratelimit};
 pub(crate) use self::command::Help;
 pub use self::command::{
-    Check,
     HelpFunction,
     HelpOptions,
     Command,
     CommandGroup,
     CommandOptions,
-    Error as CommandError
+    Error as CommandError,
 };
 pub use self::command::CommandOrAlias;
 pub use self::configuration::Configuration;
 pub use self::create_help_command::CreateHelpCommand;
 pub use self::create_command::{CreateCommand, FnOrCommand};
 pub use self::create_group::CreateGroup;
+pub use self::check::{Check, CreateCheck, CheckResult, Reason};
 
 use crate::client::Context;
 use crate::internal::RwLockExt;
@@ -167,7 +169,7 @@ pub enum DispatchError {
     /// When a custom function check has failed.
     //
     // TODO: Bring back `Arc<Command>` as `CommandOptions` in 0.6.x.
-    CheckFailed,
+    CheckFailed(String, Reason),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -202,7 +204,7 @@ pub enum DispatchError {
     WebhookAuthor,
 }
 
-type DispatchErrorHook = Fn(Context, Message, DispatchError) + Send + Sync + 'static;
+type DispatchErrorHook = dyn Fn(Context, Message, DispatchError) + Send + Sync + 'static;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -616,25 +618,21 @@ impl StandardFramework {
                     }
                 }
 
-                let all_group_checks_passed = group
-                    .checks
-                    .iter()
-                    .all(|check| (check.0)(&mut context, message, args, command));
+                for check in &group.checks {
 
-                if !all_group_checks_passed {
-                    return Some(DispatchError::CheckFailed);
+                    if let CheckResult::Failure(reason) = (check.function)(&mut context, message, args, command) {
+                        return Some(DispatchError::CheckFailed(check.name.clone(), reason));
+                    }
                 }
 
-                let all_command_checks_passed = command
-                    .checks
-                    .iter()
-                    .all(|check| (check.0)(&mut context, message, args, command));
+                for check in &command.checks {
 
-                if all_command_checks_passed {
-                    None
-                } else {
-                    Some(DispatchError::CheckFailed)
+                    if let CheckResult::Failure(reason) = (check.function)(&mut context, message, args, command) {
+                        return Some(DispatchError::CheckFailed(check.name.clone(), reason));
+                    }
                 }
+
+                None
             }
         }
     }
@@ -660,10 +658,9 @@ impl StandardFramework {
     /// Create and use a simple command:
     ///
     /// ```rust,no_run
-    /// # #[macro_use] extern crate serenity;
-    /// #
     /// # fn main() {
     /// # use serenity::prelude::*;
+    /// # use serenity::command;
     /// # use serenity::framework::standard::Args;
     /// # struct Handler;
     /// #
@@ -696,7 +693,7 @@ impl StandardFramework {
                 .or_insert_with(|| Arc::new(CommandGroup::default()));
 
             if let Some(ref mut group) = Arc::get_mut(ungrouped) {
-                let cmd: Arc<Command> = Arc::new(c);
+                let cmd: Arc<dyn Command> = Arc::new(c);
 
                 for alias in &cmd.options().aliases {
                      group.commands.insert(
@@ -740,22 +737,23 @@ impl StandardFramework {
                 let cmd = f(CreateCommand::default()).finish();
                 let name = command_name.to_string();
 
-                if let Some(ref prefixes) = group.prefixes {
+                if group.prefixes.is_empty() {
+
+                    for v in &cmd.options().aliases {
+                        group
+                            .commands
+                            .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
+                    }
+                } else {
 
                     for v in &cmd.options().aliases {
 
-                        for prefix in prefixes {
+                        for prefix in &group.prefixes {
                             group.commands.insert(
                                 format!("{} {}", prefix, v),
                                 CommandOrAlias::Alias(format!("{} {}", prefix, name)),
                             );
                         }
-                    }
-                } else {
-                    for v in &cmd.options().aliases {
-                        group
-                            .commands
-                            .insert(v.to_string(), CommandOrAlias::Alias(name.clone()));
                     }
                 }
 
@@ -1125,15 +1123,18 @@ impl Framework for StandardFramework {
 
                     let mut check_contains_group_prefix = false;
                     let mut longest_matching_prefix_len = 0;
-                    let to_check = if let Some(ref prefixes) = group.prefixes {
+                    let to_check = if group.prefixes.is_empty() {
+                        built.clone()
+                    } else {
                         // Once `built` starts with a set prefix,
                         // we want to make sure that all following matching prefixes are longer
                         // than the last matching one, this prevents picking a wrong prefix,
                         // e.g. "f" instead of "ferris" due to "f" having a lower index in the `Vec`.
-                        longest_matching_prefix_len = prefixes.iter().fold(0, |longest_prefix_len, prefix|
+                        longest_matching_prefix_len = group.prefixes.iter().fold(0, |longest_prefix_len, prefix|
                             if prefix.len() > longest_prefix_len
                             && built.starts_with(prefix)
-                            && (orginal_round.len() == prefix.len() || built.get(prefix.len()..prefix.len() + 1) == Some(" ")) {
+                            && (orginal_round.len() == prefix.len()
+                            || built.get(prefix.len()..prefix.len() + 1) == Some(" ")) {
                                 prefix.len()
                             } else {
                                 longest_prefix_len
@@ -1149,8 +1150,6 @@ impl Framework for StandardFramework {
                         } else {
                             continue;
                         }
-                    } else {
-                        built.clone()
                     };
 
                     let before = self.before.clone();
@@ -1161,7 +1160,8 @@ impl Framework for StandardFramework {
 
                         if let Some(help) = help {
                             let groups = self.groups.clone();
-                            let mut args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
+                            let owners = self.configuration.owners.clone();
+                            let args = command_and_help_args!(&message.content, position, command_length, &self.configuration.delimiters);
 
                             threadpool.execute(move || {
 
@@ -1172,7 +1172,8 @@ impl Framework for StandardFramework {
                                     }
                                 }
 
-                                let result = (help.0)(&mut context, &message, &help.1, groups, &args);
+                                let result = (help.0)
+                                    (&mut context, &message, &help.1, groups, owners, &args);
 
                                 if let Some(after) = after {
                                     (after)(&mut context, &message, &built, result);
@@ -1254,7 +1255,7 @@ impl Framework for StandardFramework {
 
                             threadpool.execute(move || {
                                 if let Some(before) = before {
-                                    if !(before)(&mut context, &message, &args.full()) {
+                                    if !(before)(&mut context, &message, &args.message()) {
                                         return;
                                     }
                                 }
@@ -1287,7 +1288,7 @@ impl Framework for StandardFramework {
                 // `Message`, else we can avoid it.
                 if let Some(ref message_without_command) = self.message_without_command {
                     let mut context_unrecognised = context.clone();
-                    let mut message_unrecognised = message.clone();
+                    let message_unrecognised = message.clone();
 
                     let unrecognised_command = unrecognised_command.clone();
                     threadpool.execute(move || {
@@ -1358,13 +1359,13 @@ pub enum HelpBehaviour {
     /// Does not list a command in the help-menu.
     Hide,
     /// The command will be displayed, hence nothing will be done.
-    Nothing
+    Nothing,
 }
 
 use std::fmt;
 
 impl fmt::Display for HelpBehaviour {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
        fmt::Debug::fmt(self, f)
     }
 }

@@ -1,3 +1,4 @@
+use crate::framework::standard::check::CreateCheck;
 pub use super::{
     Args,
     Command,
@@ -8,6 +9,7 @@ pub use super::{
 };
 
 use crate::client::Context;
+use crate::framework::standard::CheckResult;
 use crate::model::{
     channel::Message,
     Permissions
@@ -16,8 +18,8 @@ use std::sync::Arc;
 
 pub enum FnOrCommand {
     Fn(fn(&mut Context, &Message, Args) -> Result<(), CommandError>),
-    Command(Arc<Command>),
-    CommandWithOptions(Arc<Command>),
+    Command(Arc<dyn Command>),
+    CommandWithOptions(Arc<dyn Command>),
 }
 
 impl Default for FnOrCommand {
@@ -26,9 +28,9 @@ impl Default for FnOrCommand {
     }
 }
 
-type Init = Fn() + Send + Sync + 'static;
-type Before = Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
-type After = Fn(&mut Context, &Message, &Result<(), CommandError>) + Send + Sync + 'static;
+type Init = dyn Fn() + Send + Sync + 'static;
+type Before = dyn Fn(&mut Context, &Message) -> bool + Send + Sync + 'static;
+type After = dyn Fn(&mut Context, &Message, &Result<(), CommandError>) + Send + Sync + 'static;
 
 #[derive(Default)]
 pub struct Handlers {
@@ -77,6 +79,7 @@ impl CreateCommand {
     ///     CommandOptions,
     ///     CommandError,
     ///     StandardFramework,
+    ///     CheckResult,
     /// };
     /// use serenity::model::channel::Message;
     /// use std::env;
@@ -87,7 +90,10 @@ impl CreateCommand {
     /// client.with_framework(StandardFramework::new()
     ///     .configure(|c| c.prefix("~"))
     ///     .command("ping", |c| c
-    ///         .check(owner_check)
+    ///         .check_customised(owner_check, |c|
+    ///             c.name("Owner Check")
+    ///              .check_in_help(true)
+    ///              .display_in_help(true))
     ///         .desc("Replies to a ping with a pong")
     ///         .exec(ping)));
     ///
@@ -99,17 +105,27 @@ impl CreateCommand {
     /// }
     ///
     /// fn owner_check(_context: &mut Context, message: &Message, _: &mut Args, _:
-    /// &CommandOptions) -> bool {
+    /// &CommandOptions) -> CheckResult {
     ///     // replace with your user ID
-    ///     message.author.id == 7
+    ///     (message.author.id == 7).into()
     /// }
     /// ```
-    pub fn check<F>(mut self, check: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
-                     + Send
-                     + Sync
-                     + 'static {
-        self.0.checks.push(Check::new(check));
+    pub fn check_customised<C, F>(mut self, function: F, create: C) -> Self
+        where C: FnOnce(&mut CreateCheck) -> &mut CreateCheck,
+        F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> CheckResult
+        + Send
+        + Sync
+        + 'static {
+        let mut create_check = CreateCheck::new(function);
+        create(&mut create_check);
+
+        self.0.checks.push(create_check.0);
+
+        self
+    }
+
+    pub fn check(mut self, check: Check) -> Self {
+        self.0.checks.push(check);
 
         self
     }
@@ -271,7 +287,7 @@ impl CreateCommand {
         self
     }
 
-    pub(crate) fn finish(self) -> Arc<Command> {
+    pub(crate) fn finish(self) -> Arc<dyn Command> {
         struct A<C: Command>(Arc<CommandOptions>, C, Handlers);
 
         impl<C: Command> Command for A<C> {

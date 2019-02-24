@@ -913,7 +913,7 @@ pub enum RouteInfo<'a> {
 }
 
 impl<'a> RouteInfo<'a> {
-    pub fn deconstruct(&self) -> (LightMethod, Route, Cow<str>) {
+    pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
             RouteInfo::AddGroupRecipient { group_id, user_id } => (
                 LightMethod::Put,

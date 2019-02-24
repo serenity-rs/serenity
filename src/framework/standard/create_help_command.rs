@@ -46,13 +46,6 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets a label for the usage examples of a command.
-    pub fn usage_sample_label(mut self, text: &str) -> Self {
-        self.0.usage_sample_label = text.to_string();
-
-        self
-    }
-
     /// Sets a label for ungrouped-commands
     pub fn ungrouped_label(mut self, text: &str) -> Self {
         self.0.ungrouped_label = text.to_string();
@@ -157,7 +150,15 @@ impl CreateHelpCommand {
         self
     }
 
-    /// Sets the tip (or legend) explaining why some commands are striked,
+    /// Sets how a command requiring bot-ownership should be treated in the
+    /// help-menu.
+    pub fn lacking_ownership(mut self, behaviour: HelpBehaviour) -> Self {
+        self.0.lacking_ownership = behaviour;
+
+        self
+    }
+
+    /// Sets the tip (or legend) explaining why some commands are in strikethrough-style,
     /// given text will be used in guilds and direct messages.
     ///
     /// By default this is `Some(String)` and the `String` is empty resulting
@@ -165,41 +166,41 @@ impl CreateHelpCommand {
     /// If set to `None`, no tip will be given nor will it be substituted.
     /// If set to a non-empty `Some(String)`, the `String` will be displayed as tip.
     ///
-    /// **Note**: [`CreateHelpCommand::striked_commands_tip_in_direct_message`] and
-    /// [`CreateHelpCommand::striked_commands_tip_in_guild`] can specifically set this text
+    /// **Note**: [`CreateHelpCommand::strikethrough_commands_tip_in_direct_message`] and
+    /// [`CreateHelpCommand::strikethrough_commands_tip_guild`] can specifically set this text
     /// for direct messages and guilds.
     ///
-    /// [`CreateHelpCommand::striked_commands_tip_in_direct_message`]: #method.striked_commands_tip_in_direct_message
-    /// [`CreateHelpCommand::striked_commands_tip_in_guild`]: #method.striked_commands_tip_in_guild
-    pub fn striked_commands_tip(mut self, text: Option<String>) -> Self {
-        self.0.striked_commands_tip_in_dm = text.clone();
-        self.0.striked_commands_tip_in_guild = text;
+    /// [`CreateHelpCommand::strikethrough_commands_tip_in_direct_message`]: #method.strikethrough_commands_tip_in_direct_message
+    /// [`CreateHelpCommand::strikethrough_commands_tip_guild`]: #method.strikethrough_commands_tip_guild
+    pub fn strikethrough_commands_tip(mut self, text: Option<String>) -> Self {
+        self.0.strikethrough_commands_tip_dm = text.clone();
+        self.0.strikethrough_commands_tip_guild = text;
 
         self
     }
 
-    /// Sets the tip (or legend) explaining why some commands are striked,
+    /// Sets the tip (or legend) explaining why some commands are in strikethrough-style,
     /// given text will be used in guilds.
     ///
     /// By default this is `Some(String)` and the `String` is empty resulting
     /// in an automated substitution based on your `HelpBehaviour`-settings.
     /// If set to `None`, no tip will be given nor will it be substituted.
     /// If set to a non-empty `Some(String)`, the `String` will be displayed as tip.
-    pub fn striked_commands_tip_in_guild(mut self, text: Option<String>) -> Self {
-        self.0.striked_commands_tip_in_guild = text;
+    pub fn strikethrough_commands_tip_guild(mut self, text: Option<String>) -> Self {
+        self.0.strikethrough_commands_tip_guild = text;
 
         self
     }
 
-    /// Sets the tip (or legend) explaining why some commands are striked,
+    /// Sets the tip (or legend) explaining why some commands are in strikethrough-style,
     /// given text will be used in direct messages.
     ///
     /// By default this is `Some(String)` and the `String` is empty resulting
     /// in an automated substitution based on your `HelpBehaviour`-settings.
     /// If set to `None`, no tip will be given nor will it be substituted.
     /// If set to a non-empty `Some(String)`, the `String` will be displayed as tip.
-    pub fn striked_commands_tip_in_direct_message(mut self, text: Option<String>) -> Self {
-        self.0.striked_commands_tip_in_dm = text;
+    pub fn strikethrough_commands_tip_in_direct_message(mut self, text: Option<String>) -> Self {
+        self.0.strikethrough_commands_tip_dm = text;
 
         self
     }
@@ -256,11 +257,23 @@ impl CreateHelpCommand {
                 strike_text.push_str(&format!(", or are limited to {}", dm_or_guild));
             } else {
                 strike_text.push_str(&format!(" are limited to {}", dm_or_guild));
+                concat_with_comma = true;
             }
         }
-        let _ = write!(strike_text, ".");
+
+        if self.0.lacking_ownership == HelpBehaviour::Strike {
+            is_any_option_strike = true;
+
+            if concat_with_comma {
+                let _ = write!(strike_text, ", require ownership");
+            } else {
+                let _ = write!(strike_text, " require ownership");
+            }
+        }
 
         if is_any_option_strike {
+            let _ = write!(strike_text, ".");
+
             Some(strike_text)
         } else {
             None
@@ -268,15 +281,15 @@ impl CreateHelpCommand {
     }
 
     /// Finishes the creation of a help-command, returning `Help`.
-    /// If `Some(String)` was set as `striked_commands_tip` and the `String` is empty,
+    /// If `Some(String)` was set as `strikethrough_commands_tip` and the `String` is empty,
     /// the creator will substitute content based on the `HelpBehaviour`-settings.
     pub(crate) fn finish(mut self) -> Arc<Help> {
-        if self.0.striked_commands_tip_in_dm == Some(String::new()) {
-            self.0.striked_commands_tip_in_dm = self.produce_strike_text("direct messages");
+        if self.0.strikethrough_commands_tip_dm == Some(String::new()) {
+            self.0.strikethrough_commands_tip_dm = self.produce_strike_text("direct messages");
         }
 
-        if self.0.striked_commands_tip_in_guild == Some(String::new()) {
-            self.0.striked_commands_tip_in_guild = self.produce_strike_text("guild messages");
+        if self.0.strikethrough_commands_tip_guild == Some(String::new()) {
+            self.0.strikethrough_commands_tip_guild = self.produce_strike_text("guild messages");
         }
 
         let CreateHelpCommand(options, function) = self;

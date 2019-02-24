@@ -307,9 +307,6 @@ impl Cache {
     /// Printing the count of all private channels and groups:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -424,9 +421,6 @@ impl Cache {
     /// Retrieve a guild from the cache and print its name:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
@@ -522,9 +516,6 @@ impl Cache {
     /// Retrieve a group from the cache and print its owner's id:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::cache::Cache;
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
@@ -558,9 +549,6 @@ impl Cache {
     /// [`Client::on_message`] context:
     ///
     /// ```rust,ignore
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -621,13 +609,10 @@ impl Cache {
     /// [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, MessageId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
-    /// # 
+    /// #
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
     /// # let message = ChannelId(0).message(&http, MessageId(1)).unwrap();
     /// # let cache = Arc::new(RwLock::new(Cache::default()));
@@ -671,9 +656,6 @@ impl Cache {
     /// name:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use std::error::Error;
     /// #
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
@@ -724,9 +706,6 @@ impl Cache {
     /// Retrieve a role from the cache and print its name:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::cache::Cache;
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};

@@ -7,7 +7,7 @@ use std::{
 };
 
 #[cfg(feature = "cache")]
-type Check = Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
+type Check = dyn Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
 
 #[cfg(not(feature = "cache"))]
 type Check = Fn(&mut Context, ChannelId, UserId) -> bool + Send + Sync + 'static;

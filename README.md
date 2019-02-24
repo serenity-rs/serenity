@@ -39,11 +39,8 @@ docs.
 A basic ping-pong bot looks like:
 
 ```rust,ignore
-#[macro_use] extern crate serenity;
-
-use serenity::client::Client;
-use serenity::prelude::EventHandler;
-use serenity::framework::standard::StandardFramework;
+use serenity::{command, client::Client,
+    framework::standard::StandardFramework, prelude::EventHandler};
 use std::env;
 
 struct Handler;
@@ -81,12 +78,6 @@ Add the following to your `Cargo.toml` file:
 ```toml
 [dependencies]
 serenity = "0.5"
-```
-
-and to the top of your `main.rs`:
-
-```rust,ignore
-#[macro_use] extern crate serenity;
 ```
 
 Serenity supports a minimum of Rust 1.25.

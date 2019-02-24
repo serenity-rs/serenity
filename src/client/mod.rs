@@ -32,6 +32,7 @@ pub use self::{
     event_handler::EventHandler
 };
 
+#[cfg(any(feature = "cache", feature = "http"))]
 pub use crate::CacheAndHttp;
 
 // Note: the following re-exports are here for backwards compatibility
@@ -48,6 +49,7 @@ use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptio
 use std::{sync::Arc, time::Duration};
 use threadpool::ThreadPool;
 use typemap::ShareMap;
+use log::{error, debug, info};
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -123,18 +125,15 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```rust,ignore
-    /// extern crate serenity;
-    /// extern crate typemap;
-    ///
+    /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::*;
     /// use std::collections::HashMap;
     /// use std::env;
-    /// use typemap::Key;
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl Key for MessageEventCounter {
+    /// impl TypeMapKey for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
@@ -186,7 +185,7 @@ pub struct Client {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<Framework + Send>>>>,
+    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.

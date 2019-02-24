@@ -78,9 +78,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -124,9 +121,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -166,9 +160,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -211,9 +202,6 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -375,7 +363,7 @@ impl Display for Channel {
     /// [`Group::name`]: struct.Group.html#method.name
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
             Channel::Group(ref group) => Display::fmt(&group.read().name(), f),
             Channel::Guild(ref ch) => Display::fmt(&ch.read().id.mention(), f),

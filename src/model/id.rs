@@ -64,7 +64,7 @@ macro_rules! id_u64 {
             }
 
             impl Display for $name {
-                fn fmt(&self, f: &mut Formatter) -> FmtResult {
+                fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
                     Display::fmt(&self.0, f)
                 }
             }

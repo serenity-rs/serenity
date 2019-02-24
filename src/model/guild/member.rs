@@ -216,7 +216,7 @@ impl Member {
     ///
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
-    pub fn display_name(&self) -> Cow<String> {
+    pub fn display_name(&self) -> Cow<'_, String> {
         self.nick
             .as_ref()
             .map(Cow::Borrowed)
@@ -486,7 +486,7 @@ impl Display for Member {
     /// ```
     ///
     // This is in the format of `<@USER_ID>`.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         Display::fmt(&self.user.read().mention(), f)
     }
 }

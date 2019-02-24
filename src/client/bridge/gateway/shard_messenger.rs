@@ -50,9 +50,6 @@ impl ShardMessenger {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
@@ -80,9 +77,6 @@ impl ShardMessenger {
     /// query parameter of `"do"`:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
@@ -133,9 +127,6 @@ impl ShardMessenger {
     /// Setting the current activity to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
@@ -170,9 +161,6 @@ impl ShardMessenger {
     /// online:
     ///
     /// ```rust,ignore
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;
@@ -213,9 +201,6 @@ impl ShardMessenger {
     /// Setting the current online status for the shard to [`DoNotDisturb`].
     ///
     /// ```rust,no_run
-    /// # extern crate parking_lot;
-    /// # extern crate serenity;
-    /// #
     /// # use parking_lot::Mutex;
     /// # use serenity::client::gateway::Shard;
     /// # use std::error::Error;

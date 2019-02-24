@@ -4,47 +4,28 @@ use crate::model::{
         Message,
         Channel,
     },
-    Permissions
+    id::UserId,
+    Permissions,
 };
 use std::{
-    collections::HashMap,
+    collections::{HashMap, HashSet},
     fmt,
     fmt::{Debug, Formatter},
-    sync::Arc
+    sync::Arc,
 };
 use crate::utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
+use super::check::Check;
+#[cfg(feature = "lazy_static")]
+use lazy_static::lazy_static;
 
-type CheckFunction = Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
-                     + Send
-                     + Sync
-                     + 'static;
-
-pub struct Check(pub(crate) Box<CheckFunction>);
-
-impl Check {
-    pub(crate) fn new<F: Send + Sync + 'static>(f: F) -> Self
-        where F: Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool
-    {
-        Check(Box::new(f))
-    }
-}
-
-impl Debug for Check {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
-        f.debug_tuple("Check")
-            .field(&"<fn>")
-            .finish()
-    }
-}
-
-pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, &Args)
-                   -> Result<(), Error>;
+pub type HelpFunction = fn(&mut Context, &Message, &HelpOptions, HashMap<String, Arc<CommandGroup>>, HashSet<UserId>, &Args)
+    -> Result<(), Error>;
 
 pub struct Help(pub HelpFunction, pub Arc<HelpOptions>);
 
 impl Debug for Help {
-    fn fmt(&self, f: &mut Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         f.debug_struct("Help")
             .field("options", &self.1)
             .finish()
@@ -52,17 +33,17 @@ impl Debug for Help {
 }
 
 impl HelpCommand for Help {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions,hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
-        (self.0)(c, m, ho, hm, a)
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, owners: HashSet<UserId>, a: &Args) -> Result<(), Error> {
+        (self.0)(c, m, ho, hm, owners, a)
     }
 }
 
-pub type BeforeHook = Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
-pub type AfterHook = Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
-pub type UnrecognisedCommandHook = Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
-pub type MessageWithoutCommandHook = Fn(&mut Context, &Message) + Send + Sync + 'static;
-pub(crate) type InternalCommand = Arc<Command>;
-pub type PrefixCheck = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
+pub type BeforeHook = dyn Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
+pub type AfterHook = dyn Fn(&mut Context, &Message, &str, Result<(), Error>) + Send + Sync + 'static;
+pub type UnrecognisedCommandHook = dyn Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
+pub type MessageWithoutCommandHook = dyn Fn(&mut Context, &Message) + Send + Sync + 'static;
+pub(crate) type InternalCommand = Arc<dyn Command>;
+pub type PrefixCheck = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 pub enum CommandOrAlias {
     Alias(String),
@@ -70,7 +51,7 @@ pub enum CommandOrAlias {
 }
 
 impl fmt::Debug for CommandOrAlias {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match *self {
             CommandOrAlias::Alias(ref s) => f.debug_tuple("CommandOrAlias::Alias").field(&s).finish(),
             CommandOrAlias::Command(ref arc) => f.debug_tuple("CommandOrAlias::Command").field(&arc.options()).finish(),
@@ -91,7 +72,7 @@ impl<D: fmt::Display> From<D> for Error {
 
 #[derive(Debug)]
 pub struct CommandGroup {
-    pub prefixes: Option<Vec<String>>,
+    pub prefixes: Vec<String>,
     pub commands: HashMap<String, CommandOrAlias>,
     /// Some fields taken from Command
     pub bucket: Option<String>,
@@ -113,7 +94,7 @@ pub struct CommandGroup {
 impl Default for CommandGroup {
     fn default() -> CommandGroup {
         CommandGroup {
-            prefixes: None,
+            prefixes: Vec::new(),
             commands: HashMap::new(),
             bucket: None,
             required_permissions: Permissions::empty(),
@@ -174,8 +155,6 @@ pub struct HelpOptions {
     pub no_help_available_text: String,
     /// How to use a command, `{usage_label}: {command_name} {args}`
     pub usage_label: String,
-    /// Actual sample label, `{usage_sample_label}: {command_name} {args}`
-    pub usage_sample_label: String,
     /// Text labeling ungrouped commands, `{ungrouped_label}: ...`
     pub ungrouped_label: String,
     /// Text labeling the start of the description.
@@ -186,6 +165,8 @@ pub struct HelpOptions {
     pub aliases_label: String,
     /// Text specifying that a command is only usable in a guild.
     pub guild_only_text: String,
+    /// Text labeling a command's names of checks.
+    pub checks_label: String,
     /// Text specifying that a command is only usable in via DM.
     pub dm_only_text: String,
     /// Text specifying that a command can be used via DM and in guilds.
@@ -203,19 +184,25 @@ pub struct HelpOptions {
     /// inside of `CreateHelpCommand`.
     ///
     /// **Note**: Text is only used in direct messages.
-    pub striked_commands_tip_in_dm: Option<String>,
+    pub strikethrough_commands_tip_dm: Option<String>,
     /// Explains reasoning behind strikethrough-commands, see fields requiring `HelpBehaviour` for further information.
     /// If `HelpBehaviour::Strike` is unused, this field will evaluate to `None` during creation
     /// inside of `CreateHelpCommand`.
     ///
     /// **Note**: Text is only used in guilds.
-    pub striked_commands_tip_in_guild: Option<String>,
+    pub strikethrough_commands_tip_guild: Option<String>,
     /// Announcing a group's prefix as in: {group_prefix} {prefix}.
     pub group_prefix: String,
     /// If a user lacks required roles, this will treat how these commands will be displayed.
     pub lacking_role: HelpBehaviour,
     /// If a user lacks permissions, this will treat how these commands will be displayed.
     pub lacking_permissions: HelpBehaviour,
+    /// If a user lacks ownership, this will treat how these commands will be displayed.
+    pub lacking_ownership: HelpBehaviour,
+    /// If a user dispatches a command and a check fails, this will treat how these command will be displayed.
+    /// This behaviour is bypassed if `handle_checks` is set to `CheckEvaluation::Ignore` and otherwise adjusts its
+    /// behaviour based on `handle_checks`.
+    pub failed_check: HelpBehaviour,
     /// If a user is using the help-command in a channel where a command is not available,
     /// this behaviour will be executed.
     pub wrong_channel: HelpBehaviour,
@@ -225,19 +212,21 @@ pub struct HelpOptions {
     pub embed_success_colour: Colour,
     /// If not 0, help will check whether a command is similar to searched named.
     pub max_levenshtein_distance: usize,
+    /// Decides whether help should consider checks.
+    pub handle_checks: bool,
 }
 
 pub trait HelpCommand: Send + Sync + 'static {
-    fn execute(&self, _: &mut Context, _: &Message, _: &HelpOptions, _: HashMap<String, Arc<CommandGroup>>, _: &Args) -> Result<(), Error>;
+    fn execute(&self, _: &mut Context, _: &Message, _: &HelpOptions, _: HashMap<String, Arc<CommandGroup>>, _: HashSet<UserId>, _: &Args) -> Result<(), Error>;
 
     fn options(&self) -> Arc<CommandOptions> {
         Arc::clone(&DEFAULT_OPTIONS)
     }
 }
 
-impl HelpCommand for Arc<HelpCommand> {
-    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, a: &Args) -> Result<(), Error> {
-        (**self).execute(c, m, ho, hm, a)
+impl HelpCommand for Arc<dyn HelpCommand> {
+    fn execute(&self, c: &mut Context, m: &Message, ho: &HelpOptions, hm: HashMap<String, Arc<CommandGroup>>, owners: HashSet<UserId>, a: &Args) -> Result<(), Error> {
+        (**self).execute(c, m, ho, hm, owners, a)
     }
 }
 
@@ -247,11 +236,11 @@ impl Default for HelpOptions {
             suggestion_text: "Did you mean `{}`?".to_string(),
             no_help_available_text: "**Error**: No help available.".to_string(),
             usage_label: "Usage".to_string(),
-            usage_sample_label: "Sample usage".to_string(),
             ungrouped_label: "Ungrouped".to_string(),
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
             description_label: "Description".to_string(),
+            checks_label: "Checks".to_string(),
             guild_only_text: "Only in guilds".to_string(),
             dm_only_text: "Only in DM".to_string(),
             dm_and_guild_text: "In DM and guilds".to_string(),
@@ -260,14 +249,17 @@ impl Default for HelpOptions {
             individual_command_tip: "To get help with an individual command, pass its \
                  name as an argument to this command.".to_string(),
             group_prefix: "Prefix".to_string(),
-            striked_commands_tip_in_dm: Some(String::new()),
-            striked_commands_tip_in_guild: Some(String::new()),
+            strikethrough_commands_tip_dm: Some(String::new()),
+            strikethrough_commands_tip_guild: Some(String::new()),
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
+            lacking_ownership: HelpBehaviour::Hide,
             wrong_channel: HelpBehaviour::Strike,
             embed_error_colour: Colour::DARK_RED,
             embed_success_colour: Colour::ROSEWATER,
             max_levenshtein_distance: 0,
+            failed_check: HelpBehaviour::Strike,
+            handle_checks: true,
         }
     }
 }
@@ -294,7 +286,7 @@ pub trait Command: Send + Sync + 'static {
     fn after(&self, _: &mut Context, _: &Message, _: &Result<(), Error>) { }
 }
 
-impl Command for Arc<Command> {
+impl Command for Arc<dyn Command> {
     fn execute(&self, c: &mut Context, m: &Message, a: Args) -> Result<(), Error> {
         (**self).execute(c, m, a)
     }

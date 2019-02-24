@@ -154,7 +154,7 @@ impl PrivateChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_message<F, M>(&self, http: &Arc<Http>, message_id: M, f: F) -> Result<Message>
-        where F: FnOnce(EditMessage) -> EditMessage, M: Into<MessageId> {
+        where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId> {
         self.id.edit_message(&http, message_id, f)
     }
 
@@ -309,7 +309,7 @@ impl PrivateChannel {
 
 impl Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
-    fn fmt(&self, f: &mut Formatter) -> FmtResult {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         f.write_str(&self.recipient.read().name)
     }
 }

@@ -5,7 +5,7 @@ use crate::model::{
     guild::Member,
 };
 use std::{sync::{Arc, mpsc::Sender}};
-use parking_lot::Mutex;
+use parking_lot::{Mutex, RwLock};
 use super::{
     bridge::gateway::event::ClientEvent,
     event_handler::EventHandler,
@@ -13,6 +13,7 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
+use log::warn;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -22,10 +23,9 @@ use crate::framework::Framework;
 use crate::model::id::GuildId;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
-#[cfg(feature = "cache")]
+#[cfg(any(feature = "cache", feature = "http"))]
 use crate::CacheAndHttp;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
+
 
 macro_rules! update {
     ($cache_and_http:ident, $event:expr) => {
@@ -62,7 +62,7 @@ fn context(
 
 #[cfg(all(feature = "cache", not(feature = "http")))]
 fn context(
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     cache: &Arc<RwLock<Cache>>,
@@ -72,7 +72,7 @@ fn context(
 
 #[cfg(all(not(feature = "cache"), feature = "http"))]
 fn context(
-    data: &Arc<Mutex<ShareMap>>,
+    data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     http: &Arc<Http>,
@@ -98,7 +98,7 @@ pub(crate) enum DispatchEvent {
 #[clippy::too_many_arguments]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
-    framework: &Arc<Mutex<Option<Box<Framework + Send>>>>,
+    framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     data: &Arc<RwLock<ShareMap>>,
     event_handler: &Arc<H>,
     runner_tx: &Sender<InterMessage>,

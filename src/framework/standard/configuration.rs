@@ -9,6 +9,7 @@ use std::{
     sync::Arc,
 };
 use super::command::{Command, InternalCommand, PrefixCheck};
+use super::Delimiter;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -60,7 +61,7 @@ pub struct Configuration {
     #[doc(hidden)] pub owners: HashSet<UserId>,
     #[doc(hidden)] pub prefixes: Vec<String>,
     #[doc(hidden)] pub no_dm_prefix: bool,
-    #[doc(hidden)] pub delimiters: Vec<String>,
+    #[doc(hidden)] pub delimiters: Vec<Delimiter>,
     #[doc(hidden)] pub case_insensitive: bool,
     #[doc(hidden)] pub prefix_only_cmd: Option<InternalCommand>,
 }
@@ -454,7 +455,7 @@ impl Configuration {
 
     /// Sets a single delimiter to be used when splitting the content after a command.
     ///
-    /// **Note**: Defaults to a vector with a single element of `" "`.
+    /// **Note**: Defaults to a vector with a single element of `' '`.
     ///
     /// # Examples
     ///
@@ -472,9 +473,9 @@ impl Configuration {
     /// client.with_framework(StandardFramework::new().configure(|c| c
     ///     .delimiter(", ")));
     /// ```
-    pub fn delimiter(mut self, delimiter: &str) -> Self {
+    pub fn delimiter<T: Into<Delimiter>>(mut self, delimiter: T) -> Self {
         self.delimiters.clear();
-        self.delimiters.push(delimiter.to_string());
+        self.delimiters.push(delimiter.into());
 
         self
     }
@@ -502,10 +503,10 @@ impl Configuration {
     /// ```
     ///
     /// [`delimiter`]: #method.delimiter
-    pub fn delimiters<T: ToString, It: IntoIterator<Item=T>>(mut self, delimiters: It) -> Self {
+    pub fn delimiters<T: Into<Delimiter>, It: IntoIterator<Item=T>>(mut self, delimiters: It) -> Self {
         self.delimiters.clear();
         self.delimiters
-            .extend(delimiters.into_iter().map(|s| s.to_string()));
+            .extend(delimiters.into_iter().map(|s| s.into()));
 
         self
     }
@@ -542,7 +543,7 @@ impl Default for Configuration {
     /// - **blocked_guilds** to an empty HashSet
     /// - **blocked_users** to an empty HashSet
     /// - **case_insensitive** to `false`
-    /// - **delimiters** to `vec![" "]`
+    /// - **delimiters** to `vec![' ']`
     /// - **depth** to `5`
     /// - **disabled_commands** to an empty HashSet
     /// - **dynamic_prefix** to no dynamic prefix check
@@ -560,7 +561,7 @@ impl Default for Configuration {
             blocked_guilds: HashSet::default(),
             blocked_users: HashSet::default(),
             case_insensitive: false,
-            delimiters: vec![" ".to_string()],
+            delimiters: vec![Delimiter::Single(' ')],
             depth: 5,
             disabled_commands: HashSet::default(),
             dynamic_prefix: None,

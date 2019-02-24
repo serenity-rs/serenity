@@ -84,7 +84,6 @@ impl Webhook {
     /// Editing a webhook's name:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -102,8 +101,6 @@ impl Webhook {
     /// Setting a webhook's avatar:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -164,7 +161,6 @@ impl Webhook {
     /// Execute a webhook with message content of `test`:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
@@ -186,7 +182,6 @@ impl Webhook {
     /// username to `serenity`, and sending an embed:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #

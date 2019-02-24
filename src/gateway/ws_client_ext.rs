@@ -4,7 +4,9 @@ use crate::gateway::{CurrentPresence, WsClient};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::model::id::GuildId;
+use serde_json::json;
 use std::env::consts;
+use log::{debug, trace};
 
 pub trait WebSocketGatewayClientExt {
     fn send_chunk_guilds<It>(

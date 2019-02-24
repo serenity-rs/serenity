@@ -6,6 +6,7 @@ use tungstenite::{
     util::NonBlockingResult,
     Message,
 };
+use log::warn;
 
 #[cfg(not(feature = "native_tls"))]
 use std::{
