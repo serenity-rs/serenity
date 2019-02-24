@@ -14,10 +14,10 @@ You may also check your tokens prior to login via the use of
 [`validate_token`].
 
 Once logged in, you may add handlers to your client to dispatch [`Event`]s,
-by implementing the handlers in a trait, such as [`EventHandler::message`]. This will cause your handler to be called
-when a [`Event::MessageCreate`] is received. Each handler is given a
-[`Context`], giving information about the event. See the
-[client's module-level documentation].
+by implementing the handlers in a trait, such as [`EventHandler::message`].
+This will cause your handler to be called when a [`Event::MessageCreate`] is
+received. Each handler is given a [`Context`], giving information about the
+event. See the [client's module-level documentation].
 
 The [`Shard`] is transparently handled by the library, removing
 unnecessary complexity. Sharded connections are automatically handled for
@@ -111,11 +111,11 @@ The following is a full list of features:
 - **builder**: The builders used in conjunction with models' methods.
 - **cache**: The cache will store information about guilds, channels, users, and
 other data, to avoid performing REST requests. If you are low on RAM, do not
-enable this;
-- **client**: A manager for shards and event handlers, abstracting work away
-handling shard events and updating the cache, if enabled.
+enable this.
+- **client**: A manager for shards and event handlers, abstracting away the
+work of handling shard events and updating the cache, if enabled.
 - **framework**: Enables the framework, which is a utility to allow simple
-command parsing, before/after command execution, prefix setting, and more;
+command parsing, before/after command execution, prefix setting, and more.
 - **gateway**: A Shard, used as a higher-level interface for communicating with
 the Discord gateway over a WebSocket client.
 - **http**: Functions providing a wrapper over Discord's REST API at a low
@@ -148,7 +148,7 @@ version = "0.5"
 
 # Dependencies
 
-Serenity requires the following dependencies:
+Serenity requires the following system dependencies:
 
 - openssl
 
