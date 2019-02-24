@@ -55,19 +55,19 @@ impl Game {
     /// Create a command that sets the current game being played:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))] {
     /// # #[macro_use] extern crate serenity;
     /// #
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// use serenity::framework::standard::Args;
     /// use serenity::model::gateway::Game;
     ///
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(game(ctx, _msg, args) {
     ///     let name = args.full();
     ///     ctx.set_game(Game::playing(&name));
     /// });
     /// #
     /// # fn main() {}
-    /// # }
     /// ```
     pub fn playing(name: &str) -> Game {
         Game {
@@ -86,13 +86,14 @@ impl Game {
     /// Create a command that sets the current game and stream:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))] {
     /// # #[macro_use] extern crate serenity;
     /// #
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// use serenity::framework::standard::Args;
     /// use serenity::model::gateway::Game;
     ///
     /// // Assumes command has min_args set to 2.
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(stream(ctx, _msg, args) {
     ///     # let stream_url = String::from("");
     ///     let name = args.full();
@@ -100,7 +101,6 @@ impl Game {
     /// });
     /// #
     /// # fn main() {}
-    /// # }
     /// ```
     pub fn streaming(name: &str, url: &str) -> Game {
         Game {
@@ -119,19 +119,19 @@ impl Game {
     /// Create a command that sets the current game being played:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))] {
     /// # #[macro_use] extern crate serenity;
     /// #
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// use serenity::framework::standard::Args;
     /// use serenity::model::gateway::Game;
     ///
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(listen(ctx, _msg, args) {
     ///     let name = args.full();
     ///     ctx.set_game(Game::listening(&name));
     /// });
     /// #
     /// # fn main() {}
-    /// # }
     /// ```
     pub fn listening(name: &str) -> Game {
         Game {
