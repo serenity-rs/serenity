@@ -74,7 +74,7 @@ use self::bridge::voice::ClientVoiceManager;
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```no_run
-/// # fn main() -> Result<(), Box<std::error::Error>> {
+/// # fn main() {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
 /// use serenity::Client;
@@ -89,10 +89,10 @@ use self::bridge::voice::ClientVoiceManager;
 ///     }
 /// }
 ///
-/// let mut client = Client::new("my token here", Handler)?;
+/// let mut client = Client::new("my token here", Handler).expect("Could not create new client.");
 ///
-/// client.start();
-/// # Ok(()) }
+/// client.start().expect("Could not start client.");
+/// # }
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
@@ -158,15 +158,19 @@ pub struct Client {
     ///         reg(ctx, "MessageUpdate") }
     /// }
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// # fn main() {
+    ///
+    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("Could not find token."), Handler)
+    ///     .expect("Could not create client.");
     ///
     /// {
     ///     let mut data = client.data.lock();
     ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
-    /// client.start()?;
-    /// # Ok(()) }
+    /// client.start().expect("Could not start client.");
+    /// # }
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.
