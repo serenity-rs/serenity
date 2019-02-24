@@ -125,7 +125,6 @@ pub struct Client {
     /// extern crate serenity;
     /// extern crate typemap;
     ///
-    /// # fn try_main() -> Result<(), Box<std::error::Error>> {
     /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
