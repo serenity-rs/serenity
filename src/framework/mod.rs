@@ -11,7 +11,7 @@
 //! condition is met prior to calling a command; this could be a check that the
 //! user who posted a message owns the bot, for example.
 //!
-//! Each command has a given named, and an associated function/closure. For
+//! Each command has a given name, and an associated function/closure. For
 //! example, you might have two commands: `"ping"` and `"weather"`. These each
 //! have an associated function that are called if the framework determines
 //! that a message is of that command.
