@@ -463,6 +463,7 @@ impl GuildChannel {
     /// ```rust,no_run
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
+    /// use serenity::model::channel::Channel;
     /// use serenity::CACHE;
     /// use std::fs::File;
     ///
@@ -470,34 +471,28 @@ impl GuildChannel {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, _: Context, msg: Message) {
-    ///         let channel = match msg.guild_id.to_partial_guild() {
-    ///             Ok(channel) => channel,
-    ///             Err(why) => {
-    ///                 println!("Could not request guild via REST.");
+    ///         if let Ok(Channel::Guild(guild_channel)) = msg.channel_id.to_channel() {
     ///
+    ///             let current_user_id = CACHE.read().user.id;
+    ///             let guild_channel = guild_channel.read();
+    ///             let permissions = guild_channel.permissions_for(current_user_id).unwrap();
+    ///
+    ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
     ///             }
-    ///         };
     ///
-    ///         let current_user_id = CACHE.read().user.id;
-    ///         let permissions =
-    ///             channel.read().permissions_for(current_user_id).unwrap();
+    ///             let file = match File::open("./cat.png") {
+    ///                 Ok(file) => file,
+    ///                 Err(why) => {
+    ///                     println!("Err opening file: {:?}", why);
     ///
-    ///         if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
-    ///             return;
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///             let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
+    ///                 m.content("here's a cat"));
     ///         }
-    ///
-    ///         let file = match File::open("./cat.png") {
-    ///             Ok(file) => file,
-    ///             Err(why) => {
-    ///                 println!("Err opening file: {:?}", why);
-    ///
-    ///                 return;
-    ///             },
-    ///         };
-    ///
-    ///         let _ = msg.channel_id.send_files(vec![(&file, "cat.png")], |m|
-    ///             m.content("here's a cat"));
     ///     }
     /// }
     ///
