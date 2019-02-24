@@ -220,7 +220,8 @@ impl CreateEmbed {
     ///
     /// This timestamp must be in ISO-8601 format. It must also be in UTC format.
     ///
-    /// You can also pass anything that implements `chrono::TimeZone`.
+    /// You can also pass an instance of `chrono::DateTime<Utc>`, 
+    /// which will construct the timestamp string out of it.
     ///
     /// # Examples
     ///
