@@ -463,6 +463,7 @@ impl GuildChannel {
     /// ```rust,no_run
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
+    /// use serenity::CACHE;
     /// use std::fs::File;
     ///
     /// struct Handler;
