@@ -25,7 +25,7 @@ use url::Url;
 use log::{error, debug, info, trace, warn};
 
 #[cfg(not(feature = "native_tls"))]
-use internal::ws_impl::create_rustls_client;
+use crate::internal::ws_impl::create_rustls_client;
 
 #[cfg(feature = "native_tls")]
 use tungstenite::handshake::client::Request;
