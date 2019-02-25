@@ -69,7 +69,14 @@ impl Http {
 
     pub fn new_with_token(token: &str) -> Self {
         Http {
-            client: Client::builder().build().expect("Cannot build Reqwest::Client."),
+            #[cfg(not(feature = "native_tls"))]
+            client: Client::builder()
+                .use_rustls_tls()
+                .build().expect("Cannot build Reqwest::Client."),
+            #[cfg(feature = "native_tls")]
+            client: Client::builder()
+                .use_default_tls()
+                .build().expect("Cannot build Reqwest::Client."),
             token: token.to_string(),
             limiter: Arc::new(Mutex::new(())),
             routes: Arc::new(Mutex::new(HashMap::default())),
