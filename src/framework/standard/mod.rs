@@ -248,15 +248,15 @@ impl StandardFramework {
     ///
     /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
     /// #[command]
-    /// fn ping(_ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say("pong!")?;
+    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "pong!")?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[command]
-    /// fn pong(_ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say("ping!")?;
+    /// fn pong(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "ping!")?;
     ///
     ///     Ok(())
     /// }

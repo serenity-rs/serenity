@@ -171,8 +171,8 @@ impl Configuration {
     /// use serenity::framework::standard::{CommandResult, macros::{group, command}};
     ///
     /// #[command]
-    /// fn ping(_: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say("Pong!")?;
+    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "Pong!")?;
     ///     Ok(())
     /// }
     ///

@@ -17,6 +17,10 @@ log = "~0.4"
 parking_lot = "^0.6"
 serde_json = "^1.0"
 
+[dependencies.audiopus]
+optional = true
+version = "0.1"
+
 [dependencies.command_attr]
 path = "./command_attr"
 optional = true
