@@ -12,11 +12,11 @@ use std::{
     num::ParseIntError
 };
 
-#[cfg(feature = "reqwest")]
+#[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
 use opus::Error as OpusError;
-#[cfg(feature = "tungstenite")]
+#[cfg(feature = "gateway")]
 use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use crate::client::ClientError;
@@ -24,6 +24,8 @@ use crate::client::ClientError;
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
+#[cfg(not(feature = "native_tls"))]
+use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
 use crate::voice::VoiceError;
 
@@ -92,8 +94,11 @@ pub enum Error {
     /// [`http`]: http/index.html
     #[cfg(feature = "http")]
     Http(HttpError),
+    /// An error occuring in rustls
+    #[cfg(not(feature = "native_tls"))]
+    Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
-    #[cfg(feature = "tungstenite")]
+    #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
     /// An error from the `opus` crate.
     #[cfg(feature = "voice")]
@@ -135,7 +140,17 @@ impl From<OpusError> for Error {
     fn from(e: OpusError) -> Error { Error::Opus(e) }
 }
 
-#[cfg(feature = "tungstenite")]
+#[cfg(feature = "voice")]
+impl From<VoiceError> for Error {
+    fn from(e: VoiceError) -> Error { Error::Voice(e) }
+}
+
+#[cfg(not(feature = "native_tls"))]
+impl From<RustlsError> for Error {
+    fn from(e: RustlsError) -> Error { Error::Rustls(e) }
+}
+
+#[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
 }
@@ -180,7 +195,9 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(feature = "tungstenite")]
+            #[cfg(not(feature = "native_tls"))]
+            Error::Rustls(ref inner) => inner.description(),
+            #[cfg(feature = "gateway")]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",

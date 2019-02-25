@@ -36,6 +36,7 @@ optional = true
 version = "^1.0"
 
 [dependencies.reqwest]
+default-features = false
 optional = true
 version = "0.9"
 
@@ -51,6 +52,10 @@ version = "0.2"
 optional = true
 version = "^0.4"
 
+[dependencies.rustls]
+optional = true
+version = "0.14.0"
+
 [dependencies.sodiumoxide]
 default-features = false
 features = ["std"]
@@ -62,6 +67,7 @@ optional = true
 version = "~1.7"
 
 [dependencies.tungstenite]
+default-features = false
 optional = true
 version = "0.6"
 
@@ -77,6 +83,14 @@ version = "^1.0"
 optional = true
 version = "^0.2"
 
+[dependencies.webpki]
+optional = true
+version = "0.18.1"
+
+[dependencies.webpki-roots]
+optional = true
+version = "0.15.0"
+
 [dev-dependencies.matches]
 version = "0.1.6"
 
@@ -90,7 +104,7 @@ default = [
     "model",
     "http",
     "standard_framework",
-    "utils"
+    "utils",
 ]
 builder = ["utils"]
 cache = []
@@ -103,9 +117,19 @@ client = [
 ]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = ["flate2", "http", "tungstenite", "url", "utils"]
-http = ["reqwest", "lazy_static"]
+gateway = [
+    "flate2",
+    "http",
+    "url",
+    "utils",
+    "rustls",
+    "webpki",
+    "webpki-roots",
+    "tungstenite",
+]
+http = ["lazy_static", "reqwest/rustls-tls"]
 model = ["builder", "http"]
+native_tls = ["reqwest/default-tls", "tungstenite/tls"]
 standard_framework = ["framework", "uwl"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "opus", "rand", "sodiumoxide"]
