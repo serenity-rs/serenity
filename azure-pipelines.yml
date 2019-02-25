@@ -1,0 +1,45 @@
+jobs:
+- template: 'azure-template.yml'
+  parameters:
+    name: 'macOS_stable'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: 'stable'
+
+- template: 'azure-template.yml'
+  parameters:
+    name: 'macOS_beta'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: 'beta'
+
+- template: 'azure-template.yml'
+  parameters:
+    name: 'macOS_nightly'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: 'nightly'
+
+- template: 'azure-template.yml'
+  parameters:
+    name: 'Linux_stable'
+    vmImage: 'ubuntu-16.04'
+    toolchain: 'stable'
+
+- template: 'azure-template.yml'
+  parameters:
+    name: 'macOS_stable_no_cache'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: 'stable'
+    features: 'builder client framework gateway model http standard_framework utils'
+
+- template: 'azure-template.yml'
+  parameters:
+    name: 'macOS_no_gateway'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: 'stable'
+    features: 'model http'
+
+- template: 'azure-template-win.yml'
+  parameters:
+    name: 'Windows_default_features'
+    vmImage: 'vs2017-win2016'
+    toolchain: 'stable'
+    features: 'default'
