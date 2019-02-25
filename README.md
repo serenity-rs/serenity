@@ -80,17 +80,7 @@ Add the following to your `Cargo.toml` file:
 serenity = "0.5"
 ```
 
-<<<<<<< HEAD
-and to the top of your `main.rs`:
-
-```rust,ignore
-#[macro_use] extern crate serenity;
-```
-
 Serenity supports a minimum of Rust 1.31.1.
-=======
-Serenity supports a minimum of Rust 1.25.
->>>>>>> Update Code to Rust 2018 (#481)
 
 # Features
 
@@ -192,7 +182,7 @@ Building the `voice`-feature on Windows can be done by following these instructi
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [ci]: https://dev.azure.com/serenity-org/serenity/_build?definitionId=1
-[ci-badge]: https://img.shields.io/azure-devops/build/serenity-org/1ce9579e-03bc-499f-9302-4180a2dfec6f/1/current.svg?style=flat-square
+[ci-badge]: https://img.shields.io/azure-devops/build/serenity-org/1ce9579e-03bc-499f-9302-4180a2dfec6f/1/v0.6.x.svg?style=flat-square
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [crates.io link]: https://crates.io/crates/serenity
 [crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
