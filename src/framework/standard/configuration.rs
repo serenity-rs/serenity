@@ -4,7 +4,7 @@ use crate::http::Http;
 use crate::model::{channel::Message, id::UserId};
 use std::collections::HashSet;
 
-type DynamicPrefixHook = Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
+type DynamicPrefixHook = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 /// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.

@@ -85,7 +85,7 @@ pub struct Command {
 }
 
 impl fmt::Debug for Command {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("Command")
             .field("options", &self.options)
             .finish()
@@ -114,7 +114,7 @@ pub struct HelpCommand {
 }
 
 impl fmt::Debug for HelpCommand {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("HelpCommand")
             .field("fun", &"<function>")
             .field("options", &self.options)
