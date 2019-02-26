@@ -26,10 +26,11 @@
 use log::warn;
 
 use super::structures::Command as InternalCommand;
-use super::{
-    has_correct_permissions, has_correct_roles, macros::help, Args, CommandGroup, CommandOptions,
+use super::{has_correct_roles, macros::help, Args, CommandGroup, CommandOptions,
     CommandResult, HelpBehaviour, HelpOptions, OnlyIn,
 };
+#[cfg(feature = "cache")]
+use super::has_correct_permissions;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 use crate::client::Context;

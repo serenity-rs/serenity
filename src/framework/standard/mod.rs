@@ -14,7 +14,6 @@ pub use self::structures::*;
 
 use self::parse::*;
 use super::Framework;
-use crate::cache::Cache;
 use crate::client::Context;
 use crate::internal::RwLockExt;
 use crate::model::{
@@ -25,6 +24,9 @@ use crate::model::{
 use parking_lot::RwLock;
 use std::sync::Arc;
 use threadpool::ThreadPool;
+
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
