@@ -36,7 +36,7 @@ pub fn build_resume(info: &ConnectionInfo) -> Value {
 }
 
 #[inline]
-pub fn build_select_protocol(address: ::std::borrow::Cow<str>, port: u16) -> Value {
+pub fn build_select_protocol(address: ::std::borrow::Cow<'_, str>, port: u16) -> Value {
     json!({
         "op": VoiceOpCode::SelectProtocol.num(),
         "d": {
