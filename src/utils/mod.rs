@@ -815,6 +815,9 @@ pub fn content_safe(cache: &Arc<RwLock<Cache>>, s: &str, options: &ContentSafeOp
 
 #[cfg(test)]
 mod test {
+    #[cfg(feature = "cache")]
+    use crate::cache::Cache;
+
     use super::*;
 
     #[test]
@@ -853,6 +856,7 @@ mod test {
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
     }
 
+    #[cfg(feature = "cache")]
     #[test]
     fn test_content_safe() {
         use crate::model::{
