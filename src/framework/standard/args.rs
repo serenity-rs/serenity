@@ -21,7 +21,7 @@ impl<E> From<E> for Error<E> {
 }
 
 impl<E: fmt::Display> fmt::Display for Error<E> {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         use self::Error::*;
 
         match *self {
@@ -637,7 +637,7 @@ impl Args {
     /// [`trimmed`]: struct.Iter.html#method.trimmed
     /// [`quoted`]: struct.Iter.html#method.quoted
     #[inline]
-    pub fn iter<T: FromStr>(&mut self) -> Iter<T> {
+    pub fn iter<'a, T: FromStr>(&'a mut self) -> Iter<'a, T> {
         Iter {
             args: self,
             state: State::None,

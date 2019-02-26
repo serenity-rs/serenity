@@ -100,7 +100,7 @@ impl From<IoError> for RustlsError {
 
 #[cfg(not(feature = "native_tls"))]
 impl Display for RustlsError {
-    fn fmt(&self, f: &mut Formatter) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
 }
 
 #[cfg(not(feature = "native_tls"))]
