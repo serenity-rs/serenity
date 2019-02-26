@@ -288,7 +288,7 @@ impl Connection {
     #[allow(clippy::unused_variables)]
     pub fn cycle(&mut self,
                  sources: &mut Vec<LockedAudio>,
-                 receiver: &mut Option<Box<AudioReceiver>>,
+                 receiver: &mut Option<Box<dyn AudioReceiver>>,
                  audio_timer: &mut Timer,
                  bitrate: Bitrate)
                  -> Result<()> {

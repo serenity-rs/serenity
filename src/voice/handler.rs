@@ -225,7 +225,7 @@ impl Handler {
     /// can pass in just a boxed receiver, and do not need to specify `Some`.
     ///
     /// Pass `None` to drop the current receiver, if one exists.
-    pub fn listen(&mut self, receiver: Option<Box<AudioReceiver>>) {
+    pub fn listen(&mut self, receiver: Option<Box<dyn AudioReceiver>>) {
         self.send(VoiceStatus::SetReceiver(receiver))
     }
 
@@ -252,12 +252,12 @@ impl Handler {
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play(&mut self, source: Box<AudioSource>) {
+    pub fn play(&mut self, source: Box<dyn AudioSource>) {
         self.play_returning(source);
     }
 
     /// Plays audio from a source, returning the locked audio source.
-    pub fn play_returning(&mut self, source: Box<AudioSource>) -> LockedAudio {
+    pub fn play_returning(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
         let player = Arc::new(Mutex::new(Audio::new(source)));
         self.send(VoiceStatus::AddSender(player.clone()));
 
@@ -271,7 +271,7 @@ impl Handler {
     ///
     /// [`play`]: #method.play
     /// [`play_returning`]: #method.play_returning
-    pub fn play_only(&mut self, source: Box<AudioSource>) -> LockedAudio {
+    pub fn play_only(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
         let player = Arc::new(Mutex::new(Audio::new(source)));
         self.send(VoiceStatus::SetSender(Some(player.clone())));
 

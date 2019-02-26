@@ -92,7 +92,7 @@ pub struct Audio {
     /// Underlying data access object.
     ///
     /// *Calling code is not expected to use this.*
-    pub source: Box<AudioSource>,
+    pub source: Box<dyn AudioSource>,
 
     /// The current position for playback.
     ///
@@ -102,7 +102,7 @@ pub struct Audio {
 }
 
 impl Audio {
-    pub fn new(source: Box<AudioSource>) -> Self {
+    pub fn new(source: Box<dyn AudioSource>) -> Self {
         Self {
             playing: true,
             volume: 1.0,

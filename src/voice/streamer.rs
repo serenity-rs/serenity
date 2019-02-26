@@ -124,11 +124,11 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.
-pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<AudioSource>> {
+pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Box<dyn AudioSource>> {
     _ffmpeg(path.as_ref())
 }
 
-fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
+fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
     let is_stereo = is_stereo(path).unwrap_or(false);
     let stereo_val = if is_stereo { "2" } else { "1" };
@@ -175,11 +175,11 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<AudioSource>> {
 pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,
     args: &[&str],
-) -> Result<Box<AudioSource>> {
+) -> Result<Box<dyn AudioSource>> {
     _ffmpeg_optioned(path.as_ref(), args)
 }
 
-fn _ffmpeg_optioned(path: &OsStr, args: &[&str]) -> Result<Box<AudioSource>> {
+fn _ffmpeg_optioned(path: &OsStr, args: &[&str]) -> Result<Box<dyn AudioSource>> {
     let is_stereo = is_stereo(path).unwrap_or(false);
 
     let command = Command::new("ffmpeg")
@@ -196,11 +196,11 @@ fn _ffmpeg_optioned(path: &OsStr, args: &[&str]) -> Result<Box<AudioSource>> {
 
 /// Creates a streamed audio source from a DCA file.
 /// Currently only accepts the DCA1 format.
-pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<AudioSource>, DcaError> {
+pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<dyn AudioSource>, DcaError> {
     _dca(path.as_ref())
 }
 
-fn _dca(path: &OsStr) -> StdResult<Box<AudioSource>, DcaError> {
+fn _dca(path: &OsStr) -> StdResult<Box<dyn AudioSource>, DcaError> {
     let file = File::open(path).map_err(DcaError::IoError)?;
 
     let mut reader = BufReader::new(file);
@@ -245,7 +245,7 @@ fn _dca(path: &OsStr) -> StdResult<Box<AudioSource>, DcaError> {
 /// If you want to decode a `.opus` file, use [`ffmpeg`]
 ///
 /// [`ffmpeg`]: fn.ffmpeg.html
-pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
+pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader,
@@ -260,7 +260,7 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSo
 }
 
 /// Creates a PCM audio source.
-pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSource> {
+pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader,
@@ -270,7 +270,7 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<AudioSou
 }
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
-pub fn ytdl(uri: &str) -> Result<Box<AudioSource>> {
+pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
     let args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
