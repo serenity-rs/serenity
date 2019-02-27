@@ -271,6 +271,7 @@ impl CreateEmbed {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
+    /// #   #[cfg(feature = "cache")]
     ///     fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
     ///         let cache = context.cache.read();
     ///

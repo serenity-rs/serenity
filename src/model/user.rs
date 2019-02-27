@@ -54,6 +54,8 @@ impl CurrentUser {
     /// Print out the current user's avatar url if one is set:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -67,6 +69,10 @@ impl CurrentUser {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
     ///     None => println!("{} does not have an avatar set.", user.name)
     /// }
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     #[inline]
     pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
@@ -88,9 +94,15 @@ impl CurrentUser {
     /// Change the avatar:
     ///
     /// ```rust,ignore
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
     ///
     /// context.cache.write().user.edit(|p| p.avatar(Some(&avatar)));
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     ///
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
@@ -135,6 +147,8 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -150,6 +164,10 @@ impl CurrentUser {
     ///         println!("{}: {}", index, guild.name);
     ///     }
     /// }
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     pub fn guilds(&self, http: &Http) -> Result<Vec<GuildInfo>> {
      http.get_guilds(&GuildPagination::After(GuildId(1)), 100)
@@ -166,6 +184,8 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -188,11 +208,17 @@ impl CurrentUser {
     ///
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
     ///                  client_id=249608697955745802&scope=bot");
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -215,6 +241,10 @@ impl CurrentUser {
     /// assert_eq!(url,
     /// "https://discordapp.
     /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     ///
     /// # Errors
@@ -252,6 +282,8 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -265,6 +297,10 @@ impl CurrentUser {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
     ///     None => println!("Could not get static avatar for {}.", user.name)
     /// }
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     #[inline]
     pub fn static_avatar_url(&self) -> Option<String> {
@@ -278,6 +314,8 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
@@ -286,6 +324,10 @@ impl CurrentUser {
     /// # let cache = cache.read();
     /// // assuming the cache has been unlocked
     /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() {}
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
@@ -439,6 +481,7 @@ impl User {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
+    /// #   #[cfg(feature = "cache")]
     ///     fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
     ///
@@ -704,6 +747,7 @@ impl User {
     ///
     /// // start a new thread to periodically refresh the special users' data
     /// // every 12 hours
+    /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
     /// # let context = context.clone();
     ///

@@ -21,6 +21,7 @@ use crate::utils::VecMap;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
+/// #   #[cfg(feature = "cache")]
 ///     fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
 ///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
@@ -86,6 +87,7 @@ impl CreateInvite {
     /// # use serenity::{command, model::id::ChannelId};
     /// # use std::{error::Error, sync::Arc};
     /// #
+    /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -113,6 +115,7 @@ impl CreateInvite {
     /// ```rust,no_run
     /// # use serenity::{command, model::id::ChannelId};
     /// #
+    /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -139,6 +142,7 @@ impl CreateInvite {
     /// # use serenity::{command, model::id::ChannelId};
     /// # use std::error::Error;
     /// #
+    /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -164,6 +168,7 @@ impl CreateInvite {
     /// ```rust,no_run
     /// # use serenity::{command, Error, model::id::ChannelId};
     /// #
+    /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
