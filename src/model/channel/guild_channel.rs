@@ -163,11 +163,11 @@ impl GuildChannel {
     /// # use std::error::Error;
     /// #
     /// # #[cfg(feature = "cache")]
+    /// # fn main() -> Result<(), Box<Error>> {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
     /// #     let http = Arc::new(Http::default());
     /// #     let cache = Arc::new(RwLock::new(Cache::default()));
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
@@ -206,6 +206,7 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # use std::error::Error;
     /// #
+    /// # #[cfg(feature = "cache")]
     /// # fn main() -> Result<(), Box<Error>> {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;

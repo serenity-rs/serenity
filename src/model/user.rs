@@ -682,7 +682,7 @@ impl User {
     /// out-of-sync:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// struct Handler;
@@ -703,6 +703,8 @@ impl User {
     /// // every 12 hours
     /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
+    /// # use serenity::cache::Cache;
+    /// #
     /// # let context = context.clone();
     ///
     /// let handle = thread::spawn(move || {
