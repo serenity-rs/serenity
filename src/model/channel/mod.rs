@@ -78,12 +78,12 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "model", feature = "cache"))]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
     /// #     let cache = Arc::new(RwLock::new(Cache::default()));
     /// #     let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
@@ -100,7 +100,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(not(feature = "model"))]
+    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn group(self) -> Option<Arc<RwLock<Group>>> {
@@ -121,12 +121,12 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "model", feature = "cache"))]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
     /// #   let cache = Arc::new(RwLock::new(Cache::default()));
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
@@ -139,7 +139,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(not(feature = "model"))]
+    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
@@ -160,12 +160,12 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "model", feature = "cache"))]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
     /// #   let cache = Arc::new(RwLock::new(Cache::default()));
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
@@ -181,7 +181,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(not(feature = "model"))]
+    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
@@ -202,12 +202,12 @@ impl Channel {
     /// Basic usage:
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "model", feature = "cache"))]
+    /// # fn main() {
     /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
     /// #   let cache = Arc::new(RwLock::new(Cache::default()));
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
@@ -220,7 +220,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(not(feature = "model"))]
+    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {

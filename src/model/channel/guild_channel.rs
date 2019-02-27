@@ -160,9 +160,12 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # #[cfg(feature = "cache")]
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
-    /// # use std::{error::Error, sync::Arc};
+    /// # use std::sync::Arc;
     /// #
     /// # fn main() -> Result<(), Box<Error>> {
     /// #     let http = Arc::new(Http::default());
@@ -190,6 +193,9 @@ impl GuildChannel {
     /// channel.read().create_permission(&http, &overwrite)?;
     /// # Ok(())
     /// # }
+    /// #
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() -> Result<(), Box<Error>> { Ok(()) }
     /// ```
     ///
     /// Creating a permission overwrite for a role by specifying the
@@ -198,11 +204,13 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
+    /// # use std::error::Error;
+    /// #
+    /// # fn main() -> Result<(), Box<Error>> {
     /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
-    /// # use std::{error::Error, sync::Arc};
+    /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
     /// #   let http = Arc::new(Http::default());
     /// #   let cache = Arc::new(RwLock::new(Cache::default()));
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
@@ -230,9 +238,8 @@ impl GuildChannel {
     /// #     Ok(())
     /// # }
     /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
+    /// # #[cfg(not(feature = "cache"))]
+    /// # fn main() -> Result<(), Box<Error>> { Ok(()) }
     /// ```
     ///
     /// [`Channel`]: enum.Channel.html

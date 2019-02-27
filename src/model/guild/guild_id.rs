@@ -629,7 +629,7 @@ impl GuildId {
     /// using 17 shards:
     ///
     /// ```rust
-    /// use serenity::model::GuildId;
+    /// use serenity::model::id::GuildId;
     /// use serenity::utils;
     ///
     /// let guild_id = GuildId(81384788765712384);

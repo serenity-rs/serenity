@@ -393,13 +393,13 @@ impl StandardFramework {
     /// # struct Handler;
     /// #
     /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler);
+    /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// use serenity::framework::StandardFramework;
     ///
     /// client.with_framework(StandardFramework::new()
     ///     .complex_bucket("basic", 2, 10, 3, |_, channel_id, user_id| {
-    ///         Our bucket is somewhat strict. It can only apply in the specific channel and by the specific user.
+    ///         // Our bucket is somewhat strict. It can only apply in the specific channel and by the specific user.
     ///         channel_id == 456 && user_id == 789
     ///     })
     ///     .command("ping", |c| c
