@@ -1544,13 +1544,14 @@ impl Guild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # fn main() {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    /// #   #[cfg(feature = "cache")]
     ///     fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached(&ctx.cache) {
     ///             if let Some(role) = arc.read().role_by_name("role_name") {
@@ -1563,6 +1564,10 @@ impl Guild {
     /// let mut client = Client::new("token", Handler).unwrap();
     ///
     /// client.start().unwrap();
+    /// # }
+    /// #
+    /// # #[cfg(not(all(feature = "cache", feature = "client")))]
+    /// # fn main() {}
     /// ```
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)

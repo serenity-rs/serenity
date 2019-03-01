@@ -140,7 +140,7 @@ use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
 #[cfg(feature = "cache")]
-use std::time::{Duration};
+use std::time::Duration;
 #[cfg(any(feature = "client", feature = "http"))]
 use std::sync::Arc;
 #[cfg(all(feature = "client", feature = "http"))]

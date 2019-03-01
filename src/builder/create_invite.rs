@@ -13,13 +13,14 @@ use crate::utils::VecMap;
 /// Create an invite with a max age of 3600 seconds and 10 max uses:
 ///
 /// ```rust,no_run
+/// # #[cfg(all(feature = "cache", feature = "client"))]
+/// # fn main() {
 /// # use serenity::prelude::*;
 /// # use serenity::model::prelude::*;
 ///
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-/// #   #[cfg(feature = "cache")]
 ///     fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
 ///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
@@ -61,6 +62,10 @@ use crate::utils::VecMap;
 /// let mut client = Client::new("token", Handler).unwrap();
 ///
 /// client.start().unwrap();
+/// # }
+/// #
+/// # #[cfg(not(all(feature = "cache", feature = "client")))]
+/// # fn main() {}
 /// ```
 ///
 /// [`GuildChannel::create_invite`]: ../model/channel/struct.GuildChannel.html#method.create_invite
@@ -80,10 +85,12 @@ impl CreateInvite {
     /// Create an invite with a max age of `3600` seconds, or 1 hour:
     ///
     /// ```rust,no_run
-    /// # use serenity::{command, model::id::ChannelId};
-    /// # use std::{error::Error, sync::Arc};
+    /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "cache")]
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::command;
+    /// #
+    /// # #[cfg(all(feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -109,9 +116,12 @@ impl CreateInvite {
     /// Create an invite with a max use limit of `5`:
     ///
     /// ```rust,no_run
-    /// # use serenity::{command, model::id::ChannelId};
+    /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "cache")]
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::command;
+    /// #
+    /// # #[cfg(all(feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -135,10 +145,12 @@ impl CreateInvite {
     /// Create an invite which is temporary:
     ///
     /// ```rust,no_run
-    /// # use serenity::{command, model::id::ChannelId};
-    /// # use std::error::Error;
+    /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "cache")]
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::command;
+    /// #
+    /// # #[cfg(all(feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -162,9 +174,12 @@ impl CreateInvite {
     /// Create an invite which is unique:
     ///
     /// ```rust,no_run
-    /// # use serenity::{command, Error, model::id::ChannelId};
+    /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(feature = "cache")]
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::command;
+    /// #
+    /// # #[cfg(all(feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();

@@ -343,8 +343,12 @@ impl From<char> for ReactionType {
     /// Reacting to a message with an apple:
     ///
     /// ```rust,no_run
-    /// # use serenity::{command, model::id::ChannelId};
+    /// # use serenity::model::id::ChannelId;
     /// #
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::command;
+    /// #
+    /// # #[cfg(all(feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #   let message = ChannelId(0).message(&context.http, 0)?;
     /// #
