@@ -90,7 +90,7 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::command;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -121,7 +121,7 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::command;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -150,7 +150,7 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::command;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
@@ -179,7 +179,7 @@ impl CreateInvite {
     /// # #[cfg(feature = "framework")]
     /// # use serenity::command;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
     /// # command!(example(context) {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
