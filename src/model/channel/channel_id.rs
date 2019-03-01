@@ -332,7 +332,7 @@ impl ChannelId {
     /// owning the required permissions the HTTP-request will be issued.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     #[inline]
     pub fn to_channel(self, context: &Context) -> Result<Channel> {
         #[cfg(feature = "cache")]
@@ -410,7 +410,7 @@ impl ChannelId {
     }
 
     /// Returns the name of whatever channel this id holds.
-    #[cfg(feature = "model")]
+    #[cfg(all(feature = "model", feature = "client"))]
     pub fn name(&self, context: &Context) -> Option<String> {
         use self::Channel::*;
 

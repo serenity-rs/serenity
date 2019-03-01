@@ -106,6 +106,7 @@ impl CurrentUser {
     /// ```
     ///
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
+    #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, http: &Arc<Http>, f: F) -> Result<()>
         where F: FnOnce(EditProfile) -> EditProfile {
         let mut map = VecMap::new();
@@ -169,8 +170,9 @@ impl CurrentUser {
     /// # #[cfg(not(feature = "cache"))]
     /// # fn main() {}
     /// ```
+    #[cfg(feature = "http")]
     pub fn guilds(&self, http: &Http) -> Result<Vec<GuildInfo>> {
-     http.get_guilds(&GuildPagination::After(GuildId(1)), 100)
+        http.get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -257,6 +259,7 @@ impl CurrentUser {
     ///
     /// [`Error::Format`]: ../../enum.Error.html#variant.Format
     /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
+    #[cfg(feature = "http")]
     pub fn invite_url(&self, http: &Arc<Http>, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
         let client_id = http.get_current_application_info().map(|v| v.id)?;
@@ -450,6 +453,7 @@ impl User {
     ///
     /// [current user]: struct.CurrentUser.html
     #[inline]
+    #[cfg(feature = "http")]
     pub fn create_dm_channel(&self, http: &Http) -> Result<PrivateChannel> { self.id.create_dm_channel(&http) }
 
     /// Retrieves the time that this user was created at.
@@ -542,7 +546,7 @@ impl User {
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(clippy::let_and_return)]
-    #[cfg(all(feature = "builder", feature = "http"))]
+    #[cfg(all(feature = "builder", feature = "client"))]
     pub fn direct_message<F>(&self, context: &Context, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         if self.bot {
@@ -603,7 +607,7 @@ impl User {
     ///
     /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
     /// [direct_message]: #method.direct_message
-    #[cfg(feature = "builder")]
+    #[cfg(all(feature = "builder", feature = "client"))]
     #[inline]
     pub fn dm<F>(&self, context: &Context, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
@@ -645,11 +649,13 @@ impl User {
     /// [`Role`]: ../guild/struct.Role.html
     /// [`Cache`]: ../../cache/struct.Cache.html
     // no-cache would warn on guild_id.
+    #[cfg(feature = "client")]
     pub fn has_role<G, R>(&self, context: &Context, guild: G, role: R) -> bool
         where G: Into<GuildContainer>, R: Into<RoleId> {
         self._has_role(&context, guild.into(), role.into())
     }
 
+    #[cfg(feature = "client")]
     fn _has_role(&self, context: &Context, guild: GuildContainer, role: RoleId) -> bool {
         match guild {
             GuildContainer::Guild(guild) => guild.roles.contains_key(&role),
@@ -732,6 +738,7 @@ impl User {
     /// # });
     /// println!("{:?}", client.start());
     /// ```
+    #[cfg(feature = "client")]
     pub fn refresh(&mut self, context: &Context) -> Result<()> {
         self.id.to_user(&context).map(|replacement| {
             mem::replace(self, replacement);
@@ -789,11 +796,13 @@ impl User {
     ///
     /// If none is used, it returns `None`.
     #[inline]
+    #[cfg(feature = "client")]
     pub fn nick_in<G>(&self, context: &Context, guild_id: G) -> Option<String>
     where G: Into<GuildId> {
         self._nick_in(&context, guild_id.into())
     }
 
+    #[cfg(feature = "client")]
     fn _nick_in(&self, context: &Context, guild_id: GuildId) -> Option<String> {
         #[cfg(feature = "cache")]
         {
@@ -823,6 +832,7 @@ impl UserId {
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: ../user/struct.CurrentUser.html
+    #[cfg(feature = "http")]
     pub fn create_dm_channel(&self, http: &Http) -> Result<PrivateChannel> {
         let map = json!({
             "recipient_id": self.0,
@@ -845,7 +855,7 @@ impl UserId {
     /// REST API will be used only.
     ///
     /// [`User`]: ../user/struct.User.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     #[inline]
     pub fn to_user(self, context: &Context) -> Result<User> {
         #[cfg(feature = "cache")]

@@ -80,13 +80,13 @@ impl Invite {
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
     /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn create<C, F>(context: &Context, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         Self::_create(&context, channel_id.into(), f)
     }
 
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     fn _create<F>(context: &Context, channel_id: ChannelId, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
@@ -115,7 +115,7 @@ impl Invite {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
@@ -302,7 +302,7 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {

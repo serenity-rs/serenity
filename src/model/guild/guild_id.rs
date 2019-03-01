@@ -495,13 +495,13 @@ impl GuildId {
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: ../guild/struct.Member.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     #[inline]
     pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
         self._member(&context, user_id.into())
     }
 
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     fn _member(&self, context: &Context, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {

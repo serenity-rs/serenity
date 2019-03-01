@@ -357,6 +357,7 @@ impl PartialGuild {
     ///
     /// [`Guild`]: struct.Guild.html
     /// [`Member`]: struct.Member.html
+    #[cfg(feature = "client")]
     pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
         self.id.member(&context, user_id)
     }
@@ -407,7 +408,7 @@ impl PartialGuild {
     /// total, consider using [`utils::shard_id`].
     ///
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
-    #[cfg(all(feature = "cache", feature = "utils"))]
+    #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
     #[inline]
     pub fn shard_id(&self, context: &Context) -> u64 { self.id.shard_id(&context.cache) }
 

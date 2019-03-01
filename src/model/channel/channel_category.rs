@@ -64,8 +64,8 @@ impl ChannelCategory {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
-    #[cfg(feature = "http")]
     #[inline]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -90,7 +90,7 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(|c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "http"))]
+    #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]

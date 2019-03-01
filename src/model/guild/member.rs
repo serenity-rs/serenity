@@ -319,6 +319,7 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    #[cfg(feature = "client")]
     pub fn kick(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
