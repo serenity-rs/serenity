@@ -688,6 +688,7 @@ impl User {
     /// Refreshes the information about the user.
     ///
     /// Replaces the instance with the data retrieved over the REST API.
+    #[cfg(feature = "client")]
     pub fn refresh(&mut self, context: &Context) -> Result<()> {
         self.id.to_user(&context).map(|replacement| {
             mem::replace(self, replacement);
