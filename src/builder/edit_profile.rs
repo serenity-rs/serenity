@@ -20,7 +20,8 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")] {
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -39,12 +40,15 @@ impl EditProfile {
     ///             profile.avatar(Some(&base64))
     ///         });
     ///    # }
-    /// }
+    /// # }
     /// #
     /// # let mut client = Client::new("token", Handler).unwrap();
     /// #
     /// # client.start().unwrap();
     /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() {}
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html

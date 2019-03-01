@@ -232,7 +232,8 @@ impl CreateEmbed {
     /// Passing a string timestamp:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")] {
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// use serenity::prelude::*;
     /// use serenity::model::channel::Message;
     ///
@@ -256,6 +257,9 @@ impl CreateEmbed {
     ///
     /// client.start().unwrap();
     /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() {}
     /// ```
     ///
     /// Creating a join-log:
@@ -263,7 +267,8 @@ impl CreateEmbed {
     /// Note: this example isn't efficient and is for demonstrative purposes.
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")] {
+    /// # #[cfg(all(feature = "cache", feature = "client"))]
+    /// # fn main() {
     /// use serenity::prelude::*;
     /// use serenity::model::guild::Member;
     /// use serenity::model::id::GuildId;
@@ -271,7 +276,6 @@ impl CreateEmbed {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {
-    /// #   #[cfg(feature = "cache")]
     ///     fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
     ///         let cache = context.cache.read();
     ///
@@ -309,6 +313,9 @@ impl CreateEmbed {
     ///
     /// client.start().unwrap();
     /// # }
+    /// #
+    /// # #[cfg(not(all(feature = "cache", feature = "client")))]
+    /// # fn main() {}
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {

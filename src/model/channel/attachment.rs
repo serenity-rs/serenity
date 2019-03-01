@@ -43,7 +43,8 @@ impl Attachment {
     /// Download all of the attachments associated with a [`Message`]:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")] {
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     /// use std::env;
@@ -95,6 +96,9 @@ impl Attachment {
     ///
     /// client.start().unwrap();
     /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() {}
     /// ```
     ///
     /// # Errors

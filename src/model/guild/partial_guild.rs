@@ -494,7 +494,8 @@ impl PartialGuild {
     /// Obtain a reference to a [`Role`] by its name.
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature="client")] {
+    /// # #[cfg(feature = "client")]
+    /// # fn main() {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
@@ -515,6 +516,9 @@ impl PartialGuild {
     ///
     /// client.start().unwrap();
     /// # }
+    /// #
+    /// # #[cfg(not(feature = "client"))]
+    /// # fn main() {}
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html

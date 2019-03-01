@@ -71,15 +71,14 @@ impl Activity {
     /// Create a command that sets the current activity:
     ///
     /// ```rust,no_run
-    /// # #[macro_use] extern crate serenity;
-    /// #
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// # #[cfg(feature = "framework")]
     /// use serenity::framework::standard::Args;
-    /// use serenity::model::gateway::Activity;
+    /// # #[cfg(feature = "framework")]
     /// use serenity::command;
+    /// use serenity::model::gateway::Activity;
     ///
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
-    /// command!(game(ctx, _msg, args) {
+    /// # #[cfg(feature = "framework")]
+    /// command!(activity(ctx, _msg, args) {
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::playing(&name));
     /// });
@@ -113,12 +112,13 @@ impl Activity {
     /// Create a command that sets the current streaming status:
     ///
     /// ```rust,no_run
-    /// # #[macro_use] extern crate serenity;
-    /// #
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// # #[cfg(feature = "framework")]
     /// use serenity::framework::standard::Args;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::command;
     /// use serenity::model::gateway::Activity;
     ///
+    /// # #[cfg(feature = "framework")]
     /// // Assumes command has min_args set to 2.
     /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
     /// command!(stream(ctx, _msg, args) {
@@ -155,13 +155,13 @@ impl Activity {
     /// Create a command that sets the current listening status:
     ///
     /// ```rust,no_run
-    /// # #[macro_use] extern crate serenity;
-    /// #
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// # #[cfg(feature = "framework")]
     /// use serenity::framework::standard::Args;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::command;
     /// use serenity::model::gateway::Activity;
     ///
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// # #[cfg(feature = "framework")]
     /// command!(listen(ctx, _msg, args) {
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::listening(&name));
