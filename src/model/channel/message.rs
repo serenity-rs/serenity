@@ -147,7 +147,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -176,7 +176,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete_reactions(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -222,7 +222,7 @@ impl Message {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(&mut EditMessage) -> &mut EditMessage {
         #[cfg(feature = "cache")]
@@ -406,6 +406,7 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES.html
+    #[cfg(feature = "client")]
     pub fn pin(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -437,11 +438,12 @@ impl Message {
     /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     /// [permissions]: ../permissions/index.html
     #[inline]
+    #[cfg(feature = "client")]
     pub fn react<R: Into<ReactionType>>(&self, context: &Context, reaction_type: R) -> Result<()> {
         self._react(&context, &reaction_type.into())
     }
 
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     fn _react(&self, context: &Context, reaction_type: &ReactionType) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -479,7 +481,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn reply(&self, context: &Context, content: &str) -> Result<Message> {
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
@@ -539,7 +541,7 @@ impl Message {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn unpin(&self, context: &Context) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -560,6 +562,7 @@ impl Message {
     /// **Note**:
     /// If message was sent in a private channel, then the function will return
     /// `None`.
+    #[cfg(feature = "client")]
     pub fn author_nick(&self, context: &Context) -> Option<String> {
         self.guild_id.as_ref().and_then(|guild_id| self.author.nick_in(&context, *guild_id))
     }

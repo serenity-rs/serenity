@@ -235,13 +235,13 @@ impl Guild {
     /// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     #[inline]
     pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, context: &Context, user: U, options: &BO) -> Result<()> {
         self._ban(&context, user.into(), options)
     }
 
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     fn _ban<BO: BanOptions>(&self, context: &Context, user: UserId, options: &BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -269,7 +269,7 @@ impl Guild {
     /// [`Ban`]: struct.Ban.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn bans(&self, context: &Context) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
@@ -361,7 +361,7 @@ impl Guild {
     /// [`Channel`]: ../channel/enum.Channel.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn create_channel<C>(&self, context: &Context, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
         #[cfg(feature = "cache")]
@@ -435,7 +435,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn create_role<F>(&self, context: &Context, f: F) -> Result<Role>
         where F: FnOnce(&mut EditRole) -> &mut EditRole {
         #[cfg(feature = "cache")]
@@ -461,7 +461,7 @@ impl Guild {
     /// if the current user is not the guild owner.
     ///
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
@@ -542,7 +542,7 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(&mut EditGuild) -> &mut EditGuild {
         #[cfg(feature = "cache")]
@@ -626,7 +626,7 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn edit_nickname(&self, context: &Context, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -786,7 +786,7 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn invites(&self, context: &Context) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
@@ -824,6 +824,7 @@ impl Guild {
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: struct.Member.html
     #[inline]
+    #[cfg(feature = "client")]
     pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
         self.id.member(&context, user_id)
     }
@@ -1377,6 +1378,7 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    #[cfg(feature = "client")]
     pub fn prune_count(&self, context: &Context, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
@@ -1472,7 +1474,7 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn start_prune(&self, context: &Context, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
@@ -1498,7 +1500,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn unban<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<()> {
         #[cfg(feature = "cache")]
         {

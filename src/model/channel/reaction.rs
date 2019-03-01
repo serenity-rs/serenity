@@ -52,6 +52,7 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
+    #[cfg(feature = "client")]
     pub fn channel(&self, context: &Context) -> Result<Channel> {
         self.channel_id.to_channel(&context)
     }
@@ -71,7 +72,7 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<()> {
         let user_id = feature_cache! {
             {
@@ -126,6 +127,7 @@ impl Reaction {
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
     #[inline]
+    #[cfg(feature = "client")]
     pub fn user(&self, context: &Context) -> Result<User> {
         self.user_id.to_user(&context)
     }

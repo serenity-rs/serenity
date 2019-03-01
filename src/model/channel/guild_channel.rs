@@ -28,6 +28,8 @@ use std::fmt::{
 };
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils::{self as serenity_utils};
+#[cfg(all(feature = "model", feature = "builder"))]
+use crate::builder::EditChannel;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -124,7 +126,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
-    #[cfg(all(feature = "utils", feature = "http"))]
+    #[cfg(all(feature = "utils", feature = "client"))]
     pub fn create_invite<F>(&self, context: &Context, f: F) -> Result<RichInvite>
         where F: FnOnce(&mut CreateInvite) -> &mut CreateInvite {
         #[cfg(feature = "cache")]
@@ -265,7 +267,7 @@ impl GuildChannel {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn delete(&self, context: &Context) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
@@ -344,7 +346,7 @@ impl GuildChannel {
     /// ```rust,ignore
     /// channel.edit(|c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(all(feature = "utils", featue = "http"))]
+    #[cfg(all(feature = "utils", feature = "client", feature = "builder"))]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
         where F: FnOnce(EditChannel) -> EditChannel {
         #[cfg(feature = "cache")]
@@ -356,6 +358,8 @@ impl GuildChannel {
             }
         }
 
+        use serenity_utils::VecMap;
+
         let mut map = VecMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
@@ -364,7 +368,7 @@ impl GuildChannel {
 
         match context.http.edit_channel(self.id.0, &edited) {
             Ok(channel) => {
-                mem::replace(self, channel);
+                std::mem::replace(self, channel);
 
                 Ok(())
             },
@@ -658,7 +662,7 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    #[cfg(feature = "http")]
+    #[cfg(feature = "client")]
     pub fn send_message<F>(&self, context: &Context, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         #[cfg(feature = "cache")]

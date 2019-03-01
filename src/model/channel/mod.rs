@@ -239,7 +239,7 @@ impl Channel {
     /// closest functionality is leaving it.
     ///
     /// [`Group`]: struct.Group.html
-    #[cfg(feature = "model")]
+    #[cfg(all(feature = "model", feature = "client"))]
     pub fn delete(&self, context: &Context) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
