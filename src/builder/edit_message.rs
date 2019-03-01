@@ -11,7 +11,7 @@ use crate::utils::{self, VecMap};
 ///
 /// ```rust,no_run
 /// # use serenity::model::id::{ChannelId, MessageId};
-/// # #[cfg(all(feature = "cache", feature = "client"))]
+/// # #[cfg(feature = "client")]
 /// # use serenity::client::Context;
 /// # #[cfg(feature = "framework")]
 /// # use serenity::framework::standard::{CommandResult, macros::command};
