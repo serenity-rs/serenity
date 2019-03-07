@@ -8,7 +8,7 @@ use serenity::{
 struct Handler;
 
 impl EventHandler for Handler {
-    fn message(&self, ctx: Context, msg: Message) {
+    fn message(&self, ctx: &Context, msg: &Message) {
         if msg.content == "!hello" {
             // The create message builder allows you to easily create embeds and messages
             // using a builder syntax.
@@ -42,7 +42,7 @@ impl EventHandler for Handler {
         }
     }
 
-    fn ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: &Context, ready: &Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

@@ -8,7 +8,7 @@ use serenity::{
 struct Handler;
 
 impl EventHandler for Handler {
-    fn message(&self, context: Context, msg: Message) {
+    fn message(&self, context: &Context, msg: &Message) {
         if msg.content == "!messageme" {
             // If the `methods` feature is enabled, then model structs will
             // have a lot of useful methods implemented, to avoid using an
@@ -18,7 +18,7 @@ impl EventHandler for Handler {
             // In this case, you can direct message a User directly by simply
             // calling a method on its instance, with the content of the
             // message.
-            let dm = msg.author.dm(&context, |m| {
+            let dm = msg.author.dm(context, |m| {
                 m.content("Hello!");
 
                 m
@@ -30,7 +30,7 @@ impl EventHandler for Handler {
         }
     }
 
-    fn ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: &Context, ready: &Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }

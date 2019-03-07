@@ -9,9 +9,9 @@ use serenity::{
 struct Handler;
 
 impl EventHandler for Handler {
-    fn message(&self, context: Context, msg: Message) {
+    fn message(&self, context: &Context, msg: &Message) {
         if msg.content == "!ping" {
-            let channel = match msg.channel_id.to_channel(&context) {
+            let channel = match msg.channel_id.to_channel(context) {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {:?}", why);
@@ -26,7 +26,7 @@ impl EventHandler for Handler {
             // emojis, and more.
             let response = MessageBuilder::new()
                 .push("User ")
-                .push_bold_safe(msg.author.name)
+                .push_bold_safe(&msg.author.name)
                 .push(" used the 'ping' command in the ")
                 .mention(&channel)
                 .push(" channel")
@@ -38,7 +38,7 @@ impl EventHandler for Handler {
         }
     }
 
-    fn ready(&self, _: Context, ready: Ready) {
+    fn ready(&self, _: &Context, ready: &Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
