@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.25+ badge]][rust 1.25+ link]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.31.1+ badge]][rust 1.31.1+ link]
 
 # serenity
 
@@ -89,7 +89,7 @@ and to the top of your `main.rs`:
 #[macro_use] extern crate serenity;
 ```
 
-Serenity supports a minimum of Rust 1.25.
+Serenity supports a minimum of Rust 1.31.1.
 
 # Features
 
@@ -209,5 +209,5 @@ Building the `voice`-feature on Windows can be done by following these instructi
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust 1.25+ badge]: https://img.shields.io/badge/rust-1.25+-93450a.svg?style=flat-square
-[rust 1.25+ link]: https://blog.rust-lang.org/2018/03/29/Rust-1.25.html
+[rust 1.31.1+ badge]: https://img.shields.io/badge/rust-1.31.1+-93450a.svg?style=flat-square
+[rust 1.31.1+ link]: https://blog.rust-lang.org/2018/12/20/Rust-1.31.1.html
