@@ -8,7 +8,7 @@ This project mostly adheres to [Semantic Versioning][semver].
 Thanks to the following for their contributions:
 
 - [@acdenisSK]
-- [@Erk]
+- [@Erk-]
 - [@FelixMcFelix]
 - [@ijks]
 - [@JellyWX]
