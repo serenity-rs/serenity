@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.5.13] - 2019-3-10
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Erk]
+- [@FelixMcFelix]
+- [@ijks]
+- [@JellyWX]
+- [@Lakelezz]
+- [@MOZGIII]
+
+# Breaking change
+
+As unusual as it may sound for a patch version, we had to bump our minimum supported Rust version to 1.31.1 as a consequence of certain dependencies publishing releases containing uncompilable code for 1.25 rustc.
+
+## Added
+
+- [misc.] Include the latest releases in CHANGELOG.md  (@acdenisSK) [c:201dab8] [c:201bc56]
+- [misc.] Transition from Travis to Microsoft's Azure CI (@Erk-, @acdenisSK, @Lakelezz) [c:68263ac] [c:bca2f4b] [c:3b8ae67] [c:a0b1dd8] [c:bd48ac5]
+
+## Changed
+
+- [docs] Compile, but do not run tests that were previously ignored (@MOZGIII) [c:00990c0]
+- [misc.] Lock `cc` and `base64` dependencies to specific versions (@Lakelezz) [c:bc3d978]
+- [general] Update Discord's welcome messages as of 2018-12-19 (@Erk-) [c:e94388]
+- [voice] Fewer ffprobe calls when playing audio through ffmpeg (@FelixMcFelix) [c:cfcd342] (Improperly credited under @acdenisSK due to a hiccup on Github's part.)
+- [misc.] Define 1.31.1 as the new minimum Rust version (@acdenisSK) [c:07e81b0]
+- [misc.] Revert commit [c:bc3d978](https://github.com/serenity-rs/serenity/commit/bc3d978b65ae6d07342bfba4618c249d0beae98e) (@acdenisSK) [c:498e41c]
+- [misc.] Bump sodiumoxide to version 0.2 (@DoumanAsh, @MOZGIII) [c:23ae9d8] (Commit done by @acdenisSK, but the intention to upgrade the version were [Douman's](https://github.com/serenity-rs/serenity/pull/454) and [Mozgiii's](https://github.com/serenity-rs/serenity/pull/490))
+
+## Fixed
+
+- [model] Fix "no-cache with http" feature combo of `has_role` (@Erk-) [c:3899547]
+- [docs] Use a normal `main` to fix Rust 1.25 compilation (@acdenisSK) [c:b469611]
+- [docs]  Fix wording of `timestamp`'s documentation (@acdenisSK) [c:7c09cdd]
+- [misc.] Fix typos and perform some language improvements (@ijks) [c:88d914e]
+- [docs] Fix tests to work with default features without `cache` (@Lakelezz) [c:e6694f2]
+- [voice] Fix connection error being thrown on leaving voice (@JellyWX) [c:62a1aa2](https://github.com/serenity-rs/serenity/commit/62a1aa2abcf0919bf38ef90590aaa363eb03aae0)
+
 ## [0.5.12] - 2019-2-14
 
 This is a celebratory release for Valentine's day, which we present to you with utmost courtesy.
@@ -2475,6 +2515,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.5.13]: https://github.com/serenity-rs/serenity/compare/v0.5.12...v0.5.13
 [0.5.12]: https://github.com/serenity-rs/serenity/compare/v0.5.11...v0.5.12
 [0.5.11]: https://github.com/serenity-rs/serenity/compare/v0.5.10...v0.5.11
 [0.5.10]: https://github.com/serenity-rs/serenity/compare/v0.5.9...v0.5.10
@@ -2537,6 +2578,8 @@ Initial commit.
 [@iCrawl]: https://github.com/iCrawl
 [@imnotbad]: https://github.com/imnotbad
 [@indiv0]: https://github.com/indiv0
+[@ijks]: https://github.com/ijks
+[@JellyWX]: https://github.com/JellyWX
 [@jhelwig]: https://github.com/jhelwig
 [@jkcclemens]: https://github.com/jkcclemens
 [@joek13]: https://github.com/joek13
@@ -2563,6 +2606,27 @@ Initial commit.
 [@xentec]: https://github.com/xentec
 [@vityafx]: https://github.com/vityafx
 [@zeyla]: https://github.com/zeyla
+
+[c:201dab8]: https://github.com/serenity-rs/serenity/commit/201dab8fa4c31d6e840f88b691772c5b0961780f
+[c:201bc56]: https://github.com/serenity-rs/serenity/commit/201bc56f79ab913db32b3453bc8d61a7bfa0ee17
+[c:68263ac]: https://github.com/serenity-rs/serenity/commit/68263acc637010f854d986bdcd838593b0dc02f0
+[c:bca2f4b]: https://github.com/serenity-rs/serenity/commit/bca2f4be1e603122e681423410b7f30562912727
+[c:3b8ae67]: https://github.com/serenity-rs/serenity/commit/3b8ae6712cb1a6d771704de97b2ea7af3f1f7138
+[c:a0b1dd8]: https://github.com/serenity-rs/serenity/commit/a0b1dd8b2f8dc4c4a3b924d6ed686e5ba006e60d
+[c:bd48ac5]: https://github.com/serenity-rs/serenity/commit/bd48ac5106c540358babff1e31a81e1e1ab7cec0
+[c:00990c0]: https://github.com/serenity-rs/serenity/commit/00990c05bb5bfaf0e0ee5e52ed1faefe142277a3
+[c:bc3d978]: https://github.com/serenity-rs/serenity/commit/bc3d978b65ae6d07342bfba4618c249d0beae98e
+[c:e94388]: https://github.com/serenity-rs/serenity/commit/e94388115845aba533eb7d08f13fddd46ef30f69
+[c:cfcd342]: https://github.com/serenity-rs/serenity/commit/cfcd342baf254d35da948cce9fe1c39a284ce6cb
+[c:07e81b0]: https://github.com/serenity-rs/serenity/commit/07e81b02143d57f5abced7e0d4fe13d40da7a5de
+[c:498e41c]: https://github.com/serenity-rs/serenity/commit/498e41c91453a1d895e5c46e76310f92b44127c0
+[c:3899547]: https://github.com/serenity-rs/serenity/commit/3899547968abbdf3a51071a5d9eccdfaad4cc0c4
+[c:b469611]: https://github.com/serenity-rs/serenity/commit/b4696115c05eefaabff8b0f5ceb3b12b900dda2b
+[c:7c09cdd]: https://github.com/serenity-rs/serenity/commit/7c09cdd27d28264444f34ab8157bc9aa78cbc096
+[c:88d914e]: https://github.com/serenity-rs/serenity/commit/88d914e32071ef9cefcfbc4cd74df8f664b66377
+[c:e6694f2]: https://github.com/serenity-rs/serenity/commit/e6694f27d74069c80f642ab17ce73d45962fd547
+[c:62a1aa2]: https://github.com/serenity-rs/serenity/commit/62a1aa2abcf0919bf38ef90590aaa363eb03aae0
+[c:23ae9d8]: https://github.com/serenity-rs/serenity/commit/23ae9d83f96e0d1ad28905deb73eb4ad4fed61a8
 
 [c:2cb67df]: https://github.com/serenity-rs/serenity/commit/2cb67df6a0441b70462434429030cef759c7c57c
 [c:794393c]: https://github.com/serenity-rs/serenity/commit/794393c9656e2de916ca72fd63393b26d4fef7a0
