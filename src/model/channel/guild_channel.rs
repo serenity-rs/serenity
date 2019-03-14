@@ -330,7 +330,6 @@ impl GuildChannel {
         let mut map = VecMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
-        map.insert("type", Value::String(self.kind.name().to_string()));
 
         let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
 
