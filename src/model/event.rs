@@ -1926,6 +1926,14 @@ pub struct VoiceResume {
 
 #[allow(clippy::missing_docs)]
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+pub struct VoiceClientConnect {
+    pub audio_ssrc: u32,
+    pub user_id: UserId,
+    pub video_ssrc: u32,
+}
+
+#[allow(clippy::missing_docs)]
+#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceClientDisconnect {
     pub user_id: UserId,
 }
@@ -1955,6 +1963,9 @@ pub enum VoiceEvent {
     Hello(VoiceHello),
     /// Message received if a Resume request was successful.
     Resumed,
+    /// Status update in the current channel, indicating that a user has
+    /// connected.
+    ClientConnect(VoiceClientConnect),
     /// Status update in the current channel, indicating that a user has
     /// disconnected.
     ClientDisconnect(VoiceClientDisconnect),
@@ -2005,6 +2016,11 @@ impl<'de> Deserialize<'de> for VoiceEvent {
                 VoiceEvent::Speaking(v)
             },
             VoiceOpCode::Resumed => VoiceEvent::Resumed,
+            VoiceOpCode::ClientConnect => {
+                let v = VoiceClientConnect::deserialize(v).map_err(DeError::custom)?;
+
+                VoiceEvent::ClientConnect(v)
+            },
             VoiceOpCode::ClientDisconnect => {
                 let v = VoiceClientDisconnect::deserialize(v).map_err(DeError::custom)?;
 

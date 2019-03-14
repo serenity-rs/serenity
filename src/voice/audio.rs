@@ -33,6 +33,8 @@ pub trait AudioReceiver: Send {
                     data: &[i16],
                     compressed_size: usize) { }
 
+    fn client_connect(&mut self, ssrc: u32, user_id: u64) { }
+
     fn client_disconnect(&mut self, user_id: u64) { }
 }
 
