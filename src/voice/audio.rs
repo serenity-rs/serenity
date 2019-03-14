@@ -31,6 +31,8 @@ pub trait AudioReceiver: Send {
                     timestamp: u32,
                     stereo: bool,
                     data: &[i16]);
+
+    fn client_connect(&mut self, ssrc: u32, user_id: u64) { }
 }
 
 #[derive(Clone, Copy)]
