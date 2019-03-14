@@ -23,7 +23,7 @@ pub trait AudioSource: Send {
 
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, ssrc: u32, user_id: u64, speaking: bool);
+    fn speaking_update(&mut self, ssrc: u32, user_id: u64, speaking: bool) { }
 
     fn voice_packet(&mut self,
                     ssrc: u32,
@@ -31,7 +31,9 @@ pub trait AudioReceiver: Send {
                     timestamp: u32,
                     stereo: bool,
                     data: &[i16],
-                    compressed_size: usize);
+                    compressed_size: usize) { }
+
+    fn client_disconnect(&mut self, user_id: u64) { }
 }
 
 #[derive(Clone, Copy)]
