@@ -369,6 +369,8 @@ impl Connection {
                         Some(nonce) => {
                             if ev.nonce != nonce {
                                 warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            } else {
+                                info!("[Voice] Heartbeat ACK received.");
                             }
 
                             self.last_heartbeat_nonce = None;
