@@ -62,6 +62,11 @@ impl AudioReceiver for Receiver {
             ssrc,
         );
     }
+
+    fn client_connect(&mut self, _ssrc: u32, _user_id: u64) {
+        // You can implement your own logic here to handle a user who has joined the
+        // voice channel e.g., allocate structures, map their SSRC to User ID.
+    }
 }
 
 fn main() {
