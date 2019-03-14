@@ -355,7 +355,7 @@ impl Connection {
                             let b = if is_stereo { len * 2 } else { len };
 
                             receiver
-                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
+                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
                         }
                     }
                 },
