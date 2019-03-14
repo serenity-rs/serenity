@@ -175,11 +175,11 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
 pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,
     args: &[&str],
-) -> Result<Box<AudioSource>> {
+) -> Result<Box<dyn AudioSource>> {
     _ffmpeg_optioned(path.as_ref(), args, None)
 }
 
-fn _ffmpeg_optioned(path: &OsStr, args: &[&str], is_stereo_known: Option<bool>) -> Result<Box<AudioSource>> {
+fn _ffmpeg_optioned(path: &OsStr, args: &[&str], is_stereo_known: Option<bool>) -> Result<Box<dyn AudioSource>> {
     let is_stereo = is_stereo_known
         .or_else(|| is_stereo(path).ok())
         .unwrap_or(false);

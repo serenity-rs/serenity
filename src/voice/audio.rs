@@ -30,7 +30,8 @@ pub trait AudioReceiver: Send {
                     sequence: u16,
                     timestamp: u32,
                     stereo: bool,
-                    data: &[i16]);
+                    data: &[i16],
+                    compressed_size: usize);
 }
 
 #[derive(Clone, Copy)]
