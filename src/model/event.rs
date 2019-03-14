@@ -9,7 +9,7 @@ use serde::ser::{
 };
 use serde_json;
 use std::collections::HashMap;
-use super::utils::deserialize_emojis;
+use super::utils::{deserialize_emojis, deserialize_u64};
 use super::prelude::*;
 use crate::constants::{OpCode, VoiceOpCode};
 use crate::internal::prelude::*;
@@ -1881,9 +1881,16 @@ pub struct VoiceHeartbeat {
 }
 
 #[allow(clippy::missing_docs)]
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[derive(Clone, Copy, Debug, Serialize)]
 pub struct VoiceHeartbeatAck {
     pub nonce: u64,
+}
+
+impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        deserialize_u64(deserializer)
+            .map(|nonce| Self { nonce })
+    }
 }
 
 #[allow(clippy::missing_docs)]
