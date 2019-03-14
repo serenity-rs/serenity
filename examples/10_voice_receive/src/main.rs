@@ -53,14 +53,30 @@ impl AudioReceiver for Receiver {
         // to the user ID and handle their audio packets separately.
     }
 
-    fn voice_packet(&mut self, ssrc: u32, sequence: u16, _timestamp: u32, _stereo: bool, data: &[i16]) {
+    fn voice_packet(
+        &mut self,
+        ssrc: u32,
+        sequence: u16,
+        _timestamp: u32,
+        _stereo: bool,
+        data: &[i16],
+        compressed_size: usize,
+    ) {
         println!("Audio packet's first 5 bytes: {:?}", data.get(..5));
         println!(
-            "Audio packet sequence {:05} has {:04} bytes, SSRC {}",
+            "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
             sequence,
             data.len(),
+            compressed_size,
             ssrc,
         );
+    }
+
+    fn client_disconnect(&mut self, _user_id: u64) {
+        // You can implement your own logic here to handle a user who has left the
+        // voice channel e.g., finalise processing of statistics etc.
+        // You will typically need to map the User ID to their SSRC; observed when
+        // speaking or connecting.
     }
 }
 
