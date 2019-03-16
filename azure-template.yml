@@ -77,15 +77,13 @@ jobs:
         SERENITY_EXAMPLE: '10_voice_receive'
       11_create_message_builder:
         SERENITY_EXAMPLE: '11_create_message_builder'
-  variables:
-    dir: ${{ SERENITY_EXAMPLE }}
   steps:
   - bash: |
       export CARGO_TARGET_DIR="$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         cd examples
-        cd $dir
+        cd "$(SERENITY_EXAMPLE)"
         cargo build
       fi
     displayName: 'Build examples'
