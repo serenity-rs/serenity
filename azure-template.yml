@@ -54,7 +54,7 @@ jobs:
         cd examples
         SERENITY_EXAMPLE_DIR="$(pwd)"
         for dir in examples/*/ ; do
-          cd dir
+          cd $dir
           cargo build
           cd "$SERENITY_EXAMPLE_DIR"
         done
