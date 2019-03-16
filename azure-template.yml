@@ -48,7 +48,7 @@ jobs:
     displayName: 'Test Serenity'
 
 
-- job: 'Build examples'
+- job: "${{ parameters.name }}_examples"
   dependsOn: ${{ parameters.name }}
   condition: succeeded()
   pool: 
