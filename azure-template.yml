@@ -46,21 +46,42 @@ jobs:
         cargo test --no-default-features --features "$(features)"
       fi
     displayName: 'Test Serenity'
-  
+
+
+- job: 'Build examples'
+  pool: 
+    vmImage: ${{ parameters.vmImage }}
+  strategy:
+    matrix:
+      01_basic_ping_bot:
+        SERENITY_EXAMPLE: '01_basic_ping_bot'
+      02_transparent_guild_sharding:
+        SERENITY_EXAMPLE: '02_transparent_guild_sharding'
+      03_struct_utilities:
+        SERENITY_EXAMPLE: '03_struct_utilities'
+      04_message_builder:
+        SERENITY_EXAMPLE: '04_message_builder'
+      05_command_framework:
+        SERENITY_EXAMPLE: '05_command_framework'
+      06_voice:
+        SERENITY_EXAMPLE: '06_voice'
+      07_sample_bot_structure:
+        SERENITY_EXAMPLE: '07_sample_bot_structure'
+      08_env_logging:
+        SERENITY_EXAMPLE: '08_env_logging'
+      09_shard_manager:
+        SERENITY_EXAMPLE: '09_shard_manager'
+      10_voice_receive:
+        SERENITY_EXAMPLE: '10_voice_receive'
+      11_create_message_builder:
+        SERENITY_EXAMPLE: '11_create_message_builder'
+  steps:
   - bash: |
       export CARGO_TARGET_DIR="$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         cd examples
-        SERENITY_EXAMPLE_DIR="$(pwd)"
-        for dir in */ ; do
-          cd $dir
-          cargo build
-          CARGO_EXIT_CODE=$?
-          if [ $CARGO_EXIT_CODE -ne 0 ]; then
-            exit $CARGO_EXIT_CODE
-          fi
-          cd "$SERENITY_EXAMPLE_DIR"
-        done
+        cd $dir
+        cargo build
       fi
     displayName: 'Build examples'
