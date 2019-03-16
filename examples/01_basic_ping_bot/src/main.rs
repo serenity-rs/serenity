@@ -19,7 +19,7 @@ impl EventHandler for Handler {
             // authentication error, or lack of permissions to post in the
             // channel, so log to stdout when some error happens, with a
             // description of it.
-            if let Err(why) = msg.channel_id.say(&ctx.http, "Pong!") {
+            if let Err(why) = msg.channel_id.say_bogus(&ctx.http, "Pong!") {
                 println!("Error sending message: {:?}", why);
             }
         }
