@@ -56,6 +56,10 @@ jobs:
         for dir in */ ; do
           cd $dir
           cargo build
+          CARGO_EXIT_CODE=$?
+          if [ $CARGO_EXIT_CODE -ne 0 ]; then
+            exit $CARGO_EXIT_CODE
+          fi
           cd "$SERENITY_EXAMPLE_DIR"
         done
       fi
