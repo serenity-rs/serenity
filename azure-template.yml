@@ -53,7 +53,7 @@ jobs:
       if [[ "$(features)" == "all" ]]; then
         cd examples
         SERENITY_EXAMPLE_DIR="$(pwd)"
-        for dir in examples/*/ ; do
+        for dir in */ ; do
           cd $dir
           cargo build
           cd "$SERENITY_EXAMPLE_DIR"
