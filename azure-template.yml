@@ -51,8 +51,12 @@ jobs:
       export CARGO_TARGET_DIR="$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
-        for d in examples/*/ ; do
+        cd examples
+        SERENITY_EXAMPLE_DIR="$(pwd)"
+        for dir in examples/*/ ; do
+          cd dir
           cargo build
+          cd SERENITY_EXAMPLE_DIR
         done
       fi
     displayName: 'Build examples'

@@ -40,8 +40,12 @@ jobs:
   - powershell: |
       $env:CARGO_TARGET_DIR = "$HOME/shared_target"
       If ("$(features)" -eq "all") {
-        Get-ChildItem -Directory .\examples | ForEach-Object {
-          cargo build 
+        Set-Location examples
+        $SERENITY_EXAMPLE_DIR = Get-Location
+        Get-ChildItem -Directory | ForEach-Object {
+            Set-Location $_
+            cargo build
+            Set-Location $SERENITY_EXAMPLE_DIR
         }
       }
     displayName: 'Build examples'
