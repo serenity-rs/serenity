@@ -27,7 +27,8 @@ jobs:
       sh rustup-init.sh --default-toolchain $(tc) -y
     displayName: 'Install Rust'
 
-  - bash: |
+  - bash: | 
+      export CARGO_TARGET_DIR = "$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         cargo build --all-features
@@ -37,6 +38,7 @@ jobs:
     displayName: 'Build Serenity'
 
   - bash: |
+      export CARGO_TARGET_DIR = "$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         cargo test --all-features
@@ -44,3 +46,13 @@ jobs:
         cargo test --no-default-features --features "$(features)"
       fi
     displayName: 'Test Serenity'
+  
+  - bash: |
+      export CARGO_TARGET_DIR = "$HOME/shared_target"
+      source $HOME/.cargo/env
+      if [[ "$(features)" == "all" ]]; then
+        for d in examples/*/ ; do
+          cargo build
+        done
+      fi
+  displayName: 'Build examples'

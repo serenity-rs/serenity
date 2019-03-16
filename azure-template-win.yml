@@ -16,7 +16,9 @@ jobs:
       Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
       &".\rustup-init.exe" --default-toolchain $(tc) -y
     displayName: 'Install rust'
+
   - powershell: |
+      $env:CARGO_TARGET_DIR = "$HOME/shared_target"
       If ("$(features)" -eq "all") {
         &"$env:USERPROFILE\.cargo\bin\cargo" build --all-features
       }
@@ -24,7 +26,9 @@ jobs:
         &"$env:USERPROFILE\.cargo\bin\cargo" build --no-default-features --features "$(features)"
       }
     displayName: 'Build Serenity'
+
   - powershell: |
+      $env:CARGO_TARGET_DIR = "$HOME/shared_target"
       If ("$(features)" -eq "all") {
         &"$env:USERPROFILE\.cargo\bin\cargo" test --all-features
       }
@@ -32,3 +36,12 @@ jobs:
         &"$env:USERPROFILE\.cargo\bin\cargo" test --no-default-features --features "$(features)"
       }
     displayName: 'Test Serenity'
+
+  - powershell: |
+      $env:CARGO_TARGET_DIR = "$HOME/shared_target"
+      If ("$(features)" -eq "all") {
+        Get-ChildItem -Directory .\examples | ForEach-Object {
+          cargo build 
+        }
+      }
+    displayName: 'Build examples'
