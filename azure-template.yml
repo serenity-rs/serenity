@@ -51,8 +51,7 @@ jobs:
 - job: "${{ parameters.name }}_examples"
   dependsOn: ${{ parameters.name }}
   condition: succeeded()
-  pool: 
-    vmImage: ${{ parameters.vmImage }}
+  pool: server
   strategy:
     matrix:
       01_basic_ping_bot:
