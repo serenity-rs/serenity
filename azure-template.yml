@@ -56,7 +56,7 @@ jobs:
         for dir in examples/*/ ; do
           cd dir
           cargo build
-          cd SERENITY_EXAMPLE_DIR
+          cd "$SERENITY_EXAMPLE_DIR"
         done
       fi
     displayName: 'Build examples'
