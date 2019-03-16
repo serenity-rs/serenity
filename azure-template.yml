@@ -28,7 +28,7 @@ jobs:
     displayName: 'Install Rust'
 
   - bash: | 
-      export CARGO_TARGET_DIR = "$HOME/shared_target"
+      export CARGO_TARGET_DIR="$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         cargo build --all-features
@@ -38,7 +38,7 @@ jobs:
     displayName: 'Build Serenity'
 
   - bash: |
-      export CARGO_TARGET_DIR = "$HOME/shared_target"
+      export CARGO_TARGET_DIR="$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         cargo test --all-features
@@ -48,11 +48,11 @@ jobs:
     displayName: 'Test Serenity'
   
   - bash: |
-      export CARGO_TARGET_DIR = "$HOME/shared_target"
+      export CARGO_TARGET_DIR="$HOME/shared_target"
       source $HOME/.cargo/env
       if [[ "$(features)" == "all" ]]; then
         for d in examples/*/ ; do
           cargo build
         done
       fi
-  displayName: 'Build examples'
+    displayName: 'Build examples'
