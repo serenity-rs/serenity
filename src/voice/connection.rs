@@ -355,7 +355,7 @@ impl Connection {
                             let b = if is_stereo { len * 2 } else { len };
 
                             receiver
-                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b]);
+                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
                         }
                     }
                 },
@@ -367,13 +367,19 @@ impl Connection {
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
                         receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
+                },
+                ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
+                    if let Some(receiver) = receiver.as_mut() {
+                        receiver.client_disconnect(ev.user_id.0);
                     }
-                }
+                },
                 ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
                     match self.last_heartbeat_nonce {
                         Some(nonce) => {
                             if ev.nonce != nonce {
                                 warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            } else {
+                                info!("[Voice] Heartbeat ACK received.");
                             }
 
                             self.last_heartbeat_nonce = None;
