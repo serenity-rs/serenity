@@ -367,6 +367,7 @@ impl Connection {
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
                         receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
+                    }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
