@@ -1,10 +1,8 @@
 use chrono::Utc;
 use crate::client::Context;
 use crate::model::id::{ChannelId, GuildId, UserId};
-use std::{
-    collections::HashMap,
-    default::Default
-};
+use std::default::Default;
+use hashbrown::HashMap;
 
 #[cfg(feature = "cache")]
 type Check = dyn Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;

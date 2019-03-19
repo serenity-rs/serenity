@@ -1,9 +1,9 @@
 use crate::gateway::InterMessage;
 use crate::model::id::{ChannelId, GuildId, UserId};
 use std::{
-    collections::HashMap,
     sync::mpsc::Sender as MpscSender
 };
+use hashbrown::HashMap;
 use super::Handler;
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to

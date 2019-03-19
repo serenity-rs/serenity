@@ -1,5 +1,5 @@
 use crate::gateway::InterMessage;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
 use crate::model::id::{ChannelId, GuildId, UserId};
 use crate::voice::{Handler, Manager};

@@ -2,10 +2,10 @@ use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
 use std::{
-    collections::HashMap,
     hash::Hash,
     sync::Arc
 };
+use hashbrown::HashMap;
 use super::prelude::*;
 
 #[cfg(feature = "cache")]

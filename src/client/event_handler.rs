@@ -1,10 +1,8 @@
 use crate::model::prelude::*;
 use parking_lot::RwLock;
 use serde_json::Value;
-use std::{
-    collections::HashMap,
-    sync::Arc
-};
+use std::sync::Arc;
+use hashbrown::HashMap;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 

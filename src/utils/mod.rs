@@ -26,7 +26,6 @@ use crate::model::{
     },
 };
 use std::{
-    collections::HashMap,
     ffi::OsStr,
     fs::File,
     hash::{BuildHasher, Hash},
@@ -34,6 +33,7 @@ use std::{
     path::Path,
     str::FromStr,
 };
+use hashbrown::HashMap;
 
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
@@ -865,10 +865,8 @@ mod test {
             prelude::*,
         };
         use chrono::DateTime;
-        use std::{
-            collections::HashMap,
-            sync::Arc,
-        };
+        use std::sync::Arc;
+        use hashbrown::HashMap;
 
         let user = User {
             id: UserId(100000000000000000),

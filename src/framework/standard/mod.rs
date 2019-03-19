@@ -43,10 +43,10 @@ use crate::model::{
 };
 use self::command::{AfterHook, BeforeHook, MessageWithoutCommandHook, UnrecognisedCommandHook};
 use std::{
-    collections::HashMap,
     default::Default,
     sync::Arc
 };
+use hashbrown::HashMap;
 use super::Framework;
 use threadpool::ThreadPool;
 

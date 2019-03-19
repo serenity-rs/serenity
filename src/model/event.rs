@@ -8,7 +8,7 @@ use serde::ser::{
     Serializer
 };
 use serde_json;
-use std::collections::HashMap;
+use hashbrown::HashMap;
 use super::utils::{deserialize_emojis, deserialize_u64};
 use super::prelude::*;
 use crate::constants::{OpCode, VoiceOpCode};
@@ -19,7 +19,7 @@ use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
 use crate::internal::RwLockExt;
 #[cfg(feature = "cache")]
-use std::collections::hash_map::Entry;
+use hashbrown::hash_map::Entry;
 #[cfg(feature = "cache")]
 use std::mem;
 

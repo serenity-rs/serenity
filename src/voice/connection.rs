@@ -28,7 +28,6 @@ use rand::random;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::{
-    collections::HashMap,
     io::Write,
     net::{SocketAddr, ToSocketAddrs, UdpSocket},
     sync::{
@@ -46,6 +45,7 @@ use std::{
     },
     time::Duration
 };
+use hashbrown::HashMap;
 
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;

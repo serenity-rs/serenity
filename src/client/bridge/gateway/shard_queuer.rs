@@ -4,7 +4,7 @@ use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use parking_lot::RwLock;
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::VecDeque,
     sync::{
         mpsc::{
             Receiver,
@@ -15,6 +15,7 @@ use std::{
     thread,
     time::{Duration, Instant}
 };
+use hashbrown::HashMap;
 use super::super::super::EventHandler;
 use super::{
     ShardId,

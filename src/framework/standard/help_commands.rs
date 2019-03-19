@@ -32,12 +32,12 @@ use crate::model::{
 use crate::Error;
 use std::{
     borrow::Borrow,
-    collections::{HashMap, HashSet},
     hash::BuildHasher,
     ops::{Index, IndexMut},
     sync::Arc,
     fmt::Write,
 };
+use hashbrown::{HashMap, HashSet};
 use super::command::InternalCommand;
 use super::{
     Args,

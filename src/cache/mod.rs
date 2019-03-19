@@ -45,15 +45,15 @@
 use std::str::FromStr;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
-use std::collections::{
-    hash_map::Entry,
-    HashMap,
-    HashSet,
-    VecDeque,
-};
+use std::collections::VecDeque;
 use std::{
     default::Default,
     sync::Arc,
+};
+use hashbrown::{
+    hash_map::Entry,
+    HashMap,
+    HashSet
 };
 
 mod cache_update;
@@ -858,10 +858,8 @@ impl Default for Cache {
 mod test {
     use chrono::DateTime;
     use serde_json::{Number, Value};
-    use std::{
-        collections::HashMap,
-        sync::Arc,
-    };
+    use std::sync::Arc;
+    use hashbrown::HashMap;
     use crate::{
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,

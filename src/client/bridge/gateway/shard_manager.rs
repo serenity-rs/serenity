@@ -4,13 +4,14 @@ use crate::CacheAndHttp;
 use parking_lot::Mutex;
 use parking_lot::RwLock;
 use std::{
-    collections::{HashMap, VecDeque},
+    collections::VecDeque,
     sync::{
         mpsc::{self, Sender},
         Arc
     },
     thread
 };
+use hashbrown::HashMap;
 use super::super::super::EventHandler;
 use super::{
     ShardClientMessage,

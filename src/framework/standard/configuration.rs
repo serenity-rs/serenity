@@ -4,10 +4,10 @@ use crate::model::{
     id::{ChannelId, GuildId, UserId}
 };
 use std::{
-    collections::HashSet,
     default::Default,
     sync::Arc,
 };
+use hashbrown::HashSet;
 use super::command::{Command, InternalCommand, PrefixCheck};
 use super::Delimiter;
 
@@ -369,7 +369,7 @@ impl Configuration {
     /// # impl EventHandler for Handler {}
     /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::id::UserId;
-    /// use std::collections::HashSet;
+    /// use hashbrown::HashSet;
     /// use serenity::framework::StandardFramework;
     ///
     /// let mut set = HashSet::new();

@@ -507,7 +507,7 @@ mod test {
     mod model_utils {
         use crate::model::prelude::*;
         use parking_lot::RwLock;
-        use std::collections::HashMap;
+        use hashbrown::HashMap;
         use std::sync::Arc;
 
         fn group() -> Group {

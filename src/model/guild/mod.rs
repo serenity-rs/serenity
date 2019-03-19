@@ -2058,7 +2058,7 @@ mod test {
     mod model {
         use chrono::prelude::*;
         use crate::model::prelude::*;
-        use std::collections::*;
+        use hashbrown::HashMap;
         use std::sync::Arc;
 
         fn gen_user() -> User {

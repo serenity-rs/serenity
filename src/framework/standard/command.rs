@@ -8,11 +8,11 @@ use crate::model::{
     Permissions,
 };
 use std::{
-    collections::{HashMap, HashSet},
     fmt,
     fmt::{Debug, Formatter},
     sync::Arc,
 };
+use hashbrown::{HashMap, HashSet};
 use crate::utils::Colour;
 use super::{Args, Configuration, HelpBehaviour};
 use super::check::Check;

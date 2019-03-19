@@ -22,10 +22,11 @@ use serde::de::DeserializeOwned;
 use serde_json::json;
 use log::{debug, trace};
 use std::{
-    collections::{BTreeMap, HashMap},
+    collections::BTreeMap,
     io::ErrorKind as IoErrorKind,
     sync::Arc,
 };
+use hashbrown::HashMap;
 
 pub struct Http {
     client: Client,

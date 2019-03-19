@@ -18,10 +18,8 @@ use super::Cache;
 ///     },
 ///     prelude::RwLock,
 /// };
-/// use std::{
-///     collections::hash_map::Entry,
-///     sync::Arc,
-/// };
+/// use std::sync::Arc;
+/// use hashbrown::hash_map::Entry;
 ///
 /// // For example, an update to the user's record in the database was
 /// // published to a pubsub channel.

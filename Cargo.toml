@@ -91,6 +91,10 @@ version = "0.18.1"
 optional = true
 version = "0.15.0"
 
+[dependencies.hashbrown]
+version = "^0.1"
+features = ["serde"]
+
 [dev-dependencies.matches]
 version = "0.1.6"
 

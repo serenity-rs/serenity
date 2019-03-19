@@ -45,7 +45,6 @@ use parking_lot::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
 use std::{
-    collections::HashMap,
     fmt::{
         Display,
         Formatter,
@@ -54,6 +53,7 @@ use std::{
     sync::Arc,
     result::Result as StdResult
 };
+use hashbrown::HashMap;
 
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
