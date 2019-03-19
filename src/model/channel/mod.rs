@@ -401,6 +401,10 @@ pub enum ChannelType {
     ///
     /// [`ChannelCategory`]: struct.ChannelCategory.html
     Category = 4,
+    /// An indicator that the channel is a [`NewsChannel`].
+    ///
+    /// [`NewsChannel`]: struct.NewsChannel.html
+    News = 5,
 }
 
 enum_number!(
@@ -410,6 +414,7 @@ enum_number!(
         Voice,
         Group,
         Category,
+        News,
     }
 );
 
@@ -421,6 +426,7 @@ impl ChannelType {
             ChannelType::Text => "text",
             ChannelType::Voice => "voice",
             ChannelType::Category => "category",
+            ChannelType::News => "news",
         }
     }
 
@@ -431,6 +437,7 @@ impl ChannelType {
             ChannelType::Voice => 2,
             ChannelType::Group => 3,
             ChannelType::Category => 4,
+            ChannelType::News => 5,
         }
     }
 }
