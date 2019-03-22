@@ -358,7 +358,7 @@ impl Shard {
     ///
     /// Returns a `GatewayError::OverloadedShard` if the shard would have too
     /// many guilds assigned to it.
-    #[allow(clippy::cyclomatic_complexity)]
+    #[allow(clippy::cognitive_complexity)]
     pub(crate) fn handle_event(&mut self, event: &Result<GatewayEvent>)
         -> Result<Option<ShardAction>> {
         match *event {

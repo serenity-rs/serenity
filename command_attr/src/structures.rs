@@ -1,6 +1,6 @@
 use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS};
 use crate::util::{
-    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, RefOrInstance,
+    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, RefOrInstance, ParseStreamExt
 };
 use crate::crate_name;
 use proc_macro2::TokenStream as TokenStream2;
@@ -225,7 +225,7 @@ impl ToTokens for Checks {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct Options {
     pub checks: Checks,
     pub names: Vec<String>,
@@ -240,6 +240,27 @@ pub struct Options {
     pub owners_only: bool,
     pub owner_privilege: bool,
     pub sub: Vec<Ident>,
+}
+
+impl Default for Options {
+    #[inline]
+    fn default() -> Self {
+        Options {
+            checks: Checks::default(),
+            names: Vec::new(),
+            desc: None,
+            usage: None,
+            min_args: None,
+            max_args: None,
+            allowed_roles: Vec::new(),
+            required_permissions: Permissions::default(),
+            help_available: true,
+            only_in: OnlyIn::default(),
+            owners_only: false,
+            owner_privilege: true,
+            sub: Vec::new()
+        }
+    }
 }
 
 #[derive(PartialEq, Debug)]
@@ -335,7 +356,7 @@ impl Default for HelpOptions {
     }
 }
 
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub struct GroupOptions {
     pub prefixes: Vec<String>,
     pub only: OnlyIn,
@@ -350,14 +371,30 @@ pub struct GroupOptions {
     pub inherit: Option<IdentAccess>,
 }
 
+impl Default for GroupOptions {
+    #[inline]
+    fn default() -> Self {
+        GroupOptions {
+            prefixes: Vec::new(),
+            only: OnlyIn::default(),
+            owner_only: false,
+            owner_privilege: true,
+            help_available: true,
+            allowed_roles: Vec::new(),
+            required_permissions: Permissions::default(),
+            checks: Checks::default(),
+            default_command: None,
+            description: None,
+            inherit: None,
+        }
+    }
+}
+
 impl Parse for GroupOptions {
     fn parse(input: ParseStream) -> Result<Self> {
         let Object(fields) = input.parse::<Object>()?;
 
         let mut options = GroupOptions::default();
-
-        options.help_available = true;
-        options.owner_privilege = true;
 
         for Field { name, value } in fields {
             let span = name.span();
@@ -626,28 +663,30 @@ impl Parse for Group {
 
         let Field { name, value } = input.parse::<Field<Lit>>()?;
         if name != "name" {
-            return Err(Error::new(name.span(), "first key needs to be `name`"));
+            return Err(Error::new(name.span(), "every group must have a `name`"));
         }
 
         let name = value.to_ident();
 
         input.parse::<Token![,]>()?;
 
-        let Field {
-            name: n,
-            value: options,
-        } = input.parse::<Field<RefOrInstance<GroupOptions>>>()?;
-        if n != "options" {
-            return Err(Error::new(n.span(), "second key needs to be `options`"));
-        }
+        let options = if let Ok(f) = input.try_parse::<Field<RefOrInstance<GroupOptions>>>() {
+            if f.name != "options" {
+                return Err(Error::new(f.name.span(), "the options of a group must be labeled as `options`"));
+            }
 
-        input.parse::<Token![,]>()?;
+            input.parse::<Token![,]>()?;
+
+            Some(f.value)
+        } else {
+            None
+        };
 
         let commands = input.parse::<Ident>()?;
         if commands != "commands" {
             return Err(Error::new(
                 commands.span(),
-                "third key needs to be `commands`",
+                "every group must have a set of `commands`",
             ));
         }
 
@@ -664,7 +703,7 @@ impl Parse for Group {
 
         if let Ok(s) = input.parse::<Ident>() {
             if s != "sub" {
-                return Err(Error::new(s.span(), "fourth key needs to be `sub`"));
+                return Err(Error::new(s.span(), "a group may optionally have a `sub`-groub"));
             }
 
             input.parse::<Token![:]>()?;
@@ -683,7 +722,7 @@ impl Parse for Group {
 
         Ok(Group {
             name,
-            options,
+            options: options.unwrap_or_default(),
             commands: content.parse_terminated(Ident::parse_any)?,
             sub,
         })
