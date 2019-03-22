@@ -157,6 +157,15 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::MessageCreate(mut event)) => {
             update!(cache_and_http, event);
 
+            #[cfg(not(any(feature = "cache", feature = "http")))]
+            let context = context(data, runner_tx, shard_id);
+            #[cfg(all(feature = "cache", not(feature = "http")))]
+            let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+            #[cfg(all(not(feature = "cache"), feature = "http"))]
+            let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+            #[cfg(all(feature = "cache", feature = "http"))]
+            let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+
             dispatch_message(context, event.message, event_handler, threadpool);
         },
         other => handle_event(
