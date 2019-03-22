@@ -151,6 +151,8 @@ pub enum VoiceOpCode {
     Hello = 8,
     /// Sent by the server if a session coulkd successfully be resumed.
     Resumed = 9,
+    /// Message indicating that another user has connected to the voice channel.
+    ClientConnect = 12,
     /// Message indicating that another user has disconnected from the voice channel.
     ClientDisconnect = 13,
 }
@@ -167,6 +169,7 @@ enum_number!(
         Resume,
         Hello,
         Resumed,
+        ClientConnect,
         ClientDisconnect,
     }
 );
@@ -184,6 +187,7 @@ impl VoiceOpCode {
             VoiceOpCode::Resume => 7,
             VoiceOpCode::Hello => 8,
             VoiceOpCode::Resumed => 9,
+            VoiceOpCode::ClientConnect => 12,
             VoiceOpCode::ClientDisconnect => 13,
         }
     }
