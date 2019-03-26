@@ -1196,38 +1196,28 @@ pub struct VoiceStateUpdateEvent {
 
 #[cfg(feature = "cache")]
 impl CacheUpdate for VoiceStateUpdateEvent {
-    type Output = ();
+    type Output = VoiceState;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
+    fn update(&mut self, cache: &mut Cache) -> Option<VoiceState> {
         if let Some(guild_id) = self.guild_id {
             if let Some(guild) = cache.guilds.get_mut(&guild_id) {
                 let mut guild = guild.write();
 
                 if self.voice_state.channel_id.is_some() {
                     // Update or add to the voice state list
-                    {
-                        let finding = guild.voice_states.get_mut(&self.voice_state.user_id);
-
-                        if let Some(srv_state) = finding {
-                            srv_state.clone_from(&self.voice_state);
-
-                            return None;
-                        }
-                    }
-
                     guild
                         .voice_states
-                        .insert(self.voice_state.user_id, self.voice_state.clone());
+                        .insert(self.voice_state.user_id, self.voice_state.clone())
                 } else {
                     // Remove the user from the voice state list
-                    guild.voice_states.remove(&self.voice_state.user_id);
+                    guild.voice_states.remove(&self.voice_state.user_id)
                 }
+            } else {
+                None
             }
-
-            return None;
+        } else {
+            None
         }
-
-        None
     }
 }
 
