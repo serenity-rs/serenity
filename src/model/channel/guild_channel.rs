@@ -33,8 +33,10 @@ use crate::builder::EditChannel;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
-/// Represents a guild's text or voice channel. Some methods are available only
-/// for voice channels and some are only available for text channels.
+/// Represents a guild's text, news, or voice channel. Some methods are available
+/// only for voice channels and some are only available for text channels.
+/// News channels are a subset of text channels and lack slow mode hence
+/// `slow_mode_rate` will be `None`.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildChannel {
     /// The unique Id of the channel.
@@ -95,8 +97,11 @@ pub struct GuildChannel {
     #[serde(default)]
     pub nsfw: bool,
     /// A rate limit that applies per user and excludes bots.
+    ///
+    /// **Note**: This is only available for text channels excluding news
+    /// channels.
     #[serde(default, rename = "rate_limit_per_user")]
-    pub slow_mode_rate: u64,
+    pub slow_mode_rate: Option<u64>,
 }
 
 #[cfg(feature = "model")]
