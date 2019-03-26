@@ -299,7 +299,7 @@ command!(say(ctx, msg, args) {
             .clean_role(false)
     };
 
-    let mut content = content_safe(&ctx.cache, &args.full(), &settings);
+    let mut content = content_safe(&ctx.cache, &args.rest(), &settings);
 
     if let Err(why) = msg.channel_id.say(&ctx.http, &content) {
         println!("Error sending message: {:?}", why);
@@ -351,7 +351,7 @@ command!(some_long_command(ctx, msg, args) {
 });
 
 command!(about_role(ctx, msg, args) {
-    let potential_role_name = args.full();
+    let potential_role_name = args.rest();
 
     if let Some(guild) = msg.guild(&ctx.cache) {
         // `role_by_name()` allows us to attempt attaining a reference to a role
@@ -365,7 +365,7 @@ command!(about_role(ctx, msg, args) {
         }
     }
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Could not find role named: {:?}", potential_role_name)) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
     }
 });
@@ -467,7 +467,7 @@ command!(bird(ctx, msg, args) {
     let say_content = if args.is_empty() {
         ":bird: can find animals for you.".to_string()
     } else {
-        format!(":bird: could not find animal named: `{}`.", args.full())
+        format!(":bird: could not find animal named: `{}`.", args.rest())
     };
 
     if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
@@ -486,7 +486,7 @@ command!(slow_mode(ctx, msg, args) {
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
     } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
-        format!("Current slow mode rate is `{}` seconds.", channel.read().slow_mode_rate)
+        format!("Current slow mode rate is `{}` seconds.", channel.read().slow_mode_rate.unwrap_or(0))
     } else {
         "Failed to find channel in cache.".to_string()
     };
