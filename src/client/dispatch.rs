@@ -625,11 +625,15 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::VoiceStateUpdate(mut event)) => {
-            update!(cache_and_http, event);
+            let _before = update!(cache_and_http, event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.voice_state_update(context, event.guild_id, event.voice_state);
+                feature_cache! {{
+                    event_handler.voice_state_update(context, event.guild_id, _before, event.voice_state);
+                } else {
+                    event_handler.voice_state_update(context, event.guild_id, event.voice_state);
+                }}
             });
         },
         DispatchEvent::Model(Event::WebhookUpdate(mut event)) => {
