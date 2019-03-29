@@ -26,7 +26,7 @@ pub use self::{
         ytdl
     }
 };
-pub use opus::Bitrate;
+pub use audiopus::Bitrate;
 
 use self::connection_info::ConnectionInfo;
 

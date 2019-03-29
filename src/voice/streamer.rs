@@ -1,8 +1,8 @@
 use byteorder::{LittleEndian, ReadBytesExt};
 use crate::internal::prelude::*;
-use opus::{
+use audiopus::{
     Channels,
-    Decoder as OpusDecoder,
+    coder::Decoder as OpusDecoder,
     Result as OpusResult,
 };
 use parking_lot::Mutex;

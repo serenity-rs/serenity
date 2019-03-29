@@ -6,7 +6,6 @@ use std::{
 };
 use super::{
     connection::Connection,
-    Bitrate,
     Status,
     audio,
 };
@@ -26,7 +25,7 @@ fn runner(rx: &MpscReceiver<Status>) {
     let mut receiver = None;
     let mut connection = None;
     let mut timer = Timer::new(20);
-    let mut bitrate = Bitrate::Bits(audio::DEFAULT_BITRATE);
+    let mut bitrate = audio::DEFAULT_BITRATE;
 
     'runner: loop {
         loop {
