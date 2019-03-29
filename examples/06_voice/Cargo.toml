@@ -5,5 +5,5 @@ authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies.serenity]
-features = ["cache", "framework", "standard_framework", "voice"]
+features = ["cache", "framework", "standard_framework", "voice", "http"]
 path = "../../"
