@@ -21,10 +21,10 @@ pub(crate) mod consts;
 pub(crate) mod structures;
 pub(crate) mod util;
 
-use self::attributes::*;
-use self::consts::*;
-use self::structures::*;
-use self::util::*;
+use attributes::*;
+use consts::*;
+use structures::*;
+use util::*;
 
 // Stolen from <https://github.com/diesel-rs/diesel/blob/af1ff2476f997d6eb04fffd58260705d77ff6b6f/diesel_derives/src/util.rs#L81-L96>
 pub(crate) fn crate_name() -> Path {
@@ -39,6 +39,21 @@ pub(crate) fn crate_name() -> Path {
     } else {
         parse_quote!(serenity)
     }
+}
+
+macro_rules! match_options {
+    ($v:expr, $values:ident, $options:ident, $span:expr => [$($name:ident);*]) => {
+        match $v {
+            $(
+                stringify!($name) => $options.$name.parse(stringify!($name), $values),
+            )*
+            _ => {
+                return Error::new($span, &format!("invalid attribute: {:?}", $v))
+                    .to_compile_error()
+                    .into();
+            },
+        }
+    };
 }
 
 /// The heart of the attribute-based framework.
@@ -130,75 +145,19 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         };
 
         let name = values.name.to_string();
-        match &name[..] {
-            "checks" => {
-                let AChecks(idents) = AChecks::parse(values);
+        let name = &name[..];
 
-                options.checks = Checks(idents);
-            }
-            "aliases" => {
-                let Aliases(args) = Aliases::parse(values);
-
-                options.names = args;
-            }
-            "description" => {
-                let Description(arg) = Description::parse(values);
-
-                options.desc = Some(arg);
-            }
-            "usage" => {
-                let Usage(arg) = Usage::parse(values);
-
-                options.usage = Some(arg);
-            }
-            "min_args" => {
-                let MinArgs(arg) = MinArgs::parse(values);
-
-                options.min_args = Some(arg);
-            }
-            "max_args" => {
-                let MaxArgs(arg) = MaxArgs::parse(values);
-
-                options.max_args = Some(arg);
-            }
+        match name {
             "num_args" => {
-                let NumArgs(arg) = NumArgs::parse(values);
+                let mut args = 0;
+                args.parse("num_args", values);
 
-                options.min_args = Some(arg);
-                options.max_args = Some(arg);
-            }
-            "allowed_roles" => {
-                let AllowedRoles(args) = AllowedRoles::parse(values);
-
-                options.allowed_roles = args;
-            }
-            "help_available" => {
-                let HelpAvailable(b) = HelpAvailable::parse(values);
-
-                options.help_available = b;
-            }
-            "only_in" => {
-                let Only(o) = Only::parse(values);
-
-                options.only_in = o;
-            }
-            "owners_only" => {
-                let OwnersOnly(b) = OwnersOnly::parse(values);
-
-                options.owners_only = b;
-            }
-            "owner_privilege" => {
-                let OwnerPrivilege(b) = OwnerPrivilege::parse(values);
-
-                options.owner_privilege = b;
-            }
-            "sub" => {
-                let SubCommands(s) = SubCommands::parse(values);
-
-                options.sub = s;
+                options.min_args = Some(args);
+                options.max_args = Some(args);
             }
             "required_permissions" => {
-                let RequiredPermissions(p) = RequiredPermissions::parse(values);
+                let mut p = Vec::<Ident>::new();
+                p.parse("required_permissions", values);
 
                 let mut permissions = Permissions::default();
                 for perm in p {
@@ -217,18 +176,45 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                 options.required_permissions = permissions;
             }
+            "checks" => {
+                let mut checks = Vec::<Ident>::new();
+                checks.parse("checks", values);
+
+                options.checks = Checks(checks);
+            },
+            "description" => {
+                let mut desc = String::new();
+                desc.parse("description", values);
+
+                options.description = Some(desc);
+            },
+            "usage" => {
+                let mut usage = String::new();
+                usage.parse("usage", values);
+
+                options.usage = Some(usage);
+            },
             _ => {
-                return Error::new(span, &format!("invalid attribute: {:?}", name))
-                    .to_compile_error()
-                    .into();
+                match_options!(name, values, options, span => [
+                    min_args;
+                    max_args;
+                    aliases;
+                    usage;
+                    allowed_roles;
+                    help_available;
+                    only_in;
+                    owners_only;
+                    owner_privilege;
+                    sub
+                ]);
             }
         }
     }
 
     let Options {
         checks,
-        names: aliases,
-        desc,
+        aliases,
+        description,
         usage,
         min_args,
         max_args,
@@ -241,7 +227,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         sub,
     } = options;
 
-    let desc = AsOption(desc);
+    let description = AsOption(description);
     let usage = AsOption(usage);
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
@@ -287,7 +273,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         pub static #options: #options_path = #options_path {
             checks: #checks,
             names: &[#name, #(#aliases),*],
-            desc: #desc,
+            desc: #description,
             usage: #usage,
             min_args: #min_args,
             max_args: #max_args,
@@ -422,166 +408,97 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
         };
 
         let name = values.name.to_string();
-        match &name[..] {
-            "suggestion_text" => {
-                let SuggestionText(s) = SuggestionText::parse(values);
+        let name = &name[..];
 
-                options.suggestion_text = s;
-            }
-            "no_help_available_text" => {
-                let NoHelpAvailableText(s) = NoHelpAvailableText::parse(values);
-
-                options.no_help_available_text = s;
-            }
-            "usage_label" => {
-                let UsageLabel(s) = UsageLabel::parse(values);
-
-                options.usage_label = s;
-            }
-            "usage_sample_label" => {
-                let UsageSampleLabel(s) = UsageSampleLabel::parse(values);
-
-                options.usage_sample_label = s;
-            }
-            "ungrouped_label" => {
-                let UngroupedLabel(s) = UngroupedLabel::parse(values);
-
-                options.ungrouped_label = s;
-            }
-            "grouped_label" => {
-                let GroupedLabel(s) = GroupedLabel::parse(values);
-
-                options.grouped_label = s;
-            }
-            "aliases_label" => {
-                let AliasesLabel(s) = AliasesLabel::parse(values);
-
-                options.aliases_label = s;
-            }
-            "description_label" => {
-                let DescriptionLabel(s) = DescriptionLabel::parse(values);
-
-                options.description_label = s;
-            }
-            "guild_only_text" => {
-                let GuildOnlyText(s) = GuildOnlyText::parse(values);
-
-                options.guild_only_text = s;
-            }
-            "checks_label" => {
-                let ChecksLabel(s) = ChecksLabel::parse(values);
-
-                options.checks_label = s;
-            }
-            "dm_only_text" => {
-                let DmOnlyText(s) = DmOnlyText::parse(values);
-
-                options.dm_only_text = s;
-            }
-            "dm_and_guild_text" => {
-                let DmAndGuildText(s) = DmAndGuildText::parse(values);
-
-                options.dm_and_guild_text = s;
-            }
-            "available_text" => {
-                let AvailableText(s) = AvailableText::parse(values);
-
-                options.available_text = s;
-            }
-            "command_not_found_text" => {
-                let CommandNotFoundText(s) = CommandNotFoundText::parse(values);
-
-                options.command_not_found_text = s;
-            }
-            "individual_command_tip" => {
-                let IndividualCommandTip(s) = IndividualCommandTip::parse(values);
-
-                options.individual_command_tip = s;
-            }
-            "group_prefix" => {
-                let GroupPrefix(s) = GroupPrefix::parse(values);
-
-                options.group_prefix = s;
-            }
-
-            "strikethrough_commands_tip_in_dm" => {
-                let StrikeThroughCommandsTipInDm(s) = StrikeThroughCommandsTipInDm::parse(values);
-
-                options.strikethrough_commands_tip_in_dm = s;
-            }
-            "strikethrough_commands_tip_in_guild" => {
-                let StrikeThroughCommandsTipInGuild(s) =
-                    StrikeThroughCommandsTipInGuild::parse(values);
-
-                options.strikethrough_commands_tip_in_guild = s;
-            }
+        match name {
             "lacking_role" => {
-                let LackingRole(s) = LackingRole::parse(values);
+                let mut behaviour = String::with_capacity(7);
+                behaviour.parse("lacking_role", values);
 
-                options.lacking_role = match HelpBehaviour::from_str(&s) {
+                options.lacking_role = match HelpBehaviour::from_str(&behaviour) {
                     Some(h) => h,
                     None => {
-                        return Error::new(span, &format!("invalid help behaviour: {:?}", s))
-                            .to_compile_error()
-                            .into();
+                        return Error::new(
+                            span,
+                            &format!("invalid help behaviour: {:?}", behaviour),
+                        )
+                        .to_compile_error()
+                        .into();
                     }
                 };
             }
             "lacking_permissions" => {
-                let LackingPermissions(s) = LackingPermissions::parse(values);
+                let mut behaviour = String::with_capacity(7);
+                behaviour.parse("lacking_permissions", values);
 
-                options.lacking_permissions = match HelpBehaviour::from_str(&s) {
+                options.lacking_permissions = match HelpBehaviour::from_str(&behaviour) {
                     Some(h) => h,
                     None => {
-                        return Error::new(span, &format!("invalid help behaviour: {:?}", s))
-                            .to_compile_error()
-                            .into();
+                        return Error::new(
+                            span,
+                            &format!("invalid help behaviour: {:?}", behaviour),
+                        )
+                        .to_compile_error()
+                        .into();
                     }
                 };
             }
             "lacking_ownership" => {
-                let LackingOwnership(s) = LackingOwnership::parse(values);
+                let mut behaviour = String::with_capacity(7);
+                behaviour.parse("lacking_ownership", values);
 
-                options.lacking_ownership = match HelpBehaviour::from_str(&s) {
+                options.lacking_ownership = match HelpBehaviour::from_str(&behaviour) {
                     Some(h) => h,
                     None => {
-                        return Error::new(span, &format!("invalid help behaviour: {:?}", s))
-                            .to_compile_error()
-                            .into();
+                        return Error::new(
+                            span,
+                            &format!("invalid help behaviour: {:?}", behaviour),
+                        )
+                        .to_compile_error()
+                        .into();
                     }
                 };
             }
             "wrong_channel" => {
-                let WrongChannel(s) = WrongChannel::parse(values);
+                let mut behaviour = String::with_capacity(7);
+                behaviour.parse("wrong_channel", values);
 
-                options.wrong_channel = match HelpBehaviour::from_str(&s) {
+                options.wrong_channel = match HelpBehaviour::from_str(&behaviour) {
                     Some(h) => h,
                     None => {
-                        return Error::new(span, &format!("invalid help behaviour: {:?}", s))
-                            .to_compile_error()
-                            .into();
+                        return Error::new(
+                            span,
+                            &format!("invalid help behaviour: {:?}", behaviour),
+                        )
+                        .to_compile_error()
+                        .into();
                     }
                 };
             }
-            "embed_error_colour" => {
-                let EmbedErrorColour(s) = EmbedErrorColour::parse(values);
-
-                options.embed_error_colour = s;
-            }
-            "embed_success_colour" => {
-                let EmbedSuccessColour(s) = EmbedSuccessColour::parse(values);
-
-                options.embed_success_colour = s;
-            }
-            "max_levenshtein_distance" => {
-                let MaxLevenshteinDistance(s) = MaxLevenshteinDistance::parse(values);
-
-                options.max_levenshtein_distance = s;
-            }
             _ => {
-                return Error::new(span, &format!("invalid attribute: {:?}", name))
-                    .to_compile_error()
-                    .into();
+                match_options!(name, values, options, span => [
+                    suggestion_text;
+                    no_help_available_text;
+                    usage_label;
+                    usage_sample_label;
+                    ungrouped_label;
+                    grouped_label;
+                    aliases_label;
+                    description_label;
+                    guild_only_text;
+                    checks_label;
+                    dm_only_text;
+                    dm_and_guild_text;
+                    available_text;
+                    command_not_found_text;
+                    individual_command_tip;
+                    group_prefix;
+                    strikethrough_commands_tip_in_dm;
+                    strikethrough_commands_tip_in_guild;
+                    embed_error_colour;
+                    embed_success_colour;
+                    max_levenshtein_distance
+                ]);
             }
         }
     }

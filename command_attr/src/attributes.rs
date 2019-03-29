@@ -114,186 +114,108 @@ impl<'a, T: fmt::Display> fmt::Display for DisplaySlice<'a, T> {
 }
 
 pub trait AttributeOption: Sized {
-    const NAME: &'static str;
-    const ACCEPTED_FORMS: &'static [ValueKind];
+    const FORMS: &'static [ValueKind];
 
-    fn validate(vals: &Values) {
-        assert!(
-            vals.name == Self::NAME,
-            "expected attribute name to be {:?}",
-            Self::NAME
-        );
+    fn validate(vals: &Values, name: &str) {
+        assert_eq!(vals.name, name, "expected attribute name to be {:?}", name);
 
-        let is_accepted = if Self::ACCEPTED_FORMS.contains(&ValueKind::List)
-            && vals.kind == ValueKind::SingleList
-        {
-            true
-        } else {
-            Self::ACCEPTED_FORMS.contains(&vals.kind)
-        };
+        let is_accepted =
+            if Self::FORMS.contains(&ValueKind::List) && vals.kind == ValueKind::SingleList {
+                true
+            } else {
+                Self::FORMS.contains(&vals.kind)
+            };
 
         assert!(
             is_accepted,
             "expected attribute {:?} to be in one of the forms \n{}",
-            Self::NAME,
-            DisplaySlice(Self::ACCEPTED_FORMS)
+            name,
+            DisplaySlice(Self::FORMS)
         );
     }
 
-    fn parse(vals: Values) -> Self;
+    fn parse(&mut self, name: &str, vals: Values);
 }
 
-macro_rules! define_attribute_options {
-    (list_of_strings => [ $($name:ident, $n:expr);* ]) => {
-        $(
-            #[derive(Debug)]
-            pub struct $name(pub Vec<String>);
+impl AttributeOption for Vec<String> {
+    const FORMS: &'static [ValueKind] = &[ValueKind::List];
 
-            impl AttributeOption for $name {
-                const NAME: &'static str = $n;
-                const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::List];
+    fn parse(&mut self, name: &str, vals: Values) {
+        Self::validate(&vals, name);
 
-                fn parse(vals: Values) -> Self {
-                    Self::validate(&vals);
+        let res = vals.literals.into_iter().map(|lit| lit.to_str()).collect();
 
-                    let res = vals.literals.into_iter().map(|lit| lit.to_str()).collect();
-
-                    $name(res)
-                }
-            }
-        )*
-    };
-    (string => [ $($name:ident, $n:expr);* ]) => {
-        $(
-            #[derive(Debug)]
-            pub struct $name(pub String);
-
-            impl AttributeOption for $name {
-                const NAME: &'static str = $n;
-                const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::Equals, ValueKind::SingleList];
-
-                fn parse(vals: Values) -> Self {
-                    Self::validate(&vals);
-
-                    $name(vals.literals[0].to_str())
-                }
-            }
-        )*
-    };
-    (number/$type:ty => [ $($name:ident, $n:expr);* ]) => {
-        $(
-            #[derive(Debug)]
-            pub struct $name(pub $type);
-
-            impl AttributeOption for $name {
-                const NAME: &'static str = $n;
-                const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::SingleList];
-
-                fn parse(vals: Values) -> Self {
-                    Self::validate(&vals);
-
-                    $name(
-                        if let Lit::Int(l) = &vals.literals[0] {
-                            l.value() as $type
-                        } else {
-                            vals.literals[0].to_str().parse().expect("invalid integer")
-                        }
-                    )
-                }
-            }
-        )*
-    };
-    (boolean => [ $($name:ident, $n:expr);* ]) => {
-        $(
-            #[derive(Debug)]
-            pub struct $name(pub bool);
-
-            impl AttributeOption for $name {
-                const NAME: &'static str = $n;
-                const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::Name, ValueKind::SingleList];
-
-                fn parse(vals: Values) -> Self {
-                    Self::validate(&vals);
-
-                    $name(
-                        if vals.literals.is_empty() {
-                            true
-                        } else {
-                            vals.literals[0].to_bool()
-                        }
-                    )
-                }
-            }
-        )*
-    };
-    (list_of_idents => [ $($name:ident, $n:expr);* ]) => {
-        $(
-            #[derive(Debug)]
-            pub struct $name(pub Vec<Ident>);
-
-            impl AttributeOption for $name {
-                const NAME: &'static str = $n;
-                const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::List];
-
-                fn parse(vals: Values) -> Self {
-                    Self::validate(&vals);
-
-                    $name(
-                        vals.literals
-                        .into_iter()
-                        .map(|s| Ident::new(&s.to_str(), Span::call_site()))
-                        .collect(),
-                    )
-                }
-            }
-        )*
-    };
-    (boolean_or_string => [ $($name:ident, $n:expr);* ]) => {
-        $(
-            #[derive(Debug)]
-            pub struct $name(pub Option<String>);
-
-            impl AttributeOption for $name {
-                const NAME: &'static str = $n;
-                const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::Name, ValueKind::SingleList];
-
-                fn parse(vals: Values) -> Self {
-                    Self::validate(&vals);
-
-                    $name(
-                        if vals.literals.is_empty() {
-                            Some(String::new())
-                        } else if let Lit::Bool(b) = &vals.literals[0] {
-                            if b.value {
-                                Some(String::new())
-                            } else {
-                                None
-                            }
-                        } else {
-                            let s = vals.literals[0].to_str();
-
-                            match s.as_str() {
-                                "true" => Some(String::new()),
-                                "false" => None,
-                                _ => Some(s),
-                            }
-                        }
-                    )
-                }
-            }
-        )*
-    };
+        *self = res;
+    }
 }
 
-#[derive(Debug)]
-pub struct Only(pub(crate) OnlyIn);
+impl AttributeOption for String {
+    const FORMS: &'static [ValueKind] = &[ValueKind::Equals, ValueKind::SingleList];
 
-impl AttributeOption for Only {
-    const NAME: &'static str = "only_in";
-    const ACCEPTED_FORMS: &'static [ValueKind] = &[ValueKind::SingleList];
+    fn parse(&mut self, name: &str, vals: Values) {
+        Self::validate(&vals, name);
 
-    fn parse(vals: Values) -> Self {
-        Self::validate(&vals);
+        *self = vals.literals[0].to_str();
+    }
+}
+
+impl AttributeOption for bool {
+    const FORMS: &'static [ValueKind] = &[ValueKind::Name, ValueKind::SingleList];
+
+    fn parse(&mut self, name: &str, vals: Values) {
+        Self::validate(&vals, name);
+
+        *self = if vals.literals.is_empty() {
+            true
+        } else {
+            vals.literals[0].to_bool()
+        };
+    }
+}
+
+impl AttributeOption for Vec<Ident> {
+    const FORMS: &'static [ValueKind] = &[ValueKind::List];
+
+    fn parse(&mut self, name: &str, vals: Values) {
+        Self::validate(&vals, name);
+        *self = vals
+            .literals
+            .into_iter()
+            .map(|s| Ident::new(&s.to_str(), Span::call_site()))
+            .collect();
+    }
+}
+
+impl AttributeOption for Option<String> {
+    const FORMS: &'static [ValueKind] = &[ValueKind::Name, ValueKind::SingleList];
+
+    fn parse(&mut self, name: &str, vals: Values) {
+        Self::validate(&vals, name);
+
+        *self = if vals.literals.is_empty() {
+            Some(String::new())
+        } else if let Lit::Bool(b) = &vals.literals[0] {
+            if b.value {
+                Some(String::new())
+            } else {
+                None
+            }
+        } else {
+            let s = vals.literals[0].to_str();
+            match s.as_str() {
+                "true" => Some(String::new()),
+                "false" => None,
+                _ => Some(s),
+            }
+        };
+    }
+}
+
+impl AttributeOption for OnlyIn {
+    const FORMS: &'static [ValueKind] = &[ValueKind::SingleList];
+
+    fn parse(&mut self, name: &str, vals: Values) {
+        Self::validate(&vals, name);
 
         let only = vals.literals[0].to_str();
         let only = match &only[..] {
@@ -302,73 +224,45 @@ impl AttributeOption for Only {
             _ => panic!("invalid only type: {:?}", only),
         };
 
-        Only(only)
+        *self = only;
     }
 }
 
-define_attribute_options!(list_of_strings => [
-    Aliases, "aliases";
-    AllowedRoles, "allowed_roles"
-]);
+macro_rules! attr_option_num {
+    ($($n:ty),*) => {
+        $(
+            impl AttributeOption for $n {
+                const FORMS: &'static [ValueKind] = &[ValueKind::SingleList];
 
-define_attribute_options!(string => [
-    Description, "description";
-    Usage, "usage"
-]);
+                fn parse(&mut self, name: &str, vals: Values) {
+                    Self::validate(&vals, name);
 
-define_attribute_options!(number/u8 => [
-    MinArgs, "min_args";
-    MaxArgs, "max_args";
-    NumArgs, "num_args"
-]);
+                    *self = if let Lit::Int(l) = &vals.literals[0] {
+                        l.value() as $n
+                    } else {
+                        let s = vals.literals[0].to_str();
+                        // We use `as_str()` here for forcing method resolution
+                        // to choose `&str`'s `parse` method, not our trait's `parse` method.
+                        // (`AttributeOption` is implemented for `String`)
+                        s.as_str().parse().expect("invalid integer")
+                    };
+                }
+            }
 
-define_attribute_options!(boolean => [
-    HelpAvailable, "help_available";
-    OwnerPrivilege, "owner_privilege";
-    OwnersOnly, "owners_only"
-]);
+            impl AttributeOption for Option<$n> {
+                const FORMS: &'static [ValueKind] = &[ValueKind::SingleList];
 
-define_attribute_options!(list_of_idents => [
-    AChecks, "checks";
-    SubCommands, "sub";
-    RequiredPermissions, "required_permissions"
-]);
+                fn parse(&mut self, name: &str, vals: Values) {
+                    Self::validate(&vals, name);
 
-// For the help command
-define_attribute_options!(string => [
-    SuggestionText, "suggestion_text";
-    NoHelpAvailableText, "no_help_available_text";
-    UsageLabel, "usage_label";
-    UsageSampleLabel, "usage_sample_label";
-    UngroupedLabel, "ungrouped_label";
-    GroupedLabel, "grouped_label";
-    DescriptionLabel, "description_label";
-    AliasesLabel, "aliases_label";
-    GuildOnlyText, "guild_only_text";
-    ChecksLabel, "checks_label";
-    DmOnlyText, "dm_only_text";
-    DmAndGuildText, "dm_and_guild_text";
-    AvailableText, "available_text";
-    CommandNotFoundText, "command_not_found_text";
-    IndividualCommandTip, "individual_command_tip";
-    GroupPrefix, "group_prefix";
+                    let mut n: $n = 0;
+                    n.parse(name, vals);
 
-    LackingRole, "lacking_role";
-    LackingPermissions, "lacking_permissions";
-    LackingOwnership, "lacking_ownership";
-    WrongChannel, "wrong_channel"
-]);
+                    *self = Some(n);
+                }
+            }
+        )*
+    }
+}
 
-define_attribute_options!(number/u32 => [
-    EmbedErrorColour, "embed_error_colour";
-    EmbedSuccessColour, "embed_success_colour"
-]);
-
-define_attribute_options!(number/usize => [
-    MaxLevenshteinDistance, "max_levenshtein_distance"
-]);
-
-define_attribute_options!(boolean_or_string => [
-    StrikeThroughCommandsTipInDm, "strikethrough_commands_tip_in_dm";
-    StrikeThroughCommandsTipInGuild, "strikethrough_commands_tip_in_guild"
-]);
+attr_option_num!(u8, u32, usize);

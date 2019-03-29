@@ -1,17 +1,16 @@
+use crate::crate_name;
+use crate::structures::CommandFun;
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
-    parse_quote,
-    Type,
     braced, bracketed,
+    parse::{Error, Parse, ParseBuffer, ParseStream, Result},
+    parse_quote,
     spanned::Spanned,
-    parse::{Parse, ParseStream, ParseBuffer, Result, Error},
     token::{Brace, Bracket, Mut},
-    Ident, Lit, Token, ReturnType
+    Ident, Lit, ReturnType, Token, Type,
 };
-use crate::structures::CommandFun;
-use crate::crate_name;
 
 pub trait LitExt {
     fn to_str(&self) -> String;

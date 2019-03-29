@@ -1,8 +1,9 @@
 use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS};
-use crate::util::{
-    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, RefOrInstance, ParseStreamExt
-};
 use crate::crate_name;
+use crate::util::{
+    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, ParseStreamExt,
+    RefOrInstance,
+};
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
@@ -228,8 +229,8 @@ impl ToTokens for Checks {
 #[derive(Debug)]
 pub struct Options {
     pub checks: Checks,
-    pub names: Vec<String>,
-    pub desc: Option<String>,
+    pub aliases: Vec<String>,
+    pub description: Option<String>,
     pub usage: Option<String>,
     pub min_args: Option<u8>,
     pub max_args: Option<u8>,
@@ -247,8 +248,8 @@ impl Default for Options {
     fn default() -> Self {
         Options {
             checks: Checks::default(),
-            names: Vec::new(),
-            desc: None,
+            aliases: Vec::new(),
+            description: None,
             usage: None,
             min_args: None,
             max_args: None,
@@ -258,7 +259,7 @@ impl Default for Options {
             only_in: OnlyIn::default(),
             owners_only: false,
             owner_privilege: true,
-            sub: Vec::new()
+            sub: Vec::new(),
         }
     }
 }
@@ -446,7 +447,8 @@ impl Parse for GroupOptions {
                         options.help_available = b;
                     }
                 }
-                ("checks", Expr::Array(Array(arr))) | ("required_permissions", Expr::Array(Array(arr))) => {
+                ("checks", Expr::Array(Array(arr)))
+                | ("required_permissions", Expr::Array(Array(arr))) => {
                     let idents = arr
                         .into_iter()
                         .map(|l| match l {
@@ -672,7 +674,10 @@ impl Parse for Group {
 
         let options = if let Ok(f) = input.try_parse::<Field<RefOrInstance<GroupOptions>>>() {
             if f.name != "options" {
-                return Err(Error::new(f.name.span(), "the options of a group must be labeled as `options`"));
+                return Err(Error::new(
+                    f.name.span(),
+                    "the options of a group must be labeled as `options`",
+                ));
             }
 
             input.parse::<Token![,]>()?;
@@ -703,7 +708,10 @@ impl Parse for Group {
 
         if let Ok(s) = input.parse::<Ident>() {
             if s != "sub" {
-                return Err(Error::new(s.span(), "a group may optionally have a `sub`-groub"));
+                return Err(Error::new(
+                    s.span(),
+                    "a group may optionally have a `sub`-groub",
+                ));
             }
 
             input.parse::<Token![:]>()?;
