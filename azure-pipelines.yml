@@ -42,4 +42,3 @@ jobs:
     name: 'Windows_default_features'
     vmImage: 'vs2017-win2016'
     toolchain: 'stable'
-    features: 'default'
