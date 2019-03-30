@@ -15,7 +15,7 @@ use std::{
 #[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
-use opus::Error as OpusError;
+use audiopus::Error as OpusError;
 #[cfg(feature = "gateway")]
 use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
