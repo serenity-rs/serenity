@@ -126,13 +126,13 @@ impl Invite {
             }
         }
 
-        context.http.delete_invite(&self.code)
+        context.http.as_ref().delete_invite(&self.code)
     }
 
     /// Gets the information about an invite.
     #[cfg(feature = "http")]
     #[allow(clippy::unused_mut)]
-    pub fn get(http: &Arc<Http>, code: &str, stats: bool) -> Result<Invite> {
+    pub fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
         #[cfg(feature = "utils")]
@@ -140,7 +140,7 @@ impl Invite {
             invite = crate::utils::parse_invite(invite);
         }
 
-        http.get_invite(invite, stats)
+        http.as_ref().get_invite(invite, stats)
     }
 
     /// Returns a URL to use for the invite.
@@ -313,7 +313,7 @@ impl RichInvite {
             }
         }
 
-        context.http.delete_invite(&self.code)
+        context.http.as_ref().delete_invite(&self.code)
     }
 
     /// Returns a URL to use for the invite.

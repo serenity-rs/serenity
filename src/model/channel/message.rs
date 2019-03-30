@@ -187,7 +187,7 @@ impl Message {
             }
         }
 
-        context.http.delete_message_reactions(self.channel_id.0, self.id.0)
+        context.http.as_ref().delete_message_reactions(self.channel_id.0, self.id.0)
     }
 
     /// Edits this message, replacing the original content with new content.
@@ -335,7 +335,7 @@ impl Message {
     #[inline]
     pub fn reaction_users<R, U>(
         &self,
-        http: &Arc<Http>,
+        http: impl AsRef<Http>,
         reaction_type: R,
         limit: Option<u8>,
         after: U,

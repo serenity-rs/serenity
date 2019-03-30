@@ -78,7 +78,7 @@ impl Role {
     #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
     pub fn delete(&self, context: &Context) -> Result<()> {
-        context.http.delete_role(self.find_guild(&context.cache)?.0, self.id.0)
+        context.http.as_ref().delete_role(self.find_guild(&context.cache)?.0, self.id.0)
     }
 
     /// Edits a [`Role`], optionally setting its new fields.

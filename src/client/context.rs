@@ -7,7 +7,7 @@ use parking_lot::RwLock;
 use serde_json::Value;
 use std::sync::{
     Arc,
-    mpsc::Sender
+    mpsc::{channel, Sender},
 };
 use typemap::ShareMap;
 use crate::utils::VecMap;
@@ -125,7 +125,7 @@ impl Context {
             shard_id: 0,
             #[cfg(feature = "cache")]
             cache: Arc::new(RwLock::new(Cache::new())),
-            http: Arc::new(Http::new_mock())
+            http: Arc::new(Http::default())
         }
     }
 
@@ -507,4 +507,8 @@ impl Context {
     pub fn quit(&self) {
         self.shard.shutdown_clean();
     }
+}
+
+impl AsRef<Http> for &Context {
+    fn as_ref(&self) -> &Http { &self.http }
 }

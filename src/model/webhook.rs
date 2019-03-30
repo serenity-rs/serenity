@@ -66,7 +66,7 @@ impl Webhook {
     ///
     /// [`http::delete_webhook_with_token`]: ../../http/fn.delete_webhook_with_token.html
     #[inline]
-    pub fn delete(&self, http: &Http) -> Result<()> { http.delete_webhook_with_token(self.id.0, &self.token) }
+    pub fn delete(&self, http: impl AsRef<Http>) -> Result<()> { http.as_ref().delete_webhook_with_token(self.id.0, &self.token) }
 
     ///
     /// Edits the webhook in-place. All fields are optional.
@@ -92,7 +92,7 @@ impl Webhook {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http.get_webhook_with_token(id, token)
+    /// let mut webhook = http.as_ref().get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let _ = webhook.edit(&http, Some("new name"), None).expect("Error editing");
@@ -108,7 +108,7 @@ impl Webhook {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http.get_webhook_with_token(id, token)
+    /// let mut webhook = http.as_ref().get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let image = serenity::utils::read_image("./webhook_img.png")
@@ -119,7 +119,7 @@ impl Webhook {
     ///
     /// [`http::edit_webhook`]: ../../http/fn.edit_webhook.html
     /// [`http::edit_webhook_with_token`]: ../../http/fn.edit_webhook_with_token.html
-    pub fn edit(&mut self, http: &Arc<Http>, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
+    pub fn edit(&mut self, http: impl AsRef<Http>, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
         }
@@ -141,7 +141,7 @@ impl Webhook {
             map.insert("name".to_string(), Value::String(name.to_string()));
         }
 
-        match http.edit_webhook_with_token(self.id.0, &self.token, &map) {
+        match http.as_ref().edit_webhook_with_token(self.id.0, &self.token, &map) {
             Ok(replacement) => {
                 mem::replace(self, replacement);
 
@@ -168,7 +168,7 @@ impl Webhook {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http.get_webhook_with_token(id, token)
+    /// let mut webhook = http.as_ref().get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let _ = webhook.execute(&http, false, |mut w| {
@@ -191,7 +191,7 @@ impl Webhook {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let mut webhook = http.get_webhook_with_token(id, token)
+    /// let mut webhook = http.as_ref().get_webhook_with_token(id, token)
     ///     .expect("valid webhook");
     ///
     /// let embed = Embed::fake(|mut e| {
@@ -213,13 +213,13 @@ impl Webhook {
     /// });
     /// ```
     #[inline]
-    pub fn execute<F>(&self, http: &Arc<Http>, wait: bool, f: F) -> Result<Option<Message>>
+    pub fn execute<F>(&self, http: impl AsRef<Http>, wait: bool, f: F) -> Result<Option<Message>>
     where F: FnOnce(&mut ExecuteWebhook) -> &mut ExecuteWebhook {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
         let map = utils::vecmap_to_json_map(execute_webhook.0);
 
-     http.execute_webhook(self.id.0, &self.token, wait, &map)
+     http.as_ref().execute_webhook(self.id.0, &self.token, wait, &map)
     }
 
     /// Retrieves the latest information about the webhook, editing the
@@ -229,8 +229,8 @@ impl Webhook {
     /// authentication is not required.
     ///
     /// [`http::get_webhook_with_token`]: ../../http/fn.get_webhook_with_token.html
-    pub fn refresh(&mut self, http: &Http) -> Result<()> {
-        match http.get_webhook_with_token(self.id.0, &self.token) {
+    pub fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
+        match http.as_ref().get_webhook_with_token(self.id.0, &self.token) {
             Ok(replacement) => {
                 let _ = mem::replace(self, replacement);
 
@@ -250,5 +250,5 @@ impl WebhookId {
     /// [`Webhook`]: struct.Webhook.html
     /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
-    pub fn to_webhook(self, http: &Http) -> Result<Webhook> { http.get_webhook(self.0) }
+    pub fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> { http.as_ref().get_webhook(self.0) }
 }

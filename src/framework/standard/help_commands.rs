@@ -701,7 +701,7 @@ pub fn create_customised_help_data<'a, H: BuildHasher>(
 /// Sends an embed listing all groups with their commands.
 #[cfg(feature = "http")]
 fn send_grouped_commands_embed(
-    http: &Arc<Http>,
+    http: impl AsRef<Http>,
     help_options: &HelpOptions,
     channel_id: ChannelId,
     help_description: &str,
@@ -738,7 +738,7 @@ fn send_grouped_commands_embed(
 /// Sends embed showcasing information about a single command.
 #[cfg(feature = "http")]
 fn send_single_command_embed(
-    http: &Arc<Http>,
+    http: impl AsRef<Http>,
     help_options: &HelpOptions,
     channel_id: ChannelId,
     command: &Command<'_>,
@@ -793,7 +793,7 @@ fn send_single_command_embed(
 /// Sends embed listing commands that are similar to the sent one.
 #[cfg(feature = "http")]
 fn send_suggestion_embed(
-    http: &Arc<Http>,
+    http: impl AsRef<Http>,
     channel_id: ChannelId,
     help_description: &str,
     suggestions: &Suggestions,
@@ -813,7 +813,7 @@ fn send_suggestion_embed(
 
 /// Sends an embed explaining fetching commands failed.
 #[cfg(feature = "http")]
-fn send_error_embed(http: &Arc<Http>, channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
+fn send_error_embed(http: impl AsRef<Http>, channel_id: ChannelId, input: &str, colour: Colour) -> Result<Message, Error> {
     channel_id.send_message(&http, |m| {
         m.embed(|e| {
             e.colour(colour);
