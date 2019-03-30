@@ -7,7 +7,7 @@ use parking_lot::RwLock;
 use serde_json::Value;
 use std::sync::{
     Arc,
-    mpsc::{channel, Sender},
+    mpsc::Sender,
 };
 use typemap::ShareMap;
 use crate::utils::VecMap;
@@ -111,21 +111,6 @@ impl Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
-        }
-    }
-
-    /// Creates a new Context without use thus for testing purposes only.
-    #[doc(hidden)]
-    pub fn new_mock() -> Self {
-        let (sender, _) = channel();
-
-        Self {
-            data: Arc::new(RwLock::new(ShareMap::custom())),
-            shard: ShardMessenger::new(sender),
-            shard_id: 0,
-            #[cfg(feature = "cache")]
-            cache: Arc::new(RwLock::new(Cache::new())),
-            http: Arc::new(Http::default())
         }
     }
 
