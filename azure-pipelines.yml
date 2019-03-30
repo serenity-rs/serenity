@@ -39,7 +39,6 @@ jobs:
 
 - template: 'azure-template-win.yml'
   parameters:
-    name: 'Windows_default_features'
+    name: 'Windows_stable'
     vmImage: 'vs2017-win2016'
     toolchain: 'stable'
-    features: 'default'

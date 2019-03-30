@@ -14,14 +14,14 @@ use crate::internal::{
 };
 use crate::model::event::VoiceEvent;
 
-use opus::{
+use audiopus::{
     packet as opus_packet,
     Application as CodingMode,
     Bitrate,
     Channels,
-    Decoder as OpusDecoder,
-    Encoder as OpusEncoder,
-    SoftClip,
+    coder::Decoder as OpusDecoder,
+    coder::Encoder as OpusEncoder,
+    softclip::SoftClip,
 };
 use parking_lot::Mutex;
 use rand::random;
@@ -191,7 +191,7 @@ impl Connection {
 
         // Encode for Discord in Stereo, as required.
         let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
-        encoder.set_bitrate(Bitrate::Bits(DEFAULT_BITRATE))?;
+        encoder.set_bitrate(DEFAULT_BITRATE)?;
         let soft_clip = SoftClip::new(Channels::Stereo);
 
         // Per discord dev team's current recommendations:
@@ -295,7 +295,7 @@ impl Connection {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
             // If user specified, we can calculate. 20ms means 50fps.
-            Bitrate::Bits(b) => b.abs() / 50,
+            Bitrate::BitsPerSecond(b) => b / 50,
             // Otherwise, just have a lot preallocated.
             _ => 5120,
         } + 16;
@@ -319,7 +319,7 @@ impl Connection {
 
                         if let Ok(mut decrypted) =
                             secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
-                            let channels = opus_packet::get_nb_channels(&decrypted)?;
+                            let channels = opus_packet::nb_channels(&decrypted)?;
 
                             let entry =
                                 self.decoder_map.entry((ssrc, channels)).or_insert_with(
@@ -348,7 +348,7 @@ impl Connection {
                                 decrypted = decrypted.split_off(offset);
                             }
 
-                            let len = entry.decode(&decrypted, &mut buffer, false)?;
+                            let len = entry.decode(Some(&decrypted), &mut buffer[..], false)?;
 
                             let is_stereo = channels == Channels::Stereo;
 
@@ -498,7 +498,7 @@ impl Connection {
             }
         };
 
-        self.soft_clip.apply(&mut mix_buffer);
+        self.soft_clip.apply(&mut mix_buffer[..])?;
 
         if len == 0 {
             if self.silence_frames > 0 {
