@@ -86,7 +86,7 @@ struct PrefixIterator<'a, 'b: 'a, 'c> {
 impl<'a, 'b, 'c> PrefixIterator<'a, 'b, 'c> {
     fn next(&mut self) -> bool {
         // Nothing to work with.
-        if !self.group.has_prefixes() {
+        if !self.group.has_sub_prefixes() {
             self.prefix = None;
             return false;
         }
@@ -151,14 +151,14 @@ impl CommandGroup {
             .flat_map(|c| c.options.names.iter().map(|c| *c))
     }
 
+    #[inline]
     fn has_prefixes(&self) -> bool {
-        for sub in self.sub {
-            if !sub.has_prefixes() {
-                return false;
-            }
-        }
-
         !self.options.prefixes.is_empty()
+    }
+
+    #[inline]
+    fn has_sub_prefixes(&self) -> bool {
+        self.sub.iter().any(|s| s.has_sub_prefixes()) || self.has_prefixes()
     }
 }
 

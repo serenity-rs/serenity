@@ -409,7 +409,7 @@ impl Parse for GroupOptions {
                             Expr::Lit(l) => Some(l.to_str()),
                             _ => None,
                         })
-                        .collect::<Option<_>>();
+                        .collect::<Option<Vec<String>>>();
 
                     let values = match values {
                         Some(values) => values,
@@ -417,6 +417,12 @@ impl Parse for GroupOptions {
                     };
 
                     if name == "prefixes" {
+                        for v in &values {
+                            if v.is_empty() {
+                                return Err(Error::new(span, "prefixes cannot be empty"));
+                            }
+                        }
+
                         options.prefixes = values;
                     } else {
                         options.allowed_roles = values;
@@ -486,6 +492,10 @@ impl Parse for GroupOptions {
                     let s = s.to_str();
 
                     if name == "prefix" {
+                        if s.is_empty() {
+                            return Err(Error::new(s.span(), "prefixes cannot be empty"));
+                        }
+
                         options.prefixes = vec![s];
                     } else {
                         options.description = Some(s);
