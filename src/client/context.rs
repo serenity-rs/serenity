@@ -494,6 +494,7 @@ impl Context {
     }
 }
 
+#[cfg(feature = "http")]
 impl AsRef<Http> for &Context {
     fn as_ref(&self) -> &Http { &self.http }
 }
