@@ -88,7 +88,7 @@ impl Emoji {
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn delete(&self, context: &Context) -> Result<()> {
         match self.find_guild_id(&context.cache) {
-            Some(guild_id) => context.http.delete_emoji(guild_id.0, self.id.0),
+            Some(guild_id) => context.http.as_ref().delete_emoji(guild_id.0, self.id.0),
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }

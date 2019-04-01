@@ -7,7 +7,7 @@ use parking_lot::RwLock;
 use serde_json::Value;
 use std::sync::{
     Arc,
-    mpsc::Sender
+    mpsc::Sender,
 };
 use typemap::ShareMap;
 use crate::utils::VecMap;
@@ -492,4 +492,9 @@ impl Context {
     pub fn quit(&self) {
         self.shard.shutdown_clean();
     }
+}
+
+#[cfg(feature = "http")]
+impl AsRef<Http> for &Context {
+    fn as_ref(&self) -> &Http { &self.http }
 }

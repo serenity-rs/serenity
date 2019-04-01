@@ -49,7 +49,7 @@ impl ChannelId {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn broadcast_typing(&self, http: &Http) -> Result<()> { http.broadcast_typing(self.0) }
+    pub fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> { http.as_ref().broadcast_typing(self.0) }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
     /// single [`Member`] or [`Role`] within the channel.
@@ -66,7 +66,7 @@ impl ChannelId {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: &Arc<Http>, target: &PermissionOverwrite) -> Result<()> {
+    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
@@ -79,7 +79,7 @@ impl ChannelId {
             "type": kind,
         });
 
-        http.create_permission(self.0, id, &map)
+        http.as_ref().create_permission(self.0, id, &map)
     }
 
     /// React to a [`Message`] with a custom [`Emoji`] or unicode character.
@@ -96,24 +96,24 @@ impl ChannelId {
     /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_reaction<M, R>(&self, http: &Arc<Http>, message_id: M, reaction_type: R) -> Result<()>
+    pub fn create_reaction<M, R>(&self, http: impl AsRef<Http>, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
         self._create_reaction(&http, message_id.into(), &reaction_type.into())
     }
 
     fn _create_reaction(
         self,
-        http: &Arc<Http>,
+        http: impl AsRef<Http>,
         message_id: MessageId,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        http.create_reaction(self.0, message_id.0, reaction_type)
+        http.as_ref().create_reaction(self.0, message_id.0, reaction_type)
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete(&self, http: &Http) -> Result<Channel> { http.delete_channel(self.0) }
+    pub fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> { http.as_ref().delete_channel(self.0) }
 
     /// Deletes a [`Message`] given its Id.
     ///
@@ -127,13 +127,13 @@ impl ChannelId {
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_message<M: Into<MessageId>>(&self, http: &Arc<Http>, message_id: M) -> Result<()> {
+    pub fn delete_message<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<()> {
         self._delete_message(&http, message_id.into())
     }
 
     #[cfg(feature = "http")]
-    fn _delete_message(self, http: &Arc<Http>, message_id: MessageId) -> Result<()> {
-        http.delete_message(self.0, message_id.0)
+    fn _delete_message(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+        http.as_ref().delete_message(self.0, message_id.0)
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -155,7 +155,7 @@ impl ChannelId {
     /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "http")]
-    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, http: &Arc<Http>, message_ids: It) -> Result<()> {
+    pub fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, http: impl AsRef<Http>, message_ids: It) -> Result<()> {
         let ids = message_ids
             .into_iter()
             .map(|message_id| message_id.as_ref().0)
@@ -165,7 +165,7 @@ impl ChannelId {
     }
 
     #[cfg(feature = "http")]
-    fn _delete_messages(self, http: &Arc<Http>, ids: &[u64]) -> Result<()> {
+    fn _delete_messages(self, http: impl AsRef<Http>, ids: &[u64]) -> Result<()> {
         let len = ids.len();
 
         if len == 0 || len > 100 {
@@ -175,7 +175,7 @@ impl ChannelId {
         } else {
             let map = json!({ "messages": ids });
 
-            http.delete_messages(self.0, &map)
+            http.as_ref().delete_messages(self.0, &map)
         }
     }
 
@@ -185,8 +185,8 @@ impl ChannelId {
     ///
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
-    pub fn delete_permission(&self, http: &Arc<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
-        http.delete_permission(
+    pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+        http.as_ref().delete_permission(
             self.0,
             match permission_type {
                 PermissionOverwriteType::Member(id) => id.0,
@@ -205,7 +205,7 @@ impl ChannelId {
     #[cfg(feature = "http")]
     #[inline]
     pub fn delete_reaction<M, R>(&self,
-                                 http: &Arc<Http>,
+                                 http: impl AsRef<Http>,
                                  message_id: M,
                                  user_id: Option<UserId>,
                                  reaction_type: R)
@@ -222,12 +222,12 @@ impl ChannelId {
     #[cfg(feature = "http")]
     fn _delete_reaction(
         self,
-        http: &Arc<Http>,
+        http: impl AsRef<Http>,
         message_id: MessageId,
         user_id: Option<UserId>,
         reaction_type: &ReactionType,
     ) -> Result<()> {
-        http.delete_reaction(
+        http.as_ref().delete_reaction(
             self.0,
             message_id.0,
             user_id.map(|uid| uid.0),
@@ -256,13 +256,13 @@ impl ChannelId {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(all(feature = "utils", feature = "http"))]
     #[inline]
-    pub fn edit<F: FnOnce(&mut EditChannel) -> &mut EditChannel>(&self, http: &Arc<Http>, f: F) -> Result<GuildChannel> {
+    pub fn edit<F: FnOnce(&mut EditChannel) -> &mut EditChannel>(&self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel> {
         let mut channel = EditChannel::default();
         f(&mut channel);
 
         let map = utils::vecmap_to_json_map(channel.0);
 
-        http.edit_channel(self.0, &map)
+        http.as_ref().edit_channel(self.0, &map)
     }
 
     /// Edits a [`Message`] in the channel given its Id.
@@ -286,12 +286,12 @@ impl ChannelId {
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     #[cfg(all(feature = "utils", feature = "http"))]
     #[inline]
-    pub fn edit_message<F, M>(&self, http: &Arc<Http>, message_id: M, f: F) -> Result<Message>
+    pub fn edit_message<F, M>(&self, http: impl AsRef<Http>, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId> {
         self._edit_message(&http, message_id.into(), f)
     }
 
-    fn _edit_message<F>(self, http: &Arc<Http>, message_id: MessageId, f: F) -> Result<Message>
+    fn _edit_message<F>(self, http: impl AsRef<Http>, message_id: MessageId, f: F) -> Result<Message>
         where F: FnOnce(&mut EditMessage) -> &mut EditMessage {
         let mut msg = EditMessage::default();
         f(&mut msg);
@@ -306,7 +306,7 @@ impl ChannelId {
 
         let map = utils::vecmap_to_json_map(msg.0);
 
-        http.edit_message(self.0, message_id.0, &Value::Object(map))
+        http.as_ref().edit_message(self.0, message_id.0, &Value::Object(map))
     }
 
     /// Attempts to find a [`Channel`] by its Id in the cache.
@@ -352,7 +352,7 @@ impl ChannelId {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn invites(&self, http: &Http) -> Result<Vec<RichInvite>> { http.get_channel_invites(self.0) }
+    pub fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {http.as_ref().get_channel_invites(self.0) }
 
     /// Gets a message from the channel.
     ///
@@ -361,13 +361,13 @@ impl ChannelId {
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
     #[inline]
-    pub fn message<M: Into<MessageId>>(&self, http: &Arc<Http>, message_id: M) -> Result<Message> {
+    pub fn message<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<Message> {
         self._message(&http, message_id.into())
     }
 
     #[cfg(feature = "http")]
-    fn _message(self, http: &Arc<Http>, message_id: MessageId) -> Result<Message> {
-        http.get_message(self.0, message_id.0).map(|mut msg| {
+    fn _message(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
+        http.as_ref().get_message(self.0, message_id.0).map(|mut msg| {
             msg.transform_content();
 
             msg
@@ -383,7 +383,7 @@ impl ChannelId {
     /// [`Channel::messages`]: ../channel/enum.Channel.html#method.messages
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
-    pub fn messages<F>(&self, http: &Arc<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         let mut get_messages = GetMessages::default();
         f(&mut get_messages);
@@ -398,7 +398,7 @@ impl ChannelId {
             write!(query, "&before={}", before)?;
         }
 
-        http.get_messages(self.0, &query).map(|msgs| {
+        http.as_ref().get_messages(self.0, &query).map(|msgs| {
             msgs.into_iter()
                 .map(|mut msg| {
                     msg.transform_content();
@@ -442,12 +442,12 @@ impl ChannelId {
     /// [`Message`]: ../channel/struct.Message.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn pin<M: Into<MessageId>>(&self, http: &Arc<Http>, message_id: M) -> Result<()> {
+    pub fn pin<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<()> {
         self._pin(&http, message_id.into())
     }
 
-    fn _pin(self, http: &Arc<Http>, message_id: MessageId) -> Result<()> {
-        http.pin_message(self.0, message_id.0)
+    fn _pin(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+        http.as_ref().pin_message(self.0, message_id.0)
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -455,7 +455,7 @@ impl ChannelId {
     /// [`Message`]: ../channel/struct.Message.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn pins(&self, http: &Http) -> Result<Vec<Message>> { http.get_pins(self.0) }
+    pub fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {http.as_ref().get_pins(self.0) }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -471,7 +471,7 @@ impl ChannelId {
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
     pub fn reaction_users<M, R, U>(&self,
-        http: &Arc<Http>,
+        http: impl AsRef<Http>,
         message_id: M,
         reaction_type: R,
         limit: Option<u8>,
@@ -491,7 +491,7 @@ impl ChannelId {
     #[cfg(feature = "http")]
     fn _reaction_users(
         self,
-        http: &Arc<Http>,
+        http: impl AsRef<Http>,
         message_id: MessageId,
         reaction_type: &ReactionType,
         limit: Option<u8>,
@@ -499,7 +499,7 @@ impl ChannelId {
     ) -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http.get_reaction_users(
+        http.as_ref().get_reaction_users(
             self.0,
             message_id.0,
             reaction_type,
@@ -520,7 +520,7 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[cfg(feature = "http")]
     #[inline]
-    pub fn say<D>(&self, http: &Arc<Http>, content: D) -> Result<Message>
+    pub fn say<D>(&self, http: impl AsRef<Http>, content: D) -> Result<Message>
     where D: ::std::fmt::Display {
         self.send_message(&http, |m| {
             m.content(content)
@@ -596,7 +596,7 @@ impl ChannelId {
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(all(feature = "utils", feature = "http"))]
-    pub fn send_files<'a, F, T, It>(&self, http: &Arc<Http>, files: It, f: F) -> Result<Message>
+    pub fn send_files<'a, F, T, It>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
               T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         let mut create_message = CreateMessage::default();
@@ -616,7 +616,7 @@ impl ChannelId {
         }
 
         let map = utils::vecmap_to_json_map(msg.0.clone());
-        http.send_files(self.0, files, map)
+        http.as_ref().send_files(self.0, files, map)
     }
 
     /// Sends a message to the channel.
@@ -639,7 +639,7 @@ impl ChannelId {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(all(feature = "utils", feature = "http"))]
-    pub fn send_message<F>(&self, http: &Arc<Http>, f: F) -> Result<Message>
+    pub fn send_message<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
@@ -656,9 +656,9 @@ impl ChannelId {
         Message::check_embed_length(&map)?;
 
         let message = if msg.2.is_empty() {
-            http.send_message(self.0, &Value::Object(map))?
+            http.as_ref().send_message(self.0, &Value::Object(map))?
         } else {
-            http.send_files(self.0, msg.2.clone(), map)?
+            http.as_ref().send_files(self.0, msg.2.clone(), map)?
         };
 
         if let Some(reactions) = msg.1.clone() {
@@ -678,13 +678,13 @@ impl ChannelId {
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn unpin<M: Into<MessageId>>(&self, http: &Arc<Http>, message_id: M) -> Result<()> {
+    pub fn unpin<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<()> {
         self._unpin(&http, message_id.into())
     }
 
     #[cfg(feature = "http")]
-    fn _unpin(self, http: &Arc<Http>, message_id: MessageId) -> Result<()> {
-        http.unpin_message(self.0, message_id.0)
+    fn _unpin(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<()> {
+        http.as_ref().unpin_message(self.0, message_id.0)
     }
 
     /// Retrieves the channel's webhooks.
@@ -694,7 +694,7 @@ impl ChannelId {
     /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn webhooks(&self, http: &Http) -> Result<Vec<Webhook>> { http.get_channel_webhooks(self.0) }
+    pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {http.as_ref().get_channel_webhooks(self.0) }
 }
 
 impl From<Channel> for ChannelId {

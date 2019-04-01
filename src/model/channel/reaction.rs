@@ -102,7 +102,7 @@ impl Reaction {
             }
         };
 
-        context.http.delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+        context.http.as_ref().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -117,7 +117,7 @@ impl Reaction {
     /// [`Message`]: struct.Message.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn message(&self, http: &Arc<Http>) -> Result<Message> {
+    pub fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
         self.channel_id.message(&http, self.message_id)
     }
 
@@ -160,7 +160,7 @@ impl Reaction {
     #[cfg(feature = "http")]
     #[inline]
     pub fn users<R, U>(&self,
-                       http: &Arc<Http>,
+                       http: impl AsRef<Http>,
                        reaction_type: R,
                        limit: Option<u8>,
                        after: Option<U>)
@@ -172,7 +172,7 @@ impl Reaction {
     #[cfg(feature = "http")]
     fn _users(
         &self,
-        http: &Arc<Http>,
+        http: impl AsRef<Http>,
         reaction_type: &ReactionType,
         limit: Option<u8>,
         after: Option<UserId>,
@@ -184,7 +184,7 @@ impl Reaction {
             warn!("Rection users limit clamped to 100! (API Restriction)");
         }
 
-        http.get_reaction_users(
+        http.as_ref().get_reaction_users(
             self.channel_id.0,
             self.message_id.0,
             reaction_type,

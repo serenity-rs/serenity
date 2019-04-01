@@ -482,7 +482,7 @@ impl Http {
     /// let channel_id = ChannelId(7);
     /// let message_id = MessageId(8);
     ///
-    /// let _ = http.delete_message_reactions(channel_id.0, message_id.0)
+    /// let _ = http.as_ref().delete_message_reactions(channel_id.0, message_id.0)
     ///     .expect("Error deleting reactions");
     /// ```
     ///
@@ -555,7 +555,7 @@ impl Http {
     /// // must have set the token first.
     /// let http = Arc::new(Http::default());
     ///
-    /// http.delete_webhook(245037420704169985).expect("Error deleting webhook");
+    /// http.as_ref().delete_webhook(245037420704169985).expect("Error deleting webhook");
     /// ```
     ///
     /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
@@ -584,7 +584,7 @@ impl Http {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// http.delete_webhook_with_token(id, token).expect("Error deleting webhook");
+    /// http.as_ref().delete_webhook_with_token(id, token).expect("Error deleting webhook");
     /// ```
     ///
     /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
@@ -762,7 +762,7 @@ impl Http {
     ///     .expect("Error reading image");
     /// let map = ObjectBuilder::new().insert("avatar", image).build();
     ///
-    /// let edited = http.edit_webhook_with_token(id, token, map)
+    /// let edited = http.as_ref().edit_webhook_with_token(id, token, map)
     ///     .expect("Error editing webhook");
     /// ```
     ///
@@ -796,7 +796,7 @@ impl Http {
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let map = ObjectBuilder::new().insert("name", "new name").build();
     ///
-    /// let edited = http.edit_webhook_with_token(id, token, map)
+    /// let edited = http.as_ref().edit_webhook_with_token(id, token, map)
     ///     .expect("Error editing webhook");
     /// ```
     ///
@@ -850,7 +850,7 @@ impl Http {
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     /// let map = ObjectBuilder::new().insert("content", "test").build();
     ///
-    /// let message = match http.execute_webhook(id, token, true, map) {
+    /// let message = match http.as_ref().execute_webhook(id, token, true, map) {
     ///     Ok(Some(message)) => message,
     ///     Ok(None) => {
     ///         println!("Expected a webhook message");
@@ -976,7 +976,7 @@ impl Http {
     ///
     /// let channel_id = 81384788765712384;
     ///
-    /// let webhooks = http.get_channel_webhooks(channel_id)
+    /// let webhooks = http.as_ref().get_channel_webhooks(channel_id)
     ///     .expect("Error getting channel webhooks");
     /// ```
     ///
@@ -1174,7 +1174,7 @@ impl Http {
     /// # let http = Arc::new(Http::default());
     /// let guild_id = 81384788765712384;
     ///
-    /// let webhooks = http.get_guild_webhooks(guild_id)
+    /// let webhooks = http.as_ref().get_guild_webhooks(guild_id)
     ///     .expect("Error getting guild webhooks");
     /// ```
     ///
@@ -1206,7 +1206,7 @@ impl Http {
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// let guilds = http.get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
+    /// let guilds = http.as_ref().get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
     /// ```
     ///
     /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
@@ -1389,7 +1389,7 @@ impl Http {
     /// # let http = Arc::new(Http::default());
     ///
     /// let id = 245037420704169985;
-    /// let webhook = http.get_webhook(id).expect("Error getting webhook");
+    /// let webhook = http.as_ref().get_webhook(id).expect("Error getting webhook");
     /// ```
     ///
     /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
@@ -1417,7 +1417,7 @@ impl Http {
     /// let id = 245037420704169985;
     /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
     ///
-    /// let webhook = http.get_webhook_with_token(id, token)
+    /// let webhook = http.as_ref().get_webhook_with_token(id, token)
     ///     .expect("Error getting webhook");
     /// ```
     pub fn get_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<Webhook> {
