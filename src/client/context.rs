@@ -13,7 +13,7 @@ use typemap::ShareMap;
 use crate::utils::VecMap;
 use crate::utils::vecmap_to_json_map;
 #[cfg(feature = "cache")]
-pub use crate::cache::Cache;
+pub use crate::cache::{Cache, CacheRwLock};
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -44,7 +44,7 @@ pub struct Context {
     /// The ID of the shard this context is related to.
     pub shard_id: u64,
     #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
+    pub cache: CacheRwLock,
     #[cfg(feature = "http")]
     pub http: Arc<Http>,
 }
@@ -63,7 +63,7 @@ impl Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
-            cache,
+            cache: cache.into(),
             http,
         }
     }
@@ -96,7 +96,7 @@ impl Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
-            cache,
+            cache: cache.into(),
         }
     }
 
@@ -497,4 +497,11 @@ impl Context {
 #[cfg(feature = "http")]
 impl AsRef<Http> for &Context {
     fn as_ref(&self) -> &Http { &self.http }
+}
+
+#[cfg(feature = "cache")]
+impl AsRef<CacheRwLock> for &Context {
+    fn as_ref(&self) -> &CacheRwLock {
+        &self.cache
+    }
 }
