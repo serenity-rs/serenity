@@ -38,7 +38,7 @@ use crate::model::misc::ChannelParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
 use std::sync::Arc;
 #[cfg(feature = "cache")]
@@ -80,11 +80,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #     let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #     let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.group() {
@@ -123,11 +123,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.guild() {
@@ -162,11 +162,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.private() {
@@ -204,11 +204,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::id::ChannelId};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.category() {
@@ -603,7 +603,7 @@ mod test {
 impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
-    fn from_str(cache: &Arc<RwLock<Cache>>, s: &str) -> StdResult<Self, Self::Err> {
+    fn from_str(cache: impl AsRef<CacheRwLock>, s: &str) -> StdResult<Self, Self::Err> {
         match parse_channel(s) {
             Some(x) => match ChannelId(x).to_channel_cached(&cache) {
                 Some(channel) => Ok(channel),

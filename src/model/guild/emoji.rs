@@ -16,13 +16,9 @@ use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model", feature = "http"))]
 use crate::client::Context;
-#[cfg(all(feature = "cache", feature = "model"))]
-use parking_lot::RwLock;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -152,11 +148,11 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::Cache, model::{guild::Emoji, id::EmojiId}};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::{guild::Emoji, id::EmojiId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #
     /// # let mut emoji = Emoji {
     /// #     animated: false,
@@ -173,8 +169,8 @@ impl Emoji {
     /// }
     /// ```
     #[cfg(feature = "cache")]
-    pub fn find_guild_id(&self, cache: &Arc<RwLock<Cache>>) -> Option<GuildId> {
-        for guild in cache.read().guilds.values() {
+    pub fn find_guild_id(&self, cache: impl AsRef<CacheRwLock>) -> Option<GuildId> {
+        for guild in cache.as_ref().read().guilds.values() {
             let guild = guild.read();
 
             if guild.emojis.contains_key(&self.id) {

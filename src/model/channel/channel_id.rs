@@ -15,7 +15,7 @@ use crate::builder::{
     GetMessages
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache:: {Cache, CacheRwLock};
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(feature = "model")]
@@ -314,8 +314,8 @@ impl ChannelId {
     /// [`Channel`]: ../channel/enum.Channel.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_channel_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Channel> {
-        self._to_channel_cached(&cache)
+    pub fn to_channel_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> {
+        self._to_channel_cached(&cache.as_ref())
     }
 
     /// To allow testing pass their own cache instead of using the globale one.

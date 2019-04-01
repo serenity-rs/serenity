@@ -51,11 +51,9 @@ use super::Framework;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
 
 /// A convenience macro for generating a struct fulfilling the [`Command`][command trait] trait.
 ///
@@ -476,8 +474,8 @@ impl StandardFramework {
     }
 
     #[cfg(feature = "cache")]
-    fn is_blocked_guild(&self, cache: &Arc<RwLock<Cache>>, message: &Message) -> bool {
-        if let Some(Channel::Guild(channel)) = cache.read().channel(message.channel_id) {
+    fn is_blocked_guild(&self, cache: impl AsRef<CacheRwLock>, message: &Message) -> bool {
+        if let Some(Channel::Guild(channel)) = cache.as_ref().read().channel(message.channel_id) {
             let guild_id = channel.with(|g| g.guild_id);
             if self.configuration.blocked_guilds.contains(&guild_id) {
                 return true;
@@ -1321,7 +1319,7 @@ impl Framework for StandardFramework {
 }
 
 #[cfg(feature = "cache")]
-pub fn has_correct_permissions(cache: &Arc<RwLock<Cache>>, command: &Arc<CommandOptions>, message: &Message) -> bool {
+pub fn has_correct_permissions(cache: impl AsRef<CacheRwLock>, command: &Arc<CommandOptions>, message: &Message) -> bool {
     if command.required_permissions.is_empty() {
         true
     } else {

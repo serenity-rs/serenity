@@ -8,7 +8,7 @@ use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model", feature = "http"))]
 use crate::client::Context;
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::cache::FromStrAndCache;
@@ -118,8 +118,8 @@ impl Role {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
-    pub fn find_guild(&self, cache: &Arc<RwLock<Cache>>) -> Result<GuildId> {
-        for guild in cache.read().guilds.values() {
+    pub fn find_guild(&self, cache: impl AsRef<CacheRwLock>) -> Result<GuildId> {
+        for guild in cache.as_ref().read().guilds.values() {
             let guild = guild.read();
 
             if guild.roles.contains_key(&RoleId(self.id.0)) {
@@ -182,13 +182,13 @@ impl RoleId {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
-    pub fn to_role_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Role> {
+    pub fn to_role_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Role> {
         self._to_role_cached(&cache)
     }
 
     #[cfg(feature = "cache")]
-    pub(crate) fn _to_role_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Role> {
-        for guild in cache.read().guilds.values() {
+    pub(crate) fn _to_role_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Role> {
+        for guild in cache.as_ref().read().guilds.values() {
             let guild = guild.read();
 
             if !guild.roles.contains_key(&self) {
@@ -218,7 +218,7 @@ impl<'a> From<&'a Role> for RoleId {
 impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
-    fn from_str(cache: &Arc<RwLock<Cache>>, s: &str) -> StdResult<Self, Self::Err> {
+    fn from_str(cache: impl AsRef<CacheRwLock>, s: &str) -> StdResult<Self, Self::Err> {
         match parse_role(s) {
             Some(x) => match RoleId(x).to_role_cached(&cache) {
                 Some(role) => Ok(role),

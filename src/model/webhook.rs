@@ -20,8 +20,6 @@ use super::channel::Message;
 #[cfg(feature = "model")]
 use crate::utils;
 #[cfg(feature = "http")]
-use std::sync::Arc;
-#[cfg(feature = "http")]
 use crate::http::Http;
 
 /// A representation of a webhook, which is a low-effort way to post messages to

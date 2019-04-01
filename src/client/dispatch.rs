@@ -67,7 +67,7 @@ fn context(
     shard_id: u64,
     cache: &Arc<RwLock<Cache>>,
 ) -> Context {
-    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(cache))
+    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, cache.clone())
 }
 
 #[cfg(all(not(feature = "cache"), feature = "http"))]
@@ -77,7 +77,7 @@ fn context(
     shard_id: u64,
     http: &Arc<Http>,
 ) -> Context {
-    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http))
+    Context::new(Arc::clone(data), runner_tx.clone(), shard_id, http.clone())
 }
 
 #[cfg(not(any(feature = "cache", feature = "http")))]
@@ -318,7 +318,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    let before = cache_and_http.cache.read().channel(event.channel.id());
+                    let before = cache_and_http.cache.as_ref().read().channel(event.channel.id());
 
                     event_handler.channel_update(context, before, event.channel);
                 } else {
@@ -344,7 +344,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::GuildCreate(mut event)) => {
             #[cfg(feature = "cache")]
             let _is_new = {
-                let cache = cache_and_http.cache.read();
+                let cache = cache_and_http.cache.as_ref().read();
 
                 !cache.unavailable_guilds.contains(&event.guild.id)
             };
@@ -353,7 +353,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             #[cfg(feature = "cache")]
             {
-                let locked_cache = cache_and_http.cache.read();
+                let locked_cache = cache_and_http.cache.as_ref().read();
                 let context = context.clone();
 
                 if locked_cache.unavailable_guilds.is_empty() {
@@ -431,7 +431,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::GuildMemberUpdate(mut event)) => {
             let _before = update!(cache_and_http, event);
             let _after: Option<Member> = feature_cache! {{
-                cache_and_http.cache.read().member(event.guild_id, event.user.id)
+                cache_and_http.cache.as_ref().read().member(event.guild_id, event.user.id)
             } else {
                 None
             }};
@@ -502,7 +502,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    let before = cache_and_http.cache.read()
+                    let before = cache_and_http.cache.as_ref().read()
                         .guilds
                         .get(&event.guild.id)
                         .cloned();
@@ -535,7 +535,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    let _after = cache_and_http.cache.read().message(event.channel_id, event.id);
+                    let _after = cache_and_http.cache.as_ref().read().message(event.channel_id, event.id);
                     event_handler.message_update(context, _before, _after, event);
                 } else {
                     event_handler.message_update(context, event);

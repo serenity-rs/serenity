@@ -40,7 +40,7 @@ pub use crate::gateway;
 pub use crate::http as rest;
 
 #[cfg(feature = "cache")]
-pub use crate::cache::Cache;
+pub use crate::cache::{Cache, CacheRwLock};
 
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
