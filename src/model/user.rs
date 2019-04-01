@@ -22,7 +22,7 @@ use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
@@ -56,11 +56,11 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// # let cache = cache.read();
     /// // assuming the cache has been unlocked
     /// let user = &cache.user;
@@ -150,11 +150,11 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// # let cache = cache.read();
     /// # let http = Arc::new(Http::default());
     /// // assuming the cache has been unlocked
@@ -188,11 +188,11 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// # let mut cache = cache.write();
     /// # let http = Arc::new(Http::default());
     ///
@@ -221,11 +221,11 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, http::Http, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// # let mut cache = cache.write();
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::Permissions;
@@ -287,11 +287,11 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// # let cache = cache.read();
     /// // assuming the cache has been unlocked
     /// let user = &cache.user;
@@ -319,11 +319,11 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # fn main() {
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// # let cache = cache.read();
     /// // assuming the cache has been unlocked
     /// println!("The current user's distinct identifier is {}", cache.user.tag());
@@ -755,13 +755,13 @@ impl User {
     /// // every 12 hours
     /// # #[cfg(feature = "cache")]
     /// # command!(example(context) {
-    /// # use serenity::cache::Cache;
+    /// # use serenity::cache::{Cache, CacheRwLock};
     /// #
     /// # let context = context.clone();
     ///
     /// let handle = thread::spawn(move || {
     /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     ///     // 12 hours in seconds
     ///     let duration = Duration::from_secs(43200);
     ///
@@ -899,7 +899,7 @@ impl UserId {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_user_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<User>>> { cache.read().user(self) }
+    pub fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {cache.as_ref().read().user(self) }
 
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.

@@ -53,6 +53,7 @@ use std::collections::{
 };
 use std::{
     default::Default,
+    ops::Deref,
     sync::Arc,
 };
 
@@ -67,15 +68,15 @@ type MessageCache = HashMap<ChannelId, HashMap<MessageId, Message>>;
 pub trait FromStrAndCache: Sized {
     type Err;
 
-    fn from_str(cache: &Arc<RwLock<Cache>>, s: &str) -> Result<Self, Self::Err>;
+    fn from_str(cache: impl AsRef<CacheRwLock>, s: &str) -> Result<Self, Self::Err>;
 }
 
 pub trait StrExt: Sized {
-    fn parse_cached<F: FromStrAndCache>(&self, cache: &Arc<RwLock<Cache>>) -> Result<F, F::Err>;
+    fn parse_cached<F: FromStrAndCache>(&self, cache: impl AsRef<CacheRwLock>) -> Result<F, F::Err>;
 }
 
 impl<'a> StrExt for &'a str {
-    fn parse_cached<F: FromStrAndCache>(&self, cache: &Arc<RwLock<Cache>>) -> Result<F, F::Err> {
+    fn parse_cached<F: FromStrAndCache>(&self, cache: impl AsRef<CacheRwLock>) -> Result<F, F::Err> {
         F::from_str(&cache, &self)
     }
 }
@@ -83,7 +84,7 @@ impl<'a> StrExt for &'a str {
 impl<F: FromStr> FromStrAndCache for F {
     type Err = F::Err;
 
-    fn from_str(_cache: &Arc<RwLock<Cache>>, s: &str) -> Result<Self, Self::Err> {
+    fn from_str(_cache: impl AsRef<CacheRwLock>, s: &str) -> Result<Self, Self::Err> {
         s.parse::<F>()
     }
 }
@@ -307,11 +308,11 @@ impl Cache {
     /// Printing the count of all private channels and groups:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::Cache};
+    /// # use serenity::{cache::{Cache, CacheRwLock}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// let amount = cache.read().all_private_channels().len();
     ///
     /// println!("There are {} private channels", amount);
@@ -421,12 +422,12 @@ impl Cache {
     /// Retrieve a guild from the cache and print its name:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::Cache};
+    /// # use serenity::{cache::{Cache, CacheRwLock}};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(guild) = cache.read().guild(7) {
     ///     println!("Guild name: {}", guild.read().name);
@@ -516,12 +517,12 @@ impl Cache {
     /// Retrieve a group from the cache and print its owner's id:
     ///
     /// ```rust,no_run
-    /// # use serenity::cache::Cache;
+    /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// if let Some(group) = cache.read().group(7) {
     ///     println!("Owner Id: {}", group.read().owner_id);
     /// }
@@ -549,11 +550,11 @@ impl Cache {
     /// [`Client::on_message`] context:
     ///
     /// ```rust,ignore
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// let cache = cache.read();
     ///
     /// let member = {
@@ -609,13 +610,13 @@ impl Cache {
     /// [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, MessageId}};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, MessageId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
     /// # let message = ChannelId(0).message(&http, MessageId(1)).unwrap();
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #
     /// let cache = cache.read();
     /// let fetched_message = cache.message(message.channel_id, message.id);
@@ -658,12 +659,12 @@ impl Cache {
     /// ```rust,no_run
     /// # use std::error::Error;
     /// #
-    /// # use serenity::{cache::Cache, model::prelude::*, prelude::*};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #   let cache = cache.read();
     /// // assuming the cache has been unlocked
     ///
@@ -706,12 +707,12 @@ impl Cache {
     /// Retrieve a role from the cache and print its name:
     ///
     /// ```rust,no_run
-    /// # use serenity::cache::Cache;
+    /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
     /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache = Arc::new(RwLock::new(Cache::default()));
+    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(role) = cache.read().role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
@@ -1024,5 +1025,30 @@ mod test {
 
         // Assert that the channel's message cache no longer exists.
         assert!(!cache.messages.contains_key(&ChannelId(2)));
+    }
+}
+
+/// A neworphantype to allow implementing `AsRef<CacheRwLock>`
+/// for the automatically dereferenced underlying type.
+#[derive(Clone)]
+pub struct CacheRwLock(Arc<RwLock<Cache>>);
+
+impl From<Arc<RwLock<Cache>>> for CacheRwLock {
+    fn from(cache: Arc<RwLock<Cache>>) -> Self {
+        Self(cache)
+    }
+}
+
+impl AsRef<CacheRwLock> for CacheRwLock {
+    fn as_ref(&self) -> &CacheRwLock {
+        &self
+    }
+}
+
+impl Deref for CacheRwLock {
+    type Target = Arc<RwLock<Cache>>;
+
+    fn deref(&self) -> &Arc<RwLock<Cache>> {
+        &self.0
     }
 }

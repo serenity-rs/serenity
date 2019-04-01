@@ -54,9 +54,7 @@ use log::warn;
 #[cfg(feature = "cache")]
 use crate::framework::standard::{has_correct_roles, has_correct_permissions};
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
+use crate::cache::CacheRwLock;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -248,7 +246,7 @@ fn remove_aliases(cmds: &HashMap<String, CommandOrAlias>) -> HashMap<&String, &I
 /// Checks whether a user is member of required roles
 /// and given the required permissions.
 #[cfg(feature = "cache")]
-pub fn has_all_requirements(cache: &Arc<RwLock<Cache>>, cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
+pub fn has_all_requirements(cache: impl AsRef<CacheRwLock>, cmd: &Arc<CommandOptions>, msg: &Message) -> bool {
     if let Some(guild) = msg.guild(&cache) {
         let guild = guild.read();
 
@@ -273,7 +271,7 @@ pub fn has_all_requirements(cache: &Arc<RwLock<Cache>>, cmd: &Arc<CommandOptions
 /// **Note**: A command is visible when it is either normally displayed or
 /// strikethrough upon requested help by a user.
 #[cfg(feature = "cache")]
-pub fn is_command_visible(cache: &Arc<RwLock<Cache>>, command_options: &Arc<CommandOptions>, msg: &Message,
+pub fn is_command_visible(cache: impl AsRef<CacheRwLock>, command_options: &Arc<CommandOptions>, msg: &Message,
     help_options: &HelpOptions) -> bool {
 
     if !command_options.dm_only && !command_options.guild_only
@@ -318,7 +316,7 @@ pub fn is_command_visible(cache: &Arc<RwLock<Cache>>, command_options: &Arc<Comm
 /// returns similar commands.
 #[cfg(feature = "cache")]
 fn fetch_single_command<'a, H: BuildHasher>(
-    cache: &Arc<RwLock<Cache>>,
+    cache: impl AsRef<CacheRwLock>,
     groups: &'a HashMap<String, Arc<CommandGroup>, H>,
     name: &str,
     help_options: &'a HelpOptions,

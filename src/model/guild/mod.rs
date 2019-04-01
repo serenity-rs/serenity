@@ -26,7 +26,7 @@ use log::{error, warn};
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -153,8 +153,8 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
-    fn check_hierarchy(&self, cache: &Arc<RwLock<Cache>>, other_user: UserId) -> Result<()> {
-        let current_id = cache.read().user.id;
+    fn check_hierarchy(&self, cache: impl AsRef<CacheRwLock>, other_user: UserId) -> Result<()> {
+        let current_id = cache.as_ref().read().user.id;
 
         if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
             if higher != current_id {
@@ -197,8 +197,8 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    fn has_perms(&self, cache: &Arc<RwLock<Cache>>, mut permissions: Permissions) -> bool {
-        let user_id = cache.read().user.id;
+    fn has_perms(&self, cache: impl AsRef<CacheRwLock>, mut permissions: Permissions) -> bool {
+        let user_id = cache.as_ref().read().user.id;
 
         let perms = self.member_permissions(user_id);
         permissions.remove(perms);
@@ -703,7 +703,7 @@ impl Guild {
     /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn greater_member_hierarchy<T, U>(&self, cache: &Arc<RwLock<Cache>>, lhs_id: T, rhs_id: U)
+    pub fn greater_member_hierarchy<T, U>(&self, cache: impl AsRef<CacheRwLock>, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
         self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
     }
@@ -711,7 +711,7 @@ impl Guild {
     #[cfg(feature = "cache")]
     fn _greater_member_hierarchy(
         &self,
-        cache: &Arc<RwLock<Cache>>,
+        cache: impl AsRef<CacheRwLock>,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -1415,7 +1415,7 @@ impl Guild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: &Arc<RwLock<Cache>>) -> u64 { self.id.shard_id(&cache) }
+    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 { self.id.shard_id(&cache) }
 
     /// Returns the Id of the shard associated with the guild.
     ///

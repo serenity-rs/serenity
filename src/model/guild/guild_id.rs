@@ -4,7 +4,7 @@ use serde_json::json;
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(feature = "model")]
 use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
@@ -442,7 +442,7 @@ impl GuildId {
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_guild_cached(self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<Guild>>> { cache.read().guild(self) }
+    pub fn to_guild_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {cache.as_ref().read().guild(self) }
 
     /// Requests [`PartialGuild`] over REST API.
     ///
@@ -611,8 +611,8 @@ impl GuildId {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: &Arc<RwLock<Cache>>) -> u64 {
-        crate::utils::shard_id(self.0, cache.read().shard_count)
+    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+        crate::utils::shard_id(self.0, cache.as_ref().read().shard_count)
     }
 
     /// Returns the Id of the shard associated with the guild.

@@ -36,9 +36,7 @@ use std::{
 };
 
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use std::sync::Arc;
+use crate::cache::{Cache, CacheRwLock};
 
 /// Converts a HashMap into a final `serde_json::Map` representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
@@ -464,12 +462,12 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 /// use serenity::utils;
 ///
 /// // assuming that the id is `1234`:
-/// assert_eq!(1234, utils::with_cache(|cache| cache.user.id));
+/// assert_eq!(1234, utils::with_cache(|cache|cache.as_ref().user.id));
 /// ```
 #[cfg(feature = "cache")]
-pub fn with_cache<T, F>(cache: &Arc<RwLock<Cache>>, f: F) -> T
+pub fn with_cache<T, F>(cache: impl AsRef<CacheRwLock>, f: F) -> T
     where F: Fn(&Cache) -> T {
-    let cache = cache.read();
+    let cache = cache.as_ref().read();
     f(&cache)
 }
 
@@ -483,14 +481,14 @@ pub fn with_cache<T, F>(cache: &Arc<RwLock<Cache>>, f: F) -> T
 /// use serenity::utils;
 ///
 /// // assuming that the id is `1234`:
-/// assert_eq!(1234, utils::with_cache_mut(|cache| { cache.shard_count = 8; cache.user.id }));
+/// assert_eq!(1234, utils::with_cache_mut(|cache| { cache.shard_count = 8;cache.as_ref().user.id }));
 /// ```
 ///
 /// [`with_cache`]: #fn.with_cache
 #[cfg(feature = "cache")]
-pub fn with_cache_mut<T, F>(cache: &Arc<RwLock<Cache>>, mut f: F) -> T
+pub fn with_cache_mut<T, F>(cache: impl AsRef<CacheRwLock>, mut f: F) -> T
     where F: FnMut(&mut Cache) -> T {
-    let mut cache = cache.write();
+    let mut cache = cache.as_ref().write();
     f(&mut cache)
 }
 
@@ -609,7 +607,7 @@ impl Default for ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_roles(cache: &Arc<RwLock<Cache>>, s: &mut String) {
+fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@&") {
@@ -770,10 +768,10 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 ///
 /// ```rust
 /// # use std::sync::Arc;
-/// # use serenity::client::Cache;
+/// # use serenity::client::{Cache, CacheRwLock};
 /// # use parking_lot::RwLock;
 /// #
-/// # let cache = Arc::new(RwLock::new(Cache::default()));
+/// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
 /// use serenity::utils::{
 ///     content_safe,
 ///     ContentSafeOptions,
@@ -787,8 +785,9 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(cache: &Arc<RwLock<Cache>>, s: &str, options: &ContentSafeOptions) -> String {
+pub fn content_safe(cache: impl AsRef<CacheRwLock>, s: &str, options: &ContentSafeOptions) -> String {
     let mut s = s.to_string();
+    let cache = cache.as_ref();
 
     if options.clean_role {
         clean_roles(&cache, &mut s);
@@ -816,7 +815,7 @@ pub fn content_safe(cache: &Arc<RwLock<Cache>>, s: &str, options: &ContentSafeOp
 #[cfg(test)]
 mod test {
     #[cfg(feature = "cache")]
-    use crate::cache::Cache;
+    use crate::cache::CacheRwLock;
 
     use super::*;
 
@@ -945,7 +944,7 @@ mod test {
             slow_mode_rate: Some(0),
         };
 
-        let cache = Arc::new(RwLock::new(Cache::default()));
+        let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
 
         {
             let mut cache = cache.try_write().unwrap();

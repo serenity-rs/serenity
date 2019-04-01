@@ -9,7 +9,7 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -126,12 +126,12 @@ impl Message {
     /// ```
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn channel(&self, cache: &Arc<RwLock<Cache>>) -> Option<Channel> { cache.read().channel(self.channel_id) }
+    pub fn channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> { cache.as_ref().read().channel(self.channel_id) }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn is_own(&self, cache: &Arc<RwLock<Cache>>) -> bool { self.author.id == cache.read().user.id }
+    pub fn is_own(&self, cache: impl AsRef<CacheRwLock>) -> bool { self.author.id == cache.as_ref().read().user.id }
 
     /// Deletes the message.
     ///
@@ -285,7 +285,7 @@ impl Message {
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
-    pub fn content_safe(&self, cache: &Arc<RwLock<Cache>>) -> String {
+    pub fn content_safe(&self, cache: impl AsRef<CacheRwLock>) -> String {
         let mut result = self.content.clone();
 
         // First replace all user mentions.
@@ -353,8 +353,8 @@ impl Message {
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
-    pub fn guild(&self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<Guild>>> {
-        cache.read().guild(self.guild_id?)
+    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
+       cache.as_ref().read().guild(self.guild_id?)
     }
 
     /// True if message was sent using direct messages.
@@ -371,7 +371,7 @@ impl Message {
     ///
     /// [`Guild::members`]: ../guild/struct.Guild.html#structfield.members
     #[cfg(feature = "cache")]
-    pub fn member(&self, cache: &Arc<RwLock<Cache>>) -> Option<Member> {
+    pub fn member(&self, cache: impl AsRef<CacheRwLock>) -> Option<Member> {
         self.guild(&cache).and_then(|g| g.read().members.get(&self.author.id).cloned())
     }
 
