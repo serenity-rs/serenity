@@ -495,12 +495,12 @@ impl Context {
 }
 
 #[cfg(feature = "http")]
-impl AsRef<Http> for &Context {
+impl AsRef<Http> for Context {
     fn as_ref(&self) -> &Http { &self.http }
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<CacheRwLock> for &Context {
+impl AsRef<CacheRwLock> for Context {
     fn as_ref(&self) -> &CacheRwLock {
         &self.cache
     }
