@@ -18,7 +18,7 @@ use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{cache::Cache, utils};
+use crate::{cache::CacheRwLock, utils};
 #[cfg(all(feature = "http"))]
 use crate::http::Http;
 
@@ -173,8 +173,8 @@ impl Member {
 
     /// Determines the member's colour.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn colour(&self, cache: &Arc<RwLock<Cache>>) -> Option<Colour> {
-        let cache = cache.read();
+    pub fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
+        let cache = cache.as_ref().read();
         let guild = cache.guilds.get(&self.guild_id)?.read();
 
         let mut roles = self.roles
@@ -195,7 +195,7 @@ impl Member {
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
     #[cfg(feature = "cache")]
-    pub fn default_channel(&self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub fn default_channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<GuildChannel>>> {
         let guild = match self.guild_id.to_guild_cached(&cache) {
             Some(guild) => guild,
             None => return None,
@@ -261,7 +261,7 @@ impl Member {
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub fn highest_role_info(&self, cache: &Arc<RwLock<Cache>>) -> Option<(RoleId, i64)> {
+    pub fn highest_role_info(&self, cache: impl AsRef<CacheRwLock>) -> Option<(RoleId, i64)> {
         let guild = self.guild_id.to_guild_cached(&cache)?;
         let reader = guild.try_read()?;
 
@@ -361,7 +361,7 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
-    pub fn permissions(&self, cache: &Arc<RwLock<Cache>>) -> Result<Permissions> {
+    pub fn permissions(&self, cache: impl AsRef<CacheRwLock>) -> Result<Permissions> {
         let guild = match self.guild_id.to_guild_cached(&cache) {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
@@ -427,11 +427,11 @@ impl Member {
 
     /// Retrieves the full role data for the user's roles.
     ///
-    /// This is shorthand for manually searching through the CACHE.
+    /// This is shorthand for manually searching through the Cache.
     ///
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
-    pub fn roles(&self, cache: &Arc<RwLock<Cache>>) -> Option<Vec<Role>> {
+    pub fn roles(&self, cache: impl AsRef<CacheRwLock>) -> Option<Vec<Role>> {
         self
             .guild_id
             .to_guild_cached(&cache)

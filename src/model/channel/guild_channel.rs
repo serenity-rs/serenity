@@ -4,7 +4,7 @@ use crate::{model::prelude::*};
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
 use parking_lot::RwLock;
 #[cfg(feature = "cache")]
@@ -171,12 +171,12 @@ impl GuildChannel {
     /// #
     /// # #[cfg(feature = "cache")]
     /// # fn main() -> Result<(), Box<Error>> {
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #     let http = Arc::new(Http::default());
-    /// #     let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -215,12 +215,12 @@ impl GuildChannel {
     /// #
     /// # #[cfg(feature = "cache")]
     /// # fn main() -> Result<(), Box<Error>> {
-    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let http = Arc::new(Http::default());
-    /// #   let cache = Arc::new(RwLock::new(Cache::default()));
+    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -413,7 +413,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self, cache: &Arc<RwLock<Cache>>) -> Option<Arc<RwLock<Guild>>> { cache.read().guild(self.guild_id) }
+    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {cache.as_ref().read().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -558,12 +558,12 @@ impl GuildChannel {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn permissions_for<U: Into<UserId>>(&self, cache: &Arc<RwLock<Cache>>, user_id: U) -> Result<Permissions> {
+    pub fn permissions_for<U: Into<UserId>>(&self, cache: impl AsRef<CacheRwLock>, user_id: U) -> Result<Permissions> {
         self._permissions_for(&cache, user_id.into())
     }
 
     #[cfg(feature = "cache")]
-    fn _permissions_for(&self, cache: &Arc<RwLock<Cache>>, user_id: UserId) -> Result<Permissions> {
+    fn _permissions_for(&self, cache: impl AsRef<CacheRwLock>, user_id: UserId) -> Result<Permissions> {
         self.guild(&cache)
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
             .map(|g| g.read().permissions_in(self.id, user_id))
