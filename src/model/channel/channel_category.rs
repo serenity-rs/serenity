@@ -44,7 +44,7 @@ impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: &Arc<Http>, target: &PermissionOverwrite) -> Result<()> {
+    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
         self.id.create_permission(&http, target)
     }
 
@@ -55,7 +55,7 @@ impl ChannelCategory {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission(&self, http: &Arc<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+    pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(&http, permission_type)
     }
 

@@ -24,7 +24,7 @@ use crate::utils::VecMap;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
 /// # use std::sync::Arc;
 /// # let http = Arc::new(Http::default());
-/// let webhook = http.get_webhook_with_token(id, token)
+/// let webhook = http.as_ref().get_webhook_with_token(id, token)
 ///     .expect("valid webhook");
 ///
 /// let website = Embed::fake(|e| {
@@ -63,7 +63,7 @@ impl ExecuteWebhook {
     /// # use std::sync::Arc;
     /// #
     /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
+    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
@@ -90,7 +90,7 @@ impl ExecuteWebhook {
     /// # use std::sync::Arc;
     /// #
     /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
+    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("foo")
@@ -137,7 +137,7 @@ impl ExecuteWebhook {
     /// # use std::sync::Arc;
     /// #
     /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
+    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").tts(true)
@@ -164,7 +164,7 @@ impl ExecuteWebhook {
     /// # use std::sync::Arc;
     /// #
     /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.get_webhook_with_token(0, "").unwrap();
+    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").username("hakase")
