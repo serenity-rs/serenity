@@ -226,7 +226,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.shard_stage_update(&context, event);
+                event_handler.shard_stage_update(&context, &event);
             });
         }
         DispatchEvent::Model(Event::ChannelCreate(mut event)) => {
@@ -285,7 +285,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.channel_pins_update(&context, event);
+                event_handler.channel_pins_update(&context, &event);
             });
         },
         DispatchEvent::Model(Event::ChannelRecipientAdd(mut event)) => {
@@ -600,7 +600,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.typing_start(&context, event);
+                event_handler.typing_start(&context, &event);
             });
         },
         DispatchEvent::Model(Event::Unknown(mut event)) => {

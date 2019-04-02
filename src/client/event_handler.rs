@@ -66,7 +66,7 @@ pub trait EventHandler {
     /// Dispatched when a pin is added, deleted.
     ///
     /// Provides said pin's data.
-    fn channel_pins_update(&self, _ctx: &Context, _pin: ChannelPinsUpdateEvent) {}
+    fn channel_pins_update(&self, _ctx: &Context, _pin: &ChannelPinsUpdateEvent) {}
 
     /// Dispatched when a user is added to a `Group`.
     ///
@@ -283,10 +283,10 @@ pub trait EventHandler {
     /// Dispatched when a shard's connection stage is updated
     ///
     /// Provides the context of the shard and the event information about the update.
-    fn shard_stage_update(&self, _ctx: &Context, _event: ShardStageUpdateEvent) {}
+    fn shard_stage_update(&self, _ctx: &Context, _event: &ShardStageUpdateEvent) {}
 
     /// Dispatched when a user starts typing.
-    fn typing_start(&self, _ctx: &Context, _event: TypingStartEvent) {}
+    fn typing_start(&self, _ctx: &Context, _event: &TypingStartEvent) {}
 
     /// Dispatched when an unknown event was sent from discord.
     ///
