@@ -541,7 +541,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             threadpool.execute(move || {
                 feature_cache! {{
                     let _after = cache_and_http.cache.as_ref().read().message(event.channel_id, event.id);
-                    event_handler.message_update(context, _before, _after, event);
+                    event_handler.message_update(&context, _before.as_ref(), _after.as_ref(), &event);
                 } else {
                     event_handler.message_update(&context, &event);
                 }}
@@ -635,9 +635,9 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    event_handler.voice_state_update(context, event.guild_id, _before, &event.voice_state);
+                    event_handler.voice_state_update(&context, event.guild_id, _before.as_ref(), &event.voice_state);
                 } else {
-                    event_handler.voice_state_update(context, event.guild_id, &event.voice_state);
+                    event_handler.voice_state_update(&context, event.guild_id, &event.voice_state);
                 }}
             });
         },
