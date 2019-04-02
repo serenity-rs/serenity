@@ -8,9 +8,12 @@ mod configuration;
 mod parse;
 mod structures;
 
-pub use self::args::{Args, Delimiter, Error as ArgError, Iter};
-pub use self::configuration::Configuration;
-pub use self::structures::*;
+pub use args::{Args, Delimiter, Error as ArgError, Iter};
+pub use configuration::Configuration;
+pub use structures::*;
+
+use structures::buckets::{Bucket, Ratelimit};
+pub use structures::buckets::BucketBuilder;
 
 use self::parse::*;
 use super::Framework;
@@ -21,6 +24,7 @@ use crate::model::{
     guild::{Guild, Member},
     permissions::Permissions,
 };
+use std::collections::HashMap;
 use parking_lot::RwLock;
 use std::sync::Arc;
 use threadpool::ThreadPool;
@@ -34,6 +38,9 @@ use crate::cache::Cache;
 pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),
+    /// When the command requester has exceeded a ratelimit bucket. The attached
+    /// value is the time a requester has to wait to run the command again.
+    Ratelimited(i64),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the requested command can only be used in a direct message or group
@@ -69,6 +76,7 @@ type PrefixOnlyHook = dyn Fn(&mut Context, &Message) + Send + Sync + 'static;
 #[derive(Default)]
 pub struct StandardFramework {
     groups: Vec<&'static CommandGroup>,
+    buckets: HashMap<String, Bucket>,
     before: Option<Arc<BeforeHook>>,
     after: Option<Arc<AfterHook>>,
     dispatch: Option<Arc<DispatchHook>>,
@@ -138,6 +146,65 @@ impl StandardFramework {
         self
     }
 
+    /// Defines a bucket with `delay` between each command, and the `limit` of uses
+    /// per `time_span`.
+    ///
+    /// # Examples
+    ///
+    /// Create and use a bucket that limits a command to 3 uses per 10 seconds with
+    /// a 2 second delay inbetween invocations:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// #
+    /// use serenity::framework::standard::macros::command;
+    /// use serenity::framework::standard::{StandardFramework, CommandResult};
+    ///
+    /// #[command]
+    /// // Registers the bucket `basic` to this command.
+    /// #[bucket = "basic"]
+    /// fn nothing() -> CommandResult {
+    ///     Ok(())
+    /// }
+    ///
+    /// client.with_framework(StandardFramework::new()
+    ///     .bucket("basic", |b| b.delay(2).time_span(10).limit(3)));
+    /// ```
+    #[inline]
+    pub fn bucket<F>(mut self, name: &str, f: F) -> Self
+    where
+        F: FnOnce(&mut BucketBuilder) -> &mut BucketBuilder
+    {
+        let mut builder = BucketBuilder::default();
+
+        f(&mut builder);
+
+        let BucketBuilder {
+            delay,
+            time_span,
+            limit,
+            check,
+        } = builder;
+
+        self.buckets.insert(
+            name.to_string(),
+            Bucket {
+                ratelimit: Ratelimit {
+                    delay,
+                    limit: Some((time_span, limit)),
+                },
+                users: HashMap::new(),
+                check,
+            },
+        );
+
+        self
+    }
+
     fn should_fail(
         &mut self,
         ctx: &mut Context,
@@ -168,6 +235,18 @@ impl StandardFramework {
             && self.config.owners.contains(&msg.author.id)
         {
             return None;
+        }
+
+        if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| self.buckets.get_mut(*b)) {
+            let rate_limit = bucket.take(msg.author.id.0);
+
+            let apply = bucket.check.as_ref().map_or(true, |check| {
+                (check)(ctx, msg.guild_id, msg.channel_id, msg.author.id)
+            });
+
+            if apply && rate_limit > 0 {
+                return Some(DispatchError::Ratelimited(rate_limit));
+            }
         }
 
         if group.owners_only || command.owners_only {

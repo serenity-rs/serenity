@@ -182,6 +182,12 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                 options.checks = Checks(checks);
             },
+            "bucket" => {
+                let mut buck = String::new();
+                buck.parse("bucket", values);
+
+                options.bucket = Some(buck);
+            }
             "description" => {
                 let mut desc = String::new();
                 desc.parse("description", values);
@@ -213,6 +219,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let Options {
         checks,
+        bucket,
         aliases,
         description,
         usage,
@@ -229,6 +236,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let description = AsOption(description);
     let usage = AsOption(usage);
+    let bucket = AsOption(bucket);
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
 
@@ -272,6 +280,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         #(#cfgs)*
         pub static #options: #options_path = #options_path {
             checks: #checks,
+            bucket: #bucket,
             names: &[#name, #(#aliases),*],
             desc: #description,
             usage: #usage,

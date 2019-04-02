@@ -229,6 +229,7 @@ impl ToTokens for Checks {
 #[derive(Debug)]
 pub struct Options {
     pub checks: Checks,
+    pub bucket: Option<String>,
     pub aliases: Vec<String>,
     pub description: Option<String>,
     pub usage: Option<String>,
@@ -248,6 +249,7 @@ impl Default for Options {
     fn default() -> Self {
         Options {
             checks: Checks::default(),
+            bucket: None,
             aliases: Vec::new(),
             description: None,
             usage: None,

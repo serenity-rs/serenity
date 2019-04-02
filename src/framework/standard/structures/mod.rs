@@ -10,6 +10,7 @@ use crate::utils::Colour;
 use super::Args;
 
 mod check;
+pub mod buckets;
 
 pub use self::check::*;
 
@@ -25,6 +26,8 @@ pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
     pub checks: &'static [Check],
+    /// Ratelimit bucket.
+    pub bucket: Option<&'static str>,
     /// Names that the command can be referred to.
     pub names: &'static [&'static str],
     /// Command description, used by other commands.
