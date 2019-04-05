@@ -1,5 +1,6 @@
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
+use serde::de::MapAccess;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
 use std::{
     collections::HashMap,
@@ -274,6 +275,34 @@ macro_rules! num_visitors {
                 fn visit_i64<E: DeError>(self, v: i64) -> StdResult<Self::Value, E> { Ok(v as $type) }
 
                 fn visit_u64<E: DeError>(self, v: u64) -> StdResult<Self::Value, E> { Ok(v as $type) }
+
+                // This is called when serde_json's `arbitrary_precision` feature is enabled.
+                fn visit_map<A: MapAccess<'de>>(self, mut map: A) -> StdResult<Self::Value, A::Error> {
+                    struct Id {
+                        num: $type,
+                    }
+                    
+                    struct StrVisitor;
+                    
+                    impl<'de> Visitor<'de> for StrVisitor {
+                        type Value = $type;
+                        
+                        fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
+                            formatter.write_str("string")
+                        }
+                        
+                        fn visit_str<E: DeError>(self, s: &str) -> StdResult<Self::Value, E> { s.parse().map_err(E::custom) }
+                        fn visit_string<E: DeError>(self, s: String) -> StdResult<Self::Value, E> { s.parse().map_err(E::custom) }
+                    }
+                    
+                    impl<'de> Deserialize<'de> for Id {
+                        fn deserialize<D: Deserializer<'de>>(des: D) -> StdResult<Self, D::Error> {
+                            Ok(Id { num: des.deserialize_str(StrVisitor)? })
+                        }
+                    }
+                    
+                    map.next_value::<Id>().map(|id| id.num)
+                }
             }
         )*
     }
