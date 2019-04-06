@@ -645,78 +645,42 @@ impl User {
     /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
-    /// # Note
-    ///
-    /// Currently if Cache is disabled it will get the member with http, if it
-    /// fails it will only log a warning and return false, if both cache and
-    /// http is disabled it will always return false.
-    ///
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`GuildId`]: ../id/struct.GuildId.html
     /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
     /// [`Role`]: ../guild/struct.Role.html
     /// [`Cache`]: ../../cache/struct.Cache.html
-    // no-cache would warn on guild_id.
     #[cfg(feature = "client")]
-    pub fn has_role<G, R>(&self, context: &Context, guild: G, role: R) -> bool
+    pub fn has_role<G, R>(&self, context: &Context, guild: G, role: R) -> Result<bool>
         where G: Into<GuildContainer>, R: Into<RoleId> {
         self._has_role(&context, guild.into(), role.into())
     }
 
     #[cfg(feature = "client")]
-    fn _has_role(&self, context: &Context, guild: GuildContainer, role: RoleId) -> bool {
+    fn _has_role(&self, context: &Context, guild: GuildContainer, role: RoleId) -> Result<bool> {
         match guild {
             GuildContainer::Guild(partial_guild) => {
-                feature_cache! {{
-                    self.has_role(partial_guild.id.0, role)
-                } else {
-                    #[cfg(feature = "http")]
-                    {
-                        info!("[has_role] Getting the member with http");
-                        #[cfg(feature = "http")]
-                        use http::raw::get_member;
-                        if let Ok(m) = get_member(partial_guild.id.0, self.id.0) {
-                            m.roles.contains(&role)
-                        } else {
-                            error!("[has_role] Error getting the member");
-                            false
-                        }
-                    }
-                    #[cfg(not(feature = "http"))]
-                    {
-                        warn!("[has_role] Does not work without either cache or http.");
-                        false
-                    }
-                }}
+                self._has_role(context, GuildContainer::Id(partial_guild.id), role)
             },
             GuildContainer::Id(guild_id) => {
                 feature_cache! {{
-                    context.cache.read()
+                    Ok(
+                        context.cache.read()
                         .guilds
                         .get(&guild_id)
-                        .map(|g| {
+                        .map_or(false, |g| {
                             g.read().members.get(&self.id)
-                                .map(|m| m.roles.contains(&role))
-                                .unwrap_or(false)
+                                .map_or(false, |m| m.roles.contains(&role))
                         })
-                        .unwrap_or(false)
+                    )
                 } else {
                     #[cfg(feature = "http")]
                     {
-                        info!("[has_role] Getting the member with http");
-                        #[cfg(feature = "http")]
-                        use http::raw::get_member;
-                        if let Ok(m) = get_member(guild_id.0, self.id.0) {
-                            m.roles.contains(&role)
-                        } else {
-                            error!("[has_role] Error getting the member");
-                            false
-                        }
+                        context.http.get_member(guild_id.0, self.id.0).map(|m| m.roles.contains(&role))
                     }
                     #[cfg(not(feature = "http"))]
                     {
-                        warn!("[has_role] Does not work without either cache or http.");
-                        false
+                        Err(Error::Model(ModelError::ItemMissing))
                     }
                 }}
             },
