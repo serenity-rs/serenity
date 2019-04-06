@@ -1089,7 +1089,7 @@ fn normalize(text: &str) -> String {
 mod test {
     use crate::model::prelude::*;
     use super::{
-        ContentModifier::{Bold, Code, Italic},
+        ContentModifier::{Spoiler, Bold, Code, Italic},
         MessageBuilder,
     };
 
