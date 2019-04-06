@@ -34,6 +34,8 @@ pub struct CommandOptions {
     pub desc: Option<&'static str>,
     /// Command usage schema, used by other commands.
     pub usage: Option<&'static str>,
+    /// Example arguments, used by other commands.
+    pub example: Option<&'static str>,
     /// Minimum amount of arguments that should be passed.
     pub min_args: Option<u8>,
     /// Maximum amount of arguments that can be passed.

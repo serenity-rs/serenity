@@ -226,7 +226,6 @@ impl Parse for Array {
     }
 }
 
-// FIXME: God give me the strength I need to shorten this.
 pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
     if is_help && fun.args.len() > 6 {
         return Err(Error::new(
@@ -262,230 +261,58 @@ pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
     let groups_error = "fifth argument's type should be `&[&'static CommandGroup]`";
     let owners_error = "sixth argument's type should be `HashSet<UserId>`";
 
-    match fun.args.len() {
-        0 => {
-            fun.args.push(Argument {
-                mutable: None,
-                name: Ident::new("_ctx", Span::call_site()),
-                kind: context_path,
-            });
-            fun.args.push(Argument {
-                mutable: None,
-                name: Ident::new("_msg", Span::call_site()),
-                kind: message_path,
-            });
-            fun.args.push(Argument {
-                mutable: Some(parse_quote!(mut)),
-                name: Ident::new("_args", Span::call_site()),
-                kind: args_path,
-            });
 
-            if is_help {
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_options", Span::call_site()),
-                    kind: options_path,
+    macro_rules! spoof_or_check {
+        ($(($($help:tt)?) [$($mut:tt)?] $type:ident, $name:literal, $error:ident, $path:ident);*) => {{
+            macro_rules! arg {
+                () => {
+                    None
+                };
+                (mut) => {
+                    Some(parse_quote!(mut))
+                }
+            }
+
+            macro_rules! help {
+                ($b:block) => {
+                    $b
+                };
+                (help $b:block) => {
+                    if is_help {
+                        $b
+                    }
+                }
+            }
+
+            let mut index = 0;
+            $(
+                help!($($help)? {
+                    match fun.args.get(index) {
+                        Some(x) => {
+                            if x.kind != $type {
+                                return Err(Error::new(fun.args[index].span(), $error));
+                            }
+                        },
+                        None => fun.args.push(Argument {
+                            mutable: arg!($($mut)?),
+                            name: Ident::new($name, Span::call_site()),
+                            kind: $path,
+                        }),
+                    }
                 });
 
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_groups", Span::call_site()),
-                    kind: groups_path,
-                });
+                index += 1;
+            )*
+        }};
+    }
 
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_owners", Span::call_site()),
-                    kind: owners_path,
-                });
-            }
-        }
-        1 => {
-            if fun.args[0].kind != context {
-                return Err(Error::new(fun.args[0].span(), ctx_error));
-            }
-
-            fun.args.push(Argument {
-                mutable: None,
-                name: Ident::new("_msg", Span::call_site()),
-                kind: message_path,
-            });
-            fun.args.push(Argument {
-                mutable: Some(parse_quote!(mut)),
-                name: Ident::new("_args", Span::call_site()),
-                kind: args_path,
-            });
-
-            if is_help {
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_options", Span::call_site()),
-                    kind: options_path,
-                });
-
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_groups", Span::call_site()),
-                    kind: groups_path,
-                });
-
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_owners", Span::call_site()),
-                    kind: owners_path,
-                });
-            }
-        }
-        2 => {
-            if fun.args[0].kind != context {
-                return Err(Error::new(fun.args[0].span(), ctx_error));
-            }
-
-            if fun.args[1].kind != message {
-                return Err(Error::new(fun.args[1].span(), msg_error));
-            }
-
-            fun.args.push(Argument {
-                mutable: Some(parse_quote!(mut)),
-                name: Ident::new("_args", Span::call_site()),
-                kind: args_path,
-            });
-
-            if is_help {
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_options", Span::call_site()),
-                    kind: options_path,
-                });
-
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_groups", Span::call_site()),
-                    kind: groups_path,
-                });
-
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_owners", Span::call_site()),
-                    kind: owners_path,
-                });
-            }
-        }
-        3 => {
-            if fun.args[0].kind != context {
-                return Err(Error::new(fun.args[0].span(), ctx_error));
-            }
-
-            if fun.args[1].kind != message {
-                return Err(Error::new(fun.args[1].span(), msg_error));
-            }
-
-            if fun.args[2].kind != args {
-                return Err(Error::new(fun.args[2].span(), args_error));
-            }
-
-            if is_help {
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_options", Span::call_site()),
-                    kind: options_path,
-                });
-
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_groups", Span::call_site()),
-                    kind: groups_path,
-                });
-
-                fun.args.push(Argument {
-                    mutable: None,
-                    name: Ident::new("_owners", Span::call_site()),
-                    kind: owners_path,
-                });
-            }
-        }
-        4 => {
-            if fun.args[0].kind != context {
-                return Err(Error::new(fun.args[0].span(), ctx_error));
-            }
-
-            if fun.args[1].kind != message {
-                return Err(Error::new(fun.args[1].span(), msg_error));
-            }
-
-            if fun.args[2].kind != args {
-                return Err(Error::new(fun.args[2].span(), args_error));
-            }
-
-            if fun.args[3].kind != options {
-                return Err(Error::new(fun.args[3].span(), options_error));
-            }
-
-            fun.args.push(Argument {
-                mutable: None,
-                name: Ident::new("_groups", Span::call_site()),
-                kind: groups_path,
-            });
-
-            fun.args.push(Argument {
-                mutable: None,
-                name: Ident::new("_owners", Span::call_site()),
-                kind: owners_path,
-            });
-        }
-        5 => {
-            if fun.args[0].kind != context {
-                return Err(Error::new(fun.args[0].span(), ctx_error));
-            }
-
-            if fun.args[1].kind != message {
-                return Err(Error::new(fun.args[1].span(), msg_error));
-            }
-
-            if fun.args[2].kind != args {
-                return Err(Error::new(fun.args[2].span(), args_error));
-            }
-
-            if fun.args[3].kind != options {
-                return Err(Error::new(fun.args[3].span(), options_error));
-            }
-
-            if fun.args[4].kind != groups {
-                return Err(Error::new(fun.args[4].span(), groups_error));
-            }
-
-            fun.args.push(Argument {
-                mutable: None,
-                name: Ident::new("_owners", Span::call_site()),
-                kind: owners_path,
-            });
-        }
-        6 => {
-            if fun.args[0].kind != context {
-                return Err(Error::new(fun.args[0].span(), ctx_error));
-            }
-
-            if fun.args[1].kind != message {
-                return Err(Error::new(fun.args[1].span(), msg_error));
-            }
-
-            if fun.args[2].kind != args {
-                return Err(Error::new(fun.args[2].span(), args_error));
-            }
-
-            if fun.args[3].kind != options {
-                return Err(Error::new(fun.args[3].span(), options_error));
-            }
-
-            if fun.args[4].kind != groups {
-                return Err(Error::new(fun.args[4].span(), groups_error));
-            }
-
-            if fun.args[5].kind != owners {
-                return Err(Error::new(fun.args[5].span(), owners_error));
-            }
-        }
-        _ => unreachable!(),
+    spoof_or_check! {
+        ()     []    context, "_ctx", ctx_error, context_path;
+        ()     []    message, "_msg", msg_error, message_path;
+        ()     [mut] args, "_args", args_error, args_path;
+        (help) []    options, "_options", options_error, options_path;
+        (help) []    groups, "_groups", groups_error, groups_path;
+        (help) []    owners, "_owners", owners_error, owners_path
     }
 
     Ok(())

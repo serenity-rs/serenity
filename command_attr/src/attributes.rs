@@ -104,7 +104,7 @@ impl<'a, T: fmt::Display> fmt::Display for DisplaySlice<'a, T> {
             1 => write!(f, "{}", (self.0)[0])?,
             _ => {
                 for (idx, item) in self.0.iter().enumerate() {
-                    write!(f, "{}: {}", idx, item)?;
+                    writeln!(f, "{}: {}", idx, item)?;
                 }
             }
         }

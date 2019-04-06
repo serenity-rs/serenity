@@ -1,4 +1,4 @@
-// It has become too of a burden for the `quote!` macro.
+// The `quote!` macro recurses a lot.
 #![recursion_limit = "128"]
 
 extern crate proc_macro;
@@ -58,37 +58,45 @@ macro_rules! match_options {
 
 /// The heart of the attribute-based framework.
 ///
-/// This is a function attribute macro, if you attempt to use this on other Rust constructs this will fail to work.
+/// This is a function attribute macro; if you attempt to use this on other Rust constructs, it won't work.
 ///
 /// # Options
 ///
-/// The point of this attribute is for easily configurable options,
-/// altering the way the framework will interpret the command.
+/// To alter how the framework will interpret the command,
+/// you can provide options as attributes following this `#[command]` macro.
 ///
-/// Options are passed also as attributes. Though each have their own way of accepting input.
+/// Each option has its own kind of data to stock and manipulate with.
+/// They're given to the option either with the `#[option(...)]` or `#[option = ...]` syntaxes.
+/// If an option doesn't require for any data to be supplied, then it's simply `#[option]`.
 ///
-/// Available options, are as follows:
+/// If the input to the option is malformed, the macro will give you can error, describing
+/// the correct method for passing data, and what it should be.
+///
+/// The list of available options, is, as follows:
 ///
 /// - `#[checks(idents)]`
 /// Preconditions that must be met. Executed before the command's execution.
 /// `idents` is a list of identifiers, seperated by a comma, referencing functions of the declaration:
-/// `Fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool`
+/// `fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool`
 ///
 /// - `#[aliases(names)]`
 /// A list of other names that can be used to execute this command.
-/// In `CommandOptions`, these are put in the `names` field, right after the command's name.
+/// In `serenity::framework::standard::CommandOptions`, these are put in the `names` field, right after the command's name.
 ///
 /// - `#[description(desc)]`/`#[description = desc]`
 /// A summary of the command.
 ///
-/// - `#[usage(how_to)]`/`#[usage = how_to]
-/// An example of the command's usage.
+/// - `#[usage(usg)]`/`#[usage = usg]
+/// Usage schema of the command.
+///
+/// - `#[example(ex)]`/`#[example = ex]
+/// Example of the command's usage.
 ///
 /// - `#[min_args(min)]`, `#[max_args(max)]`, `#[num_args(min_and_max)]`
 /// The minimum and/or maximum amount of arguments that the command should/can receive.
 ///
 /// `num_args` is a helper attribute, serving as a shorthand for calling
-/// `min_args` and `max_args` with the same number of arguments.
+/// `min_args` and `max_args` with the same amount of arguments.
 ///
 /// - `#[allowed_roles(roles)]`
 /// A list of strings (role names), seperated by a comma,
@@ -200,6 +208,12 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                 options.usage = Some(usage);
             },
+            "example" => {
+                let mut ex = String::new();
+                ex.parse("example", values);
+
+                options.example = Some(ex);
+            },
             _ => {
                 match_options!(name, values, options, span => [
                     min_args;
@@ -223,6 +237,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         aliases,
         description,
         usage,
+        example,
         min_args,
         max_args,
         allowed_roles,
@@ -237,6 +252,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let description = AsOption(description);
     let usage = AsOption(usage);
     let bucket = AsOption(bucket);
+    let example = AsOption(example);
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
 
@@ -251,13 +267,15 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = _name.clone();
 
     // If name starts with a number, prepend an underscore to make it a valid identifier.
-    let _name = if _name.starts_with(|c: char| c.is_numeric()) {
-        Ident::new(&format!("_{}", _name), Span::call_site())
+    let n = if _name.starts_with(|c: char| c.is_numeric()) {
+        format!("_{}", _name)
     } else {
-        Ident::new(&_name, Span::call_site())
+        _name
     };
 
-    let required_permissions = required_permissions.0;
+    let _name = Ident::new(&n, Span::call_site());
+
+    let Permissions(required_permissions) = required_permissions;
 
     let options = _name.with_suffix(COMMAND_OPTIONS);
     let sub = sub
@@ -266,9 +284,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         .collect::<Vec<_>>();
 
     let n = _name.with_suffix(COMMAND);
-    let nn = fun.name.clone();
 
-    let cfgs = fun.cfgs.clone();
+    let CommandFun { name: nn, cfgs, .. } = fun;
+
     let cfgs2 = cfgs.clone();
 
     let cname = crate_name();
@@ -284,6 +302,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             names: &[#name, #(#aliases),*],
             desc: #description,
             usage: #usage,
+            example: #example,
             min_args: #min_args,
             max_args: #max_args,
             allowed_roles: &[#(#allowed_roles),*],
@@ -306,14 +325,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
-/// Just like [`command`], this is a function attribute macro for easily configurable options.
-///
-/// However, this is intended for defining the help command.
+/// A brother macro to [`command`], but for the help command.
 /// An interface for simple browsing of all the available commands the bot provides,
 /// and reading through specific information regarding a command.
 ///
-/// Therefore, the options here will pertain in the help command's **layout**,
-/// rather than its functionality.
+/// As such, the options here will pertain in the help command's **layout** than its functionality.
 ///
 /// # Options
 ///
@@ -609,14 +625,12 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
     let n = fun.name.with_suffix(HELP);
-    let nn = fun.name.clone();
-    let cfgs = fun.cfgs.clone();
+    let CommandFun { name: nn, cfgs, .. } = fun;
     let cfgs2 = cfgs.clone();
 
     let cname = crate_name();
     let options_path = quote!(#cname::framework::standard::HelpOptions);
     let command_path = quote!(#cname::framework::standard::HelpCommand);
-
     let colour_path = quote!(#cname::utils::Colour);
 
     (quote! {

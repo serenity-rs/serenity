@@ -420,7 +420,7 @@ fn fetch_single_command<'a>(
                     aliases: options.names[1..].to_vec(),
                     availability: available_text,
                     usage: options.usage.clone(),
-                    usage_sample: None, /* options.example.clone() */
+                    usage_sample: options.example.clone(),
                 },
             });
         }

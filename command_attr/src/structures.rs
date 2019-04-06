@@ -220,6 +220,7 @@ impl ToTokens for Checks {
         let cname = crate_name();
         let checks_path = quote!(#cname::framework::standard::Check);
 
+        // FIXME: Handle the other fields of a `Check`
         let v = self.0.iter().map(|i| quote!(#checks_path { name: "", function: #i, check_in_help: true, display_in_help: true }));
 
         stream.extend(quote!(&[#(#v),*]));
@@ -233,6 +234,7 @@ pub struct Options {
     pub aliases: Vec<String>,
     pub description: Option<String>,
     pub usage: Option<String>,
+    pub example: Option<String>,
     pub min_args: Option<u8>,
     pub max_args: Option<u8>,
     pub allowed_roles: Vec<String>,
@@ -253,6 +255,7 @@ impl Default for Options {
             aliases: Vec::new(),
             description: None,
             usage: None,
+            example: None,
             min_args: None,
             max_args: None,
             allowed_roles: Vec::new(),
