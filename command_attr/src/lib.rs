@@ -284,9 +284,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         .collect::<Vec<_>>();
 
     let n = _name.with_suffix(COMMAND);
+    let nn = fun.name.clone();
 
-    let CommandFun { name: nn, cfgs, .. } = fun;
-
+    let cfgs = fun.cfgs.clone();
     let cfgs2 = cfgs.clone();
 
     let cname = crate_name();
@@ -625,7 +625,9 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
     let n = fun.name.with_suffix(HELP);
-    let CommandFun { name: nn, cfgs, .. } = fun;
+    let nn = fun.name.clone();
+
+    let cfgs = fun.cfgs.clone();
     let cfgs2 = cfgs.clone();
 
     let cname = crate_name();
@@ -674,6 +676,101 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// Create a grouping of commands.
+///
+/// It is a prerequisite for all commands to be assigned under a common group,
+/// before they may be executed by a user.
+///
+/// A group might have one or more *prefixes* set. This will necessitate for
+/// one of the prefixes to appear before the group's command.
+/// For example, for a general prefix `!`, a group prefix `foo` and a command `bar`,
+/// the invocation would look like this: `!foo bar`.
+///
+/// It might have some options apply to *all* of its commands. E.g. guild or dm only.
+///
+/// Its options may be *inherited* from another group.
+///
+/// It may even couple other groups as well.
+///
+/// This group macro purports all of the said purposes above, in a json-like syntax:
+///
+/// ```rust,no_run
+/// use command_attr::{command, group};
+///
+/// #[command]
+/// fn bar() {
+///     println!("baz");
+/// }
+///
+/// group!({
+///     name: "baz",
+///     options: {
+///         prefixes: ["baz"] // Any sub-group **must** have a prefix.
+///     },
+///     commands: [],
+/// });
+///
+/// group!({
+///     name: "foo",
+///     options: {
+///         prefixes: ["foo"],
+///     },
+///     commands: [bar],
+///     sub: [baz],
+/// });
+/// ```
+///
+/// # Options
+///
+/// These appear inside the object of the `options` field:
+///
+/// - `prefixes`: Array<String>
+/// The group's prefixes.
+///
+/// - `allowed_roles`: Array<String>
+/// Only which roles may execute this group's commands.
+///
+/// - `only`: String
+/// Whether this group's commands are restricted to `guilds` or `dms`.
+///
+/// - `owner_only`: Bool
+/// If only the owners of the bot may execute this group's commands.
+///
+/// - `owner_privilege`: Bool
+/// Whether the owners should be treated as normal users.
+///
+/// Default value is `true`
+///
+/// - `help_available`: bool
+/// Whether the group is visible to the help command.
+///
+/// Default value is `true`
+///
+/// - `checks`: Array<Ident>
+/// A set of preconditions that must be met before a group command's execution.
+/// Refer to [`command`]'s `checks` documentation.
+///
+/// - `required_permissions`: Array<Ident>
+/// A set of permissions needed by the user before a group command's execution.
+///
+/// - `default_command`: Ident
+/// Command to be executed if none of the group's prefixes are given.
+/// Identifier must refer to a `#[command]`'d function.
+///
+/// - `prefix`: String
+/// Assign a single prefix to this group.
+///
+/// - `description`: String
+/// The description of the group.
+/// Used in the help command.
+///
+/// - `inherit`: Access
+/// Derive options from another `GroupOptions` instance.
+///
+/// On standalone `GroupOptions`: `$name_of_options$`
+/// `GroupOptions` belonging to another `Group`: `$name_of_group$.options`
+///
+/// [`command`]: #fn.command.html
 #[proc_macro]
 pub fn group(input: TokenStream) -> TokenStream {
     let group = parse_macro_input!(input as Group);

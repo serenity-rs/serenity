@@ -261,7 +261,7 @@ pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
     let groups_error = "fifth argument's type should be `&[&'static CommandGroup]`";
     let owners_error = "sixth argument's type should be `HashSet<UserId>`";
 
-
+    #[allow(unused_assignments)]
     macro_rules! spoof_or_check {
         ($(($($help:tt)?) [$($mut:tt)?] $type:ident, $name:literal, $error:ident, $path:ident);*) => {{
             macro_rules! arg {
