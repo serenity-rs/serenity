@@ -174,7 +174,17 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
             #[cfg(all(feature = "cache", feature = "http"))]
             let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
-            dispatch_message(context, event.message, event_handler, threadpool);
+            dispatch_message(context, event.message.clone(), event_handler, threadpool);
+            #[cfg(feature = "raw_event")]
+            handle_event(
+                DispatchEvent::Model(Event::MessageCreate(event.clone())),
+                data,
+                event_handler,
+                runner_tx,
+                threadpool,
+                shard_id,
+                cache_and_http,
+            );
         },
         other => handle_event(
             other,
@@ -224,6 +234,19 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     let context = context(data, runner_tx, shard_id, &cache_and_http.http);
     #[cfg(all(feature = "cache", feature = "http"))]
     let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+
+    #[cfg(feature = "raw_event")]
+    match event {
+        DispatchEvent::Model(ref event) => {
+            let event_handler = Arc::clone(event_handler);
+            let ev = event.clone();
+            let ctx = context.clone();
+            threadpool.execute(move || {
+                event_handler.raw_event(ctx, ev);
+            });
+        },
+        _ => {}
+    }
 
     match event {
         DispatchEvent::Client(ClientEvent::ShardStageUpdate(event)) => {

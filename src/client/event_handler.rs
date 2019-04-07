@@ -306,4 +306,10 @@ pub trait EventHandler {
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.
     fn webhook_update(&self, _ctx: Context, _guild_id: GuildId, _belongs_to_channel_id: ChannelId) {}
+
+    /// Dispatched when any event occurs
+    /// 
+    /// If the feature is enabled the overhead for dispatching events will be 2x as big.
+    #[cfg(feature = "raw_event")]
+    fn raw_event(&self, _ctx: Context, _ev: Event) {}
 }
