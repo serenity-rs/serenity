@@ -99,7 +99,6 @@ impl ExecuteWebhook {
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// # }
     /// ```
     ///
     /// [`embeds`]: #method.embeds
@@ -146,7 +145,6 @@ impl ExecuteWebhook {
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
         self.0.insert("tts", Value::Bool(tts));
@@ -173,7 +171,6 @@ impl ExecuteWebhook {
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
-    /// # }
     /// ```
     pub fn username(&mut self, username: &str) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));

@@ -27,16 +27,14 @@ use crate::utils::VecMap;
 ///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
 ///                 Some(channel) => channel,
 ///                 None => {
-///                     let _ = msg.channel_id.say(&context.http, "Error creating invite");
-///
+///                     let _ = msg.channel_id.say(&context, "Error creating invite");
 ///                     return;
 ///                 },
 ///             };
 ///
-///             if let Channel::Guild(channel) = channel {
-///                 let channel = channel.read();
+///             let channel = channel.read();
 ///
-///             let creation = reader.create_invite(&context, |i| {
+///             let creation = channel.create_invite(&context, |i| {
 ///                 i.max_age(3600).max_uses(10)
 ///             });
 ///
@@ -44,19 +42,16 @@ use crate::utils::VecMap;
 ///                 Ok(invite) => invite,
 ///                 Err(why) => {
 ///                     println!("Err creating invite: {:?}", why);
-///
-///                     if let Err(why) = msg.channel_id.say(&context.http, "Error creating invite") {
+///                     if let Err(why) = msg.channel_id.say(&context, "Error creating invite") {
 ///                         println!("Err sending err msg: {:?}", why);
 ///                     }
 ///
 ///                     return;
-///
-///                     },
-///                 };
-///
+///                 },
+///             };
 ///
 ///             let content = format!("Here's your invite: {}", invite.url());
-///             let _ = msg.channel_id.say(&context.http, &content);
+///             let _ = msg.channel_id.say(&context, &content);
 ///         }
 ///     }
 /// }

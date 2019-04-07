@@ -502,7 +502,6 @@ impl GuildChannel {
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
     /// use serenity::model::channel::Channel;
-    /// use serenity::CACHE;
     /// use std::fs::File;
     ///
     /// struct Handler;

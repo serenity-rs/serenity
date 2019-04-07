@@ -80,7 +80,6 @@ use crate::http::Http;
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```no_run
-/// # fn main() {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
 /// use serenity::Client;
@@ -88,9 +87,9 @@ use crate::http::Http;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler {
-///     fn message(&self, _: Context, msg: Message) {
+///     fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!ping" {
-///             let _ = msg.channel_id.say("Pong!");
+///             let _ = msg.channel_id.say(&context, "Pong!");
 ///         }
 ///     }
 /// }
@@ -98,7 +97,6 @@ use crate::http::Http;
 /// let mut client = Client::new("my token here", Handler).expect("Could not create new client.");
 ///
 /// client.start().expect("Could not start client.");
-/// # }
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html

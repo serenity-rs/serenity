@@ -480,7 +480,6 @@ impl User {
     /// # use serenity::model::prelude::*;
     /// #
     /// use serenity::model::Permissions;
-    /// use serenity::http::raw::get_current_user;
     ///
     /// struct Handler;
     ///
@@ -488,8 +487,7 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///
-    ///             let url = match cache.user.invite_url(&ctx.http, Permissions::empty()) {
+    ///             let url = match ctx.cache.read().user.invite_url(&ctx, Permissions::empty()) {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -747,7 +745,6 @@ impl User {
     /// });
     /// # });
     /// println!("{:?}", client.start());
-    /// # }
     /// ```
     #[cfg(feature = "client")]
     pub fn refresh(&mut self, context: &Context) -> Result<()> {
