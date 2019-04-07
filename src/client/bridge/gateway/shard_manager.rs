@@ -82,8 +82,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
-///     event_handler: Some(&event_handler),
-///     raw_event_handler: None::<Handler>,
+///     event_handler: &Some(event_handler),
+///     raw_event_handler: &None::<Arc<Handler>>,
 ///     framework: &framework,
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
