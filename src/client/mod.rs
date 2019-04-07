@@ -28,7 +28,7 @@ mod event_handler;
 pub use self::{
     context::Context,
     error::Error as ClientError,
-    event_handler::EventHandler
+    event_handler::{EventHandler, RawEventHandler},
 };
 
 #[cfg(any(feature = "cache", feature = "http"))]
@@ -60,6 +60,9 @@ use self::bridge::voice::ClientVoiceManager;
 use crate::http::Http;
 #[cfg(feature = "cache")]
 use std::time::Duration;
+
+struct DummyRawEventHandler;
+impl RawEventHandler for DummyRawEventHandler {}
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -340,12 +343,13 @@ impl Client {
     pub fn new<H>(token: &str, handler: H) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
 
-        Self::new_with_handler(token, Some(handler))
+        Self::new_with_handlers(token, Some(handler), None::<DummyRawEventHandler>)
     }
     /// Creates a client with an optional Handler. If you pass `None`, events are never parsed, but
     /// they can be received by registering a RawHandler.
-    pub fn new_with_handler<H>(token: &str, handler: Option<H>) -> Result<Self>
-        where H: EventHandler + Send + Sync + 'static {
+    pub fn new_with_handlers<H, RH>(token: &str, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
+        where H: EventHandler + Send + Sync + 'static,
+              RH: RawEventHandler + Send + Sync + 'static {
         let token = token.trim();
 
         let token = if token.starts_with("Bot ") {
@@ -361,6 +365,7 @@ impl Client {
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = handler.map(|h| Arc::new(h));
+        let raw_event_handler = raw_handler.map(|rh| Arc::new(rh));
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));
@@ -384,6 +389,7 @@ impl Client {
             ShardManager::new(ShardManagerOptions {
                 data: &data,
                 event_handler: &event_handler,
+                raw_event_handler: &raw_event_handler,
                 #[cfg(feature = "framework")]
                 framework: &framework,
                 shard_index: 0,
@@ -484,6 +490,7 @@ impl Client {
             ShardManager::new(ShardManagerOptions {
                 data: &data,
                 event_handler: &event_handler,
+                raw_event_handler: &None::<Arc<DummyRawEventHandler>>,
                 #[cfg(feature = "framework")]
                 framework: &framework,
                 shard_index: 0,

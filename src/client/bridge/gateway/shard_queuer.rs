@@ -15,7 +15,7 @@ use std::{
     thread,
     time::{Duration, Instant}
 };
-use super::super::super::EventHandler;
+use super::super::super::{EventHandler, RawEventHandler};
 use super::{
     ShardId,
     ShardManagerMessage,
@@ -42,7 +42,8 @@ const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 /// A shard queuer instance _should_ be run in its own thread, due to the
 /// blocking nature of the loop itself as well as a 5 second thread sleep
 /// between shard starts.
-pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
+pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static,
+                       RH: RawEventHandler + Send + Sync + 'static> {
     /// A copy of [`Client::data`] to be given to runners for contextual
     /// dispatching.
     ///
@@ -53,6 +54,11 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     ///
     /// [`Client`]: ../../struct.Client.html
     pub event_handler: Option<Arc<H>>,
+    /// A reference to an `RawEventHandler`, such as the one given to the
+    /// [`Client`].
+    ///
+    /// [`Client`]: ../../struct.Client.html
+    pub raw_event_handler: Option<Arc<RH>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
@@ -89,7 +95,8 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 
-impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
+impl<H: EventHandler + Send + Sync + 'static,
+     RH: RawEventHandler + Send + Sync + 'static> ShardQueuer<H, RH> {
     /// Begins the shard queuer loop.
     ///
     /// This will loop over the internal [`rx`] for [`ShardQueuerMessage`]s,
@@ -183,6 +190,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
             event_handler: self.event_handler.as_ref().map(|eh| Arc::clone(eh)),
+            raw_event_handler: self.raw_event_handler.as_ref().map(|rh| Arc::clone(rh)),
             #[cfg(feature = "framework")]
             framework: Arc::clone(&self.framework),
             manager_tx: self.manager_tx.clone(),

@@ -8,7 +8,7 @@ use std::{sync::{Arc, mpsc::Sender}};
 use parking_lot::{Mutex, RwLock};
 use super::{
     bridge::gateway::event::ClientEvent,
-    event_handler::EventHandler,
+    event_handler::{EventHandler, RawEventHandler},
     Context
 };
 use threadpool::ThreadPool;
@@ -105,99 +105,196 @@ pub(crate) enum DispatchEvent {
 
 #[cfg(feature = "framework")]
 #[allow(clippy::too_many_arguments)]
-pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
+#[clippy::too_many_arguments]
+pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
+                       RH: RawEventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     data: &Arc<RwLock<ShareMap>>,
     event_handler: &Option<Arc<H>>,
+    raw_event_handler: &Option<Arc<RH>>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
     cache_and_http: Arc<CacheAndHttp>,
 ) {
-    match event {
-        DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-            update(&cache_and_http, &mut event);
+    match (event_handler, raw_event_handler) {
+        (None, None) => {}, // Do nothing
+        (Some(ref h), None) => {
+            match event {
+                DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+                    update!(&cache_and_http, &mut event);
 
-            #[cfg(not(any(feature = "cache", feature = "http")))]
-            let context = context(data, runner_tx, shard_id);
-            #[cfg(all(feature = "cache", not(feature = "http")))]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
-            #[cfg(all(not(feature = "cache"), feature = "http"))]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-            #[cfg(all(feature = "cache", feature = "http"))]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+                    #[cfg(not(any(feature = "cache", feature = "http")))]
+                    let context = context(data, runner_tx, shard_id);
+                    #[cfg(all(feature = "cache", not(feature = "http")))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+                    #[cfg(all(not(feature = "cache"), feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                    #[cfg(all(feature = "cache", feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
-            if let Some(ref handler) = event_handler {
-                dispatch_message(
-                    context.clone(),
-                    event.message.clone(),
-                    handler,
-                    threadpool,
-                );
-            }
-
-            if let Some(ref mut framework) = *framework.lock() {
-                framework.dispatch(context, event.message, threadpool);
+                    dispatch_message(
+                        context.clone(),
+                        event.message.clone(),
+                        h,
+                        threadpool,
+                    );
+                    if let Some(ref mut framework) = *framework.lock() {
+                        framework.dispatch(context, event.message, threadpool);
+                    }
+                },
+                other => { 
+                    handle_event(
+                        other,
+                        data,
+                        h,
+                        runner_tx,
+                        threadpool,
+                        shard_id,
+                        cache_and_http,
+                    );
+                }
             }
         },
-        other => { 
-            if let Some(ref handler) = event_handler {
-                handle_event(
-                other,
-                data,
-                handler,
-                runner_tx,
-                threadpool,
-                shard_id,
-                cache_and_http,
-                );
+        (None, Some(ref rh)) => {
+            match event {
+                DispatchEvent::Model(e) => {
+                    #[cfg(not(any(feature = "cache", feature = "http")))]
+                    let context = context(data, runner_tx, shard_id);
+                    #[cfg(all(feature = "cache", not(feature = "http")))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+                    #[cfg(all(not(feature = "cache"), feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                    #[cfg(all(feature = "cache", feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+
+                    let event_handler = Arc::clone(rh);
+                    threadpool.execute(move || {
+                        event_handler.raw_event(context, e);
+                    });
+                },
+                _ => {}
             }
         },
-    }
+        (Some(ref h), Some(ref rh)) => {
+            match event {
+                DispatchEvent::Model(ref e) => 
+                    dispatch(DispatchEvent::Model(e.clone()),
+                             framework,
+                             data,
+                             &None::<Arc<H>>,
+                             raw_event_handler,
+                             runner_tx,
+                             threadpool,
+                             shard_id,
+                             Arc::clone(&cache_and_http)),
+                _ => {}
+            }
+            dispatch(event,
+                     framework,
+                     data,
+                     event_handler,
+                     &None::<Arc<RH>>,
+                     runner_tx,
+                     threadpool,
+                     shard_id,
+                     cache_and_http);
+        }
+    };
 }
 
 #[cfg(not(feature = "framework"))]
-pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
+pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
+                       RH: RawEventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
     event_handler: &Option<Arc<H>>,
+    raw_event_handler: &Option<Arc<RH>>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
     cache_and_http: Arc<CacheAndHttp>,
 ) {
-    match event {
-        DispatchEvent::Model(Event::MessageCreate(event)) => {
-            update(&cache_and_http, &mut event);
+    match (event_handler, raw_event_handler) {
+        (None, None) => {}, // Do nothing
+        (Some(ref h), None) => {
+            match event {
+                DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+                    update!(&cache_and_http, &mut event);
 
-            #[cfg(not(any(feature = "cache", feature = "http")))]
-            let context = context(data, runner_tx, shard_id);
-            #[cfg(all(feature = "cache", not(feature = "http")))]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
-            #[cfg(all(not(feature = "cache"), feature = "http"))]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-            #[cfg(all(feature = "cache", feature = "http"))]
-            let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+                    #[cfg(not(any(feature = "cache", feature = "http")))]
+                    let context = context(data, runner_tx, shard_id);
+                    #[cfg(all(feature = "cache", not(feature = "http")))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+                    #[cfg(all(not(feature = "cache"), feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                    #[cfg(all(feature = "cache", feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
-            if let Some(ref handler) = event_handler {
-                dispatch_message(context, event.message.clone(), handler, threadpool);
+                    dispatch_message(
+                        context.clone(),
+                        event.message.clone(),
+                        h,
+                        threadpool,
+                    );
+                },
+                other => { 
+                    handle_event(
+                        other,
+                        data,
+                        h,
+                        runner_tx,
+                        threadpool,
+                        shard_id,
+                        cache_and_http,
+                    );
+                }
             }
         },
-        other => {
-            if let Some(ref handler) = event_handler {
-                handle_event(
-                    other,
-                    data,
-                    handler,
-                    runner_tx,
-                    threadpool,
-                    shard_id,
-                    cache_and_http,
-                );
+        (None, Some(ref rh)) => {
+            match event {
+                DispatchEvent::Model(e) => {
+                    #[cfg(not(any(feature = "cache", feature = "http")))]
+                    let context = context(data, runner_tx, shard_id);
+                    #[cfg(all(feature = "cache", not(feature = "http")))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+                    #[cfg(all(not(feature = "cache"), feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                    #[cfg(all(feature = "cache", feature = "http"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+
+                    let event_handler = Arc::clone(rh);
+                    threadpool.execute(move || {
+                        event_handler.raw_event(context, e);
+                    });
+                },
+                _ => {}
             }
         },
-    }
+        (Some(ref h), Some(ref rh)) => {
+            match event {
+                DispatchEvent::Model(ref e) => 
+                    dispatch(DispatchEvent::Model(e.clone()),
+                             data,
+                             &None::<Arc<H>>,
+                             raw_event_handler,
+                             runner_tx,
+                             threadpool,
+                             shard_id,
+                             Arc::clone(&cache_and_http)),
+                _ => {}
+            }
+            dispatch(event,
+                     data,
+                     event_handler,
+                     &None::<Arc<RH>>,
+                     runner_tx,
+                     threadpool,
+                     shard_id,
+                     cache_and_http);
+        }
+    };
 }
 
 fn dispatch_message<H>(
@@ -236,19 +333,6 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
     let context = context(data, runner_tx, shard_id, &cache_and_http.http);
     #[cfg(all(feature = "cache", feature = "http"))]
     let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
-
-    #[cfg(feature = "raw_event")]
-    match event {
-        DispatchEvent::Model(ref event) => {
-            let event_handler = Arc::clone(event_handler);
-            let ev = event.clone();
-            let ctx = context.clone();
-            threadpool.execute(move || {
-                event_handler.raw_event(ctx, ev);
-            });
-        },
-        _ => {}
-    }
 
     match event {
         DispatchEvent::Client(ClientEvent::ShardStageUpdate(event)) => {
