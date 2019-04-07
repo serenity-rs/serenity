@@ -434,7 +434,7 @@ impl Serialize for GuildDeleteEvent {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildEmojisUpdateEvent {
-    #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
 }
 
