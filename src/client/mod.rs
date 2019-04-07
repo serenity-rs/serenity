@@ -452,7 +452,7 @@ impl Client {
     /// # }
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn new_with_cache_update_timeout<H>(token: &str, handler: Option<H>, duration: Option<Duration>) -> Result<Self>
+    pub fn new_with_cache_update_timeout<H>(token: &str, handler: H, duration: Option<Duration>) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
         let token = token.trim();
 
@@ -468,7 +468,7 @@ impl Client {
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
-        let event_handler = handler.map(|h| Arc::new(h));
+        let event_handler = Some(Arc::new(handler));
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));

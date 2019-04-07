@@ -56,9 +56,10 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// #
 /// use parking_lot::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
-/// use serenity::client::EventHandler;
+/// use serenity::client::{EventHandler, RawEventHandler};
 /// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
+/// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
 /// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
@@ -69,6 +70,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler { }
+/// impl RawEventHandler for Handler { }
 ///
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
@@ -80,7 +82,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
-///     event_handler: &event_handler,
+///     event_handler: Some(&event_handler),
+///     raw_event_handler: None::<Handler>,
 ///     framework: &framework,
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
