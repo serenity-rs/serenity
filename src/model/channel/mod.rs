@@ -457,7 +457,7 @@ impl ChannelType {
 struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
-    #[serde(deserialize_with = "deserialize_u64")] id: u64,
+    #[serde(serialize_with = "serialize_u64", deserialize_with = "deserialize_u64")] id: u64,
     #[serde(rename = "type")] kind: String,
 }
 

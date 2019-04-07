@@ -220,6 +220,10 @@ pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<
     deserializer.deserialize_any(U64Visitor)
 }
 
+pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::Error> {
+    ser.serialize_str(&data.to_string())
+}
+
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
