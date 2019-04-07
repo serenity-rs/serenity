@@ -139,7 +139,7 @@ impl ShardManager {
 
         let mut shard_queuer = ShardQueuer {
             data: Arc::clone(opt.data),
-            event_handler: Arc::clone(opt.event_handler),
+            event_handler: opt.event_handler.as_ref().map(|h| Arc::clone(h)),
             #[cfg(feature = "framework")]
             framework: Arc::clone(opt.framework),
             last_start: None,
@@ -352,7 +352,7 @@ impl Drop for ShardManager {
 
 pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
     pub data: &'a Arc<RwLock<ShareMap>>,
-    pub event_handler: &'a Arc<H>,
+    pub event_handler: &'a Option<Arc<H>>,
     #[cfg(feature = "framework")]
     pub framework: &'a Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     pub shard_index: u64,

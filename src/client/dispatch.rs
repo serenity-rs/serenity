@@ -109,7 +109,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     data: &Arc<RwLock<ShareMap>>,
-    event_handler: &Arc<H>,
+    event_handler: &Option<Arc<H>>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
@@ -128,26 +128,32 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
             #[cfg(all(feature = "cache", feature = "http"))]
             let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
-            dispatch_message(
-                context.clone(),
-                event.message.clone(),
-                event_handler,
-                threadpool,
-            );
+            if let Some(ref handler) = event_handler {
+                dispatch_message(
+                    context.clone(),
+                    event.message.clone(),
+                    handler,
+                    threadpool,
+                );
+            }
 
             if let Some(ref mut framework) = *framework.lock() {
                 framework.dispatch(context, event.message, threadpool);
             }
         },
-        other => handle_event(
-            other,
-            data,
-            event_handler,
-            runner_tx,
-            threadpool,
-            shard_id,
-            cache_and_http,
-        ),
+        other => { 
+            if let Some(ref handler) = event_handler {
+                handle_event(
+                other,
+                data,
+                handler,
+                runner_tx,
+                threadpool,
+                shard_id,
+                cache_and_http,
+                );
+            }
+        },
     }
 }
 
@@ -155,7 +161,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
-    event_handler: &Arc<H>,
+    event_handler: &Option<Arc<H>>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
@@ -174,27 +180,23 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
             #[cfg(all(feature = "cache", feature = "http"))]
             let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
-            dispatch_message(context, event.message.clone(), event_handler, threadpool);
-            #[cfg(feature = "raw_event")]
-            handle_event(
-                DispatchEvent::Model(Event::MessageCreate(event.clone())),
-                data,
-                event_handler,
-                runner_tx,
-                threadpool,
-                shard_id,
-                cache_and_http,
-            );
+            if let Some(ref handler) = event_handler {
+                dispatch_message(context, event.message.clone(), handler, threadpool);
+            }
         },
-        other => handle_event(
-            other,
-            data,
-            event_handler,
-            runner_tx,
-            threadpool,
-            shard_id,
-            cache_and_http,
-        ),
+        other => {
+            if let Some(ref handler) = event_handler {
+                handle_event(
+                    other,
+                    data,
+                    handler,
+                    runner_tx,
+                    threadpool,
+                    shard_id,
+                    cache_and_http,
+                );
+            }
+        },
     }
 }
 

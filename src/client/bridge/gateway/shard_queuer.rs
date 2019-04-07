@@ -52,7 +52,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static> {
     /// [`Client`].
     ///
     /// [`Client`]: ../../struct.Client.html
-    pub event_handler: Arc<H>,
+    pub event_handler: Option<Arc<H>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
@@ -182,7 +182,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardQueuer<H> {
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
-            event_handler: Arc::clone(&self.event_handler),
+            event_handler: self.event_handler.as_ref().map(|eh| Arc::clone(eh)),
             #[cfg(feature = "framework")]
             framework: Arc::clone(&self.framework),
             manager_tx: self.manager_tx.clone(),
