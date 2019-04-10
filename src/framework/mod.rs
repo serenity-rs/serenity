@@ -69,38 +69,35 @@ pub use self::standard::StandardFramework;
 use crate::client::Context;
 use crate::model::channel::Message;
 use threadpool::ThreadPool;
+use std::sync::Arc;
 
-#[cfg(feature = "standard_framework")]
-use crate::model::id::UserId;
-
-/// This trait allows for serenity to either use its builtin framework, or yours.
+/// A trait for defining your own framework for serenity to use.
+///
+/// Should you implement this trait, or define a `message` handler, depends on you.
+/// However, using this will benefit you by abstracting the `EventHandler` away,
+/// and providing a reference to serenity's threadpool,
+/// so that you may run your commands in separate threads.
 pub trait Framework {
     fn dispatch(&mut self, _: Context, _: Message, _: &ThreadPool);
-
-    #[doc(hidden)]
-    #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, _: UserId) {}
 }
 
 impl<F: Framework + ?Sized> Framework for Box<F> {
+     #[inline]
     fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &ThreadPool) {
         (**self).dispatch(ctx, msg, threadpool);
     }
+}
 
-    #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, id: UserId) {
-        (**self).update_current_user(id);
+impl<T: Framework + ?Sized> Framework for Arc<T> {
+    #[inline]
+    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &threadpool::ThreadPool) {
+        Arc::get_mut(self).map(|s| (*s).dispatch(ctx, msg, threadpool));
     }
 }
 
 impl<'a, F: Framework + ?Sized> Framework for &'a mut F {
+     #[inline]
     fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &ThreadPool) {
         (**self).dispatch(ctx, msg, threadpool);
     }
-
-    #[cfg(feature = "standard_framework")]
-    fn update_current_user(&mut self, id: UserId) {
-        (**self).update_current_user(id);
-    }
 }
-

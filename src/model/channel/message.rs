@@ -88,42 +88,6 @@ impl Message {
     /// Retrieves the related channel located in the cache.
     ///
     /// Returns `None` if the channel is not in the cache.
-    ///
-    /// # Examples
-    ///
-    /// On command, print the name of the channel that a message took place in:
-    ///
-    /// ```rust,no_run
-    /// # fn main() {
-    /// #   use serenity::{command, prelude::*};
-    /// #   struct Handler;
-    /// #
-    /// #   impl EventHandler for Handler {}
-    /// #   let mut client = Client::new("token", Handler).unwrap();
-    /// #
-    /// use serenity::model::channel::Channel;
-    /// use serenity::framework::StandardFramework;
-    ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .configure(|c| c.prefix("~"))
-    ///     .cmd("channelname", channel_name));
-    ///
-    /// command!(channel_name(ctx, msg) {
-    ///     let _ = match msg.channel(&ctx.cache) {
-    ///         Some(Channel::Category(c)) => msg.reply(&ctx, &c.read().name),
-    ///         Some(Channel::Group(c)) => msg.reply(&ctx, &c.read().name()),
-    ///         Some(Channel::Guild(c)) => msg.reply(&ctx, &c.read().name),
-    ///         Some(Channel::Private(c)) => {
-    ///             let channel = c.read();
-    ///             let user = channel.recipient.read();
-    ///
-    ///             msg.reply(&ctx, &format!("DM with {}", user.name.clone()))
-    ///         },
-    ///         None => msg.reply(&ctx, "Unknown"),
-    ///     };
-    /// });
-    /// # }
-    /// ```
     #[cfg(feature = "cache")]
     #[inline]
     pub fn channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> { cache.as_ref().read().channel(self.channel_id) }

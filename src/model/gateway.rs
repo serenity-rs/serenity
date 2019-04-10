@@ -71,17 +71,21 @@ impl Activity {
     /// Create a command that sets the current activity:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::Args;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::command;
     /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
     ///
     /// # #[cfg(feature = "framework")]
-    /// command!(activity(ctx, _msg, args) {
+    /// #[command]
+    /// fn activity(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::playing(&name));
-    /// });
+    ///
+    ///     Ok(())
+    /// }
     /// #
     /// # fn main() {}
     /// ```
@@ -112,20 +116,23 @@ impl Activity {
     /// Create a command that sets the current streaming status:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::Args;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::command;
     /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
     ///
     /// # #[cfg(feature = "framework")]
-    /// // Assumes command has min_args set to 2.
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
-    /// command!(stream(ctx, _msg, args) {
-    ///     # let stream_url = String::from("");
+    /// #[command]
+    /// fn stream(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
+    ///     const STREAM_URL: &str = "...";
+    ///
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::streaming(&name, &stream_url));
-    /// });
+    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL));
+    ///
+    ///     Ok(())
+    /// }
     /// #
     /// # fn main() {}
     /// ```
@@ -155,17 +162,21 @@ impl Activity {
     /// Create a command that sets the current listening status:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::framework::standard::Args;
-    /// # #[cfg(feature = "framework")]
-    /// use serenity::command;
     /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
     ///
     /// # #[cfg(feature = "framework")]
-    /// command!(listen(ctx, _msg, args) {
+    /// #[command]
+    /// fn listen(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::listening(&name));
-    /// });
+    ///
+    ///     Ok(())
+    /// }
     /// #
     /// # fn main() {}
     /// ```

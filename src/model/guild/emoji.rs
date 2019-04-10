@@ -63,23 +63,28 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::{command, model::{guild::Emoji, id::EmojiId}};
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # use serenity::client::Context;
+    /// # use serenity::model::prelude::{EmojiId, Emoji};
     /// #
-    /// # command!(example(context) {
-    /// # let mut emoji = Emoji {
-    /// #     animated: false,
-    /// #     id: EmojiId(7),
-    /// #     name: String::from("blobface"),
-    /// #     managed: false,
-    /// #     require_colons: false,
-    /// #     roles: vec![],
-    /// # };
+    /// # #[command]
+    /// # fn example(ctx: &mut Context) -> CommandResult {
+    /// #   let mut emoji = Emoji {
+    /// #       animated: false,
+    /// #       id: EmojiId(7),
+    /// #       name: String::from("blobface"),
+    /// #       managed: false,
+    /// #       require_colons: false,
+    /// #       roles: vec![],
+    /// #   };
+    /// #
     /// // assuming emoji has been set already
-    /// match emoji.delete(&context) {
+    /// match emoji.delete(&ctx) {
     ///     Ok(()) => println!("Emoji deleted."),
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
-    /// # });
+    /// #    Ok(())
+    /// # }
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn delete(&self, context: &Context) -> Result<()> {
@@ -96,29 +101,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
-    ///
-    /// # Examples
-    ///
-    /// Change the name of an emoji:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::{command, model::{guild::Emoji, id::EmojiId}};
-    /// #
-    /// # command!(example(context) {
-    /// # let mut emoji = Emoji {
-    /// #     animated: false,
-    /// #     id: EmojiId(7),
-    /// #     name: String::from("blobface"),
-    /// #     managed: false,
-    /// #     require_colons: false,
-    /// #     roles: vec![],
-    /// # };
-    /// // assuming emoji has been set already
-    /// let _ = emoji.edit(&context, "blobuwu");
-    /// assert_eq!(emoji.name, "blobuwu");
-    /// # });
-    /// ```
-    #[cfg(all(feature = "cache", feature = "http"))]
+    #[cfg(feature = "cache")]
     pub fn edit(&mut self, context: &Context, name: &str) -> Result<()> {
         match self.find_guild_id(&context.cache) {
             Some(guild_id) => {

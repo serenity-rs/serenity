@@ -688,64 +688,6 @@ impl User {
     /// Refreshes the information about the user.
     ///
     /// Replaces the instance with the data retrieved over the REST API.
-    ///
-    /// # Examples
-    ///
-    /// If maintaining a very long-running bot, you may want to periodically
-    /// refresh information about certain users if the state becomes
-    /// out-of-sync:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::{model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn message(&self, _: Context, _: Message) {
-    ///         // normal message handling here
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler).unwrap();
-    /// #
-    /// use serenity::{command, model::id::UserId};
-    /// use std::thread;
-    /// use std::time::Duration;
-    ///
-    /// // start a new thread to periodically refresh the special users' data
-    /// // every 12 hours
-    /// # #[cfg(feature = "cache")]
-    /// # command!(example(context) {
-    /// # use serenity::cache::{Cache, CacheRwLock};
-    /// #
-    /// # let context = context.clone();
-    ///
-    /// let handle = thread::spawn(move || {
-    /// let special_users = vec![UserId(114941315417899012), UserId(87600987040120832)];
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    ///     // 12 hours in seconds
-    ///     let duration = Duration::from_secs(43200);
-    ///
-    ///     loop {
-    ///         thread::sleep(duration);
-    ///
-    ///         let cache = cache.read();
-    ///
-    ///         for id in &special_users {
-    ///
-    ///             if let Some(user) = cache.user(*id) {
-    ///
-    ///                 if let Err(why) = user.write().refresh(&context) {
-    ///                     println!("Error refreshing {}: {:?}", id, why);
-    ///                 }
-    ///             }
-    ///         }
-    ///     }
-    /// });
-    /// # });
-    /// println!("{:?}", client.start());
-    /// ```
     #[cfg(feature = "client")]
     pub fn refresh(&mut self, context: &Context) -> Result<()> {
         self.id.to_user(&context).map(|replacement| {
