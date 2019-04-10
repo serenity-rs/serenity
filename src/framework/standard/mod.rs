@@ -30,7 +30,7 @@ use std::sync::Arc;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
+use crate::cache::CacheRwLock;
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
