@@ -230,36 +230,38 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
     // the runner to shutdown.
     fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
-            InterMessage::Client(ShardClientMessage::Manager(x)) => match x {
-                ShardManagerMessage::Restart(id) |
-                ShardManagerMessage::Shutdown(id) => {
-                    self.checked_shutdown(id)
-                },
-                ShardManagerMessage::ShutdownAll => {
-                    // This variant should never be received.
-                    warn!(
-                        "[ShardRunner {:?}] Received a ShutdownAll?",
-                        self.shard.shard_info(),
-                    );
+            InterMessage::Client(value) => match *value {
+                    ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) |
+                    ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id)) => {
+                        self.checked_shutdown(id)
+                    },
+                    ShardClientMessage::Manager(ShardManagerMessage::ShutdownAll) => {
+                        // This variant should never be received.
+                        warn!(
+                            "[ShardRunner {:?}] Received a ShutdownAll?",
+                            self.shard.shard_info(),
+                        );
 
-                    true
-                },
-                ShardManagerMessage::ShardUpdate { .. }
-                    | ShardManagerMessage::ShutdownInitiated => {
-                    // nb: not sent here
+                        true
+                    },
+                    ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate { .. }) => {
+                        // nb: not sent here
 
-                    true
-                },
-            },
-            InterMessage::Client(ShardClientMessage::Runner(x)) => match x {
-                ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query } => {
+                        true
+                    },
+                    ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated) => {
+                        // nb: not sent here
+
+                        true
+                    },
+                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query }) => {
                     self.shard.chunk_guilds(
                         guild_ids,
                         limit,
                         query.as_ref().map(String::as_str),
                     ).is_ok()
                 },
-                ShardRunnerMessage::Close(code, reason) => {
+                ShardClientMessage::Runner(ShardRunnerMessage::Close(code, reason)) => {
                     let reason = reason.unwrap_or_else(String::new);
                     let close = CloseFrame {
                         code: code.into(),
@@ -267,10 +269,10 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
                     };
                     self.shard.client.close(Some(close)).is_ok()
                 },
-                ShardRunnerMessage::Message(msg) => {
+                ShardClientMessage::Runner(ShardRunnerMessage::Message(msg)) => {
                     self.shard.client.write_message(msg).is_ok()
                 },
-                ShardRunnerMessage::SetActivity(activity) => {
+                ShardClientMessage::Runner(ShardRunnerMessage::SetActivity(activity)) => {
                     // To avoid a clone of `activity`, we do a little bit of
                     // trickery here:
                     //
@@ -288,12 +290,12 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
                     self.shard.update_presence().is_ok()
                 },
-                ShardRunnerMessage::SetPresence(status, activity) => {
+                ShardClientMessage::Runner(ShardRunnerMessage::SetPresence(status, activity)) => {
                     self.shard.set_presence(status, activity);
 
                     self.shard.update_presence().is_ok()
                 },
-                ShardRunnerMessage::SetStatus(status) => {
+                ShardClientMessage::Runner(ShardRunnerMessage::SetStatus(status)) => {
                     self.shard.set_status(status);
 
                     self.shard.update_presence().is_ok()

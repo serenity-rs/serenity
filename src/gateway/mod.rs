@@ -183,7 +183,7 @@ impl Display for ConnectionStage {
 #[derive(Clone, Debug)]
 pub enum InterMessage {
     #[cfg(feature = "client")]
-    Client(ShardClientMessage),
+    Client(Box<ShardClientMessage>),
     Json(Value),
 }
 
