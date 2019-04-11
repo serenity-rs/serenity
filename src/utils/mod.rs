@@ -693,12 +693,14 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
         if let Some(mut mention_end) = s[mention_start..].find(">") {
             mention_end += mention_start;
             mention_start += "<@".len();
-            let mut has_exclamation = false;
 
-            if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
+            let has_exclamation = if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
                 mention_start += "!".len();
-                has_exclamation = true;
-            }
+
+                true
+            } else {
+                false
+            };
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let replacement = if let Some(guild) = guild {
