@@ -60,9 +60,9 @@ use std::{
 macro_rules! format_command_name {
     ($behaviour:expr, $command_name:expr) => {
         match $behaviour {
-            &HelpBehaviour::Strike => format!("~~`{}`~~", $command_name),
-            &HelpBehaviour::Nothing => format!("`{}`", $command_name),
-            &HelpBehaviour::Hide => continue,
+            HelpBehaviour::Strike => format!("~~`{}`~~", $command_name),
+            HelpBehaviour::Nothing => format!("`{}`", $command_name),
+            HelpBehaviour::Hide => continue,
         }
     };
 }
