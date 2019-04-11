@@ -327,7 +327,7 @@ fn fetch_single_command<'a>(
                     .names
                     .iter()
                     .find(|n| **n == name)
-                    .map(|o| *o)
+                    .cloned()
             } else {
                 command
                     .options
@@ -340,7 +340,7 @@ fn fetch_single_command<'a>(
                             .iter()
                             .any(|prefix| format!("{} {}", prefix, n) == name)
                     })
-                    .map(|o| *o)
+                    .cloned()
             };
 
             if let Some(n) = search_command_name_matched {
@@ -414,14 +414,14 @@ fn fetch_single_command<'a>(
             return Ok(CustomisedHelpData::SingleCommand {
                 command: Command {
                     name: options.names[0],
-                    description: options.desc.clone(),
+                    description: options.desc,
                     group_name: group.name,
                     group_prefixes: &group.options.prefixes,
                     checks: check_names,
                     aliases: options.names[1..].to_vec(),
                     availability: available_text,
-                    usage: options.usage.clone(),
-                    usage_sample: options.example.clone(),
+                    usage: options.usage,
+                    usage_sample: options.example,
                 },
             });
         }
