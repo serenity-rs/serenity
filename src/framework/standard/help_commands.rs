@@ -736,10 +736,9 @@ fn send_suggestion_embed(
     suggestions: &Suggestions,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let text = format!(
-        "{}",
-        help_description.replace("{}", &suggestions.join("`, `"))
-    );
+    let text = help_description
+        .replace("{}", &suggestions.join("`, `"))
+        .to_string();
 
     channel_id.send_message(&http, |m| {
         m.embed(|e| {
