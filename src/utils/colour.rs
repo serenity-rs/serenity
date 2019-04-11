@@ -142,7 +142,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).r(), 100);
     /// ```
-    pub fn r(&self) -> u8 { ((self.0 >> 16) & 255) as u8 }
+    pub fn r(self) -> u8 { ((self.0 >> 16) & 255) as u8 }
 
     /// Returns the green RGB component of this Colour.
     ///
@@ -153,7 +153,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).g(), 76);
     /// ```
-    pub fn g(&self) -> u8 { ((self.0 >> 8) & 255) as u8 }
+    pub fn g(self) -> u8 { ((self.0 >> 8) & 255) as u8 }
 
     /// Returns the blue RGB component of this Colour.
     ///
@@ -163,7 +163,7 @@ impl Colour {
     /// use serenity::utils::Colour;
     ///
     /// assert_eq!(Colour::new(6573123).b(), 67);
-    pub fn b(&self) -> u8 { (self.0 & 255) as u8 }
+    pub fn b(self) -> u8 { (self.0 & 255) as u8 }
 
     /// Returns a tuple of the red, green, and blue components of this Colour.
     ///
@@ -181,7 +181,7 @@ impl Colour {
     /// [`r`]: #method.r
     /// [`g`]: #method.g
     /// [`b`]: #method.b
-    pub fn tuple(&self) -> (u8, u8, u8) { (self.r(), self.g(), self.b()) }
+    pub fn tuple(self) -> (u8, u8, u8) { (self.r(), self.g(), self.b()) }
 
     /// Returns a hexadecimal string of this Colour.
     ///
@@ -195,7 +195,7 @@ impl Colour {
     ///
     /// assert_eq!(Colour::new(6573123).hex(), "644C43");
     /// ```
-    pub fn hex(&self) -> String {
+    pub fn hex(self) -> String {
         format!("{:06X}", self.0)
     }
 }
