@@ -637,7 +637,7 @@ impl Args {
     /// [`trimmed`]: struct.Iter.html#method.trimmed
     /// [`quoted`]: struct.Iter.html#method.quoted
     #[inline]
-    pub fn iter<'a, T: FromStr>(&'a mut self) -> Iter<'a, T> {
+    pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {
             args: self,
             state: State::None,
