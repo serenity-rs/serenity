@@ -1224,7 +1224,6 @@ impl Http {
     }
 
     /// Gets information about a specific invite.
-    #[allow(clippy::unused_mut)]
     pub fn get_invite(&self, mut code: &str, stats: bool) -> Result<Invite> {
         #[cfg(feature = "utils")]
             {

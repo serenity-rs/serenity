@@ -143,7 +143,6 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 }
 
 #[cfg(not(feature = "framework"))]
-#[allow(clippy::unused_mut)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
@@ -180,7 +179,6 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     }
 }
 
-#[allow(clippy::unused_mut)]
 fn dispatch_message<H>(
     context: Context,
     mut message: Message,
