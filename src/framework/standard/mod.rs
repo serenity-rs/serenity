@@ -664,7 +664,7 @@ impl Framework for StandardFramework {
                 let owners = self.config.owners.clone();
 
                 // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
-                let help = self.help.clone().unwrap();
+                let help = self.help.unwrap();
 
                 threadpool.execute(move || {
                     if let Some(before) = before {
