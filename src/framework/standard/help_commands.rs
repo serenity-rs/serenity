@@ -515,7 +515,7 @@ fn create_command_group_commands_pair_from_groups<'a>(
 
 /// Fetches a single group with its commands.
 #[cfg(feature = "cache")]
-fn create_single_group<'a>(
+fn create_single_group(
     context: &Context,
     group: &CommandGroup,
     owners: &HashSet<UserId, impl BuildHasher>,
