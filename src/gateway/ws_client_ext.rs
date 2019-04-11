@@ -33,7 +33,7 @@ pub trait WebSocketGatewayClientExt {
         &mut self,
         shard_info: &[u64; 2],
         session_id: &str,
-        seq: &u64,
+        seq: u64,
         token: &str,
     ) -> Result<()>;
 }
@@ -118,7 +118,7 @@ impl WebSocketGatewayClientExt for WsClient {
         &mut self,
         shard_info: &[u64; 2],
         session_id: &str,
-        seq: &u64,
+        seq: u64,
         token: &str,
     ) -> Result<()> {
         debug!("[Shard {:?}] Sending resume; seq: {}", shard_info, seq);

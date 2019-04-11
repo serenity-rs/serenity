@@ -795,7 +795,7 @@ impl Shard {
                 self.client.send_resume(
                     &self.shard_info,
                     session_id,
-                    &self.seq,
+                    self.seq,
                     &self.token,
                 )
             },
