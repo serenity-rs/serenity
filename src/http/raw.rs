@@ -1527,7 +1527,7 @@ impl Http {
             .multipart(multipart).send()?;
 
         if !response.status().is_success() {
-            return Err(HttpError::UnsuccessfulRequest(response).into());
+            return Err(HttpError::UnsuccessfulRequest(Box::new(response)).into());
         }
 
         serde_json::from_reader(response).map_err(From::from)
@@ -1721,7 +1721,7 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::from(HttpError::UnsuccessfulRequest(response)))
+            Err(Error::from(HttpError::UnsuccessfulRequest(Box::new(response))))
         }
     }
 
@@ -1757,16 +1757,16 @@ impl Http {
     /// This is a function that performs a light amount of work and returns an
     /// empty tuple, so it's called "self.wind" to denote that it's lightweight.
     pub(super) fn wind(&self, expected: u16, req: Request<'_>) -> Result<()> {
-        let resp = self.request(req)?;
+        let response = self.request(req)?;
 
-        if resp.status().as_u16() == expected {
+        if response.status().as_u16() == expected {
             return Ok(());
         }
 
-        debug!("Expected {}, got {}", expected, resp.status());
-        trace!("Unsuccessful response: {:?}", resp);
+        debug!("Expected {}, got {}", expected, response.status());
+        trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::from(HttpError::UnsuccessfulRequest(resp)))
+        Err(Error::from(HttpError::UnsuccessfulRequest(Box::new(response))))
     }
 }
 
