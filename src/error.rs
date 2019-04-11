@@ -93,7 +93,7 @@ pub enum Error {
     ///
     /// [`http`]: http/index.html
     #[cfg(feature = "http")]
-    Http(HttpError),
+    Http(Box<HttpError>),
     /// An error occuring in rustls
     #[cfg(all(feature = "gateway", not(feature = "native_tls")))]
     Rustls(RustlsError),
