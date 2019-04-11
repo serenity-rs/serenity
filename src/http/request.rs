@@ -83,7 +83,7 @@ impl<'a> Request<'a> {
         let mut headers = Headers::with_capacity(4);
         headers.insert(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT));
         headers.insert(AUTHORIZATION,
-            HeaderValue::from_str(&token).map_err(|e| HttpError::InvalidHeader(e))?);
+            HeaderValue::from_str(&token).map_err(HttpError::InvalidHeader)?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
         headers.insert(CONTENT_LENGTH, HeaderValue::from_static(&"0"));
 
