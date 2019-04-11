@@ -91,7 +91,9 @@ impl<F: Framework + ?Sized> Framework for Box<F> {
 impl<T: Framework + ?Sized> Framework for Arc<T> {
     #[inline]
     fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &threadpool::ThreadPool) {
-        Arc::get_mut(self).map(|s| (*s).dispatch(ctx, msg, threadpool));
+        if let Some(s) = Arc::get_mut(self) {
+            (*s).dispatch(ctx, msg, threadpool)
+        }
     }
 }
 
