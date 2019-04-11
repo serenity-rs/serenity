@@ -50,6 +50,7 @@ use std::{
     borrow::Borrow,
     collections::HashSet,
     fmt::Write,
+    hash::BuildHasher,
     ops::{Index, IndexMut},
     sync::Arc,
 };
@@ -436,7 +437,7 @@ fn fetch_single_command<'a>(
 fn fetch_all_eligible_commands_in_group<'a>(
     context: &Context,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     msg: &Message,
@@ -493,7 +494,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 fn create_command_group_commands_pair_from_groups<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair> {
@@ -517,7 +518,7 @@ fn create_command_group_commands_pair_from_groups<'a>(
 fn create_single_group<'a>(
     context: &Context,
     group: &CommandGroup,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     msg: &Message,
     help_options: &HelpOptions,
 ) -> GroupCommandsPair {
@@ -546,7 +547,7 @@ fn create_single_group<'a>(
 pub fn create_customised_help_data<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
@@ -794,7 +795,7 @@ pub fn with_embeds(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl BuildHasher>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);
@@ -948,7 +949,7 @@ pub fn plain(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl BuildHasher>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);

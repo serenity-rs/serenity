@@ -1,5 +1,7 @@
-use std::fmt;
-use std::collections::HashSet;
+use std::{
+    collections::{HashSet, hash_map::RandomState},
+    fmt,
+};
 use crate::client::Context;
 use crate::model::{
     channel::Message,
@@ -104,17 +106,17 @@ impl PartialEq for Command {
     }
 }
 
-pub type HelpCommandFn = fn(
+pub type HelpCommandFn<H> = fn(
     &mut Context,
     &Message,
     Args,
     &'static HelpOptions,
     &[&'static CommandGroup],
-    HashSet<UserId>,
+    HashSet<UserId, H>,
 ) -> CommandResult;
 
 pub struct HelpCommand {
-    pub fun: HelpCommandFn,
+    pub fun: HelpCommandFn<RandomState>,
     pub options: &'static HelpOptions,
 }
 
