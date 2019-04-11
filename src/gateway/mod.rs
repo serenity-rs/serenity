@@ -150,10 +150,10 @@ impl ConnectionStage {
     /// [`ConnectionStage::Handshake`]: #variant.Handshake
     /// [`ConnectionStage::Identifying`]: #variant.Identifying
     /// [`ConnectionStage::Resuming`]: #variant.Resuming
-    pub fn is_connecting(&self) -> bool {
+    pub fn is_connecting(self) -> bool {
         use self::ConnectionStage::*;
 
-        match *self {
+        match self {
             Connecting | Handshake | Identifying | Resuming => true,
             Connected | Disconnected => false,
         }
