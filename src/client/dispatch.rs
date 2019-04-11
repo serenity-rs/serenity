@@ -197,7 +197,7 @@ fn dispatch_message<H>(
     });
 }
 
-#[allow(clippy::cognitive_complexity, unused_assignments, unused_mut)]
+#[allow(unused_assignments, unused_mut)]
 fn handle_event<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
