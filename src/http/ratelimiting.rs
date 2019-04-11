@@ -295,11 +295,11 @@ fn calculate_offset(header: &Option<&[u8]>) {
 fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
     headers.get(header).map_or(Ok(None), |header| {
         str::from_utf8(&header.as_bytes())
-            .map_err(|_| Error::Http(HttpError::RateLimitUtf8))
+            .map_err(|_| Error::from(HttpError::RateLimitUtf8))
             .and_then(|v| {
                 v.parse::<i64>()
                     .map(Some)
-                    .map_err(|_| Error::Http(HttpError::RateLimitI64))
+                    .map_err(|_| Error::from(HttpError::RateLimitI64))
             })
     })
 }

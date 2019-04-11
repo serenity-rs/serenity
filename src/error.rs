@@ -157,7 +157,7 @@ impl From<TungsteniteError> for Error {
 
 #[cfg(feature = "http")]
 impl From<HttpError> for Error {
-    fn from(e: HttpError) -> Error { Error::Http(e) }
+    fn from(e: HttpError) -> Error { Error::Http(Box::new(e)) }
 }
 
 #[cfg(feature = "http")]

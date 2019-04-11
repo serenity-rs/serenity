@@ -1721,7 +1721,7 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::Http(HttpError::UnsuccessfulRequest(response)))
+            Err(Error::from(HttpError::UnsuccessfulRequest(response)))
         }
     }
 
@@ -1766,7 +1766,7 @@ impl Http {
         debug!("Expected {}, got {}", expected, resp.status());
         trace!("Unsuccessful response: {:?}", resp);
 
-        Err(Error::Http(HttpError::UnsuccessfulRequest(resp)))
+        Err(Error::from(HttpError::UnsuccessfulRequest(resp)))
     }
 }
 
