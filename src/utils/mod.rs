@@ -613,7 +613,7 @@ fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
     while let Some(mut mention_start) = s[progress..].find("<@&") {
         mention_start += progress;
 
-        if let Some(mut mention_end) = s[mention_start..].find(">") {
+        if let Some(mut mention_end) = s[mention_start..].find('>') {
             mention_end += mention_start;
             mention_start += "<@&".len();
 
@@ -651,7 +651,7 @@ fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
     while let Some(mut mention_start) = s[progress..].find("<#") {
         mention_start += progress;
 
-        if let Some(mut mention_end) = s[mention_start..].find(">") {
+        if let Some(mut mention_end) = s[mention_start..].find('>') {
             mention_end += mention_start;
             mention_start += "<#".len();
 
@@ -690,7 +690,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
     while let Some(mut mention_start) = s[progress..].find("<@") {
         mention_start += progress;
 
-        if let Some(mut mention_end) = s[mention_start..].find(">") {
+        if let Some(mut mention_end) = s[mention_start..].find('>') {
             mention_end += mention_start;
             mention_start += "<@".len();
 
