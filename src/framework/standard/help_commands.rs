@@ -31,8 +31,6 @@ use super::{has_correct_roles, macros::help, Args, CommandGroup, CommandOptions,
 };
 #[cfg(feature = "cache")]
 use super::has_correct_permissions;
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
 use crate::client::Context;
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -44,15 +42,12 @@ use crate::model::{
 };
 use crate::utils::Colour;
 use crate::Error;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
 use std::{
     borrow::Borrow,
     collections::HashSet,
     fmt::Write,
     hash::BuildHasher,
     ops::{Index, IndexMut},
-    sync::Arc,
 };
 
 /// Macro to format a command according to a `HelpBehaviour` or

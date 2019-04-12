@@ -25,7 +25,6 @@ use crate::model::{
     permissions::Permissions,
 };
 use std::collections::HashMap;
-use parking_lot::RwLock;
 use std::sync::Arc;
 use threadpool::ThreadPool;
 
