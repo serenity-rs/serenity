@@ -61,7 +61,6 @@ enum ReceiverStatus {
     Websocket(VoiceEvent),
 }
 
-#[allow(clippy::dead_code)]
 struct ThreadItems {
     rx: MpscReceiver<ReceiverStatus>,
     tx: MpscSender<ReceiverStatus>,
@@ -71,7 +70,6 @@ struct ThreadItems {
     ws_thread: JoinHandle<()>,
 }
 
-#[allow(clippy::dead_code)]
 pub struct Connection {
     audio_timer: Timer,
     client: Arc<Mutex<WsClient>>,
