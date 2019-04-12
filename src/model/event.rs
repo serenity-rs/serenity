@@ -306,10 +306,10 @@ impl CacheUpdate for ChannelUpdateEvent {
                 }
             },
             Channel::Category(ref category) => {
-                cache
+                if let Some(c) = cache
                     .categories
                     .get_mut(&category.read().id)
-                    .map(|c| c.clone_from(category));
+                    { c.clone_from(category) }
             },
         }
 
@@ -728,7 +728,7 @@ impl CacheUpdate for GuildUpdateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.guilds.get_mut(&self.guild.id).map(|guild| {
+        if let Some(guild) = cache.guilds.get_mut(&self.guild.id) {
             let mut guild = guild.write();
 
             guild.afk_timeout = self.guild.afk_timeout;
@@ -739,7 +739,7 @@ impl CacheUpdate for GuildUpdateEvent {
             guild.region.clone_from(&self.guild.region);
             guild.roles.clone_from(&self.guild.roles);
             guild.verification_level = self.guild.verification_level;
-        });
+        }
 
         None
     }
