@@ -430,12 +430,12 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity: activity,
-            last_modified: last_modified,
-            nick: nick,
-            status: status,
-            user: user,
-            user_id: user_id,
+            activity,
+            last_modified,
+            nick,
+            status,
+            user,
+            user_id,
         })
     }
 }
