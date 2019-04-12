@@ -339,10 +339,10 @@ enum_number!(
 );
 
 impl ActivityType {
-    pub fn num(&self) -> u64 {
+    pub fn num(self) -> u64 {
         use self::ActivityType::*;
 
-        match *self {
+        match self {
             Playing => 0,
             Streaming => 1,
             Listening => 2,

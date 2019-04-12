@@ -364,7 +364,7 @@ pub enum DefaultAvatar {
 
 impl DefaultAvatar {
     /// Retrieves the String hash of the default avatar.
-    pub fn name(&self) -> Result<String> { serde_json::to_string(self).map_err(From::from) }
+    pub fn name(self) -> Result<String> { serde_json::to_string(&self).map_err(From::from) }
 }
 
 /// The representation of a user's status.
@@ -789,7 +789,7 @@ impl UserId {
     ///
     /// [current user]: ../user/struct.CurrentUser.html
     #[cfg(feature = "http")]
-    pub fn create_dm_channel(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
+    pub fn create_dm_channel(self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
         let map = json!({
             "recipient_id": self.0,
         });

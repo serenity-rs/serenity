@@ -430,8 +430,8 @@ impl ChannelType {
         }
     }
 
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             ChannelType::Text => 0,
             ChannelType::Private => 1,
             ChannelType::Voice => 2,

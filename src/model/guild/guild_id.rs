@@ -47,7 +47,7 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn ban<U, BO>(&self, http: impl AsRef<Http>, user: U, ban_options: &BO) -> Result<()>
+    pub fn ban<U, BO>(self, http: impl AsRef<Http>, user: U, ban_options: &BO) -> Result<()>
         where U: Into<UserId>, BO: BanOptions {
         self._ban(&http, user.into(), (ban_options.dmd(), ban_options.reason()))
     }
@@ -74,12 +74,12 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn bans(&self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {http.as_ref().get_bans(self.0) }
+    pub fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {http.as_ref().get_bans(self.0) }
 
     /// Gets a list of the guild's audit log entries
     #[cfg(feature = "http")]
     #[inline]
-    pub fn audit_logs(&self, http: impl AsRef<Http>,
+    pub fn audit_logs(self, http: impl AsRef<Http>,
                              action_type: Option<u8>,
                              user_id: Option<UserId>,
                              before: Option<AuditLogEntryId>,
@@ -91,7 +91,7 @@ impl GuildId {
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "http")]
-    pub fn channels(&self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
+    pub fn channels(self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
         let mut channels = HashMap::new();
 
         for channel in http.as_ref().get_channels(self.0)? {
@@ -123,7 +123,7 @@ impl GuildId {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_channel<C>(&self, http: impl AsRef<Http>, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
+    pub fn create_channel<C>(self, http: impl AsRef<Http>, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
         where C: Into<Option<ChannelId>> {
         self._create_channel(&http, name, kind, category.into())
     }
@@ -164,7 +164,7 @@ impl GuildId {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_emoji(&self, http: impl AsRef<Http>, name: &str, image: &str) -> Result<Emoji> {
+    pub fn create_emoji(self, http: impl AsRef<Http>, name: &str, image: &str) -> Result<Emoji> {
         let map = json!({
             "name": name,
             "image": image,
@@ -180,7 +180,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_integration<I>(&self, http: impl AsRef<Http>, integration_id: I, kind: &str) -> Result<()>
+    pub fn create_integration<I>(self, http: impl AsRef<Http>, integration_id: I, kind: &str) -> Result<()>
         where I: Into<IntegrationId> {
         self._create_integration(&http, integration_id.into(), kind)
     }
@@ -210,7 +210,7 @@ impl GuildId {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_role<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Role>
+    pub fn create_role<F>(self, http: impl AsRef<Http>, f: F) -> Result<Role>
     where F: FnOnce(&mut EditRole) -> &mut EditRole {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
@@ -235,7 +235,7 @@ impl GuildId {
     /// [`Guild::delete`]: ../guild/struct.Guild.html#method.delete
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete(&self, http: impl AsRef<Http>) -> Result<PartialGuild> { http.as_ref().delete_guild(self.0) }
+    pub fn delete(self, http: impl AsRef<Http>) -> Result<PartialGuild> { http.as_ref().delete_guild(self.0) }
 
     /// Deletes an [`Emoji`] from the guild.
     ///
@@ -245,7 +245,7 @@ impl GuildId {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_emoji<E: Into<EmojiId>>(&self, http: impl AsRef<Http>, emoji_id: E) -> Result<()> {
+    pub fn delete_emoji<E: Into<EmojiId>>(self, http: impl AsRef<Http>, emoji_id: E) -> Result<()> {
         self._delete_emoji(&http, emoji_id.into())
     }
 
@@ -261,7 +261,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_integration<I: Into<IntegrationId>>(&self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
+    pub fn delete_integration<I: Into<IntegrationId>>(self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
         self._delete_integration(&http, integration_id.into())
     }
 
@@ -281,7 +281,7 @@ impl GuildId {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_role<R: Into<RoleId>>(&self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
+    pub fn delete_role<R: Into<RoleId>>(self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
         self._delete_role(&http, role_id.into())
     }
 
@@ -322,7 +322,7 @@ impl GuildId {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_emoji<E: Into<EmojiId>>(&self, http: impl AsRef<Http>, emoji_id: E, name: &str) -> Result<Emoji> {
+    pub fn edit_emoji<E: Into<EmojiId>>(self, http: impl AsRef<Http>, emoji_id: E, name: &str) -> Result<Emoji> {
         self._edit_emoji(&http, emoji_id.into(), name)
     }
 
@@ -349,7 +349,7 @@ impl GuildId {
     /// ```
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
+    pub fn edit_member<F, U>(self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
         where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
         self._edit_member(&http, user_id.into(), f)
     }
@@ -371,7 +371,7 @@ impl GuildId {
     /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_nickname(&self, http: impl AsRef<Http>, new_nickname: Option<&str>) -> Result<()> {
+    pub fn edit_nickname(self, http: impl AsRef<Http>, new_nickname: Option<&str>) -> Result<()> {
         http.as_ref().edit_nickname(self.0, new_nickname)
     }
 
@@ -393,7 +393,7 @@ impl GuildId {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_role<F, R>(&self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
+    pub fn edit_role<F, R>(self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
         where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
         self._edit_role(&http, role_id.into(), f)
     }
@@ -422,14 +422,14 @@ impl GuildId {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_role_position<R>(&self, http: impl AsRef<Http>, role_id: R, position: u64) -> Result<Vec<Role>>
+    pub fn edit_role_position<R>(self, http: impl AsRef<Http>, role_id: R, position: u64) -> Result<Vec<Role>>
         where R: Into<RoleId> {
         self._edit_role_position(&http, role_id.into(), position)
     }
 
     #[cfg(feature = "http")]
     fn _edit_role_position(
-        &self,
+        self,
         http: impl AsRef<Http>,
         role_id: RoleId,
         position: u64,
@@ -460,7 +460,7 @@ impl GuildId {
     /// This performs a request over the REST API.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {http.as_ref().get_guild_integrations(self.0) }
+    pub fn integrations(self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {http.as_ref().get_guild_integrations(self.0) }
 
     /// Gets all of the guild's invites.
     ///
@@ -469,7 +469,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {http.as_ref().get_guild_invites(self.0) }
+    pub fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {http.as_ref().get_guild_invites(self.0) }
 
     /// Kicks a [`Member`] from the guild.
     ///
@@ -479,14 +479,14 @@ impl GuildId {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn kick<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
+    pub fn kick<U: Into<UserId>>(self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
         http.as_ref().kick_member(self.0, user_id.into().0)
     }
 
     /// Leaves the guild.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn leave(&self, http: impl AsRef<Http>) -> Result<()> { http.as_ref().leave_guild(self.0) }
+    pub fn leave(self, http: impl AsRef<Http>) -> Result<()> { http.as_ref().leave_guild(self.0) }
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
@@ -497,12 +497,12 @@ impl GuildId {
     /// [`Member`]: ../guild/struct.Member.html
     #[cfg(feature = "client")]
     #[inline]
-    pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
+    pub fn member<U: Into<UserId>>(self, context: &Context, user_id: U) -> Result<Member> {
         self._member(&context, user_id.into())
     }
 
     #[cfg(feature = "client")]
-    fn _member(&self, context: &Context, user_id: UserId) -> Result<Member> {
+    fn _member(self, context: &Context, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {
             if let Some(member) = context.cache.read().member(self.0, user_id) {
@@ -522,13 +522,13 @@ impl GuildId {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn members<U>(&self, http: impl AsRef<Http>, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
+    pub fn members<U>(self, http: impl AsRef<Http>, limit: Option<u64>, after: Option<U>) -> Result<Vec<Member>>
         where U: Into<UserId> {
         self._members(&http, limit, after.map(Into::into))
     }
 
     #[cfg(feature = "http")]
-    fn _members(&self, http: impl AsRef<Http>, limit: Option<u64>, after: Option<UserId>) -> Result<Vec<Member>> {
+    fn _members(self, http: impl AsRef<Http>, limit: Option<u64>, after: Option<UserId>) -> Result<Vec<Member>> {
         http.as_ref().get_guild_members(self.0, limit, after.map(|x| x.0))
     }
 
@@ -539,14 +539,14 @@ impl GuildId {
     /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn move_member<C, U>(&self, http: impl AsRef<Http>, user_id: U, channel_id: C) -> Result<()>
+    pub fn move_member<C, U>(self, http: impl AsRef<Http>, user_id: U, channel_id: C) -> Result<()>
         where C: Into<ChannelId>, U: Into<UserId> {
         self._move_member(&http, user_id.into(), channel_id.into())
     }
 
     #[cfg(feature = "http")]
     fn _move_member(
-        &self,
+        self,
         http: impl AsRef<Http>,
         user_id: UserId,
         channel_id: ChannelId,
@@ -568,7 +568,7 @@ impl GuildId {
     /// [`Member`]: ../guild/struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
-    pub fn prune_count(&self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
+    pub fn prune_count(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
         let map = json!({
             "days": days,
         });
@@ -585,12 +585,12 @@ impl GuildId {
     /// regardless of whether they were updated. Otherwise, positioning can
     /// sometimes get weird.
     #[inline]
-    pub fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
+    pub fn reorder_channels<It>(self, http: impl AsRef<Http>, channels: It) -> Result<()>
         where It: IntoIterator<Item = (ChannelId, u64)> {
         self._reorder_channels(&http, channels.into_iter().collect())
     }
 
-    fn _reorder_channels(&self, http: impl AsRef<Http>, channels: Vec<(ChannelId, u64)>) -> Result<()> {
+    fn _reorder_channels(self, http: impl AsRef<Http>, channels: Vec<(ChannelId, u64)>) -> Result<()> {
         let items = channels.into_iter().map(|(id, pos)| json!({
             "id": id,
             "position": pos,
@@ -611,7 +611,7 @@ impl GuildId {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+    pub fn shard_id(self, cache: impl AsRef<CacheRwLock>) -> u64 {
         crate::utils::shard_id(self.0, cache.as_ref().read().shard_count)
     }
 
@@ -638,7 +638,7 @@ impl GuildId {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { crate::utils::shard_id(self.0, shard_count) }
+    pub fn shard_id(self, shard_count: u64) -> u64 { crate::utils::shard_id(self.0, shard_count) }
 
     /// Starts an integration sync for the given integration Id.
     ///
@@ -647,13 +647,13 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
+    pub fn start_integration_sync<I: Into<IntegrationId>>(self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
         self._start_integration_sync(&http, integration_id.into())
     }
 
     #[cfg(feature = "http")]
     fn _start_integration_sync(
-        &self,
+        self,
         http: impl AsRef<Http>,
         integration_id: IntegrationId,
     ) -> Result<()> {
@@ -671,7 +671,7 @@ impl GuildId {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn start_prune(&self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
+    pub fn start_prune(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
         let map = json!({
             "days": days,
         });
@@ -687,7 +687,7 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn unban<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
+    pub fn unban<U: Into<UserId>>(self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
         self._unban(&http, user_id.into())
     }
 
@@ -703,7 +703,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
+    pub fn vanity_url(self, http: impl AsRef<Http>) -> Result<String> {
         http.as_ref().get_guild_vanity_url(self.0)
     }
 
@@ -713,7 +713,7 @@ impl GuildId {
     ///
     /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
-    pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {http.as_ref().get_guild_webhooks(self.0) }
+    pub fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {http.as_ref().get_guild_webhooks(self.0) }
 }
 
 impl From<PartialGuild> for GuildId {
