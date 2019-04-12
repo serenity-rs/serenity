@@ -619,7 +619,7 @@ pub fn create_customised_help_data<'a>(
         &help_options,
     );
 
-    return if listed_groups.is_empty() {
+    if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
             help_error_message: &help_options.no_help_available_text,
         }
@@ -628,7 +628,7 @@ pub fn create_customised_help_data<'a>(
             help_description: description,
             groups: listed_groups,
         }
-    };
+    }
 }
 
 /// Sends an embed listing all groups with their commands.

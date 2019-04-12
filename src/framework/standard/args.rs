@@ -535,7 +535,7 @@ impl Args {
             }
         }
 
-        return self;
+        self
     }
 
     /// Parse the current argument.
