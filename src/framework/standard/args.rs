@@ -343,9 +343,9 @@ impl Args {
 
     fn span(&self) -> (usize, usize) {
         let Token {
-            kind: _,
             start,
             end,
+            ..
         } = &self.args[self.offset];
 
         let start = *start;
