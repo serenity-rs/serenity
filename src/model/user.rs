@@ -692,8 +692,6 @@ impl User {
     pub fn refresh(&mut self, context: &Context) -> Result<()> {
         self.id.to_user(&context).map(|replacement| {
             mem::replace(self, replacement);
-
-            ()
         })
     }
 
