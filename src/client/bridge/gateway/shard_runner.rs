@@ -320,7 +320,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             Event::VoiceServerUpdate(ref event) => {
                 if let Some(guild_id) = event.guild_id {
                     let mut manager = self.voice_manager.lock();
-                    let mut search = manager.get_mut(guild_id);
+                    let search = manager.get_mut(guild_id);
 
                     if let Some(handler) = search {
                         handler.update_server(&event.endpoint, &event.token);
@@ -330,7 +330,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             Event::VoiceStateUpdate(ref event) => {
                 if let Some(guild_id) = event.guild_id {
                     let mut manager = self.voice_manager.lock();
-                    let mut search = manager.get_mut(guild_id);
+                    let search = manager.get_mut(guild_id);
 
                     if let Some(handler) = search {
                         handler.update_state(&event.voice_state);
