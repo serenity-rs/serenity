@@ -38,8 +38,6 @@
 //! differentiating between different ratelimits.
 //!
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
-#![allow(clippy::zero_ptr)]
-
 pub use super::routing::Route;
 
 use chrono::{DateTime, Utc};
