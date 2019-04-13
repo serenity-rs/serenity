@@ -1,4 +1,3 @@
-use crate::cache::CacheUpdate;
 use crate::gateway::InterMessage;
 use crate::model::{
     channel::{Channel, Message},
@@ -26,30 +25,32 @@ use crate::model::id::GuildId;
 use crate::cache::Cache;
 #[cfg(any(feature = "cache", feature = "http"))]
 use crate::CacheAndHttp;
+#[cfg(feature = "cache")]
+use crate::cache::CacheUpdate;
 
 #[inline]
+#[cfg(feature = "cache")]
 fn update<E: CacheUpdate + fmt::Debug>(cache_and_http: &Arc<CacheAndHttp>, event: &mut E) -> Option<E::Output> {
-    #[cfg(feature = "cache")]
-    {
-        if let Some(millis_timeout) = cache_and_http.update_cache_timeout {
+    if let Some(millis_timeout) = cache_and_http.update_cache_timeout {
 
-            if let Some(mut lock) = cache_and_http.cache.try_write_for(millis_timeout) {
-               lock.update(event)
-            } else {
-                warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", event);
-
-                None
-            }
+        if let Some(mut lock) = cache_and_http.cache.try_write_for(millis_timeout) {
+            lock.update(event)
         } else {
-            cache_and_http.cache.write().update(event)
-        }
-    }
+            warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", event);
 
-    #[cfg(not(feature = "cache"))]
-    {
-        None
+            None
+        }
+    } else {
+        cache_and_http.cache.write().update(event)
     }
 }
+
+#[inline]
+#[cfg(not(feature = "cache"))]
+fn update<E>(cache_and_http: &Arc<CacheAndHttp>, event: &mut E) -> Option<()> {
+    None
+}
+
 #[cfg(all(feature = "cache", feature = "http"))]
 fn context(
     data: &Arc<RwLock<ShareMap>>,
