@@ -51,12 +51,6 @@ macro_rules! id_u64 {
                 }
             }
 
-            impl PartialEq for $name {
-                fn eq(&self, other: &Self) -> bool {
-                    self.0 == other.0
-                }
-            }
-
             impl PartialEq<u64> for $name {
                 fn eq(&self, u: &u64) -> bool {
                     self.0 == *u
@@ -91,53 +85,43 @@ macro_rules! id_u64 {
 }
 
 /// An identifier for an Application.
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct ApplicationId(pub u64);
 
 /// An identifier for a Channel
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct ChannelId(pub u64);
 
 /// An identifier for an Emoji
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct EmojiId(pub u64);
 
 /// An identifier for a Guild
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct GuildId(pub u64);
 
 /// An identifier for an Integration
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct IntegrationId(pub u64);
 
 /// An identifier for a Message
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct MessageId(pub u64);
 
 /// An identifier for a Role
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct RoleId(pub u64);
 
 /// An identifier for a User
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct UserId(pub u64);
 
 /// An identifier for a [`Webhook`](../webhook/struct.Webhook.html).
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct WebhookId(pub u64);
 
 /// An identifier for an audit log entry.
-#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialOrd, Ord, Serialize)]
-#[allow(clippy::derive_hash_xor_eq)]
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct AuditLogEntryId(pub u64);
 
 id_u64! {
