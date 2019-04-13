@@ -474,7 +474,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 
         #[cfg(feature = "voice")]
         {
-            self.voice_manager.lock().manager_remove(&shard_id.0);
+            self.voice_manager.lock().manager_remove(shard_id.0);
         }
 
         Ok(())
