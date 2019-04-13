@@ -984,6 +984,7 @@ pub fn plain(
 }
 
 #[cfg(test)]
+#[cfg(all(feature = "cache", feature = "http"))]
 mod levenshtein_tests {
     use super::levenshtein_distance;
 
@@ -1036,6 +1037,7 @@ mod levenshtein_tests {
 }
 
 #[cfg(test)]
+#[cfg(all(feature = "cache", feature = "http"))]
 mod matrix_tests {
     use super::Matrix;
 
