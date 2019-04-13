@@ -456,9 +456,9 @@ impl Args {
     /// let mut args = Args::new("4 2", &[Delimiter::Single(' ')]);
     ///
     /// assert_eq!(args.current(), Some("4"));
-    /// args.next();
+    /// args.advance();
     /// assert_eq!(args.current(), Some("2"));
-    /// args.next();
+    /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
     ///

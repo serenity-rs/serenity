@@ -577,7 +577,7 @@ impl Client {
     /// impl Framework for MyFramework {
     ///     fn dispatch(&mut self, _: Context, msg: Message, tokio_handle: &Handle) {
     ///         let args = msg.content.split_whitespace();
-    ///         let command = match args.next() {
+    ///         let command = match args.advance() {
     ///             Some(command) => {
     ///                 if !command.starts_with('*') { return; }
     ///                 command
