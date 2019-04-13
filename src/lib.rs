@@ -53,9 +53,6 @@
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
-#![allow(unknown_lints)]
-#![allow(clippy::doc_markdown, clippy::inline_always)]
-#![warn(clippy::enum_glob_use, clippy::if_not_else)]
 #![deny(rust_2018_idioms)]
 
 #[macro_use]
