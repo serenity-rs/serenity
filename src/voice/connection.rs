@@ -61,6 +61,7 @@ enum ReceiverStatus {
     Websocket(VoiceEvent),
 }
 
+#[allow(dead_code)]
 struct ThreadItems {
     rx: MpscReceiver<ReceiverStatus>,
     tx: MpscSender<ReceiverStatus>,
@@ -283,125 +284,71 @@ impl Connection {
         Ok(())
     }
 
-    #[allow(unused_variables)]
-    pub fn cycle(&mut self,
-                 sources: &mut Vec<LockedAudio>,
-                 receiver: &mut Option<Box<dyn AudioReceiver>>,
-                 audio_timer: &mut Timer,
-                 bitrate: Bitrate)
-                 -> Result<()> {
-        // We need to actually reserve enough space for the desired bitrate.
-        let size = match bitrate {
-            // If user specified, we can calculate. 20ms means 50fps.
-            Bitrate::BitsPerSecond(b) => b / 50,
-            // Otherwise, just have a lot preallocated.
-            _ => 5120,
-        } + 16;
+    #[inline]
+    fn handle_received_udp(
+        &mut self,
+        receiver: &mut Option<Box<dyn AudioReceiver>>,
+        buffer: &mut [i16; 1920],
+        packet: &[u8],
+        nonce: &mut Nonce,
+        ) -> Result<()> {
 
-        let mut buffer = [0i16; 960 * 2];
-        let mut mix_buffer = [0f32; 960 * 2];
-        let mut packet = vec![0u8; size as usize].into_boxed_slice();
-        let mut nonce = secretbox::Nonce([0; 24]);
+        if let Some(receiver) = receiver.as_mut() {
+            let mut handle = &packet[2..];
+            let seq = handle.read_u16::<BigEndian>()?;
+            let timestamp = handle.read_u32::<BigEndian>()?;
+            let ssrc = handle.read_u32::<BigEndian>()?;
 
-        while let Ok(status) = self.thread_items.rx.try_recv() {
-            match status {
-                ReceiverStatus::Udp(packet) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        let mut handle = &packet[2..];
-                        let seq = handle.read_u16::<BigEndian>()?;
-                        let timestamp = handle.read_u32::<BigEndian>()?;
-                        let ssrc = handle.read_u32::<BigEndian>()?;
+            nonce.0[..HEADER_LEN]
+                .clone_from_slice(&packet[..HEADER_LEN]);
 
-                        nonce.0[..HEADER_LEN]
-                            .clone_from_slice(&packet[..HEADER_LEN]);
+            if let Ok(mut decrypted) =
+                secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
+                let channels = opus_packet::nb_channels(&decrypted)?;
 
-                        if let Ok(mut decrypted) =
-                            secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
-                            let channels = opus_packet::nb_channels(&decrypted)?;
+                let entry =
+                    self.decoder_map.entry((ssrc, channels)).or_insert_with(
+                        || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
+                    );
 
-                            let entry =
-                                self.decoder_map.entry((ssrc, channels)).or_insert_with(
-                                    || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
-                                );
-
-                            // Strip RTP Header Extensions (one-byte)
-                            if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
-                                // Read the length bytes as a big-endian u16.
-                                let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
-                                let mut offset = 4;
-                                for _ in 0..header_extension_len {
-                                    let byte = decrypted[offset];
-                                    offset += 1;
-                                    if byte == 0 {
-                                        continue;
-                                    }
-
-                                    offset += 1 + (0b1111 & (byte >> 4)) as usize;
-                                }
-
-                                while decrypted[offset] == 0 {
-                                    offset += 1;
-                                }
-
-                                decrypted = decrypted.split_off(offset);
-                            }
-
-                            let len = entry.decode(Some(&decrypted), &mut buffer[..], false)?;
-
-                            let is_stereo = channels == Channels::Stereo;
-
-                            let b = if is_stereo { len * 2 } else { len };
-
-                            receiver
-                                .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
+                // Strip RTP Header Extensions (one-byte)
+                if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
+                    // Read the length bytes as a big-endian u16.
+                    let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
+                    let mut offset = 4;
+                    for _ in 0..header_extension_len {
+                        let byte = decrypted[offset];
+                        offset += 1;
+                        if byte == 0 {
+                            continue;
                         }
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.client_disconnect(ev.user_id.0);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                    match self.last_heartbeat_nonce {
-                        Some(nonce) => {
-                            if ev.nonce != nonce {
-                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                            } else {
-                                info!("[Voice] Heartbeat ACK received.");
-                            }
 
-                            self.last_heartbeat_nonce = None;
-                        },
-                        None => {},
+                        offset += 1 + (0b1111 & (byte >> 4)) as usize;
                     }
-                },
-                ReceiverStatus::Websocket(other) => {
-                    info!("[Voice] Received other websocket data: {:?}", other);
-                },
+
+                    while decrypted[offset] == 0 {
+                        offset += 1;
+                    }
+
+                    decrypted = decrypted.split_off(offset);
+                }
+
+                let len = entry.decode(Some(&decrypted), &mut buffer[..], false)?;
+
+                let is_stereo = channels == Channels::Stereo;
+
+                let b = if is_stereo { len * 2 } else { len };
+
+                receiver
+                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
             }
         }
 
-        // Send the voice websocket keepalive if it's time
-        if self.keepalive_timer.check() {
-            info!("[Voice] WS keepalive");
-            let nonce = random::<u64>();
-            self.last_heartbeat_nonce = Some(nonce);
-            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
-            info!("[Voice] WS keepalive sent");
-        }
+        Ok(())
+    }
 
-        // Send UDP keepalive if it's time
+    #[inline]
+    fn check_audio_timer(&mut self) -> Result<()> {
         if self.audio_timer.check() {
             info!("[Voice] UDP keepalive");
             let mut bytes = [0; 4];
@@ -410,18 +357,31 @@ impl Connection {
             info!("[Voice] UDP keepalive sent");
         }
 
-        // Reconfigure encoder bitrate.
-        // From my testing, it seemed like this needed to be set every cycle.
-        if let Err(e) = self.encoder.set_bitrate(bitrate) {
-            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
+        Ok(())
+    }
+
+    #[inline]
+    fn check_keepalive_timer(&mut self) -> Result<()> {
+        if self.keepalive_timer.check() {
+            info!("[Voice] WS keepalive");
+            let nonce = random::<u64>();
+            self.last_heartbeat_nonce = Some(nonce);
+            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
+            info!("[Voice] WS keepalive sent");
         }
 
-        let mut opus_frame = Vec::new();
+        Ok(())
+    }
 
+    #[inline]
+    fn remove_unfinished_files(
+        &mut self,
+        sources: &mut Vec<LockedAudio>,
+        opus_frame: &[u8],
+        buffer: &mut [i16; 1920],
+        mut mix_buffer: &mut [f32; 1920],
+    ) -> Result<usize> {
         let mut len = 0;
-
-        // Walk over all the audio files, removing those which have finished.
-        // For this purpose, we need a while loop in Rust.
         let mut i = 0;
 
         while i < sources.len() {
@@ -459,12 +419,11 @@ impl Connection {
                 }
 
                 let temp_len = match stream.get_type() {
-                    AudioType::Opus => match stream.decode_and_add_opus_frame(&mut mix_buffer, vol) {
-                        Some(frame) => {
+                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
                             opus_frame.len()
+                        } else {
+                            0
                         },
-                        None => 0,
-                    },
                     AudioType::Pcm => {
                         let buffer_len = if source_stereo { 960 * 2 } else { 960 };
 
@@ -476,7 +435,7 @@ impl Connection {
                 };
 
                 // May need to force interleave/copy.
-                combine_audio(buffer, &mut mix_buffer, source_stereo, vol);
+                combine_audio(*buffer, &mut mix_buffer, source_stereo, vol);
 
                 len = len.max(temp_len);
                 i += if temp_len > 0 {
@@ -495,6 +454,85 @@ impl Connection {
                 aud.step_frame();
             }
         };
+
+        Ok(len)
+    }
+
+    #[allow(unused_variables)]
+    pub fn cycle(&mut self,
+                mut sources: &mut Vec<LockedAudio>,
+                mut receiver: &mut Option<Box<dyn AudioReceiver>>,
+                audio_timer: &mut Timer,
+                bitrate: Bitrate)
+                 -> Result<()> {
+        // We need to actually reserve enough space for the desired bitrate.
+        let size = match bitrate {
+            // If user specified, we can calculate. 20ms means 50fps.
+            Bitrate::BitsPerSecond(b) => b / 50,
+            // Otherwise, just have a lot preallocated.
+            _ => 5120,
+        } + 16;
+
+        let mut buffer = [0i16; 960 * 2];
+        let mut mix_buffer = [0f32; 960 * 2];
+        let mut packet = vec![0u8; size as usize].into_boxed_slice();
+        let mut nonce = secretbox::Nonce([0; 24]);
+
+        while let Ok(status) = self.thread_items.rx.try_recv() {
+            match status {
+                ReceiverStatus::Udp(packet) => {
+                    self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce)?;
+                },
+                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
+                    if let Some(receiver) = receiver.as_mut() {
+                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
+                    if let Some(receiver) = receiver.as_mut() {
+                        receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
+                    if let Some(receiver) = receiver.as_mut() {
+                        receiver.client_disconnect(ev.user_id.0);
+                    }
+                },
+                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
+                    if let Some(nonce) = self.last_heartbeat_nonce {
+
+                        if ev.nonce == nonce {
+                            info!("[Voice] Heartbeat ACK received.");
+                        } else {
+                            warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                        }
+
+                        self.last_heartbeat_nonce = None;
+                    }
+                },
+                ReceiverStatus::Websocket(other) => {
+                    info!("[Voice] Received other websocket data: {:?}", other);
+                },
+            }
+        }
+
+        // Send the voice websocket keepalive if it's time
+        self.check_keepalive_timer()?;
+
+        // Send UDP keepalive if it's time
+        self.check_audio_timer()?;
+
+        // Reconfigure encoder bitrate.
+        // From my testing, it seemed like this needed to be set every cycle.
+        if let Err(e) = self.encoder.set_bitrate(bitrate) {
+            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
+        }
+
+        let mut opus_frame = Vec::new();
+
+        // Walk over all the audio files, removing those which have finished.
+        // For this purpose, we need a while loop in Rust.
+        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer,&mut mix_buffer)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -604,11 +642,11 @@ fn combine_audio(
     true_stereo: bool,
     volume: f32,
 ) {
-    for i in 0..1920 {
-        let sample_index = if true_stereo { i } else { i/2 };
-        let sample = (raw_buffer[sample_index] as f32) / 32768.0;
+    for (i, float_buffer_element) in float_buffer.iter_mut().enumerate().take(1920) {
+        let sample_index = if true_stereo { i } else { i / 2 };
+        let sample = f32::from(raw_buffer[sample_index]) / 32768.0;
 
-        float_buffer[i] = float_buffer[i] + sample * volume;
+        *float_buffer_element += sample * volume;
     }
 }
 
