@@ -89,6 +89,8 @@ fn context(
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id)
 }
 
+// Once we can use `Box` as part of a pattern, we will reconsider boxing.
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum DispatchEvent {
     Client(ClientEvent),
     Model(Event),
