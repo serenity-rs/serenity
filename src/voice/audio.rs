@@ -24,8 +24,9 @@ pub trait AudioSource: Send {
 
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, ssrc: u32, _user_id: u64, _speaking: bool) { }
+    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) { }
 
+    #[allow(clippy::too_many_arguments)]
     fn voice_packet(&mut self,
                     _ssrc: u32,
                     _sequence: u16,
