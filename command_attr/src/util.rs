@@ -303,6 +303,8 @@ pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
 
                 index += 1;
             )*
+
+            let _ = index;
         }};
     }
 
