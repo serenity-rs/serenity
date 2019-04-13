@@ -115,8 +115,8 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
             decoder.decode_float(frame.as_slice(), &mut local_buf, false).ok()?
         };
 
-        for i in 0..1920 {
-            float_buffer[i] += local_buf[i] * volume;
+        for (i, float_buffer_element) in float_buffer.iter_mut().enumerate().take(1920) {
+            *float_buffer_element += local_buf[i] * volume;
         }
 
         Some(count)
