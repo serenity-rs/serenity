@@ -97,7 +97,7 @@ pub(crate) enum DispatchEvent {
 }
 
 #[cfg(feature = "framework")]
-#[clippy::too_many_arguments]
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
