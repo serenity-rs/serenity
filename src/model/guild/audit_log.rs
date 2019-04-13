@@ -284,6 +284,8 @@ mod u64_handler {
         des.deserialize_any(U64Visitor)
     }
 
+    // Due to `Serialize`.
+    #[allow(clippy::trivially_copy_pass_by_ref)]
     pub fn serialize<S: Serializer>(num: &u64, s: S) -> StdResult<S::Ok, S::Error> {
         s.serialize_u64(*num)
     }
