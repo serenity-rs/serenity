@@ -23,25 +23,24 @@
 //! [`plain`]: fn.plain.html
 //! [`with_embeds`]: fn.with_embeds.html
 
-use log::warn;
-
-use super::structures::Command as InternalCommand;
-use super::{has_correct_roles, macros::help, Args, CommandGroup, CommandOptions,
-    CommandResult, HelpBehaviour, HelpOptions, OnlyIn,
+#[cfg(all(feature = "cache", feature = "http"))]
+use super::{
+    Args, CommandGroup, CommandOptions,
+    CommandResult, has_correct_roles, HelpBehaviour, HelpOptions,
+    has_correct_permissions, macros::help, OnlyIn,
+    structures::Command as InternalCommand,
 };
-#[cfg(feature = "cache")]
-use super::has_correct_permissions;
-use crate::client::Context;
-#[cfg(feature = "http")]
-use crate::http::Http;
-#[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
-use crate::model::{
-    channel::Message,
-    id::{ChannelId, UserId},
+#[cfg(all(feature = "cache", feature = "http"))]
+use crate::{
+    cache::CacheRwLock,
+    client::Context,
+    model::channel::Message,
+    Error,
+    http::Http,
+    model::id::{ChannelId, UserId},
+    utils::Colour,
 };
-use crate::utils::Colour;
-use crate::Error;
+#[cfg(all(feature = "cache", feature = "http"))]
 use std::{
     borrow::Borrow,
     collections::HashSet,
@@ -49,9 +48,12 @@ use std::{
     hash::BuildHasher,
     ops::{Index, IndexMut},
 };
+#[cfg(all(feature = "cache", feature = "http"))]
+use log::warn;
 
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
+#[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! format_command_name {
     ($behaviour:expr, $command_name:expr) => {
         match $behaviour {
@@ -64,6 +66,7 @@ macro_rules! format_command_name {
 
 /// Wraps around `warn`-macro in order to keep
 /// the literal same for all formats of help.
+#[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! warn_about_failed_send {
     ($customised_help:expr, $error:expr) => {
         warn!("Failed to send {:?} because: {:?}", $customised_help, $error);
@@ -106,6 +109,7 @@ pub struct Command<'a> {
 #[derive(Clone, Debug, Default)]
 pub struct Suggestions(Vec<SuggestedCommandName>);
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
     /// Immutably borrow inner `Vec`.
     #[inline]
@@ -163,11 +167,13 @@ pub enum CustomisedHelpData<'a> {
 /// Wraps around a `Vec<Vec<T>>` and provides access
 /// via indexing of tuples representing x and y.
 #[derive(Debug)]
+#[cfg(all(feature = "cache", feature = "http"))]
 struct Matrix {
     vec: Vec<usize>,
     width: usize,
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl Matrix {
     fn new(columns: usize, rows: usize) -> Matrix {
         Matrix {
@@ -177,6 +183,7 @@ impl Matrix {
     }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl Index<(usize, usize)> for Matrix {
     type Output = usize;
 
@@ -185,6 +192,7 @@ impl Index<(usize, usize)> for Matrix {
     }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl IndexMut<(usize, usize)> for Matrix {
     fn index_mut(&mut self, matrix_entry: (usize, usize)) -> &mut usize {
         &mut self.vec[matrix_entry.1 * self.width + matrix_entry.0]
@@ -193,6 +201,7 @@ impl IndexMut<(usize, usize)> for Matrix {
 
 /// Calculates and returns levenshtein distance between
 /// two passed words.
+#[cfg(all(feature = "cache", feature = "http"))]
 pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
     let len_a = word_a.chars().count();
     let len_b = word_b.chars().count();
@@ -632,7 +641,7 @@ pub fn create_customised_help_data<'a>(
 }
 
 /// Sends an embed listing all groups with their commands.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_grouped_commands_embed(
     http: impl AsRef<Http>,
     help_options: &HelpOptions,
@@ -669,7 +678,7 @@ fn send_grouped_commands_embed(
 }
 
 /// Sends embed showcasing information about a single command.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_single_command_embed(
     http: impl AsRef<Http>,
     help_options: &HelpOptions,
@@ -723,7 +732,7 @@ fn send_single_command_embed(
 }
 
 /// Sends embed listing commands that are similar to the sent one.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_suggestion_embed(
     http: impl AsRef<Http>,
     channel_id: ChannelId,
@@ -746,7 +755,7 @@ fn send_suggestion_embed(
 }
 
 /// Sends an embed explaining fetching commands failed.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_error_embed(
     http: impl AsRef<Http>,
     channel_id: ChannelId,
@@ -839,6 +848,7 @@ pub fn with_embeds(
 }
 
 /// Turns grouped commands into a `String` taking plain help format into account.
+#[cfg(all(feature = "cache", feature = "http"))]
 fn grouped_commands_to_plain_string(
     help_options: &HelpOptions,
     help_description: &str,
@@ -866,6 +876,7 @@ fn grouped_commands_to_plain_string(
 }
 
 /// Turns a single command into a `String` taking plain help format into account.
+#[cfg(all(feature = "cache", feature = "http"))]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::default();
     let _ = writeln!(result, "__**{}**__", command.name);

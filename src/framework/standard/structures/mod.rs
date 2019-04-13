@@ -151,6 +151,7 @@ pub enum HelpBehaviour {
     Nothing,
 }
 
+
 #[derive(Debug, PartialEq)]
 pub struct HelpOptions {
     /// Suggests a command's name.

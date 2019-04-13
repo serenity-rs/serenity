@@ -4,7 +4,7 @@ use crate::model::{
     event::Event,
     guild::Member,
 };
-use std::{fmt, sync::{Arc, mpsc::Sender}};
+use std::{sync::{Arc, mpsc::Sender}};
 use parking_lot::{Mutex, RwLock};
 use super::{
     bridge::gateway::event::ClientEvent,
@@ -13,7 +13,6 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use log::warn;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -27,6 +26,10 @@ use crate::cache::Cache;
 use crate::CacheAndHttp;
 #[cfg(feature = "cache")]
 use crate::cache::CacheUpdate;
+#[cfg(feature = "cache")]
+use std::fmt;
+#[cfg(feature = "cache")]
+use log::warn;
 
 #[inline]
 #[cfg(feature = "cache")]
@@ -47,7 +50,7 @@ fn update<E: CacheUpdate + fmt::Debug>(cache_and_http: &Arc<CacheAndHttp>, event
 
 #[inline]
 #[cfg(not(feature = "cache"))]
-fn update<E>(cache_and_http: &Arc<CacheAndHttp>, event: &mut E) -> Option<()> {
+fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
     None
 }
 

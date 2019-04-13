@@ -19,7 +19,7 @@ use std::borrow::Cow;
 use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::{cache::CacheRwLock, utils};
-#[cfg(all(feature = "http"))]
+#[cfg(all(feature = "http", feature = "cache"))]
 use crate::http::Http;
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.

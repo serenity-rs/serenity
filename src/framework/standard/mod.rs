@@ -18,10 +18,8 @@ pub use structures::buckets::BucketBuilder;
 use self::parse::*;
 use super::Framework;
 use crate::client::Context;
-use crate::internal::RwLockExt;
 use crate::model::{
     channel::Message,
-    guild::{Guild, Member},
     permissions::Permissions,
 };
 use std::collections::HashMap;
@@ -30,6 +28,10 @@ use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
+#[cfg(feature = "cache")]
+use crate::model::guild::{Guild, Member};
+#[cfg(feature = "cache")]
+use crate::internal::RwLockExt;
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
@@ -737,6 +739,7 @@ pub(crate) fn has_correct_permissions(
     }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 pub(crate) fn has_correct_roles(cmd: &CommandOptions, guild: &Guild, member: &Member) -> bool {
     if cmd.allowed_roles.is_empty() {
         true

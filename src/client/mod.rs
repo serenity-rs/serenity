@@ -45,7 +45,7 @@ use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use parking_lot::RwLock;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
-use std::{sync::Arc, time::Duration};
+use std::sync::Arc;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 use log::{error, debug, info};
@@ -58,6 +58,8 @@ use crate::model::id::UserId;
 use self::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "cache")]
+use std::time::Duration;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through

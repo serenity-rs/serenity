@@ -411,11 +411,11 @@ impl ChannelId {
 
     /// Returns the name of whatever channel this id holds.
     #[cfg(all(feature = "model", feature = "client"))]
-    pub fn name(self, context: &Context) -> Option<String> {
+    pub fn name(self, _context: &Context) -> Option<String> {
         use self::Channel::*;
 
         let finding = feature_cache! {{
-            Some(self.to_channel_cached(&context.cache))
+            Some(self.to_channel_cached(&_context.cache))
         } else {
             None
         }};

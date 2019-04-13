@@ -13,14 +13,15 @@ pub use self::{
 
 use base64;
 use crate::internal::prelude::*;
-use crate::prelude::RwLock;
 use crate::model::{
-    channel::Channel,
     misc::EmojiIdentifier,
+    id::EmojiId,
+};
+#[cfg(feature = "cache")]
+use crate::model::{
     id::{
         ChannelId,
         GuildId,
-        EmojiId,
         RoleId,
         UserId,
     },
@@ -32,9 +33,13 @@ use std::{
     hash::{BuildHasher, Hash},
     io::Read,
     path::Path,
-    str::FromStr,
 };
-
+#[cfg(feature = "cache")]
+use crate::prelude::RwLock;
+#[cfg(feature = "cache")]
+use crate::model::channel::Channel;
+#[cfg(feature = "cache")]
+use std::str::FromStr;
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheRwLock};
 
