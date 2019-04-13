@@ -728,14 +728,12 @@ pub(crate) fn has_correct_permissions(
 ) -> bool {
     if command.required_permissions.is_empty() {
         true
-    } else {
-        if let Some(guild) = message.guild(&cache) {
-            let perms = guild.with(|g| g.permissions_in(message.channel_id, message.author.id));
+    } else if let Some(guild) = message.guild(&cache) {
+        let perms = guild.with(|g| g.permissions_in(message.channel_id, message.author.id));
 
-            perms.contains(command.required_permissions)
-        } else {
-            false
-        }
+        perms.contains(command.required_permissions)
+    } else {
+        false
     }
 }
 
