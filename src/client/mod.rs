@@ -17,7 +17,6 @@
 //! [`Client`]: struct.Client.html#examples
 //! [`Context`]: struct.Context.html
 //! [Client examples]: struct.Client.html#examples
-#![allow(clippy::zero_ptr)]
 
 pub mod bridge;
 
