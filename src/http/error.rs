@@ -38,6 +38,7 @@ impl From<Response> for ErrorResponse {
             error: r.json().unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
                 message: "[Serenity] No correct json was recieved!".to_string(),
+                non_exhaustive: (),
             }),
         }
     }
