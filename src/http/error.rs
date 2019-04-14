@@ -1,9 +1,6 @@
 use reqwest::{
     Error as ReqwestError,
-    header::{
-        HeaderMap,
-        InvalidHeaderValue,
-    },
+    header::InvalidHeaderValue,
     Response,
     StatusCode,
     Url,
@@ -18,12 +15,17 @@ use std::{
     }
 };
 
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct DiscordJsonError {
+    code: isize,
+    message: String
+}
+
 #[derive(Debug, Clone)]
 pub struct ErrorResponse {
     pub status_code: StatusCode,
     pub url: Url,
-    pub headers: HeaderMap,
-    pub body: String,
+    pub error: DiscordJsonError,
 }
 
 impl From<Response> for ErrorResponse {
@@ -31,11 +33,14 @@ impl From<Response> for ErrorResponse {
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
-            headers: r.headers().clone(),
-            body: r.text().unwrap_or_else(|_| "[Serenity] No body to be read".to_string()),
+            error: r.json().unwrap_or_else(|_| DiscordJsonError {
+                code: -1,
+                message: "[Serenity] No correct json was recieved!".to_string(),
+            }),
         }
     }
 }
+
 
 #[derive(Debug)]
 pub enum Error {
@@ -81,8 +86,8 @@ impl Display for Error {
 
 impl StdError for Error {
     fn description(&self) -> &str {
-        match *self {
-            Error::UnsuccessfulRequest(_) => "A non-successful response status code was received",
+        match self {
+            Error::UnsuccessfulRequest(ref e) => &e.error.message,
             Error::RateLimitI64 => "Error decoding a header into an i64",
             Error::RateLimitUtf8 => "Error decoding a header from UTF-8",
             Error::Url(_) => "Provided URL is incorrect.",
