@@ -86,7 +86,7 @@ group!({
     options: {
         owners_only: true,
         // Limit all commands to be guild-restricted.
-        only: guilds,
+        only: "guilds",
     },
     commands: [am_i_admin, slow_mode]
 });
