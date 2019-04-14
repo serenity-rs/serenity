@@ -19,12 +19,18 @@ use serenity::client::bridge::voice::ClientVoiceManager;
 // types. You can read more about it here:
 //
 // <https://github.com/Amanieu/parking_lot#features>
-use serenity::{client::{Context}, prelude::Mutex};
+use serenity::{client::Context, prelude::Mutex};
 
 use serenity::{
     command,
     client::{Client, EventHandler},
-    framework::StandardFramework,
+    framework::{
+        StandardFramework,
+        standard::{
+            Args, CommandResult,
+            macros::{command, group},
+        },
+    },
     model::{channel::Message, gateway::Ready, misc::Mentionable},
     Result as SerenityResult,
     voice,
@@ -47,6 +53,12 @@ impl EventHandler for Handler {
     }
 }
 
+group!({
+    name: "general",
+    options: {},
+    commands: [deafen, join, leave, mute, play, ping, undeafen, unmute]
+});
+
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
@@ -65,19 +77,13 @@ fn main() {
         .configure(|c| c
             .prefix("~")
             .on_mention(true))
-        .cmd("deafen", deafen)
-        .cmd("join", join)
-        .cmd("leave", leave)
-        .cmd("mute", mute)
-        .cmd("play", play)
-        .cmd("ping", ping)
-        .cmd("undeafen", undeafen)
-        .cmd("unmute", unmute));
+        .group(GENERAL_GROUP));
 
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
 
-command!(deafen(ctx, msg) {
+#[command]
+fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -106,9 +112,12 @@ command!(deafen(ctx, msg) {
 
         check_msg(msg.channel_id.say(&ctx.http, "Deafened"));
     }
-});
 
-command!(join(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild = match msg.guild(&ctx.cache) {
         Some(guild) => guild,
         None => {
@@ -143,9 +152,12 @@ command!(join(ctx, msg) {
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
     }
-});
 
-command!(leave(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -166,9 +178,12 @@ command!(leave(ctx, msg) {
     } else {
         check_msg(msg.reply(&ctx, "Not in a voice channel"));
     }
-});
 
-command!(mute(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -197,13 +212,19 @@ command!(mute(ctx, msg) {
 
         check_msg(msg.channel_id.say(&ctx.http, "Now muted"));
     }
-});
 
-command!(ping(context, msg) {
+    Ok(())
+}
+
+#[command]
+fn ping(context: &mut Context, msg: &Message) -> CommandResult {
     check_msg(msg.channel_id.say(&context.http, "Pong!"));
-});
 
-command!(play(ctx, msg, args) {
+    Ok(())
+}
+
+#[command]
+fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let url = match args.single::<String>() {
         Ok(url) => url,
         Err(_) => {
@@ -249,9 +270,12 @@ command!(play(ctx, msg, args) {
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
     }
-});
 
-command!(undeafen(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn undeafen(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -271,9 +295,12 @@ command!(undeafen(ctx, msg) {
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in"));
     }
-});
 
-command!(unmute(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn unmute(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -292,7 +319,9 @@ command!(unmute(ctx, msg) {
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in"));
     }
-});
+
+    Ok(())
+}
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 fn check_msg(result: SerenityResult<Message>) {

@@ -12,11 +12,20 @@ mod commands;
 
 use std::{collections::HashSet, env};
 use serenity::{
-    framework::StandardFramework,
+    framework::{
+        StandardFramework,
+        standard::macros::group,
+    },
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
 use log::{error, info};
+
+use commands::{
+    math::*,
+    meta::*,
+    owner::*,
+};
 
 struct Handler;
 
@@ -29,6 +38,12 @@ impl EventHandler for Handler {
         info!("Resumed");
     }
 }
+
+group!({
+    name: "general",
+    options: {},
+    commands: [math, meta, owner]
+});
 
 fn main() {
     // This will load the environment variables located at `./.env`, relative to
@@ -60,11 +75,7 @@ fn main() {
         .configure(|c| c
             .owners(owners)
             .prefix("~"))
-        .command("ping", |c| c.cmd(commands::meta::ping))
-        .command("multiply", |c| c.cmd(commands::math::multiply))
-        .command("quit", |c| c
-            .cmd(commands::owner::quit)
-            .owners_only(true)));
+        .group(GENERAL_GROUP));
 
     if let Err(why) = client.start() {
         error!("Client error: {:?}", why);

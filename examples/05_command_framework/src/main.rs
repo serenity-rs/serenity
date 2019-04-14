@@ -14,11 +14,11 @@ use serenity::{
     command,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
-        Args, CheckResult, CommandOptions, DispatchError, HelpBehaviour,
+        Args, CheckResult, CommandOptions, CommandResult, DispatchError, HelpBehaviour,
         help_commands, StandardFramework,
+        macros::{command, group},
     },
     model::{channel::{Channel, Message}, gateway::Ready, Permissions},
-    prelude::*,
     utils::{content_safe, ContentSafeOptions},
 };
 
@@ -47,6 +47,49 @@ impl EventHandler for Handler {
         println!("{} is connected!", ready.user.name);
     }
 }
+
+group!({
+    name: "general",
+    options: {},
+    commands: [about, say, commands, ping, role, some_long_command]
+});
+
+group!({
+    name: "emoji",
+    options: {
+        // Sets multiple prefixes for a group.
+        // This requires us to call commands in this group
+        // via `~emoji` (or `~e`) instead of just `~`.
+        prefixes: ["emoji", "em"],
+        // Set a description to appear if a user wants to display a single group
+        // e.g. via help using the group-name or one of its prefixes.
+        description: "A group with commands providing an emoji as response.",
+        // Sets a command that will be executed if only a group-prefix was passed.
+        default_command: bird,
+    },
+    commands: [cat, dog]
+});
+
+group!({
+    name: "math",
+    options: {
+        // Sets a single prefix for this group.
+        // So one has to call commands in this group
+        // via `~math` instead of just `~`.
+        prefix: "math",
+    },
+    command: [multiply]
+});
+
+group!({
+    name: "owner",
+    options: {
+        owners_only: true,
+        // Limit all commands to be guild-restricted.
+        only: guilds,
+    },
+    commands: [am_i_admin, slow_mode]
+});
 
 fn main() {
     // Configure the client with your Discord bot token in the environment.
@@ -155,103 +198,18 @@ fn main() {
                 let _ = msg.channel_id.say(&ctx.http, &format!("Try this again in {} seconds.", seconds));
             }
         })
+        .help(help_commands::with_embeds)
         // Can't be used more than once per 5 seconds:
-        .simple_bucket("emoji", 5)
+        .bucket("emoji", |b| b.delay(5))
         // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
-        .bucket("complicated", 5, 30, 2)
-        .command("about", |c| c.cmd(about))
-        // You can use the simple `help(help_commands::with_embeds)` or
-        // customise your help-menu via `customised_help()`.
-        .customised_help(help_commands::with_embeds, |c| {
-                // This replaces the information that a user can pass
-                // a command-name as argument to gain specific information about it.
-                c.individual_command_tip("Hello! こんにちは！Hola! Bonjour! 您好!\n\
-                If you want more information about a specific command, just pass the command as argument.")
-                // Some arguments require a `{}` in order to replace it with contextual information.
-                // In this case our `{}` refers to a command's name.
-                .command_not_found_text("Could not find: `{}`.")
-                // Define the maximum Levenshtein-distance between a searched command-name
-                // and commands. If the distance is lower than or equal the set distance,
-                // it will be displayed as a suggestion.
-                // Setting the distance to 0 will disable suggestions.
-                .max_levenshtein_distance(3)
-                // On another note, you can set up the help-menu-filter-behaviour.
-                // Here are all possible settings shown on all possible options.
-                // First case is if a user lacks permissions for a command, we can hide the command.
-                .lacking_permissions(HelpBehaviour::Hide)
-                // If the user is nothing but lacking a certain role, we just display it hence our variant is `Nothing`.
-                .lacking_role(HelpBehaviour::Nothing)
-                // The last `enum`-variant is `Strike`, which ~~strikes~~ a command.
-                .wrong_channel(HelpBehaviour::Strike)
-                // Serenity will automatically analyse and generate a hint/tip explaining the possible
-                // cases of ~~strikethrough-commands~~, but only if
-                // `strikethrough_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
-                // If the `String` is not empty, your given `String` will be used instead.
-                // If you pass in a `None`, no hint will be displayed at all.
-                 })
-        .command("commands", |c| c
-            // Make this command use the "complicated" bucket.
-            .bucket("complicated")
-            .cmd(commands))
-        // Command that will repeat passed arguments and remove user and
-        // role mentions with safe alternative.
-        .command("say", |c| c
-            .cmd(say))
-        .group("Emoji", |g| g
-            // Sets multiple prefixes for a group.
-            // This requires us to call commands in this group
-            // via `~emoji` (or `~e`) instead of just `~`.
-            .prefixes(vec!["emoji", "em"])
-            // Set a description to appear if a user wants to display a single group
-            // e.g. via help using the group-name or one of its prefixes.
-            .desc("A group with commands providing an emoji as response.")
-            // Sets a command that will be executed if only a group-prefix was passed.
-            .default_cmd(bird)
-            .command("cat", |c| c
-                .desc("Sends an emoji with a cat.")
-                .batch_known_as(vec!["kitty", "neko"]) // Adds multiple aliases
-                .bucket("emoji") // Make this command use the "emoji" bucket.
-                .cmd(cat)
-                 // Allow only administrators to call this:
-                .required_permissions(Permissions::ADMINISTRATOR))
-            .command("dog", |c| c
-                .desc("Sends an emoji with a dog.")
-                .bucket("emoji")
-                .cmd(dog)))
-        .group("Math", |g| g
-            // Sets a single prefix for this group.
-            // So one has to call commands in this group
-            // via `~math` instead of just `~`.
-            .prefix("math")
-            .command("multiply", |c| c
-                .known_as("*") // Lets us also call `~math *` instead of just `~math multiply`.
-                .cmd(multiply)))
-        .command("latency", |c| c
-            .cmd(latency))
-        .command("ping", |c| c
-            // User needs to pass the test for the command to execute.
-            .check_customised(admin_check, |c| c
-                .name("Admin")
-                // Whether the check shall be tested in the help-system.
-                .check_in_help(true)
-                // Whether the check shall be displayed in the help-system.
-                .display_in_help(true))
-            .guild_only(true)
-            .cmd(ping))
-        .command("role", |c| c
-            .cmd(about_role)
-            // Limits the usage of this command to roles named:
-            .allowed_roles(vec!["mods", "ultimate neko"]))
-        .command("some long command", |c| c.cmd(some_long_command))
-        .group("Owner", |g| g
-            .owners_only(true)
-            .command("am i admin", |c| c
-                .cmd(am_i_admin)
-                .guild_only(true))
-            .command("slow mode", |c| c
-                .cmd(slow_mode)
-                .guild_only(true))
-        ),
+        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2))
+        // The `group!` macro generates `static` instances of the options set for the group.
+        // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
+        // #name is turned all uppercase
+        .group(GENERAL_GROUP)
+        .group(EMOJI_GROUP)
+        .group(MATH_GROUP)
+        .group(OWNER_GROUP)
     );
 
     if let Err(why) = client.start() {
@@ -259,13 +217,12 @@ fn main() {
     }
 }
 
-// Commands can be created via the `command!` macro, to avoid manually typing
-// type annotations.
-//
-// This may bring more features available for commands in the future. See the
-// "multiply" command below for some of the power that the `command!` macro can
-// bring.
-command!(commands(ctx, msg, _args) {
+// Commands can be created via the attribute `#[command]` macro.
+#[command]
+// Options are passed via subsequent attributes.
+// Make this command use the "complicated" bucket.
+#[bucket = "complicated"]
+fn commands(ctx: &mut Context, msg: &Message) -> CommandResult {
     let mut contents = "Commands used:\n".to_string();
 
     let data = ctx.data.read();
@@ -278,12 +235,15 @@ command!(commands(ctx, msg, _args) {
     if let Err(why) = msg.channel_id.say(&ctx.http, &contents) {
         println!("Error sending message: {:?}", why);
     }
-});
+
+    Ok(())
+}
 
 // Repeats what the user passed as argument but ensures that user and role
 // mentions are replaced with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
-command!(say(ctx, msg, args) {
+#[command]
+fn say(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let mut settings = if let Some(guild_id) = msg.guild_id {
        // By default roles, users, and channel mentions are cleaned.
        ContentSafeOptions::default()
@@ -304,7 +264,9 @@ command!(say(ctx, msg, args) {
     if let Err(why) = msg.channel_id.say(&ctx.http, &content) {
         println!("Error sending message: {:?}", why);
     }
-});
+
+    Ok(())
+}
 
 // A function which acts as a "check", to determine whether to call a command.
 //
@@ -344,13 +306,19 @@ fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOption
     false.into()
 }
 
-command!(some_long_command(ctx, msg, args) {
-    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args)) {
+#[command]
+fn some_long_command(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())) {
         println!("Error sending message: {:?}", why);
     }
-});
 
-command!(about_role(ctx, msg, args) {
+    Ok(())
+}
+
+#[command]
+// Limits the usage of this command to roles named:
+#[allowed_roles("mods", "ultimate neko")]
+fn about_role(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let potential_role_name = args.rest();
 
     if let Some(guild) = msg.guild(&ctx.cache) {
@@ -368,29 +336,14 @@ command!(about_role(ctx, msg, args) {
     if let Err(why) = msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)) {
         println!("Error sending message: {:?}", why);
     }
-});
 
-// Using the `command!` macro, commands can be created with a certain type of
-// "dynamic" type checking. This is a method of requiring that the arguments
-// given match the required type, and maps those arguments to the specified
-// bindings.
-//
-// For example, the following will be correctly parsed by the macro:
-//
-// `~multiply 3.7 4.3`
-//
-// However, the following will not, as the second argument can not be an f64:
-//
-// `~multiply 3.7 four`
-//
-// Since the argument can't be converted, the command returns early.
-//
-// Additionally, if not enough arguments are given (e.g. `~multiply 3`), then
-// the command will return early. If additional arguments are provided, they
-// will be ignored.
-//
-// Argument type overloading is currently not supported.
-command!(multiply(ctx, msg, args) {
+    Ok(())
+}
+
+#[command]
+// Lets us also call `~math *` instead of just `~math multiply`.
+#[aliases("*")]
+fn multiply(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let first = args.single::<f64>()?;
     let second = args.single::<f64>()?;
 
@@ -401,13 +354,17 @@ command!(multiply(ctx, msg, args) {
     }
 });
 
-command!(about(ctx, msg, _args) {
+#[command]
+fn about(ctx, msg) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )") {
         println!("Error sending message: {:?}", why);
     }
-});
 
-command!(latency(ctx, msg, _args) {
+    Ok(())
+}
+
+#[command]
+fn latency(ctx, msg) -> CommandResult {
     // The shard manager is an interface for mutating, stopping, restarting, and
     // retrieving information about shards.
     let data = ctx.data.read();
@@ -437,33 +394,49 @@ command!(latency(ctx, msg, _args) {
     };
 
     let _ = msg.reply(&ctx, &format!("The shard latency is {:?}", runner.latency));
-});
 
-command!(ping(ctx, msg, _args) {
+    Ok(())
+}
+
+#[command]
+// Limit command usage to guilds.
+#[only(guilds)]
+fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )") {
         println!("Error sending message: {:?}", why);
     }
-});
 
-command!(am_i_admin(ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "Yes you are.") {
-        println!("Error sending message: {:?}", why);
-    }
-});
+    Ok(())
+}
 
-command!(dog(ctx, msg, _args) {
-    if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:") {
-        println!("Error sending message: {:?}", why);
-    }
-});
-
-command!(cat(ctx, msg, _args) {
+#[command]
+// Adds multiple aliases
+#[aliases("kitty", "neko")]
+// Make this command use the "emoji" bucket.
+#[bucket = "emoji"]
+// Allow only administrators to call this:
+#[required_permissions("ADMINISTRATOR")]
+fn cat(ctx: &mut Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, ":cat:") {
         println!("Error sending message: {:?}", why);
     }
-});
 
-command!(bird(ctx, msg, args) {
+    Ok(())
+}
+
+#[command]
+#[description = "Sends an emoji with a dog."]
+#[bucket = "emoji"]
+fn dog(ctx: &mut Context, msg: &Message) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:") {
+        println!("Error sending message: {:?}", why);
+    }
+
+    Ok(())
+}
+
+#[command]
+fn bird(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let say_content = if args.is_empty() {
         ":bird: can find animals for you.".to_string()
     } else {
@@ -473,11 +446,22 @@ command!(bird(ctx, msg, args) {
     if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
         println!("Error sending message: {:?}", why);
     }
-});
 
-command!(slow_mode(ctx, msg, args) {
+    Ok(())
+}
+
+#[command]
+fn am_i_admin(ctx: &mut Context, msg: &Message) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "Yes you are.") {
+        println!("Error sending message: {:?}", why);
+    }
+
+    Ok(())
+}
+
+#[command]
+fn slow_mode(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
-
         if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)) {
             println!("Error setting channel's slow mode rate: {:?}", why);
 
@@ -494,4 +478,6 @@ command!(slow_mode(ctx, msg, args) {
     if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
         println!("Error sending message: {:?}", why);
     }
-});
+
+    Ok(())
+}

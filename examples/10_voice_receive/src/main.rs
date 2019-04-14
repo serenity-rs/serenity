@@ -11,7 +11,13 @@ use std::{env, sync::Arc};
 use serenity::{
     command,
     client::{bridge::voice::ClientVoiceManager, Client, Context, EventHandler},
-    framework::StandardFramework,
+    framework::{
+        StandardFramework,
+        standard::{
+            Args, CommandResult,
+            macros::{command, group},
+        },
+    },
     model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
     prelude::*,
     voice::AudioReceiver,
@@ -85,6 +91,12 @@ impl AudioReceiver for Receiver {
     }
 }
 
+group!({
+    name: "general",
+    options: {},
+    commands: [join, leave, ping]
+});
+
 fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
@@ -103,14 +115,13 @@ fn main() {
         .configure(|c| c
             .prefix("~")
             .on_mention(true))
-        .cmd("join", join)
-        .cmd("leave", leave)
-        .cmd("ping", ping));
+        .group(GENERAL_GROUP));
 
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
 
-command!(join(ctx, msg, args) {
+#[command]
+fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
@@ -138,9 +149,12 @@ command!(join(ctx, msg, args) {
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
     }
-});
 
-command!(leave(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -161,11 +175,16 @@ command!(leave(ctx, msg) {
     } else {
         check_msg(msg.reply(&ctx, "Not in a voice channel"));
     }
-});
 
-command!(ping(ctx, msg) {
+    Ok(())
+}
+
+#[command]
+fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     check_msg(msg.channel_id.say(&ctx.http,"Pong!"));
-});
+
+    Ok(())
+}
 
 /// Checks that a message successfully sent; if not, then logs why to stdout.
 fn check_msg(result: SerenityResult<Message>) {
