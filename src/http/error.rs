@@ -17,8 +17,10 @@ use std::{
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct DiscordJsonError {
-    code: isize,
-    message: String
+    pub code: isize,
+    pub message: String,
+    #[serde(skip)]
+    non_exhaustive: (),
 }
 
 #[derive(Debug, Clone)]
