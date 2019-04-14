@@ -1,8 +1,13 @@
 use reqwest::{
     Error as ReqwestError,
-    header::InvalidHeaderValue,
+    header::{
+        HeaderMap,
+        InvalidHeaderValue,
+    },
     Response,
-    UrlError
+    StatusCode,
+    Url,
+    UrlError,
 };
 use std::{
     error::Error as StdError,
@@ -13,10 +18,29 @@ use std::{
     }
 };
 
+#[derive(Debug, Clone)]
+pub struct ErrorResponse {
+    pub status_code: StatusCode,
+    pub url: Url,
+    pub headers: HeaderMap,
+    pub body: String,
+}
+
+impl From<Response> for ErrorResponse {
+    fn from(mut r: Response) -> Self {
+        ErrorResponse {
+            status_code: r.status(),
+            url: r.url().clone(),
+            headers: r.headers().clone(),
+            body: r.text().unwrap_or_else(|_| "[Serenity] No body to be read".to_string()),
+        }
+    }
+}
+
 #[derive(Debug)]
 pub enum Error {
     /// When a non-successful status code was received for a request.
-    UnsuccessfulRequest(Box<Response>),
+    UnsuccessfulRequest(ErrorResponse),
     /// When the decoding of a ratelimit header could not be properly decoded
     /// into an `i64`.
     RateLimitI64,
