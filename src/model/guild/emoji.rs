@@ -5,8 +5,9 @@ use std::fmt::{
     Write as FmtWrite
 };
 use super::super::id::{EmojiId, RoleId};
-use serde_json::json;
 
+#[cfg(all(feature = "cache", feature = "model"))]
+use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]

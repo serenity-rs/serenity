@@ -13,7 +13,6 @@ use super::{
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use log::warn;
 
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -25,28 +24,34 @@ use crate::model::id::GuildId;
 use crate::cache::Cache;
 #[cfg(any(feature = "cache", feature = "http"))]
 use crate::CacheAndHttp;
+#[cfg(feature = "cache")]
+use crate::cache::CacheUpdate;
+#[cfg(feature = "cache")]
+use std::fmt;
+#[cfg(feature = "cache")]
+use log::warn;
 
+#[inline]
+#[cfg(feature = "cache")]
+fn update<E: CacheUpdate + fmt::Debug>(cache_and_http: &Arc<CacheAndHttp>, event: &mut E) -> Option<E::Output> {
+    if let Some(millis_timeout) = cache_and_http.update_cache_timeout {
 
-macro_rules! update {
-    ($cache_and_http:ident, $event:expr) => {
-        {
-            #[cfg(feature = "cache")]
-            {
-                if let Some(millis_timeout) = $cache_and_http.update_cache_timeout {
+        if let Some(mut lock) = cache_and_http.cache.try_write_for(millis_timeout) {
+            lock.update(event)
+        } else {
+            warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", event);
 
-                    if let Some(mut lock) = $cache_and_http.cache.try_write_for(millis_timeout) {
-                        lock.update(&mut $event)
-                    } else {
-                        warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", $event);
-
-                        None
-                    }
-                } else {
-                    $cache_and_http.cache.write().update(&mut $event)
-                }
-            }
+            None
         }
+    } else {
+        cache_and_http.cache.write().update(event)
     }
+}
+
+#[inline]
+#[cfg(not(feature = "cache"))]
+fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
+    None
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
@@ -89,13 +94,15 @@ fn context(
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id)
 }
 
+// Once we can use `Box` as part of a pattern, we will reconsider boxing.
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum DispatchEvent {
     Client(ClientEvent),
     Model(Event),
 }
 
 #[cfg(feature = "framework")]
-#[clippy::too_many_arguments]
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
@@ -108,7 +115,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 ) {
     match event {
         DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             #[cfg(not(any(feature = "cache", feature = "http")))]
             let context = context(data, runner_tx, shard_id);
@@ -143,7 +150,6 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
 }
 
 #[cfg(not(feature = "framework"))]
-#[allow(clippy::unused_mut)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
@@ -154,8 +160,8 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     cache_and_http: Arc<CacheAndHttp>,
 ) {
     match event {
-        DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-            update!(cache_and_http, event);
+        DispatchEvent::Model(Event::MessageCreate(event)) => {
+            update(&cache_and_http, &mut event);
 
             #[cfg(not(any(feature = "cache", feature = "http")))]
             let context = context(data, runner_tx, shard_id);
@@ -180,7 +186,6 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static>(
     }
 }
 
-#[allow(clippy::unused_mut)]
 fn dispatch_message<H>(
     context: Context,
     mut message: Message,
@@ -198,8 +203,8 @@ fn dispatch_message<H>(
         event_handler.message(context, message);
     });
 }
-
-#[allow(clippy::cognitive_complexity, unused_assignments, unused_mut)]
+// Once we can use `Box` as part of a pattern, we will reconsider boxing.
+#[allow(clippy::too_many_arguments)]
 fn handle_event<H: EventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
@@ -227,7 +232,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         }
         DispatchEvent::Model(Event::ChannelCreate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             // Discord sends both a MessageCreate and a ChannelCreate upon a new message in a private channel.
             // This could potentially be annoying to handle when otherwise wanting to normally take care of a new channel.
             // So therefore, private channels are dispatched to their own handler code.
@@ -257,7 +262,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             }
         },
         DispatchEvent::Model(Event::ChannelDelete(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             match event.channel {
                 Channel::Private(_) | Channel::Group(_) => {},
@@ -277,7 +282,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 },
             }
         },
-        DispatchEvent::Model(Event::ChannelPinsUpdate(mut event)) => {
+        DispatchEvent::Model(Event::ChannelPinsUpdate(event)) => {
 
             let event_handler = Arc::clone(event_handler);
 
@@ -286,7 +291,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::ChannelRecipientAdd(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             let event_handler = Arc::clone(event_handler);
 
@@ -299,7 +304,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::ChannelRecipientRemove(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             let event_handler = Arc::clone(event_handler);
 
@@ -312,7 +317,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::ChannelUpdate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             let event_handler = Arc::clone(event_handler);
 
@@ -326,14 +331,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 }}
             });
         },
-        DispatchEvent::Model(Event::GuildBanAdd(mut event)) => {
+        DispatchEvent::Model(Event::GuildBanAdd(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 event_handler.guild_ban_addition(context, event.guild_id, event.user);
             });
         },
-        DispatchEvent::Model(Event::GuildBanRemove(mut event)) => {
+        DispatchEvent::Model(Event::GuildBanRemove(event)) => {
 
             let event_handler = Arc::clone(event_handler);
 
@@ -349,7 +354,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 !cache.unavailable_guilds.contains(&event.guild.id)
             };
 
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             #[cfg(feature = "cache")]
             {
@@ -381,7 +386,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildDelete(mut event)) => {
-            let _full = update!(cache_and_http, event);
+            let _full = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -393,14 +398,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildEmojisUpdate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 event_handler.guild_emojis_update(context, event.guild_id, event.emojis);
             });
         },
-        DispatchEvent::Model(Event::GuildIntegrationsUpdate(mut event)) => {
+        DispatchEvent::Model(Event::GuildIntegrationsUpdate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -408,7 +413,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildMemberAdd(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             let event_handler = Arc::clone(event_handler);
 
@@ -417,7 +422,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildMemberRemove(mut event)) => {
-            let _member = update!(cache_and_http, event);
+            let _member = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -429,7 +434,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildMemberUpdate(mut event)) => {
-            let _before = update!(cache_and_http, event);
+            let _before = update(&cache_and_http, &mut event);
             let _after: Option<Member> = feature_cache! {{
                 cache_and_http.cache.as_ref().read().member(event.guild_id, event.user.id)
             } else {
@@ -449,7 +454,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildMembersChunk(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -457,7 +462,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -465,7 +470,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildRoleDelete(mut event)) => {
-            let _role = update!(cache_and_http, event);
+            let _role = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -477,7 +482,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildRoleUpdate(mut event)) => {
-            let _before = update!(cache_and_http, event);
+            let _before = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -489,7 +494,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildUnavailable(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -497,7 +502,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildUpdate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -515,14 +520,14 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         },
         // Already handled by the framework check macro
         DispatchEvent::Model(Event::MessageCreate(_)) => {},
-        DispatchEvent::Model(Event::MessageDeleteBulk(mut event)) => {
+        DispatchEvent::Model(Event::MessageDeleteBulk(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 event_handler.message_delete_bulk(context, event.channel_id, event.ids);
             });
         },
-        DispatchEvent::Model(Event::MessageDelete(mut event)) => {
+        DispatchEvent::Model(Event::MessageDelete(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -530,7 +535,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
-            let _before = update!(cache_and_http, event);
+            let _before = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -543,7 +548,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::PresencesReplace(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -551,7 +556,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::PresenceUpdate(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
 
             let event_handler = Arc::clone(event_handler);
 
@@ -559,21 +564,21 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 event_handler.presence_update(context, event);
             });
         },
-        DispatchEvent::Model(Event::ReactionAdd(mut event)) => {
+        DispatchEvent::Model(Event::ReactionAdd(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 event_handler.reaction_add(context, event.reaction);
             });
         },
-        DispatchEvent::Model(Event::ReactionRemove(mut event)) => {
+        DispatchEvent::Model(Event::ReactionRemove(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 event_handler.reaction_remove(context, event.reaction);
             });
         },
-        DispatchEvent::Model(Event::ReactionRemoveAll(mut event)) => {
+        DispatchEvent::Model(Event::ReactionRemoveAll(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -581,24 +586,24 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::Ready(mut event)) => {
-            update!(cache_and_http, event);
+            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(&event_handler);
 
             threadpool.execute(move || {
                 event_handler.ready(context, event.ready);
             });
         },
-        DispatchEvent::Model(Event::Resumed(mut event)) => {
+        DispatchEvent::Model(Event::Resumed(event)) => {
             event_handler.resume(context, event);
         },
-        DispatchEvent::Model(Event::TypingStart(mut event)) => {
+        DispatchEvent::Model(Event::TypingStart(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 event_handler.typing_start(context, event);
             });
         },
-        DispatchEvent::Model(Event::Unknown(mut event)) => {
+        DispatchEvent::Model(Event::Unknown(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -606,7 +611,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::UserUpdate(mut event)) => {
-            let _before = update!(cache_and_http, event);
+            let _before = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -617,7 +622,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 }}
             });
         },
-        DispatchEvent::Model(Event::VoiceServerUpdate(mut event)) => {
+        DispatchEvent::Model(Event::VoiceServerUpdate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -625,7 +630,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::VoiceStateUpdate(mut event)) => {
-            let _before = update!(cache_and_http, event);
+            let _before = update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -636,7 +641,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 }}
             });
         },
-        DispatchEvent::Model(Event::WebhookUpdate(mut event)) => {
+        DispatchEvent::Model(Event::WebhookUpdate(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {

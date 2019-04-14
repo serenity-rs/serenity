@@ -255,6 +255,6 @@ impl ShardMessenger {
     #[inline]
     fn send(&self, msg: ShardRunnerMessage)
         -> Result<(), SendError<InterMessage>> {
-        self.tx.send(InterMessage::Client(ShardClientMessage::Runner(msg)))
+        self.tx.send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
     }
 }

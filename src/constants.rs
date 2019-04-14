@@ -110,8 +110,8 @@ enum_number!(
 );
 
 impl OpCode {
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             OpCode::Event => 0,
             OpCode::Heartbeat => 1,
             OpCode::Identify => 2,
@@ -175,8 +175,8 @@ enum_number!(
 );
 
 impl VoiceOpCode {
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             VoiceOpCode::Identify => 0,
             VoiceOpCode::SelectProtocol => 1,
             VoiceOpCode::Ready => 2,

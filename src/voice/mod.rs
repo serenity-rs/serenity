@@ -30,11 +30,11 @@ pub use audiopus::Bitrate;
 
 use self::connection_info::ConnectionInfo;
 
-const CRYPTO_MODE: &'static str = "xsalsa20_poly1305";
+const CRYPTO_MODE: &str = "xsalsa20_poly1305";
 
 pub(crate) enum Status {
     Connect(ConnectionInfo),
-    #[allow(clippy::dead_code)] Disconnect,
+    Disconnect,
     SetReceiver(Option<Box<dyn AudioReceiver>>),
     SetSender(Option<LockedAudio>),
     AddSender(LockedAudio),

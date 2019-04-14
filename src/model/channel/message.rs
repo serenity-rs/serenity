@@ -665,10 +665,10 @@ enum_number!(
 );
 
 impl MessageType {
-    pub fn num(&self) -> u64 {
+    pub fn num(self) -> u64 {
         use self::MessageType::*;
 
-        match *self {
+        match self {
             Regular => 0,
             GroupRecipientAddition => 1,
             GroupRecipientRemoval => 2,

@@ -283,7 +283,7 @@ impl ShardManager {
         if let Some(runner) = self.runners.lock().get(&shard_id) {
             let shutdown = ShardManagerMessage::Shutdown(shard_id);
             let client_msg = ShardClientMessage::Manager(shutdown);
-            let msg = InterMessage::Client(client_msg);
+            let msg = InterMessage::Client(Box::new(client_msg));
 
             if let Err(why) = runner.runner_tx.send(msg) {
                 warn!(

@@ -93,7 +93,7 @@ pub enum Error {
     ///
     /// [`http`]: http/index.html
     #[cfg(feature = "http")]
-    Http(HttpError),
+    Http(Box<HttpError>),
     /// An error occuring in rustls
     #[cfg(all(feature = "gateway", not(feature = "native_tls")))]
     Rustls(RustlsError),
@@ -157,7 +157,7 @@ impl From<TungsteniteError> for Error {
 
 #[cfg(feature = "http")]
 impl From<HttpError> for Error {
-    fn from(e: HttpError) -> Error { Error::Http(e) }
+    fn from(e: HttpError) -> Error { Error::Http(Box::new(e)) }
 }
 
 #[cfg(feature = "http")]

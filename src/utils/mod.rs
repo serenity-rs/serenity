@@ -13,14 +13,15 @@ pub use self::{
 
 use base64;
 use crate::internal::prelude::*;
-use crate::prelude::RwLock;
 use crate::model::{
-    channel::Channel,
     misc::EmojiIdentifier,
+    id::EmojiId,
+};
+#[cfg(feature = "cache")]
+use crate::model::{
     id::{
         ChannelId,
         GuildId,
-        EmojiId,
         RoleId,
         UserId,
     },
@@ -32,9 +33,13 @@ use std::{
     hash::{BuildHasher, Hash},
     io::Read,
     path::Path,
-    str::FromStr,
 };
-
+#[cfg(feature = "cache")]
+use crate::prelude::RwLock;
+#[cfg(feature = "cache")]
+use crate::model::channel::Channel;
+#[cfg(feature = "cache")]
+use std::str::FromStr;
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheRwLock};
 
@@ -613,7 +618,7 @@ fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
     while let Some(mut mention_start) = s[progress..].find("<@&") {
         mention_start += progress;
 
-        if let Some(mut mention_end) = s[mention_start..].find(">") {
+        if let Some(mut mention_end) = s[mention_start..].find('>') {
             mention_end += mention_start;
             mention_start += "<@&".len();
 
@@ -651,7 +656,7 @@ fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
     while let Some(mut mention_start) = s[progress..].find("<#") {
         mention_start += progress;
 
-        if let Some(mut mention_end) = s[mention_start..].find(">") {
+        if let Some(mut mention_end) = s[mention_start..].find('>') {
             mention_end += mention_start;
             mention_start += "<#".len();
 
@@ -690,15 +695,17 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
     while let Some(mut mention_start) = s[progress..].find("<@") {
         mention_start += progress;
 
-        if let Some(mut mention_end) = s[mention_start..].find(">") {
+        if let Some(mut mention_end) = s[mention_start..].find('>') {
             mention_end += mention_start;
             mention_start += "<@".len();
-            let mut has_exclamation = false;
 
-            if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
+            let has_exclamation = if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
                 mention_start += "!".len();
-                has_exclamation = true;
-            }
+
+                true
+            } else {
+                false
+            };
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let replacement = if let Some(guild) = guild {
@@ -719,7 +726,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                         "@invalid-user".to_string()
                     }
                 } else {
-                    let user = cache.read().users.get(&id).map(|user| user.clone());
+                    let user = cache.read().users.get(&id).cloned();
 
                     if let Some(user) = user {
                         let user = user.read();

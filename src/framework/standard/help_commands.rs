@@ -23,51 +23,50 @@
 //! [`plain`]: fn.plain.html
 //! [`with_embeds`]: fn.with_embeds.html
 
-use log::warn;
-
-use super::structures::Command as InternalCommand;
-use super::{has_correct_roles, macros::help, Args, CommandGroup, CommandOptions,
-    CommandResult, HelpBehaviour, HelpOptions, OnlyIn,
+#[cfg(all(feature = "cache", feature = "http"))]
+use super::{
+    Args, CommandGroup, CommandOptions,
+    CommandResult, has_correct_roles, HelpBehaviour, HelpOptions,
+    has_correct_permissions, macros::help, OnlyIn,
+    structures::Command as InternalCommand,
 };
-#[cfg(feature = "cache")]
-use super::has_correct_permissions;
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
-use crate::client::Context;
-#[cfg(feature = "http")]
-use crate::http::Http;
-#[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
-use crate::model::{
-    channel::Message,
-    id::{ChannelId, UserId},
+#[cfg(all(feature = "cache", feature = "http"))]
+use crate::{
+    cache::CacheRwLock,
+    client::Context,
+    model::channel::Message,
+    Error,
+    http::Http,
+    model::id::{ChannelId, UserId},
+    utils::Colour,
 };
-use crate::utils::Colour;
-use crate::Error;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
+#[cfg(all(feature = "cache", feature = "http"))]
 use std::{
     borrow::Borrow,
     collections::HashSet,
     fmt::Write,
+    hash::BuildHasher,
     ops::{Index, IndexMut},
-    sync::Arc,
 };
+#[cfg(all(feature = "cache", feature = "http"))]
+use log::warn;
 
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
+#[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! format_command_name {
     ($behaviour:expr, $command_name:expr) => {
         match $behaviour {
-            &HelpBehaviour::Strike => format!("~~`{}`~~", $command_name),
-            &HelpBehaviour::Nothing => format!("`{}`", $command_name),
-            &HelpBehaviour::Hide => continue,
+            HelpBehaviour::Strike => format!("~~`{}`~~", $command_name),
+            HelpBehaviour::Nothing => format!("`{}`", $command_name),
+            HelpBehaviour::Hide => continue,
         }
     };
 }
 
 /// Wraps around `warn`-macro in order to keep
 /// the literal same for all formats of help.
+#[cfg(all(feature = "cache", feature = "http"))]
 macro_rules! warn_about_failed_send {
     ($customised_help:expr, $error:expr) => {
         warn!("Failed to send {:?} because: {:?}", $customised_help, $error);
@@ -110,6 +109,7 @@ pub struct Command<'a> {
 #[derive(Clone, Debug, Default)]
 pub struct Suggestions(Vec<SuggestedCommandName>);
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
     /// Immutably borrow inner `Vec`.
     #[inline]
@@ -167,11 +167,13 @@ pub enum CustomisedHelpData<'a> {
 /// Wraps around a `Vec<Vec<T>>` and provides access
 /// via indexing of tuples representing x and y.
 #[derive(Debug)]
+#[cfg(all(feature = "cache", feature = "http"))]
 struct Matrix {
     vec: Vec<usize>,
     width: usize,
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl Matrix {
     fn new(columns: usize, rows: usize) -> Matrix {
         Matrix {
@@ -181,6 +183,7 @@ impl Matrix {
     }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl Index<(usize, usize)> for Matrix {
     type Output = usize;
 
@@ -189,6 +192,7 @@ impl Index<(usize, usize)> for Matrix {
     }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl IndexMut<(usize, usize)> for Matrix {
     fn index_mut(&mut self, matrix_entry: (usize, usize)) -> &mut usize {
         &mut self.vec[matrix_entry.1 * self.width + matrix_entry.0]
@@ -197,6 +201,7 @@ impl IndexMut<(usize, usize)> for Matrix {
 
 /// Calculates and returns levenshtein distance between
 /// two passed words.
+#[cfg(all(feature = "cache", feature = "http"))]
 pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
     let len_a = word_a.chars().count();
     let len_b = word_b.chars().count();
@@ -326,7 +331,7 @@ fn fetch_single_command<'a>(
                     .names
                     .iter()
                     .find(|n| **n == name)
-                    .map(|o| *o)
+                    .cloned()
             } else {
                 command
                     .options
@@ -339,7 +344,7 @@ fn fetch_single_command<'a>(
                             .iter()
                             .any(|prefix| format!("{} {}", prefix, n) == name)
                     })
-                    .map(|o| *o)
+                    .cloned()
             };
 
             if let Some(n) = search_command_name_matched {
@@ -413,14 +418,14 @@ fn fetch_single_command<'a>(
             return Ok(CustomisedHelpData::SingleCommand {
                 command: Command {
                     name: options.names[0],
-                    description: options.desc.clone(),
+                    description: options.desc,
                     group_name: group.name,
                     group_prefixes: &group.options.prefixes,
                     checks: check_names,
                     aliases: options.names[1..].to_vec(),
                     availability: available_text,
-                    usage: options.usage.clone(),
-                    usage_sample: options.example.clone(),
+                    usage: options.usage,
+                    usage_sample: options.example,
                 },
             });
         }
@@ -436,7 +441,7 @@ fn fetch_single_command<'a>(
 fn fetch_all_eligible_commands_in_group<'a>(
     context: &Context,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     msg: &Message,
@@ -493,7 +498,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 fn create_command_group_commands_pair_from_groups<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair> {
@@ -514,10 +519,10 @@ fn create_command_group_commands_pair_from_groups<'a>(
 
 /// Fetches a single group with its commands.
 #[cfg(feature = "cache")]
-fn create_single_group<'a>(
+fn create_single_group(
     context: &Context,
     group: &CommandGroup,
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     msg: &Message,
     help_options: &HelpOptions,
 ) -> GroupCommandsPair {
@@ -546,7 +551,7 @@ fn create_single_group<'a>(
 pub fn create_customised_help_data<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId>,
+    owners: &HashSet<UserId, impl BuildHasher>,
     args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
@@ -623,7 +628,7 @@ pub fn create_customised_help_data<'a>(
         &help_options,
     );
 
-    return if listed_groups.is_empty() {
+    if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
             help_error_message: &help_options.no_help_available_text,
         }
@@ -632,11 +637,11 @@ pub fn create_customised_help_data<'a>(
             help_description: description,
             groups: listed_groups,
         }
-    };
+    }
 }
 
 /// Sends an embed listing all groups with their commands.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_grouped_commands_embed(
     http: impl AsRef<Http>,
     help_options: &HelpOptions,
@@ -673,7 +678,7 @@ fn send_grouped_commands_embed(
 }
 
 /// Sends embed showcasing information about a single command.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_single_command_embed(
     http: impl AsRef<Http>,
     help_options: &HelpOptions,
@@ -727,7 +732,7 @@ fn send_single_command_embed(
 }
 
 /// Sends embed listing commands that are similar to the sent one.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_suggestion_embed(
     http: impl AsRef<Http>,
     channel_id: ChannelId,
@@ -735,10 +740,9 @@ fn send_suggestion_embed(
     suggestions: &Suggestions,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let text = format!(
-        "{}",
-        help_description.replace("{}", &suggestions.join("`, `"))
-    );
+    let text = help_description
+        .replace("{}", &suggestions.join("`, `"))
+        .to_string();
 
     channel_id.send_message(&http, |m| {
         m.embed(|e| {
@@ -751,7 +755,7 @@ fn send_suggestion_embed(
 }
 
 /// Sends an embed explaining fetching commands failed.
-#[cfg(feature = "http")]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn send_error_embed(
     http: impl AsRef<Http>,
     channel_id: ChannelId,
@@ -794,7 +798,7 @@ pub fn with_embeds(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl BuildHasher>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);
@@ -844,6 +848,7 @@ pub fn with_embeds(
 }
 
 /// Turns grouped commands into a `String` taking plain help format into account.
+#[cfg(all(feature = "cache", feature = "http"))]
 fn grouped_commands_to_plain_string(
     help_options: &HelpOptions,
     help_description: &str,
@@ -871,6 +876,7 @@ fn grouped_commands_to_plain_string(
 }
 
 /// Turns a single command into a `String` taking plain help format into account.
+#[cfg(all(feature = "cache", feature = "http"))]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::default();
     let _ = writeln!(result, "__**{}**__", command.name);
@@ -948,7 +954,7 @@ pub fn plain(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>,
+    owners: HashSet<UserId, impl BuildHasher>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);
@@ -978,6 +984,7 @@ pub fn plain(
 }
 
 #[cfg(test)]
+#[cfg(all(feature = "cache", feature = "http"))]
 mod levenshtein_tests {
     use super::levenshtein_distance;
 
@@ -1030,6 +1037,7 @@ mod levenshtein_tests {
 }
 
 #[cfg(test)]
+#[cfg(all(feature = "cache", feature = "http"))]
 mod matrix_tests {
     use super::Matrix;
 

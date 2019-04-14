@@ -18,19 +18,20 @@ pub use structures::buckets::BucketBuilder;
 use self::parse::*;
 use super::Framework;
 use crate::client::Context;
-use crate::internal::RwLockExt;
 use crate::model::{
     channel::Message,
-    guild::{Guild, Member},
     permissions::Permissions,
 };
 use std::collections::HashMap;
-use parking_lot::RwLock;
 use std::sync::Arc;
 use threadpool::ThreadPool;
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
+#[cfg(feature = "cache")]
+use crate::model::guild::{Guild, Member};
+#[cfg(feature = "cache")]
+use crate::internal::RwLockExt;
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
@@ -664,7 +665,7 @@ impl Framework for StandardFramework {
                 let owners = self.config.owners.clone();
 
                 // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
-                let help = self.help.clone().unwrap();
+                let help = self.help.unwrap();
 
                 threadpool.execute(move || {
                     if let Some(before) = before {
@@ -729,17 +730,16 @@ pub(crate) fn has_correct_permissions(
 ) -> bool {
     if command.required_permissions.is_empty() {
         true
-    } else {
-        if let Some(guild) = message.guild(&cache) {
-            let perms = guild.with(|g| g.permissions_in(message.channel_id, message.author.id));
+    } else if let Some(guild) = message.guild(&cache) {
+        let perms = guild.with(|g| g.permissions_in(message.channel_id, message.author.id));
 
-            perms.contains(command.required_permissions)
-        } else {
-            false
-        }
+        perms.contains(command.required_permissions)
+    } else {
+        false
     }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 pub(crate) fn has_correct_roles(cmd: &CommandOptions, guild: &Guild, member: &Member) -> bool {
     if cmd.allowed_roles.is_empty() {
         true

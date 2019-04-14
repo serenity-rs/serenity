@@ -343,9 +343,9 @@ impl Args {
 
     fn span(&self) -> (usize, usize) {
         let Token {
-            kind: _,
             start,
             end,
+            ..
         } = &self.args[self.offset];
 
         let start = *start;
@@ -365,7 +365,7 @@ impl Args {
     /// This increments the offset pointer.
     ///
     /// Does nothing if the message is empty.
-    pub fn next(&mut self) -> &mut Self {
+    pub fn advance(&mut self) -> &mut Self {
         if self.is_empty() {
             return self;
         }
@@ -456,9 +456,9 @@ impl Args {
     /// let mut args = Args::new("4 2", &[Delimiter::Single(' ')]);
     ///
     /// assert_eq!(args.current(), Some("4"));
-    /// args.next();
+    /// args.advance();
     /// assert_eq!(args.current(), Some("2"));
-    /// args.next();
+    /// args.advance();
     /// assert_eq!(args.current(), None);
     /// ```
     ///
@@ -535,7 +535,7 @@ impl Args {
             }
         }
 
-        return self;
+        self
     }
 
     /// Parse the current argument.
@@ -584,7 +584,7 @@ impl Args {
     #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
-        self.next();
+        self.advance();
         Ok(p)
     }
 
@@ -607,7 +607,7 @@ impl Args {
     #[inline]
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.quoted().parse::<T>()?;
-        self.next();
+        self.advance();
         Ok(p)
     }
 
@@ -637,7 +637,7 @@ impl Args {
     /// [`trimmed`]: struct.Iter.html#method.trimmed
     /// [`quoted`]: struct.Iter.html#method.quoted
     #[inline]
-    pub fn iter<'a, T: FromStr>(&'a mut self) -> Iter<'a, T> {
+    pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {
             args: self,
             state: State::None,
@@ -824,7 +824,7 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> {
             None
         } else {
             let arg = self.parse();
-            self.args.next();
+            self.args.advance();
             Some(arg)
         }
     }

@@ -16,7 +16,7 @@ use std::{
 #[derive(Debug)]
 pub enum Error {
     /// When a non-successful status code was received for a request.
-    UnsuccessfulRequest(Response),
+    UnsuccessfulRequest(Box<Response>),
     /// When the decoding of a ratelimit header could not be properly decoded
     /// into an `i64`.
     RateLimitI64,

@@ -150,10 +150,10 @@ impl ConnectionStage {
     /// [`ConnectionStage::Handshake`]: #variant.Handshake
     /// [`ConnectionStage::Identifying`]: #variant.Identifying
     /// [`ConnectionStage::Resuming`]: #variant.Resuming
-    pub fn is_connecting(&self) -> bool {
+    pub fn is_connecting(self) -> bool {
         use self::ConnectionStage::*;
 
-        match *self {
+        match self {
             Connecting | Handshake | Identifying | Resuming => true,
             Connected | Disconnected => false,
         }
@@ -183,7 +183,7 @@ impl Display for ConnectionStage {
 #[derive(Clone, Debug)]
 pub enum InterMessage {
     #[cfg(feature = "client")]
-    Client(ShardClientMessage),
+    Client(Box<ShardClientMessage>),
     Json(Value),
 }
 

@@ -339,10 +339,10 @@ enum_number!(
 );
 
 impl ActivityType {
-    pub fn num(&self) -> u64 {
+    pub fn num(self) -> u64 {
         use self::ActivityType::*;
 
-        match *self {
+        match self {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
@@ -430,12 +430,12 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity: activity,
-            last_modified: last_modified,
-            nick: nick,
-            status: status,
-            user: user,
-            user_id: user_id,
+            activity,
+            last_modified,
+            nick,
+            status,
+            user,
+            user_id,
         })
     }
 }

@@ -1904,8 +1904,8 @@ enum_number!(
 );
 
 impl DefaultMessageNotificationLevel {
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             DefaultMessageNotificationLevel::All => 0,
             DefaultMessageNotificationLevel::Mentions => 1,
         }
@@ -1932,8 +1932,8 @@ enum_number!(
 );
 
 impl ExplicitContentFilter {
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             ExplicitContentFilter::None => 0,
             ExplicitContentFilter::WithoutRole => 1,
             ExplicitContentFilter::All => 2,
@@ -1958,8 +1958,8 @@ enum_number!(
 );
 
 impl MfaLevel {
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             MfaLevel::None => 0,
             MfaLevel::Elevated => 1,
         }
@@ -2043,8 +2043,8 @@ enum_number!(
 );
 
 impl VerificationLevel {
-    pub fn num(&self) -> u64 {
-        match *self {
+    pub fn num(self) -> u64 {
+        match self {
             VerificationLevel::None => 0,
             VerificationLevel::Low => 1,
             VerificationLevel::Medium => 2,

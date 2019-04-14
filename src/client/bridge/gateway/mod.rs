@@ -79,6 +79,8 @@ use crate::gateway::{ConnectionStage, InterMessage};
 ///
 /// [`ShardManager`]: struct.ShardManager.html
 /// [`ShardRunner`]: struct.ShardRunner.html
+// Once we can use `Box` as part of a pattern, we will reconsider boxing.
+#[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].

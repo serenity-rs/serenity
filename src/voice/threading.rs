@@ -17,7 +17,7 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     ThreadBuilder::new()
         .name(name)
         .spawn(move || runner(&rx))
-        .expect(&format!("[Voice] Error starting guild: {:?}", guild_id));
+        .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
 }
 
 fn runner(rx: &MpscReceiver<Status>) {

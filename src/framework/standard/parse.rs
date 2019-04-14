@@ -141,14 +141,14 @@ impl CommandGroup {
         self.commands
             .iter()
             .find(|c| c.options.names.contains(&name))
-            .map(|c| *c)
+            .cloned()
     }
 
     #[inline]
     fn command_names(&self) -> impl Iterator<Item = &'static str> {
         self.commands
             .iter()
-            .flat_map(|c| c.options.names.iter().map(|c| *c))
+            .flat_map(|c| c.options.names.iter().cloned())
     }
 
     #[inline]
@@ -168,14 +168,14 @@ impl CommandOptions {
         self.sub
             .iter()
             .find(|c| c.options.names.contains(&name))
-            .map(|c| *c)
+            .cloned()
     }
 
     #[inline]
     fn command_names(&self) -> impl Iterator<Item = &'static str> {
         self.sub
             .iter()
-            .flat_map(|c| c.options.names.iter().map(|c| *c))
+            .flat_map(|c| c.options.names.iter().cloned())
     }
 }
 

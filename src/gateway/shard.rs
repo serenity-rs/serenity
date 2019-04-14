@@ -20,7 +20,10 @@ use super::{
     WsClient,
     WebSocketGatewayClientExt,
 };
-use tungstenite::error::Error as TungsteniteError;
+use tungstenite::{
+    error::Error as TungsteniteError,
+    protocol::frame::CloseFrame,
+};
 use url::Url;
 use log::{error, debug, info, trace, warn};
 
@@ -334,6 +337,141 @@ impl Shard {
         self.stage
     }
 
+    fn handle_gateway_dispatch(&mut self, seq: u64, event: &Event) -> Result<Option<ShardAction>> {
+        if seq > self.seq + 1 {
+            warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
+        }
+
+        match *event {
+            Event::Ready(ref ready) => {
+                debug!("[Shard {:?}] Received Ready", self.shard_info);
+
+                self.session_id = Some(ready.ready.session_id.clone());
+                self.stage = ConnectionStage::Connected;
+            },
+            Event::Resumed(_) => {
+                info!("[Shard {:?}] Resumed", self.shard_info);
+
+                self.stage = ConnectionStage::Connected;
+                self.last_heartbeat_acknowledged = true;
+                self.heartbeat_instants = (Some(Instant::now()), None);
+            },
+            _ => {},
+        }
+
+        self.seq = seq;
+
+        Ok(None)
+    }
+
+    fn handle_heartbeat_event(&mut self, s: u64) -> Result<Option<ShardAction>> {
+        info!("[Shard {:?}] Received shard heartbeat", self.shard_info);
+
+        // Received seq is off -- attempt to resume.
+        if s > self.seq + 1 {
+            info!(
+                "[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
+                self.shard_info,
+                s,
+                self.seq
+            );
+
+            if self.stage == ConnectionStage::Handshake {
+                self.stage = ConnectionStage::Identifying;
+
+                return Ok(Some(ShardAction::Identify));
+            } else {
+                warn!(
+                    "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
+                    self.shard_info
+                );
+
+                return Ok(Some(ShardAction::Reconnect(self.reconnection_type())));
+            }
+        }
+
+        Ok(Some(ShardAction::Heartbeat))
+    }
+
+    fn handle_gateway_closed(&mut self, data: &Option<CloseFrame<'static>>) -> Result<Option<ShardAction>> {
+        let num = data.as_ref().map(|d| d.code.into());
+        let clean = num == Some(1000);
+
+        match num {
+            Some(close_codes::UNKNOWN_OPCODE) => {
+                warn!("[Shard {:?}] Sent invalid opcode",
+                        self.shard_info);
+            },
+            Some(close_codes::DECODE_ERROR) => {
+                warn!("[Shard {:?}] Sent invalid message",
+                        self.shard_info);
+            },
+            Some(close_codes::NOT_AUTHENTICATED) => {
+                warn!("[Shard {:?}] Sent no authentication",
+                        self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::NoAuthentication));
+            },
+            Some(close_codes::AUTHENTICATION_FAILED) => {
+                warn!("Sent invalid authentication");
+
+                return Err(Error::Gateway(GatewayError::InvalidAuthentication));
+            },
+            Some(close_codes::ALREADY_AUTHENTICATED) => {
+                warn!("[Shard {:?}] Already authenticated",
+                        self.shard_info);
+            },
+            Some(close_codes::INVALID_SEQUENCE) => {
+                warn!("[Shard {:?}] Sent invalid seq: {}",
+                        self.shard_info,
+                        self.seq);
+
+                self.seq = 0;
+            },
+            Some(close_codes::RATE_LIMITED) => {
+                warn!("[Shard {:?}] Gateway ratelimited",
+                        self.shard_info);
+            },
+            Some(close_codes::INVALID_SHARD) => {
+                warn!("[Shard {:?}] Sent invalid shard data",
+                        self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::InvalidShardData));
+            },
+            Some(close_codes::SHARDING_REQUIRED) => {
+                error!("[Shard {:?}] Shard has too many guilds",
+                        self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::OverloadedShard));
+            },
+            Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
+                info!("[Shard {:?}] Invalid session", self.shard_info);
+
+                self.session_id = None;
+            },
+            Some(other) if !clean => {
+                warn!(
+                    "[Shard {:?}] Unknown unclean close {}: {:?}",
+                    self.shard_info,
+                    other,
+                    data.as_ref().map(|d| &d.reason),
+                );
+            },
+            _ => {},
+        }
+
+        let resume = num.map(|x| {
+            x != close_codes::AUTHENTICATION_FAILED &&
+            self.session_id.is_some()
+        }).unwrap_or(true);
+
+        Ok(Some(if resume {
+            ShardAction::Reconnect(ReconnectType::Resume)
+        } else {
+            ShardAction::Reconnect(ReconnectType::Reidentify)
+        }))
+    }
+
     /// Handles an event from the gateway over the receiver, requiring the
     /// receiver to be passed if a reconnect needs to occur.
     ///
@@ -358,64 +496,11 @@ impl Shard {
     ///
     /// Returns a `GatewayError::OverloadedShard` if the shard would have too
     /// many guilds assigned to it.
-    #[allow(clippy::cognitive_complexity)]
     pub(crate) fn handle_event(&mut self, event: &Result<GatewayEvent>)
         -> Result<Option<ShardAction>> {
         match *event {
-            Ok(GatewayEvent::Dispatch(seq, ref event)) => {
-                if seq > self.seq + 1 {
-                    warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
-                }
-
-                match *event {
-                    Event::Ready(ref ready) => {
-                        debug!("[Shard {:?}] Received Ready", self.shard_info);
-
-                        self.session_id = Some(ready.ready.session_id.clone());
-                        self.stage = ConnectionStage::Connected;
-                    },
-                    Event::Resumed(_) => {
-                        info!("[Shard {:?}] Resumed", self.shard_info);
-
-                        self.stage = ConnectionStage::Connected;
-                        self.last_heartbeat_acknowledged = true;
-                        self.heartbeat_instants = (Some(Instant::now()), None);
-                    },
-                    _ => {},
-                }
-
-                self.seq = seq;
-
-                Ok(None)
-            },
-            Ok(GatewayEvent::Heartbeat(s)) => {
-                info!("[Shard {:?}] Received shard heartbeat", self.shard_info);
-
-                // Received seq is off -- attempt to resume.
-                if s > self.seq + 1 {
-                    info!(
-                        "[Shard {:?}] Received off sequence (them: {}; us: {}); resuming",
-                        self.shard_info,
-                        s,
-                        self.seq
-                    );
-
-                    if self.stage == ConnectionStage::Handshake {
-                        self.stage = ConnectionStage::Identifying;
-
-                        return Ok(Some(ShardAction::Identify));
-                    } else {
-                        warn!(
-                            "[Shard {:?}] Heartbeat during non-Handshake; auto-reconnecting",
-                            self.shard_info
-                        );
-
-                        return Ok(Some(ShardAction::Reconnect(self.reconnection_type())));
-                    }
-                }
-
-                Ok(Some(ShardAction::Heartbeat))
-            },
+            Ok(GatewayEvent::Dispatch(seq, ref event)) => self.handle_gateway_dispatch(seq, event),
+            Ok(GatewayEvent::Heartbeat(s)) => self.handle_heartbeat_event(s),
             Ok(GatewayEvent::HeartbeatAck) => {
                 self.heartbeat_instants.1 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = true;
@@ -461,84 +546,7 @@ impl Shard {
             Ok(GatewayEvent::Reconnect) => {
                 Ok(Some(ShardAction::Reconnect(ReconnectType::Reidentify)))
             },
-            Err(Error::Gateway(GatewayError::Closed(ref data))) => {
-                let num = data.as_ref().map(|d| d.code.into());
-                let clean = num == Some(1000);
-
-                match num {
-                    Some(close_codes::UNKNOWN_OPCODE) => {
-                        warn!("[Shard {:?}] Sent invalid opcode",
-                              self.shard_info);
-                    },
-                    Some(close_codes::DECODE_ERROR) => {
-                        warn!("[Shard {:?}] Sent invalid message",
-                              self.shard_info);
-                    },
-                    Some(close_codes::NOT_AUTHENTICATED) => {
-                        warn!("[Shard {:?}] Sent no authentication",
-                              self.shard_info);
-
-                        return Err(Error::Gateway(GatewayError::NoAuthentication));
-                    },
-                    Some(close_codes::AUTHENTICATION_FAILED) => {
-                        warn!("Sent invalid authentication");
-
-                        return Err(Error::Gateway(GatewayError::InvalidAuthentication));
-                    },
-                    Some(close_codes::ALREADY_AUTHENTICATED) => {
-                        warn!("[Shard {:?}] Already authenticated",
-                              self.shard_info);
-                    },
-                    Some(close_codes::INVALID_SEQUENCE) => {
-                        warn!("[Shard {:?}] Sent invalid seq: {}",
-                              self.shard_info,
-                              self.seq);
-
-                        self.seq = 0;
-                    },
-                    Some(close_codes::RATE_LIMITED) => {
-                        warn!("[Shard {:?}] Gateway ratelimited",
-                              self.shard_info);
-                    },
-                    Some(close_codes::INVALID_SHARD) => {
-                        warn!("[Shard {:?}] Sent invalid shard data",
-                              self.shard_info);
-
-                        return Err(Error::Gateway(GatewayError::InvalidShardData));
-                    },
-                    Some(close_codes::SHARDING_REQUIRED) => {
-                        error!("[Shard {:?}] Shard has too many guilds",
-                               self.shard_info);
-
-                        return Err(Error::Gateway(GatewayError::OverloadedShard));
-                    },
-                    Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
-                        info!("[Shard {:?}] Invalid session", self.shard_info);
-
-                        self.session_id = None;
-                    },
-                    Some(other) if !clean => {
-                        warn!(
-                            "[Shard {:?}] Unknown unclean close {}: {:?}",
-                            self.shard_info,
-                            other,
-                            data.as_ref().map(|d| &d.reason),
-                        );
-                    },
-                    _ => {},
-                }
-
-                let resume = num.map(|x| {
-                    x != close_codes::AUTHENTICATION_FAILED &&
-                    self.session_id.is_some()
-                }).unwrap_or(true);
-
-                Ok(Some(if resume {
-                    ShardAction::Reconnect(ReconnectType::Resume)
-                } else {
-                    ShardAction::Reconnect(ReconnectType::Reidentify)
-                }))
-            },
+            Err(Error::Gateway(GatewayError::Closed(ref data))) => self.handle_gateway_closed(&data),
             Err(Error::Tungstenite(ref why)) => {
                 warn!("[Shard {:?}] Websocket error: {:?}",
                       self.shard_info,
@@ -795,7 +803,7 @@ impl Shard {
                 self.client.send_resume(
                     &self.shard_info,
                     session_id,
-                    &self.seq,
+                    self.seq,
                     &self.token,
                 )
             },

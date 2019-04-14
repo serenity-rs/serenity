@@ -24,19 +24,20 @@ pub trait AudioSource: Send {
 
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, ssrc: u32, user_id: u64, speaking: bool) { }
+    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) { }
 
+    #[allow(clippy::too_many_arguments)]
     fn voice_packet(&mut self,
-                    ssrc: u32,
-                    sequence: u16,
-                    timestamp: u32,
-                    stereo: bool,
-                    data: &[i16],
-                    compressed_size: usize) { }
+                    _ssrc: u32,
+                    _sequence: u16,
+                    _timestamp: u32,
+                    _stereo: bool,
+                    _data: &[i16],
+                    _compressed_size: usize) { }
 
-    fn client_connect(&mut self, ssrc: u32, user_id: u64) { }
+    fn client_connect(&mut self, _ssrc: u32, _user_id: u64) { }
 
-    fn client_disconnect(&mut self, user_id: u64) { }
+    fn client_disconnect(&mut self, _user_id: u64) { }
 }
 
 #[derive(Clone, Copy)]
