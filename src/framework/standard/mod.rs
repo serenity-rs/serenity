@@ -534,7 +534,7 @@ impl StandardFramework {
     ///
     /// # Examples
     ///
-    /// Using `message_without_command`:
+    /// Using `normal_message`:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;

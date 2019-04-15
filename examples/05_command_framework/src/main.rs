@@ -8,17 +8,15 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::{collections::{HashMap, HashSet}, env, fmt::Write, sync::Arc};
-
+use std::{collections::{HashMap, HashSet}, env, fmt::Write, hash::BuildHasher, sync::Arc};
 use serenity::{
-    command,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
         Args, CheckResult, CommandOptions, CommandResult, CommandGroup,
-        DispatchError, HelpBehaviour, HelpOptions, help_commands, StandardFramework,
+        DispatchError, HelpOptions, help_commands, StandardFramework,
         macros::{command, group, help},
     },
-    model::{channel::{Channel, Message}, gateway::Ready, Permissions},
+    model::{channel::{Channel, Message}, gateway::Ready, id::UserId},
     utils::{content_safe, ContentSafeOptions},
 };
 
@@ -51,7 +49,7 @@ impl EventHandler for Handler {
 group!({
     name: "general",
     options: {},
-    commands: [about, say, commands, ping, role, some_long_command]
+    commands: [about, say, commands, ping, some_long_command]
 });
 
 group!({
@@ -67,7 +65,7 @@ group!({
         // Sets a command that will be executed if only a group-prefix was passed.
         default_command: bird,
     },
-    commands: [cat, dog]
+    commands: [cat, dog],
 });
 
 group!({
@@ -78,17 +76,19 @@ group!({
         // via `~math` instead of just `~`.
         prefix: "math",
     },
-    command: [multiply]
+    commands: [multiply],
 });
 
 group!({
     name: "owner",
     options: {
-        owners_only: true,
+        owner_only: true,
         // Limit all commands to be guild-restricted.
         only: "guilds",
+        // Adds checks that need to be passed.
+        checks: [owner_check],
     },
-    commands: [am_i_admin, slow_mode]
+    commands: [am_i_admin, slow_mode],
 });
 
 // The framework provides two built-in help commands for you to use.
@@ -127,7 +127,7 @@ fn my_help(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId>
+    owners: HashSet<UserId, impl BuildHasher>
 ) -> CommandResult {
     help_commands::with_embeds(context, msg, args, help_options, groups, owners)
 }
@@ -173,12 +173,9 @@ fn main() {
         // configurations.
         StandardFramework::new()
         .configure(|c| c
-            .allow_whitespace(true)
+            .with_whitespace(true)
             .on_mention(true)
             .prefix("~")
-            // A command that will be executed
-            // if nothing but a prefix is passed.
-            .prefix_only_cmd(about)
             // You can set multiple delimiters via delimiters()
             // or just one via delimiter(",")
             // If you set multiple delimiters, the order you list them
@@ -228,18 +225,18 @@ fn main() {
             println!("Could not find command named '{}'", unknown_command_name);
         })
         // Set a function that's called whenever a message is not a command.
-        .message_without_command(|_, message| {
+        .normal_message(|_, message| {
             println!("Message is not a command '{}'", message.content);
         })
         // Set a function that's called whenever a command's execution didn't complete for one
         // reason or another. For example, when a user has exceeded a rate-limit or a command
         // can only be performed by the bot owner.
         .on_dispatch_error(|ctx, msg, error| {
-            if let DispatchError::RateLimited(seconds) = error {
+            if let DispatchError::Ratelimited(seconds) = error {
                 let _ = msg.channel_id.say(&ctx.http, &format!("Try this again in {} seconds.", seconds));
             }
         })
-        .help(my_help)
+        .help(&MY_HELP_HELP_COMMAND)
         // Can't be used more than once per 5 seconds:
         .bucket("emoji", |b| b.delay(5))
         // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
@@ -247,10 +244,10 @@ fn main() {
         // The `group!` macro generates `static` instances of the options set for the group.
         // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
         // #name is turned all uppercase
-        .group(GENERAL_GROUP)
-        .group(EMOJI_GROUP)
-        .group(MATH_GROUP)
-        .group(OWNER_GROUP)
+        .group(&GENERAL_GROUP)
+        .group(&EMOJI_GROUP)
+        .group(&MATH_GROUP)
+        .group(&OWNER_GROUP)
     );
 
     if let Err(why) = client.start() {
@@ -285,7 +282,7 @@ fn commands(ctx: &mut Context, msg: &Message) -> CommandResult {
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
 #[command]
 fn say(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
-    let mut settings = if let Some(guild_id) = msg.guild_id {
+    let settings = if let Some(guild_id) = msg.guild_id {
        // By default roles, users, and channel mentions are cleaned.
        ContentSafeOptions::default()
             // We do not want to clean channal mentions as they
@@ -300,7 +297,7 @@ fn say(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
             .clean_role(false)
     };
 
-    let mut content = content_safe(&ctx.cache, &args.rest(), &settings);
+    let content = content_safe(&ctx.cache, &args.rest(), &settings);
 
     if let Err(why) = msg.channel_id.say(&ctx.http, &content) {
         println!("Error sending message: {:?}", why);
@@ -330,21 +327,6 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
     // and if the check's failure origin is unknown you can mark it as such (same as using `false.into`):
     // `CheckResult::new_unknown()`
     (msg.author.id == 7).into()
-}
-
-// A function which acts as a "check", to determine whether to call a command.
-//
-// This check analyses whether a guild member permissions has
-// administrator-permissions.
-fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
-    if let Some(member) = msg.member(&ctx.cache) {
-
-        if let Ok(permissions) = member.permissions(&ctx.cache) {
-            return permissions.administrator().into();
-        }
-    }
-
-    false.into()
 }
 
 #[command]
@@ -393,10 +375,12 @@ fn multiply(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, &res.to_string()) {
         println!("Err sending product of {} and {}: {:?}", first, second, why);
     }
-});
+
+    Ok(())
+}
 
 #[command]
-fn about(ctx, msg) -> CommandResult {
+fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )") {
         println!("Error sending message: {:?}", why);
     }
@@ -405,7 +389,7 @@ fn about(ctx, msg) -> CommandResult {
 }
 
 #[command]
-fn latency(ctx, msg) -> CommandResult {
+fn latency(ctx: &mut Context, msg: &Message) -> CommandResult {
     // The shard manager is an interface for mutating, stopping, restarting, and
     // retrieving information about shards.
     let data = ctx.data.read();
@@ -441,7 +425,7 @@ fn latency(ctx, msg) -> CommandResult {
 
 #[command]
 // Limit command usage to guilds.
-#[only(guilds)]
+#[only_in(guilds)]
 fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )") {
         println!("Error sending message: {:?}", why);
@@ -501,7 +485,7 @@ fn am_i_admin(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn slow_mode(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+fn slow_mode(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
         if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)) {
             println!("Error setting channel's slow mode rate: {:?}", why);
