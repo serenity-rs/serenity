@@ -11,9 +11,9 @@ use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
-    parse_macro_input, parse_quote,
+    parse_macro_input,
     spanned::Spanned,
-    Ident, Lit, Path,
+    Ident, Lit,
 };
 
 pub(crate) mod attributes;
@@ -25,21 +25,6 @@ use attributes::*;
 use consts::*;
 use structures::*;
 use util::*;
-
-// Stolen from <https://github.com/diesel-rs/diesel/blob/af1ff2476f997d6eb04fffd58260705d77ff6b6f/diesel_derives/src/util.rs#L81-L96>
-pub(crate) fn crate_name() -> Path {
-    let in_self = std::env::var("CARGO_PKG_NAME").unwrap() == "serenity";
-    let in_doctest = std::env::args()
-        .next()
-        .unwrap_or_default()
-        .contains("rustdoc");
-
-    if in_self && !in_doctest {
-        parse_quote!(crate)
-    } else {
-        parse_quote!(serenity)
-    }
-}
 
 macro_rules! match_options {
     ($v:expr, $values:ident, $options:ident, $span:expr => [$($name:ident);*]) => {
@@ -289,10 +274,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let cfgs = fun.cfgs.clone();
     let cfgs2 = cfgs.clone();
 
-    let cname = crate_name();
-    let options_path = quote!(#cname::framework::standard::CommandOptions);
-    let command_path = quote!(#cname::framework::standard::Command);
-    let permissions_path = quote!(#cname::model::permissions::Permissions);
+    let options_path = quote!(serenity::framework::standard::CommandOptions);
+    let command_path = quote!(serenity::framework::standard::Command);
+    let permissions_path = quote!(serenity::model::permissions::Permissions);
 
     (quote! {
         #(#cfgs)*
@@ -630,10 +614,9 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let cfgs = fun.cfgs.clone();
     let cfgs2 = cfgs.clone();
 
-    let cname = crate_name();
-    let options_path = quote!(#cname::framework::standard::HelpOptions);
-    let command_path = quote!(#cname::framework::standard::HelpCommand);
-    let colour_path = quote!(#cname::utils::Colour);
+    let options_path = quote!(serenity::framework::standard::HelpOptions);
+    let command_path = quote!(serenity::framework::standard::HelpCommand);
+    let colour_path = quote!(serenity::utils::Colour);
 
     (quote! {
         #(#cfgs)*
@@ -810,8 +793,7 @@ pub fn group_options(input: TokenStream) -> TokenStream {
 
     let name = name.with_suffix(GROUP_OPTIONS);
 
-    let cname = crate_name();
-    let options_path = quote!(#cname::framework::standard::GroupOptions);
+    let options_path = quote!(serenity::framework::standard::GroupOptions);
 
     (quote! {
         pub static #name: #options_path = #options;

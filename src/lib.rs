@@ -112,3 +112,6 @@ pub struct CacheAndHttp {
     pub http: Arc<Http>,
     __nonexhaustive: (),
 }
+
+// For the procedural macros defined in `command_attr`; do not remove!
+extern crate self as serenity;

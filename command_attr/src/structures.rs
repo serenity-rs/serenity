@@ -1,5 +1,4 @@
 use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS};
-use crate::crate_name;
 use crate::util::{
     Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, ParseStreamExt,
     RefOrInstance,
@@ -26,8 +25,7 @@ pub enum OnlyIn {
 
 impl ToTokens for OnlyIn {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let cname = crate_name();
-        let only_in_path = quote!(#cname::framework::standard::OnlyIn);
+        let only_in_path = quote!(serenity::framework::standard::OnlyIn);
         match self {
             OnlyIn::Dm => stream.extend(quote!(#only_in_path::Dm)),
             OnlyIn::Guild => stream.extend(quote!(#only_in_path::Guild)),
@@ -222,8 +220,7 @@ pub struct Checks(pub Vec<Ident>);
 
 impl ToTokens for Checks {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let cname = crate_name();
-        let checks_path = quote!(#cname::framework::standard::Check);
+        let checks_path = quote!(serenity::framework::standard::Check);
 
         // FIXME: Handle the other fields of a `Check`
         let v = self.0.iter().map(|i| quote!(#checks_path { name: "", function: #i, check_in_help: true, display_in_help: true }));
@@ -294,8 +291,7 @@ impl HelpBehaviour {
 
 impl ToTokens for HelpBehaviour {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let cname = crate_name();
-        let help_behaviour_path = quote!(#cname::framework::standard::HelpBehaviour);
+        let help_behaviour_path = quote!(serenity::framework::standard::HelpBehaviour);
         match self {
             HelpBehaviour::Strike => stream.extend(quote!(#help_behaviour_path::Strike)),
             HelpBehaviour::Hide => stream.extend(quote!(#help_behaviour_path::Hide)),
@@ -552,9 +548,8 @@ impl ToTokens for GroupOptions {
             };
         }
 
-        let cname = crate_name();
-        let options_path = quote!(#cname::framework::standard::GroupOptions);
-        let permissions_path = quote!(#cname::model::permissions::Permissions);
+        let options_path = quote!(serenity::framework::standard::GroupOptions);
+        let permissions_path = quote!(serenity::model::permissions::Permissions);
         let required_permissions = required_permissions.0;
 
         if let Some(IdentAccess(from, its)) = inherit {
@@ -796,9 +791,8 @@ impl ToTokens for Group {
             RefOrInstance::Instance(opt) => options = Some(opt),
         }
 
-        let cname = crate_name();
-        let options_path = quote!(#cname::framework::standard::GroupOptions);
-        let group_path = quote!(#cname::framework::standard::CommandGroup);
+        let options_path = quote!(serenity::framework::standard::GroupOptions);
+        let group_path = quote!(serenity::framework::standard::CommandGroup);
 
         if options.is_some() {
             stream.extend(quote! {

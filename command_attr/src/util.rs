@@ -1,4 +1,3 @@
-use crate::crate_name;
 use crate::structures::CommandFun;
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
@@ -246,13 +245,12 @@ pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
     let groups: Type = parse_quote!(&[&'static CommandGroup]);
     let owners: Type = parse_quote!(HashSet<UserId, impl BuildHasher>);
 
-    let cname = crate_name();
-    let context_path: Type = parse_quote!(&mut #cname::prelude::Context);
-    let message_path: Type = parse_quote!(&#cname::model::channel::Message);
-    let args_path: Type = parse_quote!(#cname::framework::standard::Args);
-    let options_path: Type = parse_quote!(&'static #cname::framework::standard::HelpOptions);
-    let groups_path: Type = parse_quote!(&[&'static #cname::framework::standard::CommandGroup]);
-    let owners_path: Type = parse_quote!(std::collections::HashSet<#cname::model::id::UserId, std::hash::BuildHasher>);
+    let context_path: Type = parse_quote!(&mut serenity::prelude::Context);
+    let message_path: Type = parse_quote!(&serenity::model::channel::Message);
+    let args_path: Type = parse_quote!(serenity::framework::standard::Args);
+    let options_path: Type = parse_quote!(&'static serenity::framework::standard::HelpOptions);
+    let groups_path: Type = parse_quote!(&[&'static serenity::framework::standard::CommandGroup]);
+    let owners_path: Type = parse_quote!(std::collections::HashSet<serenity::model::id::UserId, std::hash::BuildHasher>);
 
     let ctx_error = "first argument's type should be `&mut Context`";
     let msg_error = "second argument's type should be `&Message`";
