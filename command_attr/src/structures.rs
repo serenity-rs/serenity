@@ -278,7 +278,7 @@ pub enum HelpBehaviour {
 
 impl HelpBehaviour {
     pub fn from_str(s: &str) -> Option<Self> {
-        Some(match s {
+        Some(match s.to_lowercase().as_str() {
             "strike" => HelpBehaviour::Strike,
             "hide" => HelpBehaviour::Hide,
             "nothing" => HelpBehaviour::Nothing,
