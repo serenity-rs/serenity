@@ -47,6 +47,7 @@ impl Default for OnlyIn {
 pub struct CommandFun {
     pub _pub: Option<Pub>,
     pub cfgs: Vec<Attribute>,
+    pub docs: Vec<Attribute>,
     pub attributes: Vec<Attribute>,
     pub name: Ident,
     pub args: Vec<Argument>,
@@ -60,10 +61,11 @@ impl Parse for CommandFun {
 
         let (cfgs, attributes): (Vec<_>, Vec<_>) = attributes
             .into_iter()
-            // Omit doc comments.
-            .filter(|a| !a.path.is_ident("doc"))
             // Split the cfgs from our attributes.
             .partition(|a| a.path.is_ident("cfg"));
+
+        // Filter out doc-comments as well.
+        let (docs, attributes) = attributes.into_iter().partition(|a| a.path.is_ident("doc"));
 
         let _pub = if input.peek(Token![pub]) {
             Some(input.parse::<Token![pub]>()?)
@@ -139,6 +141,7 @@ impl Parse for CommandFun {
         Ok(CommandFun {
             _pub,
             cfgs,
+            docs,
             attributes,
             name,
             args,
@@ -153,6 +156,7 @@ impl ToTokens for CommandFun {
         let CommandFun {
             _pub,
             cfgs,
+            docs,
             attributes: _,
             name,
             args,
@@ -162,6 +166,7 @@ impl ToTokens for CommandFun {
 
         stream.extend(quote! {
             #(#cfgs)*
+            #(#docs)*
             #_pub fn #name (#(#args),*) #ret {
                 #(#body)*
             }
