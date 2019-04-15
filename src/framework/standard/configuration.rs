@@ -273,14 +273,14 @@ impl Configuration {
         self
     }
 
-    /// Whether or not to respond to commands initiated with a mention. Note
-    /// that this can be used in conjunction with [`prefix`].
+    /// Whether or not to respond to commands initiated with the mentioned id.
+    /// Note that this can be used in conjunction with [`prefix`].
     ///
-    /// **Note**: Defaults to `false`.
+    /// **Note**: Defaults to ignore mentions.
     ///
     /// # Examples
     ///
-    /// Setting this to `true` will allow the following types of mentions to be
+    /// Setting this to an id will allow the following types of mentions to be
     /// responded to:
     ///
     /// ```ignore
@@ -294,19 +294,8 @@ impl Configuration {
     /// encourages you to ignore differentiating between the two.
     ///
     /// [`prefix`]: #method.prefix
-    pub fn on_mention(&mut self, on_mention: bool) -> &mut Self {
-        if !on_mention {
-            return self;
-        }
-
-        let http = Http::new(
-            reqwest::Client::builder().build().expect("Could not construct Reqwest-Client."),
-            "",
-        );
-
-        if let Ok(current_user) = http.get_current_user() {
-            self.on_mention = Some(current_user.id.to_string());
-        }
+    pub fn on_mention(&mut self, on_mention: Some(UserId)) -> &mut Self {
+        self.on_mention = on_mention.map(ToString::to_string);
 
         self
     }
