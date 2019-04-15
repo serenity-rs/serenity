@@ -245,7 +245,7 @@ impl PrivateChannel {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[cfg(feature = "http")]
     #[inline]
-    pub fn say<D: ::std::fmt::Display>(&self, http: impl AsRef<Http>, content: D) -> Result<Message> { self.id.say(&http, content) }
+    pub fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> { self.id.say(&http, content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
