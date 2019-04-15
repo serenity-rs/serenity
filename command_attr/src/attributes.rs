@@ -265,4 +265,4 @@ macro_rules! attr_option_num {
     }
 }
 
-attr_option_num!(u8, u32, usize);
+attr_option_num!(u16, u32, usize);

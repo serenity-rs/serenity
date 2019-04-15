@@ -39,9 +39,9 @@ pub struct CommandOptions {
     /// Example arguments, used by other commands.
     pub example: Option<&'static str>,
     /// Minimum amount of arguments that should be passed.
-    pub min_args: Option<u8>,
+    pub min_args: Option<u16>,
     /// Maximum amount of arguments that can be passed.
-    pub max_args: Option<u8>,
+    pub max_args: Option<u16>,
     /// Roles allowed to use this command.
     pub allowed_roles: &'static [&'static str],
     /// Permissions required to use this command.

@@ -57,9 +57,9 @@ pub enum DispatchError {
     /// When the command requester lacks specific required permissions.
     LackingPermissions(Permissions),
     /// When there are too few arguments.
-    NotEnoughArguments { min: u8, given: usize },
+    NotEnoughArguments { min: u16, given: usize },
     /// When there are too many arguments.
-    TooManyArguments { max: u8, given: usize },
+    TooManyArguments { max: u16, given: usize },
 }
 
 pub type DispatchHook = dyn Fn(&mut Context, &Message, DispatchError) + Send + Sync + 'static;
