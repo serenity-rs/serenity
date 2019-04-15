@@ -145,13 +145,13 @@ fn main() {
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
-    // We will fetch your bot's owners
-    let owners = match client.cache_and_http.http.get_current_application_info() {
+    // We will fetch your bot's owners and id
+    let (owners, bot_id) = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
             let mut owners = HashSet::new();
             owners.insert(info.owner.id);
 
-            owners
+            (owners, info.id)
         },
         Err(why) => panic!("Could not access application info: {:?}", why),
     };
@@ -174,7 +174,7 @@ fn main() {
         StandardFramework::new()
         .configure(|c| c
             .with_whitespace(true)
-            .on_mention(true)
+            .on_mention(Some(bot_id))
             .prefix("~")
             // You can set multiple delimiters via delimiters()
             // or just one via delimiter(",")

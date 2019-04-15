@@ -75,8 +75,7 @@ fn main() {
 
     client.with_framework(StandardFramework::new()
         .configure(|c| c
-            .prefix("~")
-            .on_mention(true))
+            .prefix("~"))
         .group(GENERAL_GROUP));
 
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
