@@ -322,12 +322,12 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
 
     if dec_for != DeclarFor::Check {
         spoof_or_check! {
-            ()     []    context, "_ctx",     ctx_error,     context_path;
-            ()     []    message, "_msg",     msg_error,     message_path;
-            ()     [mut] args,    "_args",    args_error,    args_path;
-            (help) []    options, "_options", options_error, options_path;
-            (help) []    groups,  "_groups",  groups_error,  groups_path;
-            (help) []    owners,  "_owners",  owners_error,  owners_path
+            ()     []    context,  "_ctx",     ctx_error,      context_path;
+            ()     []    message,  "_msg",     msg_error,      message_path;
+            ()     [mut] args,     "_args",    args_error,     args_path;
+            (help) []    hoptions, "_hoptions", hoptions_error, hoptions_path;
+            (help) []    groups,   "_groups",  groups_error,   groups_path;
+            (help) []    owners,   "_owners",  owners_error,   owners_path
         }
     } else {
         spoof_or_check! {
