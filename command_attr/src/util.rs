@@ -225,37 +225,51 @@ impl Parse for Array {
     }
 }
 
-pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
-    if is_help && fun.args.len() > 6 {
+#[derive(Debug, Clone, Copy, PartialEq, Eq)]
+pub enum DeclarFor {
+    Command,
+    Help,
+    Check,
+}
+
+pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<()> {
+    let len = match dec_for {
+        DeclarFor::Command => 3,
+        DeclarFor::Help => 6,
+        DeclarFor::Check => 4,
+    };
+
+    if fun.args.len() > len {
         return Err(Error::new(
             fun.args.last().unwrap().span(),
-            "function's arity exceeds more than 6 arguments",
-        ));
-    } else if !is_help && fun.args.len() > 3 {
-        return Err(Error::new(
-            fun.args.last().unwrap().span(),
-            "function's arity exceeds more than 3 arguments",
+            format!("function's arity exceeds more than {} arguments", len),
         ));
     }
 
     let context: Type = parse_quote!(&mut Context);
     let message: Type = parse_quote!(&Message);
     let args: Type = parse_quote!(Args);
-    let options: Type = parse_quote!(&'static HelpOptions);
+    let args2: Type = parse_quote!(&mut Args);
+    let options: Type = parse_quote!(&CommandOptions);
+    let hoptions: Type = parse_quote!(&'static HelpOptions);
     let groups: Type = parse_quote!(&[&'static CommandGroup]);
     let owners: Type = parse_quote!(HashSet<UserId, impl BuildHasher>);
 
     let context_path: Type = parse_quote!(&mut serenity::prelude::Context);
     let message_path: Type = parse_quote!(&serenity::model::channel::Message);
     let args_path: Type = parse_quote!(serenity::framework::standard::Args);
-    let options_path: Type = parse_quote!(&'static serenity::framework::standard::HelpOptions);
+    let args2_path: Type = parse_quote!(&mut serenity::framework::standard::Args);
+    let options_path: Type = parse_quote!(&'static serenity::framework::standard::CommandOptions);
+    let hoptions_path: Type = parse_quote!(&'static serenity::framework::standard::HelpOptions);
     let groups_path: Type = parse_quote!(&[&'static serenity::framework::standard::CommandGroup]);
     let owners_path: Type = parse_quote!(std::collections::HashSet<serenity::model::id::UserId, std::hash::BuildHasher>);
 
     let ctx_error = "first argument's type should be `&mut Context`";
     let msg_error = "second argument's type should be `&Message`";
     let args_error = "third argument's type should be `Args`";
-    let options_error = "fourth argument's type should be `&'static HelpOptions`";
+    let args2_error = "third argument's type should be `&mut Args`";
+    let options_error = "fourth argument's type should be `&'static CommandOptions`";
+    let hoptions_error = "fourth argument's type should be `&'static HelpOptions`";
     let groups_error = "fifth argument's type should be `&[&'static CommandGroup]`";
     let owners_error = "sixth argument's type should be `HashSet<UserId, impl BuildHasher>`";
 
@@ -276,7 +290,7 @@ pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
                     $b
                 };
                 (help $b:block) => {
-                    if is_help {
+                    if dec_for == DeclarFor::Help {
                         $b
                     }
                 }
@@ -306,26 +320,33 @@ pub fn validate_declaration(fun: &mut CommandFun, is_help: bool) -> Result<()> {
         }};
     }
 
-    spoof_or_check! {
-        ()     []    context, "_ctx", ctx_error, context_path;
-        ()     []    message, "_msg", msg_error, message_path;
-        ()     [mut] args, "_args", args_error, args_path;
-        (help) []    options, "_options", options_error, options_path;
-        (help) []    groups, "_groups", groups_error, groups_path;
-        (help) []    owners, "_owners", owners_error, owners_path
+    if dec_for != DeclarFor::Check {
+        spoof_or_check! {
+            ()     []    context, "_ctx",     ctx_error,     context_path;
+            ()     []    message, "_msg",     msg_error,     message_path;
+            ()     [mut] args,    "_args",    args_error,    args_path;
+            (help) []    options, "_options", options_error, options_path;
+            (help) []    groups,  "_groups",  groups_error,  groups_path;
+            (help) []    owners,  "_owners",  owners_error,  owners_path
+        }
+    } else {
+        spoof_or_check! {
+            ()     []    context, "_ctx",     ctx_error,     context_path;
+            ()     []    message, "_msg",     msg_error,     message_path;
+            ()     []    args2,   "_args",    args2_error,   args2_path;
+            ()     []    options, "_options", options_error, options_path
+        }
     }
 
     Ok(())
 }
 
-pub fn validate_return_type(fun: &mut CommandFun) -> Result<()> {
+pub fn validate_return_type(fun: &mut CommandFun, want: Type) -> Result<()> {
     let span = fun.ret.span();
     let kind = match fun.ret {
         ReturnType::Type(_, ref kind) => kind,
         _ => unreachable!(),
     };
-
-    let want: Type = parse_quote!(CommandResult);
 
     if &**kind != &want {
         return Err(Error::new(

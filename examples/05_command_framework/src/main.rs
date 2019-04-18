@@ -14,7 +14,7 @@ use serenity::{
     framework::standard::{
         Args, CheckResult, CommandOptions, CommandResult, CommandGroup,
         DispatchError, HelpOptions, help_commands, StandardFramework,
-        macros::{command, group, help},
+        macros::{command, group, help, check},
     },
     model::{channel::{Channel, Message}, gateway::Ready, id::UserId},
     utils::{content_safe, ContentSafeOptions},
@@ -86,7 +86,7 @@ group!({
         // Limit all commands to be guild-restricted.
         only: "guilds",
         // Adds checks that need to be passed.
-        checks: [owner_check],
+        checks: [Admin],
     },
     commands: [am_i_admin, slow_mode],
 });
@@ -311,6 +311,8 @@ fn say(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 // In this case, this command checks to ensure you are the owner of the message
 // in order for the command to be executed. If the check fails, the command is
 // not called.
+#[check]
+#[name = "Owner"]
 fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
     // Replace 7 with your ID to make this check pass.
     //
@@ -327,6 +329,27 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
     // and if the check's failure origin is unknown you can mark it as such (same as using `false.into`):
     // `CheckResult::new_unknown()`
     (msg.author.id == 7).into()
+}
+
+// A function which acts as a "check", to determine whether to call a command.
+//
+// This check analyses whether a guild member permissions has
+// administrator-permissions.
+#[check]
+#[name = "Admin"]
+// Whether the check shall be tested in the help-system.
+#[check_in_help(true)]
+// Whether the check shall be displayed in the help-system.
+#[display_in_help(true)]
+fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+    if let Some(member) = msg.member(&ctx.cache) {
+
+        if let Ok(permissions) = member.permissions(&ctx.cache) {
+            return permissions.administrator().into();
+        }
+    }
+
+    false.into()
 }
 
 #[command]
@@ -426,6 +449,7 @@ fn latency(ctx: &mut Context, msg: &Message) -> CommandResult {
 #[command]
 // Limit command usage to guilds.
 #[only_in(guilds)]
+#[checks(Owner)]
 fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )") {
         println!("Error sending message: {:?}", why);

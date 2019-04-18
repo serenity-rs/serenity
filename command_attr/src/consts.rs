@@ -5,6 +5,7 @@ pub mod suffixes {
     pub const HELP_OPTIONS: &str = "HELP_OPTIONS";
     pub const GROUP: &str = "GROUP";
     pub const GROUP_OPTIONS: &str = "GROUP_OPTIONS";
+    pub const CHECK: &str = "CHECK";
 }
 
 pub use self::suffixes::*;

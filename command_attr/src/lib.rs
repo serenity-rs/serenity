@@ -11,6 +11,7 @@ use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
+    parse_quote,
     parse_macro_input,
     spanned::Spanned,
     Ident, Lit,
@@ -241,11 +242,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
 
-    if let Err(err) = validate_declaration(&mut fun, false) {
+    if let Err(err) = validate_declaration(&mut fun, DeclarFor::Command) {
         return err.to_compile_error().into();
     }
 
-    if let Err(err) = validate_return_type(&mut fun) {
+    if let Err(err) = validate_return_type(&mut fun, parse_quote!(CommandResult)) {
         return err.to_compile_error().into();
     }
 
@@ -598,11 +599,11 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
     let strikethrough_commands_tip_in_guild = AsOption(strikethrough_commands_tip_in_guild);
 
-    if let Err(err) = validate_declaration(&mut fun, true) {
+    if let Err(err) = validate_declaration(&mut fun, DeclarFor::Help) {
         return err.to_compile_error().into();
     }
 
-    if let Err(err) = validate_return_type(&mut fun) {
+    if let Err(err) = validate_return_type(&mut fun, parse_quote!(CommandResult)) {
         return err.to_compile_error().into();
     }
 
@@ -797,6 +798,64 @@ pub fn group_options(input: TokenStream) -> TokenStream {
 
     (quote! {
         pub static #name: #options_path = #options;
+    })
+    .into()
+}
+
+#[proc_macro_attribute]
+pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    let fun = parse_macro_input!(input as CommandFun);
+
+    let mut name = "<fn>".to_string();
+    let mut display_in_help = true;
+    let mut check_in_help = true;
+
+    for attribute in &fun.attributes {
+        let span = attribute.span();
+        let values = match parse_values(attribute) {
+            Ok(vals) => vals,
+            Err(err) => return err.to_compile_error().into(),
+        };
+
+        let n = values.name.to_string();
+        let n = &n[..];
+
+        match n {
+            "name" => name.parse("name", values),
+            "display_in_help" => display_in_help.parse("display_in_help", values),
+            "check_in_help" => check_in_help.parse("check_in_help", values),
+            _ => {
+                return Error::new(span, &format!("invalid attribute: {:?}", n))
+                    .to_compile_error()
+                    .into();
+            }
+        }
+    }
+
+    if let Err(err) = validate_declaration(&mut fun, DeclarFor::Check) {
+        return err.to_compile_error().into();
+    }
+
+    if let Err(err) = validate_return_type(&mut fun, parse_quote!(CheckResult)) {
+        return err.to_compile_error().into();
+    }
+
+    let n = fun.name.clone();
+    let n2 = name.clone();
+    let name = if name.is_empty() { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
+    let name = name.with_suffix(CHECK);
+
+    let check = quote!(serenity::framework::standard::Check);
+
+    (quote! {
+        pub static #name: #check = #check {
+            name: #n2,
+            function: #n,
+            display_in_help: #display_in_help,
+            check_in_help: #check_in_help
+        };
+
+        #fun
     })
     .into()
 }
