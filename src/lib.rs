@@ -114,4 +114,5 @@ pub struct CacheAndHttp {
 }
 
 // For the procedural macros defined in `command_attr`; do not remove!
+#[allow(rust_2018_idioms)]
 extern crate self as serenity;
