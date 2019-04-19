@@ -310,12 +310,14 @@ pub fn is_command_visible(
 /// Checks if `search_on` starts with `word` and is then cleanly followed by a
 /// `" "`.
 #[inline]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
     search_on.starts_with(word) && search_on.get(word.len()..word.len() + 1)
         .map_or(false, |slice| slice == " ")
 }
 
 #[inline]
+#[cfg(all(feature = "cache", feature = "http"))]
 fn find_any_command_matches(
     command: &'static InternalCommand,
     group: &CommandGroup,
@@ -342,6 +344,7 @@ fn find_any_command_matches(
         }).cloned()
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 fn nested_group_command_search<'a>(
     cache: &CacheRwLock,
     groups: &[&'static CommandGroup],
