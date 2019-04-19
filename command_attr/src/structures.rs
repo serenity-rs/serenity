@@ -327,6 +327,7 @@ pub struct HelpOptions {
     pub embed_error_colour: u32,
     pub embed_success_colour: u32,
     pub max_levenshtein_distance: usize,
+    pub indention_prefix: String,
 }
 
 impl Default for HelpOptions {
@@ -359,6 +360,7 @@ impl Default for HelpOptions {
             embed_error_colour: 0x992D22,   // DARK_RED
             embed_success_colour: 0xF6DBD8, // ROSEWATER
             max_levenshtein_distance: 0,
+            indention_prefix: "-".to_string(),
         }
     }
 }

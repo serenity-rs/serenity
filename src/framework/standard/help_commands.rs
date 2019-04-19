@@ -80,6 +80,7 @@ pub struct GroupCommandsPair {
     name: &'static str,
     prefixes: Vec<&'static str>,
     command_names: Vec<String>,
+    sub_groups: Vec<GroupCommandsPair>,
 }
 
 /// A single suggested command containing its name and Levenshtein distance
@@ -306,18 +307,49 @@ pub fn is_command_visible(
     false
 }
 
-/// Tries to extract a single command matching searched command name otherwise
-/// returns similar commands.
-#[cfg(feature = "cache")]
-fn fetch_single_command<'a>(
-    cache: impl AsRef<CacheRwLock>,
+/// Checks if `search_on` starts with `word` and is then cleanly followed by a
+/// `" "`.
+#[inline]
+fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
+    search_on.starts_with(word) && search_on.get(word.len()..word.len() + 1)
+        .map_or(false, |slice| slice == " ")
+}
+
+#[inline]
+fn find_any_command_matches(
+    command: &'static InternalCommand,
+    group: &CommandGroup,
+    name: &mut String,
+) -> Option<&'static str> {
+    command
+        .options
+        .names
+        .iter()
+        .find(|n| {
+            group
+                .options
+                .prefixes
+                .iter()
+                .any(|prefix|
+                    if starts_with_whole_word(&name, &prefix) {
+                        name.drain(..prefix.len() + 1);
+
+                        n == &name
+                    } else {
+                        false
+                    }
+                )
+        }).cloned()
+}
+
+fn nested_group_command_search<'a>(
+    cache: &CacheRwLock,
     groups: &[&'static CommandGroup],
-    name: &str,
+    name: &mut String,
     help_options: &'a HelpOptions,
     msg: &Message,
-) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
-    let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
-
+    similar_commands: &mut Vec<SuggestedCommandName>,
+) -> Result<CustomisedHelpData<'a>, ()> {
     for group in groups {
         let group = *group;
         let mut found: Option<&'static InternalCommand> = None;
@@ -333,21 +365,11 @@ fn fetch_single_command<'a>(
                     .find(|n| **n == name)
                     .cloned()
             } else {
-                command
-                    .options
-                    .names
-                    .iter()
-                    .find(|n| {
-                        group
-                            .options
-                            .prefixes
-                            .iter()
-                            .any(|prefix| format!("{} {}", prefix, n) == name)
-                    })
-                    .cloned()
+                find_any_command_matches(&command, &group, name)
             };
 
             if let Some(n) = search_command_name_matched {
+
                 if n == command.options.names[0] {
                     if is_command_visible(&cache, &command.options, msg, help_options) {
                         found = Some(command);
@@ -362,6 +384,7 @@ fn fetch_single_command<'a>(
                     });
                 }
             } else if help_options.max_levenshtein_distance > 0 {
+
                 let command_name = if let Some(first_prefix) = group.options.prefixes.get(0) {
                     format!("{} {}", &first_prefix, &command.options.names[0])
                 } else {
@@ -429,11 +452,104 @@ fn fetch_single_command<'a>(
                 },
             });
         }
+
+        match nested_group_command_search(
+            &cache,
+            &group.sub,
+            name,
+            &help_options,
+            &msg,
+            similar_commands,
+        ) {
+            Ok(found) => return Ok(found),
+            Err(()) => (),
+        }
+
     }
 
-    similar_commands.sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
+    Err(())
+}
 
-    Err(similar_commands)
+/// Tries to extract a single command matching searched command name otherwise
+/// returns similar commands.
+#[cfg(feature = "cache")]
+fn fetch_single_command<'a>(
+    cache: impl AsRef<CacheRwLock>,
+    groups: &[&'static CommandGroup],
+    name: &str,
+    help_options: &'a HelpOptions,
+    msg: &Message,
+) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
+    let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
+    let cache = cache.as_ref();
+    let mut name = name.to_string();
+
+    match nested_group_command_search(
+        &cache,
+        &groups,
+        &mut name,
+        &help_options,
+        &msg,
+        &mut similar_commands,
+    ) {
+        Ok(found) => Ok(found),
+        Err(()) => Err(similar_commands),
+    }
+}
+
+#[cfg(feature = "cache")]
+fn fill_eligible_commands<'a>(
+    context: &Context,
+    commands: &[&'static InternalCommand],
+    owners: &HashSet<UserId, impl BuildHasher>,
+    help_options: &'a HelpOptions,
+    group: &'a CommandGroup,
+    msg: &Message,
+    to_fill: &mut GroupCommandsPair,
+) {
+    to_fill.name = group.name;
+    to_fill.prefixes = group.options.prefixes.to_vec();
+
+    for command in commands {
+        let command = *command;
+        let options = &command.options;
+        let name = &options.names[0];
+
+        if options.only_in == OnlyIn::None
+            || options.only_in == OnlyIn::Dm && msg.is_private()
+            || options.only_in == OnlyIn::Guild && !msg.is_private()
+        {
+            if options.owners_only && !owners.contains(&msg.author.id) {
+                let name = format_command_name!(&help_options.lacking_ownership, &name);
+                to_fill.command_names.push(name);
+
+                continue;
+            }
+
+            if options.help_available && has_correct_permissions(&context.cache, &options, msg) {
+                if let Some(guild) = msg.guild(&context.cache) {
+                    let guild = guild.read();
+
+                    if let Some(member) = guild.members.get(&msg.author.id) {
+                        if has_correct_roles(&options, &guild, &member) {
+                            to_fill.command_names.push(format!("`{}`", &name));
+                        } else {
+                            let name = format_command_name!(&help_options.lacking_role, &name);
+                            to_fill.command_names.push(name);
+                        }
+                    }
+                } else {
+                    to_fill.command_names.push(format!("`{}`", &name));
+                }
+            } else {
+                let name = format_command_name!(&help_options.lacking_permissions, &name);
+                to_fill.command_names.push(name);
+            }
+        } else {
+            let name = format_command_name!(&help_options.wrong_channel, &name);
+            to_fill.command_names.push(name);
+        }
+    }
 }
 
 /// Tries to extract a single command matching searched command name.
@@ -447,51 +563,23 @@ fn fetch_all_eligible_commands_in_group<'a>(
     msg: &Message,
 ) -> GroupCommandsPair {
     let mut group_with_cmds = GroupCommandsPair::default();
-    group_with_cmds.prefixes = group.options.prefixes.to_vec();
 
-    for command in commands {
-        let command = *command;
-        let options = &command.options;
-        let name = &options.names[0];
+    fill_eligible_commands(&context, &commands, &owners,
+        &help_options, &group, &msg,
+        &mut group_with_cmds);
 
-        if options.only_in == OnlyIn::None
-            || options.only_in == OnlyIn::Dm && msg.is_private()
-            || options.only_in == OnlyIn::Guild && !msg.is_private()
-        {
-            if options.owners_only && !owners.contains(&msg.author.id) {
-                let name = format_command_name!(&help_options.lacking_ownership, &name);
-                group_with_cmds.command_names.push(name);
+    for sub_group in group.sub {
+        let grouped_cmd = fetch_all_eligible_commands_in_group(
+            &context, &sub_group.commands, &owners,
+            &help_options, &sub_group, &msg
+        );
 
-                continue;
-            }
-
-            if options.help_available && has_correct_permissions(&context.cache, &options, msg) {
-                if let Some(guild) = msg.guild(&context.cache) {
-                    let guild = guild.read();
-
-                    if let Some(member) = guild.members.get(&msg.author.id) {
-                        if has_correct_roles(&options, &guild, &member) {
-                            group_with_cmds.command_names.push(format!("`{}`", &name));
-                        } else {
-                            let name = format_command_name!(&help_options.lacking_role, &name);
-                            group_with_cmds.command_names.push(name);
-                        }
-                    }
-                } else {
-                    group_with_cmds.command_names.push(format!("`{}`", &name));
-                }
-            } else {
-                let name = format_command_name!(&help_options.lacking_permissions, &name);
-                group_with_cmds.command_names.push(name);
-            }
-        } else {
-            let name = format_command_name!(&help_options.wrong_channel, &name);
-            group_with_cmds.command_names.push(name);
-        }
+        group_with_cmds.sub_groups.push(grouped_cmd);
     }
 
     group_with_cmds
 }
+
 
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
@@ -537,10 +625,6 @@ fn create_single_group(
 
     group_with_cmds.name = group.name;
 
-    for prefix in group.options.prefixes {
-        group_with_cmds.prefixes.push(*prefix);
-    }
-
     group_with_cmds
 }
 
@@ -567,6 +651,7 @@ pub fn create_customised_help_data<'a>(
                 let searched_named_lowercase = name.to_lowercase();
 
                 for group in groups {
+
                     if group.name.to_lowercase() == searched_named_lowercase
                         || group
                             .options
@@ -640,6 +725,109 @@ pub fn create_customised_help_data<'a>(
     }
 }
 
+/// Flattens a group with all its nested sub-groups into the passed `group_text`
+/// buffer.
+/// If `nest_level` is `0`, this function will skip the group's name.
+#[cfg(all(feature = "cache", feature = "http"))]
+fn flatten_group_to_string(
+    group_text: &mut String,
+    group: &GroupCommandsPair,
+    nest_level: usize,
+    help_options: &HelpOptions,
+) {
+    let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
+
+    if nest_level > 0 {
+        let _ = writeln!(group_text,
+            "{}__**{}**__",
+            repeated_indent_str,
+            group.name,
+        );
+    }
+
+    if !group.prefixes.is_empty() {
+        let _ = writeln!(group_text,
+            "{}{}: `{}`",
+            &repeated_indent_str,
+            help_options.group_prefix,
+            group.prefixes.join("`, `"),
+        );
+    };
+
+    let mut joined_commands = group
+        .command_names
+        .join(&format!("\n{}", &repeated_indent_str));
+
+
+    if group.command_names.len() >= 1 {
+        joined_commands.insert_str(0, &repeated_indent_str);
+    }
+
+    let _ = writeln!(group_text, "{}", joined_commands);
+
+    for sub_group in &group.sub_groups {
+        let mut sub_group_text = String::default();
+
+        flatten_group_to_string(
+            &mut sub_group_text,
+            &sub_group,
+            nest_level + 1,
+            &help_options,
+        );
+
+        let _ = write!(group_text, "{}", sub_group_text);
+    }
+}
+
+/// Flattens a group with all its nested sub-groups into the passed `group_text`
+/// buffer respecting the plain help format.
+/// If `nest_level` is `0`, this function will skip the group's name.
+#[cfg(all(feature = "cache", feature = "http"))]
+fn flatten_group_to_plain_string(
+    group_text: &mut String,
+    group: &GroupCommandsPair,
+    nest_level: usize,
+    help_options: &HelpOptions,
+) {
+    let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
+
+    if nest_level > 0 {
+        let _ = write!(group_text,
+            "\n{}**{}**",
+            repeated_indent_str,
+            group.name,
+        );
+    }
+
+    if group.prefixes.is_empty() {
+        let _ = write!(group_text, ": ");
+    } else {
+        let _ = write!(group_text,
+            " ({}: `{}`): ",
+            help_options.group_prefix,
+            group.prefixes.join("`, `"),
+        );
+    }
+
+    let joined_commands = format!("`{}`", group.command_names.join("`, `"));
+
+    let _ = write!(group_text, "{}", joined_commands);
+
+    for sub_group in &group.sub_groups {
+        let mut sub_group_text = String::default();
+
+        flatten_group_to_plain_string(
+            &mut sub_group_text,
+            &sub_group,
+            nest_level + 1,
+            &help_options,
+        );
+
+        let _ = write!(group_text, "{}", sub_group_text);
+    }
+}
+
+
 /// Sends an embed listing all groups with their commands.
 #[cfg(all(feature = "cache", feature = "http"))]
 fn send_grouped_commands_embed(
@@ -656,19 +844,16 @@ fn send_grouped_commands_embed(
             embed.description(help_description);
 
             for group in groups {
-                let joined_command_text_body = group.command_names.join("\n");
+                let mut embed_text = String::default();
 
-                let field_text = match group.prefixes.len() {
-                    0 => joined_command_text_body,
-                    _ => format!(
-                        "{}: `{}`\n{}",
-                        help_options.group_prefix,
-                        group.prefixes.join("`, `"),
-                        joined_command_text_body
-                    ),
-                };
+                flatten_group_to_string(
+                    &mut embed_text,
+                    &group,
+                    0,
+                    &help_options,
+                );
 
-                embed.field(group.name, field_text, true);
+                embed.field(group.name, &embed_text, true);
             }
 
             embed
@@ -860,16 +1045,12 @@ fn grouped_commands_to_plain_string(
     for group in groups {
         let _ = write!(result, "\n**{}**", &group.name);
 
-        if !group.prefixes.is_empty() {
-            let _ = write!(
-                result,
-                " ({}: `{}`)",
-                &help_options.group_prefix,
-                &group.prefixes.join("`, `")
-            );
-        }
-
-        let _ = write!(result, ": {}", group.command_names.join(" "));
+        flatten_group_to_plain_string(
+            &mut result,
+            &group,
+            0,
+            &help_options,
+        );
     }
 
     result

@@ -402,6 +402,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// - `#[max_levenshtein_distance(n)]`
 /// How much should the help command search for a similiar name.
 ///
+/// Indicator for a nested guild. The prefix will be repeated based on what
+/// kind of level the item sits. A sub-group would be level two, a sub-sub-group
+/// would be level three.
+/// - `#[indention_prefix = s]`
+///
 /// [`command`]: fn.command.html
 #[proc_macro_attribute]
 pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -506,7 +511,8 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
                     strikethrough_commands_tip_in_guild;
                     embed_error_colour;
                     embed_success_colour;
-                    max_levenshtein_distance
+                    max_levenshtein_distance;
+                    indention_prefix
                 ]);
             }
         }
@@ -593,6 +599,7 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
         embed_error_colour,
         embed_success_colour,
         max_levenshtein_distance,
+        indention_prefix,
     } = options;
 
     let strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
@@ -646,6 +653,7 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
             embed_error_colour: #colour_path(#embed_error_colour),
             embed_success_colour: #colour_path(#embed_success_colour),
             max_levenshtein_distance: #max_levenshtein_distance,
+            indention_prefix: #indention_prefix,
         };
 
         #(#cfgs2)*
