@@ -108,6 +108,10 @@ If you want more information about a specific command, just pass the command as 
 // it will be displayed as a suggestion.
 // Setting the distance to 0 will disable suggestions.
 #[max_levenshtein_distance(3)]
+// When you use sub-groups, Serenity will use the `indention_prefix` to indicate
+// how deeply an item is indented.
+// The default value is "-", it will be changed to "+".
+#[indention_prefix = "+"]
 // On another note, you can set up the help-menu-filter-behaviour.
 // Here are all possible settings shown on all possible options.
 // First case is if a user lacks permissions for a command, we can hide the command.
@@ -248,6 +252,7 @@ fn main() {
         .group(&EMOJI_GROUP)
         .group(&MATH_GROUP)
         .group(&OWNER_GROUP)
+        .group(&MAGIC_GROUP)
     );
 
     if let Err(why) = client.start() {

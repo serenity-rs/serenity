@@ -215,6 +215,9 @@ pub struct HelpOptions {
     pub embed_success_colour: Colour,
     /// If not 0, help will check whether a command is similar to searched named.
     pub max_levenshtein_distance: usize,
+    /// Help will use this as prefix to express how deeply nested a command or
+    /// group is.
+    pub indention_prefix: &'static str,
 }
 
 #[derive(Debug)]
