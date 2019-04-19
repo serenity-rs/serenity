@@ -973,10 +973,10 @@ fn send_error_embed(
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler).unwrap();
 /// #
-/// use serenity::framework::standard::{StandardFramework, help_commands};
+/// use serenity::framework::standard::{StandardFramework, help_commands::*};
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(help_commands::with_embeds));
+///     .help(&WITH_EMBEDS_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 #[help]
@@ -1125,10 +1125,10 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler).unwrap();
 /// #
-/// use serenity::framework::standard::{StandardFramework, help_commands};
+/// use serenity::framework::standard::{StandardFramework, help_commands::*};
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(help_commands::plain));
+///     .help(&PLAIN_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 #[help]
