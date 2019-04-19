@@ -804,7 +804,7 @@ pub fn group_options(input: TokenStream) -> TokenStream {
 
 #[proc_macro_attribute]
 pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
-    let fun = parse_macro_input!(input as CommandFun);
+    let mut fun = parse_macro_input!(input as CommandFun);
 
     let mut name = "<fn>".to_string();
     let mut display_in_help = true;
