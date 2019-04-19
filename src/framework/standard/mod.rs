@@ -410,6 +410,16 @@ impl StandardFramework {
         self
     }
 
+    /// Specify the function to be called on messages comprised of only the prefix.
+    pub fn prefix_only<F>(mut self, f: F) -> Self
+    where
+        F: Fn(&mut Context, &Message) + Send + Sync + 'static
+    {
+        self.prefix_only = Some(Arc::new(f));
+
+        self
+    }
+
     /// Specify the function to be called prior to every command's execution.
     /// If that function returns true, the command will be executed.
     ///
