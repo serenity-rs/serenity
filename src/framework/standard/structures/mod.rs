@@ -55,7 +55,7 @@ pub struct CommandOptions {
     /// Whether the command treats owners as normal users.
     pub owner_privilege: bool,
     /// Other commands belonging to this command.
-    pub sub: &'static [&'static Command],
+    pub sub_groups: &'static [&'static Command],
 }
 
 #[derive(Debug, PartialEq)]
@@ -225,5 +225,5 @@ pub struct CommandGroup {
     pub name: &'static str,
     pub options: &'static GroupOptions,
     pub commands: &'static [&'static Command],
-    pub sub: &'static [&'static CommandGroup],
+    pub sub_groups: &'static [&'static CommandGroup],
 }

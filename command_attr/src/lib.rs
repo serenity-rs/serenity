@@ -211,7 +211,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     only_in;
                     owners_only;
                     owner_privilege;
-                    sub
+                    sub_groups
                 ]);
             }
         }
@@ -232,7 +232,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         only_in,
         owners_only,
         owner_privilege,
-        sub,
+        sub_groups,
     } = options;
 
     let description = AsOption(description);
@@ -264,7 +264,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let Permissions(required_permissions) = required_permissions;
 
     let options = _name.with_suffix(COMMAND_OPTIONS);
-    let sub = sub
+    let sub_groups = sub_groups
         .into_iter()
         .map(|i| i.with_suffix(COMMAND))
         .collect::<Vec<_>>();
@@ -296,7 +296,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             only_in: #only_in,
             owners_only: #owners_only,
             owner_privilege: #owner_privilege,
-            sub: &[#(&#sub),*],
+            sub_groups: &[#(&#sub_groups),*],
         };
 
         #(#cfgs2)*
@@ -708,7 +708,7 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
 ///         prefixes: ["foo"],
 ///     },
 ///     commands: [bar],
-///     sub: [baz],
+///     sub_groups: [baz],
 /// });
 /// ```
 ///

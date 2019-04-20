@@ -93,13 +93,14 @@ impl<'a, 'b, 'c> PrefixIterator<'a, 'b, 'c> {
 
         // First, check if the subgroups' prefixes were used.
         // And on success, change the current group to the matching group.
-        for sub in self.group.sub {
-            for p in sub.options.prefixes {
+        for sub_group in self.group.sub_groups {
+
+            for p in sub_group.options.prefixes {
                 let pp = self.stream.peek_for(p.chars().count());
 
                 if *p == pp {
                     self.prefix = Some(pp);
-                    self.group = *sub;
+                    self.group = *sub_group;
                     let pos = self.stream.offset();
                     self.stream.set(pos + pp.len());
 
@@ -158,14 +159,14 @@ impl CommandGroup {
 
     #[inline]
     fn has_sub_prefixes(&self) -> bool {
-        self.sub.iter().any(|s| s.has_sub_prefixes()) || self.has_prefixes()
+        self.sub_groups.iter().any(|s| s.has_sub_prefixes()) || self.has_prefixes()
     }
 }
 
 impl CommandOptions {
     #[inline]
     fn get_sub(&self, name: &str) -> Option<&'static Command> {
-        self.sub
+        self.sub_groups
             .iter()
             .find(|c| c.options.names.contains(&name))
             .cloned()
@@ -173,7 +174,7 @@ impl CommandOptions {
 
     #[inline]
     fn command_names(&self) -> impl Iterator<Item = &'static str> {
-        self.sub
+        self.sub_groups
             .iter()
             .flat_map(|c| c.options.names.iter().cloned())
     }
