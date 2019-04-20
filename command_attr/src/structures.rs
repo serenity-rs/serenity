@@ -242,7 +242,7 @@ pub struct Options {
     pub only_in: OnlyIn,
     pub owners_only: bool,
     pub owner_privilege: bool,
-    pub sub: Vec<Ident>,
+    pub sub_groups: Vec<Ident>,
 }
 
 impl Default for Options {
@@ -263,7 +263,7 @@ impl Default for Options {
             only_in: OnlyIn::default(),
             owners_only: false,
             owner_privilege: true,
-            sub: Vec::new(),
+            sub_groups: Vec::new(),
         }
     }
 }
@@ -667,7 +667,7 @@ pub struct Group {
     pub name: Ident,
     pub options: RefOrInstance<GroupOptions>,
     pub commands: Punctuated<Ident, Token![,]>,
-    pub sub: Vec<RefOrInstance<Group>>,
+    pub sub_groups: Vec<RefOrInstance<Group>>,
 }
 
 impl Parse for Group {
@@ -718,13 +718,13 @@ impl Parse for Group {
             input.parse::<Token![,]>()?;
         }
 
-        let mut sub = Vec::new();
+        let mut sub_groups = Vec::new();
 
         if let Ok(s) = input.parse::<Ident>() {
-            if s != "sub" {
+            if s != "sub_groups" {
                 return Err(Error::new(
                     s.span(),
-                    "a group may optionally have a `sub`-groub",
+                    "a group may optionally have a `sub_groups`",
                 ));
             }
 
@@ -735,7 +735,7 @@ impl Parse for Group {
 
             let refs: Punctuated<_, Token![,]> = content.parse_terminated(RefOrInstance::parse)?;
 
-            sub.extend(refs.into_iter());
+            sub_groups.extend(refs.into_iter());
         }
 
         if input.peek(Token![,]) {
@@ -746,7 +746,7 @@ impl Parse for Group {
             name,
             options: options.unwrap_or_default(),
             commands: content.parse_terminated(Ident::parse_any)?,
-            sub,
+            sub_groups,
         })
     }
 }
@@ -757,7 +757,7 @@ impl ToTokens for Group {
             name,
             options: opts,
             commands,
-            sub,
+            sub_groups,
         } = self;
 
         let commands = commands.into_iter().map(|cmd| {
@@ -767,7 +767,7 @@ impl ToTokens for Group {
             }
         });
 
-        let sub = sub
+        let sub_groups = sub_groups
             .into_iter()
             .map(|group| match group {
                 RefOrInstance::Instance(group) => {
@@ -804,7 +804,7 @@ impl ToTokens for Group {
                 name: #n,
                 options: &#group_ops,
                 commands: &[#(#commands),*],
-                sub: &[#(&#sub),*]
+                sub_groups: &[#(&#sub_groups),*]
             };
         });
     }

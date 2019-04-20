@@ -458,7 +458,7 @@ fn nested_group_command_search<'a>(
 
         match nested_group_command_search(
             &cache,
-            &group.sub,
+            &group.sub_groups,
             name,
             &help_options,
             &msg,
@@ -571,7 +571,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
         &help_options, &group, &msg,
         &mut group_with_cmds);
 
-    for sub_group in group.sub {
+    for sub_group in group.sub_groups {
         let grouped_cmd = fetch_all_eligible_commands_in_group(
             &context, &sub_group.commands, &owners,
             &help_options, &sub_group, &msg
