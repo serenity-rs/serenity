@@ -30,6 +30,8 @@ pub enum Error {
     /// When all shards that the client is responsible for have shutdown with an
     /// error.
     Shutdown,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl Display for Error {
@@ -42,6 +44,7 @@ impl StdError for Error {
             Error::InvalidToken => "The provided token was invalid",
             Error::ShardBootFailure => "Failed to (re-)boot a shard",
             Error::Shutdown => "The clients shards shutdown",
+            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

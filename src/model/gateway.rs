@@ -328,6 +328,8 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 enum_number!(
@@ -346,6 +348,7 @@ impl ActivityType {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
+            __Nonexhaustive => unreachable!(),
         }
     }
 }

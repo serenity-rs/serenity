@@ -217,6 +217,8 @@ pub enum ReactionType {
     },
     /// A reaction with a twemoji.
     Unicode(String),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
@@ -310,6 +312,7 @@ impl Serialize for ReactionType {
 
                 map.end()
             },
+            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -330,6 +333,7 @@ impl ReactionType {
                 ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
+            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -418,7 +422,6 @@ impl<'a> From<&'a str> for ReactionType {
 }
 
 // TODO: Change this to `!` once it becomes stable.
-
 #[derive(Debug)]
 pub enum NeverFails {}
 
@@ -469,6 +472,7 @@ impl Display for ReactionType {
                 f.write_char('>')
             },
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),
+            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }

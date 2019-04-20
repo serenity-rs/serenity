@@ -21,6 +21,8 @@ pub enum OnlyIn {
     Dm,
     Guild,
     None,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 #[derive(Debug, PartialEq)]
@@ -149,6 +151,8 @@ pub enum HelpBehaviour {
     Hide,
     /// The command will be displayed, hence nothing will be done.
     Nothing,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 

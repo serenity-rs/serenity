@@ -89,6 +89,8 @@ pub enum RustlsError {
     HandshakeError,
     /// Standard IO error happening while creating the tcp stream
     Io(IoError),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 #[cfg(not(feature = "native_tls"))]
@@ -112,6 +114,7 @@ impl StdError for RustlsError {
             WebPKI => "Failed to validate X.509 certificate",
             HandshakeError => "TLS handshake failed when making the websocket connection",
             Io(ref inner) => inner.description(),
+            __Nonexhaustive => unreachable!(),
         }
     }
 }

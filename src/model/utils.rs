@@ -87,6 +87,7 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
             Channel::Private(ref channel) => channel.read().id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
+            Channel::__Nonexhaustive => unreachable!(),
         };
 
         private_channels.insert(id, private_channel);
@@ -231,6 +232,7 @@ pub fn user_has_perms(cache: impl AsRef<CacheRwLock>, channel_id: ChannelId, mut
             // just assume that all permissions are granted and return `true`.
             return Ok(true);
         },
+        Channel::__Nonexhaustive => unreachable!(),
     };
 
     let guild = match cache.guild(guild_id) {
@@ -281,26 +283,26 @@ macro_rules! num_visitors {
                     struct Id {
                         num: $type,
                     }
-                    
+
                     struct StrVisitor;
-                    
+
                     impl<'de> Visitor<'de> for StrVisitor {
                         type Value = $type;
-                        
+
                         fn expecting(&self, formatter: &mut Formatter<'_>) -> FmtResult {
                             formatter.write_str("string")
                         }
-                        
+
                         fn visit_str<E: DeError>(self, s: &str) -> StdResult<Self::Value, E> { s.parse().map_err(E::custom) }
                         fn visit_string<E: DeError>(self, s: String) -> StdResult<Self::Value, E> { s.parse().map_err(E::custom) }
                     }
-                    
+
                     impl<'de> Deserialize<'de> for Id {
                         fn deserialize<D: Deserializer<'de>>(des: D) -> StdResult<Self, D::Error> {
                             Ok(Id { num: des.deserialize_str(StrVisitor)? })
                         }
                     }
-                    
+
                     map.next_value::<Id>().map(|id| id.num)
                 }
             }

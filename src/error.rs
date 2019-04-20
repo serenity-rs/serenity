@@ -108,6 +108,8 @@ pub enum Error {
     /// [voice module]: voice/index.html
     #[cfg(feature = "voice")]
     Voice(VoiceError),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl From<FormatError> for Error {
@@ -201,6 +203,7 @@ impl StdError for Error {
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Voice(_) => "Voice error",
+            Error::__Nonexhaustive => unreachable!(),
         }
     }
 

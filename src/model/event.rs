@@ -118,6 +118,7 @@ impl CacheUpdate for ChannelCreateEvent {
                 .categories
                 .insert(category.read().id, Arc::clone(category))
                 .map(Channel::Category),
+            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -149,7 +150,8 @@ impl CacheUpdate for ChannelDeleteEvent {
                 cache.categories.remove(&channel_id);
             },
             // We ignore these because the delete event does not fire for these.
-            Channel::Private(_) | Channel::Group(_) => unreachable!(),
+            Channel::Private(_) | Channel::Group(_)
+            | Channel::__Nonexhaustive => unreachable!(),
         };
 
         // Remove the cached messages for the channel.
@@ -311,6 +313,7 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .get_mut(&category.read().id)
                     { c.clone_from(category) }
             },
+            Channel::__Nonexhaustive => unreachable!(),
         }
 
         None
@@ -1096,6 +1099,7 @@ impl CacheUpdate for ReadyEvent {
                     cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild)));
                 },
                 GuildStatus::OnlinePartialGuild(_) => {},
+                GuildStatus::__Nonexhaustive => unreachable!(),
             }
         }
 
@@ -1254,6 +1258,8 @@ pub enum GatewayEvent {
     InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for GatewayEvent {
@@ -1437,6 +1443,8 @@ pub enum Event {
     WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// Deserializes a `serde_json::Value` into an `Event`.
@@ -1561,6 +1569,7 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             kind: kind.to_owned(),
             value: v,
         }),
+        EventType::__Nonexhaustive => unreachable!(),
     })
 }
 
@@ -1802,6 +1811,8 @@ pub enum EventType {
     /// This should be logged so that support for it can be added in the
     /// library.
     Other(String),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for EventType {
@@ -1959,6 +1970,8 @@ pub enum VoiceEvent {
     ClientDisconnect(VoiceClientDisconnect),
     /// An unknown voice event not registered.
     Unknown(VoiceOpCode, Value),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for VoiceEvent {

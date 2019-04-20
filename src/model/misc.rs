@@ -32,6 +32,7 @@ impl Mentionable for Channel {
             Channel::Private(ref x) => x.with(Mentionable::mention),
             Channel::Group(ref x) => x.with(Mentionable::mention),
             Channel::Category(ref x) => x.with(Mentionable::mention),
+            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -93,6 +94,8 @@ impl Mentionable for GuildChannel {
 pub enum UserParseError {
     InvalidUsername,
     Rest(Box<Error>),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -108,6 +111,7 @@ impl StdError for UserParseError {
         match *self {
             InvalidUsername => "invalid username",
             Rest(_) => "could not fetch",
+            __Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -267,6 +271,8 @@ pub enum IncidentStatus {
     Monitoring,
     Postmortem,
     Resolved,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// A Discord status maintenance message. This can be either for active

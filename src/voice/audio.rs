@@ -44,6 +44,8 @@ pub trait AudioReceiver: Send {
 pub enum AudioType {
     Opus,
     Pcm,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// Control object for audio playback.

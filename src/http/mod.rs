@@ -82,6 +82,8 @@ pub enum AttachmentType<'a> {
     File((&'a File, &'a str)),
     /// Indicates that the `AttachmentType` is a `Path`
     Path(&'a Path),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
@@ -115,6 +117,8 @@ pub enum GuildPagination {
     After(GuildId),
     /// The Id to get the guilds before.
     Before(GuildId),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 #[cfg(test)]

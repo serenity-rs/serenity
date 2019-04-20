@@ -360,6 +360,8 @@ pub enum DefaultAvatar {
     /// The avatar when the result is `4`.
     #[serde(rename = "1cbd08c76f8af6dddce02c5138971129")]
     Red,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl DefaultAvatar {
@@ -383,6 +385,8 @@ pub enum OnlineStatus {
     #[serde(rename = "invisible")] Invisible,
     #[serde(rename = "offline")] Offline,
     #[serde(rename = "online")] Online,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl OnlineStatus {
@@ -393,6 +397,7 @@ impl OnlineStatus {
             OnlineStatus::Invisible => "invisible",
             OnlineStatus::Offline => "offline",
             OnlineStatus::Online => "online",
+            OnlineStatus::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -682,6 +687,7 @@ impl User {
                     }
                 }}
             },
+            GuildContainer::__Nonexhaustive => unreachable!(),
         }
     }
 

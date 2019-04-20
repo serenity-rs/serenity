@@ -852,6 +852,8 @@ pub enum ContentModifier {
     Code,
     Underline,
     Spoiler,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// Describes formatting on string content
@@ -937,7 +939,8 @@ impl Content {
             },
             ContentModifier::Spoiler => {
                 self.spoiler = true;
-            }
+            },
+            ContentModifier::__Nonexhaustive => unreachable!(),
         }
     }
 

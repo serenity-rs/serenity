@@ -8,6 +8,8 @@ pub enum Prefix<'a> {
     Punct(&'a str),
     Mention(&'a str),
     None,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 pub fn parse_prefix<'a>(

@@ -50,6 +50,8 @@ pub enum Error {
     OverloadedShard,
     /// Failed to reconnect after a number of attempts.
     ReconnectFailure,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl Display for Error {
@@ -73,6 +75,7 @@ impl StdError for Error {
             NoSessionId => "No Session Id present when required",
             OverloadedShard => "Shard has too many guilds",
             ReconnectFailure => "Failed to Reconnect",
+            __Nonexhaustive => unreachable!(),
         }
     }
 }

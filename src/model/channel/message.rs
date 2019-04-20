@@ -649,6 +649,8 @@ pub enum MessageType {
     PinsAdd = 6,
     /// An indicator that a member joined the guild.
     MemberJoin = 7,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 enum_number!(
@@ -677,6 +679,7 @@ impl MessageType {
             GroupIconUpdate => 5,
             PinsAdd => 6,
             MemberJoin => 7,
+            __Nonexhaustive => unreachable!(),
         }
     }
 }
