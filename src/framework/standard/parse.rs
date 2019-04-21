@@ -185,20 +185,24 @@ pub(crate) fn parse_command<'a>(
     prefix: Prefix<'a>,
     groups: &[&'static CommandGroup],
     config: &Configuration,
-    help_was_set: bool,
+    help_was_set: Option<&[&'static str]>,
 ) -> Result<Invoke<'a>, Option<&'a str>> {
     let mut stream = StringStream::new(msg);
     stream.take_while(|s| s.is_whitespace());
 
     let mut unrecognised = None;
 
-    // We take precedence over commands named `help`.
-    if help_was_set && stream.eat("help") {
-        stream.take_while(|s| s.is_whitespace());
+    // We take precedence over commands named help command's name.
+    if let Some(names) = help_was_set {
+        for name in names {
+            if stream.eat(name) {
+                stream.take_while(|s| s.is_whitespace());
 
-        let args = stream.rest();
+                let args = stream.rest();
 
-        return Ok(Invoke::Help { prefix, args });
+                return Ok(Invoke::Help { prefix, name, args });
+            }
+        }
     }
 
     for group in groups {
@@ -332,6 +336,7 @@ pub enum Invoke<'a> {
     },
     Help {
         prefix: Prefix<'a>,
+        name: &'static str,
         args: &'a str,
     },
 }

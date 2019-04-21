@@ -14,7 +14,8 @@ use syn::{
     parse_quote,
     parse_macro_input,
     spanned::Spanned,
-    Ident, Lit,
+    punctuated::Punctuated,
+    Token, Ident, Lit,
 };
 
 pub(crate) mod attributes;
@@ -410,8 +411,24 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// [`command`]: fn.command.html
 #[proc_macro_attribute]
-pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
+pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut fun = parse_macro_input!(input as CommandFun);
+
+    let names = if !attr.is_empty() {
+        struct Names(Vec<String>);
+
+        impl Parse for Names {
+            fn parse(input: ParseStream) -> Result<Self> {
+                let n: Punctuated<Lit, Token![,]> = input.parse_terminated(Lit::parse)?;
+                Ok(Names(n.into_iter().map(|l| l.to_str()).collect()))
+            }
+        }
+        let Names(names) = parse_macro_input!(attr as Names);
+
+        names
+    } else {
+        vec!["help".to_string()]
+    };
 
     let mut options = HelpOptions::default();
 
@@ -629,6 +646,7 @@ pub fn help(_attr: TokenStream, input: TokenStream) -> TokenStream {
     (quote! {
         #(#cfgs)*
         pub static #options: #options_path = #options_path {
+            names: &[#(#names),*],
             suggestion_text: #suggestion_text,
             no_help_available_text: #no_help_available_text,
             usage_label: #usage_label,

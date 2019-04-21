@@ -621,7 +621,7 @@ impl Framework for StandardFramework {
             prefix,
             &self.groups,
             &self.config,
-            self.help.is_some(),
+            self.help.as_ref().map(|h| h.options.names),
         ) {
             Ok(i) => i,
             Err(Some(unreg)) => {
@@ -662,6 +662,7 @@ impl Framework for StandardFramework {
         match invoke {
             Invoke::Help {
                 prefix: _prefix,
+                name,
                 args,
             } => {
                 let args = Args::new(args, &self.config.delimiters);
@@ -670,7 +671,6 @@ impl Framework for StandardFramework {
                 let after = self.after.clone();
                 let groups = self.groups.clone();
                 let msg = msg.clone();
-                let name = "help";
 
                 let owners = self.config.owners.clone();
 

@@ -154,6 +154,9 @@ pub enum HelpBehaviour {
 
 #[derive(Debug, PartialEq)]
 pub struct HelpOptions {
+    /// Which names should the help command use for dispatching.
+    /// Defaults to `["help"]`
+    pub names: &'static [&'static str],
     /// Suggests a command's name.
     pub suggestion_text: &'static str,
     /// If no help is available, this text will be displayed.
