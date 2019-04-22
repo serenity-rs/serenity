@@ -252,7 +252,6 @@ fn main() {
         .group(&EMOJI_GROUP)
         .group(&MATH_GROUP)
         .group(&OWNER_GROUP)
-        .group(&MAGIC_GROUP)
     );
 
     if let Err(why) = client.start() {
