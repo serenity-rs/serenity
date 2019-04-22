@@ -27,7 +27,7 @@ pub enum OnlyIn {
 pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
-    pub checks: &'static [Check],
+    pub checks: &'static [&'static Check],
     /// Ratelimit bucket.
     pub bucket: Option<&'static str>,
     /// Names that the command can be referred to.
@@ -67,7 +67,7 @@ pub struct GroupOptions {
     pub help_available: bool,
     pub allowed_roles: &'static [&'static str],
     pub required_permissions: Permissions,
-    pub checks: &'static [Check],
+    pub checks: &'static [&'static Check],
     pub default_command: Option<&'static Command>,
     pub description: Option<&'static str>,
 }

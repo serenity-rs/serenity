@@ -1,6 +1,6 @@
 pub mod help_commands;
 pub mod macros {
-    pub use command_attr::{command, group, group_options, help};
+    pub use command_attr::{command, group, group_options, help, check};
 }
 
 mod args;
