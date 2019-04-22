@@ -25,6 +25,8 @@ pub enum Reason {
     Log(String),
     /// Information for the user but also for logging purposes.
     UserAndLog { user: String, log: String },
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// Returned from [`Check`]s.

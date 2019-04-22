@@ -28,6 +28,8 @@ pub enum VoiceError {
     ///
     /// The JSON output is given.
     YouTubeDLUrl(Value),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// An error returned from the dca method.
@@ -37,4 +39,6 @@ pub enum DcaError {
     InvalidHeader,
     InvalidMetadata(JsonError),
     InvalidSize(i32),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }

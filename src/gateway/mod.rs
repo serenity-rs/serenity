@@ -114,6 +114,8 @@ pub enum ConnectionStage {
     ///
     /// [`Shard`]: struct.Shard.html
     Resuming,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ConnectionStage {
@@ -156,6 +158,7 @@ impl ConnectionStage {
         match self {
             Connecting | Handshake | Identifying | Resuming => true,
             Connected | Disconnected => false,
+            __Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -171,6 +174,7 @@ impl Display for ConnectionStage {
             Handshake => "handshaking",
             Identifying => "identifying",
             Resuming => "resuming",
+            __Nonexhaustive => unreachable!(),
         })
     }
 }
@@ -185,12 +189,16 @@ pub enum InterMessage {
     #[cfg(feature = "client")]
     Client(Box<ShardClientMessage>),
     Json(Value),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 pub enum ShardAction {
     Heartbeat,
     Identify,
     Reconnect(ReconnectType),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// The type of reconnection that should be performed.
@@ -199,4 +207,6 @@ pub enum ReconnectType {
     Reidentify,
     /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }

@@ -1781,6 +1781,8 @@ pub enum GuildContainer {
     Guild(PartialGuild),
     /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// Information relating to a guild's widget embed.
@@ -1871,6 +1873,8 @@ pub enum GuildStatus {
     OnlinePartialGuild(PartialGuild),
     OnlineGuild(Guild),
     Offline(GuildUnavailable),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 #[cfg(feature = "model")]
@@ -1883,6 +1887,7 @@ impl GuildStatus {
             GuildStatus::Offline(offline) => offline.id,
             GuildStatus::OnlineGuild(ref guild) => guild.id,
             GuildStatus::OnlinePartialGuild(ref partial_guild) => partial_guild.id,
+            GuildStatus::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -1894,6 +1899,8 @@ pub enum DefaultMessageNotificationLevel {
     All = 0,
     /// Receive only mentions.
     Mentions = 1,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 enum_number!(
@@ -1908,6 +1915,7 @@ impl DefaultMessageNotificationLevel {
         match self {
             DefaultMessageNotificationLevel::All => 0,
             DefaultMessageNotificationLevel::Mentions => 1,
+            DefaultMessageNotificationLevel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -1921,6 +1929,8 @@ pub enum ExplicitContentFilter {
     WithoutRole = 1,
     /// Scan messages sent by all members.
     All = 2,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 enum_number!(
@@ -1937,6 +1947,7 @@ impl ExplicitContentFilter {
             ExplicitContentFilter::None => 0,
             ExplicitContentFilter::WithoutRole => 1,
             ExplicitContentFilter::All => 2,
+            ExplicitContentFilter::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -1948,6 +1959,8 @@ pub enum MfaLevel {
     None = 0,
     /// MFA is enabled.
     Elevated = 1,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 enum_number!(
@@ -1962,6 +1975,7 @@ impl MfaLevel {
         match self {
             MfaLevel::None => 0,
             MfaLevel::Elevated => 1,
+            MfaLevel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -1987,6 +2001,8 @@ pub enum Region {
     #[serde(rename = "vip-amsterdam")] VipAmsterdam,
     #[serde(rename = "vip-us-east")] VipUsEast,
     #[serde(rename = "vip-us-west")] VipUsWest,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl Region {
@@ -2010,6 +2026,7 @@ impl Region {
             Region::VipAmsterdam => "vip-amsterdam",
             Region::VipUsEast => "vip-us-east",
             Region::VipUsWest => "vip-us-west",
+            Region::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -2030,6 +2047,8 @@ pub enum VerificationLevel {
     High = 3,
     /// Must have a verified phone on the user's Discord account.
     Higher = 4,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 enum_number!(
@@ -2050,6 +2069,7 @@ impl VerificationLevel {
             VerificationLevel::Medium => 2,
             VerificationLevel::High => 3,
             VerificationLevel::Higher => 4,
+            VerificationLevel::__Nonexhaustive => unreachable!(),
         }
     }
 }

@@ -99,6 +99,8 @@ fn context(
 pub(crate) enum DispatchEvent {
     Client(ClientEvent),
     Model(Event),
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 #[cfg(feature = "framework")]
@@ -259,6 +261,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                         event_handler.category_create(context, channel);
                     });
                 },
+                Channel::__Nonexhaustive => unreachable!(),
             }
         },
         DispatchEvent::Model(Event::ChannelDelete(mut event)) => {
@@ -280,6 +283,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                         event_handler.category_delete(context, channel);
                     });
                 },
+                Channel::__Nonexhaustive => unreachable!(),
             }
         },
         DispatchEvent::Model(Event::ChannelPinsUpdate(event)) => {
@@ -648,5 +652,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 event_handler.webhook_update(context, event.guild_id, event.channel_id);
             });
         },
+        DispatchEvent::Model(Event::__Nonexhaustive) => unreachable!(),
+        DispatchEvent::__Nonexhaustive => unreachable!(),
     }
 }

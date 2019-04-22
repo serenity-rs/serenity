@@ -25,6 +25,8 @@ pub enum Target {
     Invite = 50,
     Webhook = 60,
     Emoji = 70,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 /// Determines the action that was done on a target.
@@ -39,6 +41,8 @@ pub enum Action {
     Webhook(ActionWebhook),
     Emoji(ActionEmoji),
     MessageDelete,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl Action {
@@ -55,6 +59,7 @@ impl Action {
             Action::Webhook(ref x) => x.num(),
             Action::Emoji(ref x) => x.num(),
             Action::MessageDelete => 72,
+            Action::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -65,6 +70,8 @@ pub enum ActionChannel {
     Create = 10,
     Update = 11,
     Delete = 12,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionChannel {
@@ -73,6 +80,7 @@ impl ActionChannel {
             ActionChannel::Create => 10,
             ActionChannel::Update => 11,
             ActionChannel::Delete => 12,
+            ActionChannel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -83,6 +91,8 @@ pub enum ActionChannelOverwrite {
     Create = 13,
     Update = 14,
     Delete = 15,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionChannelOverwrite {
@@ -91,6 +101,7 @@ impl ActionChannelOverwrite {
             ActionChannelOverwrite::Create => 13,
             ActionChannelOverwrite::Update => 14,
             ActionChannelOverwrite::Delete => 15,
+            ActionChannelOverwrite::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -104,6 +115,8 @@ pub enum ActionMember {
     BanRemove = 23,
     Update = 24,
     RoleUpdate = 25,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionMember {
@@ -115,6 +128,7 @@ impl ActionMember {
             ActionMember::BanRemove => 23,
             ActionMember::Update => 24,
             ActionMember::RoleUpdate => 25,
+            ActionMember::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -125,6 +139,8 @@ pub enum ActionRole {
     Create = 30,
     Update = 31,
     Delete = 32,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionRole {
@@ -133,6 +149,7 @@ impl ActionRole {
             ActionRole::Create => 30,
             ActionRole::Update => 31,
             ActionRole::Delete => 32,
+            ActionRole::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -143,6 +160,8 @@ pub enum ActionInvite {
     Create = 40,
     Update = 41,
     Delete = 42,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionInvite {
@@ -151,6 +170,7 @@ impl ActionInvite {
             ActionInvite::Create => 40,
             ActionInvite::Update => 41,
             ActionInvite::Delete => 42,
+            ActionInvite::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -161,6 +181,8 @@ pub enum ActionWebhook {
     Create = 50,
     Update = 51,
     Delete = 52,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionWebhook {
@@ -169,6 +191,7 @@ impl ActionWebhook {
             ActionWebhook::Create => 50,
             ActionWebhook::Update => 51,
             ActionWebhook::Delete => 52,
+            ActionWebhook::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -179,6 +202,8 @@ pub enum ActionEmoji {
     Create = 60,
     Delete = 61,
     Update = 62,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl ActionEmoji {
@@ -187,6 +212,7 @@ impl ActionEmoji {
             ActionEmoji::Create => 60,
             ActionEmoji::Update => 61,
             ActionEmoji::Delete => 62,
+            ActionEmoji::__Nonexhaustive => unreachable!(),
         }
     }
 }
