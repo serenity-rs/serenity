@@ -123,7 +123,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
         (Some(ref h), None) => {
             match event {
                 DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                    update!(&cache_and_http, &mut event);
+                    update(&cache_and_http, &mut event);
 
                     #[cfg(not(any(feature = "cache", feature = "http")))]
                     let context = context(data, runner_tx, shard_id);
@@ -177,7 +177,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                 _ => {}
             }
         },
-        (Some(ref h), Some(ref rh)) => {
+        (Some(_), Some(_)) => {
             match event {
                 DispatchEvent::Model(ref e) => 
                     dispatch(DispatchEvent::Model(e.clone()),
@@ -221,7 +221,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
         (Some(ref h), None) => {
             match event {
                 DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                    update!(&cache_and_http, &mut event);
+                    update(&cache_and_http, &mut event);
 
                     #[cfg(not(any(feature = "cache", feature = "http")))]
                     let context = context(data, runner_tx, shard_id);
