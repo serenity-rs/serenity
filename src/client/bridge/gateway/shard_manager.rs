@@ -11,7 +11,7 @@ use std::{
     },
     thread
 };
-use super::super::super::EventHandler;
+use super::super::super::{EventHandler, RawEventHandler};
 use super::{
     ShardClientMessage,
     ShardId,
@@ -56,9 +56,10 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// #
 /// use parking_lot::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
-/// use serenity::client::EventHandler;
+/// use serenity::client::{EventHandler, RawEventHandler};
 /// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
+/// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
 /// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
@@ -69,6 +70,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// struct Handler;
 ///
 /// impl EventHandler for Handler { }
+/// impl RawEventHandler for Handler { }
 ///
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
@@ -80,7 +82,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
-///     event_handler: &event_handler,
+///     event_handler: &Some(event_handler),
+///     raw_event_handler: &None::<Arc<Handler>>,
 ///     framework: &framework,
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
@@ -129,9 +132,11 @@ pub struct ShardManager {
 impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor
     /// for usage in a separate thread.
-    pub fn new<H>(
-        opt: ShardManagerOptions<'_, H>,
-    ) -> (Arc<Mutex<Self>>, ShardManagerMonitor) where H: EventHandler + Send + Sync + 'static {
+    pub fn new<H, RH>(
+        opt: ShardManagerOptions<'_, H, RH>,
+    ) -> (Arc<Mutex<Self>>, ShardManagerMonitor)
+        where H: EventHandler + Send + Sync + 'static,
+              RH: RawEventHandler + Send + Sync + 'static {
         let (thread_tx, thread_rx) = mpsc::channel();
         let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
 
@@ -139,7 +144,8 @@ impl ShardManager {
 
         let mut shard_queuer = ShardQueuer {
             data: Arc::clone(opt.data),
-            event_handler: Arc::clone(opt.event_handler),
+            event_handler: opt.event_handler.as_ref().map(|h| Arc::clone(h)),
+            raw_event_handler: opt.raw_event_handler.as_ref().map(|rh| Arc::clone(rh)),
             #[cfg(feature = "framework")]
             framework: Arc::clone(opt.framework),
             last_start: None,
@@ -350,9 +356,10 @@ impl Drop for ShardManager {
     }
 }
 
-pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static> {
+pub struct ShardManagerOptions<'a, H: EventHandler + Send + Sync + 'static, RH: RawEventHandler + Send + Sync + 'static> {
     pub data: &'a Arc<RwLock<ShareMap>>,
-    pub event_handler: &'a Arc<H>,
+    pub event_handler: &'a Option<Arc<H>>,
+    pub raw_event_handler: &'a Option<Arc<RH>>,
     #[cfg(feature = "framework")]
     pub framework: &'a Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     pub shard_index: u64,

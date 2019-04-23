@@ -19,7 +19,7 @@ use std::{
     },
 };
 use super::super::super::dispatch::{DispatchEvent, dispatch};
-use super::super::super::EventHandler;
+use super::super::super::{EventHandler, RawEventHandler};
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 use threadpool::ThreadPool;
@@ -38,9 +38,11 @@ use log::{error, debug, warn};
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
 /// [`Shard`]: ../../../gateway/struct.Shard.html
-pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
+pub struct ShardRunner<H: EventHandler + Send + Sync + 'static,
+                       RH: RawEventHandler + Send + Sync + 'static> {
     data: Arc<RwLock<ShareMap>>,
-    event_handler: Arc<H>,
+    event_handler: Option<Arc<H>>,
+    raw_event_handler: Option<Arc<RH>>,
     #[cfg(feature = "framework")]
     framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     manager_tx: Sender<ShardManagerMessage>,
@@ -55,9 +57,10 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static> {
     cache_and_http: Arc<CacheAndHttp>,
 }
 
-impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
+impl<H: EventHandler + Send + Sync + 'static,
+     RH: RawEventHandler + Send + Sync + 'static> ShardRunner<H, RH> {
     /// Creates a new runner for a Shard.
-    pub fn new(opt: ShardRunnerOptions<H>) -> Self {
+    pub fn new(opt: ShardRunnerOptions<H, RH>) -> Self {
         let (tx, rx) = mpsc::channel();
 
         Self {
@@ -65,6 +68,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             runner_tx: tx,
             data: opt.data,
             event_handler: opt.event_handler,
+            raw_event_handler: opt.raw_event_handler,
             #[cfg(feature = "framework")]
             framework: opt.framework,
             manager_tx: opt.manager_tx,
@@ -217,6 +221,7 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
             &self.framework,
             &self.data,
             &self.event_handler,
+            &self.raw_event_handler,
             &self.runner_tx,
             &self.threadpool,
             self.shard.shard_info()[0],
@@ -496,9 +501,11 @@ impl<H: EventHandler + Send + Sync + 'static> ShardRunner<H> {
 /// Options to be passed to [`ShardRunner::new`].
 ///
 /// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
-pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static> {
+pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static,
+                              RH: RawEventHandler + Send  + Sync + 'static> {
     pub data: Arc<RwLock<ShareMap>>,
-    pub event_handler: Arc<H>,
+    pub event_handler: Option<Arc<H>>,
+    pub raw_event_handler: Option<Arc<RH>>,
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     pub manager_tx: Sender<ShardManagerMessage>,
