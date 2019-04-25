@@ -27,7 +27,7 @@
 use super::{
     Args, CommandGroup, CommandOptions,
     CommandResult, has_correct_roles, HelpBehaviour, HelpOptions,
-    has_correct_permissions, macros::help, OnlyIn,
+    has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
 #[cfg(all(feature = "cache", feature = "http"))]
@@ -982,12 +982,11 @@ fn send_error_embed(
 ///     .help(&WITH_EMBEDS_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
-#[help]
 pub fn with_embeds(
     context: &mut Context,
     msg: &Message,
     args: Args,
-    help_options: &'static HelpOptions,
+    help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId, impl BuildHasher>,
 ) -> CommandResult {
@@ -1135,12 +1134,11 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     .help(&PLAIN_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
-#[help]
 pub fn plain(
     context: &mut Context,
     msg: &Message,
     args: Args,
-    help_options: &'static HelpOptions,
+    help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId, impl BuildHasher>,
 ) -> CommandResult {
