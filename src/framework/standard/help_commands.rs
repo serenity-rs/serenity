@@ -976,10 +976,26 @@ fn send_error_embed(
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler).unwrap();
 /// #
-/// use serenity::framework::standard::{StandardFramework, help_commands::*};
+/// use std::{collections::HashSet, hash::BuildHasher};
+/// use serenity::{framework::standard::{Args, CommandGroup, CommandResult,
+///     StandardFramework, macros::help, HelpOptions,
+///     help_commands::*}, model::prelude::*,
+/// };
+///
+/// #[help]
+/// fn my_help(
+///     context: &mut Context,
+///     msg: &Message,
+///     args: Args,
+///     help_options: &'static HelpOptions,
+///     groups: &[&'static CommandGroup],
+///     owners: HashSet<UserId, impl BuildHasher>
+/// ) -> CommandResult {
+///     with_embeds(context, msg, args, &help_options, groups, owners)
+/// }
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(&WITH_EMBEDS_HELP_COMMAND));
+///     .help(&MY_HELP_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 pub fn with_embeds(
@@ -1128,10 +1144,26 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler).unwrap();
 /// #
-/// use serenity::framework::standard::{StandardFramework, help_commands::*};
+/// use std::{collections::HashSet, hash::BuildHasher};
+/// use serenity::{framework::standard::{Args, CommandGroup, CommandResult,
+///     StandardFramework, macros::help, HelpOptions,
+///     help_commands::*}, model::prelude::*,
+/// };
+///
+/// #[help]
+/// fn my_help(
+///     context: &mut Context,
+///     msg: &Message,
+///     args: Args,
+///     help_options: &'static HelpOptions,
+///     groups: &[&'static CommandGroup],
+///     owners: HashSet<UserId, impl BuildHasher>
+/// ) -> CommandResult {
+///     plain(context, msg, args, &help_options, groups, owners)
+/// }
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(&PLAIN_HELP_COMMAND));
+///     .help(&MY_HELP_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 pub fn plain(
