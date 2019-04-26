@@ -11,11 +11,10 @@ use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
-    parse_quote,
-    parse_macro_input,
-    spanned::Spanned,
+    parse_macro_input, parse_quote,
     punctuated::Punctuated,
-    Token, Ident, Lit,
+    spanned::Spanned,
+    Ident, Lit, Token,
 };
 
 pub(crate) mod attributes;
@@ -176,7 +175,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 checks.parse("checks", values);
 
                 options.checks = Checks(checks);
-            },
+            }
             "bucket" => {
                 let mut buck = String::new();
                 buck.parse("bucket", values);
@@ -188,19 +187,19 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 desc.parse("description", values);
 
                 options.description = Some(desc);
-            },
+            }
             "usage" => {
                 let mut usage = String::new();
                 usage.parse("usage", values);
 
                 options.usage = Some(usage);
-            },
+            }
             "example" => {
                 let mut ex = String::new();
                 ex.parse("example", values);
 
                 options.example = Some(ex);
-            },
+            }
             _ => {
                 match_options!(name, values, options, span => [
                     min_args;
@@ -459,6 +458,34 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                     }
                 };
             }
+            "embed_error_colour" => {
+                let mut val = String::with_capacity(14);
+
+                val.parse("embed_error_colour", values);
+
+                options.embed_error_colour = match Colour::from_str(&val) {
+                    Some(c) => c,
+                    None => {
+                        return Error::new(span, &format!("invalid colour: {:?}", val))
+                            .to_compile_error()
+                            .into();
+                    }
+                };
+            }
+            "embed_success_colour" => {
+                let mut val = String::with_capacity(14);
+
+                val.parse("embed_success_colour", values);
+
+                options.embed_error_colour = match Colour::from_str(&val) {
+                    Some(c) => c,
+                    None => {
+                        return Error::new(span, &format!("invalid colour: {:?}", val))
+                            .to_compile_error()
+                            .into();
+                    }
+                };
+            }
             "lacking_permissions" => {
                 let mut behaviour = String::with_capacity(7);
                 behaviour.parse("lacking_permissions", values);
@@ -527,8 +554,6 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                     group_prefix;
                     strikethrough_commands_tip_in_dm;
                     strikethrough_commands_tip_in_guild;
-                    embed_error_colour;
-                    embed_success_colour;
                     max_levenshtein_distance;
                     indention_prefix
                 ]);
@@ -622,6 +647,9 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
     let strikethrough_commands_tip_in_guild = AsOption(strikethrough_commands_tip_in_guild);
+
+    let Colour(embed_error_colour) = embed_error_colour;
+    let Colour(embed_success_colour) = embed_success_colour;
 
     if let Err(err) = validate_declaration(&mut fun, DeclarFor::Help) {
         return err.to_compile_error().into();
@@ -868,7 +896,11 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let n = fun.name.clone();
     let n2 = name.clone();
-    let name = if name.is_empty() { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
+    let name = if name.is_empty() {
+        fun.name.clone()
+    } else {
+        Ident::new(&name, Span::call_site())
+    };
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);

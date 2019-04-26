@@ -180,7 +180,7 @@ pub struct Permissions(pub u64);
 
 impl Permissions {
     pub fn from_str(s: &str) -> Option<Self> {
-        Some(Permissions(match s {
+        Some(Permissions(match s.to_uppercase().as_str() {
             "PRESET_GENERAL" => 0b0000_0110_0011_0111_1101_1100_0100_0001,
             "PRESET_TEXT" => 0b0000_0000_0000_0111_1111_1100_0100_0000,
             "PRESET_VOICE" => 0b0000_0011_1111_0000_0000_0000_0000_0000,
@@ -213,6 +213,45 @@ impl Permissions {
             "MANAGE_ROLES" => 0b0001_0000_0000_0000_0000_0000_0000_0000,
             "MANAGE_WEBHOOKS" => 0b0010_0000_0000_0000_0000_0000_0000_0000,
             "MANAGE_EMOJIS" => 0b0100_0000_0000_0000_0000_0000_0000_0000,
+            _ => return None,
+        }))
+    }
+}
+
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+pub struct Colour(pub u32);
+
+impl Colour {
+    pub fn from_str(s: &str) -> Option<Self> {
+        Some(Colour(match s.to_uppercase().as_str() {
+            "BLITZ_BLUE" => 0x6FC6E2,
+            "BLUE" => 0x3498DB,
+            "BLURPLE" => 0x7289DA,
+            "DARK_BLUE" => 0x206694,
+            "DARK_GOLD" => 0xC27C0E,
+            "DARK_GREEN" => 0x1F8B4C,
+            "DARK_GREY" => 0x607D8B,
+            "DARK_MAGENTA" => 0xAD14757,
+            "DARK_ORANGE" => 0xA84300,
+            "DARK_PURPLE" => 0x71368A,
+            "DARK_RED" => 0x992D22,
+            "DARK_TEAL" => 0x11806A,
+            "DARKER_GREY" => 0x546E7A,
+            "FABLED_PINK" => 0xFAB81ED,
+            "FADED_PURPLE" => 0x8882C4,
+            "FOOYOO" => 0x11CA80,
+            "GOLD" => 0xF1C40F,
+            "KERBAL" => 0xBADA55,
+            "LIGHT_GREY" => 0x979C9F,
+            "LIGHTER_GREY" => 0x95A5A6,
+            "MAGENTA" => 0xE91E63,
+            "MEIBE_PINK" => 0xE68397,
+            "ORANGE" => 0xE67E22,
+            "PURPLE" => 0x9B59B6,
+            "RED" => 0xE74C3C,
+            "ROHRKATZE_BLUE" => 0x7596FF,
+            "ROSEWATER" => 0xF6DBD8,
+            "TEAL" => 0x1ABC9C,
             _ => return None,
         }))
     }
@@ -327,8 +366,8 @@ pub struct HelpOptions {
     pub lacking_permissions: HelpBehaviour,
     pub lacking_ownership: HelpBehaviour,
     pub wrong_channel: HelpBehaviour,
-    pub embed_error_colour: u32,
-    pub embed_success_colour: u32,
+    pub embed_error_colour: Colour,
+    pub embed_success_colour: Colour,
     pub max_levenshtein_distance: usize,
     pub indention_prefix: String,
 }
@@ -360,8 +399,8 @@ impl Default for HelpOptions {
             lacking_permissions: HelpBehaviour::Strike,
             lacking_ownership: HelpBehaviour::Hide,
             wrong_channel: HelpBehaviour::Strike,
-            embed_error_colour: 0x992D22,   // DARK_RED
-            embed_success_colour: 0xF6DBD8, // ROSEWATER
+            embed_error_colour: Colour::from_str("DARK_RED").unwrap(),
+            embed_success_colour: Colour::from_str("ROSEWATER").unwrap(),
             max_levenshtein_distance: 0,
             indention_prefix: "-".to_string(),
         }
