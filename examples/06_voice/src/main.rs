@@ -22,7 +22,6 @@ use serenity::client::bridge::voice::ClientVoiceManager;
 use serenity::{client::Context, prelude::Mutex};
 
 use serenity::{
-    command,
     client::{Client, EventHandler},
     framework::{
         StandardFramework,
@@ -77,7 +76,7 @@ fn main() {
         .configure(|c| c
             .prefix("~")
             .on_mention(true))
-        .group(GENERAL_GROUP));
+        .group(&GENERAL_GROUP));
 
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
