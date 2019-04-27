@@ -143,7 +143,7 @@ impl PartialEq for HelpCommand {
 /// Lacking required permissions to execute the command.
 /// Lacking required roles to execute the command.
 /// The command can't be used in the current channel (as in `DM only` or `guild only`).
-#[derive(PartialEq, Debug)]
+#[derive(Clone, PartialEq, Debug)]
 pub enum HelpBehaviour {
     /// Strikes a command by applying `~~{command_name}~~`.
     Strike,
@@ -156,7 +156,7 @@ pub enum HelpBehaviour {
 }
 
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct HelpOptions {
     /// Which names should the help command use for dispatching.
     /// Defaults to `["help"]`
