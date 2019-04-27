@@ -282,7 +282,7 @@ impl PartialGuild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
         self.id.edit_member(&http, user_id, f)
     }
 

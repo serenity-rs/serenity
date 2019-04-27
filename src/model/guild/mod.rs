@@ -608,7 +608,7 @@ impl Guild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
         self.id.edit_member(&http, user_id, f)
     }
 
@@ -649,14 +649,14 @@ impl Guild {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// guild.edit_role(RoleId(7), |r| r.hoist(true));
+    /// guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
     /// ```
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_role<F, R>(&self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        where F: FnOnce(&mut EditRole) -> &mut EditRole, R: Into<RoleId> {
         self.id.edit_role(&http, role_id, f)
     }
 

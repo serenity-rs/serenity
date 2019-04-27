@@ -345,19 +345,21 @@ impl GuildId {
     /// Mute a member and set their roles to just one role with a predefined Id:
     ///
     /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
+    /// guild.edit_member(&context, user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
         self._edit_member(&http, user_id.into(), f)
     }
 
     #[cfg(feature = "http")]
     fn _edit_member<F>(self, http: impl AsRef<Http>, user_id: UserId, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember {
-        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
+        where F: FnOnce(&mut EditMember) -> &mut EditMember {
+        let mut edit_member = EditMember::default();
+        f(&mut edit_member);
+        let map = utils::vecmap_to_json_map(edit_member.0);
 
         http.as_ref().edit_member(self.0, user_id.0, &map)
     }
@@ -386,7 +388,7 @@ impl GuildId {
     /// ```rust,ignore
     /// use serenity::model::{GuildId, RoleId};
     ///
-    /// GuildId(7).edit_role(RoleId(8), |r| r.hoist(true));
+    /// GuildId(7).edit_role(&context, RoleId(8), |r| r.hoist(true));
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html
@@ -394,14 +396,16 @@ impl GuildId {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_role<F, R>(self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        where F: FnOnce(&mut EditRole) -> &mut EditRole, R: Into<RoleId> {
         self._edit_role(&http, role_id.into(), f)
     }
 
     #[cfg(feature = "http")]
     fn _edit_role<F>(self, http: impl AsRef<Http>, role_id: RoleId, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole {
-        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
+        where F: FnOnce(&mut EditRole) -> &mut EditRole {
+        let mut edit_role = EditRole::default();
+        f(&mut edit_role);
+        let map = utils::vecmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.0, &map)
     }
@@ -415,7 +419,7 @@ impl GuildId {
     ///
     /// ```rust,ignore
     /// use serenity::model::{GuildId, RoleId};
-    /// GuildId(7).edit_role_position(RoleId(8), 2);
+    /// GuildId(7).edit_role_position(&context, RoleId(8), 2);
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html

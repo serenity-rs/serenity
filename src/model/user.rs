@@ -108,7 +108,7 @@ impl CurrentUser {
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
     #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-        where F: FnOnce(EditProfile) -> EditProfile {
+        where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
         let mut map = VecMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
@@ -116,7 +116,9 @@ impl CurrentUser {
             map.insert("email", Value::String(email.clone()));
         }
 
-        let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
+        let mut edit_profile = EditProfile(map);
+        f(&mut edit_profile);
+        let map = utils::vecmap_to_json_map(edit_profile.0);
 
         match http.as_ref().edit_profile(&map) {
             Ok(new) => {

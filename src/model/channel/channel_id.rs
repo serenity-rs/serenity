@@ -251,7 +251,7 @@ impl ChannelId {
     /// ```rust,ignore
     /// // assuming a `channel_id` has been bound
     ///
-    /// channel_id.edit(|c| c.name("test").bitrate(64000));
+    /// channel_id.edit(&context, |c| c.name("test").bitrate(64000));
     /// ```
     ///
     /// [`Channel`]: ../channel/enum.Channel.html

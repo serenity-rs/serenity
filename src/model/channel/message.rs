@@ -170,7 +170,7 @@ impl Message {
     /// ```rust,ignore
     /// // assuming a `message` has already been bound
     ///
-    /// message.edit(|m| m.content("new content"));
+    /// message.edit(&context, |m| m.content("new content"));
     /// ```
     ///
     /// # Errors
