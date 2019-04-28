@@ -1,0 +1,563 @@
+{
+  "afk_channel_id": null,
+  "afk_timeout": 300,
+  "application_id": null,
+  "channels": [
+    {
+      "id": 460018247631372300,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": null,
+      "last_pin_timestamp": null,
+      "name": "support",
+      "permission_overwrites": [],
+      "position": 5,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 439869042346688500,
+      "bitrate": null,
+      "parent_id": 365542905944735740,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 448125329241014300,
+      "last_pin_timestamp": null,
+      "name": "a",
+      "permission_overwrites": [],
+      "position": 7,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 432971341919158300,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 433351544755453950,
+      "last_pin_timestamp": null,
+      "name": "kirby-game-after-star-allies-spoilers",
+      "permission_overwrites": [],
+      "position": 3,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 293429863073841150,
+      "bitrate": 64000,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 2,
+      "last_message_id": null,
+      "last_pin_timestamp": null,
+      "name": "General",
+      "permission_overwrites": [],
+      "position": 0,
+      "topic": null,
+      "user_limit": 0,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 338609202509643800,
+      "bitrate": 64000,
+      "parent_id": 365540319116394500,
+      "guild_id": 293429863073841150,
+      "type": 2,
+      "last_message_id": null,
+      "last_pin_timestamp": null,
+      "name": "musica",
+      "permission_overwrites": [
+        {
+          "allow": 0,
+          "deny": 1049600,
+          "id": 293429863073841150,
+          "type": "role"
+        },
+        {
+          "allow": 3146752,
+          "deny": 0,
+          "id": 381853433818513400,
+          "type": "member"
+        },
+        {
+          "allow": 3146752,
+          "deny": 0,
+          "id": 379940375252434940,
+          "type": "member"
+        }
+      ],
+      "position": 1,
+      "topic": null,
+      "user_limit": 0,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 381854106643333100,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 545265778333843460,
+      "last_pin_timestamp": null,
+      "name": "main",
+      "permission_overwrites": [
+        {
+          "allow": 0,
+          "deny": 1024,
+          "id": 381853685254455300,
+          "type": "role"
+        }
+      ],
+      "position": 1,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 365540598461235200,
+      "bitrate": 64000,
+      "parent_id": null,
+      "guild_id": 293429863073841150,
+      "type": 4,
+      "last_message_id": null,
+      "last_pin_timestamp": null,
+      "name": "General",
+      "permission_overwrites": [],
+      "position": 0,
+      "topic": null,
+      "user_limit": 0,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 487189010943311900,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 487190059368448000,
+      "last_pin_timestamp": null,
+      "name": "uno",
+      "permission_overwrites": [],
+      "position": 10,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 446966996920172540,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 471636894879449100,
+      "last_pin_timestamp": null,
+      "name": "logs",
+      "permission_overwrites": [],
+      "position": 4,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 365541216332546050,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 560912348098068500,
+      "last_pin_timestamp": null,
+      "name": "praise-lord-cthulu",
+      "permission_overwrites": [
+        {
+          "allow": 0,
+          "deny": 1024,
+          "id": 380003078344278000,
+          "type": "role"
+        }
+      ],
+      "position": 0,
+      "topic": "",
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 462693965670514700,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 533658644789723140,
+      "last_pin_timestamp": null,
+      "name": "updates",
+      "permission_overwrites": [],
+      "position": 6,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 365542905944735740,
+      "bitrate": 64000,
+      "parent_id": null,
+      "guild_id": 293429863073841150,
+      "type": 4,
+      "last_message_id": null,
+      "last_pin_timestamp": null,
+      "name": "Kernel",
+      "permission_overwrites": [],
+      "position": 1,
+      "topic": null,
+      "user_limit": 0,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 365540319116394500,
+      "bitrate": 64000,
+      "parent_id": null,
+      "guild_id": 293429863073841150,
+      "type": 4,
+      "last_message_id": null,
+      "last_pin_timestamp": null,
+      "name": "Stuff",
+      "permission_overwrites": [
+        {
+          "allow": 0,
+          "deny": 1049600,
+          "id": 293429863073841150,
+          "type": "role"
+        }
+      ],
+      "position": 2,
+      "topic": null,
+      "user_limit": 0,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 293429863073841150,
+      "bitrate": null,
+      "parent_id": 365540319116394500,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 402133583625584640,
+      "last_pin_timestamp": null,
+      "name": "general",
+      "permission_overwrites": [
+        {
+          "allow": 0,
+          "deny": 1049600,
+          "id": 293429863073841150,
+          "type": "role"
+        }
+      ],
+      "position": 9,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 355768523873714200,
+      "bitrate": null,
+      "parent_id": 365540319116394500,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 365063515779760100,
+      "last_pin_timestamp": null,
+      "name": "art",
+      "permission_overwrites": [
+        {
+          "allow": 0,
+          "deny": 1049600,
+          "id": 293429863073841150,
+          "type": "role"
+        }
+      ],
+      "position": 8,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    },
+    {
+      "id": 397354326634528800,
+      "bitrate": null,
+      "parent_id": 365540598461235200,
+      "guild_id": 293429863073841150,
+      "type": 0,
+      "last_message_id": 558731221056880830,
+      "last_pin_timestamp": null,
+      "name": "test-venting",
+      "permission_overwrites": [],
+      "position": 2,
+      "topic": null,
+      "user_limit": null,
+      "nsfw": false,
+      "rate_limit_per_user": 0
+    }
+  ],
+  "default_message_notifications": 0,
+  "emojis": [
+    {
+      "animated": false,
+      "id": 540931795919700000,
+      "name": "yoyo",
+      "managed": false,
+      "require_colons": true,
+      "roles": []
+    },
+    {
+      "animated": true,
+      "id": 527898515775422460,
+      "name": "ily",
+      "managed": false,
+      "require_colons": true,
+      "roles": []
+    },
+    {
+      "animated": false,
+      "id": 507973003699552260,
+      "name": "handnut",
+      "managed": false,
+      "require_colons": true,
+      "roles": []
+    },
+    {
+      "animated": true,
+      "id": 507973013975728100,
+      "name": "nut",
+      "managed": false,
+      "require_colons": true,
+      "roles": []
+    },
+    {
+      "animated": false,
+      "id": 465940562621497340,
+      "name": "vore",
+      "managed": false,
+      "require_colons": true,
+      "roles": []
+    },
+    {
+      "animated": false,
+      "id": 498080251658633200,
+      "name": "uno",
+      "managed": false,
+      "require_colons": true,
+      "roles": []
+    }
+  ],
+  "explicit_content_filter": 0,
+  "features": [],
+  "icon": null,
+  "id": 293429863073841150,
+  "joined_at": "2017-11-19T17:10:13+00:00",
+  "large": false,
+  "member_count": 4,
+  "members": [
+    {
+      "deaf": false,
+      "guild_id": 293429863073841150,
+      "joined_at": "2017-11-19T17:10:13+00:00",
+      "mute": false,
+      "nick": null,
+      "roles": [
+        381853685254455300,
+        430433058932391940,
+        445994873292587000
+      ],
+      "user": {
+        "id": 381853433818513400,
+        "avatar": null,
+        "bot": true,
+        "discriminator": 2877,
+        "username": "Poyobot Dev"
+      }
+    },
+    {
+      "deaf": false,
+      "guild_id": 293429863073841150,
+      "joined_at": "2017-03-20T17:05:31.024+00:00",
+      "mute": false,
+      "nick": "Charlotte",
+      "roles": [
+        430433058932391940,
+        445994873292587000,
+        445994879487574000
+      ],
+      "user": {
+        "id": 246313908065927170,
+        "avatar": "a_efd3c72e8aa6759ded5134dc5d08ea0b",
+        "bot": false,
+        "discriminator": 8601,
+        "username": "Dark Kirb"
+      }
+    },
+    {
+      "deaf": false,
+      "guild_id": 293429863073841150,
+      "joined_at": "2017-11-14T14:36:34.032+00:00",
+      "mute": false,
+      "nick": null,
+      "roles": [
+        380003078344278000,
+        445994873292587000
+      ],
+      "user": {
+        "id": 379940375252434940,
+        "avatar": "07c119c9088c95856633529b941f40ff",
+        "bot": true,
+        "discriminator": 223,
+        "username": "Poyobot"
+      }
+    }
+  ],
+  "mfa_level": 0,
+  "name": "Darklink's test server",
+  "owner_id": 246313908065927170,
+  "presences": [
+    {
+      "game": null,
+      "last_modified": null,
+      "nick": null,
+      "status": "online",
+      "user": {
+        "id": 246313908065927170
+      }
+    },
+    {
+      "game": null,
+      "last_modified": null,
+      "nick": null,
+      "status": "online",
+      "user": {
+        "id": 381853433818513400
+      }
+    }
+  ],
+  "region": "eu-central",
+  "roles": [
+    {
+      "id": 430433058932391940,
+      "color": 52224,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 1",
+      "permissions": 104324161,
+      "position": 7
+    },
+    {
+      "id": 445994877503668200,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 5",
+      "permissions": 104324161,
+      "position": 3
+    },
+    {
+      "id": 445994878502043650,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 6",
+      "permissions": 104324161,
+      "position": 2
+    },
+    {
+      "id": 430433233860034560,
+      "color": 16702650,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 2",
+      "permissions": 104324161,
+      "position": 6
+    },
+    {
+      "id": 445994879487574000,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 7",
+      "permissions": 104324161,
+      "position": 1
+    },
+    {
+      "id": 381853685254455300,
+      "color": 0,
+      "hoist": false,
+      "managed": true,
+      "mentionable": true,
+      "name": "Poyobot Dev",
+      "permissions": 272100416,
+      "position": 10
+    },
+    {
+      "id": 293429863073841150,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "@everyone",
+      "permissions": 104324161,
+      "position": 0
+    },
+    {
+      "id": 445994873292587000,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 3",
+      "permissions": 104324161,
+      "position": 5
+    },
+    {
+      "id": 445994876039856100,
+      "color": 0,
+      "hoist": false,
+      "managed": false,
+      "mentionable": false,
+      "name": "role 4",
+      "permissions": 104324161,
+      "position": 4
+    },
+    {
+      "id": 380003078344278000,
+      "color": 0,
+      "hoist": false,
+      "managed": true,
+      "mentionable": false,
+      "name": "Poyobot",
+      "permissions": 339213376,
+      "position": 9
+    }
+  ],
+  "splash": null,
+  "system_channel_id": 365541216332546050,
+  "verification_level": 0,
+  "voice_states": []
+}
