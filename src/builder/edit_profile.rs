@@ -29,16 +29,15 @@ impl EditProfile {
     ///
     /// # impl EventHandler for Handler {
     ///    # fn message(&self, context: Context, _: Message) {
-    ///         use serenity::utils;
+    ///         use serenity::{http::raw, utils};
     ///
     ///         // assuming a `context` has been bound
     ///
     ///         let base64 = utils::read_image("./my_image.jpg")
     ///         .expect("Failed to read image");
     ///
-    ///         let _ = context.edit_profile(|mut profile| {
-    ///             profile.avatar(Some(&base64))
-    ///         });
+    ///         let _ = context.cache.write().user.edit(&context, |p|
+    ///             p.avatar(Some(&base64)));
     ///    # }
     /// # }
     /// #
