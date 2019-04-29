@@ -1723,7 +1723,7 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::Http(HttpError::UnsuccessfulRequest(response.into())))
+            Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
         }
     }
 
@@ -1768,7 +1768,7 @@ impl Http {
         debug!("Expected {}, got {}", expected, response.status());
         trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::Http(HttpError::UnsuccessfulRequest(resp.into())))
+        Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
     }
 }
 

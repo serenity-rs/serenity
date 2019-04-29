@@ -15,7 +15,7 @@ use std::{
     }
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize)]
+#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 pub struct DiscordJsonError {
     pub code: isize,
     pub message: String,
@@ -23,7 +23,7 @@ pub struct DiscordJsonError {
     non_exhaustive: (),
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq)]
 pub struct ErrorResponse {
     pub status_code: StatusCode,
     pub url: Url,
@@ -98,5 +98,38 @@ impl StdError for Error {
             Error::Request(_) => "Error while sending HTTP request.",
             Error::__Nonexhaustive => unreachable!(),
         }
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use super::*;
+    use http_crate::response::Builder;
+    use reqwest::r#async::ResponseBuilderExt;
+
+    #[test]
+    fn test_error_response_into() {
+        let error = DiscordJsonError {
+            code: 43121215,
+            message: String::from("This is a Ferris error"),
+            non_exhaustive: (),
+        };
+
+        let mut builder = Builder::new();
+        builder.status(403);
+        builder.url(String::from("https://ferris.crab").parse().unwrap());
+        let body_string = serde_json::to_string(&error).unwrap();
+        let response = builder.body(body_string.into_bytes()).unwrap();
+
+        let reqwest_response: reqwest::Response = response.into();
+        let error_response: ErrorResponse = reqwest_response.into();
+        
+        let known = ErrorResponse {
+            status_code: reqwest::StatusCode::from_u16(403).unwrap(),
+            url: String::from("https://ferris.crab").parse().unwrap(),
+            error: error,
+        };
+
+        assert_eq!(error_response, known);
     }
 }
