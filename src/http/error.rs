@@ -15,12 +15,18 @@ use std::{
     }
 };
 
-#[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
+#[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct DiscordJsonError {
     pub code: isize,
     pub message: String,
     #[serde(skip)]
     non_exhaustive: (),
+}
+
+impl std::fmt::Debug for DiscordJsonError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "\"{}\"", self.message)
+    }
 }
 
 #[derive(Debug, Clone, PartialEq)]
