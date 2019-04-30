@@ -46,7 +46,7 @@ impl EditProfile {
     /// # client.start().unwrap();
     /// # }
     /// #
-    /// # #[cfg(not(feature = "client"))]
+    /// # #[cfg(all(not(feature = "client"), not(feature = "cache")))]
     /// # fn main() {}
     /// ```
     ///
