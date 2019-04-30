@@ -20,7 +20,7 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
+    /// # #[cfg(all(feature = "client", feature = "cache"))]
     /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
@@ -29,16 +29,15 @@ impl EditProfile {
     ///
     /// # impl EventHandler for Handler {
     ///    # fn message(&self, context: Context, _: Message) {
-    ///         use serenity::utils;
+    ///         use serenity::{http::raw, utils};
     ///
     ///         // assuming a `context` has been bound
     ///
     ///         let base64 = utils::read_image("./my_image.jpg")
     ///         .expect("Failed to read image");
     ///
-    ///         let _ = context.edit_profile(|mut profile| {
-    ///             profile.avatar(Some(&base64))
-    ///         });
+    ///         let _ = context.cache.write().user.edit(&context, |p|
+    ///             p.avatar(Some(&base64)));
     ///    # }
     /// # }
     /// #
@@ -47,7 +46,7 @@ impl EditProfile {
     /// # client.start().unwrap();
     /// # }
     /// #
-    /// # #[cfg(not(feature = "client"))]
+    /// # #[cfg(any(not(feature = "client"), not(feature = "cache")))]
     /// # fn main() {}
     /// ```
     ///

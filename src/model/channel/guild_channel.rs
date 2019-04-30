@@ -349,11 +349,11 @@ impl GuildChannel {
     /// Change a voice channels name and bitrate:
     ///
     /// ```rust,ignore
-    /// channel.edit(|c| c.name("test").bitrate(86400));
+    /// channel.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "utils", feature = "client", feature = "builder"))]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+        where F: FnOnce(&mut EditChannel) -> &mut EditChannel {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -369,7 +369,9 @@ impl GuildChannel {
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
 
-        let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
+        let mut edit_channel = EditChannel::default();
+        f(&mut edit_channel);
+        let edited = serenity_utils::vecmap_to_json_map(edit_channel.0);
 
         match context.http.edit_channel(self.id.0, &edited) {
             Ok(channel) => {

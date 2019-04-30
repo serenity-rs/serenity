@@ -104,7 +104,7 @@ impl Role {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "builder", feature = "cache", feature = "http"))]
-    pub fn edit<F: FnOnce(EditRole) -> EditRole>(&self, context: &Context, f: F) -> Result<Role> {
+    pub fn edit<F: FnOnce(&mut EditRole) -> &mut EditRole>(&self, context: &Context, f: F) -> Result<Role> {
         self.find_guild(&context.cache)
             .and_then(|guild_id| guild_id.edit_role(&context.http, self.id, f))
     }
