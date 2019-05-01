@@ -60,6 +60,11 @@ pub enum DispatchError {
     NotEnoughArguments { min: u16, given: usize },
     /// When there are too many arguments.
     TooManyArguments { max: u16, given: usize },
+    /// When the command was requested by a bot user when they are set to be
+    /// ignored.
+    IgnoredBot,
+    /// When the bot ignores webhooks and a command was issued by one.
+    WebhookAuthor,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -216,6 +221,14 @@ impl StandardFramework {
         command: &'static CommandOptions,
         group: &'static GroupOptions,
     ) -> Option<DispatchError> {
+        if self.config.ignore_bots && msg.author.bot {
+            return Some(DispatchError::IgnoredBot);
+        }
+
+        if self.config.ignore_webhooks && msg.webhook_id.is_some() {
+            return Some(DispatchError::WebhookAuthor);
+        }
+
         if let Some(min) = command.min_args {
             if args.len() < min as usize {
                 return Some(DispatchError::NotEnoughArguments {
@@ -585,11 +598,6 @@ impl StandardFramework {
 
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        // Ignore bots/webhooks.
-        if msg.author.bot || msg.webhook_id.is_some() {
-            return;
-        }
-
         let (prefix, rest) = parse_prefix(&mut ctx, &msg, &self.config);
 
         if prefix != Prefix::None && rest.trim().is_empty() {
