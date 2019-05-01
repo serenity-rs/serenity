@@ -1529,7 +1529,7 @@ impl Http {
             .multipart(multipart).send()?;
 
         if !response.status().is_success() {
-            return Err(HttpError::UnsuccessfulRequest(Box::new(response)).into());
+            return Err(HttpError::UnsuccessfulRequest(response.into()).into());
         }
 
         serde_json::from_reader(response).map_err(From::from)
@@ -1723,7 +1723,7 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::from(HttpError::UnsuccessfulRequest(Box::new(response))))
+            Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
         }
     }
 
@@ -1768,7 +1768,7 @@ impl Http {
         debug!("Expected {}, got {}", expected, response.status());
         trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::from(HttpError::UnsuccessfulRequest(Box::new(response))))
+        Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
     }
 }
 

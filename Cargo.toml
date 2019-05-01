@@ -97,6 +97,10 @@ version = "^0.19"
 optional = true
 version = "^0.16"
 
+[dev-dependencies.http_crate]
+version = "~0.1"
+package = "http"
+
 [dev-dependencies.matches]
 version = "^0.1"
 
