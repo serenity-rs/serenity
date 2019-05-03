@@ -1,6 +1,5 @@
 use super::Delimiter;
 use crate::client::Context;
-use crate::http::Http;
 use crate::model::{channel::Message, id::UserId};
 use std::collections::HashSet;
 
@@ -296,7 +295,7 @@ impl Configuration {
     ///
     /// [`prefix`]: #method.prefix
     pub fn on_mention(&mut self, id_to_mention: Option<UserId>) -> &mut Self {
-        self.on_mention = id_to_mention.map(ToString::to_string);
+        self.on_mention = id_to_mention.map(|id| id.to_string());
 
         self
     }
