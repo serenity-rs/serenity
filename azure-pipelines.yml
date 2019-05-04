@@ -28,14 +28,14 @@ jobs:
     name: 'macOS_stable_no_cache'
     vmImage: 'xcode9-macos10.13'
     toolchain: 'stable'
-    features: 'builder client framework gateway model http standard_framework utils'
+    features: 'builder client framework gateway model http standard_framework utils rustls_backend'
 
 - template: 'azure-template.yml'
   parameters:
     name: 'macOS_no_gateway'
     vmImage: 'xcode9-macos10.13'
     toolchain: 'stable'
-    features: 'model http'
+    features: 'model http rustls_backend'
 
 - template: 'azure-template-win.yml'
   parameters:
