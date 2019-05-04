@@ -117,6 +117,8 @@ the HTTP functions.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables compilation of voice support, so that voice channels can be
 connected to and audio can be sent/received.
+- **default_native_tls**: Default features but using `native_tls_backend`
+instead of `rustls_backend`.
 
 Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
 one if you do not use the default features:
@@ -124,6 +126,7 @@ one if you do not use the default features:
 TLS implementation.
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
 and OpenSSL on other platforms.
+
 
 If you want all of the default features except for `cache` for example, you can
 list all but that:
