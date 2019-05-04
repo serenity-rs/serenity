@@ -211,7 +211,7 @@ impl StdError for Error {
         match *self {
             Error::Json(ref inner) => Some(inner),
             Error::Io(ref inner) => Some(inner),
-            #[cfg(feature = "tungstenite")]
+            #[cfg(feature = "gateway")]
             Error::Tungstenite(ref inner) => Some(inner),
             _ => None,
         }
