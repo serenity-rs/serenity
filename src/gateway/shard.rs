@@ -27,10 +27,10 @@ use tungstenite::{
 use url::Url;
 use log::{error, debug, info, trace, warn};
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
 
-#[cfg(feature = "native_tls")]
+#[cfg(feature = "native_tls_backend")]
 use tungstenite::handshake::client::Request;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
@@ -828,13 +828,13 @@ impl Shard {
     }
 }
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
     Ok(create_rustls_client(url)?)
 }
 
-#[cfg(feature = "native_tls")]
+#[cfg(feature = "native_tls_backend")]
 fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
     let client = tungstenite::connect(Request::from(url))?;
@@ -843,10 +843,10 @@ fn connect(base_url: &str) -> Result<WsClient> {
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
-    #[cfg(not(feature = "native_tls"))]
+    #[cfg(not(feature = "native_tls_backend"))]
     let stream = &client.get_mut().sock;
 
-    #[cfg(feature = "native_tls")]
+    #[cfg(feature = "native_tls_backend")]
     let stream = match client.get_mut() {
         tungstenite::stream::Stream::Plain(stream) => stream,
         tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),

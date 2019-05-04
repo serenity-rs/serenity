@@ -24,7 +24,7 @@ use crate::client::ClientError;
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
-#[cfg(all(feature = "gateway", not(feature = "native_tls")))]
+#[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
 use crate::voice::VoiceError;
@@ -95,7 +95,7 @@ pub enum Error {
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
     /// An error occuring in rustls
-    #[cfg(all(feature = "gateway", not(feature = "native_tls")))]
+    #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
@@ -147,7 +147,7 @@ impl From<VoiceError> for Error {
     fn from(e: VoiceError) -> Error { Error::Voice(e) }
 }
 
-#[cfg(all(feature = "gateway", not(feature = "native_tls")))]
+#[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
 impl From<RustlsError> for Error {
     fn from(e: RustlsError) -> Error { Error::Rustls(e) }
 }
@@ -197,7 +197,7 @@ impl StdError for Error {
             Error::Http(ref inner) => inner.description(),
             #[cfg(feature = "voice")]
             Error::Opus(ref inner) => inner.description(),
-            #[cfg(all(feature = "gateway", not(feature = "native_tls")))]
+            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
             Error::Rustls(ref inner) => inner.description(),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(ref inner) => inner.description(),

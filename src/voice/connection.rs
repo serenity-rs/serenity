@@ -53,7 +53,7 @@ use super::{payload, VoiceError, CRYPTO_MODE};
 use url::Url;
 use log::{debug, info, warn};
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
 
 enum ReceiverStatus {
@@ -96,10 +96,10 @@ impl Connection {
     pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
-        #[cfg(not(feature = "native_tls"))]
+        #[cfg(not(feature = "native_tls_backend"))]
         let mut client = create_rustls_client(url)?;
 
-        #[cfg(feature = "native_tls")]
+        #[cfg(feature = "native_tls_backend")]
         let mut client = tungstenite::connect(url)?.0;
         let mut hello = None;
         let mut ready = None;
@@ -231,10 +231,10 @@ impl Connection {
         // (if at all possible) and then proceed as normal.
         let _ = self.thread_items.ws_close_sender.send(0);
 
-        #[cfg(not(feature = "native_tls"))]
+        #[cfg(not(feature = "native_tls_backend"))]
         let mut client = create_rustls_client(url)?;
 
-        #[cfg(feature = "native_tls")]
+        #[cfg(feature = "native_tls_backend")]
         let mut client = tungstenite::connect(url)?.0;
 
         client.send_json(&payload::build_resume(&self.connection_info))?;
@@ -782,10 +782,10 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>
 
 #[inline]
 fn unset_blocking(client: &mut WsClient) -> Result<()> {
-    #[cfg(not(feature = "native_tls"))]
+    #[cfg(not(feature = "native_tls_backend"))]
     let stream = &client.get_mut().sock;
 
-    #[cfg(feature = "native_tls")]
+    #[cfg(feature = "native_tls_backend")]
     let stream = match client.get_mut() {
         tungstenite::stream::Stream::Plain(stream) => stream,
         tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
