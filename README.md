@@ -170,8 +170,6 @@ Voice+youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
-Building the `voice`-feature on Windows can be done by following these instructions: https://github.com/serenity-rs/serenity/wiki/Voice-on-Windows
-
 # Related Projects
 
 - [Discord.net][library:Discord.net]
