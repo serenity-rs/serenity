@@ -39,8 +39,24 @@ docs.
 A basic ping-pong bot looks like:
 
 ```rust,ignore
-use serenity::{command, client::Client,
-    framework::standard::StandardFramework, prelude::EventHandler};
+use serenity::client::Client;
+use serenity::model::channel::Message;
+use serenity::prelude::{EventHandler, Context};
+use serenity::framework::standard::{
+    StandardFramework,
+    CommandResult,
+    macros::{
+        command,
+        group
+    }
+};
+
+group!({
+    name: "general",
+    options: {},
+    commands: [ping],
+});
+
 use std::env;
 
 struct Handler;
@@ -53,7 +69,7 @@ fn main() {
         .expect("Error creating client");
     client.with_framework(StandardFramework::new()
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-        .cmd("ping", ping));
+        .group(&GENERAL_GROUP));
 
     // start listening for events by starting a single shard
     if let Err(why) = client.start() {
@@ -61,9 +77,13 @@ fn main() {
     }
 }
 
-command!(ping(_context, message) {
-    let _ = message.reply("Pong!");
-});
+#[command]
+fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    msg.reply(ctx, "Pong!")?;
+
+    Ok(())
+}
+
 ```
 
 ### Full Examples
@@ -77,7 +97,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.5"
+serenity = "0.6"
 ```
 
 Serenity supports a minimum of Rust 1.31.1.
@@ -91,7 +111,7 @@ Cargo.toml:
 [dependencies.serenity]
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
-version = "0.5"
+version = "0.6"
 ```
 
 The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
@@ -122,6 +142,7 @@ instead of `rustls_backend`.
 
 Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
 one if you do not use the default features:
+
 - **rustls_backend**: Uses Rustls for all platforms, a pure Rust
 TLS implementation.
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
@@ -145,7 +166,7 @@ features = [
     "utils",
     "rustls_backend",
 ]
-version = "0.5"
+version = "0.6"
 ```
 
 # Dependencies
