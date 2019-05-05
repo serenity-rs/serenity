@@ -150,23 +150,22 @@ version = "0.5"
 
 # Dependencies
 
-Serenity requires the following system dependencies:
+If you use the `native_tls_backend` and you are not developing on macOS or Windows, you will need:
 
 - openssl
 
-### Voice
-
-The following dependencies all require the **voice** feature to be enabled in
-your Cargo.toml:
+If you want to use `voice`, Serenity will attempt to build these for you:
 
 - libsodium (Arch: `community/libsodium`)
 - opus (Arch: `extra/opus`)
 
-Voice+ffmpeg:
+In case the automated building fails, you may report it to us, but installing should fix it.
+
+Voice + ffmpeg:
 
 - ffmpeg (Arch: `extra/ffmpeg`)
 
-Voice+youtube-dl:
+Voice + youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
