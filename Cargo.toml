@@ -115,6 +115,19 @@ default = [
     "http",
     "standard_framework",
     "utils",
+    "rustls_backend",
+]
+default_native_tls = [
+    "builder",
+    "cache",
+    "client",
+    "framework",
+    "gateway",
+    "model",
+    "http",
+    "standard_framework",
+    "utils",
+    "native_tls_backend",
 ]
 builder = ["utils"]
 cache = []
@@ -132,14 +145,13 @@ gateway = [
     "http",
     "url",
     "utils",
-    "rustls",
     "webpki",
     "webpki-roots",
-    "tungstenite",
 ]
-http = ["lazy_static", "reqwest/rustls-tls"]
+http = []
+rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls"]
+native_tls_backend = ["reqwest/default-tls", "tungstenite/tls"]
 model = ["builder", "http"]
-native_tls = ["reqwest/default-tls", "tungstenite/tls"]
 standard_framework = ["framework", "uwl", "command_attr"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide"]
