@@ -214,11 +214,9 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
         let flags = match map.remove("flags") {
-            Some(v) => {
-                let bits = serde_json::from_value::<u64>(v).map_err(DeError::custom)?;
-
-                Some(ActivityFlags::from_bits_truncate(bits))
-            },
+            Some(v) => serde_json::from_value::<Option<u64>>(v)
+                .map_err(DeError::custom)?
+                .map(ActivityFlags::from_bits_truncate),
             None => None,
         };
         let instance = match map.remove("instance") {

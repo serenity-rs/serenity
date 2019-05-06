@@ -458,7 +458,7 @@ pub struct GuildIntegrationsUpdateEvent {
     pub guild_id: GuildId,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 pub struct GuildMemberAddEvent {
     pub guild_id: GuildId,
     pub member: Member,
@@ -500,6 +500,21 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
             member: Member::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
         })
+    }
+}
+
+impl Serialize for GuildMemberAddEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where S: Serializer {
+        let mut s: Vec<u8> = Vec::new();
+        let mut ser = serde_json::Serializer::new(&mut s);
+        Member::serialize(&self.member, &mut ser).unwrap(); // TODO find better way to do this
+        let mut map: JsonMap = serde_json::from_str(std::str::from_utf8(&s).unwrap()).unwrap();
+        map.insert(
+            "guild_id".to_string(),
+            serde_json::value::Value::Number(serde_json::Number::from(self.guild_id.0)),
+        );
+        map.serialize(serializer)
     }
 }
 
@@ -1192,7 +1207,7 @@ pub struct VoiceServerUpdateEvent {
     pub token: String,
 }
 
-#[derive(Clone, Debug, Serialize)]
+#[derive(Clone, Debug)]
 pub struct VoiceStateUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub voice_state: VoiceState,
@@ -1238,6 +1253,23 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
             voice_state: VoiceState::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
         })
+    }
+}
+
+impl Serialize for VoiceStateUpdateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where S: Serializer {
+        let mut s: Vec<u8> = Vec::new();
+        let mut ser = serde_json::Serializer::new(&mut s);
+        VoiceState::serialize(&self.voice_state, &mut ser).unwrap(); // TODO find better way to do this
+        let mut map: JsonMap = serde_json::from_str(std::str::from_utf8(&s).unwrap()).unwrap();
+        if let Some(guild_id) = self.guild_id {
+            map.insert(
+                "guild_id".to_string(),
+                serde_json::value::Value::Number(serde_json::Number::from(guild_id.0)),
+            );
+        }
+        map.serialize(serializer)
     }
 }
 

@@ -174,6 +174,17 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     Ok(Arc::new(RwLock::new(user)))
 }
 
+pub fn serialize_single_recipient<S: Serializer>(
+    user: &Arc<RwLock<User>>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(1))?;
+
+    seq.serialize_element(&*user.read())?;
+
+    seq.end()
+}
+
 pub fn deserialize_sync_user<'de, D>(deserializer: D)
     -> StdResult<Arc<RwLock<User>>, D::Error> where D: Deserializer<'de> {
     Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
