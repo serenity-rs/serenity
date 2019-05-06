@@ -5,18 +5,10 @@ use std::fs::File;
 
 macro_rules! p {
     ($s:ident, $filename:expr) => {{
-        let f = File::open(concat!("./tests/resources/", $filename, ".json"))
-            .expect("Opening test file");
-        let v = serde_json::from_reader::<File, Value>(f).expect("Loading test file");
+        let f = File::open(concat!("./tests/resources/", $filename, ".json")).unwrap();
+        let v = serde_json::from_reader::<File, Value>(f).unwrap();
 
-        let deserialized = $s::deserialize(v).expect("Deserializing file");
-        let serialized = serde_json::to_string(&deserialized).expect("Reserializing file");
-        if serialized.len() > 327 {
-            println!("{}", &serialized[327..]);
-            println!("{}", &serialized[..]);
-        }
-        let redeserialized: $s = serde_json::from_str(&serialized).expect("Deserializing file (2)");
-        redeserialized
+        $s::deserialize(v).unwrap()
     }};
 }
 
