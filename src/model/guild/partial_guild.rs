@@ -20,7 +20,7 @@ pub struct PartialGuild {
     pub default_message_notifications: DefaultMessageNotificationLevel,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
-    #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     /// Features enabled for the guild.
     ///
     /// Refer to [`Guild::features`] for more information.
@@ -32,7 +32,7 @@ pub struct PartialGuild {
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
-    #[serde(deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
+    #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
 }

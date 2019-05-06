@@ -5,7 +5,7 @@ use std::fmt::{
     Formatter,
     Result as FmtResult
 };
-use super::deserialize_single_recipient;
+use super::{deserialize_single_recipient, serialize_single_recipient};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -42,8 +42,8 @@ pub struct PrivateChannel {
     pub kind: ChannelType,
     /// The recipient to the private channel.
     #[serde(deserialize_with = "deserialize_single_recipient",
-            rename = "recipients",
-            serialize_with = "serialize_sync_user")]
+            serialize_with = "serialize_single_recipient",
+            rename = "recipients")]
     pub recipient: Arc<RwLock<User>>,
 }
 
