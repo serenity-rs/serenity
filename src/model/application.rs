@@ -83,4 +83,6 @@ pub struct CurrentApplicationInfo {
     pub name: String,
     pub owner: User,
     #[serde(default)] pub rpc_origins: Vec<String>,
+    pub bot_public: bool,
+    pub bot_require_code_grant: bool,
 }
