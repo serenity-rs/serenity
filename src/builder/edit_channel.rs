@@ -63,6 +63,17 @@ impl EditChannel {
         self
     }
 
+    /// Is the channel inappropriate for work?
+    ///
+    /// This is for [text] channels only.
+    ///
+    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
+    pub fn nsfw(&mut self, nsfw: bool) -> &mut Self {
+        self.0.insert("nsfw", Value::Bool(nsfw));
+
+        self
+    }
+
     /// The number of users that may be in the channel simultaneously.
     ///
     /// This is for [voice] channels only.
