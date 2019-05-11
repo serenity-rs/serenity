@@ -139,6 +139,7 @@ It's no ready yet, but we hope that on its release that it will clear misunderst
 - [model] Make `enum`s non-exhaustive ([@Lakelezz]) [c:9cc8816]
 - [http] Make the HttpError Send+Sync ([@Erk-]) [c:6cfc0e1]
 - [framework] Update `on_mention` to take a `UserId` ([@Celti]) [c:d995fa0]
+- [utils] Simplify `from_rgb`, turn some of Colour's functions to `const`. ([@hyarsan]) [c:c149e36]
 
 ## Fixed
 
@@ -3619,3 +3620,4 @@ Initial commit.
 [c:fcc4e2c]: https://github.com/serenity-rs/serenity/commit/fcc4e2ce2e523248ed33c9f4853d3485cbc9b6e6
 [c:23ff6f]: https://github.com/serenity-rs/serenity/commit/23ff6f21019bc94f8dc32355fa34691b881bfb69
 [c:e57b510]: https://github.com/serenity-rs/serenity/commit/e57b510edd640abb243664337a1c163924313612
+[c:c149e36]: https://github.com/serenity-rs/serenity/commit/c149e368ae4bb1be5d0392b9cae282fc530831c5
