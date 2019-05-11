@@ -211,12 +211,16 @@ impl Group {
 
     /// Gets messages from the channel.
     ///
+    /// Refer to the [`GetMessages`]-builder for more information on how to
+    /// use `builder`.
+    ///
     /// Requires the [Read Message History] permission.
     ///
+    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
     #[inline]
-    pub fn messages<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         self.channel_id.messages(&http, f)
     }
