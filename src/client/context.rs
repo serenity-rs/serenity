@@ -313,49 +313,6 @@ impl Context {
         self.shard.set_presence(Some(activity), OnlineStatus::Online);
     }
 
-    /// Sets the current activity, passing in only its name. This will
-    /// automatically set the current user's [`OnlineStatus`] to [`Online`], and
-    /// its [`ActivityType`] as [`Playing`].
-    ///
-    /// Use [`reset_presence`] to clear the current activity, or
-    /// [`set_presence`] for more fine-grained control.
-    ///
-    /// **Note**: Maximum length is 128.
-    ///
-    /// # Examples
-    ///
-    /// When an [`Event::Ready`] is received, set the activity name to `"test"`:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # use serenity::model::gateway::Ready;
-    /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.set_game_name("test");
-    ///     }
-    /// }
-    ///
-    /// let mut client = Client::new("token", Handler).unwrap();
-    /// client.start().unwrap();
-    /// ```
-    ///
-    /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`ActivityType`]: ../model/gateway/enum.ActivityType.html
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
-    /// [`OnlineStatus`]: ../model/user/enum.OnlineStatus.html
-    /// [`Playing`]: ../model/gateway/enum.ActivityType.html#variant.Playing
-    /// [`reset_presence`]: #method.reset_presence
-    /// [`set_presence`]: #method.set_presence
-    #[deprecated(since = "0.5.5", note = "Use Context::set_activity")]
-    #[inline]
-    pub fn set_game_name(&self, game_name: &str) {
-        let activity = Activity::playing(game_name);
-        self.shard.set_presence(Some(activity), OnlineStatus::Online);
-    }
-
     /// Sets the current user's presence, providing all fields to be passed.
     ///
     /// # Examples

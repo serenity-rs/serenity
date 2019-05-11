@@ -178,17 +178,17 @@ impl PrivateChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`Channel::messages`] for more information.
+    /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`Channel::messages`]: enum.Channel.html#method.messages
+    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
     #[inline]
-    pub fn messages<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
-        self.id.messages(&http, f)
+        self.id.messages(&http, builder)
     }
 
     /// Returns "DM with $username#discriminator".

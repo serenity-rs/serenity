@@ -47,7 +47,7 @@ use crate::utils::VecMap;
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../http/fn.execute_webhook.html
+/// [`execute_webhook`]: ../http/raw/struct.Http.html#method.execute_webhook
 #[derive(Clone, Debug)]
 pub struct ExecuteWebhook(pub VecMap<&'static str, Value>);
 
