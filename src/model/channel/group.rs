@@ -222,7 +222,7 @@ impl Group {
     #[inline]
     pub fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
-        self.channel_id.messages(&http, f)
+        self.channel_id.messages(&http, builder)
     }
 
     /// Generates a name for the group.
