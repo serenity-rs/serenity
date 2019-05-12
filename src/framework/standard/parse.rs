@@ -239,7 +239,14 @@ pub(crate) fn parse_command<'a>(
         let pos = stream.offset();
 
         for name in group.command_names() {
-            let n = stream.peek_for(name.chars().count());
+            // FIXME: If `by_space` option is set true, we shouldn't be retrieving the block of text
+            // again and again for every group or command name.
+            let n = if config.by_space {
+                stream.peek_until(|s| s.is_whitespace())
+            } else {
+                stream.peek_for(name.chars().count())
+            };
+
             let equals = if config.case_insensitive {
                 let n = n.to_lowercase();
                 n == name && !config.disabled_commands.contains(&n)
@@ -264,7 +271,12 @@ pub(crate) fn parse_command<'a>(
                     command: &mut &'static Command,
                 ) {
                     for name in command.options.command_names() {
-                        let n = stream.peek_for(name.chars().count());
+                        let n = if config.by_space {
+                            stream.peek_until(|s| s.is_whitespace())
+                        } else {
+                            stream.peek_for(name.chars().count())
+                        };
+
                         let equals = if config.case_insensitive {
                             let n = n.to_lowercase();
                             n == name && !config.disabled_commands.contains(&n)

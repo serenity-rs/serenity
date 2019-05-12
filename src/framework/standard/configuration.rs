@@ -97,6 +97,8 @@ pub struct Configuration {
     #[doc(hidden)]
     pub with_whitespace: WithWhiteSpace,
     #[doc(hidden)]
+    pub by_space: bool,
+    #[doc(hidden)]
     pub disabled_commands: HashSet<String>,
     #[doc(hidden)]
     pub dynamic_prefixes: Vec<Box<DynamicPrefixHook>>,
@@ -152,6 +154,16 @@ impl Configuration {
     /// ```
     pub fn with_whitespace<I: Into<WithWhiteSpace>>(&mut self, with: I) -> &mut Self {
         self.with_whitespace = with.into();
+
+        self
+    }
+
+    /// Whether the framework should split the message by a space first to parse the group or command.
+    /// If set to false, it will only test part of the message by the *length* of the group's or command's names.
+    ///
+    /// **Note**: Defaults to `true`
+    pub fn by_space(&mut self, b: bool) -> &mut Self {
+        self.by_space = b;
 
         self
     }
@@ -500,6 +512,7 @@ impl Default for Configuration {
     ///
     /// - **allow_dm** to `true`
     /// - **with_whitespace** to `(false, true, true)`
+    /// - **by_space** to `true`
     /// - **case_insensitive** to `false`
     /// - **delimiters** to `vec![' ']`
     /// - **disabled_commands** to an empty HashSet
@@ -514,6 +527,7 @@ impl Default for Configuration {
         Configuration {
             allow_dm: true,
             with_whitespace: WithWhiteSpace::default(),
+            by_space: true,
             case_insensitive: false,
             delimiters: vec![Delimiter::Single(' ')],
             disabled_commands: HashSet::default(),
