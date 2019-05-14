@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.6.0-rc.1] - 2019-5-14
+
+Thanks to the following for their contributions:
+- [@acdenisSK]
+- [@Lakelezz]
+- [@mattico]
+
+A short release for some things we overlooked.
+
+## Added
+
+- [model] Add missing fields of `current_application_info` ([@mattico]) [c:23bed41]
+- [builder] Allow for channels to be (or not be) set as nsfw ([@acdenisSK]) [c:1bd5bbc]
+- [framework] Bring back old parsing behaviour ([@acdenisSK]) [c:64e97c5]
+- [http] `AsRef<Http>` Implementation for `Http` ([@Lakelezz]) [c:b425ceb]
+
+## Fixed
+
+- [misc.] Fix Doc-Links and update Changelog ([@Lakelezz]) [c:c63eaea]
+
+## Changed
+
+- [framework] Take into equation ignoring bots and webhooks for help ([@acdenisSK]) [c:b1559bc]
+- [general] Increase minimum support Rust version ([@acdenisSK]) [c:61ac765]
+- [general/framework] Shackle the minimum version of uwl to 0.3.2 ([@acdenisSK]) [c:decbc04]
+
 ## [0.6.0-rc.0] - 2019-5-6
 
 Thanks to the following for their contributions:
@@ -2663,6 +2689,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.6.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.1
 [0.6.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.5.13...v0.6.0-rc.0
 [0.5.13]: https://github.com/serenity-rs/serenity/compare/v0.5.12...v0.5.13
 [0.5.12]: https://github.com/serenity-rs/serenity/compare/v0.5.11...v0.5.12
@@ -2742,6 +2769,7 @@ Initial commit.
 [@lolzballs]: https://github.com/lolzballs
 [@Lymia]: https://github.com/Lymia
 [@khazhyk]: https://github.com/khazhyk
+[@mattico]: https://github.com/mattico
 [@megumisonoda]: https://github.com/megumisonoda
 [@Mishio595]: https://github.com/Mishio595
 [@mshenrick]: https://github.com/mshenrick
@@ -2762,6 +2790,16 @@ Initial commit.
 [@xentec]: https://github.com/xentec
 [@vityafx]: https://github.com/vityafx
 [@zeyla]: https://github.com/zeyla
+
+
+[c:23bed41]: https://github.com/serenity-rs/serenity/commit/23bed417864a53c6e050ec732f72cf175ef293df
+[c:1bd5bbc]: https://github.com/serenity-rs/serenity/commit/1bd5bbc8004dab8150ba4c631b8323440634cd35
+[c:c63eaea]: https://github.com/serenity-rs/serenity/commit/c63eaeafe5c23006712021cc3efde9988efb2fd2
+[c:64e97c5]: https://github.com/serenity-rs/serenity/commit/64e97c51367630f04d1d58ab917d584cd6e9c15a
+[c:b425ceb]: https://github.com/serenity-rs/serenity/commit/b425ceb51ac34e55ce055ad981569818fa2558ea
+[c:b1559bc]: https://github.com/serenity-rs/serenity/commit/b1559bc38f99a65cdf3231ddafa84c51b5829b1a
+[c:61ac765]: https://github.com/serenity-rs/serenity/commit/61ac765c9d5ad75a848322418d4d2c4ad0c54236
+[c:decbc04]: https://github.com/serenity-rs/serenity/commit/decbc04c01cbb24755a0ac1219c9778b9c53d63c
 
 [c:5405ac2]: https://github.com/serenity-rs/serenity/commit/5405ac2a46c5f90451de0a2c68f6f6d323ce299b
 [c:f7360e6]: https://github.com/serenity-rs/serenity/commit/f7360e6675d100c7af9c0a67ed47d76e64672e37
