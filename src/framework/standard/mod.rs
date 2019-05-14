@@ -213,6 +213,18 @@ impl StandardFramework {
         self
     }
 
+    fn should_fail_common(&self, msg: &Message) -> Option<DispatchError> {
+        if self.config.ignore_bots && msg.author.bot {
+            return Some(DispatchError::IgnoredBot);
+        }
+
+        if self.config.ignore_webhooks && msg.webhook_id.is_some() {
+            return Some(DispatchError::WebhookAuthor);
+        }
+
+        None
+    }
+
     fn should_fail(
         &mut self,
         ctx: &mut Context,
@@ -221,12 +233,8 @@ impl StandardFramework {
         command: &'static CommandOptions,
         group: &'static GroupOptions,
     ) -> Option<DispatchError> {
-        if self.config.ignore_bots && msg.author.bot {
-            return Some(DispatchError::IgnoredBot);
-        }
-
-        if self.config.ignore_webhooks && msg.webhook_id.is_some() {
-            return Some(DispatchError::WebhookAuthor);
+        if let Some(err) = self.should_fail_common(msg) {
+            return Some(err);
         }
 
         if let Some(min) = command.min_args {
@@ -675,6 +683,14 @@ impl Framework for StandardFramework {
                 name,
                 args,
             } => {
+                if let Some(error) = self.should_fail_common(&msg) {
+                    if let Some(dispatch) = &self.dispatch {
+                        dispatch(&mut ctx, &msg, error);
+                    }
+
+                    return;
+                }
+
                 let args = Args::new(args, &self.config.delimiters);
 
                 let before = self.before.clone();
