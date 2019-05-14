@@ -31,7 +31,7 @@ features = ["derive"]
 
 [dependencies.uwl]
 optional = true
-version = "0.3"
+version = "^0.3.2"
 
 [dependencies.base64]
 optional = true
