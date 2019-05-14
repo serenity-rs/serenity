@@ -1772,6 +1772,10 @@ impl Http {
     }
 }
 
+impl AsRef<Http> for Http {
+    fn as_ref(&self) -> &Http { &self }
+}
+
 impl Default for Http {
     fn default() -> Self {
         Self {
