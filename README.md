@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.34.1+ badge]][rust 1.34.1+ link]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.34.2+ badge]][rust 1.34.2+ link]
 
 # serenity
 
@@ -100,7 +100,7 @@ Add the following to your `Cargo.toml` file:
 serenity = "0.6.0-rc.0"
 ```
 
-Serenity supports a minimum of Rust 1.34.1.
+Serenity supports a minimum of Rust 1.34.2.
 
 # Features
 
@@ -229,5 +229,5 @@ Voice + youtube-dl:
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust 1.34.1+ badge]: https://img.shields.io/badge/rust-1.34.1+-93450a.svg?style=flat-square
-[rust 1.34.1+ link]: https://blog.rust-lang.org/2019/04/25/Rust-1.34.1.html
+[rust 1.34.2+ badge]: https://img.shields.io/badge/rust-1.34.2+-93450a.svg?style=flat-square
+[rust 1.34.2+ link]: https://blog.rust-lang.org/2019/05/14/Rust-1.34.2.html
