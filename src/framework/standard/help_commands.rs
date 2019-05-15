@@ -521,6 +521,10 @@ fn fill_eligible_commands<'a>(
         let options = &command.options;
         let name = &options.names[0];
 
+        if !options.help_available {
+            continue;
+        }
+
         if options.only_in == OnlyIn::None
             || options.only_in == OnlyIn::Dm && msg.is_private()
             || options.only_in == OnlyIn::Guild && !msg.is_private()
@@ -532,7 +536,7 @@ fn fill_eligible_commands<'a>(
                 continue;
             }
 
-            if options.help_available && has_correct_permissions(&context.cache, &options, msg) {
+            if has_correct_permissions(&context.cache, &options, msg) {
                 if let Some(guild) = msg.guild(&context.cache) {
                     let guild = guild.read();
 
