@@ -438,11 +438,15 @@ fn fetch_all_eligible_commands_in_group<'a>(
         let cmd = &commands[&*name];
         let cmd = cmd.options();
 
+        if !cmd.help_available {
+            continue;
+        }
+
         if !cmd.dm_only && !cmd.guild_only
             || cmd.dm_only && msg.is_private()
             || cmd.guild_only && !msg.is_private()
         {
-            if cmd.help_available && has_correct_permissions(&cmd, msg) {
+            if has_correct_permissions(&cmd, msg) {
 
                 if let Some(guild) = msg.guild() {
                     let guild = guild.read();
