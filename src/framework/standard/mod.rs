@@ -498,6 +498,17 @@ impl StandardFramework {
                 .contains(&message.channel_id)
     }
 
+    #[inline]
+    fn should_fail_common(&self, message: &Message) -> Option<DispatchError> {
+        if self.configuration.ignore_bots && message.author.bot {
+            Some(DispatchError::IgnoredBot)
+        } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
+            Some(DispatchError::WebhookAuthor)
+        } else {
+            None
+        }
+    }
+
     #[allow(too_many_arguments)]
     #[cfg_attr(feature = "cargo-clippy", allow(cyclomatic_complexity))]
     fn should_fail(&mut self,
@@ -509,10 +520,8 @@ impl StandardFramework {
                    to_check: &str,
                    built: &str)
                    -> Option<DispatchError> {
-        if self.configuration.ignore_bots && message.author.bot {
-            Some(DispatchError::IgnoredBot)
-        } else if self.configuration.ignore_webhooks && message.webhook_id.is_some() {
-            Some(DispatchError::WebhookAuthor)
+        if let Some(err) = self.should_fail_common(message) {
+            return Some(err);
         } else {
             let len = args.len();
 
@@ -1156,6 +1165,14 @@ impl Framework for StandardFramework {
                     let after = self.after.clone();
 
                     if to_check == "help" {
+                        if let Some(error) = self.should_fail_common(&message) {
+                            if let Some(ref handler) = self.dispatch_error_handler {
+                                handler(context, message, error);
+                            }
+
+                            return;
+                        }
+
                         let help = self.help.clone();
 
                         if let Some(help) = help {
