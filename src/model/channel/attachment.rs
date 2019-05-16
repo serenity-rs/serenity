@@ -4,14 +4,17 @@ use reqwest::Client as ReqwestClient;
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use std::io::Read;
+#[cfg(feature = "model")]
+use super::id::AttachmentId;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
 /// [`Embed`]: struct.Embed.html
+#[cfg(feature = "model")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Attachment {
     /// The unique ID given to this attachment.
-    pub id: String,
+    pub id: AttachmentId,
     /// The filename of the file that was uploaded. This is equivalent to what
     /// the uploader had their file named.
     pub filename: String,
