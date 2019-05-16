@@ -12,7 +12,7 @@ struct Handler;
 impl EventHandler for Handler {
     fn message(&self, _: Context, msg: Message) {
         if msg.content == "!messageme" {
-            // If the `methods` feature is enabled, then model structs will
+            // If the `utils`-feature is enabled, then model structs will
             // have a lot of useful methods implemented, to avoid using an
             // often otherwise bulky Context, or even much lower-level `rest`
             // method.
