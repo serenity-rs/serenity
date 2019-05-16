@@ -126,7 +126,12 @@ pub struct WebhookId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct AuditLogEntryId(pub u64);
 
+/// An identifier for an attachment.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct AttachmentId(u64);
+
 id_u64! {
+    AttachmentId;
     ApplicationId;
     ChannelId;
     EmojiId;
