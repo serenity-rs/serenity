@@ -411,7 +411,7 @@ impl Default for HelpOptions {
 pub struct GroupOptions {
     pub prefixes: Vec<String>,
     pub only: OnlyIn,
-    pub owner_only: bool,
+    pub owners_only: bool,
     pub owner_privilege: bool,
     pub help_available: bool,
     pub allowed_roles: Vec<String>,
@@ -428,7 +428,7 @@ impl Default for GroupOptions {
         GroupOptions {
             prefixes: Vec::new(),
             only: OnlyIn::default(),
-            owner_only: false,
+            owners_only: false,
             owner_privilege: true,
             help_available: true,
             allowed_roles: Vec::new(),
@@ -490,13 +490,13 @@ impl Parse for GroupOptions {
 
                     options.only = only;
                 }
-                ("owner_only", Expr::Lit(value))
+                ("owners_only", Expr::Lit(value))
                 | ("owner_privilege", Expr::Lit(value))
                 | ("help_available", Expr::Lit(value)) => {
                     let b = value.to_bool();
 
-                    if name == "owner_only" {
-                        options.owner_only = b;
+                    if name == "owners_only" {
+                        options.owners_only = b;
                     } else if name == "owner_privilege" {
                         options.owner_privilege = b;
                     } else {
@@ -573,7 +573,7 @@ impl ToTokens for GroupOptions {
             allowed_roles,
             required_permissions,
             owner_privilege,
-            owner_only,
+            owners_only,
             help_available,
             only,
             description,
@@ -643,8 +643,8 @@ impl ToTokens for GroupOptions {
                 quote!()
             };
 
-            let owner_only = if *owner_only {
-                quote! { owner_only: #owner_only, }
+            let owners_only = if *owners_only {
+                quote! { owners_only: #owners_only, }
             } else {
                 quote!()
             };
@@ -679,7 +679,7 @@ impl ToTokens for GroupOptions {
                     #allowed_roles
                     #required_permissions
                     #owner_privilege
-                    #owner_only
+                    #owners_only
                     #help_available
                     #only
                     #description
@@ -695,7 +695,7 @@ impl ToTokens for GroupOptions {
                     allowed_roles: &[#(#allowed_roles),*],
                     required_permissions: #permissions_path { bits: #required_permissions },
                     owner_privilege: #owner_privilege,
-                    owners_only: #owner_only,
+                    owners_only: #owners_only,
                     help_available: #help_available,
                     only: #only,
                     description: #description,

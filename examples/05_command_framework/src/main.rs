@@ -82,7 +82,7 @@ group!({
 group!({
     name: "owner",
     options: {
-        owner_only: true,
+        owners_only: true,
         // Limit all commands to be guild-restricted.
         only: "guilds",
         // Adds checks that need to be passed.

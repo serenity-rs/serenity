@@ -771,7 +771,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// - `only`: String
 /// Whether this group's commands are restricted to `guilds` or `dms`.
 ///
-/// - `owner_only`: Bool
+/// - `owners_only`: Bool
 /// If only the owners of the bot may execute this group's commands.
 ///
 /// - `owner_privilege`: Bool
