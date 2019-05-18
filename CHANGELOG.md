@@ -177,6 +177,30 @@ It's no ready yet, but we hope that on its release that it will clear misunderst
 - [client] Remove deprecated `Context::edit_profile` ([@zeyla]) [c:bc0d82e]
 - [misc.] Remove everything marked `deprecated` since `v0.5.x` or older ([@Lakelezz]) [c:70720ae]
 
+## [0.5.14] - 2019-5-17
+
+This release fixes a few bugs.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Lakelezz]
+
+## Added
+
+- [model] Allow turning on and off the nsfw property of guilds channels ([@acdenisSK]) [c:68c4f5c]
+
+## Changed
+
+- [builder] Remove `type`-field from `edit`'s request body. ([@Lakelezz]) [c:f648d90]
+
+## Fixed
+
+- [model] Handle serde_json's "arbitrary precision" feature. ([@acdenisSK]) [c:33f4adf]
+- [framework] Do not display commands their `help_available` is set to `false`. ([@Lakelezz]) [c:1705338]
+- [framework] Ignore bots when using the help-command if framework's `ignore_bots` is set to `true`. ([@acdenisSK]) [c:e40758e]
+- [misc.] Rename the `methods`-feature inside the third example to `utils`. ([@Lakelezz]) [c:a7ee6a6]
+
 ## [0.5.13] - 2019-3-10
 
 Thanks to the following for their contributions:
@@ -2690,7 +2714,8 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 Initial commit.
 
 [0.6.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.1
-[0.6.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.5.13...v0.6.0-rc.0
+[0.6.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.5.14...v0.6.0-rc.0
+[0.5.14]: https://github.com/serenity-rs/serenity/compare/v0.5.13...v0.5.14
 [0.5.13]: https://github.com/serenity-rs/serenity/compare/v0.5.12...v0.5.13
 [0.5.12]: https://github.com/serenity-rs/serenity/compare/v0.5.11...v0.5.12
 [0.5.11]: https://github.com/serenity-rs/serenity/compare/v0.5.10...v0.5.11
@@ -2854,6 +2879,13 @@ Initial commit.
 [c:a3477a2]: https://github.com/serenity-rs/serenity/commit/a3477a2cad7d36110acb0316df927bf8611ebece
 [c:bc0d82e]: https://github.com/serenity-rs/serenity/commit/bc0d82eb73f1d5c277dbe9865540b7a623d373b2
 [c:70720ae]: https://github.com/serenity-rs/serenity/commit/70720aeeee44d67a4cb2d58a0c375a54c9be95a2
+
+[c:f648d90]: https://github.com/serenity-rs/serenity/commit/f648d9093f87354bbec03228fa647f6dd9afb03a
+[c:33f4adf]: https://github.com/serenity-rs/serenity/commit/33f4adfe0f6303ac6b39e8c3db6f413e2289c81b
+[c:1705338]: https://github.com/serenity-rs/serenity/commit/17053381b1481e753abdcd319143ddd63467605d
+[c:e40758e]: https://github.com/serenity-rs/serenity/commit/e40758eefdbe5a2b62f252cde69e7dec04898a09
+[c:a7ee6a6]: https://github.com/serenity-rs/serenity/commit/a7ee6a674ae158839466db58ad7e090bb64dc797
+[c:68c4f5c]: https://github.com/serenity-rs/serenity/commit/68c4f5c907993c70fc4a590a6f7d06ee0dba98ee
 
 [c:201dab8]: https://github.com/serenity-rs/serenity/commit/201dab8fa4c31d6e840f88b691772c5b0961780f
 [c:201bc56]: https://github.com/serenity-rs/serenity/commit/201bc56f79ab913db32b3453bc8d61a7bfa0ee17
