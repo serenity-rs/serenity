@@ -1,6 +1,6 @@
 use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS, CHECK};
 use crate::util::{
-    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, ParseStreamExt,
+    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object,
     RefOrInstance,
 };
 use proc_macro2::TokenStream as TokenStream2;
@@ -731,20 +731,16 @@ impl Parse for Group {
 
         input.parse::<Token![,]>()?;
 
-        let options = if let Ok(f) = input.try_parse::<Field<RefOrInstance<GroupOptions>>>() {
-            if f.name != "options" {
-                return Err(Error::new(
-                    f.name.span(),
-                    "the options of a group must be labeled as `options`",
-                ));
-            }
+        let Field { name: oname, value: options } = input.parse::<Field<RefOrInstance<GroupOptions>>>()?;
 
-            input.parse::<Token![,]>()?;
+        if oname != "options" {
+            return Err(Error::new(
+                oname.span(),
+                "every group must have some `options`",
+            ));
+        }
 
-            Some(f.value)
-        } else {
-            None
-        };
+        input.parse::<Token![,]>()?;
 
         let commands = input.parse::<Ident>()?;
         if commands != "commands" {
@@ -789,7 +785,7 @@ impl Parse for Group {
 
         Ok(Group {
             name,
-            options: options.unwrap_or_default(),
+            options,
             commands: content.parse_terminated(Ident::parse_any)?,
             sub_groups,
         })

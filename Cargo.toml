@@ -22,6 +22,7 @@ optional = true
 version = "0.1"
 
 [dependencies.command_attr]
+path = "./command_attr"
 version = "0.1.0-rc"
 optional = true
 
