@@ -216,8 +216,8 @@ fn set_reminder(context: &mut Context, msg: &Message, mut args: Args) -> Command
 
     // First, we check if the user wants a repeated task or not.
     if repeat {
-        // Chrono's duration can also be negative, negative numbers thus we
-        // have to cast to i64.
+        // Chrono's duration can also be negative
+        // and therefore we cast to `i64`.
         scheduler.add_task_duration(Duration::milliseconds(time as i64), move |_| {
             let bot_msg = match msg.channel_id.say(&http, &args) {
                 Ok(msg) => msg,
