@@ -9,7 +9,6 @@ use crate::utils::VecMap;
 /// - `after`
 /// - `around`
 /// - `before`
-/// - `most_recent`
 ///
 /// These can not be mixed, and the first in the list alphabetically will be
 /// used. If one is not specified, `most_recent` will be used.
@@ -99,9 +98,4 @@ impl GetMessages {
         self.0.insert("limit", if limit > 100 { 100 } else { limit });
         self
     }
-
-    /// This is a function that is here for completeness. You do not need to
-    /// call this - except to clear previous calls to `after`, `around`, and
-    /// `before` - as it is the default value.
-    pub fn most_recent(&self) { }
 }
