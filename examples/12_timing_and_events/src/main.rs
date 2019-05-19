@@ -36,17 +36,6 @@ enum DispatchEvent {
     ReactEvent(MessageId, UserId),
 }
 
-impl Hash for DispatchEvent {
-    fn hash<H: Hasher>(&self, state: &mut H) {
-        match self {
-            DispatchEvent::ReactEvent(msg_id, user_id) => {
-                msg_id.hash(state);
-                user_id.hash(state);
-            }
-        }
-    }
-}
-
 // We need to implement equality for our enum.
 // One could test variants only. In this case, we want to know who reacted
 // on which message.
@@ -63,6 +52,19 @@ impl PartialEq for DispatchEvent {
 }
 
 impl Eq for DispatchEvent {}
+
+// See following Clippy-lint:
+// https://rust-lang.github.io/rust-clippy/master/index.html#derive_hash_xor_eq
+impl Hash for DispatchEvent {
+    fn hash<H: Hasher>(&self, state: &mut H) {
+        match self {
+            DispatchEvent::ReactEvent(msg_id, user_id) => {
+                msg_id.hash(state);
+                user_id.hash(state);
+            }
+        }
+    }
+}
 
 struct DispatcherKey;
 impl TypeMapKey for DispatcherKey {
