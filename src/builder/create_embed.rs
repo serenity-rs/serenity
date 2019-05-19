@@ -474,8 +474,6 @@ impl CreateEmbedAuthor {
         self.0.insert("url", Value::String(url.to_string()));
         self
     }
-
-    pub fn build(&mut self) {}
 }
 
 /// A builder to create a fake [`Embed`] object's footer, for use with the
