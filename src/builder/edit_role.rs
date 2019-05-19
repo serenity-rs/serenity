@@ -93,7 +93,7 @@ impl EditRole {
     }
 
     /// The name of the role to set.
-    pub fn name(&mut self, name: &str) -> &mut Self {
+    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }

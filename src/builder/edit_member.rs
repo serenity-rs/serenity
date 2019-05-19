@@ -37,7 +37,7 @@ impl EditMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_NICKNAMES
-    pub fn nickname(&mut self, nickname: &str) -> &mut Self {
+    pub fn nickname<S: ToString>(&mut self, nickname: S) -> &mut Self {
         self.0.insert("nick", Value::String(nickname.to_string()));
         self
     }

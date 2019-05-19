@@ -19,10 +19,6 @@ use chrono::{DateTime, TimeZone};
 use crate::internal::prelude::*;
 use crate::model::channel::Embed;
 use serde_json::{json, Value};
-use std::{
-    default::Default,
-    fmt::Display
-};
 use crate::utils::{self, VecMap};
 
 #[cfg(feature = "utils")]
@@ -111,16 +107,9 @@ impl CreateEmbed {
     ///
     /// **Note**: This can't be longer than 2048 characters.
     #[inline]
-    pub fn description<D: Display>(&mut self, description: D) -> &mut Self {
-        self._description(description.to_string());
+    pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
+        self.0.insert("description", Value::String(description.to_string()));
         self
-    }
-
-    fn _description(&mut self, description: String) {
-        self.0.insert(
-            "description",
-            Value::String(description),
-        );
     }
 
     /// Set a field. Note that this will not overwrite other fields, and will
@@ -130,12 +119,12 @@ impl CreateEmbed {
     /// name and 1024 in a field value.
     #[inline]
     pub fn field<T, U>(&mut self, name: T, value: U, inline: bool)  -> &mut Self
-        where T: Display, U: Display {
-        self._field(&name.to_string(), &value.to_string(), inline);
+        where T: ToString, U: ToString {
+        self._field(name.to_string(), value.to_string(), inline);
         self
     }
 
-    fn _field(&mut self, name: &str, value: &str, inline: bool) {
+    fn _field(&mut self, name: String, value: String, inline: bool) {
         {
             let entry = self.0
                 .entry("fields")
@@ -158,11 +147,12 @@ impl CreateEmbed {
     /// [`field`]: #method.field
     pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
         where It: IntoIterator<Item=(T, U, bool)>,
-              T: Display,
-              U: Display {
-        for field in fields {
-            self.field(field.0.to_string(), field.1.to_string(), field.2);
+              T: ToString,
+              U: ToString {
+        for (name, value, inline) in fields {
+            self.field(name, value, inline);
         }
+
         self
     }
 
@@ -183,9 +173,9 @@ impl CreateEmbed {
         self
     }
 
-    fn url_object(&mut self, name: &'static str, url: &str) -> &mut Self {
+    fn url_object(&mut self, name: &'static str, url: String) -> &mut Self {
         let obj = json!({
-            "url": url.to_string()
+            "url": url,
         });
 
         self.0.insert(name, obj);
@@ -194,24 +184,17 @@ impl CreateEmbed {
 
     /// Set the image associated with the embed. This only supports HTTP(S).
     #[inline]
-    pub fn image<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
-        self._image(url.as_ref());
-        self
-    }
+    pub fn image<S: ToString>(&mut self, url: S) -> &mut Self {
+        self.url_object("image", url.to_string());
 
-    fn _image(&mut self, url: &str) {
-        self.url_object("image", url);
+        self
     }
 
     /// Set the thumbnail of the embed. This only supports HTTP(S).
     #[inline]
-    pub fn thumbnail<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
-        self._thumbnail(url.as_ref());
+    pub fn thumbnail<S: ToString>(&mut self, url: S) -> &mut Self {
+        self.url_object("thumbnail", url.to_string());
         self
-    }
-
-    fn _thumbnail(&mut self, url: &str) {
-        self.url_object("thumbnail", url);
     }
 
     /// Set the timestamp.
@@ -328,24 +311,16 @@ impl CreateEmbed {
 
     /// Set the title of the embed.
     #[inline]
-    pub fn title<D: Display>(&mut self, title: D) -> &mut Self {
-        self._title(title.to_string());
+    pub fn title<D: ToString>(&mut self, title: D) -> &mut Self {
+        self.0.insert("title", Value::String(title.to_string()));
         self
-    }
-
-    fn _title(&mut self, title: String) {
-        self.0.insert("title", Value::String(title));
     }
 
     /// Set the URL to direct to when clicking on the title.
     #[inline]
-    pub fn url<S: AsRef<str>>(&mut self, url: S) -> &mut Self {
-        self._url(url.as_ref());
-        self
-    }
-
-    fn _url(&mut self, url: &str) {
+    pub fn url<S: ToString>(&mut self, url: S) -> &mut Self {
         self.0.insert("url", Value::String(url.to_string()));
+        self
     }
 
     /// Same as calling [`image`] with "attachment://filename.(jpg, png)".
@@ -357,13 +332,10 @@ impl CreateEmbed {
     ///
     /// [`image`]: #method.image
     #[inline]
-    pub fn attachment<S: AsRef<str>>(&mut self, filename: S) -> &mut Self {
-        self._attachment(filename.as_ref());
-        self
-    }
+    pub fn attachment<S: ToString>(&mut self, filename: S) -> &mut Self {
+        self.image(format_args!("attachment://{}", filename));
 
-    fn _attachment(&mut self, filename: &str) {
-        self.image(&format!("attachment://{}", filename));
+        self
     }
 }
 
@@ -458,19 +430,19 @@ pub struct CreateEmbedAuthor(pub VecMap<&'static str, Value>);
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
-    pub fn icon_url(&mut self, icon_url: &str) -> &mut Self {
+    pub fn icon_url<S: ToString>(&mut self, icon_url: S) -> &mut Self {
         self.0.insert("icon_url", Value::String(icon_url.to_string()));
         self
     }
 
     /// Set the author's name.
-    pub fn name(&mut self, name: &str) -> &mut Self {
+    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }
 
     /// Set the author's URL.
-    pub fn url(&mut self, url: &str) -> &mut Self {
+    pub fn url<S: ToString>(&mut self, url: S) -> &mut Self {
         self.0.insert("url", Value::String(url.to_string()));
         self
     }
@@ -488,13 +460,13 @@ pub struct CreateEmbedFooter(pub VecMap<&'static str, Value>);
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
-    pub fn icon_url(&mut self, icon_url: &str) -> &mut Self {
+    pub fn icon_url<S: ToString>(&mut self, icon_url: S) -> &mut Self {
         self.0.insert("icon_url", Value::String(icon_url.to_string()));
         self
     }
 
     /// Set the footer's text.
-    pub fn text<D: Display>(&mut self, text: D) -> &mut Self {
+    pub fn text<S: ToString>(&mut self, text: S) -> &mut Self {
         self.0.insert("text", Value::String(text.to_string()));
         self
     }

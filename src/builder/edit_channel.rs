@@ -36,7 +36,7 @@ impl EditChannel {
     /// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    pub fn name(&mut self, name: &str) -> &mut Self {
+    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }
@@ -54,7 +54,7 @@ impl EditChannel {
     /// This is for [text] channels only.
     ///
     /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
-    pub fn topic(&mut self, topic: &str) -> &mut Self {
+    pub fn topic<S: ToString>(&mut self, topic: S) -> &mut Self {
         self.0.insert("topic", Value::String(topic.to_string()));
         self
     }

@@ -94,7 +94,7 @@ impl EditGuild {
     /// Set the name of the guild.
     ///
     /// **Note**: Must be between (and including) 2-100 chracters.
-    pub fn name(&mut self, name: &str) -> &mut Self {
+    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }

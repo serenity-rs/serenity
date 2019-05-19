@@ -100,7 +100,7 @@ impl EditProfile {
     /// and current discriminator, a new unique discriminator will be assigned.
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
-    pub fn username(&mut self, username: &str) -> &mut Self {
+    pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
         self
     }

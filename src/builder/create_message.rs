@@ -1,7 +1,6 @@
 use crate::internal::prelude::*;
 use crate::http::AttachmentType;
 use crate::model::channel::ReactionType;
-use std::fmt::Display;
 use super::CreateEmbed;
 use crate::utils::{self, VecMap};
 
@@ -59,8 +58,8 @@ impl<'a> CreateMessage<'a> {
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: Display>(&mut self, content: D) -> &mut Self {
-        self._content(content.to_string());
+    pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
+        self.0.insert("content", Value::String(content.to_string()));
         self
     }
 
