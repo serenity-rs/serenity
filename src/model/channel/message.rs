@@ -212,7 +212,7 @@ impl Message {
 
         f(&mut builder);
 
-        let map = serenity_utils::vecmap_to_json_map(builder.0);
+        let map = serenity_utils::hashmap_to_json_map(builder.0);
 
         match context.http.edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
             Ok(edited) => {

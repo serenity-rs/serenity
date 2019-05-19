@@ -15,11 +15,15 @@
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 //! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
 
-use chrono::{DateTime, TimeZone};
 use crate::internal::prelude::*;
 use crate::model::channel::Embed;
+use crate::utils;
+
+use chrono::{DateTime, TimeZone};
 use serde_json::{json, Value};
-use crate::utils::{self, VecMap};
+
+use std::fmt::Display;
+use std::collections::HashMap;
 
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
@@ -36,7 +40,7 @@ use crate::utils::Colour;
 /// [`Embed`]: ../model/channel/struct.Embed.html
 /// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
 #[derive(Clone, Debug)]
-pub struct CreateEmbed(pub VecMap<&'static str, Value>);
+pub struct CreateEmbed(pub HashMap<&'static str, Value>);
 
 impl CreateEmbed {
     /// Set the author of the embed.
@@ -50,7 +54,7 @@ impl CreateEmbed {
         let mut author = CreateEmbedAuthor::default();
         f(&mut author);
 
-        let map = utils::vecmap_to_json_map(author.0);
+        let map = utils::hashmap_to_json_map(author.0);
 
         self.0.insert("author", Value::Object(map));
         self
@@ -167,7 +171,7 @@ impl CreateEmbed {
         let mut create_embed_footer = CreateEmbedFooter::default();
         f(&mut create_embed_footer);
         let footer = create_embed_footer.0;
-        let map = utils::vecmap_to_json_map(footer);
+        let map = utils::hashmap_to_json_map(footer);
 
         self.0.insert("footer", Value::Object(map));
         self
@@ -333,7 +337,9 @@ impl CreateEmbed {
     /// [`image`]: #method.image
     #[inline]
     pub fn attachment<S: ToString>(&mut self, filename: S) -> &mut Self {
-        self.image(format_args!("attachment://{}", filename));
+        let mut filename = filename.to_string();
+        filename.insert_str(0, "attachment://");
+        self.url_object("image", filename);
 
         self
     }
@@ -342,7 +348,7 @@ impl CreateEmbed {
 impl Default for CreateEmbed {
     /// Creates a builder with default values, setting the `type` to `rich`.
     fn default() -> CreateEmbed {
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("type", Value::String("rich".to_string()));
 
         CreateEmbed(map)
@@ -426,7 +432,7 @@ impl From<Embed> for CreateEmbed {
 /// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
 /// [`name`]: #method.name
 #[derive(Clone, Debug, Default)]
-pub struct CreateEmbedAuthor(pub VecMap<&'static str, Value>);
+pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
 
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
@@ -456,7 +462,7 @@ impl CreateEmbedAuthor {
 /// [`Embed`]: ../model/channel/struct.Embed.html
 /// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
 #[derive(Clone, Debug, Default)]
-pub struct CreateEmbedFooter(pub VecMap<&'static str, Value>);
+pub struct CreateEmbedFooter(pub HashMap<&'static str, Value>);
 
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
@@ -558,7 +564,7 @@ mod test {
             builder.title("still a hakase");
             builder.url("https://i.imgur.com/XfWpfCV.gif");
 
-        let built = Value::Object(utils::vecmap_to_json_map(builder.0));
+        let built = Value::Object(utils::hashmap_to_json_map(builder.0));
 
         let obj = json!({
             "color": 0xFF0011,

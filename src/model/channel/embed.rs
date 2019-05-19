@@ -95,7 +95,7 @@ impl Embed {
         where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
-        let map = utils::vecmap_to_json_map(create_embed.0);
+        let map = utils::hashmap_to_json_map(create_embed.0);
 
         Value::Object(map)
     }

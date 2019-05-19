@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -27,7 +27,7 @@ use std::fmt::{
     Result as FmtResult
 };
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils::{self as serenity_utils};
+use crate::utils as serenity_utils;
 #[cfg(all(feature = "model", feature = "builder"))]
 use crate::builder::EditChannel;
 #[cfg(feature = "http")]
@@ -146,7 +146,7 @@ impl GuildChannel {
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
-        let map = serenity_utils::vecmap_to_json_map(invite.0);
+        let map = serenity_utils::hashmap_to_json_map(invite.0);
 
         context.http.create_invite(self.id.0, &map)
     }
@@ -363,15 +363,13 @@ impl GuildChannel {
             }
         }
 
-        use serenity_utils::VecMap;
-
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
-        let edited = serenity_utils::vecmap_to_json_map(edit_channel.0);
+        let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
         match context.http.edit_channel(self.id.0, &edited) {
             Ok(channel) => {

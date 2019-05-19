@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
-use crate::utils::VecMap;
 use crate::model::id::ChannelId;
+use std::collections::HashMap;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
@@ -20,7 +20,7 @@ use crate::model::id::ChannelId;
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/channel/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub VecMap<&'static str, Value>);
+pub struct EditChannel(pub HashMap<&'static str, Value>);
 
 impl EditChannel {
     /// The bitrate of the channel in bits.

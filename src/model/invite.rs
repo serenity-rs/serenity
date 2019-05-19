@@ -94,7 +94,7 @@ impl Invite {
             }
         }
 
-        let map = utils::vecmap_to_json_map(f(CreateInvite::default()).0);
+        let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
 
         context.http.create_invite(channel_id.0, &map)
     }

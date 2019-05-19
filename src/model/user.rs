@@ -26,7 +26,7 @@ use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use crate::utils::{self, VecMap};
+use crate::utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -109,7 +109,7 @@ impl CurrentUser {
     #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
         where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
@@ -118,7 +118,7 @@ impl CurrentUser {
 
         let mut edit_profile = EditProfile(map);
         f(&mut edit_profile);
-        let map = utils::vecmap_to_json_map(edit_profile.0);
+        let map = utils::hashmap_to_json_map(edit_profile.0);
 
         match http.as_ref().edit_profile(&map) {
             Ok(new) => {

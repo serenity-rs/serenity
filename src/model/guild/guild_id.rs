@@ -214,7 +214,7 @@ impl GuildId {
     where F: FnOnce(&mut EditRole) -> &mut EditRole {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = utils::vecmap_to_json_map(edit_role.0);
+        let map = utils::hashmap_to_json_map(edit_role.0);
 
         let role = http.as_ref().create_role(self.0, &map)?;
 
@@ -305,7 +305,7 @@ impl GuildId {
     where F: FnOnce(&mut EditGuild) -> &mut EditGuild{
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
-        let map = utils::vecmap_to_json_map(edit_guild.0);
+        let map = utils::hashmap_to_json_map(edit_guild.0);
 
         http.as_ref().edit_guild(self.0, &map)
     }
@@ -359,7 +359,7 @@ impl GuildId {
         where F: FnOnce(&mut EditMember) -> &mut EditMember {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
-        let map = utils::vecmap_to_json_map(edit_member.0);
+        let map = utils::hashmap_to_json_map(edit_member.0);
 
         http.as_ref().edit_member(self.0, user_id.0, &map)
     }
@@ -405,7 +405,7 @@ impl GuildId {
         where F: FnOnce(&mut EditRole) -> &mut EditRole {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = utils::vecmap_to_json_map(edit_role.0);
+        let map = utils::hashmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.0, &map)
     }

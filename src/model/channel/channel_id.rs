@@ -262,7 +262,7 @@ impl ChannelId {
         let mut channel = EditChannel::default();
         f(&mut channel);
 
-        let map = utils::vecmap_to_json_map(channel.0);
+        let map = utils::hashmap_to_json_map(channel.0);
 
         http.as_ref().edit_channel(self.0, &map)
     }
@@ -306,7 +306,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::vecmap_to_json_map(msg.0);
+        let map = utils::hashmap_to_json_map(msg.0);
 
         http.as_ref().edit_message(self.0, message_id.0, &Value::Object(map))
     }
@@ -617,7 +617,7 @@ impl ChannelId {
             msg.0.insert("payload_json", json!({ "embed": e }));
         }
 
-        let map = utils::vecmap_to_json_map(msg.0.clone());
+        let map = utils::hashmap_to_json_map(msg.0.clone());
         http.as_ref().send_files(self.0, files, map)
     }
 
@@ -652,7 +652,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::vecmap_to_json_map(msg.0.clone());
+        let map = utils::hashmap_to_json_map(msg.0.clone());
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;

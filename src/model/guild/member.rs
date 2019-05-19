@@ -123,7 +123,7 @@ impl Member {
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
-        let map = utils::vecmap_to_json_map(builder.0);
+        let map = utils::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
@@ -245,7 +245,7 @@ impl Member {
     pub fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(&self, http: impl AsRef<Http>, f: F) -> Result<()> {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
-        let map = utils::vecmap_to_json_map(edit_member.0);
+        let map = utils::hashmap_to_json_map(edit_member.0);
 
         http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
@@ -415,7 +415,7 @@ impl Member {
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
-        let map = utils::vecmap_to_json_map(builder.0);
+        let map = utils::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map) {
             Ok(()) => Ok(()),
