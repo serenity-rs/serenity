@@ -284,7 +284,7 @@ pub struct Options {
     pub only_in: OnlyIn,
     pub owners_only: bool,
     pub owner_privilege: bool,
-    pub sub_groups: Vec<Ident>,
+    pub sub_commands: Vec<Ident>,
 }
 
 impl Default for Options {
@@ -305,7 +305,7 @@ impl Default for Options {
             only_in: OnlyIn::default(),
             owners_only: false,
             owner_privilege: true,
-            sub_groups: Vec::new(),
+            sub_commands: Vec::new(),
         }
     }
 }

@@ -57,7 +57,7 @@ pub struct CommandOptions {
     /// Whether the command treats owners as normal users.
     pub owner_privilege: bool,
     /// Other commands belonging to this command.
-    pub sub_groups: &'static [&'static Command],
+    pub sub_commands: &'static [&'static Command],
 }
 
 #[derive(Debug, PartialEq)]
@@ -227,7 +227,7 @@ pub struct HelpOptions {
     pub indention_prefix: &'static str,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct CommandGroup {
     pub name: &'static str,
     pub options: &'static GroupOptions,
