@@ -303,6 +303,7 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
         .spawn()?;
 
     let ffmpeg = Command::new("ffmpeg")
+        .arg("-re")
         .arg("-i")
         .arg("-")
         .args(&ffmpeg_args)
