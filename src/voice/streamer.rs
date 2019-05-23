@@ -273,39 +273,45 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn Audi
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
-    let args = [
+    let ytdl_args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
         "--no-playlist",
-        "--print-json",
-        "--skip-download",
+        "--ignore-config",
         uri,
+        "-o",
+        "-"
     ];
 
-    let out = Command::new("youtube-dl")
-        .args(&args)
+    let ffmpeg_args = [
+        "-f",
+        "s16le",
+        "-ac",
+        "2",
+        "-ar",
+        "48000",
+        "-acodec",
+        "pcm_s16le",
+        "-",
+    ];
+
+    let youtube_dl = Command::new("youtube-dl")
+        .args(&ytdl_args)
         .stdin(Stdio::null())
-        .output()?;
+        .stderr(Stdio::null())
+        .stdout(Stdio::piped())
+        .spawn()?;
 
-    if !out.status.success() {
-        return Err(Error::Voice(VoiceError::YouTubeDLRun(out)));
-    }
+    let ffmpeg = Command::new("ffmpeg")
+        .arg("-i")
+        .arg("-")
+        .args(&ffmpeg_args)
+        .stdin(youtube_dl.stdout.unwrap())
+        .stderr(Stdio::null())
+        .stdout(Stdio::piped())
+        .spawn()?;
 
-    let value = serde_json::from_reader(&out.stdout[..])?;
-    let mut obj = match value {
-        Value::Object(obj) => obj,
-        other => return Err(Error::Voice(VoiceError::YouTubeDLProcessing(other))),
-    };
-
-    let uri = match obj.remove("url") {
-        Some(v) => match v {
-            Value::String(uri) => uri,
-            other => return Err(Error::Voice(VoiceError::YouTubeDLUrl(other))),
-        },
-        None => return Err(Error::Voice(VoiceError::YouTubeDLUrl(Value::Object(obj)))),
-    };
-
-    ffmpeg(&uri)
+    Ok(pcm(true, ChildContainer(ffmpeg)))
 }
 
 fn is_stereo(path: &OsStr) -> Result<bool> {
