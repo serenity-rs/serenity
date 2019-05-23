@@ -17,6 +17,7 @@ use std::{
 };
 use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
 use log::{debug, warn};
+use crate::prelude::SerenityError;
 
 struct ChildContainer(Child);
 
@@ -307,7 +308,7 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
         .arg("-i")
         .arg("-")
         .args(&ffmpeg_args)
-        .stdin(youtube_dl.stdout.unwrap())
+        .stdin(youtube_dl.stdout.ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?)
         .stderr(Stdio::null())
         .stdout(Stdio::piped())
         .spawn()?;
