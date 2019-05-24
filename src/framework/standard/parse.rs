@@ -58,8 +58,7 @@ pub fn parse_prefix<'a>(
     }
 
     if let Some(prefix) = prefix {
-        let pos = stream.offset();
-        stream.set(pos + prefix.len());
+        stream.increment(prefix.len());
 
         if config.with_whitespace.prefixes {
             stream.take_while(|s| s.is_whitespace());
@@ -128,8 +127,7 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
             let equals = self.as_lowercase(n, |n| n == *name && !self.config.disabled_commands.contains(n));
 
             if equals {
-                let pos = self.stream.offset();
-                self.stream.set(pos + n.len());
+                self.stream.increment(n.len());
 
                 if self.config.with_whitespace.commands {
                     self.stream.take_while(|s| s.is_whitespace());
@@ -157,8 +155,7 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
             let pp = self.next_text(|| p.chars().count());
 
             if *p == pp {
-                let pos = self.stream.offset();
-                self.stream.set(pos + pp.len());
+                self.stream.increment(pp.len());
 
                 if self.config.with_whitespace.groups {
                     self.stream.take_while(|s| s.is_whitespace());

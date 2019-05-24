@@ -63,7 +63,7 @@ macro_rules! match_options {
 /// - `#[checks(idents)]`
 /// Preconditions that must be met. Executed before the command's execution.
 /// `idents` is a list of identifiers, seperated by a comma, referencing functions of the declaration:
-/// `fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool`
+/// `fn(&mut Context, &Message, &mut Args, &CommandOptions) -> serenity::framework::standard::CheckResult`
 ///
 /// - `#[aliases(names)]`
 /// A list of other names that can be used to execute this command.
@@ -72,10 +72,10 @@ macro_rules! match_options {
 /// - `#[description(desc)]`/`#[description = desc]`
 /// A summary of the command.
 ///
-/// - `#[usage(usg)]`/`#[usage = usg]
+/// - `#[usage(usg)]`/`#[usage = usg]`
 /// Usage schema of the command.
 ///
-/// - `#[example(ex)]`/`#[example = ex]
+/// - `#[example(ex)]`/`#[example = ex]`
 /// Example of the command's usage.
 ///
 /// - `#[min_args(min)]`, `#[max_args(max)]`, `#[num_args(min_and_max)]`
@@ -99,7 +99,7 @@ macro_rules! match_options {
 /// - `#[owners_only]`/`#[owners_only(bool)]`
 /// Whether this command is exclusive to owners.
 ///
-/// - `#[owner_privilege]`/`#[owner_privilege]
+/// - `#[owner_privilege]`/`#[owner_privilege]`
 /// Whether this command has a privilege for owners (i.e certain options are ignored for them).
 ///
 /// - `#[sub(commands)]`
