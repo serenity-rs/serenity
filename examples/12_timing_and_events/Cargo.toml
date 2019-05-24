@@ -1,0 +1,13 @@
+[package]
+name = "12_timing_and_events"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies.serenity]
+features = ["framework", "standard_framework", "rustls_backend"]
+path = "../../"
+
+[dependencies]
+hey_listen = "0.4.0"
+white_rabbit = "0.1.1"
