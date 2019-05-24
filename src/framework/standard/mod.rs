@@ -767,6 +767,7 @@ pub trait CommonOptions {
     fn owners_only(&self) -> bool;
 }
 
+#[cfg(feature = "cache")]
 impl CommonOptions for &GroupOptions {
     fn required_permissions(&self) -> &Permissions {
         &self.required_permissions
@@ -789,6 +790,7 @@ impl CommonOptions for &GroupOptions {
     }
 }
 
+#[cfg(feature = "cache")]
 impl CommonOptions for &CommandOptions {
     fn required_permissions(&self) -> &Permissions {
         &self.required_permissions
@@ -811,6 +813,7 @@ impl CommonOptions for &CommandOptions {
     }
 }
 
+#[cfg(feature = "cache")]
 pub(crate) fn has_correct_permissions(
     cache: impl AsRef<CacheRwLock>,
     options: &impl CommonOptions,
