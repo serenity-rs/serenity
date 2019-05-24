@@ -277,6 +277,8 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
     let ytdl_args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
+        "-R",
+        "infinite",
         "--no-playlist",
         "--ignore-config",
         uri,
