@@ -206,6 +206,20 @@ impl Guild {
         permissions.is_empty()
     }
 
+    #[cfg(feature = "cache")]
+    pub fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
+        let name = name.as_ref();
+        let cache = cache.as_ref().read();
+        let guild = cache.guilds.get(&self.id)?.read();
+
+        guild.channels
+            .iter()
+            .filter(|(_c_id, c)| c.read().name == name)
+            .map(|(c_id, _c)| c_id)
+            .nth(0)
+            .cloned()
+    }
+
     /// Ban a [`User`] from the guild. All messages by the
     /// user within the last given number of days given will be deleted.
     ///
