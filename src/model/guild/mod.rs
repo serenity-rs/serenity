@@ -214,10 +214,13 @@ impl Guild {
 
         guild.channels
             .iter()
-            .filter(|(_c_id, c)| c.read().name == name)
-            .map(|(c_id, _c)| c_id)
-            .nth(0)
-            .cloned()
+            .find_map(|(id, c)| {
+                if c.read().name == name {
+                    Some(*id)
+                } else {
+                    None
+                }
+            })
     }
 
     /// Ban a [`User`] from the guild. All messages by the
