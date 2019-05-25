@@ -231,6 +231,7 @@ pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<
     deserializer.deserialize_any(U64Visitor)
 }
 
+#[allow(clippy::trivially_copy_pass_by_ref)]
 pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::Error> {
     ser.serialize_str(&data.to_string())
 }

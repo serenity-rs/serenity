@@ -364,8 +364,8 @@ impl Client {
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
-        let event_handler = handler.map(|h| Arc::new(h));
-        let raw_event_handler = raw_handler.map(|rh| Arc::new(rh));
+        let event_handler = handler.map(Arc::new);
+        let raw_event_handler = raw_handler.map(Arc::new);
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));

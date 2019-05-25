@@ -129,11 +129,11 @@ mod test {
 
         let reqwest_response: reqwest::Response = response.into();
         let error_response: ErrorResponse = reqwest_response.into();
-        
+
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),
             url: String::from("https://ferris.crab").parse().unwrap(),
-            error: error,
+            error,
         };
 
         assert_eq!(error_response, known);

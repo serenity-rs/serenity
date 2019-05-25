@@ -46,7 +46,6 @@ use std::{
     borrow::Borrow,
     collections::HashSet,
     fmt::Write,
-    hash::BuildHasher,
     ops::{Index, IndexMut},
 };
 #[cfg(all(feature = "cache", feature = "http"))]
@@ -272,7 +271,7 @@ pub fn has_all_requirements(
 #[inline]
 #[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
-    search_on.starts_with(word) && search_on.get(word.len()..word.len() + 1)
+    search_on.starts_with(word) && search_on.get(word.len()..=word.len())
         .map_or(false, |slice| slice == " ")
 }
 
@@ -294,7 +293,7 @@ fn find_any_command_matches(
                 .iter()
                 .any(|prefix|
                     if starts_with_whole_word(&name, &prefix) {
-                        name.drain(..prefix.len() + 1);
+                        name.drain(..=prefix.len());
 
                         n == &name
                     } else {
@@ -308,7 +307,7 @@ fn find_any_command_matches(
 fn check_command_behaviour(
     msg: &Message,
     options: &impl CommonOptions,
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     help_options: &HelpOptions,
     cache: &CacheRwLock,
 ) -> HelpBehaviour {
@@ -321,7 +320,7 @@ fn check_command_behaviour(
         || options.only_in() == OnlyIn::Guild && !msg.is_private()
     {
         if options.owners_only() && !owners.contains(&msg.author.id) {
-            return help_options.lacking_ownership.clone();
+            return help_options.lacking_ownership;
         }
 
         if has_correct_permissions(&cache, options, msg) {
@@ -333,23 +332,24 @@ fn check_command_behaviour(
                     if has_correct_roles(options, &guild, &member) {
                         return HelpBehaviour::Nothing;
                     } else {
-                        return help_options.lacking_role.clone();
+                        return help_options.lacking_role;
                     }
                 }
             } else {
                 return HelpBehaviour::Nothing;
             }
         } else {
-            return help_options.lacking_permissions.clone();
+            return help_options.lacking_permissions;
         }
     } else {
-        return help_options.wrong_channel.clone();
+        return help_options.wrong_channel;
     }
 
     HelpBehaviour::Nothing
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::too_many_arguments)]
 fn nested_group_command_search<'a>(
     cache: &CacheRwLock,
     groups: &[&'static CommandGroup],
@@ -357,7 +357,7 @@ fn nested_group_command_search<'a>(
     help_options: &'a HelpOptions,
     msg: &Message,
     similar_commands: &mut Vec<SuggestedCommandName>,
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
 ) -> Result<CustomisedHelpData<'a>, ()> {
     for group in groups {
         let group = *group;
@@ -516,7 +516,7 @@ fn fetch_single_command<'a>(
     name: &str,
     help_options: &'a HelpOptions,
     msg: &Message,
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
 ) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
     let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
     let cache = cache.as_ref();
@@ -537,10 +537,11 @@ fn fetch_single_command<'a>(
 }
 
 #[cfg(feature = "cache")]
+#[allow(clippy::too_many_arguments)]
 fn fill_eligible_commands<'a>(
     context: &Context,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     msg: &Message,
@@ -599,10 +600,11 @@ fn fill_eligible_commands<'a>(
 
 /// Tries to extract a single command matching searched command name.
 #[cfg(feature = "cache")]
+#[allow(clippy::too_many_arguments)]
 fn fetch_all_eligible_commands_in_group<'a>(
     context: &Context,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     msg: &Message,
@@ -645,7 +647,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 fn create_command_group_commands_pair_from_groups<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair> {
@@ -669,7 +671,7 @@ fn create_command_group_commands_pair_from_groups<'a>(
 fn create_single_group(
     context: &Context,
     group: &CommandGroup,
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     msg: &Message,
     help_options: &HelpOptions,
 ) -> GroupCommandsPair {
@@ -692,10 +694,11 @@ fn create_single_group(
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
+#[allow(clippy::implicit_hasher)]
 pub fn create_customised_help_data<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
@@ -720,7 +723,7 @@ pub fn create_customised_help_data<'a>(
                             .any(|prefix| *prefix == searched_named_lowercase)
                     {
                         let single_group =
-                            create_single_group(&context, &group, &owners, &msg, &help_options);
+                            create_single_group(&context, &group, owners, &msg, &help_options);
 
                         if !single_group.command_names.is_empty() {
                             return CustomisedHelpData::GroupedCommands {
@@ -768,7 +771,7 @@ pub fn create_customised_help_data<'a>(
     let listed_groups = create_command_group_commands_pair_from_groups(
         &context,
         &groups,
-        &owners,
+        owners,
         &msg,
         &help_options,
     );
@@ -819,14 +822,14 @@ fn flatten_group_to_string(
         .join(&format!("\n{}", &repeated_indent_str));
 
 
-    if group.command_names.len() >= 1 {
+    if !group.command_names.is_empty() {
         joined_commands.insert_str(0, &repeated_indent_str);
     }
 
     let _ = writeln!(group_text, "{}", joined_commands);
 
     for sub_group in &group.sub_groups {
-        
+
         if !sub_group.command_names.is_empty() {
             let mut sub_group_text = String::default();
 
@@ -1046,7 +1049,7 @@ fn send_error_embed(
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
 ///     groups: &[&'static CommandGroup],
-///     owners: HashSet<UserId, impl BuildHasher>
+///     owners: HashSet<UserId>
 /// ) -> CommandResult {
 ///     with_embeds(context, msg, args, &help_options, groups, owners)
 /// }
@@ -1055,13 +1058,14 @@ fn send_error_embed(
 ///     .help(&MY_HELP_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::implicit_hasher)]
 pub fn with_embeds(
     context: &mut Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>,
+    owners: HashSet<UserId>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);
@@ -1214,7 +1218,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
 ///     groups: &[&'static CommandGroup],
-///     owners: HashSet<UserId, impl BuildHasher>
+///     owners: HashSet<UserId>
 /// ) -> CommandResult {
 ///     plain(context, msg, args, &help_options, groups, owners)
 /// }
@@ -1223,13 +1227,14 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     .help(&MY_HELP_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::implicit_hasher)]
 pub fn plain(
     context: &mut Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>,
+    owners: HashSet<UserId>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);

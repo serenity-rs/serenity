@@ -77,6 +77,7 @@ pub fn parse_prefix<'a>(
     (Prefix::None, args.trim())
 }
 
+#[allow(clippy::enum_variant_names)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum ParseMode {
     BySpace,

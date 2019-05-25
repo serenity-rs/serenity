@@ -94,6 +94,11 @@ impl GuildId {
     pub fn channels(self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
         let mut channels = HashMap::new();
 
+        // Clippy is suggesting:
+        // consider removing
+        // `http.as_ref().get_channels(self.0)?()`:
+        // `http.as_ref().get_channels(self.0)?`.
+        #[allow(clippy::identity_conversion)]
         for channel in http.as_ref().get_channels(self.0)? {
             channels.insert(channel.id, channel);
         }
