@@ -822,7 +822,7 @@ fn flatten_group_to_string(
         .join(&format!("\n{}", &repeated_indent_str));
 
 
-    if group.command_names.is_empty() {
+    if !group.command_names.is_empty() {
         joined_commands.insert_str(0, &repeated_indent_str);
     }
 
