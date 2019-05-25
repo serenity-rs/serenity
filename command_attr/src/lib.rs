@@ -252,12 +252,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let name = _name.clone();
 
-    // If name starts with a number, prepend an underscore to make it a valid identifier.
-    let n = if _name.starts_with(|c: char| c.is_numeric()) {
-        format!("_{}", _name)
-    } else {
-        _name
-    };
+    let n = fun.name.to_string();
 
     let _name = Ident::new(&n, Span::call_site());
 
