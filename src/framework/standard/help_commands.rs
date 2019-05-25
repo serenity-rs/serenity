@@ -598,7 +598,8 @@ fn fill_eligible_commands<'a>(
     }
 }
 
-/// Tries to extract a single command matching searched command name.
+/// Tries to fetch all commands visible to the user within a group and
+/// its sub-groups.
 #[cfg(feature = "cache")]
 #[allow(clippy::too_many_arguments)]
 fn fetch_all_eligible_commands_in_group<'a>(
@@ -625,6 +626,12 @@ fn fetch_all_eligible_commands_in_group<'a>(
     );
 
     for sub_group in group.sub_groups {
+        if HelpBehaviour::Hide == highest_formatter {
+            break;
+        } else if sub_group.commands.is_empty() && sub_group.sub_groups.is_empty() {
+            continue;
+        }
+
         let grouped_cmd = fetch_all_eligible_commands_in_group(
             &context,
             &sub_group.commands,
@@ -830,7 +837,7 @@ fn flatten_group_to_string(
 
     for sub_group in &group.sub_groups {
 
-        if !sub_group.command_names.is_empty() {
+        if !(sub_group.command_names.is_empty() && sub_group.sub_groups.is_empty()) {
             let mut sub_group_text = String::default();
 
             flatten_group_to_string(
