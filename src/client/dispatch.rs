@@ -105,7 +105,7 @@ pub(crate) enum DispatchEvent {
 
 #[cfg(feature = "framework")]
 #[allow(clippy::too_many_arguments)]
-#[clippy::too_many_arguments]
+#[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                        RH: RawEventHandler + Send + Sync + 'static>(
     event: DispatchEvent,
@@ -144,7 +144,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                         framework.dispatch(context, event.message, threadpool);
                     }
                 },
-                other => { 
+                other => {
                     handle_event(
                         other,
                         data,
@@ -158,28 +158,24 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
             }
         },
         (None, Some(ref rh)) => {
-            match event {
-                DispatchEvent::Model(e) => {
-                    #[cfg(not(any(feature = "cache", feature = "http")))]
-                    let context = context(data, runner_tx, shard_id);
-                    #[cfg(all(feature = "cache", not(feature = "http")))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
-                    #[cfg(all(not(feature = "cache"), feature = "http"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(all(feature = "cache", feature = "http"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
+            if let DispatchEvent::Model(e) = event {
+                #[cfg(not(any(feature = "cache", feature = "http")))]
+                let context = context(data, runner_tx, shard_id);
+                #[cfg(all(feature = "cache", not(feature = "http")))]
+                let context = context(data, runner_tx, shard_id, &cache_and_http.cache);
+                #[cfg(all(not(feature = "cache"), feature = "http"))]
+                let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                #[cfg(all(feature = "cache", feature = "http"))]
+                let context = context(data, runner_tx, shard_id, &cache_and_http.cache, &cache_and_http.http);
 
-                    let event_handler = Arc::clone(rh);
-                    threadpool.execute(move || {
-                        event_handler.raw_event(context, e);
-                    });
-                },
-                _ => {}
+                let event_handler = Arc::clone(rh);
+                threadpool.execute(move || {
+                    event_handler.raw_event(context, e);
+                });
             }
         },
         (Some(_), Some(_)) => {
-            match event {
-                DispatchEvent::Model(ref e) => 
+            if let DispatchEvent::Model(ref e) = event {
                     dispatch(DispatchEvent::Model(e.clone()),
                              framework,
                              data,
@@ -188,8 +184,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                              runner_tx,
                              threadpool,
                              shard_id,
-                             Arc::clone(&cache_and_http)),
-                _ => {}
+                             Arc::clone(&cache_and_http))
             }
             dispatch(event,
                      framework,
@@ -239,7 +234,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                         threadpool,
                     );
                 },
-                other => { 
+                other => {
                     handle_event(
                         other,
                         data,
@@ -274,7 +269,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
         },
         (Some(ref h), Some(ref rh)) => {
             match event {
-                DispatchEvent::Model(ref e) => 
+                DispatchEvent::Model(ref e) =>
                     dispatch(DispatchEvent::Model(e.clone()),
                              data,
                              &None::<Arc<H>>,

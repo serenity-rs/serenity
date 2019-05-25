@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashSet, hash_map::RandomState},
+    collections::HashSet,
     fmt,
 };
 use crate::client::Context;
@@ -108,17 +108,17 @@ impl PartialEq for Command {
     }
 }
 
-pub type HelpCommandFn<H> = fn(
+pub type HelpCommandFn = fn(
     &mut Context,
     &Message,
     Args,
     &'static HelpOptions,
     &[&'static CommandGroup],
-    HashSet<UserId, H>,
+    HashSet<UserId>,
 ) -> CommandResult;
 
 pub struct HelpCommand {
-    pub fun: HelpCommandFn<RandomState>,
+    pub fun: HelpCommandFn,
     pub options: &'static HelpOptions,
 }
 

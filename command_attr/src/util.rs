@@ -253,7 +253,7 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
     let options: Type = parse_quote!(&CommandOptions);
     let hoptions: Type = parse_quote!(&'static HelpOptions);
     let groups: Type = parse_quote!(&[&'static CommandGroup]);
-    let owners: Type = parse_quote!(HashSet<UserId, impl BuildHasher>);
+    let owners: Type = parse_quote!(HashSet<UserId>);
 
     let context_path: Type = parse_quote!(&mut serenity::prelude::Context);
     let message_path: Type = parse_quote!(&serenity::model::channel::Message);
@@ -271,7 +271,7 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
     let options_error = "fourth argument's type should be `&'static CommandOptions`";
     let hoptions_error = "fourth argument's type should be `&'static HelpOptions`";
     let groups_error = "fifth argument's type should be `&[&'static CommandGroup]`";
-    let owners_error = "sixth argument's type should be `HashSet<UserId, impl BuildHasher>`";
+    let owners_error = "sixth argument's type should be `HashSet<UserId>`";
 
     #[allow(unused_assignments)]
     macro_rules! spoof_or_check {

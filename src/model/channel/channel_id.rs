@@ -523,7 +523,7 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[cfg(feature = "http")]
     #[inline]
-    pub fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
+    pub fn say(self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
         self.send_message(&http, |m| {
             m.content(content)
         })

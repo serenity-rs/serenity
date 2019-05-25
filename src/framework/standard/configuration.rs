@@ -352,6 +352,7 @@ impl Configuration {
     ///
     /// client.with_framework(StandardFramework::new().configure(|c| c.owners(set)));
     /// ```
+    #[allow(clippy::implicit_hasher)]
     pub fn owners(&mut self, user_ids: HashSet<UserId>) -> &mut Self {
         self.owners = user_ids;
 

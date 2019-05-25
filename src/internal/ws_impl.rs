@@ -126,7 +126,7 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
 
     let base_host = if let Some(h) = url.host_str() {
-        let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
+        let (dot, _) = h.rmatch_indices('.').nth(1).unwrap_or((0, ""));
         // We do not want the leading '.', but if there is no leading '.' we do
         // not want to remove the leading character.
         let split_at_index = if dot == 0 { 0 } else { dot + 1 };

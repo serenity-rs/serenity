@@ -8,7 +8,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::{collections::{HashMap, HashSet}, env, fmt::Write, hash::BuildHasher, sync::Arc};
+use std::{collections::{HashMap, HashSet}, env, fmt::Write, sync::Arc};
 use serenity::{
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
@@ -131,7 +131,7 @@ fn my_help(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>
+    owners: HashSet<UserId>
 ) -> CommandResult {
     help_commands::with_embeds(context, msg, args, help_options, groups, owners)
 }
