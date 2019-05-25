@@ -303,7 +303,7 @@ impl StandardFramework {
                     if let Some(member) = guild.members.get(&msg.author.id) {
                         if let Ok(permissions) = member.permissions(&ctx.cache) {
                             if !permissions.administrator()
-                                && !has_correct_roles(command, &guild, member)
+                                && !has_correct_roles(&command, &guild, member)
                             {
                                 return Some(DispatchError::LackingRole);
                             }
@@ -759,28 +759,87 @@ impl Framework for StandardFramework {
 }
 
 #[cfg(feature = "cache")]
+pub trait CommonOptions {
+    fn required_permissions(&self) -> &Permissions;
+    fn allowed_roles(&self) -> &'static [&'static str];
+    fn only_in(&self) -> OnlyIn;
+    fn help_available(&self) -> bool;
+    fn owners_only(&self) -> bool;
+}
+
+#[cfg(feature = "cache")]
+impl CommonOptions for &GroupOptions {
+    fn required_permissions(&self) -> &Permissions {
+        &self.required_permissions
+    }
+
+    fn allowed_roles(&self) -> &'static [&'static str] {
+        &self.allowed_roles
+    }
+
+    fn only_in(&self) -> OnlyIn {
+        self.only
+    }
+
+    fn help_available(&self) -> bool {
+        self.help_available
+    }
+
+    fn owners_only(&self) -> bool {
+        self.owners_only
+    }
+}
+
+#[cfg(feature = "cache")]
+impl CommonOptions for &CommandOptions {
+    fn required_permissions(&self) -> &Permissions {
+        &self.required_permissions
+    }
+
+    fn allowed_roles(&self) -> &'static [&'static str] {
+        &self.allowed_roles
+    }
+
+    fn only_in(&self) -> OnlyIn {
+        self.only_in
+    }
+
+    fn help_available(&self) -> bool {
+        self.help_available
+    }
+
+    fn owners_only(&self) -> bool {
+        self.owners_only
+    }
+}
+
+#[cfg(feature = "cache")]
 pub(crate) fn has_correct_permissions(
     cache: impl AsRef<CacheRwLock>,
-    command: &CommandOptions,
+    options: &impl CommonOptions,
     message: &Message,
 ) -> bool {
-    if command.required_permissions.is_empty() {
+    if options.required_permissions().is_empty() {
         true
     } else if let Some(guild) = message.guild(&cache) {
         let perms = guild.with(|g| g.permissions_in(message.channel_id, message.author.id));
 
-        perms.contains(command.required_permissions)
+        perms.contains(*options.required_permissions())
     } else {
         false
     }
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
-pub(crate) fn has_correct_roles(cmd: &CommandOptions, guild: &Guild, member: &Member) -> bool {
-    if cmd.allowed_roles.is_empty() {
+pub(crate) fn has_correct_roles(
+    options: &impl CommonOptions,
+    guild: &Guild,
+    member: &Member)
+-> bool {
+    if options.allowed_roles().is_empty() {
         true
     } else {
-        cmd.allowed_roles
+        options.allowed_roles()
             .iter()
             .flat_map(|r| guild.role_by_name(r))
             .any(|g| member.roles.contains(&g.id))
