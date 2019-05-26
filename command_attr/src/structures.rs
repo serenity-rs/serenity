@@ -1,7 +1,7 @@
 use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS, CHECK};
 use crate::util::{
     Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object,
-    RefOrInstance,
+    RefOrInstance, Bracketed,
 };
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
@@ -761,20 +761,13 @@ impl Parse for Group {
 
         let mut sub_groups = Vec::new();
 
-        if let Ok(s) = input.parse::<Ident>() {
-            if s != "sub_groups" {
+        if let Ok(Field { name, value: Bracketed(refs) }) = input.parse::<Field<Bracketed<RefOrInstance<Group>>>>() {
+            if name != "sub_groups" {
                 return Err(Error::new(
-                    s.span(),
+                    name.span(),
                     "a group may optionally have a `sub_groups`",
                 ));
             }
-
-            input.parse::<Token![:]>()?;
-
-            let content;
-            bracketed!(content in input);
-
-            let refs: Punctuated<_, Token![,]> = content.parse_terminated(RefOrInstance::parse)?;
 
             sub_groups.extend(refs.into_iter());
         }

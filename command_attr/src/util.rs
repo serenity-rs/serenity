@@ -6,8 +6,9 @@ use syn::{
     braced, bracketed,
     parse::{Error, Parse, ParseBuffer, ParseStream, Result},
     parse_quote,
+    punctuated::Punctuated,
     spanned::Spanned,
-    token::{Brace, Bracket, Mut},
+    token::{Comma, Brace, Bracket, Mut},
     Ident, Lit, ReturnType, Token, Type,
 };
 
@@ -79,6 +80,30 @@ impl<'a> ParseStreamExt for ParseBuffer<'a> {
         }
 
         res
+    }
+}
+
+#[derive(Debug)]
+pub struct Bracketed<T>(pub Punctuated<T, Comma>);
+
+impl<T: Parse> Parse for Bracketed<T> {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        bracketed!(content in input);
+
+        Ok(Bracketed(content.parse_terminated(T::parse)?))
+    }
+}
+
+#[derive(Debug)]
+pub struct Braced<T>(pub Punctuated<T, Comma>);
+
+impl<T: Parse> Parse for Braced<T> {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        braced!(content in input);
+
+        Ok(Braced(content.parse_terminated(T::parse)?))
     }
 }
 
@@ -200,11 +225,7 @@ pub struct Object(pub Vec<Field<Expr>>);
 
 impl Parse for Object {
     fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        braced!(content in input);
-        let input = content;
-
-        let fields = input.parse_terminated::<_, Token![,]>(Field::<Expr>::parse)?;
+        let Braced(fields) = input.parse::<Braced<Field<Expr>>>()?;
 
         Ok(Object(fields.into_iter().collect()))
     }
@@ -215,11 +236,7 @@ pub struct Array(pub Vec<Expr>);
 
 impl Parse for Array {
     fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        bracketed!(content in input);
-        let input = content;
-
-        let fields = input.parse_terminated::<_, Token![,]>(Expr::parse)?;
+        let Bracketed(fields) = input.parse::<Bracketed<Expr>>()?;
 
         Ok(Array(fields.into_iter().collect()))
     }
