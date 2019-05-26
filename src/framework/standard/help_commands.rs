@@ -291,15 +291,13 @@ fn find_any_command_matches(
                 .options
                 .prefixes
                 .iter()
-                .any(|prefix|
+                .any(|prefix| {
                     if starts_with_whole_word(&name, &prefix) {
                         name.drain(..=prefix.len());
-
-                        n == &name
-                    } else {
-                        false
                     }
-                )
+
+                    n == &name
+                })
         }).cloned()
 }
 
@@ -382,6 +380,10 @@ fn nested_group_command_search<'a>(
             let command = *command;
 
             let search_command_name_matched = if group.options.prefixes.is_empty() {
+                if starts_with_whole_word(&name, &group.name) {
+                    name.drain(..=group.name.len());
+                }
+
                 command
                     .options
                     .names
@@ -697,6 +699,92 @@ fn create_single_group(
     group_with_cmds
 }
 
+/// If `searched_group` is exact match on `group_name`,
+/// this function returns `true` but does not trim.
+/// Otherwise, it is treated as an optionally passed group-name and ends up
+/// being removed from `searched_group`.
+///
+/// If a group has no prefixes, it is not required to be part of
+/// `searched_group` to reach a sub-group of `group_name`.
+#[cfg(feature = "cache")]
+fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool {
+    if group_name == searched_group.as_str() {
+        return true;
+    } else if starts_with_whole_word(&searched_group, &group_name) {
+        searched_group.drain(..=group_name.len());
+    }
+
+    false
+}
+
+#[cfg(feature = "cache")]
+#[allow(clippy::implicit_hasher)]
+pub fn searched_lowercase<'a>(
+    context: &Context,
+    group: &CommandGroup,
+    owners: &HashSet<UserId>,
+    args: &'a Args,
+    help_options: &'a HelpOptions,
+    msg: &Message,
+    searched_named_lowercase: &mut String,
+) -> Option<CustomisedHelpData<'a>> {
+    let is_prefixless_group = {
+        group.options.prefixes.is_empty()
+        && trim_prefixless_group(
+            &group.name.to_lowercase(),
+            searched_named_lowercase,
+        )
+    };
+    let mut progressed = is_prefixless_group;
+
+    if is_prefixless_group
+        || group
+            .options
+            .prefixes
+            .iter()
+            .any(|prefix| {
+                if starts_with_whole_word(&searched_named_lowercase, &prefix) {
+                    searched_named_lowercase.drain(..=prefix.len());
+                    progressed = true;
+                }
+
+                prefix == &searched_named_lowercase
+            })
+    {
+        let single_group =
+            create_single_group(&context, &group, owners, &msg, &help_options);
+
+        if !single_group.command_names.is_empty() {
+            return Some(CustomisedHelpData::GroupedCommands {
+                help_description: group
+                    .options
+                    .description
+                    .as_ref()
+                    .map(|s| s.to_string())
+                    .unwrap_or_default(),
+                groups: vec![single_group],
+            });
+        }
+    } else if progressed || group.options.prefixes.is_empty() {
+        for sub_group in group.sub_groups {
+
+            if let Some(found_set) = searched_lowercase(
+                context,
+                sub_group,
+                owners,
+                args,
+                help_options,
+                msg,
+                searched_named_lowercase,
+            ) {
+                return Some(found_set);
+            }
+        }
+    }
+
+    None
+}
+
 /// Iterates over all commands and forges them into a `CustomisedHelpData`.
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
@@ -718,31 +806,20 @@ pub fn create_customised_help_data<'a>(
         return match fetch_single_command(&cache, &groups, &name, &help_options, &msg, owners) {
             Ok(single_command) => single_command,
             Err(suggestions) => {
-                let searched_named_lowercase = name.to_lowercase();
+                let mut searched_named_lowercase = name.to_lowercase().to_string();
 
                 for group in groups {
 
-                    if group.name.to_lowercase() == searched_named_lowercase
-                        || group
-                            .options
-                            .prefixes
-                            .iter()
-                            .any(|prefix| *prefix == searched_named_lowercase)
-                    {
-                        let single_group =
-                            create_single_group(&context, &group, owners, &msg, &help_options);
-
-                        if !single_group.command_names.is_empty() {
-                            return CustomisedHelpData::GroupedCommands {
-                                help_description: group
-                                    .options
-                                    .description
-                                    .as_ref()
-                                    .map(|s| s.to_string())
-                                    .unwrap_or_default(),
-                                groups: vec![single_group],
-                            };
-                        }
+                    if let Some(found_command) = searched_lowercase(
+                        context,
+                        group,
+                        owners,
+                        args,
+                        help_options,
+                        msg,
+                        &mut searched_named_lowercase,
+                    ) {
+                        return found_command;
                     }
                 }
 
