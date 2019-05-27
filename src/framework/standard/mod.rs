@@ -292,7 +292,8 @@ impl StandardFramework {
             }
         }
 
-        if !self.config.allowed_channels.contains(&msg.channel_id) {
+        if !self.config.allowed_channels.is_empty() && 
+           !self.config.allowed_channels.contains(&msg.channel_id) {
             return Some(DispatchError::BlockedChannel);
         }
 
