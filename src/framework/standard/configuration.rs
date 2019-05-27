@@ -1,6 +1,6 @@
 use super::Delimiter;
 use crate::client::Context;
-use crate::model::{channel::Message, id::UserId};
+use crate::model::{channel::Message, id::{UserId, GuildId, ChannelId}};
 use std::collections::HashSet;
 
 type DynamicPrefixHook = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
@@ -99,6 +99,12 @@ pub struct Configuration {
     #[doc(hidden)]
     pub by_space: bool,
     #[doc(hidden)]
+    pub blocked_guilds: HashSet<GuildId>,
+    #[doc(hidden)]
+    pub blocked_users: HashSet<UserId>,
+    #[doc(hidden)]
+    pub allowed_channels: HashSet<ChannelId>,
+    #[doc(hidden)]
     pub disabled_commands: HashSet<String>,
     #[doc(hidden)]
     pub dynamic_prefixes: Vec<Box<DynamicPrefixHook>>,
@@ -164,6 +170,86 @@ impl Configuration {
     /// **Note**: Defaults to `true`
     pub fn by_space(&mut self, b: bool) -> &mut Self {
         self.by_space = b;
+
+        self
+    }
+
+       /// HashSet of channels Ids where commands will be working.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// use serenity::model::id::ChannelId;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new().configure(|c| c
+    ///     .allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect())));
+    /// ```
+    pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
+        self.allowed_channels = channels;
+
+        self
+    }
+
+    /// HashSet of guild Ids where commands will be ignored.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// use serenity::model::id::GuildId;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new().configure(|c| c
+    ///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect())));
+    /// ```
+    pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
+        self.blocked_guilds = guilds;
+
+        self
+    }
+
+    /// HashSet of user Ids whose commands will be ignored.
+    ///
+    /// Guilds owned by user Ids will also be ignored.
+    ///
+    /// **Note**: Defaults to an empty HashSet.
+    ///
+    /// # Examples
+    ///
+    /// Create a HashSet in-place:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// # struct Handler;
+    /// #
+    /// # impl EventHandler for Handler {}
+    /// # let mut client = Client::new("token", Handler).unwrap();
+    /// use serenity::model::id::UserId;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// client.with_framework(StandardFramework::new().configure(|c| c
+    ///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect())));
+    /// ```
+    pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
+        self.blocked_users = users;
 
         self
     }
@@ -514,6 +600,9 @@ impl Default for Configuration {
     /// - **allow_dm** to `true`
     /// - **with_whitespace** to `(false, true, true)`
     /// - **by_space** to `true`
+    /// - **blocked_guilds** to an empty HashSet
+    /// - **blocked_users** to an empty HashSet,
+    /// - **allowed_channels** to an empty HashSet,
     /// - **case_insensitive** to `false`
     /// - **delimiters** to `vec![' ']`
     /// - **disabled_commands** to an empty HashSet
@@ -529,6 +618,9 @@ impl Default for Configuration {
             allow_dm: true,
             with_whitespace: WithWhiteSpace::default(),
             by_space: true,
+            blocked_guilds: HashSet::default(),
+            blocked_users: HashSet::default(),
+            allowed_channels: HashSet::default(),
             case_insensitive: false,
             delimiters: vec![Delimiter::Single(' ')],
             disabled_commands: HashSet::default(),

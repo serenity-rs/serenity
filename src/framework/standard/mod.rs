@@ -19,7 +19,7 @@ use self::parse::*;
 use super::Framework;
 use crate::client::Context;
 use crate::model::{
-    channel::Message,
+    channel::{Channel, Message},
     permissions::Permissions,
 };
 use std::collections::HashMap;
@@ -44,6 +44,12 @@ pub enum DispatchError {
     Ratelimited(i64),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
+    /// When the user is blocked in bot configuration.
+    BlockedUser,
+    /// When the guild or its owner is blocked in bot configuration.
+    BlockedGuild,
+    /// When the channel blocked in bot configuration.
+    BlockedChannel,
     /// When the requested command can only be used in a direct message or group
     /// channel.
     OnlyForDM,
@@ -237,6 +243,10 @@ impl StandardFramework {
             return Some(err);
         }
 
+        if self.config.disabled_commands.contains(command.names[0]) {
+            return Some(DispatchError::CommandDisabled(command.names[0].to_string()));
+        }
+
         if let Some(min) = command.min_args {
             if args.len() < min as usize {
                 return Some(DispatchError::NotEnoughArguments {
@@ -259,6 +269,31 @@ impl StandardFramework {
             && self.config.owners.contains(&msg.author.id)
         {
             return None;
+        }
+
+        if self.config.blocked_users.contains(&msg.author.id) {
+            return Some(DispatchError::BlockedUser);
+        }
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(Channel::Guild(chan)) = msg.channel_id.to_channel_cached(&ctx.cache) {
+                let guild_id = chan.with(|c| c.guild_id);
+
+                if self.config.blocked_guilds.contains(&guild_id) {
+                    return Some(DispatchError::BlockedGuild);
+                }
+
+                if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
+                    if self.config.blocked_users.contains(&guild.with(|g| g.owner_id)) {
+                        return Some(DispatchError::BlockedGuild);
+                    }
+                }
+            }
+        }
+
+        if !self.config.allowed_channels.contains(&msg.channel_id) {
+            return Some(DispatchError::BlockedChannel);
         }
 
         if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| self.buckets.get_mut(*b)) {
@@ -288,6 +323,7 @@ impl StandardFramework {
             return Some(DispatchError::OnlyForGuilds);
         }
 
+
         #[cfg(feature = "cache")]
         {
             if !has_correct_permissions(&ctx.cache, &command, msg) {
@@ -311,10 +347,6 @@ impl StandardFramework {
                     }
                 }
             }
-        }
-
-        if self.config.disabled_commands.contains(command.names[0]) {
-            return Some(DispatchError::CommandDisabled(command.names[0].to_string()));
         }
 
         for check in command.checks.iter().chain(group.checks.iter()) {
