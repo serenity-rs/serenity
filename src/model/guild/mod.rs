@@ -136,7 +136,7 @@ pub struct Guild {
     pub system_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
-    /// A mapping of of [`User`]s to their current voice state.
+    /// A mapping of [`User`]s to their current voice state.
     ///
     /// [`User`]: ../user/struct.User.html
     #[serde(serialize_with = "serialize_gen_map")]
