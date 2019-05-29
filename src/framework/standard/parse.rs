@@ -1,4 +1,4 @@
-use super::{Command, CommandGroup, Configuration};
+use super::*;
 use crate::client::Context;
 use crate::model::channel::Message;
 use uwl::{StrExt, StringStream};
@@ -84,20 +84,30 @@ enum ParseMode {
     ByLength,
 }
 
-struct CommandParser<'msg, 'groups, 'config> {
+struct CommandParser<'msg, 'groups, 'config, 'ctx> {
+    msg: &'msg Message,
     stream: StringStream<'msg>,
     groups: &'groups [&'static CommandGroup],
     config: &'config Configuration,
+    ctx: &'ctx Context,
     mode: ParseMode,
     unrecognised: Option<&'msg str>,
 }
 
-impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
-    fn new(stream: StringStream<'msg>, groups: &'groups [&'static CommandGroup], config: &'config Configuration) -> Self {
+impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
+    fn new(
+        msg: &'msg Message,
+        stream: StringStream<'msg>,
+        groups: &'groups [&'static CommandGroup],
+        config: &'config Configuration,
+        ctx: &'ctx Context,
+    ) -> Self {
         CommandParser {
+            msg,
             stream,
             groups,
             config,
+            ctx,
             mode: if config.by_space { ParseMode::BySpace } else { ParseMode::ByLength },
             unrecognised: None,
         }
@@ -119,7 +129,48 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
         }
     }
 
-    fn command(&mut self, command: &'static Command) -> Option<&'static Command> {
+    fn check_discrepancy(&self, options: &impl CommonOptions) -> Result<(), DispatchError> {
+        if options.owners_only() {
+            return Err(DispatchError::OnlyForOwners);
+        }
+
+        if options.only_in() == OnlyIn::Dm && !self.msg.is_private() {
+            return Err(DispatchError::OnlyForDM);
+        }
+
+        if (!self.config.allow_dm || options.only_in() == OnlyIn::Guild) && self.msg.is_private() {
+            return Err(DispatchError::OnlyForGuilds);
+        }
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(guild_id) = self.msg.guild_id {
+                let guild = match guild_id.to_guild_cached(&self.ctx) {
+                    Some(g) => g,
+                    None => return Ok(()),
+                };
+
+                let guild = guild.read();
+
+                let perms = guild.permissions_in(self.msg.channel_id, self.msg.author.id);
+
+                if !perms.contains(*options.required_permissions()) {
+                    return Err(DispatchError::LackingPermissions(*options.required_permissions()));
+                }
+
+                if let Some(member) = guild.members.get(&self.msg.author.id) {
+                    if !perms.administrator() && !has_correct_roles(options, &guild, &member) {
+                        return Err(DispatchError::LackingRole);
+                    }
+                }
+
+            }
+        }
+
+        Ok(())
+    }
+
+    fn command(&mut self, command: &'static Command) -> Result<Option<&'static Command>, DispatchError> {
         for name in command.options.names {
             // FIXME: If `by_space` option is set true, we shouldn't be retrieving the block of text
             // again and again for the command name.
@@ -135,23 +186,25 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
                 }
 
                 for sub in command.options.sub_commands {
-                    if let Some(cmd) = self.command(sub) {
+                    if let Some(cmd) = self.command(sub)? {
                         self.unrecognised = None;
-                        return Some(cmd);
+                        return Ok(Some(cmd));
                     }
                 }
 
+                self.check_discrepancy(&command.options)?;
+
                 self.unrecognised = None;
-                return Some(command);
+                return Ok(Some(command));
             }
 
             self.unrecognised = Some(n);
         }
 
-        None
+        Ok(None)
     }
 
-    fn group(&mut self, group: &'static CommandGroup) -> (Option<&'msg str>, &'static CommandGroup) {
+    fn group(&mut self, group: &'static CommandGroup) -> Result<(Option<&'msg str>, &'static CommandGroup), DispatchError> {
         for p in group.options.prefixes {
             let pp = self.next_text(|| p.chars().count());
 
@@ -163,24 +216,28 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
                 }
 
                 for sub_group in group.sub_groups {
-                    let x = self.group(*sub_group);
+                    let x = self.group(*sub_group)?;
 
                     if x.0.is_some() {
-                        return x;
+                        return Ok(x);
                     }
                 }
 
-                return (Some(pp), group);
+                self.check_discrepancy(&group.options)?;
+                return Ok((Some(pp), group));
             }
         }
 
-        (None, group)
+        Ok((None, group))
     }
 
-    fn parse(mut self, prefix: Prefix<'msg>) -> Result<Invoke<'msg>, Option<&'msg str>> {
+    fn parse(mut self, prefix: Prefix<'msg>) -> Result<Invoke<'msg>, Result<Option<&'msg str>, DispatchError>> {
         let pos = self.stream.offset();
         for group in self.groups {
-            let (gprefix, group) = self.group(*group);
+            let (gprefix, group) = match self.group(*group) {
+                Ok(t) => t,
+                Err(err) => return Err(Err(err)),
+            };
 
             if gprefix.is_none() && !group.options.prefixes.is_empty() {
                 unsafe { self.stream.set_unchecked(pos) };
@@ -188,7 +245,12 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
             }
 
             for command in group.commands {
-                if let Some(command) = self.command(command) {
+                let command = match self.command(command)  {
+                    Ok(c) => c,
+                    Err(err) => return Err(Err(err)),
+                };
+
+                if let Some(command) = command {
                     return Ok(Invoke::Command {
                         prefix,
                         group,
@@ -215,18 +277,20 @@ impl<'msg, 'groups, 'config> CommandParser<'msg, 'groups, 'config> {
             unsafe { self.stream.set_unchecked(pos) };
         }
 
-        Err(self.unrecognised)
+        Err(Ok(self.unrecognised))
     }
 }
 
 pub(crate) fn parse_command<'a>(
-    msg: &'a str,
+    message: &'a str,
+    msg: &'a Message,
     prefix: Prefix<'a>,
     groups: &[&'static CommandGroup],
     config: &Configuration,
+    ctx: &Context,
     help_was_set: Option<&[&'static str]>,
-) -> Result<Invoke<'a>, Option<&'a str>> {
-    let mut stream = StringStream::new(msg);
+) -> Result<Invoke<'a>, Result<Option<&'a str>, DispatchError>> {
+    let mut stream = StringStream::new(message);
     stream.take_while(|s| s.is_whitespace());
 
     // We take precedence over commands named help command's name.
@@ -242,7 +306,7 @@ pub(crate) fn parse_command<'a>(
         }
     }
 
-    CommandParser::new(stream, groups, config).parse(prefix)
+    CommandParser::new(msg, stream, groups, config, ctx).parse(prefix)
 }
 
 #[derive(Debug)]

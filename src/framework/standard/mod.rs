@@ -292,7 +292,7 @@ impl StandardFramework {
             }
         }
 
-        if !self.config.allowed_channels.is_empty() && 
+        if !self.config.allowed_channels.is_empty() &&
            !self.config.allowed_channels.contains(&msg.channel_id) {
             return Some(DispatchError::BlockedChannel);
         }
@@ -306,47 +306,6 @@ impl StandardFramework {
 
             if apply && rate_limit > 0 {
                 return Some(DispatchError::Ratelimited(rate_limit));
-            }
-        }
-
-        if group.owners_only || command.owners_only {
-            return Some(DispatchError::OnlyForOwners);
-        }
-
-        if (group.only == OnlyIn::Dm || command.only_in == OnlyIn::Dm) && !msg.is_private() {
-            return Some(DispatchError::OnlyForDM);
-        }
-
-        if (!self.config.allow_dm
-            || (group.only == OnlyIn::Guild || command.only_in == OnlyIn::Guild))
-            && msg.is_private()
-        {
-            return Some(DispatchError::OnlyForGuilds);
-        }
-
-
-        #[cfg(feature = "cache")]
-        {
-            if !has_correct_permissions(&ctx.cache, &command, msg) {
-                return Some(DispatchError::LackingPermissions(
-                    command.required_permissions,
-                ));
-            }
-
-            if !command.allowed_roles.is_empty() {
-                if let Some(guild) = msg.guild(&ctx.cache) {
-                    let guild = guild.read();
-
-                    if let Some(member) = guild.members.get(&msg.author.id) {
-                        if let Ok(permissions) = member.permissions(&ctx.cache) {
-                            if !permissions.administrator()
-                                && !has_correct_roles(&command, &guild, member)
-                            {
-                                return Some(DispatchError::LackingRole);
-                            }
-                        }
-                    }
-                }
             }
         }
 
@@ -669,13 +628,15 @@ impl Framework for StandardFramework {
 
         let invoke = match parse_command(
             rest,
+            &msg,
             prefix,
             &self.groups,
             &self.config,
+            &ctx,
             self.help.as_ref().map(|h| h.options.names),
         ) {
             Ok(i) => i,
-            Err(Some(unreg)) => {
+            Err(Ok(Some(unreg))) => {
                 if let Some(unrecognised_command) = &self.unrecognised_command {
                     let unrecognised_command = Arc::clone(&unrecognised_command);
                     let mut ctx = ctx.clone();
@@ -697,13 +658,20 @@ impl Framework for StandardFramework {
 
                 return;
             }
-            Err(None) => {
+            Err(Ok(None)) => {
                 if let Some(normal) = &self.normal_message {
                     let normal = Arc::clone(&normal);
                     let msg = msg.clone();
                     threadpool.execute(move || {
                         normal(&mut ctx, &msg);
                     });
+                }
+
+                return;
+            },
+            Err(Err(error)) => {
+                if let Some(dispatch) = &self.dispatch {
+                    dispatch(&mut ctx, &msg, error);
                 }
 
                 return;
