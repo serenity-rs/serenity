@@ -84,6 +84,10 @@ macro_rules! match_options {
 /// `num_args` is a helper attribute, serving as a shorthand for calling
 /// `min_args` and `max_args` with the same amount of arguments.
 ///
+/// - `#[required_permissions(perms)]`
+/// A list of permissions that the user must have.
+/// Refer to [Discord's offical documentation about available permissions](https://discordapp.com/developers/docs/topics/permissions).
+///
 /// - `#[allowed_roles(roles)]`
 /// A list of strings (role names), seperated by a comma,
 /// stating that only members of certain roles can execute this command.
@@ -108,7 +112,7 @@ macro_rules! match_options {
 ///
 /// # Notes
 /// The name of the command is parsed from the applied function,
-/// or can be passed inside the `#[command]` attribute, a lá `#[command(foobar)]`.
+/// or may be specified inside the `#[command]` attribute, a lá `#[command("foobar")]`.
 ///
 /// This macro attribute generates static instances of `Command` and `CommandOptions`,
 /// conserving the provided options.
@@ -250,27 +254,16 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         return err.to_compile_error().into();
     }
 
-    let name = _name.clone();
-
-    // If name starts with a number, prepend an underscore to make it a valid identifier.
-    let n = if _name.starts_with(|c: char| c.is_numeric()) {
-        format!("_{}", _name)
-    } else {
-        _name
-    };
-
-    let _name = Ident::new(&n, Span::call_site());
-
     let Permissions(required_permissions) = required_permissions;
 
-    let options = _name.with_suffix(COMMAND_OPTIONS);
+    let name = fun.name.clone();
+    let options = name.with_suffix(COMMAND_OPTIONS);
     let sub_commands = sub_commands
         .into_iter()
         .map(|i| i.with_suffix(COMMAND))
         .collect::<Vec<_>>();
 
-    let n = _name.with_suffix(COMMAND);
-    let nn = fun.name.clone();
+    let n = name.with_suffix(COMMAND);
 
     let cfgs = fun.cfgs.clone();
     let cfgs2 = cfgs.clone();
@@ -284,7 +277,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         pub static #options: #options_path = #options_path {
             checks: #checks,
             bucket: #bucket,
-            names: &[#name, #(#aliases),*],
+            names: &[#_name, #(#aliases),*],
             desc: #description,
             usage: #usage,
             example: #example,
@@ -301,7 +294,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
         #(#cfgs2)*
         pub static #n: #command_path = #command_path {
-            fun: #nn,
+            fun: #name,
             options: &#options,
         };
 
