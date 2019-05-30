@@ -777,7 +777,7 @@ impl CommonOptions for &GroupOptions {
     }
 
     fn only_in(&self) -> OnlyIn {
-        self.only
+        self.only_in
     }
 
     fn help_available(&self) -> bool {

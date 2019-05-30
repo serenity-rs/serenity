@@ -410,7 +410,7 @@ impl Default for HelpOptions {
 #[derive(Debug)]
 pub struct GroupOptions {
     pub prefixes: Vec<String>,
-    pub only: OnlyIn,
+    pub only_in: OnlyIn,
     pub owners_only: bool,
     pub owner_privilege: bool,
     pub help_available: bool,
@@ -427,7 +427,7 @@ impl Default for GroupOptions {
     fn default() -> Self {
         GroupOptions {
             prefixes: Vec::new(),
-            only: OnlyIn::default(),
+            only_in: OnlyIn::default(),
             owners_only: false,
             owner_privilege: true,
             help_available: true,
@@ -478,7 +478,7 @@ impl Parse for GroupOptions {
                         options.allowed_roles = values;
                     }
                 }
-                ("only", Expr::Lit(value)) => {
+                ("only_in", Expr::Lit(value)) => {
                     let span = value.span();
                     let value = value.to_str();
 
@@ -488,7 +488,7 @@ impl Parse for GroupOptions {
                         _ => return Err(Error::new(span, "invalid only option")),
                     };
 
-                    options.only = only;
+                    options.only_in = only;
                 }
                 ("owners_only", Expr::Lit(value))
                 | ("owner_privilege", Expr::Lit(value))
@@ -575,7 +575,7 @@ impl ToTokens for GroupOptions {
             owner_privilege,
             owners_only,
             help_available,
-            only,
+            only_in,
             description,
             checks,
             default_command,
@@ -655,8 +655,8 @@ impl ToTokens for GroupOptions {
                 quote!()
             };
 
-            let only = if *only != OnlyIn::None {
-                quote! { only: #only, }
+            let only_in = if *only_in != OnlyIn::None {
+                quote! { only_in: #only_in, }
             } else {
                 quote!()
             };
@@ -681,7 +681,7 @@ impl ToTokens for GroupOptions {
                     #owner_privilege
                     #owners_only
                     #help_available
-                    #only
+                    #only_in
                     #description
                     #checks
                     #default_command
@@ -697,7 +697,7 @@ impl ToTokens for GroupOptions {
                     owner_privilege: #owner_privilege,
                     owners_only: #owners_only,
                     help_available: #help_available,
-                    only: #only,
+                    only_in: #only_in,
                     description: #description,
                     checks: #checks,
                     default_command: #dc,

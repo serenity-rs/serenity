@@ -63,7 +63,7 @@ pub struct CommandOptions {
 #[derive(Debug, PartialEq)]
 pub struct GroupOptions {
     pub prefixes: &'static [&'static str],
-    pub only: OnlyIn,
+    pub only_in: OnlyIn,
     pub owners_only: bool,
     pub owner_privilege: bool,
     pub help_available: bool,
