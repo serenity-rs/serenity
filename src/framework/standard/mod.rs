@@ -759,7 +759,6 @@ impl Framework for StandardFramework {
     }
 }
 
-#[cfg(feature = "cache")]
 pub trait CommonOptions {
     fn required_permissions(&self) -> &Permissions;
     fn allowed_roles(&self) -> &'static [&'static str];
@@ -768,7 +767,6 @@ pub trait CommonOptions {
     fn owners_only(&self) -> bool;
 }
 
-#[cfg(feature = "cache")]
 impl CommonOptions for &GroupOptions {
     fn required_permissions(&self) -> &Permissions {
         &self.required_permissions
@@ -791,7 +789,6 @@ impl CommonOptions for &GroupOptions {
     }
 }
 
-#[cfg(feature = "cache")]
 impl CommonOptions for &CommandOptions {
     fn required_permissions(&self) -> &Permissions {
         &self.required_permissions
