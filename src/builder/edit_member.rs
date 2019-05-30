@@ -67,8 +67,10 @@ impl EditMember {
     ///
     /// [Move Members]: ../model/permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
-    pub fn voice_channel<C: Into<ChannelId>>(&mut self, channel_id: C) {
-        self._voice_channel(channel_id.into())
+    pub fn voice_channel<C: Into<ChannelId>>(&mut self, channel_id: C) -> &mut Self {
+        self._voice_channel(channel_id.into());
+
+        self
     }
 
     fn _voice_channel(&mut self, channel_id: ChannelId) {
