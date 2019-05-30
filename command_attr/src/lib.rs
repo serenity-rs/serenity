@@ -378,6 +378,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing` (leave be).
 ///
+/// - `#[lacking_ownership(s)]`/`#[lacking_ownership = s]`
+/// If a user lacks ownership, this will treat how these commands will be displayed.
+///
+/// Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing` (leave be).
+///
 /// - `#[lacking_permissions(s)]`/`#[lacking_role = s]`
 /// If a user lacks permissions, this will treat how commands will be displayed.
 ///
