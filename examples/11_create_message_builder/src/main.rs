@@ -1,8 +1,9 @@
-use std::env;
+use std::{env, path::Path};
 
 use serenity::{
     model::{channel::Message, gateway::Ready},
-    prelude::*
+    prelude::*,
+    http::AttachmentType,
 };
 
 struct Handler;
@@ -19,6 +20,7 @@ impl EventHandler for Handler {
                 m.embed(|e| {
                     e.title("This is a title");
                     e.description("This is a description");
+                    e.image("attachment://ferris_eyes.png");
                     e.fields(vec![
                         ("This is the first field", "This is a field body", true),
                         ("This is the second field", "Both of these fields are inline", true),
@@ -32,7 +34,7 @@ impl EventHandler for Handler {
 
                     e
                 });
-
+                m.add_file(AttachmentType::Path(Path::new("./ferris_eyes.png")));
                 m
             });
 
