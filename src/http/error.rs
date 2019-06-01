@@ -55,7 +55,7 @@ impl From<Response> for ErrorResponse {
         let error_response: DiscordJsonError = serde_json::from_str(&text)
             .unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
-                message: "[Serenity] No valid Json was recieved!".to_string(),
+                message: "[Serenity] No valid json was received!".to_string(),
                 non_exhaustive: (),
             });
 
