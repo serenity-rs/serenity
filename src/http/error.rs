@@ -38,14 +38,31 @@ pub struct ErrorResponse {
 
 impl From<Response> for ErrorResponse {
     fn from(mut r: Response) -> Self {
+        let maybe_text = r.text();
+        if !maybe_text.is_ok() {
+            return ErrorResponse {
+                status_code: reqwest::StatusCode::IM_A_TEAPOT,
+                url: reqwest::Url::parse("https://internal.error").unwrap(),
+                error: DiscordJsonError {
+                    code: -1,
+                    message: "[Serenity] Invalid response!".to_string(),
+                    non_exhaustive: (),
+                }
+            };
+        }
+
+        let text = maybe_text.unwrap();
+        let error_response: DiscordJsonError = serde_json::from_str(&text)
+            .unwrap_or_else(|_| DiscordJsonError {
+                code: -1,
+                message: "[Serenity] No valid Json was recieved!".to_string(),
+                non_exhaustive: (),
+            });
+
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
-            error: r.json().unwrap_or_else(|_| DiscordJsonError {
-                code: -1,
-                message: "[Serenity] No correct json was recieved!".to_string(),
-                non_exhaustive: (),
-            }),
+            error: error_response,
         }
     }
 }
