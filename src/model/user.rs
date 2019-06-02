@@ -555,7 +555,7 @@ impl User {
     #[allow(clippy::let_and_return)]
     #[cfg(all(feature = "builder", feature = "client"))]
     pub fn direct_message<F>(&self, context: &Context, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+        where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -617,7 +617,7 @@ impl User {
     #[cfg(all(feature = "builder", feature = "client"))]
     #[inline]
     pub fn dm<F>(&self, context: &Context, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+    where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         self.direct_message(&context, f)
     }
 
