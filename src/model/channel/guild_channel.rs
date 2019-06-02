@@ -412,7 +412,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {cache.as_ref().read().guild(self.guild_id) }
+    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> { cache.as_ref().read().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -702,6 +702,60 @@ impl GuildChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> { self.id.webhooks(&http) }
+
+    /// Retrieves [`Member`]s from the current channel.
+    ///
+    /// [`ChannelType::Voice`] returns [`Member`]s using the channel.
+    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s
+    /// that can read the channel.
+    ///
+    /// Other [`ChannelType`]s lack the concept of [`Member`]s and
+    /// will return: [`ModelError::InvalidChannelType`].
+    ///
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [`ChannelType`]: enum.ChannelType.html
+    /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
+    /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
+    /// [`ChannelType::News`]: enum.ChannelType.html#variant.News
+    /// [`ModelError::InvalidChannelType`]: ../error/enum.Error.html#variant.InvalidChannelType
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
+           let cache = cache.as_ref();
+    let guild = cache.read().guild(self.guild_id).unwrap();
+
+    match self.kind {
+        ChannelType::Voice => Ok(guild
+            .read()
+            .voice_states
+            .values()
+            .filter_map(|v| {
+                v.channel_id.map_or_else(
+                    || None,
+                    |c| {
+                        if c == self.id {
+                            guild.read().members.get(&v.user_id).cloned()
+                        } else {
+                            None
+                        }
+                    },
+                )
+            })
+            .collect()),
+        ChannelType::News | ChannelType::Text => Ok(guild
+                .read()
+                .members
+                .iter()
+                .filter_map(|e|
+                    // TODO: Change `map().unwrap_or()` to `map_or_else` once it stabilised.
+                    if self.permissions_for(&cache, e.0).map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
+                        Some(e.1.clone())
+                    } else {
+                        None
+                    }
+                ).collect()),
+        _ => Err(Error::from(ModelError::InvalidChannelType)),
+    }
 }
 
 #[cfg(feature = "model")]
