@@ -730,8 +730,7 @@ impl GuildChannel {
                 .voice_states
                 .values()
                 .filter_map(|v| {
-                    v.channel_id.map_or(
-                        None,
+                    v.channel_id.and_then(
                         |c| {
                             if c == self.id {
                                 guild.read().members.get(&v.user_id).cloned()
