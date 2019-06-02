@@ -721,40 +721,40 @@ impl GuildChannel {
     #[cfg(feature = "cache")]
     #[inline]
     pub fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
-           let cache = cache.as_ref();
-    let guild = cache.read().guild(self.guild_id).unwrap();
+        let cache = cache.as_ref();
+        let guild = cache.read().guild(self.guild_id).unwrap();
 
-    match self.kind {
-        ChannelType::Voice => Ok(guild
-            .read()
-            .voice_states
-            .values()
-            .filter_map(|v| {
-                v.channel_id.map_or_else(
-                    || None,
-                    |c| {
-                        if c == self.id {
-                            guild.read().members.get(&v.user_id).cloned()
+        match self.kind {
+            ChannelType::Voice => Ok(guild
+                .read()
+                .voice_states
+                .values()
+                .filter_map(|v| {
+                    v.channel_id.map_or(
+                        None,
+                        |c| {
+                            if c == self.id {
+                                guild.read().members.get(&v.user_id).cloned()
+                            } else {
+                                None
+                            }
+                        },
+                    )
+                })
+                .collect()),
+            ChannelType::News | ChannelType::Text => Ok(guild
+                    .read()
+                    .members
+                    .iter()
+                    .filter_map(|e|
+                        if self.permissions_for(&cache, e.0).map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
+                            Some(e.1.clone())
                         } else {
                             None
                         }
-                    },
-                )
-            })
-            .collect()),
-        ChannelType::News | ChannelType::Text => Ok(guild
-                .read()
-                .members
-                .iter()
-                .filter_map(|e|
-                    // TODO: Change `map().unwrap_or()` to `map_or_else` once it stabilised.
-                    if self.permissions_for(&cache, e.0).map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
-                        Some(e.1.clone())
-                    } else {
-                        None
-                    }
-                ).collect()),
-        _ => Err(Error::from(ModelError::InvalidChannelType)),
+                    ).collect()),
+            _ => Err(Error::from(ModelError::InvalidChannelType)),
+        }
     }
 }
 
