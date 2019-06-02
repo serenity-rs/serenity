@@ -14,7 +14,7 @@ pub trait EventHandler {
     ///
     /// Provides the cached guilds' ids.
     #[cfg(feature = "cache")]
-    fn cached(&self, _ctx: Context, _guilds: Vec<GuildId>) {}
+    fn cache_ready(&self, _ctx: Context, _guilds: Vec<GuildId>) {}
 
     /// Dispatched when a channel is created.
     ///
