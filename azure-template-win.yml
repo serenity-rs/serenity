@@ -6,7 +6,7 @@ parameters:
 
 jobs:
 - job: ${{ parameters.name }}
-  pool: 
+  pool:
     vmImage: ${{ parameters.vmImage }}
   variables:
     tc: ${{ parameters.toolchain }}
@@ -18,17 +18,17 @@ jobs:
     displayName: 'Install rust'
   - powershell: |
       If ("$(features)" -eq "all") {
-        &"$env:USERPROFILE\.cargo\bin\cargo" build --all-features
+        cargo build --all-features
       }
       Else {
-        &"$env:USERPROFILE\.cargo\bin\cargo" build --no-default-features --features "$(features)"
+        cargo build --no-default-features --features "$(features)"
       }
     displayName: 'Build Serenity'
   - powershell: |
       If ("$(features)" -eq "all") {
-        &"$env:USERPROFILE\.cargo\bin\cargo" test --all-features
+        cargo test --all-features
       }
       Else {
-        &"$env:USERPROFILE\.cargo\bin\cargo" test --no-default-features --features "$(features)"
+        cargo test --no-default-features --features "$(features)"
       }
     displayName: 'Test Serenity'
