@@ -1,23 +1,23 @@
 jobs:
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_stable'
     vmImage: 'xcode9-macos10.13'
     toolchain: 'stable'
 
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_beta'
     vmImage: 'xcode9-macos10.13'
     toolchain: 'beta'
 
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_nightly'
     vmImage: 'xcode9-macos10.13'
     toolchain: 'nightly'
 
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_1_31_1'
     vmImage: 'xcode9-macos10.13'
@@ -29,14 +29,14 @@ jobs:
     vmImage: 'ubuntu-16.04'
     toolchain: 'stable'
 
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_1_31_1_no_cache'
     vmImage: 'xcode9-macos10.13'
     toolchain: '1.31.1'
     features: 'builder client framework gateway model http standard_framework utils'
 
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_no_gateway'
     vmImage: 'xcode9-macos10.13'
