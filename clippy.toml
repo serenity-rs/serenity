@@ -5,4 +5,3 @@ doc-valid-idents = [
 ]
 enum-variant-name-threshold = 1
 single-char-binding-names-threshold = 3
-too-many-arguments-threshold = 6

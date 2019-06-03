@@ -736,20 +736,20 @@ pub fn searched_lowercase<'a>(
         )
     };
     let mut progressed = is_prefixless_group;
+    let is_word_prefix = group
+        .options
+        .prefixes
+        .iter()
+        .any(|prefix| {
+            if starts_with_whole_word(&searched_named_lowercase, &prefix) {
+                searched_named_lowercase.drain(..=prefix.len());
+                progressed = true;
+            }
 
-    if is_prefixless_group
-        || group
-            .options
-            .prefixes
-            .iter()
-            .any(|prefix| {
-                if starts_with_whole_word(&searched_named_lowercase, &prefix) {
-                    searched_named_lowercase.drain(..=prefix.len());
-                    progressed = true;
-                }
+            prefix == searched_named_lowercase
+        });
 
-                prefix == &searched_named_lowercase
-            })
+    if is_prefixless_group || is_word_prefix
     {
         let single_group =
             create_single_group(&context, &group, owners, &msg, &help_options);
