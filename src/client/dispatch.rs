@@ -478,7 +478,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let event_handler = Arc::clone(event_handler);
 
                     threadpool.execute(move || {
-                        event_handler.cached(context, guild_amount);
+                        event_handler.cache_ready(context, guild_amount);
                     });
                 }
             }

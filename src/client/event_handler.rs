@@ -10,11 +10,16 @@ use crate::client::bridge::gateway::event::*;
 
 /// The core trait for handling events by serenity.
 pub trait EventHandler {
-    /// Dispatched when the cache gets full.
+    /// Dispatched when the cache has received and inserted all data from
+    /// guilds.
+    ///
+    /// This process happens upon starting your bot and should be fairly quick.
+    /// However, cache actions performed prior this event may fail as the data
+    /// could be not inserted yet.
     ///
     /// Provides the cached guilds' ids.
     #[cfg(feature = "cache")]
-    fn cached(&self, _ctx: Context, _guilds: Vec<GuildId>) {}
+    fn cache_ready(&self, _ctx: Context, _guilds: Vec<GuildId>) {}
 
     /// Dispatched when a channel is created.
     ///
