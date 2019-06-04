@@ -4,11 +4,12 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     braced, bracketed,
+    ext::IdentExt,
     parse::{Error, Parse, ParseBuffer, ParseStream, Result},
     parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
-    token::{Comma, Brace, Bracket, Mut},
+    token::{Brace, Bracket, Comma, Mut},
     Ident, Lit, ReturnType, Token, Type,
 };
 
@@ -92,6 +93,20 @@ impl<T: Parse> Parse for Bracketed<T> {
         bracketed!(content in input);
 
         Ok(Bracketed(content.parse_terminated(T::parse)?))
+    }
+}
+
+// TODO: Replace this extraneous struct with a proper specialised impl on `Bracketed`
+// once the `specialisation` feature gets stabilised.
+#[derive(Debug)]
+pub struct BracketedIdents(pub Punctuated<Ident, Comma>);
+
+impl Parse for BracketedIdents {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        bracketed!(content in input);
+
+        Ok(BracketedIdents(content.parse_terminated(Ident::parse_any)?))
     }
 }
 

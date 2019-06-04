@@ -1,14 +1,12 @@
-use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS, CHECK};
+use crate::consts::{CHECK, COMMAND, GROUP, GROUP_OPTIONS};
 use crate::util::{
-    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object,
-    RefOrInstance, Bracketed,
+    Argument, Array, AsOption, Braced, Bracketed, BracketedIdents, Expr, Field, IdentAccess,
+    IdentExt2, LitExt, Object, RefOrInstance,
 };
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
-    braced, bracketed,
-    ext::IdentExt,
-    parenthesized,
+    braced, parenthesized,
     parse::{Error, Parse, ParseStream, Result},
     punctuated::Punctuated,
     spanned::Spanned,
@@ -717,70 +715,66 @@ pub struct Group {
 
 impl Parse for Group {
     fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        braced!(content in input);
-
-        let input = content;
-
-        let Field { name, value } = input.parse::<Field<Lit>>()?;
-        if name != "name" {
-            return Err(Error::new(name.span(), "every group must have a `name`"));
+        enum GroupField {
+            Name(Ident),
+            Options(RefOrInstance<GroupOptions>),
+            Commands(BracketedIdents),
+            SubGroups(Bracketed<RefOrInstance<Group>>),
         }
 
-        let name = value.to_ident();
+        impl Parse for GroupField {
+            fn parse(input: ParseStream) -> Result<Self> {
+                let name = input.parse::<Ident>()?;
 
-        input.parse::<Token![,]>()?;
+                input.parse::<Token![:]>()?;
 
-        let Field { name: oname, value: options } = input.parse::<Field<RefOrInstance<GroupOptions>>>()?;
-
-        if oname != "options" {
-            return Err(Error::new(
-                oname.span(),
-                "every group must have some `options`",
-            ));
-        }
-
-        input.parse::<Token![,]>()?;
-
-        let commands = input.parse::<Ident>()?;
-        if commands != "commands" {
-            return Err(Error::new(
-                commands.span(),
-                "every group must have a set of `commands`",
-            ));
-        }
-
-        input.parse::<Token![:]>()?;
-
-        let content;
-        bracketed!(content in input);
-
-        if input.peek(Token![,]) {
-            input.parse::<Token![,]>()?;
-        }
-
-        let mut sub_groups = Vec::new();
-
-        if let Ok(Field { name, value: Bracketed(refs) }) = input.parse::<Field<Bracketed<RefOrInstance<Group>>>>() {
-            if name != "sub_groups" {
-                return Err(Error::new(
-                    name.span(),
-                    "a group may optionally have a `sub_groups`",
-                ));
+                match name.to_string().as_str() {
+                    "name" => Ok(GroupField::Name(input.parse::<Lit>()?.to_ident())),
+                    "options" => Ok(GroupField::Options(input.parse()?)),
+                    "commands" => Ok(GroupField::Commands(input.parse()?)),
+                    "sub_groups" => Ok(GroupField::SubGroups(input.parse()?)),
+                    n => Err(input.error(format_args!(
+                    "`{}` is not an acceptable field of the `group!` macro.
+                    Perhaps you meant one these fields? `name` / `options` / `commands` / `sub_groups`", n))),
+                }
             }
-
-            sub_groups.extend(refs.into_iter());
         }
+
+        let Braced(fields) = input.parse::<Braced<GroupField>>()?;
 
         if input.peek(Token![,]) {
             input.parse::<Token![,]>()?;
         }
+
+        let mut name = None;
+        let mut options = None;
+        let mut commands = None;
+        let mut sub_groups = None;
+
+        for field in fields {
+            match field {
+                GroupField::Name(n) => name = Some(n),
+                GroupField::Options(o) => options = Some(o),
+                GroupField::Commands(BracketedIdents(p)) => commands = Some(p),
+                GroupField::SubGroups(Bracketed(p)) => sub_groups = Some(p.into_iter().collect()),
+            }
+        }
+
+        let name = match name {
+            Some(n) => n,
+            None => return Err(input.error("every group must have a `name`")),
+        };
+
+        let commands = match commands {
+            Some(c) => c,
+            None => return Err(input.error("every group must have some runnable `commands`")),
+        };
 
         Ok(Group {
             name,
-            options,
-            commands: content.parse_terminated(Ident::parse_any)?,
-            sub_groups,
+            commands,
+            options: options.unwrap_or_default(),
+            sub_groups: sub_groups.unwrap_or_else(Vec::new),
         })
     }
 }
