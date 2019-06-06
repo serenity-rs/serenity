@@ -4,7 +4,7 @@ use super::super::utils::{deserialize_emojis, deserialize_roles};
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -102,7 +102,7 @@ impl PartialGuild {
     /// ```rust,ignore
     /// use serenity::model::ChannelType;
     ///
-    /// guild.create_channel("test", ChannelType::Voice, None);
+    /// guild.create_channel(|c| c.name("test").kind(ChannelType::Voice));
     /// ```
     ///
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
@@ -110,9 +110,8 @@ impl PartialGuild {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_channel<C>(&self, http: impl AsRef<Http>, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
-        self.id.create_channel(&http, name, kind, category)
+    pub fn create_channel(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+        self.id.create_channel(&http, f)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.

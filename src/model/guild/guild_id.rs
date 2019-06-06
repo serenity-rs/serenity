@@ -15,6 +15,8 @@ use crate::model::guild::BanOptions;
 use crate::utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::builder::CreateChannel;
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -120,7 +122,7 @@ impl GuildId {
     /// use serenity::model::id::GuildId;
     /// use serenity::model::channel::ChannelType;
     ///
-    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice, None);
+    /// let _channel = GuildId(7).create_channel(|c| c.name("test").kind(ChannelType::Voice));
     /// ```
     ///
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
@@ -128,24 +130,11 @@ impl GuildId {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_channel<C>(self, http: impl AsRef<Http>, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
-        self._create_channel(&http, name, kind, category.into())
-    }
+    pub fn create_channel(self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+        let mut builder = CreateChannel::default();
+        f(&mut builder);
 
-    #[cfg(feature = "http")]
-    fn _create_channel(
-        self,
-        http: impl AsRef<Http>,
-        name: &str,
-        kind: ChannelType,
-        category: Option<ChannelId>,
-    ) -> Result<GuildChannel> {
-        let map = json!({
-            "name": name,
-            "type": kind as u8,
-            "parent_id": category.map(|c| c.0)
-        });
+        let map = utils::hashmap_to_json_map(builder.0);
 
         http.as_ref().create_channel(self.0, &map)
     }

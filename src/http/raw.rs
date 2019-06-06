@@ -209,9 +209,11 @@ impl Http {
     /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
     /// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    pub fn create_channel(&self, guild_id: u64, map: &Value) -> Result<GuildChannel> {
+    pub fn create_channel(&self, guild_id: u64, map: &JsonMap) -> Result<GuildChannel> {
+        let body = serde_json::to_vec(map)?;
+
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(&body),
             headers: None,
             route: RouteInfo::CreateChannel { guild_id },
         })

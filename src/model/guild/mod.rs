@@ -17,9 +17,9 @@ pub use self::role::*;
 pub use self::audit_log::*;
 
 use chrono::{DateTime, FixedOffset};
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use serde::de::Error as DeError;
-use serde_json::{json};
+use serde_json::json;
 use super::utils::*;
 use log::{error, warn};
 
@@ -32,11 +32,9 @@ use parking_lot::RwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::constants::LARGE_THRESHOLD;
-#[cfg(feature = "model")]
-use std;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "http")]
@@ -367,7 +365,7 @@ impl Guild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text, None);
+    /// let _ = guild.create_channel(|c| c.name("my-test-channel").kind(ChannelType::Text));
     /// ```
     ///
     /// # Errors
@@ -379,8 +377,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "client")]
-    pub fn create_channel<C>(&self, context: &Context, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
+    pub fn create_channel(&self, context: &Context, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -390,7 +387,7 @@ impl Guild {
             }
         }
 
-        self.id.create_channel(&context.http, name, kind, category)
+        self.id.create_channel(&context.http, f)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The

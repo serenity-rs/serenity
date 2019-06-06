@@ -6,6 +6,7 @@
 //! by a builder.
 
 mod create_embed;
+mod create_channel;
 mod create_invite;
 mod create_message;
 mod edit_channel;
@@ -19,6 +20,7 @@ mod get_messages;
 
 pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
+    create_channel::CreateChannel,
     create_invite::CreateInvite,
     create_message::CreateMessage,
     edit_channel::EditChannel,
