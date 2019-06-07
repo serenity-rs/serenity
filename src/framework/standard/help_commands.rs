@@ -394,26 +394,18 @@ fn nested_group_command_search<'a>(
                 find_any_command_matches(&command, &group, name)
             };
 
-            if let Some(n) = search_command_name_matched {
+            if search_command_name_matched.is_some() {
 
-                if n == command.options.names[0] {
-                    if HelpBehaviour::Nothing == check_command_behaviour(
-                        &msg,
-                        &command.options,
-                        &owners,
-                        &help_options,
-                        &cache,
-                    ) {
-                        found = Some(command);
-                    } else {
-                        break;
-                    }
+                if HelpBehaviour::Nothing == check_command_behaviour(
+                    &msg,
+                    &command.options,
+                    &owners,
+                    &help_options,
+                    &cache,
+                ) {
+                    found = Some(command);
                 } else {
-                    // Alias.
-                    return Ok(CustomisedHelpData::SuggestedCommands {
-                        help_description: help_options.suggestion_text.replace("{}", name),
-                        suggestions: Suggestions::default(),
-                    });
+                    break;
                 }
             } else if help_options.max_levenshtein_distance > 0 {
 
@@ -749,8 +741,7 @@ pub fn searched_lowercase<'a>(
             prefix == searched_named_lowercase
         });
 
-    if is_prefixless_group || is_word_prefix
-    {
+    if is_prefixless_group || is_word_prefix {
         let single_group =
             create_single_group(&context, &group, owners, &msg, &help_options);
 
