@@ -84,7 +84,7 @@ group!({
     options: {
         owners_only: true,
         // Limit all commands to be guild-restricted.
-        only: "guilds",
+        only_in: "guilds",
         // Adds checks that need to be passed.
         checks: [Admin],
     },
