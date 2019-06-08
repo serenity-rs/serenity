@@ -1,16 +1,15 @@
+use super::super::id::AttachmentId;
+
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use std::io::Read;
-#[cfg(feature = "model")]
-use super::id::AttachmentId;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
 /// [`Embed`]: struct.Embed.html
-#[cfg(feature = "model")]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Attachment {
     /// The unique ID given to this attachment.

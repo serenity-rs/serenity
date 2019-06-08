@@ -1,5 +1,4 @@
 use crate::{internal::RwLockExt, model::prelude::*};
-use serde_json::json;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -24,6 +23,8 @@ use crate::http::AttachmentType;
 use crate::utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(all(feature = "http", feature = "model"))]
+use serde_json::json;
 
 #[cfg(feature = "model")]
 impl ChannelId {

@@ -1,5 +1,4 @@
 use crate::{model::prelude::*};
-use serde_json::json;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -17,6 +16,8 @@ use crate::utils;
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
+#[cfg(feature = "model")]
+use serde_json::json;
 
 #[cfg(feature = "model")]
 impl GuildId {

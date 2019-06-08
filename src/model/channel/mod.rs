@@ -102,7 +102,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
+    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn group(self) -> Option<Arc<RwLock<Group>>> {
@@ -141,7 +141,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
+    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
@@ -183,7 +183,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
+    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
@@ -222,7 +222,7 @@ impl Channel {
     /// #
     /// # }
     /// #
-    /// # #[cfg(all(feature = "model", not(feature = "cache")))]
+    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
     /// fn main() {}
     /// ```
     pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {

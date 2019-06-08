@@ -21,9 +21,7 @@ pub use self::premium_tier::*;
 use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 use serde::de::Error as DeError;
-use serde_json::json;
 use super::utils::*;
-use log::{error, warn};
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -31,12 +29,16 @@ use crate::client::Context;
 use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
+#[cfg(all(feature = "http", feature = "model"))]
+use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::constants::LARGE_THRESHOLD;
+#[cfg(feature = "model")]
+use log::{error, warn};
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "http")]

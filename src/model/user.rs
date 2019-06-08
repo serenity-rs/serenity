@@ -5,7 +5,6 @@ use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
 use crate::{internal::prelude::*, model::misc::Mentionable};
-use serde_json::json;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -23,6 +22,14 @@ use std::fmt::Write;
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
+#[cfg(all(
+    feature = "model",
+    any(
+        all(feature = "builder", feature = "client"),
+        feature = "http",
+    ),
+))]
+use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
