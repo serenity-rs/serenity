@@ -23,7 +23,7 @@ jobs:
     vmImage: 'xcode9-macos10.13'
     toolchain: '1.31.1'
 
-- template: 'azure-template.yml'
+- template: 'azure-template-unix.yml'
   parameters:
     name: 'Linux_stable'
     vmImage: 'ubuntu-16.04'
