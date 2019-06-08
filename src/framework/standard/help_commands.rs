@@ -27,13 +27,14 @@
 use super::{
     Args, CommandGroup, CommandOptions,
     CommandResult, has_correct_roles, HelpBehaviour, HelpOptions,
-    has_correct_permissions, macros::help, OnlyIn,
+    has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::{
     cache::CacheRwLock,
     client::Context,
+    framework::standard::CommonOptions,
     model::channel::Message,
     Error,
     http::Http,
@@ -45,7 +46,6 @@ use std::{
     borrow::Borrow,
     collections::HashSet,
     fmt::Write,
-    hash::BuildHasher,
     ops::{Index, IndexMut},
 };
 #[cfg(all(feature = "cache", feature = "http"))]
@@ -249,13 +249,15 @@ pub fn has_all_requirements(
         let guild = guild.read();
 
         if let Some(member) = guild.members.get(&msg.author.id) {
+
             if let Ok(permissions) = member.permissions(&cache) {
+
                 return if cmd.allowed_roles.is_empty() {
-                    permissions.administrator() || has_correct_permissions(&cache, cmd, msg)
+                    permissions.administrator() || has_correct_permissions(&cache, &cmd, msg)
                 } else {
                     permissions.administrator()
-                        || (has_correct_roles(cmd, &guild, member)
-                            && has_correct_permissions(&cache, cmd, msg))
+                        || (has_correct_roles(&cmd, &guild, member)
+                            && has_correct_permissions(&cache, &cmd, msg))
                 };
             }
         }
@@ -264,58 +266,12 @@ pub fn has_all_requirements(
     cmd.only_in != OnlyIn::Guild
 }
 
-/// Checks whether a command would be visible, takes permissions, channel sent in,
-/// and roles into consideration.
-///
-/// **Note**: A command is visible when it is either normally displayed or
-/// strikethrough upon requested help by a user.
-#[cfg(feature = "cache")]
-pub fn is_command_visible(
-    cache: impl AsRef<CacheRwLock>,
-    command_options: &CommandOptions,
-    msg: &Message,
-    help_options: &HelpOptions,
-) -> bool {
-    if command_options.only_in == OnlyIn::None
-        || command_options.only_in == OnlyIn::Dm && msg.is_private()
-        || command_options.only_in == OnlyIn::Guild && !msg.is_private()
-    {
-        if let Some(guild) = msg.guild(&cache) {
-            let guild = guild.read();
-
-            if let Some(member) = guild.members.get(&msg.author.id) {
-                if command_options.help_available {
-                    return if has_correct_permissions(&cache, command_options, msg) {
-                        if has_correct_roles(command_options, &guild, &member) {
-                            true
-                        } else {
-                            help_options.lacking_role != HelpBehaviour::Hide
-                        }
-                    } else {
-                        help_options.lacking_permissions != HelpBehaviour::Hide
-                    };
-                }
-            }
-        } else if command_options.help_available {
-            return if has_correct_permissions(&cache, command_options, msg) {
-                true
-            } else {
-                help_options.lacking_permissions != HelpBehaviour::Hide
-            };
-        }
-    } else {
-        return help_options.wrong_channel != HelpBehaviour::Hide;
-    }
-
-    false
-}
-
 /// Checks if `search_on` starts with `word` and is then cleanly followed by a
 /// `" "`.
 #[inline]
 #[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
-    search_on.starts_with(word) && search_on.get(word.len()..word.len() + 1)
+    search_on.starts_with(word) && search_on.get(word.len()..=word.len())
         .map_or(false, |slice| slice == " ")
 }
 
@@ -335,19 +291,63 @@ fn find_any_command_matches(
                 .options
                 .prefixes
                 .iter()
-                .any(|prefix|
+                .any(|prefix| {
                     if starts_with_whole_word(&name, &prefix) {
-                        name.drain(..prefix.len() + 1);
-
-                        n == &name
-                    } else {
-                        false
+                        name.drain(..=prefix.len());
                     }
-                )
+
+                    n == &name
+                })
         }).cloned()
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
+fn check_command_behaviour(
+    msg: &Message,
+    options: &impl CommonOptions,
+    owners: &HashSet<UserId>,
+    help_options: &HelpOptions,
+    cache: &CacheRwLock,
+) -> HelpBehaviour {
+    if !&options.help_available() {
+        return HelpBehaviour::Hide;
+    }
+
+    if options.only_in() == OnlyIn::None
+        || options.only_in() == OnlyIn::Dm && msg.is_private()
+        || options.only_in() == OnlyIn::Guild && !msg.is_private()
+    {
+        if options.owners_only() && !owners.contains(&msg.author.id) {
+            return help_options.lacking_ownership;
+        }
+
+        if has_correct_permissions(&cache, options, msg) {
+
+            if let Some(guild) = msg.guild(&cache) {
+                let guild = guild.read();
+
+                if let Some(member) = guild.members.get(&msg.author.id) {
+                    if has_correct_roles(options, &guild, &member) {
+                        return HelpBehaviour::Nothing;
+                    } else {
+                        return help_options.lacking_role;
+                    }
+                }
+            } else {
+                return HelpBehaviour::Nothing;
+            }
+        } else {
+            return help_options.lacking_permissions;
+        }
+    } else {
+        return help_options.wrong_channel;
+    }
+
+    HelpBehaviour::Nothing
+}
+
+#[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::too_many_arguments)]
 fn nested_group_command_search<'a>(
     cache: &CacheRwLock,
     groups: &[&'static CommandGroup],
@@ -355,15 +355,35 @@ fn nested_group_command_search<'a>(
     help_options: &'a HelpOptions,
     msg: &Message,
     similar_commands: &mut Vec<SuggestedCommandName>,
+    owners: &HashSet<UserId>,
 ) -> Result<CustomisedHelpData<'a>, ()> {
     for group in groups {
         let group = *group;
         let mut found: Option<&'static InternalCommand> = None;
 
+        let group_behaviour = check_command_behaviour(
+                &msg,
+                &group.options,
+                &owners,
+                &help_options,
+                &cache,
+        );
+
+        match &group_behaviour {
+            HelpBehaviour::Nothing => (),
+            _ => {
+                continue;
+            }
+        }
+
         for command in group.commands {
             let command = *command;
 
             let search_command_name_matched = if group.options.prefixes.is_empty() {
+                if starts_with_whole_word(&name, &group.name) {
+                    name.drain(..=group.name.len());
+                }
+
                 command
                     .options
                     .names
@@ -374,20 +394,18 @@ fn nested_group_command_search<'a>(
                 find_any_command_matches(&command, &group, name)
             };
 
-            if let Some(n) = search_command_name_matched {
+            if search_command_name_matched.is_some() {
 
-                if n == command.options.names[0] {
-                    if is_command_visible(&cache, &command.options, msg, help_options) {
-                        found = Some(command);
-                    } else {
-                        break;
-                    }
+                if HelpBehaviour::Nothing == check_command_behaviour(
+                    &msg,
+                    &command.options,
+                    &owners,
+                    &help_options,
+                    &cache,
+                ) {
+                    found = Some(command);
                 } else {
-                    // Alias.
-                    return Ok(CustomisedHelpData::SuggestedCommands {
-                        help_description: help_options.suggestion_text.replace("{}", name),
-                        suggestions: Suggestions::default(),
-                    });
+                    break;
                 }
             } else if help_options.max_levenshtein_distance > 0 {
 
@@ -400,7 +418,13 @@ fn nested_group_command_search<'a>(
                 let levenshtein_distance = levenshtein_distance(&command_name, &name);
 
                 if levenshtein_distance <= help_options.max_levenshtein_distance
-                    && is_command_visible(&cache, &command.options, &msg, &help_options)
+                    && HelpBehaviour::Nothing == check_command_behaviour(
+                        &msg,
+                        &command.options,
+                        &owners,
+                        &help_options,
+                        &cache,
+                    )
                 {
                     similar_commands.push(SuggestedCommandName {
                         name: command_name,
@@ -460,12 +484,13 @@ fn nested_group_command_search<'a>(
         }
 
         match nested_group_command_search(
-            &cache,
+            cache,
             &group.sub_groups,
             name,
-            &help_options,
-            &msg,
+            help_options,
+            msg,
             similar_commands,
+            owners,
         ) {
             Ok(found) => return Ok(found),
             Err(()) => (),
@@ -485,6 +510,7 @@ fn fetch_single_command<'a>(
     name: &str,
     help_options: &'a HelpOptions,
     msg: &Message,
+    owners: &HashSet<UserId>,
 ) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
     let mut similar_commands: Vec<SuggestedCommandName> = Vec::new();
     let cache = cache.as_ref();
@@ -497,6 +523,7 @@ fn fetch_single_command<'a>(
         &help_options,
         &msg,
         &mut similar_commands,
+        &owners,
     ) {
         Ok(found) => Ok(found),
         Err(()) => Err(similar_commands),
@@ -504,80 +531,109 @@ fn fetch_single_command<'a>(
 }
 
 #[cfg(feature = "cache")]
+#[allow(clippy::too_many_arguments)]
 fn fill_eligible_commands<'a>(
     context: &Context,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     msg: &Message,
     to_fill: &mut GroupCommandsPair,
+    highest_formatter: &mut HelpBehaviour,
 ) {
     to_fill.name = group.name;
     to_fill.prefixes = group.options.prefixes.to_vec();
+
+    let group_behaviour = {
+        if let HelpBehaviour::Hide = highest_formatter {
+            HelpBehaviour::Hide
+        } else {
+            std::cmp::max(
+                *highest_formatter,
+                check_command_behaviour(
+                    msg,
+                    &group.options,
+                    owners,
+                    help_options,
+                    &context.cache,
+                )
+            )
+        }
+    };
+
+    *highest_formatter = group_behaviour;
 
     for command in commands {
         let command = *command;
         let options = &command.options;
         let name = &options.names[0];
 
-        if options.only_in == OnlyIn::None
-            || options.only_in == OnlyIn::Dm && msg.is_private()
-            || options.only_in == OnlyIn::Guild && !msg.is_private()
-        {
-            if options.owners_only && !owners.contains(&msg.author.id) {
-                let name = format_command_name!(&help_options.lacking_ownership, &name);
+        match &group_behaviour {
+            HelpBehaviour::Nothing => (),
+            _ => {
+                let name = format_command_name!(&group_behaviour, &name);
                 to_fill.command_names.push(name);
 
                 continue;
             }
-
-            if options.help_available && has_correct_permissions(&context.cache, &options, msg) {
-                if let Some(guild) = msg.guild(&context.cache) {
-                    let guild = guild.read();
-
-                    if let Some(member) = guild.members.get(&msg.author.id) {
-                        if has_correct_roles(&options, &guild, &member) {
-                            to_fill.command_names.push(format!("`{}`", &name));
-                        } else {
-                            let name = format_command_name!(&help_options.lacking_role, &name);
-                            to_fill.command_names.push(name);
-                        }
-                    }
-                } else {
-                    to_fill.command_names.push(format!("`{}`", &name));
-                }
-            } else {
-                let name = format_command_name!(&help_options.lacking_permissions, &name);
-                to_fill.command_names.push(name);
-            }
-        } else {
-            let name = format_command_name!(&help_options.wrong_channel, &name);
-            to_fill.command_names.push(name);
         }
+
+        let command_behaviour = check_command_behaviour(
+            msg,
+            &command.options,
+            owners,
+            help_options,
+            &context.cache,
+        );
+
+        let name = format_command_name!(command_behaviour, &name);
+        to_fill.command_names.push(name);
     }
 }
 
-/// Tries to extract a single command matching searched command name.
+/// Tries to fetch all commands visible to the user within a group and
+/// its sub-groups.
 #[cfg(feature = "cache")]
+#[allow(clippy::too_many_arguments)]
 fn fetch_all_eligible_commands_in_group<'a>(
     context: &Context,
     commands: &[&'static InternalCommand],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     help_options: &'a HelpOptions,
     group: &'a CommandGroup,
     msg: &Message,
+    highest_formatter: HelpBehaviour,
 ) -> GroupCommandsPair {
     let mut group_with_cmds = GroupCommandsPair::default();
+    let mut highest_formatter = highest_formatter;
 
-    fill_eligible_commands(&context, &commands, &owners,
-        &help_options, &group, &msg,
-        &mut group_with_cmds);
+    fill_eligible_commands(
+        &context,
+        &commands,
+        &owners,
+        &help_options,
+        &group,
+        &msg,
+        &mut group_with_cmds,
+        &mut highest_formatter,
+    );
 
     for sub_group in group.sub_groups {
+        if HelpBehaviour::Hide == highest_formatter {
+            break;
+        } else if sub_group.commands.is_empty() && sub_group.sub_groups.is_empty() {
+            continue;
+        }
+
         let grouped_cmd = fetch_all_eligible_commands_in_group(
-            &context, &sub_group.commands, &owners,
-            &help_options, &sub_group, &msg
+            &context,
+            &sub_group.commands,
+            &owners,
+            &help_options,
+            &sub_group,
+            &msg,
+            highest_formatter,
         );
 
         group_with_cmds.sub_groups.push(grouped_cmd);
@@ -592,7 +648,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 fn create_command_group_commands_pair_from_groups<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     msg: &Message,
     help_options: &'a HelpOptions,
 ) -> Vec<GroupCommandsPair> {
@@ -616,7 +672,7 @@ fn create_command_group_commands_pair_from_groups<'a>(
 fn create_single_group(
     context: &Context,
     group: &CommandGroup,
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     msg: &Message,
     help_options: &HelpOptions,
 ) -> GroupCommandsPair {
@@ -627,6 +683,7 @@ fn create_single_group(
         &help_options,
         &group,
         &msg,
+        HelpBehaviour::Nothing,
     );
 
     group_with_cmds.name = group.name;
@@ -634,14 +691,100 @@ fn create_single_group(
     group_with_cmds
 }
 
+/// If `searched_group` is exact match on `group_name`,
+/// this function returns `true` but does not trim.
+/// Otherwise, it is treated as an optionally passed group-name and ends up
+/// being removed from `searched_group`.
+///
+/// If a group has no prefixes, it is not required to be part of
+/// `searched_group` to reach a sub-group of `group_name`.
+#[cfg(feature = "cache")]
+fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool {
+    if group_name == searched_group.as_str() {
+        return true;
+    } else if starts_with_whole_word(&searched_group, &group_name) {
+        searched_group.drain(..=group_name.len());
+    }
+
+    false
+}
+
+#[cfg(feature = "cache")]
+#[allow(clippy::implicit_hasher)]
+pub fn searched_lowercase<'a>(
+    context: &Context,
+    group: &CommandGroup,
+    owners: &HashSet<UserId>,
+    args: &'a Args,
+    help_options: &'a HelpOptions,
+    msg: &Message,
+    searched_named_lowercase: &mut String,
+) -> Option<CustomisedHelpData<'a>> {
+    let is_prefixless_group = {
+        group.options.prefixes.is_empty()
+        && trim_prefixless_group(
+            &group.name.to_lowercase(),
+            searched_named_lowercase,
+        )
+    };
+    let mut progressed = is_prefixless_group;
+    let is_word_prefix = group
+        .options
+        .prefixes
+        .iter()
+        .any(|prefix| {
+            if starts_with_whole_word(&searched_named_lowercase, &prefix) {
+                searched_named_lowercase.drain(..=prefix.len());
+                progressed = true;
+            }
+
+            prefix == searched_named_lowercase
+        });
+
+    if is_prefixless_group || is_word_prefix {
+        let single_group =
+            create_single_group(&context, &group, owners, &msg, &help_options);
+
+        if !single_group.command_names.is_empty() {
+            return Some(CustomisedHelpData::GroupedCommands {
+                help_description: group
+                    .options
+                    .description
+                    .as_ref()
+                    .map(|s| s.to_string())
+                    .unwrap_or_default(),
+                groups: vec![single_group],
+            });
+        }
+    } else if progressed || group.options.prefixes.is_empty() {
+        for sub_group in group.sub_groups {
+
+            if let Some(found_set) = searched_lowercase(
+                context,
+                sub_group,
+                owners,
+                args,
+                help_options,
+                msg,
+                searched_named_lowercase,
+            ) {
+                return Some(found_set);
+            }
+        }
+    }
+
+    None
+}
+
 /// Iterates over all commands and forges them into a `CustomisedHelpData`.
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
+#[allow(clippy::implicit_hasher)]
 pub fn create_customised_help_data<'a>(
     context: &Context,
     groups: &[&'static CommandGroup],
-    owners: &HashSet<UserId, impl BuildHasher>,
+    owners: &HashSet<UserId>,
     args: &'a Args,
     help_options: &'a HelpOptions,
     msg: &Message,
@@ -651,34 +794,23 @@ pub fn create_customised_help_data<'a>(
     if !args.is_empty() {
         let name = args.message();
 
-        return match fetch_single_command(&cache, &groups, &name, &help_options, &msg) {
+        return match fetch_single_command(&cache, &groups, &name, &help_options, &msg, owners) {
             Ok(single_command) => single_command,
             Err(suggestions) => {
-                let searched_named_lowercase = name.to_lowercase();
+                let mut searched_named_lowercase = name.to_lowercase().to_string();
 
                 for group in groups {
 
-                    if group.name.to_lowercase() == searched_named_lowercase
-                        || group
-                            .options
-                            .prefixes
-                            .iter()
-                            .any(|prefix| *prefix == searched_named_lowercase)
-                    {
-                        let single_group =
-                            create_single_group(&context, &group, &owners, &msg, &help_options);
-
-                        if !single_group.command_names.is_empty() {
-                            return CustomisedHelpData::GroupedCommands {
-                                help_description: group
-                                    .options
-                                    .description
-                                    .as_ref()
-                                    .map(|s| s.to_string())
-                                    .unwrap_or_default(),
-                                groups: vec![single_group],
-                            };
-                        }
+                    if let Some(found_command) = searched_lowercase(
+                        context,
+                        group,
+                        owners,
+                        args,
+                        help_options,
+                        msg,
+                        &mut searched_named_lowercase,
+                    ) {
+                        return found_command;
                     }
                 }
 
@@ -714,7 +846,7 @@ pub fn create_customised_help_data<'a>(
     let listed_groups = create_command_group_commands_pair_from_groups(
         &context,
         &groups,
-        &owners,
+        owners,
         &msg,
         &help_options,
     );
@@ -765,23 +897,26 @@ fn flatten_group_to_string(
         .join(&format!("\n{}", &repeated_indent_str));
 
 
-    if group.command_names.len() >= 1 {
+    if !group.command_names.is_empty() {
         joined_commands.insert_str(0, &repeated_indent_str);
     }
 
     let _ = writeln!(group_text, "{}", joined_commands);
 
     for sub_group in &group.sub_groups {
-        let mut sub_group_text = String::default();
 
-        flatten_group_to_string(
-            &mut sub_group_text,
-            &sub_group,
-            nest_level + 1,
-            &help_options,
-        );
+        if !(sub_group.command_names.is_empty() && sub_group.sub_groups.is_empty()) {
+            let mut sub_group_text = String::default();
 
-        let _ = write!(group_text, "{}", sub_group_text);
+            flatten_group_to_string(
+                &mut sub_group_text,
+                &sub_group,
+                nest_level + 1,
+                &help_options,
+            );
+
+            let _ = write!(group_text, "{}", sub_group_text);
+        }
     }
 }
 
@@ -976,20 +1111,36 @@ fn send_error_embed(
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler).unwrap();
 /// #
-/// use serenity::framework::standard::{StandardFramework, help_commands::*};
+/// use std::{collections::HashSet, hash::BuildHasher};
+/// use serenity::{framework::standard::{Args, CommandGroup, CommandResult,
+///     StandardFramework, macros::help, HelpOptions,
+///     help_commands::*}, model::prelude::*,
+/// };
+///
+/// #[help]
+/// fn my_help(
+///     context: &mut Context,
+///     msg: &Message,
+///     args: Args,
+///     help_options: &'static HelpOptions,
+///     groups: &[&'static CommandGroup],
+///     owners: HashSet<UserId>
+/// ) -> CommandResult {
+///     with_embeds(context, msg, args, &help_options, groups, owners)
+/// }
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(&WITH_EMBEDS_HELP_COMMAND));
+///     .help(&MY_HELP_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
-#[help]
+#[allow(clippy::implicit_hasher)]
 pub fn with_embeds(
     context: &mut Context,
     msg: &Message,
     args: Args,
-    help_options: &'static HelpOptions,
+    help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>,
+    owners: HashSet<UserId>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);
@@ -1129,20 +1280,36 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 /// # impl EventHandler for Handler {}
 /// # let mut client = Client::new("token", Handler).unwrap();
 /// #
-/// use serenity::framework::standard::{StandardFramework, help_commands::*};
+/// use std::{collections::HashSet, hash::BuildHasher};
+/// use serenity::{framework::standard::{Args, CommandGroup, CommandResult,
+///     StandardFramework, macros::help, HelpOptions,
+///     help_commands::*}, model::prelude::*,
+/// };
+///
+/// #[help]
+/// fn my_help(
+///     context: &mut Context,
+///     msg: &Message,
+///     args: Args,
+///     help_options: &'static HelpOptions,
+///     groups: &[&'static CommandGroup],
+///     owners: HashSet<UserId>
+/// ) -> CommandResult {
+///     plain(context, msg, args, &help_options, groups, owners)
+/// }
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(&PLAIN_HELP_COMMAND));
+///     .help(&MY_HELP_HELP_COMMAND));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
-#[help]
+#[allow(clippy::implicit_hasher)]
 pub fn plain(
     context: &mut Context,
     msg: &Message,
     args: Args,
-    help_options: &'static HelpOptions,
+    help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>,
+    owners: HashSet<UserId>,
 ) -> CommandResult {
     let formatted_help =
         create_customised_help_data(&context, &groups, &owners, &args, help_options, msg);

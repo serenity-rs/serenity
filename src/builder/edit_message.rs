@@ -1,7 +1,8 @@
 use crate::internal::prelude::*;
-use std::fmt::Display;
 use super::CreateEmbed;
-use crate::utils::{self, VecMap};
+use crate::utils;
+
+use std::collections::HashMap;
 
 /// A builder to specify the fields to edit in an existing message.
 ///
@@ -31,20 +32,16 @@ use crate::utils::{self, VecMap};
 ///
 /// [`Message`]: ../model/channel/struct.Message.html
 #[derive(Clone, Debug, Default)]
-pub struct EditMessage(pub VecMap<&'static str, Value>);
+pub struct EditMessage(pub HashMap<&'static str, Value>);
 
 impl EditMessage {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: Display>(&mut self, content: D) -> &mut Self {
-        self._content(content.to_string());
+    pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
+        self.0.insert("content", Value::String(content.to_string()));
         self
-    }
-
-    fn _content(&mut self, content: String) {
-        self.0.insert("content", Value::String(content));
     }
 
     /// Set an embed for the message.
@@ -52,7 +49,7 @@ impl EditMessage {
     where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
-        let map = utils::vecmap_to_json_map(create_embed.0);
+        let map = utils::hashmap_to_json_map(create_embed.0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);

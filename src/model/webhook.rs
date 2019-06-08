@@ -215,7 +215,7 @@ impl Webhook {
     where F: FnOnce(&mut ExecuteWebhook) -> &mut ExecuteWebhook {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
-        let map = utils::vecmap_to_json_map(execute_webhook.0);
+        let map = utils::hashmap_to_json_map(execute_webhook.0);
 
      http.as_ref().execute_webhook(self.id.0, &self.token, wait, &map)
     }

@@ -15,6 +15,8 @@ use crate::model::guild::BanOptions;
 use crate::utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::builder::CreateChannel;
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -94,6 +96,11 @@ impl GuildId {
     pub fn channels(self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
         let mut channels = HashMap::new();
 
+        // Clippy is suggesting:
+        // consider removing
+        // `http.as_ref().get_channels(self.0)?()`:
+        // `http.as_ref().get_channels(self.0)?`.
+        #[allow(clippy::identity_conversion)]
         for channel in http.as_ref().get_channels(self.0)? {
             channels.insert(channel.id, channel);
         }
@@ -115,7 +122,7 @@ impl GuildId {
     /// use serenity::model::id::GuildId;
     /// use serenity::model::channel::ChannelType;
     ///
-    /// let _channel = GuildId(7).create_channel("test", ChannelType::Voice, None);
+    /// let _channel = GuildId(7).create_channel(|c| c.name("test").kind(ChannelType::Voice));
     /// ```
     ///
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
@@ -123,24 +130,11 @@ impl GuildId {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_channel<C>(self, http: impl AsRef<Http>, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
-        self._create_channel(&http, name, kind, category.into())
-    }
+    pub fn create_channel(self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+        let mut builder = CreateChannel::default();
+        f(&mut builder);
 
-    #[cfg(feature = "http")]
-    fn _create_channel(
-        self,
-        http: impl AsRef<Http>,
-        name: &str,
-        kind: ChannelType,
-        category: Option<ChannelId>,
-    ) -> Result<GuildChannel> {
-        let map = json!({
-            "name": name,
-            "type": kind as u8,
-            "parent_id": category.map(|c| c.0)
-        });
+        let map = utils::hashmap_to_json_map(builder.0);
 
         http.as_ref().create_channel(self.0, &map)
     }
@@ -214,7 +208,7 @@ impl GuildId {
     where F: FnOnce(&mut EditRole) -> &mut EditRole {
         let mut edit_role = EditRole::default();
         f(&mut edit_role);
-        let map = utils::vecmap_to_json_map(edit_role.0);
+        let map = utils::hashmap_to_json_map(edit_role.0);
 
         let role = http.as_ref().create_role(self.0, &map)?;
 
@@ -305,7 +299,7 @@ impl GuildId {
     where F: FnOnce(&mut EditGuild) -> &mut EditGuild{
         let mut edit_guild = EditGuild::default();
         f(&mut edit_guild);
-        let map = utils::vecmap_to_json_map(edit_guild.0);
+        let map = utils::hashmap_to_json_map(edit_guild.0);
 
         http.as_ref().edit_guild(self.0, &map)
     }
@@ -345,19 +339,21 @@ impl GuildId {
     /// Mute a member and set their roles to just one role with a predefined Id:
     ///
     /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
+    /// guild.edit_member(&context, user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
         self._edit_member(&http, user_id.into(), f)
     }
 
     #[cfg(feature = "http")]
     fn _edit_member<F>(self, http: impl AsRef<Http>, user_id: UserId, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember {
-        let map = utils::vecmap_to_json_map(f(EditMember::default()).0);
+        where F: FnOnce(&mut EditMember) -> &mut EditMember {
+        let mut edit_member = EditMember::default();
+        f(&mut edit_member);
+        let map = utils::hashmap_to_json_map(edit_member.0);
 
         http.as_ref().edit_member(self.0, user_id.0, &map)
     }
@@ -386,7 +382,7 @@ impl GuildId {
     /// ```rust,ignore
     /// use serenity::model::{GuildId, RoleId};
     ///
-    /// GuildId(7).edit_role(RoleId(8), |r| r.hoist(true));
+    /// GuildId(7).edit_role(&context, RoleId(8), |r| r.hoist(true));
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html
@@ -394,14 +390,16 @@ impl GuildId {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_role<F, R>(self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        where F: FnOnce(&mut EditRole) -> &mut EditRole, R: Into<RoleId> {
         self._edit_role(&http, role_id.into(), f)
     }
 
     #[cfg(feature = "http")]
     fn _edit_role<F>(self, http: impl AsRef<Http>, role_id: RoleId, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole {
-        let map = utils::vecmap_to_json_map(f(EditRole::default()).0);
+        where F: FnOnce(&mut EditRole) -> &mut EditRole {
+        let mut edit_role = EditRole::default();
+        f(&mut edit_role);
+        let map = utils::hashmap_to_json_map(edit_role.0);
 
         http.as_ref().edit_role(self.0, role_id.0, &map)
     }
@@ -415,7 +413,7 @@ impl GuildId {
     ///
     /// ```rust,ignore
     /// use serenity::model::{GuildId, RoleId};
-    /// GuildId(7).edit_role_position(RoleId(8), 2);
+    /// GuildId(7).edit_role_position(&context, RoleId(8), 2);
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html

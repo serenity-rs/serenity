@@ -8,7 +8,7 @@ use tungstenite::{
 };
 use log::warn;
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 use std::{
     error::Error as StdError,
     fmt::{
@@ -20,7 +20,7 @@ use std::{
     net::TcpStream,
     sync::Arc,
 };
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 use url::Url;
 
 pub trait ReceiverExt {
@@ -81,7 +81,7 @@ fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>>{
 
 /// An error that occured while connecting over rustls
 #[derive(Debug)]
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 pub enum RustlsError {
     /// WebPKI X.509 Certificate Validation Error.
     WebPKI,
@@ -93,19 +93,19 @@ pub enum RustlsError {
     __Nonexhaustive,
 }
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 impl From<IoError> for RustlsError {
     fn from(e: IoError) -> Self {
         RustlsError::Io(e)
     }
 }
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
 }
 
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 impl StdError for RustlsError {
     fn description(&self) -> &str {
         use self::RustlsError::*;
@@ -120,13 +120,13 @@ impl StdError for RustlsError {
 }
 
 // Create a tungstenite client with a rustls stream.
-#[cfg(not(feature = "native_tls"))]
+#[cfg(not(feature = "native_tls_backend"))]
 pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     let mut config = rustls::ClientConfig::new();
     config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
 
     let base_host = if let Some(h) = url.host_str() {
-        let (dot, _) = h.rmatch_indices('.').skip(1).next().unwrap_or((0, ""));
+        let (dot, _) = h.rmatch_indices('.').nth(1).unwrap_or((0, ""));
         // We do not want the leading '.', but if there is no leading '.' we do
         // not want to remove the leading character.
         let split_at_index = if dot == 0 { 0 } else { dot + 1 };

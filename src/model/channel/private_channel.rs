@@ -5,7 +5,7 @@ use std::fmt::{
     Formatter,
     Result as FmtResult
 };
-use super::deserialize_single_recipient;
+use super::{deserialize_single_recipient, serialize_single_recipient};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -42,8 +42,8 @@ pub struct PrivateChannel {
     pub kind: ChannelType,
     /// The recipient to the private channel.
     #[serde(deserialize_with = "deserialize_single_recipient",
-            rename = "recipients",
-            serialize_with = "serialize_sync_user")]
+            serialize_with = "serialize_single_recipient",
+            rename = "recipients")]
     pub recipient: Arc<RwLock<User>>,
 }
 
@@ -178,17 +178,17 @@ impl PrivateChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`Channel::messages`] for more information.
+    /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`Channel::messages`]: enum.Channel.html#method.messages
+    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
     #[inline]
-    pub fn messages<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
-        self.id.messages(&http, f)
+        self.id.messages(&http, builder)
     }
 
     /// Returns "DM with $username#discriminator".
@@ -268,7 +268,7 @@ impl PrivateChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn send_files<'a, F, T, It>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
               T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         self.id.send_files(&http, files, f)
     }
@@ -289,8 +289,8 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn send_message<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+    pub fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
+    where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         self.id.send_message(&http, f)
     }
 

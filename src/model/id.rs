@@ -12,9 +12,11 @@ macro_rules! id_u64 {
             impl $name {
                 /// Retrieves the time that the Id was created at.
                 pub fn created_at(&self) -> NaiveDateTime {
-                    let offset = (self.0 >> 22) / 1000;
+                    let offset = self.0 >> 22;
+                    let secs = offset / 1000;
+                    let millis = (offset % 1000) * 1_000_000; // 1 million nanoseconds in a millisecond
 
-                    NaiveDateTime::from_timestamp(1_420_070_400 + offset as i64, 0)
+                    NaiveDateTime::from_timestamp(1_420_070_400 + secs as i64, millis as u32)
                 }
 
                 /// Immutably borrow inner Id.
@@ -124,7 +126,12 @@ pub struct WebhookId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct AuditLogEntryId(pub u64);
 
+/// An identifier for an attachment.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct AttachmentId(u64);
+
 id_u64! {
+    AttachmentId;
     ApplicationId;
     ChannelId;
     EmojiId;

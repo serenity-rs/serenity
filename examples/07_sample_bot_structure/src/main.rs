@@ -42,7 +42,7 @@ impl EventHandler for Handler {
 group!({
     name: "general",
     options: {},
-    commands: [math, meta, owner]
+    commands: [multiply, ping, quit]
 });
 
 fn main() {
@@ -75,7 +75,7 @@ fn main() {
         .configure(|c| c
             .owners(owners)
             .prefix("~"))
-        .group(GENERAL_GROUP));
+        .group(&GENERAL_GROUP));
 
     if let Err(why) = client.start() {
         error!("Client error: {:?}", why);

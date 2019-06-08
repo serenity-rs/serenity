@@ -1,9 +1,10 @@
 use crate::internal::prelude::*;
 use crate::http::AttachmentType;
 use crate::model::channel::ReactionType;
-use std::fmt::Display;
 use super::CreateEmbed;
-use crate::utils::{self, VecMap};
+use crate::utils;
+
+use std::collections::HashMap;
 
 /// A builder to specify the contents of an [`http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
@@ -52,15 +53,15 @@ use crate::utils::{self, VecMap};
 /// [`embed`]: #method.embed
 /// [`http::send_message`]: ../http/fn.send_message.html
 #[derive(Clone, Debug)]
-pub struct CreateMessage<'a>(pub VecMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType<'a>>);
+pub struct CreateMessage<'a>(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType<'a>>);
 
 impl<'a> CreateMessage<'a> {
     /// Set the content of the message.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
-    pub fn content<D: Display>(&mut self, content: D) -> &mut Self {
-        self._content(content.to_string());
+    pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
+        self.0.insert("content", Value::String(content.to_string()));
         self
     }
 
@@ -73,7 +74,7 @@ impl<'a> CreateMessage<'a> {
     where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
-        let map = utils::vecmap_to_json_map(embed.0);
+        let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
         self.0.insert("embed", embed);
@@ -130,7 +131,7 @@ impl<'a> Default for CreateMessage<'a> {
     /// [`Message`]: ../model/channel/struct.Message.html
     /// [`tts`]: #method.tts
     fn default() -> CreateMessage<'a> {
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
         CreateMessage(map, None, Vec::new())

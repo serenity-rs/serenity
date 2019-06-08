@@ -1,5 +1,5 @@
 use chrono::{DateTime, FixedOffset};
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -27,7 +27,7 @@ use std::fmt::{
     Result as FmtResult
 };
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils::{self as serenity_utils};
+use crate::utils as serenity_utils;
 #[cfg(all(feature = "model", feature = "builder"))]
 use crate::builder::EditChannel;
 #[cfg(feature = "http")]
@@ -146,7 +146,7 @@ impl GuildChannel {
         let mut invite = CreateInvite::default();
         f(&mut invite);
 
-        let map = serenity_utils::vecmap_to_json_map(invite.0);
+        let map = serenity_utils::hashmap_to_json_map(invite.0);
 
         context.http.create_invite(self.id.0, &map)
     }
@@ -349,11 +349,11 @@ impl GuildChannel {
     /// Change a voice channels name and bitrate:
     ///
     /// ```rust,ignore
-    /// channel.edit(|c| c.name("test").bitrate(86400));
+    /// channel.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "utils", feature = "client", feature = "builder"))]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+        where F: FnOnce(&mut EditChannel) -> &mut EditChannel {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -363,13 +363,13 @@ impl GuildChannel {
             }
         }
 
-        use serenity_utils::VecMap;
-
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
 
-        let edited = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
+        let mut edit_channel = EditChannel::default();
+        f(&mut edit_channel);
+        let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
         match context.http.edit_channel(self.id.0, &edited) {
             Ok(channel) => {
@@ -412,7 +412,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {cache.as_ref().read().guild(self.guild_id) }
+    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> { cache.as_ref().read().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -447,16 +447,17 @@ impl GuildChannel {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`Channel::messages`] for more information.
+    /// Refer to the [`GetMessages`]-builder for more information on how to
+    /// use `builder`.
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`Channel::messages`]: enum.Channel.html#method.messages
+    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    pub fn messages<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
-        self.id.messages(&http, f)
+        self.id.messages(&http, builder)
     }
 
     /// Returns the name of the guild channel.
@@ -619,7 +620,7 @@ impl GuildChannel {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[cfg(feature = "http")]
     #[inline]
-    pub fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> { self.id.say(&http, content) }
+    pub fn say(self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> { self.id.say(&http, content) }
 
     /// Sends (a) file(s) along with optional message contents.
     ///
@@ -642,7 +643,7 @@ impl GuildChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn send_files<'a, F, T, It>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
               T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         self.id.send_files(&http, files, f)
     }
@@ -667,8 +668,8 @@ impl GuildChannel {
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "client")]
-    pub fn send_message<F>(&self, context: &Context, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+    pub fn send_message<'a, F>(&self, context: &Context, f: F) -> Result<Message>
+    where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::SEND_MESSAGES;
@@ -701,6 +702,59 @@ impl GuildChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> { self.id.webhooks(&http) }
+
+    /// Retrieves [`Member`]s from the current channel.
+    ///
+    /// [`ChannelType::Voice`] returns [`Member`]s using the channel.
+    /// [`ChannelType::Text`] and [`ChannelType::News`] return [`Member`]s
+    /// that can read the channel.
+    ///
+    /// Other [`ChannelType`]s lack the concept of [`Member`]s and
+    /// will return: [`ModelError::InvalidChannelType`].
+    ///
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [`ChannelType`]: enum.ChannelType.html
+    /// [`ChannelType::Voice`]: enum.ChannelType.html#variant.Voice
+    /// [`ChannelType::Text`]: enum.ChannelType.html#variant.Text
+    /// [`ChannelType::News`]: enum.ChannelType.html#variant.News
+    /// [`ModelError::InvalidChannelType`]: ../error/enum.Error.html#variant.InvalidChannelType
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
+        let cache = cache.as_ref();
+        let guild = cache.read().guild(self.guild_id).unwrap();
+
+        match self.kind {
+            ChannelType::Voice => Ok(guild
+                .read()
+                .voice_states
+                .values()
+                .filter_map(|v| {
+                    v.channel_id.and_then(
+                        |c| {
+                            if c == self.id {
+                                guild.read().members.get(&v.user_id).cloned()
+                            } else {
+                                None
+                            }
+                        },
+                    )
+                })
+                .collect()),
+            ChannelType::News | ChannelType::Text => Ok(guild
+                    .read()
+                    .members
+                    .iter()
+                    .filter_map(|e|
+                        if self.permissions_for(&cache, e.0).map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
+                            Some(e.1.clone())
+                        } else {
+                            None
+                        }
+                    ).collect()),
+            _ => Err(Error::from(ModelError::InvalidChannelType)),
+        }
+    }
 }
 
 #[cfg(feature = "model")]

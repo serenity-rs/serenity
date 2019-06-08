@@ -69,11 +69,11 @@ impl Http {
 
     pub fn new_with_token(token: &str) -> Self {
         Http {
-            #[cfg(not(feature = "native_tls"))]
+            #[cfg(not(feature = "native_tls_backend"))]
             client: Client::builder()
                 .use_rustls_tls()
                 .build().expect("Cannot build Reqwest::Client."),
-            #[cfg(feature = "native_tls")]
+            #[cfg(feature = "native_tls_backend")]
             client: Client::builder()
                 .use_default_tls()
                 .build().expect("Cannot build Reqwest::Client."),
@@ -209,9 +209,11 @@ impl Http {
     /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
     /// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    pub fn create_channel(&self, guild_id: u64, map: &Value) -> Result<GuildChannel> {
+    pub fn create_channel(&self, guild_id: u64, map: &JsonMap) -> Result<GuildChannel> {
+        let body = serde_json::to_vec(map)?;
+
         self.fire(Request {
-            body: Some(map.to_string().as_bytes()),
+            body: Some(&body),
             headers: None,
             route: RouteInfo::CreateChannel { guild_id },
         })
@@ -1529,7 +1531,7 @@ impl Http {
             .multipart(multipart).send()?;
 
         if !response.status().is_success() {
-            return Err(HttpError::UnsuccessfulRequest(Box::new(response)).into());
+            return Err(HttpError::UnsuccessfulRequest(response.into()).into());
         }
 
         serde_json::from_reader(response).map_err(From::from)
@@ -1723,7 +1725,7 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::from(HttpError::UnsuccessfulRequest(Box::new(response))))
+            Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
         }
     }
 
@@ -1768,8 +1770,12 @@ impl Http {
         debug!("Expected {}, got {}", expected, response.status());
         trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::from(HttpError::UnsuccessfulRequest(Box::new(response))))
+        Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
     }
+}
+
+impl AsRef<Http> for Http {
+    fn as_ref(&self) -> &Http { &self }
 }
 
 impl Default for Http {

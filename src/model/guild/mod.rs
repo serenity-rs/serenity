@@ -19,9 +19,9 @@ pub use self::audit_log::*;
 pub use self::premium_tier::*;
 
 use chrono::{DateTime, FixedOffset};
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use serde::de::Error as DeError;
-use serde_json::{json};
+use serde_json::json;
 use super::utils::*;
 use log::{error, warn};
 
@@ -34,13 +34,9 @@ use parking_lot::RwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use crate::http;
-#[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::constants::LARGE_THRESHOLD;
-#[cfg(feature = "model")]
-use std;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "http")]
@@ -147,7 +143,7 @@ pub struct Guild {
     pub system_channel_id: Option<ChannelId>,
     /// Indicator of the current verification level of the guild.
     pub verification_level: VerificationLevel,
-    /// A mapping of of [`User`]s to their current voice state.
+    /// A mapping of [`User`]s to their current voice state.
     ///
     /// [`User`]: ../user/struct.User.html
     #[serde(serialize_with = "serialize_gen_map")]
@@ -218,6 +214,23 @@ impl Guild {
         permissions.remove(perms);
 
         permissions.is_empty()
+    }
+
+    #[cfg(feature = "cache")]
+    pub fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
+        let name = name.as_ref();
+        let cache = cache.as_ref().read();
+        let guild = cache.guilds.get(&self.id)?.read();
+
+        guild.channels
+            .iter()
+            .find_map(|(id, c)| {
+                if c.read().name == name {
+                    Some(*id)
+                } else {
+                    None
+                }
+            })
     }
 
     /// Ban a [`User`] from the guild. All messages by the
@@ -364,7 +377,7 @@ impl Guild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let _ = guild.create_channel("my-test-channel", ChannelType::Text, None);
+    /// let _ = guild.create_channel(|c| c.name("my-test-channel").kind(ChannelType::Text));
     /// ```
     ///
     /// # Errors
@@ -376,8 +389,7 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "client")]
-    pub fn create_channel<C>(&self, context: &Context, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
+    pub fn create_channel(&self, context: &Context, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -387,7 +399,7 @@ impl Guild {
             }
         }
 
-        self.id.create_channel(&context.http, name, kind, category)
+        self.id.create_channel(&context.http, f)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -622,7 +634,7 @@ impl Guild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
         self.id.edit_member(&http, user_id, f)
     }
 
@@ -663,14 +675,14 @@ impl Guild {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// guild.edit_role(RoleId(7), |r| r.hoist(true));
+    /// guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
     /// ```
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_role<F, R>(&self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(EditRole) -> EditRole, R: Into<RoleId> {
+        where F: FnOnce(&mut EditRole) -> &mut EditRole, R: Into<RoleId> {
         self.id.edit_role(&http, role_id, f)
     }
 

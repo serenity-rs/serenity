@@ -8,7 +8,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["framework", "standard_framework"]
 //! ```
-use std::{collections::{HashMap, HashSet}, env, fmt::Write, hash::BuildHasher, sync::Arc};
+use std::{collections::{HashMap, HashSet}, env, fmt::Write, sync::Arc};
 use serenity::{
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
@@ -82,9 +82,9 @@ group!({
 group!({
     name: "owner",
     options: {
-        owner_only: true,
+        owners_only: true,
         // Limit all commands to be guild-restricted.
-        only: "guilds",
+        only_in: "guilds",
         // Adds checks that need to be passed.
         checks: [Admin],
     },
@@ -131,7 +131,7 @@ fn my_help(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>
+    owners: HashSet<UserId>
 ) -> CommandResult {
     help_commands::with_embeds(context, msg, args, help_options, groups, owners)
 }
@@ -149,13 +149,13 @@ fn main() {
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
-    // We will fetch your bot's owners
-    let owners = match client.cache_and_http.http.get_current_application_info() {
+    // We will fetch your bot's owners and id
+    let (owners, bot_id) = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
             let mut owners = HashSet::new();
             owners.insert(info.owner.id);
 
-            owners
+            (owners, info.id)
         },
         Err(why) => panic!("Could not access application info: {:?}", why),
     };
@@ -178,7 +178,7 @@ fn main() {
         StandardFramework::new()
         .configure(|c| c
             .with_whitespace(true)
-            .on_mention(true)
+            .on_mention(Some(bot_id))
             .prefix("~")
             // You can set multiple delimiters via delimiters()
             // or just one via delimiter(",")

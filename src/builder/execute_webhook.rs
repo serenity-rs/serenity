@@ -1,6 +1,5 @@
 use serde_json::Value;
-use std::default::Default;
-use crate::utils::VecMap;
+use std::collections::HashMap;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -47,9 +46,9 @@ use crate::utils::VecMap;
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../http/fn.execute_webhook.html
+/// [`execute_webhook`]: ../http/raw/struct.Http.html#method.execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook(pub VecMap<&'static str, Value>);
+pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
 
 impl ExecuteWebhook {
     /// Override the default avatar of the webhook with an image URL.
@@ -71,7 +70,7 @@ impl ExecuteWebhook {
     ///     w.avatar_url(avatar_url).content("Here's a webhook")
     /// });
     /// ```
-    pub fn avatar_url(&mut self, avatar_url: &str) -> &mut Self {
+    pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
         self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
         self
     }
@@ -102,7 +101,7 @@ impl ExecuteWebhook {
     /// ```
     ///
     /// [`embeds`]: #method.embeds
-    pub fn content(&mut self, content: &str) -> &mut Self {
+    pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
         self
     }
@@ -172,7 +171,7 @@ impl ExecuteWebhook {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
     /// ```
-    pub fn username(&mut self, username: &str) -> &mut Self {
+    pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
         self
     }
@@ -196,7 +195,7 @@ impl Default for ExecuteWebhook {
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html
     /// [`tts`]: #method.tts
     fn default() -> ExecuteWebhook {
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
         ExecuteWebhook(map)

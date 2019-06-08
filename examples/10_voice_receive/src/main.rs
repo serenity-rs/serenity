@@ -9,7 +9,6 @@
 use std::{env, sync::Arc};
 
 use serenity::{
-    command,
     client::{bridge::voice::ClientVoiceManager, Client, Context, EventHandler},
     framework::{
         StandardFramework,
@@ -23,9 +22,6 @@ use serenity::{
     voice::AudioReceiver,
     Result as SerenityResult,
 };
-
-// This imports `typemap`'s `Key` as `TypeMapKey`.
-use serenity::prelude::*;
 
 struct VoiceManager;
 
@@ -113,9 +109,8 @@ fn main() {
 
     client.with_framework(StandardFramework::new()
         .configure(|c| c
-            .prefix("~")
-            .on_mention(true))
-        .group(GENERAL_GROUP));
+            .prefix("~"))
+        .group(&GENERAL_GROUP));
 
     let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
 }
@@ -140,7 +135,7 @@ fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
         },
     };
 
-    let mut manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
@@ -164,7 +159,7 @@ fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let mut manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
     let has_handler = manager.get(guild_id).is_some();
 

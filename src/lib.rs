@@ -36,7 +36,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.5"
+//! serenity = "0.6.0-rc.1"
 //! ```
 //!
 //! [`Cache`]: cache/struct.Cache.html
@@ -114,5 +114,6 @@ pub struct CacheAndHttp {
 }
 
 // For the procedural macros defined in `command_attr`; do not remove!
+#[allow(clippy::useless_attribute)]
 #[allow(rust_2018_idioms)]
 extern crate self as serenity;

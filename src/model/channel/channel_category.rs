@@ -1,11 +1,11 @@
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(all(feature = "builder", feature = "model"))]
 use crate::builder::EditChannel;
 #[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils::{self as serenity_utils, VecMap};
+use crate::utils as serenity_utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -88,11 +88,11 @@ impl ChannelCategory {
     /// Change a voice channels name and bitrate:
     ///
     /// ```rust,ignore
-    /// category.edit(|c| c.name("test").bitrate(86400));
+    /// category.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
     pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
-        where F: FnOnce(EditChannel) -> EditChannel {
+        where F: FnOnce(&mut EditChannel) -> &mut EditChannel {
         #[cfg(feature = "cache")]
         {
             let req = Permissions::MANAGE_CHANNELS;
@@ -102,11 +102,14 @@ impl ChannelCategory {
             }
         }
 
-        let mut map = VecMap::new();
+        let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
 
-        let map = serenity_utils::vecmap_to_json_map(f(EditChannel(map)).0);
+
+        let mut edit_channel = EditChannel::default();
+        f(&mut edit_channel);
+        let map = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
         context.http.edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {

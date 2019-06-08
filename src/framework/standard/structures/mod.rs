@@ -1,5 +1,5 @@
 use std::{
-    collections::{HashSet, hash_map::RandomState},
+    collections::HashSet,
     fmt,
 };
 use crate::client::Context;
@@ -57,13 +57,13 @@ pub struct CommandOptions {
     /// Whether the command treats owners as normal users.
     pub owner_privilege: bool,
     /// Other commands belonging to this command.
-    pub sub_groups: &'static [&'static Command],
+    pub sub_commands: &'static [&'static Command],
 }
 
 #[derive(Debug, PartialEq)]
 pub struct GroupOptions {
     pub prefixes: &'static [&'static str],
-    pub only: OnlyIn,
+    pub only_in: OnlyIn,
     pub owners_only: bool,
     pub owner_privilege: bool,
     pub help_available: bool,
@@ -108,17 +108,17 @@ impl PartialEq for Command {
     }
 }
 
-pub type HelpCommandFn<H> = fn(
+pub type HelpCommandFn = fn(
     &mut Context,
     &Message,
     Args,
     &'static HelpOptions,
     &[&'static CommandGroup],
-    HashSet<UserId, H>,
+    HashSet<UserId>,
 ) -> CommandResult;
 
 pub struct HelpCommand {
-    pub fun: HelpCommandFn<RandomState>,
+    pub fun: HelpCommandFn,
     pub options: &'static HelpOptions,
 }
 
@@ -143,20 +143,19 @@ impl PartialEq for HelpCommand {
 /// Lacking required permissions to execute the command.
 /// Lacking required roles to execute the command.
 /// The command can't be used in the current channel (as in `DM only` or `guild only`).
-#[derive(PartialEq, Debug)]
+#[derive(Copy, Clone, Debug, PartialOrd, Ord, Eq, PartialEq)]
 pub enum HelpBehaviour {
+    /// The command will be displayed, hence nothing will be done.
+    Nothing,
     /// Strikes a command by applying `~~{command_name}~~`.
     Strike,
     /// Does not list a command in the help-menu.
     Hide,
-    /// The command will be displayed, hence nothing will be done.
-    Nothing,
     #[doc(hidden)]
     __Nonexhaustive,
 }
 
-
-#[derive(Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct HelpOptions {
     /// Which names should the help command use for dispatching.
     /// Defaults to `["help"]`
@@ -227,10 +226,41 @@ pub struct HelpOptions {
     pub indention_prefix: &'static str,
 }
 
-#[derive(Debug)]
+#[derive(Debug, PartialEq)]
 pub struct CommandGroup {
     pub name: &'static str,
     pub options: &'static GroupOptions,
     pub commands: &'static [&'static Command],
     pub sub_groups: &'static [&'static CommandGroup],
+}
+
+#[cfg(test)]
+#[cfg(all(feature = "cache", feature = "http"))]
+mod levenshtein_tests {
+    use super::HelpBehaviour;
+
+    #[test]
+    fn help_behaviour_eq() {
+        assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Hide));
+        assert_eq!(HelpBehaviour::Strike, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Strike));
+        assert_eq!(HelpBehaviour::Nothing, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Nothing));
+    }
+
+    #[test]
+    fn help_behaviour_hide() {
+        assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Nothing));
+        assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Strike));
+    }
+
+    #[test]
+    fn help_behaviour_strike() {
+        assert_eq!(HelpBehaviour::Strike, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Nothing));
+        assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Hide));
+    }
+
+    #[test]
+    fn help_behaviour_nothing() {
+        assert_eq!(HelpBehaviour::Strike, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Strike));
+        assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Hide));
+    }
 }

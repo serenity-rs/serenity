@@ -4,7 +4,7 @@ use super::super::utils::{deserialize_emojis, deserialize_roles};
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(feature = "model")]
-use crate::builder::{EditGuild, EditMember, EditRole};
+use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -20,7 +20,7 @@ pub struct PartialGuild {
     pub default_message_notifications: DefaultMessageNotificationLevel,
     pub embed_channel_id: Option<ChannelId>,
     pub embed_enabled: bool,
-    #[serde(deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     /// Features enabled for the guild.
     ///
     /// Refer to [`Guild::features`] for more information.
@@ -32,7 +32,7 @@ pub struct PartialGuild {
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
-    #[serde(deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
+    #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
     pub description: Option<String>,
@@ -107,7 +107,7 @@ impl PartialGuild {
     /// ```rust,ignore
     /// use serenity::model::ChannelType;
     ///
-    /// guild.create_channel("test", ChannelType::Voice, None);
+    /// guild.create_channel(|c| c.name("test").kind(ChannelType::Voice));
     /// ```
     ///
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
@@ -115,9 +115,8 @@ impl PartialGuild {
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_channel<C>(&self, http: impl AsRef<Http>, name: &str, kind: ChannelType, category: C) -> Result<GuildChannel>
-        where C: Into<Option<ChannelId>> {
-        self.id.create_channel(&http, name, kind, category)
+    pub fn create_channel(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+        self.id.create_channel(&http, f)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -287,7 +286,7 @@ impl PartialGuild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(EditMember) -> EditMember, U: Into<UserId> {
+        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
         self.id.edit_member(&http, user_id, f)
     }
 

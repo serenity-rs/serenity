@@ -251,7 +251,7 @@ impl ChannelId {
     /// ```rust,ignore
     /// // assuming a `channel_id` has been bound
     ///
-    /// channel_id.edit(|c| c.name("test").bitrate(64000));
+    /// channel_id.edit(&context, |c| c.name("test").bitrate(64000));
     /// ```
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
@@ -262,7 +262,7 @@ impl ChannelId {
         let mut channel = EditChannel::default();
         f(&mut channel);
 
-        let map = utils::vecmap_to_json_map(channel.0);
+        let map = utils::hashmap_to_json_map(channel.0);
 
         http.as_ref().edit_channel(self.0, &map)
     }
@@ -306,7 +306,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::vecmap_to_json_map(msg.0);
+        let map = utils::hashmap_to_json_map(msg.0);
 
         http.as_ref().edit_message(self.0, message_id.0, &Value::Object(map))
     }
@@ -378,17 +378,17 @@ impl ChannelId {
 
     /// Gets messages from the channel.
     ///
-    /// Refer to [`Channel::messages`] for more information.
+    /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`Channel::messages`]: ../channel/enum.Channel.html#method.messages
+    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
-    pub fn messages<F>(self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
         let mut get_messages = GetMessages::default();
-        f(&mut get_messages);
+        builder(&mut get_messages);
         let mut map = get_messages.0;
         let mut query = format!("?limit={}", map.remove(&"limit").unwrap_or(50));
 
@@ -523,7 +523,7 @@ impl ChannelId {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[cfg(feature = "http")]
     #[inline]
-    pub fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
+    pub fn say(self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
         self.send_message(&http, |m| {
             m.content(content)
         })
@@ -599,7 +599,7 @@ impl ChannelId {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(all(feature = "utils", feature = "http"))]
     pub fn send_files<'a, F, T, It>(self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>,
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
               T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
@@ -617,7 +617,7 @@ impl ChannelId {
             msg.0.insert("payload_json", json!({ "embed": e }));
         }
 
-        let map = utils::vecmap_to_json_map(msg.0.clone());
+        let map = utils::hashmap_to_json_map(msg.0.clone());
         http.as_ref().send_files(self.0, files, map)
     }
 
@@ -641,8 +641,8 @@ impl ChannelId {
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(all(feature = "utils", feature = "http"))]
-    pub fn send_message<F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+    pub fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
@@ -652,7 +652,7 @@ impl ChannelId {
             }
         }
 
-        let map = utils::vecmap_to_json_map(msg.0.clone());
+        let map = utils::hashmap_to_json_map(msg.0.clone());
 
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;

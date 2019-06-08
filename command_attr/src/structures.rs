@@ -1,14 +1,12 @@
-use crate::consts::{COMMAND, GROUP, GROUP_OPTIONS, CHECK};
+use crate::consts::{CHECK, COMMAND, GROUP, GROUP_OPTIONS};
 use crate::util::{
-    Argument, Array, AsOption, Expr, Field, IdentAccess, IdentExt2, LitExt, Object, ParseStreamExt,
-    RefOrInstance,
+    Argument, Array, AsOption, Braced, Bracketed, BracketedIdents, Expr, Field, IdentAccess,
+    IdentExt2, LitExt, Object, RefOrInstance,
 };
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
-    braced, bracketed,
-    ext::IdentExt,
-    parenthesized,
+    braced, parenthesized,
     parse::{Error, Parse, ParseStream, Result},
     punctuated::Punctuated,
     spanned::Spanned,
@@ -180,7 +178,7 @@ pub struct Permissions(pub u64);
 
 impl Permissions {
     pub fn from_str(s: &str) -> Option<Self> {
-        Some(Permissions(match s {
+        Some(Permissions(match s.to_uppercase().as_str() {
             "PRESET_GENERAL" => 0b0000_0110_0011_0111_1101_1100_0100_0001,
             "PRESET_TEXT" => 0b0000_0000_0000_0111_1111_1100_0100_0000,
             "PRESET_VOICE" => 0b0000_0011_1111_0000_0000_0000_0000_0000,
@@ -218,6 +216,45 @@ impl Permissions {
     }
 }
 
+#[derive(Debug, Default, Clone, Copy, PartialEq)]
+pub struct Colour(pub u32);
+
+impl Colour {
+    pub fn from_str(s: &str) -> Option<Self> {
+        Some(Colour(match s.to_uppercase().as_str() {
+            "BLITZ_BLUE" => 0x6FC6E2,
+            "BLUE" => 0x3498DB,
+            "BLURPLE" => 0x7289DA,
+            "DARK_BLUE" => 0x206694,
+            "DARK_GOLD" => 0xC27C0E,
+            "DARK_GREEN" => 0x1F8B4C,
+            "DARK_GREY" => 0x607D8B,
+            "DARK_MAGENTA" => 0xAD14757,
+            "DARK_ORANGE" => 0xA84300,
+            "DARK_PURPLE" => 0x71368A,
+            "DARK_RED" => 0x992D22,
+            "DARK_TEAL" => 0x11806A,
+            "DARKER_GREY" => 0x546E7A,
+            "FABLED_PINK" => 0xFAB81ED,
+            "FADED_PURPLE" => 0x8882C4,
+            "FOOYOO" => 0x11CA80,
+            "GOLD" => 0xF1C40F,
+            "KERBAL" => 0xBADA55,
+            "LIGHT_GREY" => 0x979C9F,
+            "LIGHTER_GREY" => 0x95A5A6,
+            "MAGENTA" => 0xE91E63,
+            "MEIBE_PINK" => 0xE68397,
+            "ORANGE" => 0xE67E22,
+            "PURPLE" => 0x9B59B6,
+            "RED" => 0xE74C3C,
+            "ROHRKATZE_BLUE" => 0x7596FF,
+            "ROSEWATER" => 0xF6DBD8,
+            "TEAL" => 0x1ABC9C,
+            _ => return None,
+        }))
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct Checks(pub Vec<Ident>);
 
@@ -245,7 +282,7 @@ pub struct Options {
     pub only_in: OnlyIn,
     pub owners_only: bool,
     pub owner_privilege: bool,
-    pub sub_groups: Vec<Ident>,
+    pub sub_commands: Vec<Ident>,
 }
 
 impl Default for Options {
@@ -266,7 +303,7 @@ impl Default for Options {
             only_in: OnlyIn::default(),
             owners_only: false,
             owner_privilege: true,
-            sub_groups: Vec::new(),
+            sub_commands: Vec::new(),
         }
     }
 }
@@ -327,8 +364,8 @@ pub struct HelpOptions {
     pub lacking_permissions: HelpBehaviour,
     pub lacking_ownership: HelpBehaviour,
     pub wrong_channel: HelpBehaviour,
-    pub embed_error_colour: u32,
-    pub embed_success_colour: u32,
+    pub embed_error_colour: Colour,
+    pub embed_success_colour: Colour,
     pub max_levenshtein_distance: usize,
     pub indention_prefix: String,
 }
@@ -360,8 +397,8 @@ impl Default for HelpOptions {
             lacking_permissions: HelpBehaviour::Strike,
             lacking_ownership: HelpBehaviour::Hide,
             wrong_channel: HelpBehaviour::Strike,
-            embed_error_colour: 0x992D22,   // DARK_RED
-            embed_success_colour: 0xF6DBD8, // ROSEWATER
+            embed_error_colour: Colour::from_str("DARK_RED").unwrap(),
+            embed_success_colour: Colour::from_str("ROSEWATER").unwrap(),
             max_levenshtein_distance: 0,
             indention_prefix: "-".to_string(),
         }
@@ -371,8 +408,8 @@ impl Default for HelpOptions {
 #[derive(Debug)]
 pub struct GroupOptions {
     pub prefixes: Vec<String>,
-    pub only: OnlyIn,
-    pub owner_only: bool,
+    pub only_in: OnlyIn,
+    pub owners_only: bool,
     pub owner_privilege: bool,
     pub help_available: bool,
     pub allowed_roles: Vec<String>,
@@ -388,8 +425,8 @@ impl Default for GroupOptions {
     fn default() -> Self {
         GroupOptions {
             prefixes: Vec::new(),
-            only: OnlyIn::default(),
-            owner_only: false,
+            only_in: OnlyIn::default(),
+            owners_only: false,
             owner_privilege: true,
             help_available: true,
             allowed_roles: Vec::new(),
@@ -439,7 +476,7 @@ impl Parse for GroupOptions {
                         options.allowed_roles = values;
                     }
                 }
-                ("only", Expr::Lit(value)) => {
+                ("only_in", Expr::Lit(value)) => {
                     let span = value.span();
                     let value = value.to_str();
 
@@ -449,15 +486,15 @@ impl Parse for GroupOptions {
                         _ => return Err(Error::new(span, "invalid only option")),
                     };
 
-                    options.only = only;
+                    options.only_in = only;
                 }
-                ("owner_only", Expr::Lit(value))
+                ("owners_only", Expr::Lit(value))
                 | ("owner_privilege", Expr::Lit(value))
                 | ("help_available", Expr::Lit(value)) => {
                     let b = value.to_bool();
 
-                    if name == "owner_only" {
-                        options.owner_only = b;
+                    if name == "owners_only" {
+                        options.owners_only = b;
                     } else if name == "owner_privilege" {
                         options.owner_privilege = b;
                     } else {
@@ -534,9 +571,9 @@ impl ToTokens for GroupOptions {
             allowed_roles,
             required_permissions,
             owner_privilege,
-            owner_only,
+            owners_only,
             help_available,
-            only,
+            only_in,
             description,
             checks,
             default_command,
@@ -604,8 +641,8 @@ impl ToTokens for GroupOptions {
                 quote!()
             };
 
-            let owner_only = if *owner_only {
-                quote! { owner_only: #owner_only, }
+            let owners_only = if *owners_only {
+                quote! { owners_only: #owners_only, }
             } else {
                 quote!()
             };
@@ -616,8 +653,8 @@ impl ToTokens for GroupOptions {
                 quote!()
             };
 
-            let only = if *only != OnlyIn::None {
-                quote! { only: #only, }
+            let only_in = if *only_in != OnlyIn::None {
+                quote! { only_in: #only_in, }
             } else {
                 quote!()
             };
@@ -640,9 +677,9 @@ impl ToTokens for GroupOptions {
                     #allowed_roles
                     #required_permissions
                     #owner_privilege
-                    #owner_only
+                    #owners_only
                     #help_available
-                    #only
+                    #only_in
                     #description
                     #checks
                     #default_command
@@ -656,9 +693,9 @@ impl ToTokens for GroupOptions {
                     allowed_roles: &[#(#allowed_roles),*],
                     required_permissions: #permissions_path { bits: #required_permissions },
                     owner_privilege: #owner_privilege,
-                    owners_only: #owner_only,
+                    owners_only: #owners_only,
                     help_available: #help_available,
-                    only: #only,
+                    only_in: #only_in,
                     description: #description,
                     checks: #checks,
                     default_command: #dc,
@@ -678,81 +715,66 @@ pub struct Group {
 
 impl Parse for Group {
     fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        braced!(content in input);
-
-        let input = content;
-
-        let Field { name, value } = input.parse::<Field<Lit>>()?;
-        if name != "name" {
-            return Err(Error::new(name.span(), "every group must have a `name`"));
+        enum GroupField {
+            Name(Ident),
+            Options(RefOrInstance<GroupOptions>),
+            Commands(BracketedIdents),
+            SubGroups(Bracketed<RefOrInstance<Group>>),
         }
 
-        let name = value.to_ident();
+        impl Parse for GroupField {
+            fn parse(input: ParseStream) -> Result<Self> {
+                let name = input.parse::<Ident>()?;
 
-        input.parse::<Token![,]>()?;
+                input.parse::<Token![:]>()?;
 
-        let options = if let Ok(f) = input.try_parse::<Field<RefOrInstance<GroupOptions>>>() {
-            if f.name != "options" {
-                return Err(Error::new(
-                    f.name.span(),
-                    "the options of a group must be labeled as `options`",
-                ));
+                match name.to_string().as_str() {
+                    "name" => Ok(GroupField::Name(input.parse::<Lit>()?.to_ident())),
+                    "options" => Ok(GroupField::Options(input.parse()?)),
+                    "commands" => Ok(GroupField::Commands(input.parse()?)),
+                    "sub_groups" => Ok(GroupField::SubGroups(input.parse()?)),
+                    n => Err(input.error(format_args!(
+                    "`{}` is not an acceptable field of the `group!` macro.
+                    Perhaps you meant one these fields? `name` / `options` / `commands` / `sub_groups`", n))),
+                }
             }
+        }
 
+        let Braced(fields) = input.parse::<Braced<GroupField>>()?;
+
+        if input.peek(Token![,]) {
             input.parse::<Token![,]>()?;
+        }
 
-            Some(f.value)
-        } else {
-            None
+        let mut name = None;
+        let mut options = None;
+        let mut commands = None;
+        let mut sub_groups = None;
+
+        for field in fields {
+            match field {
+                GroupField::Name(n) => name = Some(n),
+                GroupField::Options(o) => options = Some(o),
+                GroupField::Commands(BracketedIdents(p)) => commands = Some(p),
+                GroupField::SubGroups(Bracketed(p)) => sub_groups = Some(p.into_iter().collect()),
+            }
+        }
+
+        let name = match name {
+            Some(n) => n,
+            None => return Err(input.error("every group must have a `name`")),
         };
 
-        let commands = input.parse::<Ident>()?;
-        if commands != "commands" {
-            return Err(Error::new(
-                commands.span(),
-                "every group must have a set of `commands`",
-            ));
-        }
-
-        input.parse::<Token![:]>()?;
-
-        let content;
-        bracketed!(content in input);
-
-        if input.peek(Token![,]) {
-            input.parse::<Token![,]>()?;
-        }
-
-        let mut sub_groups = Vec::new();
-
-        if let Ok(s) = input.parse::<Ident>() {
-            if s != "sub_groups" {
-                return Err(Error::new(
-                    s.span(),
-                    "a group may optionally have a `sub_groups`",
-                ));
-            }
-
-            input.parse::<Token![:]>()?;
-
-            let content;
-            bracketed!(content in input);
-
-            let refs: Punctuated<_, Token![,]> = content.parse_terminated(RefOrInstance::parse)?;
-
-            sub_groups.extend(refs.into_iter());
-        }
-
-        if input.peek(Token![,]) {
-            input.parse::<Token![,]>()?;
-        }
+        let commands = match commands {
+            Some(c) => c,
+            None => return Err(input.error("every group must have some runnable `commands`")),
+        };
 
         Ok(Group {
             name,
+            commands,
             options: options.unwrap_or_default(),
-            commands: content.parse_terminated(Ident::parse_any)?,
-            sub_groups,
+            sub_groups: sub_groups.unwrap_or_else(Vec::new),
         })
     }
 }

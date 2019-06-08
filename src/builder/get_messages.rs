@@ -1,5 +1,5 @@
 use crate::model::id::MessageId;
-use crate::utils::VecMap;
+use std::collections::HashMap;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///
@@ -9,7 +9,6 @@ use crate::utils::VecMap;
 /// - `after`
 /// - `around`
 /// - `before`
-/// - `most_recent`
 ///
 /// These can not be mixed, and the first in the list alphabetically will be
 /// used. If one is not specified, `most_recent` will be used.
@@ -49,7 +48,7 @@ use crate::utils::VecMap;
 ///
 /// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
 #[derive(Clone, Debug, Default)]
-pub struct GetMessages(pub VecMap<&'static str, u64>);
+pub struct GetMessages(pub HashMap<&'static str, u64>);
 
 impl GetMessages {
     /// Indicates to retrieve the messages after a specific message, given by
@@ -99,9 +98,4 @@ impl GetMessages {
         self.0.insert("limit", if limit > 100 { 100 } else { limit });
         self
     }
-
-    /// This is a function that is here for completeness. You do not need to
-    /// call this - except to clear previous calls to `after`, `around`, and
-    /// `before` - as it is the default value.
-    pub fn most_recent(&self) { }
 }

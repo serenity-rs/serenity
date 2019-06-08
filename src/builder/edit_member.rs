@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
 use crate::model::id::{ChannelId, RoleId};
-use crate::utils::VecMap;
+use std::collections::HashMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -8,7 +8,7 @@ use crate::utils::VecMap;
 /// [`Member`]: ../model/guild/struct.Member.html
 /// [`Member::edit`]: ../model/guild/struct.Member.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditMember(pub VecMap<&'static str, Value>);
+pub struct EditMember(pub HashMap<&'static str, Value>);
 
 impl EditMember {
     /// Whether to deafen the member.
@@ -37,7 +37,7 @@ impl EditMember {
     /// Requires the [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_NICKNAMES
-    pub fn nickname(&mut self, nickname: &str) -> &mut Self {
+    pub fn nickname<S: ToString>(&mut self, nickname: S) -> &mut Self {
         self.0.insert("nick", Value::String(nickname.to_string()));
         self
     }
@@ -67,8 +67,10 @@ impl EditMember {
     ///
     /// [Move Members]: ../model/permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
-    pub fn voice_channel<C: Into<ChannelId>>(&mut self, channel_id: C) {
-        self._voice_channel(channel_id.into())
+    pub fn voice_channel<C: Into<ChannelId>>(&mut self, channel_id: C) -> &mut Self {
+        self._voice_channel(channel_id.into());
+
+        self
     }
 
     fn _voice_channel(&mut self, channel_id: ChannelId) {

@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
-use crate::utils::VecMap;
 use crate::model::id::ChannelId;
+use std::collections::HashMap;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
@@ -20,7 +20,7 @@ use crate::model::id::ChannelId;
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/channel/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub VecMap<&'static str, Value>);
+pub struct EditChannel(pub HashMap<&'static str, Value>);
 
 impl EditChannel {
     /// The bitrate of the channel in bits.
@@ -36,7 +36,7 @@ impl EditChannel {
     /// The name of the channel.
     ///
     /// Must be between 2 and 100 characters long.
-    pub fn name(&mut self, name: &str) -> &mut Self {
+    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }
@@ -54,8 +54,19 @@ impl EditChannel {
     /// This is for [text] channels only.
     ///
     /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
-    pub fn topic(&mut self, topic: &str) -> &mut Self {
+    pub fn topic<S: ToString>(&mut self, topic: S) -> &mut Self {
         self.0.insert("topic", Value::String(topic.to_string()));
+        self
+    }
+
+    /// Is the channel inappropriate for work?
+    ///
+    /// This is for [text] channels only.
+    ///
+    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
+    pub fn nsfw(&mut self, nsfw: bool) -> &mut Self {
+        self.0.insert("nsfw", Value::Bool(nsfw));
+
         self
     }
 

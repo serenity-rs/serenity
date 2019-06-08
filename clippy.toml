@@ -1,8 +1,7 @@
-cyclomatic-complexity-threshold = 20
+cognitive-complexity-threshold = 20
 doc-valid-idents = [
     "UserAgent",
     "WebSocket",
 ]
 enum-variant-name-threshold = 1
 single-char-binding-names-threshold = 3
-too-many-arguments-threshold = 6

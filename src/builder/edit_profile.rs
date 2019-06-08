@@ -1,12 +1,12 @@
 use crate::internal::prelude::*;
-use crate::utils::VecMap;
+use std::collections::HashMap;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
 ///
 /// [`CurrentUser::edit`]: ../model/user/struct.CurrentUser.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditProfile(pub VecMap<&'static str, Value>);
+pub struct EditProfile(pub HashMap<&'static str, Value>);
 
 impl EditProfile {
     /// Sets the avatar of the current user. `None` can be passed to remove an
@@ -20,7 +20,7 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
+    /// # #[cfg(all(feature = "client", feature = "cache"))]
     /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
@@ -29,16 +29,15 @@ impl EditProfile {
     ///
     /// # impl EventHandler for Handler {
     ///    # fn message(&self, context: Context, _: Message) {
-    ///         use serenity::utils;
+    ///         use serenity::{http::raw, utils};
     ///
     ///         // assuming a `context` has been bound
     ///
     ///         let base64 = utils::read_image("./my_image.jpg")
     ///         .expect("Failed to read image");
     ///
-    ///         let _ = context.edit_profile(|mut profile| {
-    ///             profile.avatar(Some(&base64))
-    ///         });
+    ///         let _ = context.cache.write().user.edit(&context, |p|
+    ///             p.avatar(Some(&base64)));
     ///    # }
     /// # }
     /// #
@@ -47,7 +46,7 @@ impl EditProfile {
     /// # client.start().unwrap();
     /// # }
     /// #
-    /// # #[cfg(not(feature = "client"))]
+    /// # #[cfg(any(not(feature = "client"), not(feature = "cache")))]
     /// # fn main() {}
     /// ```
     ///
@@ -101,7 +100,7 @@ impl EditProfile {
     /// and current discriminator, a new unique discriminator will be assigned.
     /// If there are no available discriminators with the requested username,
     /// an error will occur.
-    pub fn username(&mut self, username: &str) -> &mut Self {
+    pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
         self
     }

@@ -26,7 +26,7 @@ use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
-use crate::utils::{self, VecMap};
+use crate::utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -108,15 +108,17 @@ impl CurrentUser {
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
     #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-        where F: FnOnce(EditProfile) -> EditProfile {
-        let mut map = VecMap::new();
+        where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
+        let mut map = HashMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
         if let Some(email) = self.email.as_ref() {
             map.insert("email", Value::String(email.clone()));
         }
 
-        let map = utils::vecmap_to_json_map(f(EditProfile(map)).0);
+        let mut edit_profile = EditProfile(map);
+        f(&mut edit_profile);
+        let map = utils::hashmap_to_json_map(edit_profile.0);
 
         match http.as_ref().edit_profile(&map) {
             Ok(new) => {
@@ -553,7 +555,7 @@ impl User {
     #[allow(clippy::let_and_return)]
     #[cfg(all(feature = "builder", feature = "client"))]
     pub fn direct_message<F>(&self, context: &Context, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+        where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -615,7 +617,7 @@ impl User {
     #[cfg(all(feature = "builder", feature = "client"))]
     #[inline]
     pub fn dm<F>(&self, context: &Context, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+    where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         self.direct_message(&context, f)
     }
 

@@ -19,7 +19,7 @@ use self::parse::*;
 use super::Framework;
 use crate::client::Context;
 use crate::model::{
-    channel::Message,
+    channel::{Channel, Message},
     permissions::Permissions,
 };
 use std::collections::HashMap;
@@ -44,6 +44,12 @@ pub enum DispatchError {
     Ratelimited(i64),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
+    /// When the user is blocked in bot configuration.
+    BlockedUser,
+    /// When the guild or its owner is blocked in bot configuration.
+    BlockedGuild,
+    /// When the channel blocked in bot configuration.
+    BlockedChannel,
     /// When the requested command can only be used in a direct message or group
     /// channel.
     OnlyForDM,
@@ -60,6 +66,11 @@ pub enum DispatchError {
     NotEnoughArguments { min: u16, given: usize },
     /// When there are too many arguments.
     TooManyArguments { max: u16, given: usize },
+    /// When the command was requested by a bot user when they are set to be
+    /// ignored.
+    IgnoredBot,
+    /// When the bot ignores webhooks and a command was issued by one.
+    WebhookAuthor,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -208,6 +219,18 @@ impl StandardFramework {
         self
     }
 
+    fn should_fail_common(&self, msg: &Message) -> Option<DispatchError> {
+        if self.config.ignore_bots && msg.author.bot {
+            return Some(DispatchError::IgnoredBot);
+        }
+
+        if self.config.ignore_webhooks && msg.webhook_id.is_some() {
+            return Some(DispatchError::WebhookAuthor);
+        }
+
+        None
+    }
+
     fn should_fail(
         &mut self,
         ctx: &mut Context,
@@ -216,6 +239,14 @@ impl StandardFramework {
         command: &'static CommandOptions,
         group: &'static GroupOptions,
     ) -> Option<DispatchError> {
+        if let Some(err) = self.should_fail_common(msg) {
+            return Some(err);
+        }
+
+        if self.config.disabled_commands.contains(command.names[0]) {
+            return Some(DispatchError::CommandDisabled(command.names[0].to_string()));
+        }
+
         if let Some(min) = command.min_args {
             if args.len() < min as usize {
                 return Some(DispatchError::NotEnoughArguments {
@@ -240,6 +271,32 @@ impl StandardFramework {
             return None;
         }
 
+        if self.config.blocked_users.contains(&msg.author.id) {
+            return Some(DispatchError::BlockedUser);
+        }
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(Channel::Guild(chan)) = msg.channel_id.to_channel_cached(&ctx.cache) {
+                let guild_id = chan.with(|c| c.guild_id);
+
+                if self.config.blocked_guilds.contains(&guild_id) {
+                    return Some(DispatchError::BlockedGuild);
+                }
+
+                if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
+                    if self.config.blocked_users.contains(&guild.with(|g| g.owner_id)) {
+                        return Some(DispatchError::BlockedGuild);
+                    }
+                }
+            }
+        }
+
+        if !self.config.allowed_channels.is_empty() &&
+           !self.config.allowed_channels.contains(&msg.channel_id) {
+            return Some(DispatchError::BlockedChannel);
+        }
+
         if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| self.buckets.get_mut(*b)) {
             let rate_limit = bucket.take(msg.author.id.0);
 
@@ -250,50 +307,6 @@ impl StandardFramework {
             if apply && rate_limit > 0 {
                 return Some(DispatchError::Ratelimited(rate_limit));
             }
-        }
-
-        if group.owners_only || command.owners_only {
-            return Some(DispatchError::OnlyForOwners);
-        }
-
-        if (group.only == OnlyIn::Dm || command.only_in == OnlyIn::Dm) && !msg.is_private() {
-            return Some(DispatchError::OnlyForDM);
-        }
-
-        if (!self.config.allow_dm
-            || (group.only == OnlyIn::Guild || command.only_in == OnlyIn::Guild))
-            && msg.is_private()
-        {
-            return Some(DispatchError::OnlyForGuilds);
-        }
-
-        #[cfg(feature = "cache")]
-        {
-            if !has_correct_permissions(&ctx.cache, &command, msg) {
-                return Some(DispatchError::LackingPermissions(
-                    command.required_permissions,
-                ));
-            }
-
-            if !command.allowed_roles.is_empty() {
-                if let Some(guild) = msg.guild(&ctx.cache) {
-                    let guild = guild.read();
-
-                    if let Some(member) = guild.members.get(&msg.author.id) {
-                        if let Ok(permissions) = member.permissions(&ctx.cache) {
-                            if !permissions.administrator()
-                                && !has_correct_roles(command, &guild, member)
-                            {
-                                return Some(DispatchError::LackingRole);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-
-        if self.config.disabled_commands.contains(command.names[0]) {
-            return Some(DispatchError::CommandDisabled(command.names[0].to_string()));
         }
 
         for check in command.checks.iter().chain(group.checks.iter()) {
@@ -585,11 +598,6 @@ impl StandardFramework {
 
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        // Ignore bots/webhooks.
-        if msg.author.bot || msg.webhook_id.is_some() {
-            return;
-        }
-
         let (prefix, rest) = parse_prefix(&mut ctx, &msg, &self.config);
 
         if prefix != Prefix::None && rest.trim().is_empty() {
@@ -620,13 +628,15 @@ impl Framework for StandardFramework {
 
         let invoke = match parse_command(
             rest,
+            &msg,
             prefix,
             &self.groups,
             &self.config,
+            &ctx,
             self.help.as_ref().map(|h| h.options.names),
         ) {
             Ok(i) => i,
-            Err(Some(unreg)) => {
+            Err(Ok(Some(unreg))) => {
                 if let Some(unrecognised_command) = &self.unrecognised_command {
                     let unrecognised_command = Arc::clone(&unrecognised_command);
                     let mut ctx = ctx.clone();
@@ -648,13 +658,20 @@ impl Framework for StandardFramework {
 
                 return;
             }
-            Err(None) => {
+            Err(Ok(None)) => {
                 if let Some(normal) = &self.normal_message {
                     let normal = Arc::clone(&normal);
                     let msg = msg.clone();
                     threadpool.execute(move || {
                         normal(&mut ctx, &msg);
                     });
+                }
+
+                return;
+            },
+            Err(Err(error)) => {
+                if let Some(dispatch) = &self.dispatch {
+                    dispatch(&mut ctx, &msg, error);
                 }
 
                 return;
@@ -667,6 +684,14 @@ impl Framework for StandardFramework {
                 name,
                 args,
             } => {
+                if let Some(error) = self.should_fail_common(&msg) {
+                    if let Some(dispatch) = &self.dispatch {
+                        dispatch(&mut ctx, &msg, error);
+                    }
+
+                    return;
+                }
+
                 let args = Args::new(args, &self.config.delimiters);
 
                 let before = self.before.clone();
@@ -734,29 +759,85 @@ impl Framework for StandardFramework {
     }
 }
 
+pub trait CommonOptions {
+    fn required_permissions(&self) -> &Permissions;
+    fn allowed_roles(&self) -> &'static [&'static str];
+    fn only_in(&self) -> OnlyIn;
+    fn help_available(&self) -> bool;
+    fn owners_only(&self) -> bool;
+}
+
+impl CommonOptions for &GroupOptions {
+    fn required_permissions(&self) -> &Permissions {
+        &self.required_permissions
+    }
+
+    fn allowed_roles(&self) -> &'static [&'static str] {
+        &self.allowed_roles
+    }
+
+    fn only_in(&self) -> OnlyIn {
+        self.only_in
+    }
+
+    fn help_available(&self) -> bool {
+        self.help_available
+    }
+
+    fn owners_only(&self) -> bool {
+        self.owners_only
+    }
+}
+
+impl CommonOptions for &CommandOptions {
+    fn required_permissions(&self) -> &Permissions {
+        &self.required_permissions
+    }
+
+    fn allowed_roles(&self) -> &'static [&'static str] {
+        &self.allowed_roles
+    }
+
+    fn only_in(&self) -> OnlyIn {
+        self.only_in
+    }
+
+    fn help_available(&self) -> bool {
+        self.help_available
+    }
+
+    fn owners_only(&self) -> bool {
+        self.owners_only
+    }
+}
+
 #[cfg(feature = "cache")]
 pub(crate) fn has_correct_permissions(
     cache: impl AsRef<CacheRwLock>,
-    command: &CommandOptions,
+    options: &impl CommonOptions,
     message: &Message,
 ) -> bool {
-    if command.required_permissions.is_empty() {
+    if options.required_permissions().is_empty() {
         true
     } else if let Some(guild) = message.guild(&cache) {
         let perms = guild.with(|g| g.permissions_in(message.channel_id, message.author.id));
 
-        perms.contains(command.required_permissions)
+        perms.contains(*options.required_permissions())
     } else {
         false
     }
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
-pub(crate) fn has_correct_roles(cmd: &CommandOptions, guild: &Guild, member: &Member) -> bool {
-    if cmd.allowed_roles.is_empty() {
+pub(crate) fn has_correct_roles(
+    options: &impl CommonOptions,
+    guild: &Guild,
+    member: &Member)
+-> bool {
+    if options.allowed_roles().is_empty() {
         true
     } else {
-        cmd.allowed_roles
+        options.allowed_roles()
             .iter()
             .flat_map(|r| guild.role_by_name(r))
             .any(|g| member.roles.contains(&g.id))

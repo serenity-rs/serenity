@@ -3,12 +3,10 @@
 
 mod colour;
 mod message_builder;
-mod vec_map;
 
 pub use self::{
     colour::Colour,
     message_builder::{Content, ContentModifier, MessageBuilder},
-    vec_map::VecMap
 };
 
 use base64;
@@ -46,17 +44,6 @@ use crate::cache::{Cache, CacheRwLock};
 /// Converts a HashMap into a final `serde_json::Map` representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
     -> Map<String, Value> where H: BuildHasher, T: Eq + Hash + ToString {
-    let mut json_map = Map::new();
-
-    for (key, value) in map {
-        json_map.insert(key.to_string(), value);
-    }
-
-    json_map
-}
-
-/// Converts a VecMap into a final `serde_json::Map` representation.
-pub fn vecmap_to_json_map<K: PartialEq + ToString>(map: VecMap<K, Value>) -> Map<String, Value> {
     let mut json_map = Map::new();
 
     for (key, value) in map {

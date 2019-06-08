@@ -211,14 +211,18 @@ impl Group {
 
     /// Gets messages from the channel.
     ///
+    /// Refer to the [`GetMessages`]-builder for more information on how to
+    /// use `builder`.
+    ///
     /// Requires the [Read Message History] permission.
     ///
+    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[cfg(feature = "http")]
     #[inline]
-    pub fn messages<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Vec<Message>>
+    pub fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
-        self.channel_id.messages(&http, f)
+        self.channel_id.messages(&http, builder)
     }
 
     /// Generates a name for the group.
@@ -331,7 +335,7 @@ impl Group {
     #[cfg(feature = "http")]
     #[inline]
     pub fn send_files<'a, F, T, It: IntoIterator<Item=T>>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b>, T: Into<AttachmentType<'a>> {
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>, T: Into<AttachmentType<'a>> {
         self.channel_id.send_files(&http, files, f)
     }
 
@@ -346,8 +350,8 @@ impl Group {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn send_message<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'b>) -> &'b mut CreateMessage<'b> {
+    pub fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
+        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         self.channel_id.send_message(&http, f)
     }
 

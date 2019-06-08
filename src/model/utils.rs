@@ -34,6 +34,18 @@ pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
     Ok(emojis)
 }
 
+pub fn serialize_emojis<S: Serializer>(
+    emojis: &HashMap<EmojiId, Emoji>,
+    serializer: S) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(emojis.len()))?;
+
+    for emoji in emojis.values() {
+        seq.serialize_element(emoji)?;
+    }
+
+    seq.end()
+}
+
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<ChannelId, Arc<RwLock<GuildChannel>>>, D::Error> {
@@ -46,6 +58,7 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
 
     Ok(map)
 }
+
 
 pub fn deserialize_members<'de, D: Deserializer<'de>>(
     deserializer: D)
@@ -75,6 +88,19 @@ pub fn deserialize_presences<'de, D: Deserializer<'de>>(
     Ok(presences)
 }
 
+pub fn serialize_presences<S: Serializer>(
+    presences: &HashMap<UserId, Presence>,
+    serializer: S
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(presences.len()))?;
+
+    for presence in presences.values() {
+        seq.serialize_element(presence)?;
+    }
+
+    seq.end()
+}
+
 pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
@@ -96,6 +122,19 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
     Ok(private_channels)
 }
 
+pub fn serialize_private_channels<S: Serializer>(
+    private_channels: &HashMap<ChannelId, Channel>,
+    serializer: S
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(private_channels.len()))?;
+
+    for private_channel in private_channels.values() {
+        seq.serialize_element(private_channel)?;
+    }
+
+    seq.end()
+}
+
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<HashMap<RoleId, Role>, D::Error> {
@@ -109,6 +148,19 @@ pub fn deserialize_roles<'de, D: Deserializer<'de>>(
     Ok(roles)
 }
 
+pub fn serialize_roles<S: Serializer>(
+    roles: &HashMap<RoleId, Role>,
+    serializer: S
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(roles.len()))?;
+
+    for role in roles.values() {
+        seq.serialize_element(role)?;
+    }
+
+    seq.end()
+}
+
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     deserializer: D)
     -> StdResult<Arc<RwLock<User>>, D::Error> {
@@ -120,6 +172,17 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     };
 
     Ok(Arc::new(RwLock::new(user)))
+}
+
+pub fn serialize_single_recipient<S: Serializer>(
+    user: &Arc<RwLock<User>>,
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
+    let mut seq = serializer.serialize_seq(Some(1))?;
+
+    seq.serialize_element(&*user.read())?;
+
+    seq.end()
 }
 
 pub fn deserialize_sync_user<'de, D>(deserializer: D)
@@ -166,6 +229,11 @@ pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<
 
 pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
     deserializer.deserialize_any(U64Visitor)
+}
+
+#[allow(clippy::trivially_copy_pass_by_ref)]
+pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::Error> {
+    ser.serialize_str(&data.to_string())
 }
 
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(

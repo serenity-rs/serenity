@@ -108,7 +108,7 @@ pub enum Error {
     ///
     /// [`Permission`]: ../permissions/struct.Permissions.html
     InvalidPermissions(Permissions),
-    /// An indicator that the [current user] can not perform an action.
+    /// An indicator that the [current user] cannot perform an action.
     ///
     /// [current user]: ../user/struct.CurrentUser.html
     InvalidUser,
@@ -127,6 +127,12 @@ pub enum Error {
     /// Indicates that the current user is attempting to Direct Message another
     /// bot user, which is disallowed by the API.
     MessagingBot,
+    /// An indicator that the [`ChannelType`] cannot perform an action.
+    ///
+    /// [`ChannelType`]: ../channel/enum.ChannelType.html
+    InvalidChannelType,
+    #[doc(hidden)]
+    __Nonexhaustive,
 }
 
 impl Display for Error {
@@ -141,11 +147,13 @@ impl StdError for Error {
             Error::EmbedTooLarge(_) => "Embed too large",
             Error::GuildNotFound => "Guild not found in the cache",
             Error::Hierarchy => "Role hierarchy prevents this action",
+            Error::InvalidChannelType => "The channel cannot perform the action.",
             Error::InvalidPermissions(_) => "Invalid permissions",
-            Error::InvalidUser => "The current user can not perform the action",
+            Error::InvalidUser => "The current user cannot perform the action",
             Error::ItemMissing => "The required item is missing from the cache",
             Error::MessageTooLong(_) => "Message too large",
             Error::MessagingBot => "Attempted to message another bot user",
+            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

@@ -4,10 +4,12 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     braced, bracketed,
+    ext::IdentExt,
     parse::{Error, Parse, ParseBuffer, ParseStream, Result},
     parse_quote,
+    punctuated::Punctuated,
     spanned::Spanned,
-    token::{Brace, Bracket, Mut},
+    token::{Brace, Bracket, Comma, Mut},
     Ident, Lit, ReturnType, Token, Type,
 };
 
@@ -79,6 +81,44 @@ impl<'a> ParseStreamExt for ParseBuffer<'a> {
         }
 
         res
+    }
+}
+
+#[derive(Debug)]
+pub struct Bracketed<T>(pub Punctuated<T, Comma>);
+
+impl<T: Parse> Parse for Bracketed<T> {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        bracketed!(content in input);
+
+        Ok(Bracketed(content.parse_terminated(T::parse)?))
+    }
+}
+
+// TODO: Replace this extraneous struct with a proper specialised impl on `Bracketed`
+// once the `specialisation` feature gets stabilised.
+#[derive(Debug)]
+pub struct BracketedIdents(pub Punctuated<Ident, Comma>);
+
+impl Parse for BracketedIdents {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        bracketed!(content in input);
+
+        Ok(BracketedIdents(content.parse_terminated(Ident::parse_any)?))
+    }
+}
+
+#[derive(Debug)]
+pub struct Braced<T>(pub Punctuated<T, Comma>);
+
+impl<T: Parse> Parse for Braced<T> {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        braced!(content in input);
+
+        Ok(Braced(content.parse_terminated(T::parse)?))
     }
 }
 
@@ -200,11 +240,7 @@ pub struct Object(pub Vec<Field<Expr>>);
 
 impl Parse for Object {
     fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        braced!(content in input);
-        let input = content;
-
-        let fields = input.parse_terminated::<_, Token![,]>(Field::<Expr>::parse)?;
+        let Braced(fields) = input.parse::<Braced<Field<Expr>>>()?;
 
         Ok(Object(fields.into_iter().collect()))
     }
@@ -215,11 +251,7 @@ pub struct Array(pub Vec<Expr>);
 
 impl Parse for Array {
     fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        bracketed!(content in input);
-        let input = content;
-
-        let fields = input.parse_terminated::<_, Token![,]>(Expr::parse)?;
+        let Bracketed(fields) = input.parse::<Bracketed<Expr>>()?;
 
         Ok(Array(fields.into_iter().collect()))
     }
@@ -253,7 +285,7 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
     let options: Type = parse_quote!(&CommandOptions);
     let hoptions: Type = parse_quote!(&'static HelpOptions);
     let groups: Type = parse_quote!(&[&'static CommandGroup]);
-    let owners: Type = parse_quote!(HashSet<UserId, impl BuildHasher>);
+    let owners: Type = parse_quote!(HashSet<UserId>);
 
     let context_path: Type = parse_quote!(&mut serenity::prelude::Context);
     let message_path: Type = parse_quote!(&serenity::model::channel::Message);
@@ -271,7 +303,7 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
     let options_error = "fourth argument's type should be `&'static CommandOptions`";
     let hoptions_error = "fourth argument's type should be `&'static HelpOptions`";
     let groups_error = "fifth argument's type should be `&[&'static CommandGroup]`";
-    let owners_error = "sixth argument's type should be `HashSet<UserId, impl BuildHasher>`";
+    let owners_error = "sixth argument's type should be `HashSet<UserId>`";
 
     #[allow(unused_assignments)]
     macro_rules! spoof_or_check {

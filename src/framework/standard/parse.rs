@@ -1,4 +1,4 @@
-use super::{Command, CommandGroup, CommandOptions, Configuration};
+use super::*;
 use crate::client::Context;
 use crate::model::channel::Message;
 use uwl::{StrExt, StringStream};
@@ -58,8 +58,7 @@ pub fn parse_prefix<'a>(
     }
 
     if let Some(prefix) = prefix {
-        let pos = stream.offset();
-        stream.set(pos + prefix.len());
+        stream.increment(prefix.len());
 
         if config.with_whitespace.prefixes {
             stream.take_while(|s| s.is_whitespace());
@@ -78,121 +77,221 @@ pub fn parse_prefix<'a>(
     (Prefix::None, args.trim())
 }
 
-struct PrefixIterator<'a, 'b: 'a, 'c> {
-    stream: &'a mut StringStream<'b>,
-    group: &'static CommandGroup,
-    prefix: Option<&'b str>,
-    config: &'c Configuration,
+#[allow(clippy::enum_variant_names)]
+#[derive(Debug, Clone, Copy, PartialEq)]
+enum ParseMode {
+    BySpace,
+    ByLength,
 }
 
-impl<'a, 'b, 'c> PrefixIterator<'a, 'b, 'c> {
-    fn next(&mut self) -> bool {
-        // Nothing to work with.
-        if !self.group.has_sub_prefixes() {
-            self.prefix = None;
-            return false;
+struct CommandParser<'msg, 'groups, 'config, 'ctx> {
+    msg: &'msg Message,
+    stream: StringStream<'msg>,
+    groups: &'groups [&'static CommandGroup],
+    config: &'config Configuration,
+    ctx: &'ctx Context,
+    mode: ParseMode,
+    unrecognised: Option<&'msg str>,
+}
+
+impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
+    fn new(
+        msg: &'msg Message,
+        stream: StringStream<'msg>,
+        groups: &'groups [&'static CommandGroup],
+        config: &'config Configuration,
+        ctx: &'ctx Context,
+    ) -> Self {
+        CommandParser {
+            msg,
+            stream,
+            groups,
+            config,
+            ctx,
+            mode: if config.by_space { ParseMode::BySpace } else { ParseMode::ByLength },
+            unrecognised: None,
+        }
+    }
+
+    fn next_text(&self, length: impl FnOnce() -> usize) -> &'msg str {
+        match self.mode {
+            ParseMode::ByLength => self.stream.peek_for(length()),
+            ParseMode::BySpace => self.stream.peek_until(|s| s.is_whitespace()),
+        }
+    }
+
+    fn as_lowercase(&self, s: &str, f: impl FnOnce(&str) -> bool) -> bool {
+        if self.config.case_insensitive {
+            let s = s.to_lowercase();
+            f(&s)
+        } else {
+            f(s)
+        }
+    }
+
+    fn check_discrepancy(&self, options: &impl CommonOptions) -> Result<(), DispatchError> {
+        if options.owners_only() && !self.config.owners.contains(&self.msg.author.id) {
+            return Err(DispatchError::OnlyForOwners);
         }
 
-        // First, check if the subgroups' prefixes were used.
-        // And on success, change the current group to the matching group.
-        for sub_group in self.group.sub_groups {
+        if options.only_in() == OnlyIn::Dm && !self.msg.is_private() {
+            return Err(DispatchError::OnlyForDM);
+        }
 
-            for p in sub_group.options.prefixes {
-                let pp = self.stream.peek_for(p.chars().count());
+        if (!self.config.allow_dm || options.only_in() == OnlyIn::Guild) && self.msg.is_private() {
+            return Err(DispatchError::OnlyForGuilds);
+        }
 
-                if *p == pp {
-                    self.prefix = Some(pp);
-                    self.group = *sub_group;
-                    let pos = self.stream.offset();
-                    self.stream.set(pos + pp.len());
+        #[cfg(feature = "cache")]
+        {
+            if let Some(guild_id) = self.msg.guild_id {
+                let guild = match guild_id.to_guild_cached(&self.ctx) {
+                    Some(g) => g,
+                    None => return Ok(()),
+                };
 
-                    if self.config.with_whitespace.groups {
-                        self.stream.take_while(|s| s.is_whitespace());
-                    }
+                let guild = guild.read();
 
-                    return true;
+                let perms = guild.permissions_in(self.msg.channel_id, self.msg.author.id);
+
+                if !perms.contains(*options.required_permissions()) {
+                    return Err(DispatchError::LackingPermissions(*options.required_permissions()));
                 }
+
+                if let Some(member) = guild.members.get(&self.msg.author.id) {
+                    if !perms.administrator() && !has_correct_roles(options, &guild, &member) {
+                        return Err(DispatchError::LackingRole);
+                    }
+                }
+
             }
         }
 
-        // Then check if this group's prefixes were used.
-        for p in self.group.options.prefixes {
-            let pp = self.stream.peek_for(p.chars().count());
+        Ok(())
+    }
+
+    fn command(&mut self, command: &'static Command) -> Result<Option<&'static Command>, DispatchError> {
+        for name in command.options.names {
+            // FIXME: If `by_space` option is set true, we shouldn't be retrieving the block of text
+            // again and again for the command name.
+            let n = self.next_text(|| name.chars().count());
+
+            let equals = self.as_lowercase(n, |n| n == *name && !self.config.disabled_commands.contains(n));
+
+            if equals {
+                self.stream.increment(n.len());
+
+                if self.config.with_whitespace.commands {
+                    self.stream.take_while(|s| s.is_whitespace());
+                }
+
+                for sub in command.options.sub_commands {
+                    if let Some(cmd) = self.command(sub)? {
+                        self.unrecognised = None;
+                        return Ok(Some(cmd));
+                    }
+                }
+
+                self.check_discrepancy(&command.options)?;
+
+                self.unrecognised = None;
+                return Ok(Some(command));
+            }
+
+            self.unrecognised = Some(n);
+        }
+
+        Ok(None)
+    }
+
+    fn group(&mut self, group: &'static CommandGroup) -> Result<(Option<&'msg str>, &'static CommandGroup), DispatchError> {
+        for p in group.options.prefixes {
+            let pp = self.next_text(|| p.chars().count());
 
             if *p == pp {
-                self.prefix = Some(pp);
-                let pos = self.stream.offset();
-                self.stream.set(pos + pp.len());
+                self.stream.increment(pp.len());
 
                 if self.config.with_whitespace.groups {
                     self.stream.take_while(|s| s.is_whitespace());
                 }
 
-                return true;
+                for sub_group in group.sub_groups {
+                    let x = self.group(*sub_group)?;
+
+                    if x.0.is_some() {
+                        return Ok(x);
+                    }
+                }
+
+                self.check_discrepancy(&group.options)?;
+                return Ok((Some(pp), group));
             }
         }
 
-        self.prefix = None;
-
-        false
-    }
-}
-
-impl CommandGroup {
-    #[inline]
-    fn get_command(&self, name: &str) -> Option<&'static Command> {
-        self.commands
-            .iter()
-            .find(|c| c.options.names.contains(&name))
-            .cloned()
+        Ok((None, group))
     }
 
-    #[inline]
-    fn command_names(&self) -> impl Iterator<Item = &'static str> {
-        self.commands
-            .iter()
-            .flat_map(|c| c.options.names.iter().cloned())
-    }
+    fn parse(mut self, prefix: Prefix<'msg>) -> Result<Invoke<'msg>, Result<Option<&'msg str>, DispatchError>> {
+        let pos = self.stream.offset();
+        for group in self.groups {
+            let (gprefix, group) = match self.group(*group) {
+                Ok(t) => t,
+                Err(err) => return Err(Err(err)),
+            };
 
-    #[inline]
-    fn has_prefixes(&self) -> bool {
-        !self.options.prefixes.is_empty()
-    }
+            if gprefix.is_none() && !group.options.prefixes.is_empty() {
+                unsafe { self.stream.set_unchecked(pos) };
+                continue;
+            }
 
-    #[inline]
-    fn has_sub_prefixes(&self) -> bool {
-        self.sub_groups.iter().any(|s| s.has_sub_prefixes()) || self.has_prefixes()
-    }
-}
+            for command in group.commands {
+                let command = match self.command(command)  {
+                    Ok(c) => c,
+                    Err(err) => return Err(Err(err)),
+                };
 
-impl CommandOptions {
-    #[inline]
-    fn get_sub(&self, name: &str) -> Option<&'static Command> {
-        self.sub_groups
-            .iter()
-            .find(|c| c.options.names.contains(&name))
-            .cloned()
-    }
+                if let Some(command) = command {
+                    return Ok(Invoke::Command {
+                        prefix,
+                        group,
+                        gprefix,
+                        command,
+                        args: self.stream.rest(),
+                    });
+                }
+            }
 
-    #[inline]
-    fn command_names(&self) -> impl Iterator<Item = &'static str> {
-        self.sub_groups
-            .iter()
-            .flat_map(|c| c.options.names.iter().cloned())
+            // Only execute the default command if a group prefix is present.
+            if let Some(command) = group.options.default_command {
+                if gprefix.is_some() {
+                    return Ok(Invoke::Command {
+                        prefix,
+                        group,
+                        gprefix,
+                        command,
+                        args: self.stream.rest(),
+                    });
+                }
+            }
+
+            unsafe { self.stream.set_unchecked(pos) };
+        }
+
+        Err(Ok(self.unrecognised))
     }
 }
 
 pub(crate) fn parse_command<'a>(
-    msg: &'a str,
+    message: &'a str,
+    msg: &'a Message,
     prefix: Prefix<'a>,
     groups: &[&'static CommandGroup],
     config: &Configuration,
+    ctx: &Context,
     help_was_set: Option<&[&'static str]>,
-) -> Result<Invoke<'a>, Option<&'a str>> {
-    let mut stream = StringStream::new(msg);
+) -> Result<Invoke<'a>, Result<Option<&'a str>, DispatchError>> {
+    let mut stream = StringStream::new(message);
     stream.take_while(|s| s.is_whitespace());
-
-    let mut unrecognised = None;
 
     // We take precedence over commands named help command's name.
     if let Some(names) = help_was_set {
@@ -207,122 +306,7 @@ pub(crate) fn parse_command<'a>(
         }
     }
 
-    for group in groups {
-        let mut group: &'static CommandGroup = *group;
-        let pos = stream.offset();
-
-        let mut gprefix = None;
-
-        // New block because of the lifetime constraint to `StringStream`.
-        {
-            // Iterate through the possible prefixes of a group and its subgroups.
-            let mut it = PrefixIterator {
-                stream: &mut stream,
-                group,
-                config,
-                prefix: None,
-            };
-
-            while it.next() {
-                gprefix = it.prefix.take();
-            }
-
-            group = it.group;
-        }
-
-        // the group has prefixes defined but none were provided.
-        if gprefix.is_none() && group.has_prefixes() {
-            unsafe { stream.set_unchecked(pos) };
-            continue;
-        }
-
-        let pos = stream.offset();
-
-        for name in group.command_names() {
-            let n = stream.peek_for(name.chars().count());
-            let equals = if config.case_insensitive {
-                let n = n.to_lowercase();
-                n == name && !config.disabled_commands.contains(&n)
-            } else {
-                n == name && !config.disabled_commands.contains(n)
-            };
-
-            if equals {
-                let pos = stream.offset();
-                stream.set(pos + n.len());
-
-                if config.with_whitespace.commands {
-                    stream.take_while(|s| s.is_whitespace());
-                }
-
-                let mut command = group.get_command(&n).unwrap();
-
-                // Go through all the possible subcommands.
-                fn iterate_commands<'a>(
-                    stream: &mut StringStream<'a>,
-                    config: &Configuration,
-                    command: &mut &'static Command,
-                ) {
-                    for name in command.options.command_names() {
-                        let n = stream.peek_for(name.chars().count());
-                        let equals = if config.case_insensitive {
-                            let n = n.to_lowercase();
-                            n == name && !config.disabled_commands.contains(&n)
-                        } else {
-                            n == name && !config.disabled_commands.contains(n)
-                        };
-
-                        if equals {
-                            let pos = stream.offset();
-                            stream.set(pos + n.len());
-
-                            if config.with_whitespace.commands {
-                                stream.take_while(|s| s.is_whitespace());
-                            }
-
-                            *command = command.options.get_sub(&n).unwrap();
-                            iterate_commands(stream, config, command);
-                        }
-                    }
-                }
-
-                iterate_commands(&mut stream, &config, &mut command);
-
-                unrecognised.take();
-
-                let args = stream.rest();
-
-                return Ok(Invoke::Command {
-                    prefix,
-                    gprefix,
-                    group,
-                    command,
-                    args,
-                });
-            } else {
-                unrecognised = Some(n);
-            }
-        }
-
-        unsafe { stream.set_unchecked(pos) };
-
-        // Only execute the default command if a group prefix is present.
-        if gprefix.is_some() {
-            if let Some(command) = group.options.default_command {
-                let args = stream.rest();
-
-                return Ok(Invoke::Command {
-                    prefix,
-                    gprefix,
-                    group,
-                    command,
-                    args,
-                });
-            }
-        }
-    }
-
-    Err(unrecognised)
+    CommandParser::new(msg, stream, groups, config, ctx).parse(prefix)
 }
 
 #[derive(Debug)]

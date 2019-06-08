@@ -11,11 +11,10 @@ use proc_macro2::Span;
 use quote::{quote, ToTokens};
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
-    parse_quote,
-    parse_macro_input,
-    spanned::Spanned,
+    parse_macro_input, parse_quote,
     punctuated::Punctuated,
-    Token, Ident, Lit,
+    spanned::Spanned,
+    Ident, Lit, Token,
 };
 
 pub(crate) mod attributes;
@@ -64,7 +63,7 @@ macro_rules! match_options {
 /// - `#[checks(idents)]`
 /// Preconditions that must be met. Executed before the command's execution.
 /// `idents` is a list of identifiers, seperated by a comma, referencing functions of the declaration:
-/// `fn(&mut Context, &Message, &mut Args, &CommandOptions) -> bool`
+/// `fn(&mut Context, &Message, &mut Args, &CommandOptions) -> serenity::framework::standard::CheckResult`
 ///
 /// - `#[aliases(names)]`
 /// A list of other names that can be used to execute this command.
@@ -73,10 +72,10 @@ macro_rules! match_options {
 /// - `#[description(desc)]`/`#[description = desc]`
 /// A summary of the command.
 ///
-/// - `#[usage(usg)]`/`#[usage = usg]
+/// - `#[usage(usg)]`/`#[usage = usg]`
 /// Usage schema of the command.
 ///
-/// - `#[example(ex)]`/`#[example = ex]
+/// - `#[example(ex)]`/`#[example = ex]`
 /// Example of the command's usage.
 ///
 /// - `#[min_args(min)]`, `#[max_args(max)]`, `#[num_args(min_and_max)]`
@@ -84,6 +83,10 @@ macro_rules! match_options {
 ///
 /// `num_args` is a helper attribute, serving as a shorthand for calling
 /// `min_args` and `max_args` with the same amount of arguments.
+///
+/// - `#[required_permissions(perms)]`
+/// A list of permissions that the user must have.
+/// Refer to [Discord's offical documentation about available permissions](https://discordapp.com/developers/docs/topics/permissions).
 ///
 /// - `#[allowed_roles(roles)]`
 /// A list of strings (role names), seperated by a comma,
@@ -100,7 +103,7 @@ macro_rules! match_options {
 /// - `#[owners_only]`/`#[owners_only(bool)]`
 /// Whether this command is exclusive to owners.
 ///
-/// - `#[owner_privilege]`/`#[owner_privilege]
+/// - `#[owner_privilege]`/`#[owner_privilege]`
 /// Whether this command has a privilege for owners (i.e certain options are ignored for them).
 ///
 /// - `#[sub(commands)]`
@@ -109,7 +112,7 @@ macro_rules! match_options {
 ///
 /// # Notes
 /// The name of the command is parsed from the applied function,
-/// or can be passed inside the `#[command]` attribute, a lá `#[command(foobar)]`.
+/// or may be specified inside the `#[command]` attribute, a lá `#[command("foobar")]`.
 ///
 /// This macro attribute generates static instances of `Command` and `CommandOptions`,
 /// conserving the provided options.
@@ -176,7 +179,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 checks.parse("checks", values);
 
                 options.checks = Checks(checks);
-            },
+            }
             "bucket" => {
                 let mut buck = String::new();
                 buck.parse("bucket", values);
@@ -188,19 +191,19 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 desc.parse("description", values);
 
                 options.description = Some(desc);
-            },
+            }
             "usage" => {
                 let mut usage = String::new();
                 usage.parse("usage", values);
 
                 options.usage = Some(usage);
-            },
+            }
             "example" => {
                 let mut ex = String::new();
                 ex.parse("example", values);
 
                 options.example = Some(ex);
-            },
+            }
             _ => {
                 match_options!(name, values, options, span => [
                     min_args;
@@ -212,7 +215,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     only_in;
                     owners_only;
                     owner_privilege;
-                    sub_groups
+                    sub_commands
                 ]);
             }
         }
@@ -233,7 +236,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         only_in,
         owners_only,
         owner_privilege,
-        sub_groups,
+        sub_commands,
     } = options;
 
     let description = AsOption(description);
@@ -251,27 +254,16 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         return err.to_compile_error().into();
     }
 
-    let name = _name.clone();
-
-    // If name starts with a number, prepend an underscore to make it a valid identifier.
-    let n = if _name.starts_with(|c: char| c.is_numeric()) {
-        format!("_{}", _name)
-    } else {
-        _name
-    };
-
-    let _name = Ident::new(&n, Span::call_site());
-
     let Permissions(required_permissions) = required_permissions;
 
-    let options = _name.with_suffix(COMMAND_OPTIONS);
-    let sub_groups = sub_groups
+    let name = fun.name.clone();
+    let options = name.with_suffix(COMMAND_OPTIONS);
+    let sub_commands = sub_commands
         .into_iter()
         .map(|i| i.with_suffix(COMMAND))
         .collect::<Vec<_>>();
 
-    let n = _name.with_suffix(COMMAND);
-    let nn = fun.name.clone();
+    let n = name.with_suffix(COMMAND);
 
     let cfgs = fun.cfgs.clone();
     let cfgs2 = cfgs.clone();
@@ -285,7 +277,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         pub static #options: #options_path = #options_path {
             checks: #checks,
             bucket: #bucket,
-            names: &[#name, #(#aliases),*],
+            names: &[#_name, #(#aliases),*],
             desc: #description,
             usage: #usage,
             example: #example,
@@ -297,12 +289,12 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             only_in: #only_in,
             owners_only: #owners_only,
             owner_privilege: #owner_privilege,
-            sub_groups: &[#(&#sub_groups),*],
+            sub_commands: &[#(&#sub_commands),*],
         };
 
         #(#cfgs2)*
         pub static #n: #command_path = #command_path {
-            fun: #nn,
+            fun: #name,
             options: &#options,
         };
 
@@ -386,6 +378,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing` (leave be).
 ///
+/// - `#[lacking_ownership(s)]`/`#[lacking_ownership = s]`
+/// If a user lacks ownership, this will treat how these commands will be displayed.
+///
+/// Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing` (leave be).
+///
 /// - `#[lacking_permissions(s)]`/`#[lacking_role = s]`
 /// If a user lacks permissions, this will treat how commands will be displayed.
 ///
@@ -459,6 +456,34 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                     }
                 };
             }
+            "embed_error_colour" => {
+                let mut val = String::with_capacity(14);
+
+                val.parse("embed_error_colour", values);
+
+                options.embed_error_colour = match Colour::from_str(&val) {
+                    Some(c) => c,
+                    None => {
+                        return Error::new(span, &format!("invalid colour: {:?}", val))
+                            .to_compile_error()
+                            .into();
+                    }
+                };
+            }
+            "embed_success_colour" => {
+                let mut val = String::with_capacity(14);
+
+                val.parse("embed_success_colour", values);
+
+                options.embed_error_colour = match Colour::from_str(&val) {
+                    Some(c) => c,
+                    None => {
+                        return Error::new(span, &format!("invalid colour: {:?}", val))
+                            .to_compile_error()
+                            .into();
+                    }
+                };
+            }
             "lacking_permissions" => {
                 let mut behaviour = String::with_capacity(7);
                 behaviour.parse("lacking_permissions", values);
@@ -527,8 +552,6 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                     group_prefix;
                     strikethrough_commands_tip_in_dm;
                     strikethrough_commands_tip_in_guild;
-                    embed_error_colour;
-                    embed_success_colour;
                     max_levenshtein_distance;
                     indention_prefix
                 ]);
@@ -622,6 +645,9 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
     let strikethrough_commands_tip_in_guild = AsOption(strikethrough_commands_tip_in_guild);
+
+    let Colour(embed_error_colour) = embed_error_colour;
+    let Colour(embed_success_colour) = embed_success_colour;
 
     if let Err(err) = validate_declaration(&mut fun, DeclarFor::Help) {
         return err.to_compile_error().into();
@@ -743,7 +769,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// - `only`: String
 /// Whether this group's commands are restricted to `guilds` or `dms`.
 ///
-/// - `owner_only`: Bool
+/// - `owners_only`: Bool
 /// If only the owners of the bot may execute this group's commands.
 ///
 /// - `owner_privilege`: Bool
@@ -868,7 +894,11 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let n = fun.name.clone();
     let n2 = name.clone();
-    let name = if name.is_empty() { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
+    let name = if name.is_empty() {
+        fun.name.clone()
+    } else {
+        Ident::new(&name, Span::call_site())
+    };
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);

@@ -19,7 +19,7 @@ pub use crate::model::misc::Mentionable;
 pub use parking_lot::{Mutex, RwLock};
 
 #[cfg(feature = "client")]
-pub use crate::client::{Client, ClientError as ClientError, Context, EventHandler};
+pub use crate::client::{Client, ClientError, Context, EventHandler, RawEventHandler};
 #[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
 #[cfg(feature = "http")]

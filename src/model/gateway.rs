@@ -214,11 +214,9 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
         let flags = match map.remove("flags") {
-            Some(v) => {
-                let bits = serde_json::from_value::<u64>(v).map_err(DeError::custom)?;
-
-                Some(ActivityFlags::from_bits_truncate(bits))
-            },
+            Some(v) => serde_json::from_value::<Option<u64>>(v)
+                .map_err(DeError::custom)?
+                .map(ActivityFlags::from_bits_truncate),
             None => None,
         };
         let instance = match map.remove("instance") {
@@ -419,7 +417,8 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
         let last_modified = match map.remove("last_modified") {
-            Some(v) => Some(u64::deserialize(v).map_err(DeError::custom)?),
+            Some(v) => serde_json::from_value::<Option<u64>>(v)
+                .map_err(DeError::custom)?,
             None => None,
         };
         let nick = match map.remove("nick") {
@@ -473,9 +472,9 @@ impl Serialize for Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(default, deserialize_with = "deserialize_presences")]
+    #[serde(default, serialize_with = "serialize_presences", deserialize_with = "deserialize_presences")]
     pub presences: HashMap<UserId, Presence>,
-    #[serde(default, deserialize_with = "deserialize_private_channels")]
+    #[serde(default, serialize_with = "serialize_private_channels", deserialize_with = "deserialize_private_channels")]
     pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,

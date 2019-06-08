@@ -3,7 +3,7 @@ use crate::model::{
     guild::Role,
     Permissions
 };
-use crate::utils::VecMap;
+use std::collections::HashMap;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
 ///
@@ -44,14 +44,14 @@ use crate::utils::VecMap;
 /// [`Role`]: ../model/guild/struct.Role.html
 /// [`Role::edit`]: ../model/guild/struct.Role.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditRole(pub VecMap<&'static str, Value>);
+pub struct EditRole(pub HashMap<&'static str, Value>);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
     ///
     /// [`Role`]: ../model/guild/struct.Role.html
     pub fn new(role: &Role) -> Self {
-        let mut map = VecMap::with_capacity(8);
+        let mut map = HashMap::with_capacity(8);
 
         #[cfg(feature = "utils")]
         {
@@ -93,7 +93,7 @@ impl EditRole {
     }
 
     /// The name of the role to set.
-    pub fn name(&mut self, name: &str) -> &mut Self {
+    pub fn name<S: ToString>(&mut self, name: S) -> &mut Self {
         self.0.insert("name", Value::String(name.to_string()));
         self
     }
