@@ -35,6 +35,10 @@ pub struct PartialGuild {
     #[serde(deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
+    pub description: Option<String>,
+    pub premium_tier: PremiumTier,
+    pub premium_subscription_count: u64,
+    pub banner: Option<String>,
 }
 
 #[cfg(feature = "model")]

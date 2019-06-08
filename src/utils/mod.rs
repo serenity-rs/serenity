@@ -911,6 +911,10 @@ mod test {
             system_channel_id: None,
             verification_level: VerificationLevel::None,
             voice_states: HashMap::new(),
+            description: None,
+            premium_tier: PremiumTier::Tier0,
+            premium_subscription_count: 0,
+            banner: None,
         };
 
         let member = Member {

@@ -19,5 +19,9 @@
   "default_message_notifications": 1,
   "explicit_content_filter": 0,
   "joined_at": "2017-12-12T00:10:08.769400+00:00",
-  "mfa_level": 0
+  "mfa_level": 0,
+  "description": "Hmmmmmmmmm",
+  "premium_tier": 0,
+  "premium_subscription_count": 0,
+  "banner": null
 }

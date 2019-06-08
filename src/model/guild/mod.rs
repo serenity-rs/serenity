@@ -7,6 +7,7 @@ mod member;
 mod partial_guild;
 mod role;
 mod audit_log;
+mod premium_tier;
 
 pub use self::emoji::*;
 pub use self::guild_id::*;
@@ -15,6 +16,7 @@ pub use self::member::*;
 pub use self::partial_guild::*;
 pub use self::role::*;
 pub use self::audit_log::*;
+pub use self::premium_tier::*;
 
 use chrono::{DateTime, FixedOffset};
 use crate::{model::prelude::*};
@@ -31,6 +33,8 @@ use crate::cache::CacheRwLock;
 use parking_lot::RwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
+#[cfg(feature = "model")]
+use crate::http;
 #[cfg(feature = "model")]
 use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
@@ -148,6 +152,14 @@ pub struct Guild {
     /// [`User`]: ../user/struct.User.html
     #[serde(serialize_with = "serialize_gen_map")]
     pub voice_states: HashMap<UserId, VoiceState>,
+    /// The server's description
+    pub description: Option<String>,
+    /// The server's premium boosting level
+    pub premium_tier: PremiumTier,
+    /// The total number of users currently boosting this server
+    pub premium_subscription_count: u64,
+    /// the server's banner
+    pub banner: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -1706,6 +1718,24 @@ impl<'de> Deserialize<'de> for Guild {
             .ok_or_else(|| DeError::custom("expected guild voice_states"))
             .and_then(deserialize_voice_states)
             .map_err(DeError::custom)?;
+        let description = match map.remove("description") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let premium_tier = map.remove("premium_tier")
+            .ok_or_else(|| DeError::custom("expected guild premium_tier"))
+            .and_then(PremiumTier::deserialize)
+            .map_err(DeError::custom)?;
+        let premium_subscription_count = map.remove("premium_subscription_count")
+            .ok_or_else(|| DeError::custom("expected guild premium_subscription_count"))
+            .and_then(u64::deserialize)
+            .map_err(DeError::custom)?;
+        let banner = match map.remove("banner") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+
 
         Ok(Self {
             afk_channel_id,
@@ -1732,6 +1762,10 @@ impl<'de> Deserialize<'de> for Guild {
             system_channel_id,
             verification_level,
             voice_states,
+            description,
+            premium_tier,
+            premium_subscription_count,
+            banner,
         })
     }
 }
@@ -2152,9 +2186,13 @@ mod test {
                 splash: Some("asdf".to_string()),
                 verification_level: VerificationLevel::None,
                 voice_states: hm6,
+                description: None,
+                premium_tier: PremiumTier::Tier1,
                 application_id: Some(ApplicationId(0)),
                 explicit_content_filter: ExplicitContentFilter::None,
                 system_channel_id: Some(ChannelId(0)),
+                premium_subscription_count: 12,
+                banner: None,
             }
         }
 

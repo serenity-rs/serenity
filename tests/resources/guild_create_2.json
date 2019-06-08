@@ -24,5 +24,9 @@
     "channels": [],
     "application_id": null,
     "afk_timeout": 1800,
-    "afk_channel_id": "147780166708363265"
+    "afk_channel_id": "147780166708363265",
+    "description": "Hmmmmmmmmm",
+    "premium_tier": 0,
+    "premium_subscription_count": 0,
+    "banner": null
 }
