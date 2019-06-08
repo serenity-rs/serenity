@@ -39,6 +39,7 @@ pub struct PartialGuild {
     pub premium_tier: PremiumTier,
     pub premium_subscription_count: u64,
     pub banner: Option<String>,
+    pub vanity_url_code: Option<String>,
 }
 
 #[cfg(feature = "model")]

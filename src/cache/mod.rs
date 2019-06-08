@@ -1001,6 +1001,7 @@ mod test {
                     channels,
                     premium_subscription_count: 0,
                     banner: None,
+                    vanity_url_code: Some("bruhmoment".to_string()),
                 },
             }
         };
@@ -1029,6 +1030,7 @@ mod test {
                 premium_tier: Tier2,
                 premium_subscription_count: 12,
                 banner: None,
+                vanity_url_code: Some("bruhmoment".to_string()),
             },
         };
 

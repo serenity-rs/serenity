@@ -158,8 +158,10 @@ pub struct Guild {
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server
     pub premium_subscription_count: u64,
-    /// the server's banner
+    /// The server's banner
     pub banner: Option<String>,
+    /// The vanity url code for the guild
+    pub vanity_url_code: Option<String>,
 }
 
 #[cfg(feature = "model")]
@@ -1734,7 +1736,10 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-
+        let vanity_url_code = match map.remove("vanity_url_code") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
 
 
         Ok(Self {
@@ -1766,6 +1771,7 @@ impl<'de> Deserialize<'de> for Guild {
             premium_tier,
             premium_subscription_count,
             banner,
+            vanity_url_code,
         })
     }
 }
@@ -2193,6 +2199,7 @@ mod test {
                 system_channel_id: Some(ChannelId(0)),
                 premium_subscription_count: 12,
                 banner: None,
+                vanity_url_code: Some("bruhmoment".to_string())
             }
         }
 

@@ -915,6 +915,7 @@ mod test {
             premium_tier: PremiumTier::Tier0,
             premium_subscription_count: 0,
             banner: None,
+            vanity_url_code: Some("bruhmoment1".to_string()),
         };
 
         let member = Member {
