@@ -6,7 +6,12 @@ mod message_builder;
 
 pub use self::{
     colour::Colour,
-    message_builder::{Content, ContentModifier, MessageBuilder},
+    message_builder::{
+        Content,
+        ContentModifier,
+        EmbedMessageBuilding,
+        MessageBuilder,
+    },
 };
 
 use base64;
