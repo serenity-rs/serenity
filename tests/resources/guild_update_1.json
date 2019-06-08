@@ -37,5 +37,9 @@
   "splash": null,
   "verification_level": 2,
   "widget_channel_id": null,
-  "widget_enabled": true
+  "widget_enabled": true,
+  "description": "Hmmmmmmmmm",
+  "premium_tier": 0,
+  "premium_subscription_count": 0,
+  "banner": null
 }

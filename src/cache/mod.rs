@@ -872,6 +872,7 @@ mod test {
         model::prelude::*,
         prelude::RwLock,
     };
+    use crate::model::guild::PremiumTier::Tier2;
 
     #[test]
     fn test_cache_messages() {
@@ -995,7 +996,12 @@ mod test {
                     system_channel_id: None,
                     verification_level: VerificationLevel::Low,
                     voice_states: HashMap::new(),
+                    description: None,
+                    premium_tier: PremiumTier::Tier0,
                     channels,
+                    premium_subscription_count: 0,
+                    banner: None,
+                    vanity_url_code: Some("bruhmoment".to_string()),
                 },
             }
         };
@@ -1020,6 +1026,11 @@ mod test {
                 roles: HashMap::new(),
                 splash: None,
                 verification_level: VerificationLevel::Low,
+                description: None,
+                premium_tier: Tier2,
+                premium_subscription_count: 12,
+                banner: None,
+                vanity_url_code: Some("bruhmoment".to_string()),
             },
         };
 
