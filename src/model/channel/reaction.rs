@@ -11,7 +11,6 @@ use std::{
     },
     str::FromStr
 };
-use log::warn;
 
 use crate::internal::prelude::*;
 
@@ -19,6 +18,8 @@ use crate::internal::prelude::*;
 use crate::client::Context;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(all(feature = "http", feature = "model"))]
+use log::warn;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]

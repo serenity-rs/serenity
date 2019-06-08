@@ -2,7 +2,7 @@
 
 use chrono::{DateTime, FixedOffset};
 use crate::{model::prelude::*};
-use serde_json::{json, Value};
+use serde_json::Value;
 
 #[cfg(feature = "client")]
 use crate::client::Context;
@@ -12,6 +12,8 @@ use crate::builder::{CreateEmbed, EditMessage};
 use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
+#[cfg(all(feature = "client", feature = "model"))]
+use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(all(feature = "cache", feature = "model"))]
