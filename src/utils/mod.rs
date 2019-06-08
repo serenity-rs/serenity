@@ -7,7 +7,12 @@ mod vec_map;
 
 pub use self::{
     colour::Colour,
-    message_builder::{Content, ContentModifier, MessageBuilder},
+    message_builder::{
+        Content,
+        ContentModifier,
+        EmbedMessageBuilding,
+        MessageBuilder,
+    },
     vec_map::VecMap
 };
 
