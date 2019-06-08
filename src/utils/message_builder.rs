@@ -829,6 +829,119 @@ impl Display for MessageBuilder {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
 }
 
+/// A trait with additional functionality over the [`MessageBuilder`] for
+/// creating content with additional functionality available only in embeds.
+///
+/// Namely, this allows you to create named links via the non-escaping
+/// [`push_named_link`] method and the escaping [`push_named_link_safe`] method.
+///
+/// # Examples
+///
+/// Make a named link to Rust's GitHub organization:
+///
+/// ```rust
+/// # #[cfg(feature = "utils")]
+/// # fn main() {
+/// #
+/// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+///
+/// let msg = MessageBuilder::new()
+///     .push_named_link("Rust's GitHub", "https://github.com/rust-lang")
+///     .build();
+///
+/// assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
+/// # }
+/// #
+/// # #[cfg(not(feature = "utils"))]
+/// # fn main() { }
+/// ```
+///
+/// [`MessageBuilder`]: struct.MessageBuilder.html
+/// [`push_named_link`]: #tymethod.push_named_link
+/// [`push_named_link_safe`]: #tymethod.push_named_link_safe
+pub trait EmbedMessageBuilding {
+    /// Pushes a named link to a message, intended for use in embeds.
+    ///
+    /// # Examples
+    ///
+    /// Make a simple link to Rust's homepage for use in an embed:
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "utils")]
+    /// # fn main() {
+    /// #
+    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    ///
+    /// let msg = MessageBuilder::new()
+    ///     .push("Rust's website: ")
+    ///     .push_named_link("Homepage", "https://rust-lang.org")
+    ///     .build();
+    ///
+    /// assert_eq!(msg, "Rust's website: [Homepage](https://rust-lang.org)");
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "utils"))]
+    /// # fn main() { }
+    /// ```
+    fn push_named_link<T: I, U: I>(self, name: T, url: U) -> Self;
+
+    /// Pushes a named link intended for use in an embed, but with a normalized
+    /// name to avoid escaping issues.
+    ///
+    /// Refer to `push_named_link` for more information.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// # #[cfg(feature = "utils")]
+    /// # fn main() {
+    /// #
+    /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
+    ///
+    /// let msg = MessageBuilder::new()
+    ///     .push("A weird website name: ")
+    ///     .push_named_link_safe("Try to ] break links (](", "https://rust-lang.org")
+    ///     .build();
+    ///
+    /// assert_eq!(msg, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
+    /// # }
+    /// #
+    /// # #[cfg(not(feature = "utils"))]
+    /// # fn main() { }
+    /// ```
+    ///
+    /// [`push_named_link`]: #tymethod.push_named_link
+    fn push_named_link_safe<T: I, U: I>(self, name: T, url: U) -> Self;
+}
+
+impl EmbedMessageBuilding for MessageBuilder {
+    fn push_named_link<T: I, U: I>(mut self, name: T, url: U) -> Self {
+        let name = name.into().to_string();
+        let url = url.into().to_string();
+
+        let _ = write!(self.0, "[{}]({})", name, url);
+
+        self
+    }
+
+    fn push_named_link_safe<T: I, U: I>(mut self, name: T, url: U) -> Self {
+        self.0.push_str("[");
+        {
+            let mut c = name.into();
+            c.inner = normalize(&c.inner).replace("]", " ");
+            self.0.push_str(&c.to_string());
+        }
+        self.0.push_str("](");
+        {
+            let mut c = url.into();
+            c.inner = normalize(&c.inner).replace(")", " ");
+            self.0.push_str(&c.to_string());
+        }
+        self.0.push_str(")");
+
+        self
+    }
+}
 
 /// Formatting modifiers for MessageBuilder content pushes
 ///
