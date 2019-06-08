@@ -130,7 +130,7 @@ impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
     }
 
     fn check_discrepancy(&self, options: &impl CommonOptions) -> Result<(), DispatchError> {
-        if options.owners_only() {
+        if options.owners_only() && !self.config.owners.contains(&self.msg.author.id) {
             return Err(DispatchError::OnlyForOwners);
         }
 
