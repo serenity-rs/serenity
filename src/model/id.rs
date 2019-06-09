@@ -1,6 +1,6 @@
 //! A collection of newtypes defining type-strong IDs.
 
-use chrono::NaiveDateTime;
+use chrono::{FixedOffset, DateTime, NaiveDateTime};
 use crate::internal::prelude::*;
 use serde::de::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -11,12 +11,13 @@ macro_rules! id_u64 {
         $(
             impl $name {
                 /// Retrieves the time that the Id was created at.
-                pub fn created_at(&self) -> NaiveDateTime {
+                pub fn created_at(&self) -> DateTime<FixedOffset> {
                     let offset = self.0 >> 22;
                     let secs = offset / 1000;
                     let millis = (offset % 1000) * 1_000_000; // 1 million nanoseconds in a millisecond
 
-                    NaiveDateTime::from_timestamp(1_420_070_400 + secs as i64, millis as u32)
+                    let tm = NaiveDateTime::from_timestamp(1_420_070_400 + secs as i64, millis as u32);
+                    DateTime::from_utc(tm, FixedOffset::east(0))
                 }
 
                 /// Immutably borrow inner Id.

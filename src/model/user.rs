@@ -11,8 +11,6 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
-use chrono::NaiveDateTime;
-#[cfg(feature = "model")]
 use crate::http::GuildPagination;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
@@ -439,6 +437,7 @@ pub struct User {
 }
 
 use std::hash::{Hash, Hasher};
+use chrono::{DateTime, FixedOffset};
 
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
@@ -472,7 +471,7 @@ impl User {
 
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> NaiveDateTime { self.id.created_at() }
+    pub fn created_at(&self) -> DateTime<FixedOffset> { self.id.created_at() }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
