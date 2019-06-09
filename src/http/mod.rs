@@ -49,7 +49,7 @@ use crate::cache::CacheRwLock;
 #[cfg(feature = "client")]
 use crate::client::Context;
 
-/// This trait will be required by functions the need [`Http`] and can
+/// This trait will be required by functions that need [`Http`] and can
 /// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
 ///
 /// The types [`Context`], [`CacheRwLock`], and [`Http`] implement this trait
