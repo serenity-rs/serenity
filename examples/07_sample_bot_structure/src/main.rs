@@ -10,8 +10,13 @@
 //! ```
 mod commands;
 
-use std::{collections::HashSet, env};
+use std::{
+    collections::HashSet,
+    env,
+    sync::Arc,
+};
 use serenity::{
+    client::bridge::gateway::ShardManager,
     framework::{
         StandardFramework,
         standard::macros::group,
@@ -26,6 +31,11 @@ use commands::{
     meta::*,
     owner::*,
 };
+struct ShardManagerContainer;
+
+impl TypeMapKey for ShardManagerContainer {
+    type Value = Arc<Mutex<ShardManager>>;
+}
 
 struct Handler;
 
@@ -60,6 +70,11 @@ fn main() {
         .expect("Expected a token in the environment");
 
     let mut client = Client::new(&token, Handler).expect("Err creating client");
+
+    {
+        let mut data = client.data.write();
+        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
+    }
 
     let owners = match client.cache_and_http.http.get_current_application_info() {
         Ok(info) => {
