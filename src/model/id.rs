@@ -1,6 +1,6 @@
 //! A collection of newtypes defining type-strong IDs.
 
-use chrono::{FixedOffset, DateTime, NaiveDateTime, Utc};
+use chrono::{FixedOffset, DateTime, NaiveDateTime};
 use crate::internal::prelude::*;
 use serde::de::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};

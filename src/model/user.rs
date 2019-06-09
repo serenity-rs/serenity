@@ -12,8 +12,6 @@ use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
-use chrono::NaiveDateTime;
-#[cfg(feature = "model")]
 use crate::http::GuildPagination;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
