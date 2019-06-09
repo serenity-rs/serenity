@@ -369,17 +369,6 @@ impl Context {
     pub fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
     }
-
-    /// Disconnects the shard from the websocket, essentially "quiting" it.
-    /// Note however that this will only exit the one which the `Context` was given.
-    /// If it's just one shard that's on, then serenity will stop any further actions
-    /// until [`Client::start`] and vice versa are called again.
-    ///
-    /// [`Client::start`]: ./struct.Client.html#method.start
-    #[inline]
-    pub fn quit(&self) {
-        self.shard.shutdown_clean();
-    }
 }
 
 #[cfg(feature = "http")]
