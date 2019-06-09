@@ -425,16 +425,17 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::ChannelUpdate(mut event)) => {
-            update(&cache_and_http, &mut event);
-
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
                 feature_cache! {{
                     let before = cache_and_http.cache.as_ref().read().channel(event.channel.id());
+                    update(&cache_and_http, &mut event);
 
                     event_handler.channel_update(context, before, event.channel);
                 } else {
+                    update(&cache_and_http, &mut event);
+
                     event_handler.channel_update(context, event.channel);
                 }}
             });
@@ -610,7 +611,6 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildUpdate(mut event)) => {
-            update(&cache_and_http, &mut event);
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
@@ -619,9 +619,12 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                         .guilds
                         .get(&event.guild.id)
                         .cloned();
+                    update(&cache_and_http, &mut event);
 
                     event_handler.guild_update(context, before, event.guild);
                 } else {
+                    update(&cache_and_http, &mut event);
+
                     event_handler.guild_update(context, event.guild);
                 }}
             });
