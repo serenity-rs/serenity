@@ -1,8 +1,8 @@
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use crate::{model::prelude::*};
 use serde_json::json;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(feature = "model")]
@@ -495,20 +495,23 @@ impl GuildId {
     /// [`Member`]: ../guild/struct.Member.html
     #[cfg(feature = "client")]
     #[inline]
-    pub fn member<U: Into<UserId>>(self, context: &Context, user_id: U) -> Result<Member> {
-        self._member(&context, user_id.into())
+    pub fn member<U: Into<UserId>>(self, cache_http: impl CacheHttp, user_id: U) -> Result<Member> {
+        self._member(cache_http, user_id.into())
     }
 
     #[cfg(feature = "client")]
-    fn _member(self, context: &Context, user_id: UserId) -> Result<Member> {
+    fn _member(self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {
-            if let Some(member) = context.cache.read().member(self.0, user_id) {
-                return Ok(member);
+            if let Some(cache) = cache_http.cache() {
+
+                if let Some(member) = cache.read().member(self.0, user_id) {
+                    return Ok(member);
+                }
             }
         }
 
-        context.http.get_member(self.0, user_id.0)
+        cache_http.http().get_member(self.0, user_id.0)
     }
 
     /// Gets a list of the guild's members.

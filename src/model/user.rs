@@ -1,5 +1,7 @@
 //! User information-related models.
 
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
@@ -7,8 +9,6 @@ use super::prelude::*;
 use crate::{internal::prelude::*, model::misc::Mentionable};
 use serde_json::json;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
@@ -554,45 +554,43 @@ impl User {
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(clippy::let_and_return)]
     #[cfg(all(feature = "builder", feature = "client"))]
-    pub fn direct_message<F>(&self, context: &Context, f: F) -> Result<Message>
+    pub fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
         where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
-        let private_channel_id = feature_cache! {
-            {
-                let finding = {
-                    let cache = context.cache.read();
+        let private_channel_id = if let Some(cache) = cache_http.cache() {
+            let finding = {
+                let cache = cache.read();
 
-                    let finding = cache.private_channels
-                        .values()
-                        .map(|ch| ch.read())
-                        .find(|ch| ch.recipient.read().id == self.id)
-                        .map(|ch| ch.id);
+                let finding = cache.private_channels
+                    .values()
+                    .map(|ch| ch.read())
+                    .find(|ch| ch.recipient.read().id == self.id)
+                    .map(|ch| ch.id);
 
-                    finding
-                };
+                finding
+            };
 
-                if let Some(finding) = finding {
-                    finding
-                } else {
-                    let map = json!({
-                        "recipient_id": self.id.0,
-                    });
-
-                    context.http.create_private_channel(&map)?.id
-                }
+            if let Some(finding) = finding {
+                finding
             } else {
                 let map = json!({
                     "recipient_id": self.id.0,
                 });
 
-                context.http.create_private_channel(&map)?.id
+                cache_http.http().create_private_channel(&map)?.id
             }
+        } else {
+            let map = json!({
+                "recipient_id": self.id.0,
+            });
+
+            cache_http.http().create_private_channel(&map)?.id
         };
 
-        private_channel_id.send_message(&context.http, f)
+        private_channel_id.send_message(&cache_http.http(), f)
     }
 
     /// This is an alias of [direct_message].
@@ -616,9 +614,9 @@ impl User {
     /// [direct_message]: #method.direct_message
     #[cfg(all(feature = "builder", feature = "client"))]
     #[inline]
-    pub fn dm<F>(&self, context: &Context, f: F) -> Result<Message>
+    pub fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
-        self.direct_message(&context, f)
+        self.direct_message(cache_http, f)
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default
@@ -656,21 +654,29 @@ impl User {
     /// [`Role`]: ../guild/struct.Role.html
     /// [`Cache`]: ../../cache/struct.Cache.html
     #[cfg(feature = "client")]
-    pub fn has_role<G, R>(&self, context: &Context, guild: G, role: R) -> Result<bool>
+    pub fn has_role<G, R>(&self, cache_http: impl CacheHttp, guild: G, role: R) -> Result<bool>
         where G: Into<GuildContainer>, R: Into<RoleId> {
-        self._has_role(&context, guild.into(), role.into())
+        self._has_role(cache_http, guild.into(), role.into())
     }
 
     #[cfg(feature = "client")]
-    fn _has_role(&self, context: &Context, guild: GuildContainer, role: RoleId) -> Result<bool> {
+    fn _has_role(
+        &self,
+        cache_http: impl CacheHttp,
+        guild: GuildContainer,
+        role: RoleId
+    ) -> Result<bool> {
         match guild {
             GuildContainer::Guild(partial_guild) => {
-                self._has_role(context, GuildContainer::Id(partial_guild.id), role)
+                self._has_role(
+                    cache_http,
+                    GuildContainer::Id(partial_guild.id), role
+                )
             },
             GuildContainer::Id(guild_id) => {
-                feature_cache! {{
+                if let Some(cache) = cache_http.cache() {
                     Ok(
-                        context.cache.read()
+                        cache.read()
                         .guilds
                         .get(&guild_id)
                         .map_or(false, |g| {
@@ -681,13 +687,15 @@ impl User {
                 } else {
                     #[cfg(feature = "http")]
                     {
-                        context.http.get_member(guild_id.0, self.id.0).map(|m| m.roles.contains(&role))
+                        cache_http.http()
+                            .get_member(guild_id.0, self.id.0)
+                            .map(|m| m.roles.contains(&role))
                     }
                     #[cfg(not(feature = "http"))]
                     {
                         Err(Error::Model(ModelError::ItemMissing))
                     }
-                }}
+                }
             },
             GuildContainer::__Nonexhaustive => unreachable!(),
         }
@@ -696,9 +704,9 @@ impl User {
     /// Refreshes the information about the user.
     ///
     /// Replaces the instance with the data retrieved over the REST API.
-    #[cfg(feature = "client")]
-    pub fn refresh(&mut self, context: &Context) -> Result<()> {
-        self.id.to_user(&context).map(|replacement| {
+    #[cfg(feature = "http")]
+    pub fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
+        self.id.to_user(cache_http).map(|replacement| {
             mem::replace(self, replacement);
         })
     }
@@ -759,23 +767,19 @@ impl User {
     /// If none is used, it returns `None`.
     #[inline]
     #[cfg(feature = "client")]
-    pub fn nick_in<G>(&self, context: &Context, guild_id: G) -> Option<String>
+    pub fn nick_in<G>(&self, cache_http: impl CacheHttp, guild_id: G) -> Option<String>
     where G: Into<GuildId> {
-        self._nick_in(&context, guild_id.into())
+        self._nick_in(cache_http, guild_id.into())
     }
 
     #[cfg(feature = "client")]
-    fn _nick_in(&self, context: &Context, guild_id: GuildId) -> Option<String> {
-        #[cfg(feature = "cache")]
-        {
-            guild_id.to_guild_cached(&context.cache).and_then(|guild| {
+    fn _nick_in(&self, cache_http: impl CacheHttp, guild_id: GuildId) -> Option<String> {
+        if let Some(cache) = cache_http.cache() {
+            guild_id.to_guild_cached(cache).and_then(|guild| {
                 guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
             })
-        }
-
-        #[cfg(not(feature = "cache"))]
-        {
-            guild_id.member(&context, &self.id).ok().and_then(|member| member.nick.clone())
+        } else {
+            guild_id.member(cache_http, &self.id).ok().and_then(|member| member.nick.clone())
         }
     }
 }
@@ -817,17 +821,20 @@ impl UserId {
     /// REST API will be used only.
     ///
     /// [`User`]: ../user/struct.User.html
-    #[cfg(feature = "client")]
+    #[cfg(feature = "http")]
     #[inline]
-    pub fn to_user(self, context: &Context) -> Result<User> {
+    pub fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]
         {
-            if let Some(user) = context.cache.read().user(self) {
-                return Ok(user.read().clone());
+            if let Some(cache) = cache_http.cache() {
+
+                if let Some(user) = cache.read().user(self) {
+                    return Ok(user.read().clone());
+                }
             }
         }
 
-        context.http.get_user(self.0)
+        cache_http.http().get_user(self.0)
     }
 }
 

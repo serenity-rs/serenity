@@ -18,8 +18,8 @@ use super::super::ModelError;
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(all(feature = "cache", feature = "model", feature = "http"))]
-use crate::client::Context;
+#[cfg(all(feature = "cache", feature = "http"))]
+use crate::http::raw::Http;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -88,9 +88,11 @@ impl Emoji {
     /// # }
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn delete(&self, context: &Context) -> Result<()> {
-        match self.find_guild_id(&context.cache) {
-            Some(guild_id) => context.http.as_ref().delete_emoji(guild_id.0, self.id.0),
+    pub fn delete<T>(&self, cache_and_http: T) -> Result<()>
+    where T: AsRef<CacheRwLock> + AsRef<Http> {
+        match self.find_guild_id(&cache_and_http) {
+            Some(guild_id) => AsRef::<Http>::as_ref(&cache_and_http)
+                .delete_emoji(guild_id.0, self.id.0),
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
@@ -102,15 +104,17 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
-    #[cfg(feature = "cache")]
-    pub fn edit(&mut self, context: &Context, name: &str) -> Result<()> {
-        match self.find_guild_id(&context.cache) {
+    #[cfg(all(feature = "cache", feature = "http"))]
+    pub fn edit<T>(&mut self, cache_and_http: T, name: &str) -> Result<()>
+    where T: AsRef<CacheRwLock> + AsRef<Http> {
+        match self.find_guild_id(&cache_and_http) {
             Some(guild_id) => {
                 let map = json!({
                     "name": name,
                 });
 
-                match context.http.edit_emoji(guild_id.0, self.id.0, &map) {
+                match AsRef::<Http>::as_ref(&cache_and_http)
+                    .edit_emoji(guild_id.0, self.id.0, &map) {
                     Ok(emoji) => {
                         mem::replace(self, emoji);
 
