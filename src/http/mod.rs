@@ -44,6 +44,69 @@ use std::{
     path::{Path, PathBuf},
 };
 
+#[cfg(feature = "cache")]
+use crate::cache::CacheRwLock;
+#[cfg(feature = "client")]
+use crate::client::Context;
+
+/// This trait will be required by functions the need [`Http`] and can
+/// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
+///
+/// The types [`Context`], [`CacheRwLock`], and [`Http`] implement this trait
+/// and thus passing these to functions expecting `impl CacheHttp` is possible.
+///
+/// In a situation where you have the `cache`-feature enabled but you do not
+/// pass a cache, the function will behave as if no `cache`-feature is active.
+///
+/// If you are calling a function that expects `impl CacheHttp` as argument
+/// and you wish to utilise the `cache`-feature but you got no access to a
+/// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
+///
+/// [`CacheRwLock`]: ../cache/struct.CacheRwLock.html
+/// [`Http`]: raw/struct.Http.html
+/// [`Context`]: ../client/struct.Context.html
+pub trait CacheHttp {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http;
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { None }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for &Context {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+impl CacheHttp for (&CacheRwLock, &Http) {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.1 }
+
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.0) }
+}
+
+impl CacheHttp for &Http {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { *self }
+}
+
+#[cfg(feature = "cache")]
+impl AsRef<CacheRwLock> for (&CacheRwLock, &Http) {
+    fn as_ref(&self) -> &CacheRwLock {
+        self.0
+    }
+}
+
+#[cfg(feature = "cache")]
+impl AsRef<Http> for (&CacheRwLock, &Http) {
+    fn as_ref(&self) -> &Http {
+        self.1
+    }
+}
+
 /// An method used for ratelimiting special routes.
 ///
 /// This is needed because `reqwest`'s `Method` enum does not derive Copy.
