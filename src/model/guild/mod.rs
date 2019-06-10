@@ -1793,13 +1793,13 @@ impl<'de> Deserialize<'de> for Guild {
 /// Checks if a `&str` contains another `&str`.
 #[cfg(feature = "model")]
 fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
-    to_look_at.to_lowercase().contains(to_find)
+    to_look_at.to_lowercase().contains(&to_find.to_lowercase())
 }
 
 /// Checks if a `&str` starts with another `&str`.
 #[cfg(feature = "model")]
 fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
-    to_look_at.to_lowercase().starts_with(to_find)
+    to_look_at.to_lowercase().starts_with(&to_find.to_lowercase())
 }
 
 /// Takes a `&str` as `origin` and tests if either
