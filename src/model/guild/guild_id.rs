@@ -493,13 +493,13 @@ impl GuildId {
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: ../guild/struct.Member.html
-    #[cfg(feature = "client")]
+    #[cfg(feature = "http")]
     #[inline]
     pub fn member<U: Into<UserId>>(self, cache_http: impl CacheHttp, user_id: U) -> Result<Member> {
         self._member(cache_http, user_id.into())
     }
 
-    #[cfg(feature = "client")]
+    #[cfg(feature = "http")]
     fn _member(self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Member> {
         #[cfg(feature = "cache")]
         {

@@ -80,12 +80,10 @@ impl CacheHttp for &Context {
     fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 impl CacheHttp for (&CacheRwLock, &Http) {
-    #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.1 }
-
-    #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&CacheRwLock> { Some(&self.0) }
+    fn http(&self) -> &Http { &self.1 }
 }
 
 impl CacheHttp for &Http {
@@ -93,7 +91,7 @@ impl CacheHttp for &Http {
     fn http(&self) -> &Http { *self }
 }
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "http"))]
 impl AsRef<CacheRwLock> for (&CacheRwLock, &Http) {
     fn as_ref(&self) -> &CacheRwLock {
         self.0

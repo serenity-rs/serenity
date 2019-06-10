@@ -415,31 +415,23 @@ impl ChannelId {
     }
 
     /// Returns the name of whatever channel this id holds.
-    #[cfg(all(feature = "model", feature = "http"))]
-    pub fn name(self, cache_http: impl CacheHttp) -> Option<String> {
-        use self::Channel::*;
-
-        let finding = if let Some(cache) = cache_http.cache() {
-            Some(self.to_channel_cached(&cache))
-        } else {
-            None
-        };
-
-        let channel = if let Some(Some(c)) = finding {
+    #[cfg(all(feature = "model", feature = "cache"))]
+    pub fn name(self, cache: impl AsRef<CacheRwLock>) -> Option<String> {
+        let channel = if let Some(c) = self.to_channel_cached(&cache) {
             c
         } else {
             return None;
         };
 
         Some(match channel {
-            Guild(channel) => channel.read().name().to_string(),
-            Group(channel) => match channel.read().name() {
+            Channel::Guild(channel) => channel.read().name().to_string(),
+            Channel::Group(channel) => match channel.read().name() {
                 Cow::Borrowed(name) => name.to_string(),
                 Cow::Owned(name) => name,
             },
-            Category(category) => category.read().name().to_string(),
-            Private(channel) => channel.read().name(),
-            __Nonexhaustive => unreachable!(),
+            Channel::Category(category) => category.read().name().to_string(),
+            Channel::Private(channel) => channel.read().name(),
+            Channel::__Nonexhaustive => unreachable!(),
         })
     }
 

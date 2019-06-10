@@ -560,34 +560,28 @@ impl User {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
-        let private_channel_id = if let Some(cache) = cache_http.cache() {
-            let finding = {
-                let cache = cache.read();
+        let mut private_channel_id = None;
 
-                let finding = cache.private_channels
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                private_channel_id = cache.read().private_channels
                     .values()
                     .map(|ch| ch.read())
                     .find(|ch| ch.recipient.read().id == self.id)
                     .map(|ch| ch.id);
+            }
+        }
 
-                finding
-            };
-
-            if let Some(finding) = finding {
-                finding
-            } else {
+        let private_channel_id = match private_channel_id {
+            Some(id) => id,
+            None => {
                 let map = json!({
                     "recipient_id": self.id.0,
                 });
 
                 cache_http.http().create_private_channel(&map)?.id
             }
-        } else {
-            let map = json!({
-                "recipient_id": self.id.0,
-            });
-
-            cache_http.http().create_private_channel(&map)?.id
         };
 
         private_channel_id.send_message(&cache_http.http(), f)
@@ -674,27 +668,36 @@ impl User {
                 )
             },
             GuildContainer::Id(guild_id) => {
-                if let Some(cache) = cache_http.cache() {
-                    Ok(
-                        cache.read()
-                        .guilds
-                        .get(&guild_id)
-                        .map_or(false, |g| {
-                            g.read().members.get(&self.id)
-                                .map_or(false, |m| m.roles.contains(&role))
-                        })
-                    )
-                } else {
-                    #[cfg(feature = "http")]
-                    {
+                let mut has_role = None;
+
+                #[cfg(feature = "cache")]
+                {
+                    if let Some(cache) = cache_http.cache() {
+                        has_role = Some(
+                            cache.read()
+                            .guilds
+                            .get(&guild_id)
+                            .map_or(false, |g| {
+                                g.read().members.get(&self.id)
+                                    .map_or(false, |m| m.roles.contains(&role))
+                            })
+                        );
+                    }
+                }
+
+                #[cfg(feature = "http")]
+                {
+                    if let Some(has_role) = has_role {
+                        Ok(has_role)
+                    } else {
                         cache_http.http()
                             .get_member(guild_id.0, self.id.0)
                             .map(|m| m.roles.contains(&role))
                     }
-                    #[cfg(not(feature = "http"))]
-                    {
-                        Err(Error::Model(ModelError::ItemMissing))
-                    }
+                }
+                #[cfg(not(feature = "http"))]
+                {
+                    Err(Error::Model(ModelError::ItemMissing))
                 }
             },
             GuildContainer::__Nonexhaustive => unreachable!(),
@@ -766,21 +769,24 @@ impl User {
     ///
     /// If none is used, it returns `None`.
     #[inline]
-    #[cfg(feature = "client")]
+    #[cfg(feature = "http")]
     pub fn nick_in<G>(&self, cache_http: impl CacheHttp, guild_id: G) -> Option<String>
     where G: Into<GuildId> {
         self._nick_in(cache_http, guild_id.into())
     }
 
-    #[cfg(feature = "client")]
+    #[cfg(feature = "http")]
     fn _nick_in(&self, cache_http: impl CacheHttp, guild_id: GuildId) -> Option<String> {
-        if let Some(cache) = cache_http.cache() {
-            guild_id.to_guild_cached(cache).and_then(|guild| {
-                guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
-            })
-        } else {
-            guild_id.member(cache_http, &self.id).ok().and_then(|member| member.nick.clone())
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                return guild_id.to_guild_cached(cache).and_then(|guild| {
+                    guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
+                });
+            }
         }
+
+        guild_id.member(cache_http, &self.id).ok().and_then(|member| member.nick.clone())
     }
 }
 

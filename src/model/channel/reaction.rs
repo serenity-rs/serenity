@@ -74,31 +74,26 @@ impl Reaction {
     /// [permissions]: ../permissions/index.html
     #[cfg(feature = "http")]
     pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        let user_id = if let Some(cache) = cache_http.cache() {
-            let user = if self.user_id == cache.read().user.id {
-                None
-            } else {
-                Some(self.user_id.0)
-            };
 
-            // If the reaction is one _not_ made by the current user, then ensure
-            // that the current user has permission* to delete the reaction.
-            //
-            // Normally, users can only delete their own reactions.
-            //
-            // * The `Manage Messages` permission.
-            if user.is_some() {
-                let req = Permissions::MANAGE_MESSAGES;
+        let mut user_id = Some(self.user_id.0);
 
-                if !utils::user_has_perms(cache, self.channel_id, req).unwrap_or(true) {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+
+                if self.user_id == cache.read().user.id {
+                    user_id = None;
+                }
+
+                if user_id.is_some() {
+                    let req = Permissions::MANAGE_MESSAGES;
+
+                    if !utils::user_has_perms(cache, self.channel_id, req).unwrap_or(true) {
+                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    }
                 }
             }
-
-            user
-        } else {
-            Some(self.user_id.0)
-        };
+        }
 
         cache_http.http().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
