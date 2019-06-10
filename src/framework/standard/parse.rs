@@ -77,20 +77,12 @@ pub fn parse_prefix<'a>(
     (Prefix::None, args.trim())
 }
 
-#[allow(clippy::enum_variant_names)]
-#[derive(Debug, Clone, Copy, PartialEq)]
-enum ParseMode {
-    BySpace,
-    ByLength,
-}
-
 struct CommandParser<'msg, 'groups, 'config, 'ctx> {
     msg: &'msg Message,
     stream: StringStream<'msg>,
     groups: &'groups [&'static CommandGroup],
     config: &'config Configuration,
     ctx: &'ctx Context,
-    mode: ParseMode,
     unrecognised: Option<&'msg str>,
 }
 
@@ -108,15 +100,15 @@ impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
             groups,
             config,
             ctx,
-            mode: if config.by_space { ParseMode::BySpace } else { ParseMode::ByLength },
             unrecognised: None,
         }
     }
 
     fn next_text(&self, length: impl FnOnce() -> usize) -> &'msg str {
-        match self.mode {
-            ParseMode::ByLength => self.stream.peek_for(length()),
-            ParseMode::BySpace => self.stream.peek_until(|s| s.is_whitespace()),
+        if self.config.by_space {
+            self.stream.peek_until(|s| s.is_whitespace())
+        } else {
+            self.stream.peek_for(length())
         }
     }
 
@@ -207,6 +199,23 @@ impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
     }
 
     fn group(&mut self, group: &'static CommandGroup) -> Result<(Option<&'msg str>, &'static CommandGroup), DispatchError> {
+        // Do not bother going through this group's prefixes if it doesn't contain any, but
+        // try if its sub-groups maybe do and are satisfied in the message.
+        if group.options.prefixes.is_empty() {
+            for sub_group in group.sub_groups {
+                let x = self.group(*sub_group)?;
+
+                if x.0.is_some() {
+                    return Ok(x);
+                }
+            }
+
+            // It appears they don't. Fall back to using this group.
+            self.check_discrepancy(&group.options)?;
+
+            return Ok((None, group));
+        }
+
         for p in group.options.prefixes {
             let pp = self.next_text(|| p.chars().count());
 
