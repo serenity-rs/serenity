@@ -43,7 +43,7 @@ impl From<Response> for ErrorResponse {
             url: r.url().clone(),
             error: r.json().unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
-                message: "[Serenity] No correct json was recieved!".to_string(),
+                message: "[Serenity] No correct json was received!".to_string(),
                 non_exhaustive: (),
             }),
         }
