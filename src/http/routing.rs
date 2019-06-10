@@ -753,6 +753,9 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         role_id: u64,
     },
+    EditRolePosition {
+        guild_id: u64,
+    },
     EditWebhook {
         webhook_id: u64,
     },
@@ -1137,6 +1140,11 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdRolesId(guild_id),
                 Cow::from(Route::guild_role(guild_id, role_id)),
+            ),
+            RouteInfo::EditRolePosition { guild_id } => (
+                LightMethod::Patch,
+                Route::GuildsIdRolesId(guild_id),
+                Cow::from(Route::guild_roles(guild_id)),
             ),
             RouteInfo::EditWebhook { webhook_id } => (
                 LightMethod::Patch,

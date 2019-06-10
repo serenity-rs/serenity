@@ -724,15 +724,15 @@ impl Http {
 
     /// Changes the position of a role in a guild.
     pub fn edit_role_position(&self, guild_id: u64, role_id: u64, position: u64) -> Result<Vec<Role>> {
-        let body = serde_json::to_vec(&json!({
+        let body = serde_json::to_vec(&json!([{
             "id": role_id,
             "position": position,
-        }))?;
+        }]))?;
 
         self.fire(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::EditRole { guild_id, role_id },
+            route: RouteInfo::EditRolePosition { guild_id },
         })
     }
 
