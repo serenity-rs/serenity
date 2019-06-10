@@ -346,12 +346,12 @@ impl From<char> for ReactionType {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(ctx: &mut Context) -> CommandResult {
     /// #   let message = ChannelId(0).message(&ctx.http, 0)?;
     /// #
-    /// message.react(&ctx, '🍎')?;
+    /// message.react(ctx, '🍎')?;
     /// # Ok(())
     /// # }
     /// #

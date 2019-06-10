@@ -87,13 +87,13 @@ impl CreateInvite {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(&context, |i| {
+    /// let invite = channel.create_invite(context, |i| {
     ///     i.max_age(3600)
     /// })?;
     /// # Ok(())
@@ -124,13 +124,13 @@ impl CreateInvite {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(&context, |i| {
+    /// let invite = channel.create_invite(context, |i| {
     ///     i.max_uses(5)
     /// })?;
     /// # Ok(())
@@ -159,13 +159,13 @@ impl CreateInvite {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(&context, |i| {
+    /// let invite = channel.create_invite(context, |i| {
     ///     i.temporary(true)
     /// })?;
     /// # Ok(())
@@ -193,13 +193,13 @@ impl CreateInvite {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
-    /// let invite = channel.create_invite(&context, |i| {
+    /// let invite = channel.create_invite(context, |i| {
     ///     i.unique(true)
     /// })?;
     /// # Ok(())
