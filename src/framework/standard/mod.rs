@@ -765,6 +765,7 @@ pub trait CommonOptions {
     fn only_in(&self) -> OnlyIn;
     fn help_available(&self) -> bool;
     fn owners_only(&self) -> bool;
+    fn owner_privilege(&self) -> bool;
 }
 
 impl CommonOptions for &GroupOptions {
@@ -787,6 +788,10 @@ impl CommonOptions for &GroupOptions {
     fn owners_only(&self) -> bool {
         self.owners_only
     }
+
+    fn owner_privilege(&self) -> bool {
+        self.owner_privilege
+    }
 }
 
 impl CommonOptions for &CommandOptions {
@@ -808,6 +813,10 @@ impl CommonOptions for &CommandOptions {
 
     fn owners_only(&self) -> bool {
         self.owners_only
+    }
+
+    fn owner_privilege(&self) -> bool {
+        self.owner_privilege
     }
 }
 

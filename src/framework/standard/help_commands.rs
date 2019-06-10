@@ -321,6 +321,10 @@ fn check_command_behaviour(
             return help_options.lacking_ownership;
         }
 
+        if options.owner_privilege() && owners.contains(&msg.author.id) {
+            return HelpBehaviour::Nothing;
+        }
+
         if has_correct_permissions(&cache, options, msg) {
 
             if let Some(guild) = msg.guild(&cache) {
