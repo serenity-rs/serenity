@@ -17,11 +17,11 @@ use std::collections::HashMap;
 /// # #[cfg(feature = "framework")]
 /// # use serenity::framework::standard::{CommandResult, macros::command};
 /// #
-/// # #[cfg(all(feature = "client", feature = "framework"))]
+/// # #[cfg(all(feature = "http", feature = "framework"))]
 /// # #[command]
 /// # fn example(ctx: &mut Context) -> CommandResult {
 /// # let mut message = ChannelId(7).message(&ctx.http, MessageId(8)).unwrap();
-/// let _ = message.edit(&ctx, |m| {
+/// let _ = message.edit(ctx, |m| {
 ///     m.content("hello")
 /// });
 /// # Ok(())

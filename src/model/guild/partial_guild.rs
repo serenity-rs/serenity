@@ -1,12 +1,14 @@
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use crate::{model::prelude::*};
 use super::super::utils::{deserialize_emojis, deserialize_roles};
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
+use crate::cache::CacheRwLock;
 
 /// Partial information about a [`Guild`]. This does not include information
 /// like member data.
@@ -362,8 +364,8 @@ impl PartialGuild {
     /// [`Guild`]: struct.Guild.html
     /// [`Member`]: struct.Member.html
     #[cfg(feature = "client")]
-    pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
-        self.id.member(&context, user_id)
+    pub fn member<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<Member> {
+        self.id.member(cache_http, user_id)
     }
 
     /// Gets a list of the guild's members.
@@ -414,7 +416,7 @@ impl PartialGuild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
     #[inline]
-    pub fn shard_id(&self, context: &Context) -> u64 { self.id.shard_id(&context.cache) }
+    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 { self.id.shard_id(cache) }
 
     /// Returns the Id of the shard associated with the guild.
     ///

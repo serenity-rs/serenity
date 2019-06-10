@@ -9,6 +9,8 @@ mod role;
 mod audit_log;
 mod premium_tier;
 
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 pub use self::emoji::*;
 pub use self::guild_id::*;
 pub use self::integration::*;
@@ -23,8 +25,6 @@ use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use super::utils::*;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -266,24 +266,26 @@ impl Guild {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "client")]
     #[inline]
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, context: &Context, user: U, options: &BO) -> Result<()> {
-        self._ban(&context, user.into(), options)
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, cache_http: impl CacheHttp, user: U, options: &BO) -> Result<()> {
+        self._ban(cache_http, user.into(), options)
     }
 
     #[cfg(feature = "client")]
-    fn _ban<BO: BanOptions>(&self, context: &Context, user: UserId, options: &BO) -> Result<()> {
+    fn _ban<BO: BanOptions>(&self, cache_http: impl CacheHttp, user: UserId, options: &BO) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::BAN_MEMBERS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+
+                self.check_hierarchy(cache, user)?;
             }
-
-            self.check_hierarchy(&context.cache, user)?;
         }
 
-        self.id.ban(&context.http, user, options)
+        self.id.ban(cache_http.http(), user, options)
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -298,18 +300,20 @@ impl Guild {
     /// [`Ban`]: struct.Ban.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(feature = "client")]
-    pub fn bans(&self, context: &Context) -> Result<Vec<Ban>> {
+    #[cfg(feature = "http")]
+    pub fn bans(&self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::BAN_MEMBERS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.bans(&context.http)
+        self.id.bans(cache_http.http())
     }
 
     /// Retrieves a list of [`AuditLogs`] for the guild.
@@ -391,17 +395,19 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "client")]
-    pub fn create_channel(&self, context: &Context, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+    pub fn create_channel(&self, cache_http: impl CacheHttp, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_CHANNELS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_CHANNELS;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.create_channel(&context.http, f)
+        self.id.create_channel(cache_http.http(), f)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -464,18 +470,20 @@ impl Guild {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "client")]
-    pub fn create_role<F>(&self, context: &Context, f: F) -> Result<Role>
+    pub fn create_role<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Role>
         where F: FnOnce(&mut EditRole) -> &mut EditRole {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_ROLES;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_ROLES;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.create_role(&context.http, f)
+        self.id.create_role(cache_http.http(), f)
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -489,18 +497,21 @@ impl Guild {
     /// if the current user is not the guild owner.
     ///
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    #[cfg(feature = "client")]
-    pub fn delete(&self, context: &Context) -> Result<PartialGuild> {
+    #[cfg(feature = "http")]
+    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
-            if self.owner_id != context.cache.read().user.id {
-                let req = Permissions::MANAGE_GUILD;
+            if let Some(cache) = cache_http.cache() {
 
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if self.owner_id != cache.read().user.id {
+                    let req = Permissions::MANAGE_GUILD;
+
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.delete(&context.http)
+        self.id.delete(cache_http.http())
     }
 
     /// Deletes an [`Emoji`] from the guild.
@@ -571,18 +582,20 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "client")]
-    pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
         where F: FnOnce(&mut EditGuild) -> &mut EditGuild {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_GUILD;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        match self.id.edit(&context.http, f) {
+        match self.id.edit(cache_http.http(), f) {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
                 self.afk_timeout = guild.afk_timeout;
@@ -655,17 +668,19 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     #[cfg(feature = "client")]
-    pub fn edit_nickname(&self, context: &Context, new_nickname: Option<&str>) -> Result<()> {
+    pub fn edit_nickname(&self, cache_http: impl CacheHttp, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::CHANGE_NICKNAME;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::CHANGE_NICKNAME;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.edit_nickname(&context.http, new_nickname)
+        self.id.edit_nickname(cache_http.http(), new_nickname)
     }
 
     /// Edits a role, optionally setting its fields.
@@ -814,18 +829,20 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    #[cfg(feature = "client")]
-    pub fn invites(&self, context: &Context) -> Result<Vec<RichInvite>> {
+    #[cfg(feature = "http")]
+    pub fn invites(&self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_GUILD;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_GUILD;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.invites(&context.http)
+        self.id.invites(cache_http.http())
     }
 
     /// Checks if the guild is 'large'. A guild is considered large if it has
@@ -853,8 +870,8 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     #[inline]
     #[cfg(feature = "client")]
-    pub fn member<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<Member> {
-        self.id.member(&context, user_id)
+    pub fn member<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<Member> {
+        self.id.member(cache_http, user_id)
     }
 
     /// Gets a list of the guild's members.
@@ -1407,17 +1424,19 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "client")]
-    pub fn prune_count(&self, context: &Context, days: u16) -> Result<GuildPrune> {
+    pub fn prune_count(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::KICK_MEMBERS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.prune_count(&context.http, days)
+        self.id.prune_count(cache_http.http(), days)
     }
 
     /// Re-orders the channels of the guild.
@@ -1503,17 +1522,19 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "client")]
-    pub fn start_prune(&self, context: &Context, days: u16) -> Result<GuildPrune> {
+    pub fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::KICK_MEMBERS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::KICK_MEMBERS;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.start_prune(&context.http, days)
+        self.id.start_prune(cache_http.http(), days)
     }
 
     /// Unbans the given [`User`] from the guild.
@@ -1529,17 +1550,19 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "client")]
-    pub fn unban<U: Into<UserId>>(&self, context: &Context, user_id: U) -> Result<()> {
+    pub fn unban<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::BAN_MEMBERS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::BAN_MEMBERS;
 
-            if !self.has_perms(&context.cache, req) {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !self.has_perms(cache, req) {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.unban(&context.http, user_id)
+        self.id.unban(&cache_http.http(), user_id)
     }
 
     /// Retrieve's the guild's vanity URL.

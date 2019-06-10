@@ -5,8 +5,6 @@ use std::cmp::Ordering;
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model", feature = "http"))]
-use crate::client::Context;
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
 
@@ -16,6 +14,8 @@ use crate::cache::FromStrAndCache;
 use crate::model::misc::RoleParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
+#[cfg(all(feature = "cache", feature = "http"))]
+use crate::http::raw::Http;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -77,8 +77,10 @@ impl Role {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn delete(&self, context: &Context) -> Result<()> {
-        context.http.as_ref().delete_role(self.find_guild(&context.cache)?.0, self.id.0)
+    pub fn delete<T>(&mut self, cache_and_http: T) -> Result<()>
+    where T: AsRef<CacheRwLock> + AsRef<Http> {
+        AsRef::<Http>::as_ref(&cache_and_http)
+            .delete_role(self.find_guild(&cache_and_http)?.0, self.id.0)
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -104,11 +106,11 @@ impl Role {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "builder", feature = "cache", feature = "http"))]
-    pub fn edit<F: FnOnce(&mut EditRole) -> &mut EditRole>(&self, context: &Context, f: F) -> Result<Role> {
-        self.find_guild(&context.cache)
-            .and_then(|guild_id| guild_id.edit_role(&context.http, self.id, f))
+    pub fn edit<F: FnOnce(&mut EditRole) -> &mut EditRole, T>(&self, cache_and_http: T, f: F) -> Result<Role>
+    where T: AsRef<CacheRwLock> + AsRef<Http> {
+        self.find_guild(&cache_and_http)
+            .and_then(|guild_id| guild_id.edit_role(&cache_and_http, self.id, f))
     }
-
     /// Searches the cache for the guild that owns the role.
     ///
     /// # Errors

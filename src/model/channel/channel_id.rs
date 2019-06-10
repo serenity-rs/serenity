@@ -1,7 +1,7 @@
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use crate::{internal::RwLockExt, model::prelude::*};
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(feature = "model")]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
@@ -335,17 +335,20 @@ impl ChannelId {
     /// owning the required permissions the HTTP-request will be issued.
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
-    #[cfg(feature = "client")]
+    #[cfg(feature = "http")]
     #[inline]
-    pub fn to_channel(self, context: &Context) -> Result<Channel> {
+    pub fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            if let Some(channel) = context.cache.read().channel(self) {
-                return Ok(channel);
+            if let Some(cache) = cache_http.cache() {
+
+                if let Some(channel) = cache.read().channel(self) {
+                    return Ok(channel);
+                }
             }
         }
 
-        context.http.get_channel(self.0)
+        cache_http.http().get_channel(self.0)
     }
 
     /// Gets all of the channel's invites.
@@ -413,31 +416,23 @@ impl ChannelId {
     }
 
     /// Returns the name of whatever channel this id holds.
-    #[cfg(all(feature = "model", feature = "client"))]
-    pub fn name(self, _context: &Context) -> Option<String> {
-        use self::Channel::*;
-
-        let finding = feature_cache! {{
-            Some(self.to_channel_cached(&_context.cache))
-        } else {
-            None
-        }};
-
-        let channel = if let Some(Some(c)) = finding {
+    #[cfg(all(feature = "model", feature = "cache"))]
+    pub fn name(self, cache: impl AsRef<CacheRwLock>) -> Option<String> {
+        let channel = if let Some(c) = self.to_channel_cached(&cache) {
             c
         } else {
             return None;
         };
 
         Some(match channel {
-            Guild(channel) => channel.read().name().to_string(),
-            Group(channel) => match channel.read().name() {
+            Channel::Guild(channel) => channel.read().name().to_string(),
+            Channel::Group(channel) => match channel.read().name() {
                 Cow::Borrowed(name) => name.to_string(),
                 Cow::Owned(name) => name,
             },
-            Category(category) => category.read().name().to_string(),
-            Private(channel) => channel.read().name(),
-            __Nonexhaustive => unreachable!(),
+            Channel::Category(category) => category.read().name().to_string(),
+            Channel::Private(channel) => channel.read().name(),
+            Channel::__Nonexhaustive => unreachable!(),
         })
     }
 

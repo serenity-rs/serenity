@@ -1,3 +1,5 @@
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use crate::{model::prelude::*};
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
@@ -14,8 +16,6 @@ use std::{
 
 use crate::internal::prelude::*;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(feature = "http")]
 use crate::http::Http;
 #[cfg(all(feature = "http", feature = "model"))]
@@ -53,9 +53,9 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    #[cfg(feature = "client")]
-    pub fn channel(&self, context: &Context) -> Result<Channel> {
-        self.channel_id.to_channel(&context)
+    #[cfg(feature = "http")]
+    pub fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
+        self.channel_id.to_channel(cache_http)
     }
 
     /// Deletes the reaction, but only if the current user is the user who made
@@ -73,37 +73,30 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "client")]
-    pub fn delete(&self, context: &Context) -> Result<()> {
-        let user_id = feature_cache! {
-            {
-                let user = if self.user_id == context.cache.read().user.id {
-                    None
-                } else {
-                    Some(self.user_id.0)
-                };
+    #[cfg(feature = "http")]
+    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
 
-                // If the reaction is one _not_ made by the current user, then ensure
-                // that the current user has permission* to delete the reaction.
-                //
-                // Normally, users can only delete their own reactions.
-                //
-                // * The `Manage Messages` permission.
-                if user.is_some() {
+        let mut user_id = Some(self.user_id.0);
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+
+                if self.user_id == cache.read().user.id {
+                    user_id = None;
+                }
+
+                if user_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(&context.cache, self.channel_id, req).unwrap_or(true) {
+                    if !utils::user_has_perms(cache, self.channel_id, req).unwrap_or(true) {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
-
-                user
-            } else {
-                Some(self.user_id.0)
             }
-        };
+        }
 
-        context.http.as_ref().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+        cache_http.http().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -128,9 +121,9 @@ impl Reaction {
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
     #[inline]
-    #[cfg(feature = "client")]
-    pub fn user(&self, context: &Context) -> Result<User> {
-        self.user_id.to_user(&context)
+    #[cfg(feature = "http")]
+    pub fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
+        self.user_id.to_user(cache_http)
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -354,12 +347,12 @@ impl From<char> for ReactionType {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::model::id::ChannelId;
     /// #
-    /// # #[cfg(all(feature = "client", feature = "framework"))]
+    /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(ctx: &mut Context) -> CommandResult {
     /// #   let message = ChannelId(0).message(&ctx.http, 0)?;
     /// #
-    /// message.react(&ctx, '🍎')?;
+    /// message.react(ctx, '🍎')?;
     /// # Ok(())
     /// # }
     /// #

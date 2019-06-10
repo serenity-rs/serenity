@@ -1,10 +1,10 @@
 //! Models for server and channel invites.
 
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use chrono::{DateTime, FixedOffset};
 use super::prelude::*;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
 #[cfg(feature = "model")]
@@ -77,26 +77,28 @@ impl Invite {
     /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
     /// [permission]: ../permissions/index.html
     #[cfg(feature = "client")]
-    pub fn create<C, F>(context: &Context, channel_id: C, f: F) -> Result<RichInvite>
+    pub fn create<C, F>(cache_http: impl CacheHttp, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
-        Self::_create(&context, channel_id.into(), f)
+        Self::_create(cache_http, channel_id.into(), f)
     }
 
     #[cfg(feature = "client")]
-    fn _create<F>(context: &Context, channel_id: ChannelId, f: F) -> Result<RichInvite>
+    fn _create<F>(cache_http: impl CacheHttp, channel_id: ChannelId, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::CREATE_INVITE;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::CREATE_INVITE;
 
-            if !model_utils::user_has_perms(&context.cache, channel_id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !model_utils::user_has_perms(cache, channel_id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
         let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
 
-        context.http.create_invite(channel_id.0, &map)
+        cache_http.http().create_invite(channel_id.0, &map)
     }
 
     /// Deletes the invite.
@@ -111,18 +113,20 @@ impl Invite {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "client")]
-    pub fn delete(&self, context: &Context) -> Result<Invite> {
+    #[cfg(feature = "http")]
+    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_GUILD;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_GUILD;
 
-            if !model_utils::user_has_perms(&context.cache, self.channel.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !model_utils::user_has_perms(cache, self.channel.id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        context.http.as_ref().delete_invite(&self.code)
+        cache_http.http().as_ref().delete_invite(&self.code)
     }
 
     /// Gets the information about an invite.
@@ -297,18 +301,20 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "client")]
-    pub fn delete(&self, context: &Context) -> Result<Invite> {
+    #[cfg(feature = "http")]
+    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_GUILD;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_GUILD;
 
-            if !model_utils::user_has_perms(&context.cache, self.channel.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !model_utils::user_has_perms(cache, self.channel.id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        context.http.as_ref().delete_invite(&self.code)
+        cache_http.http().as_ref().delete_invite(&self.code)
     }
 
     /// Returns a URL to use for the invite.

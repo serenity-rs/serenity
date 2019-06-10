@@ -10,6 +10,8 @@ mod private_channel;
 mod reaction;
 mod channel_category;
 
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 pub use self::attachment::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
@@ -26,8 +28,6 @@ use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
 use super::utils::deserialize_u64;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(feature = "model")]
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
@@ -241,20 +241,20 @@ impl Channel {
     /// closest functionality is leaving it.
     ///
     /// [`Group`]: struct.Group.html
-    #[cfg(all(feature = "model", feature = "client"))]
-    pub fn delete(&self, context: &Context) -> Result<()> {
+    #[cfg(all(feature = "model", feature = "http"))]
+    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = group.read().leave(&context.http)?;
+                let _ = group.read().leave(cache_http.http())?;
             },
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.read().delete(&context)?;
+                let _ = public_channel.read().delete(cache_http)?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.read().delete(&context.http)?;
+                let _ = private_channel.read().delete(cache_http.http())?;
             },
             Channel::Category(ref category) => {
-                category.read().delete(&context)?;
+                category.read().delete(cache_http)?;
             },
             Channel::__Nonexhaustive => unreachable!(),
         }

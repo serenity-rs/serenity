@@ -1,8 +1,8 @@
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
@@ -132,14 +132,16 @@ impl GuildChannel {
     /// let invite = channel.create_invite(|i| i.max_uses(5));
     /// ```
     #[cfg(all(feature = "utils", feature = "client"))]
-    pub fn create_invite<F>(&self, context: &Context, f: F) -> Result<RichInvite>
+    pub fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
         where F: FnOnce(&mut CreateInvite) -> &mut CreateInvite {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::CREATE_INVITE;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::CREATE_INVITE;
 
-            if !utils::user_has_perms(&context.cache, self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(&cache, self.id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
@@ -148,7 +150,7 @@ impl GuildChannel {
 
         let map = serenity_utils::hashmap_to_json_map(invite.0);
 
-        context.http.create_invite(self.id.0, &map)
+        cache_http.http().create_invite(self.id.0, &map)
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -272,18 +274,20 @@ impl GuildChannel {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
-    #[cfg(feature = "client")]
-    pub fn delete(&self, context: &Context) -> Result<Channel> {
+    #[cfg(feature = "http")]
+    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_CHANNELS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(&context.cache, self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(&cache, self.id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.delete(&context.http)
+        self.id.delete(&cache_http.http())
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -352,14 +356,16 @@ impl GuildChannel {
     /// channel.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "utils", feature = "client", feature = "builder"))]
-    pub fn edit<F>(&mut self, context: &Context, f: F) -> Result<()>
+    pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
         where F: FnOnce(&mut EditChannel) -> &mut EditChannel {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::MANAGE_CHANNELS;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_CHANNELS;
 
-            if !utils::user_has_perms(&context.cache, self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(&cache, self.id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
@@ -371,7 +377,7 @@ impl GuildChannel {
         f(&mut edit_channel);
         let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        match context.http.edit_channel(self.id.0, &edited) {
+        match cache_http.http().edit_channel(self.id.0, &edited) {
             Ok(channel) => {
                 std::mem::replace(self, channel);
 
@@ -668,18 +674,20 @@ impl GuildChannel {
     /// [`Message`]: struct.Message.html
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "client")]
-    pub fn send_message<'a, F>(&self, context: &Context, f: F) -> Result<Message>
+    pub fn send_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         #[cfg(feature = "cache")]
         {
-            let req = Permissions::SEND_MESSAGES;
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::SEND_MESSAGES;
 
-            if !utils::user_has_perms(&context.cache, self.id, req)? {
-                return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !utils::user_has_perms(&cache, self.id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
             }
         }
 
-        self.id.send_message(&context.http, f)
+        self.id.send_message(&cache_http.http(), f)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

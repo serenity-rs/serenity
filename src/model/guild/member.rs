@@ -1,3 +1,5 @@
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 use crate::{model::prelude::*};
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{
@@ -7,8 +9,6 @@ use std::fmt::{
 };
 use super::deserialize_sync_user;
 
-#[cfg(feature = "client")]
-use crate::client::Context;
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use crate::builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -321,25 +321,27 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    #[cfg(feature = "client")]
-    pub fn kick(&self, context: &Context) -> Result<()> {
+    #[cfg(feature = "http")]
+    pub fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            let locked_cache = context.cache.read();
+            if let Some(cache) = cache_http.cache() {
+                let locked_cache = cache.read();
 
-            if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
-                let req = Permissions::KICK_MEMBERS;
-                let reader = guild.read();
+                if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
+                    let req = Permissions::KICK_MEMBERS;
+                    let reader = guild.read();
 
-                if !reader.has_perms(&context.cache, req) {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    if !reader.has_perms(cache, req) {
+                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                    }
+
+                    reader.check_hierarchy(cache, self.user.read().id)?;
                 }
-
-                reader.check_hierarchy(&context.cache, self.user.read().id)?;
             }
         }
 
-        self.guild_id.kick(&context.http, self.user.read().id)
+        self.guild_id.kick(cache_http.http(), self.user.read().id)
     }
 
     /// Returns the guild-level permissions for the member.
