@@ -73,6 +73,14 @@ pub trait CacheHttp {
 }
 
 #[cfg(feature = "client")]
+impl CacheHttp for Context {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
 impl CacheHttp for &Context {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
@@ -82,6 +90,14 @@ impl CacheHttp for &Context {
 
 #[cfg(feature = "client")]
 impl CacheHttp for &mut Context {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for &&mut Context {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
