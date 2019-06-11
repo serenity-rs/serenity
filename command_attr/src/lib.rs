@@ -659,7 +659,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
-    let n = fun.name.with_suffix(HELP);
+    let n = fun.name.to_uppercase();
     let nn = fun.name.clone();
 
     let cfgs = fun.cfgs.clone();

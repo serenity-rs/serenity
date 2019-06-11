@@ -240,7 +240,7 @@ fn main() {
                 let _ = msg.channel_id.say(&ctx.http, &format!("Try this again in {} seconds.", seconds));
             }
         })
-        .help(&MY_HELP_HELP_COMMAND)
+        .help(&MY_HELP)
         // Can't be used more than once per 5 seconds:
         .bucket("emoji", |b| b.delay(5))
         // Can't be used more than 2 times per 30 seconds, with a 5 second delay:

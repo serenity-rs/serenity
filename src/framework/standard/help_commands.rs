@@ -1134,7 +1134,7 @@ fn send_error_embed(
 /// }
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(&MY_HELP_HELP_COMMAND));
+///     .help(&MY_HELP));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
@@ -1303,7 +1303,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 /// }
 ///
 /// client.with_framework(StandardFramework::new()
-///     .help(&MY_HELP_HELP_COMMAND));
+///     .help(&MY_HELP));
 /// ```
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]

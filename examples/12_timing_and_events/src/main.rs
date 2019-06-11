@@ -165,7 +165,7 @@ fn main() {
             println!("Error in {}: {:?}", cmd_name, why);
         }
     })
-        .help(&MY_HELP_HELP_COMMAND)
+        .help(&MY_HELP)
         .group(&REMIND_ME_GROUP)
     );
 
