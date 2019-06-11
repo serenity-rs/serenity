@@ -210,9 +210,6 @@ impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
                 }
             }
 
-            // It appears they don't. Fall back to using this group.
-            self.check_discrepancy(&group.options)?;
-
             return Ok((None, group));
         }
 
@@ -262,6 +259,18 @@ impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
                 };
 
                 if let Some(command) = command {
+                    if group.options.prefixes.is_empty() {
+                        // Might seem a little late to do at this point of time, like it would
+                        // have been better to test against any discrepancies of this group
+                        // in the `group` method then continue said test in the `command` method,
+                        // but we can't accurately perform that on a group with no prefixes.
+                        // I.e. Does the message contain this group? Well, maybe God knows, but we
+                        // certainly don't and cannot if we don't have any sort of text to verify with.
+                        if let Err(err) = self.check_discrepancy(&group.options) {
+                            return Err(Err(err));
+                        }
+                    }
+
                     return Ok(Invoke::Command {
                         prefix,
                         group,
