@@ -1035,6 +1035,16 @@ fn send_single_command_embed(
                 embed.field(&help_options.usage_label, full_usage_text, true);
             }
 
+            if let Some(ref example) = command.usage_sample {
+                let full_example_text = if let Some(first_prefix) = command.group_prefixes.get(0) {
+                    format!("`{} {} {}`", first_prefix, command.name, example)
+                } else {
+                    format!("`{} {}`", command.name, example)
+                };
+
+                embed.field(&help_options.usage_sample_label, full_example_text, true);
+            }
+
             embed.field(&help_options.grouped_label, command.group_name, true);
 
             if !command.aliases.is_empty() {
@@ -1253,6 +1263,22 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                 result,
                 "**{}**: `{} {}`",
                 help_options.usage_label, command.name, usage
+            );
+        }
+    }
+
+    if let Some(ref example) = command.usage_sample {
+        if let Some(first_prefix) = command.group_prefixes.get(0) {
+            let _ = writeln!(
+                result,
+                "**{}**: `{} {} {}`",
+                help_options.usage_label, first_prefix, command.name, example
+            );
+        } else {
+            let _ = writeln!(
+                result,
+                "**{}**: `{} {}`",
+                help_options.usage_label, command.name, example
             );
         }
     }
