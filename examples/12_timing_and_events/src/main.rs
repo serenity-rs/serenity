@@ -3,7 +3,7 @@
 //! We will create a remind-me command that will send a message after a
 //! a demanded amount of time. Once the message has been sent, the user can
 //! react to it, triggering an event to send another message.
-use std::{collections::HashSet, env, hash::{BuildHasher, Hash, Hasher},
+use std::{collections::HashSet, env, hash::{Hash, Hasher},
     sync::Arc,
 };
 use serenity::{
@@ -105,7 +105,7 @@ fn my_help(
     args: Args,
     help_options: &'static HelpOptions,
     groups: &[&'static CommandGroup],
-    owners: HashSet<UserId, impl BuildHasher>
+    owners: HashSet<UserId>
 ) -> CommandResult {
     help_commands::with_embeds(context, msg, args, &help_options, groups, owners)
 }
