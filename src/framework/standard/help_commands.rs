@@ -282,6 +282,8 @@ fn find_any_command_matches(
     group: &CommandGroup,
     name: &mut String,
 ) -> Option<&'static str> {
+    let mut found_prefix = false;
+
     command
         .options
         .names
@@ -292,11 +294,18 @@ fn find_any_command_matches(
                 .prefixes
                 .iter()
                 .any(|prefix| {
-                    if starts_with_whole_word(&name, &prefix) {
-                        name.drain(..=prefix.len());
-                    }
+                    if found_prefix || starts_with_whole_word(&name, &prefix) {
+                        
+                        if !found_prefix {
+                            name.drain(..=prefix.len());
+                        }
 
-                    n == &name
+                        found_prefix = true;
+
+                        n == &name
+                    } else {
+                        false
+                    }
                 })
         }).cloned()
 }
