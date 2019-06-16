@@ -43,7 +43,7 @@ pub use super::routing::Route;
 use chrono::{DateTime, Utc};
 use reqwest::{
     Response,
-    header::HeaderMap as Headers,
+    header::HeaderMap,
     StatusCode,
 };
 use crate::internal::prelude::*;
@@ -291,14 +291,108 @@ fn calculate_offset(header: &Option<&[u8]>) {
 
 }
 
-fn parse_header(headers: &Headers, header: &str) -> Result<Option<i64>> {
-    headers.get(header).map_or(Ok(None), |header| {
-        str::from_utf8(&header.as_bytes())
-            .map_err(|_| Error::from(HttpError::RateLimitUtf8))
-            .and_then(|v| {
-                v.parse::<i64>()
-                    .map(Some)
-                    .map_err(|_| Error::from(HttpError::RateLimitI64))
-            })
-    })
+fn parse_header(headers: &HeaderMap, header: &str) -> Result<Option<i64>> {
+    let header = match headers.get(header) {
+        Some(v) => v,
+        None => return Ok(None),
+    };
+
+    let unicode = str::from_utf8(&header.as_bytes()).map_err(|_| {
+        Error::from(HttpError::RateLimitUtf8)
+    })?;
+
+    let num = unicode.parse().map_err(|_| {
+        Error::from(HttpError::RateLimitI64)
+    })?;
+
+    Ok(Some(num))
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::{
+        error::Error,
+        http::HttpError,
+    };
+    use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
+    use std::{
+        error::Error as StdError,
+        result::Result as StdResult,
+    };
+    use super::parse_header;
+
+    type Result<T> = StdResult<T, Box<dyn StdError>>;
+
+    fn headers() -> HeaderMap {
+        let pairs = &[
+            (
+                HeaderName::from_static("x-ratelimit-limit"),
+                HeaderValue::from_static("5"),
+            ),
+            (
+                HeaderName::from_static("x-ratelimit-remaining"),
+                HeaderValue::from_static("4"),
+            ),
+            (
+                HeaderName::from_static("x-ratelimit-reset"),
+                HeaderValue::from_static("1560704880"),
+            ),
+            (
+                HeaderName::from_static("x-bad-num"),
+                HeaderValue::from_static("abc"),
+            ),
+            (
+                HeaderName::from_static("x-bad-unicode"),
+                HeaderValue::from_bytes(&[255, 255, 255, 255]).unwrap(),
+            ),
+        ];
+
+        let mut map = HeaderMap::with_capacity(pairs.len());
+
+        for (name, val) in pairs.into_iter() {
+            map.insert(name, val.to_owned());
+        }
+
+        map
+    }
+
+    #[test]
+    fn test_parse_header_good() -> Result<()> {
+        let headers = headers();
+
+        assert_eq!(parse_header(&headers, "x-ratelimit-limit")?.unwrap(), 5);
+        assert_eq!(
+            parse_header(&headers, "x-ratelimit-remaining")?.unwrap(),
+            4,
+        );
+        assert_eq!(
+            parse_header(&headers, "x-ratelimit-reset")?.unwrap(),
+            1_560_704_880,
+        );
+
+        Ok(())
+    }
+
+    #[test]
+    fn test_parse_header_errors() -> Result<()> {
+        let headers = headers();
+
+        match parse_header(&headers, "x-bad-num").unwrap_err() {
+            Error::Http(x) => match *x {
+                HttpError::RateLimitI64 => assert!(true),
+                _ => assert!(false),
+            },
+            _ => assert!(false),
+        }
+
+        match parse_header(&headers, "x-bad-unicode").unwrap_err() {
+            Error::Http(http_err) => match *http_err {
+                HttpError::RateLimitUtf8 => assert!(true),
+                _ => assert!(false),
+            },
+            _ => assert!(false),
+        }
+
+        Ok(())
+    }
 }
