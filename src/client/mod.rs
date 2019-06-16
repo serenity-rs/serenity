@@ -34,10 +34,6 @@ pub use self::{
 #[cfg(any(feature = "cache", feature = "http"))]
 pub use crate::CacheAndHttp;
 
-// Note: the following re-exports are here for backwards compatibility
-pub use crate::gateway;
-pub use crate::http as rest;
-
 #[cfg(feature = "cache")]
 pub use crate::cache::{Cache, CacheRwLock};
 
