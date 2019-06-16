@@ -46,7 +46,7 @@ use std::collections::HashMap;
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
 /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../http/raw/struct.Http.html#method.execute_webhook
+/// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook
 #[derive(Clone, Debug)]
 pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
 

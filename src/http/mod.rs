@@ -23,16 +23,16 @@
 //! [`Client`]: ../client/struct.Client.html
 //! [model]: ../model/index.html
 
+pub mod client;
 pub mod ratelimiting;
-pub mod raw;
 pub mod request;
 pub mod routing;
 
 mod error;
 
 pub use reqwest::StatusCode;
+pub use self::client::*;
 pub use self::error::Error as HttpError;
-pub use self::raw::*;
 
 use reqwest::{
     Method,
