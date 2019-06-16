@@ -28,7 +28,7 @@ use std::{
 };
 
 pub struct Http {
-    client: Client,
+    client: Arc<Client>,
     pub token: String,
     pub limiter: Arc<Mutex<()>>,
     /// The routes mutex is a HashMap of each [`Route`] and their respective
@@ -58,7 +58,7 @@ pub struct Http {
 }
 
 impl Http {
-    pub fn new(client: Client, token: &str) -> Self {
+    pub fn new(client: Arc<Client>, token: &str) -> Self {
         Http {
             client,
             token: token.to_string(),
@@ -70,13 +70,13 @@ impl Http {
     pub fn new_with_token(token: &str) -> Self {
         Http {
             #[cfg(not(feature = "native_tls_backend"))]
-            client: Client::builder()
+            client: Arc::new(Client::builder()
                 .use_rustls_tls()
-                .build().expect("Cannot build Reqwest::Client."),
+                .build().expect("Cannot build Reqwest::Client.")),
             #[cfg(feature = "native_tls_backend")]
-            client: Client::builder()
+            client: Arc::new(Client::builder()
                 .use_default_tls()
-                .build().expect("Cannot build Reqwest::Client."),
+                .build().expect("Cannot build Reqwest::Client.")),
             token: token.to_string(),
             limiter: Arc::new(Mutex::new(())),
             routes: Arc::new(Mutex::new(HashMap::default())),
@@ -1780,8 +1780,9 @@ impl AsRef<Http> for Http {
 
 impl Default for Http {
     fn default() -> Self {
+        let client = Client::builder().build().expect("Cannot build Reqwest::Client.");
         Self {
-            client: Client::builder().build().expect("Cannot build Reqwest::Client."),
+            client: Arc::new(client),
             token: "".to_string(),
             limiter: Arc::new(Mutex::new(())),
             routes: Arc::new(Mutex::new(HashMap::default())),
