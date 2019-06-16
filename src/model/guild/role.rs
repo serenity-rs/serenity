@@ -15,7 +15,7 @@ use crate::model::misc::RoleParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
 #[cfg(all(feature = "cache", feature = "http"))]
-use crate::http::raw::Http;
+use crate::http::client::Http;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
