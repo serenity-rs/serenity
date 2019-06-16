@@ -63,7 +63,7 @@ use crate::client::Context;
 /// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
 ///
 /// [`CacheRwLock`]: ../cache/struct.CacheRwLock.html
-/// [`Http`]: raw/struct.Http.html
+/// [`Http`]: client/struct.Http.html
 /// [`Context`]: ../client/struct.Context.html
 pub trait CacheHttp {
     #[cfg(feature = "http")]
