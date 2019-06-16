@@ -358,7 +358,7 @@ impl Client {
             format!("Bot {}", token)
         };
 
-        let http = Http::new(reqwest::Client::builder().build()?, &token);
+        let http = Http::new_with_token(&token);
 
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
@@ -462,7 +462,7 @@ impl Client {
             format!("Bot {}", token)
         };
 
-        let http = Http::new(reqwest::Client::builder().build()?, &token);
+        let http = Http::new_with_token(&token);
 
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
