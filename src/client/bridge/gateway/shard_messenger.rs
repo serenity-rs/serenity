@@ -51,7 +51,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -78,7 +78,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -128,7 +128,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -162,7 +162,7 @@ impl ShardMessenger {
     ///
     /// ```rust,ignore
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -202,7 +202,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
