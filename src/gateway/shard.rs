@@ -269,7 +269,7 @@ impl Shard {
     /// ```rust,no_run
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// # use serenity::{client::gateway::Shard, prelude::Mutex};
+    /// # use serenity::{gateway::Shard, prelude::Mutex};
     /// # use std::sync::Arc;
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
@@ -319,7 +319,7 @@ impl Shard {
     /// ```rust,no_run
     /// # #[cfg(feature = "model")]
     /// # fn main() {
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use serenity::prelude::Mutex;
     /// # use std::sync::Arc;
     /// #
@@ -680,7 +680,7 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -707,7 +707,7 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use parking_lot::Mutex;
-    /// # use serenity::client::gateway::Shard;
+    /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
