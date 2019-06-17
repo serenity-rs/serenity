@@ -162,7 +162,7 @@ pub(super) fn perform(http: &Http, req: Request<'_>) -> Result<Response> {
 /// **Note**: You should _not_ mutate any of the fields, as this can help cause
 /// 429s.
 ///
-/// [`Http`]: ../raw/struct.Http.html#structfield.routes
+/// [`Http`]: ../client/struct.Http.html#structfield.routes
 /// [`Route`]: ../routing/enum.Route.html
 /// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
 #[derive(Clone, Debug, Default)]
