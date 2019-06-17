@@ -19,7 +19,7 @@ use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "http"))]
-use crate::http::raw::Http;
+use crate::http::client::Http;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
