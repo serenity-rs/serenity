@@ -1,4 +1,4 @@
-//! This example will showcase one way on how to extend Serentiy with a
+//! This example will showcase one way on how to extend Serenity with a
 //! time-scheduler and an event-trigger-system.
 //! We will create a remind-me command that will send a message after a
 //! a demanded amount of time. Once the message has been sent, the user can
