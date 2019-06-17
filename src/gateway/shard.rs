@@ -140,7 +140,10 @@ impl Shard {
     ) -> Result<Shard> {
         let mut client = connect(&*ws_url.lock())?;
 
+        // Configure timeout and buffer sizes. See the respective
+        // methods for the reasoning behind changing the defaults.
         let _ = set_client_timeout(&mut client);
+        set_client_buffer_sizes(&mut client);
 
         let current_presence = (None, OnlineStatus::Online);
         let heartbeat_instants = (None, None);
@@ -856,6 +859,22 @@ fn set_client_timeout(client: &mut WsClient) -> Result<()> {
     stream.set_write_timeout(Some(StdDuration::from_secs(50)))?;
 
     Ok(())
+}
+
+fn set_client_buffer_sizes(client: &mut WsClient) {
+    // Despite chunking members inside larger guilds, Discord will
+    // still send us the online state of all members at the same time
+    // in a single frame. By default, tungstenite only allows frames
+    // with a maximum of 16mb at a time. Larger guilds can easily surpass
+    // this limit.
+    //
+    // Since we know all traffic is coming from a trusted source (Discord),
+    // we can remove the buffer limit entirely. This eliminates the issue
+    // where we have to keep upping buffer sizes because of growing guilds.
+    client.set_config(|c| {
+        c.max_frame_size = None;
+        c.max_message_size = None;
+    })
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {
