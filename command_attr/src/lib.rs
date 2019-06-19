@@ -250,7 +250,12 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         return err.to_compile_error().into();
     }
 
-    if let Err(err) = validate_return_type(&mut fun, parse_quote!(CommandResult)) {
+    let either = [
+        parse_quote!(CommandResult),
+        parse_quote!(serenity::framework::standard::CommandResult),
+    ];
+
+    if let Err(err) = validate_return_type(&mut fun, either) {
         return err.to_compile_error().into();
     }
 
@@ -653,7 +658,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         return err.to_compile_error().into();
     }
 
-    if let Err(err) = validate_return_type(&mut fun, parse_quote!(CommandResult)) {
+    let either = [
+        parse_quote!(CommandResult),
+        parse_quote!(serenity::framework::standard::CommandResult),
+    ];
+
+    if let Err(err) = validate_return_type(&mut fun, either) {
         return err.to_compile_error().into();
     }
 
@@ -733,24 +743,33 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// ```rust,no_run
 /// use command_attr::{command, group};
 ///
+/// # type CommandResult = ();
+///
 /// #[command]
-/// fn bar() {
+/// fn bar() -> CommandResult {
 ///     println!("baz");
+///
+///     Ok(())
+/// }
+///
+/// #[command]
+/// fn answer_to_life() -> CommandResult {
+///     println!("42");
+///
+///     Ok(())
 /// }
 ///
 /// group!({
 ///     name: "baz",
 ///     options: {
-///         prefixes: ["baz"] // Any sub-group **must** have a prefix.
+///         // All sub-groups must own at least one prefix.
+///         prefix: "baz",
 ///     },
-///     commands: [],
+///     commands: [answer_to_life],
 /// });
 ///
 /// group!({
 ///     name: "foo",
-///     options: {
-///         prefixes: ["foo"],
-///     },
 ///     commands: [bar],
 ///     sub_groups: [baz],
 /// });
@@ -888,7 +907,12 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
         return err.to_compile_error().into();
     }
 
-    if let Err(err) = validate_return_type(&mut fun, parse_quote!(CheckResult)) {
+    let either = [
+        parse_quote!(CheckResult),
+        parse_quote!(serenity::framework::standard::CheckResult),
+    ];
+
+    if let Err(err) = validate_return_type(&mut fun, either) {
         return err.to_compile_error().into();
     }
 

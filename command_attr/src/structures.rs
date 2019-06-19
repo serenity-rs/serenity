@@ -1,17 +1,17 @@
 use crate::consts::{CHECK, COMMAND, GROUP, GROUP_OPTIONS};
 use crate::util::{
-    Argument, Array, AsOption, Braced, Bracketed, BracketedIdents, Expr, Field, IdentAccess,
+    Argument, Array, AsOption, Braced, Bracketed, BracketedIdents, Parenthesised, Expr, Field, IdentAccess,
     IdentExt2, LitExt, Object, RefOrInstance,
 };
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
-    braced, parenthesized,
+    braced,
     parse::{Error, Parse, ParseStream, Result},
     punctuated::Punctuated,
     spanned::Spanned,
     token::Pub,
-    ArgCaptured, Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token,
+    ArgCaptured, Attribute, Block, FnArg, Ident, Lit, Pat, Type, ReturnType, Stmt, Token,
 };
 
 #[derive(Debug, PartialEq)]
@@ -50,7 +50,7 @@ pub struct CommandFun {
     pub attributes: Vec<Attribute>,
     pub name: Ident,
     pub args: Vec<Argument>,
-    pub ret: ReturnType,
+    pub ret: Type,
     pub body: Vec<Stmt>,
 }
 
@@ -75,15 +75,15 @@ impl Parse for CommandFun {
         input.parse::<Token![fn]>()?;
         let name = input.parse()?;
 
-        // (....)
-        let pcont;
-        parenthesized!(pcont in input);
-        let args: Punctuated<FnArg, Token![,]> = pcont.parse_terminated(FnArg::parse)?;
+        // (...)
+        let Parenthesised(args) = input.parse::<Parenthesised<FnArg>>()?;
 
-        let ret = if input.peek(Token![->]) {
-            input.parse()?
-        } else {
-            return Err(Error::new(input.cursor().span(), "expected a return type"));
+        let ret = match input.parse::<ReturnType>()? {
+            ReturnType::Type(_, t) => (*t).clone(),
+            ReturnType::Default => {
+                return Err(input
+                    .error("expected a result type of either `CommandResult` or `CheckResult`"))
+            }
         };
 
         // { ... }
@@ -166,7 +166,7 @@ impl ToTokens for CommandFun {
         stream.extend(quote! {
             #(#cfgs)*
             #(#docs)*
-            #_pub fn #name (#(#args),*) #ret {
+            #_pub fn #name (#(#args),*) -> #ret {
                 #(#body)*
             }
         });
