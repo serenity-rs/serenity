@@ -3,14 +3,14 @@ use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
-    braced, bracketed,
+    braced, bracketed, parenthesized,
     ext::IdentExt,
     parse::{Error, Parse, ParseBuffer, ParseStream, Result},
     parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
     token::{Brace, Bracket, Comma, Mut},
-    Ident, Lit, ReturnType, Token, Type,
+    Ident, Lit, Token, Type,
 };
 
 pub trait LitExt {
@@ -119,6 +119,18 @@ impl<T: Parse> Parse for Braced<T> {
         braced!(content in input);
 
         Ok(Braced(content.parse_terminated(T::parse)?))
+    }
+}
+
+#[derive(Debug)]
+pub struct Parenthesised<T>(pub Punctuated<T, Comma>);
+
+impl<T: Parse> Parse for Parenthesised<T> {
+    fn parse(input: ParseStream) -> Result<Self> {
+        let content;
+        parenthesized!(content in input);
+
+        Ok(Parenthesised(content.parse_terminated(T::parse)?))
     }
 }
 
@@ -373,22 +385,20 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
     Ok(())
 }
 
-pub fn validate_return_type(fun: &mut CommandFun, want: Type) -> Result<()> {
-    let span = fun.ret.span();
-    let kind = match fun.ret {
-        ReturnType::Type(_, ref kind) => kind,
-        _ => unreachable!(),
-    };
+pub fn validate_return_type(fun: &mut CommandFun, [relative, absolute]: [Type; 2]) -> Result<()> {
+    let ret = &fun.ret;
 
-    if &**kind != &want {
-        return Err(Error::new(
-            span,
-            &format!(
-                "expected a result as a return type, but got `{}`",
-                quote!(#kind)
-            ),
-        ));
+    if *ret == relative || *ret == absolute {
+        return Ok(());
     }
 
-    Ok(())
+    Err(Error::new(
+        ret.span(),
+        &format!(
+            "expected either `{}` or `{}` as the return type, but got `{}`",
+            quote!(#relative),
+            quote!(#absolute),
+            quote!(#ret),
+        ),
+    ))
 }
