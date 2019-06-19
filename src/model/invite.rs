@@ -54,6 +54,8 @@ pub struct Invite {
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Group`]: ../channel/struct.Group.html
     pub guild: Option<InviteGuild>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -149,28 +151,34 @@ impl Invite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
+    /// # extern crate serde_json;
+    /// # extern crate serenity;
+    /// #
+    /// # use serde_json::json;
     /// # use serenity::model::prelude::*;
     /// #
-    /// # let invite = Invite {
-    /// #     approximate_member_count: Some(1812),
-    /// #     approximate_presence_count: Some(717),
-    /// #     code: "WxZumR".to_string(),
-    /// #     channel: InviteChannel {
-    /// #         id: ChannelId(1),
-    /// #         name: "foo".to_string(),
-    /// #         kind: ChannelType::Text,
+    /// # fn main() {
+    /// # let invite = serde_json::from_value::<Invite>(json!({
+    /// #     "approximate_member_count": Some(1812),
+    /// #     "approximate_presence_count": Some(717),
+    /// #     "code": "WxZumR",
+    /// #     "channel": {
+    /// #         "id": ChannelId(1),
+    /// #         "name": "foo",
+    /// #         "type": ChannelType::Text,
     /// #     },
-    /// #     guild: Some(InviteGuild {
-    /// #         id: GuildId(2),
-    /// #         icon: None,
-    /// #         name: "bar".to_string(),
-    /// #         splash_hash: None,
-    /// #         text_channel_count: Some(7),
-    /// #         voice_channel_count: Some(3),
-    /// #     }),
-    /// # };
+    /// #     "guild": {
+    /// #         "id": GuildId(2),
+    /// #         "icon": None::<String>,
+    /// #         "name": "bar",
+    /// #         "splash_hash": None::<String>,
+    /// #         "text_channel_count": 7,
+    /// #         "voice_channel_count": 3,
+    /// #     },
+    /// # })).unwrap();
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
+    /// # }
     /// ```
     pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
 }
@@ -181,6 +189,8 @@ pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
     #[serde(rename = "type")] pub kind: ChannelType,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// A minimal amount of information about the guild an invite points to.
@@ -192,6 +202,8 @@ pub struct InviteGuild {
     pub splash_hash: Option<String>,
     pub text_channel_count: Option<u64>,
     pub voice_channel_count: Option<u64>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -280,6 +292,8 @@ pub struct RichInvite {
     pub temporary: bool,
     /// The amount of times that an invite has been used.
     pub uses: u64,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -324,38 +338,44 @@ impl RichInvite {
     /// Retrieve the URL for an invite with the code `WxZumR`:
     ///
     /// ```rust
+    /// # extern crate serde_json;
+    /// # extern crate serenity;
+    /// #
+    /// # use serde_json::json;
     /// # use serenity::model::prelude::*;
     /// #
-    /// # let invite = RichInvite {
-    /// #     code: "WxZumR".to_string(),
-    /// #     channel: InviteChannel {
-    /// #         id: ChannelId(1),
-    /// #         name: "foo".to_string(),
-    /// #         kind: ChannelType::Text,
+    /// # fn main() {
+    /// # let invite = serde_json::from_value::<RichInvite>(json!({
+    /// #     "code": "WxZumR",
+    /// #     "channel": {
+    /// #         "id": ChannelId(1),
+    /// #         "name": "foo",
+    /// #         "type": ChannelType::Text,
     /// #     },
-    /// #     created_at: "2017-01-29T15:35:17.136000+00:00".parse().unwrap(),
-    /// #     guild: Some(InviteGuild {
-    /// #         id: GuildId(2),
-    /// #         icon: None,
-    /// #         name: "baz".to_string(),
-    /// #         splash_hash: None,
-    /// #         text_channel_count: None,
-    /// #         voice_channel_count: None,
-    /// #     }),
-    /// #     inviter: User {
-    /// #         avatar: None,
-    /// #         bot: false,
-    /// #         discriminator: 3,
-    /// #         id: UserId(4),
-    /// #         name: "qux".to_string(),
+    /// #     "created_at": "2017-01-29T15:35:17.136000+00:00",
+    /// #     "guild": {
+    /// #         "id": GuildId(2),
+    /// #         "icon": None::<String>,
+    /// #         "name": "baz",
+    /// #         "splash_hash": None::<String>,
+    /// #         "text_channel_count": None::<u64>,
+    /// #         "voice_channel_count": None::<u64>,
     /// #     },
-    /// #     max_age: 5,
-    /// #     max_uses: 6,
-    /// #     temporary: true,
-    /// #     uses: 7,
-    /// # };
+    /// #     "inviter": {
+    /// #         "avatar": None::<String>,
+    /// #         "bot": false,
+    /// #         "discriminator": 3,
+    /// #         "id": UserId(4),
+    /// #         "username": "qux",
+    /// #     },
+    /// #     "max_age": 5,
+    /// #     "max_uses": 6,
+    /// #     "temporary": true,
+    /// #     "uses": 7,
+    /// # })).unwrap();
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
+    /// # }
     /// ```
     pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
 }

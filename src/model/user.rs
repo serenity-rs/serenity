@@ -46,6 +46,8 @@ pub struct CurrentUser {
     pub mfa_enabled: bool,
     #[serde(rename = "username")] pub name: String,
     pub verified: bool,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -434,6 +436,8 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 use std::hash::{Hash, Hasher};
@@ -858,6 +862,7 @@ impl From<CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name,
+            _nonexhaustive: (),
         }
     }
 }
@@ -870,6 +875,7 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
+            _nonexhaustive: (),
         }
     }
 }
@@ -954,6 +960,7 @@ mod test {
                 bot: true,
                 discriminator: 1432,
                 name: "test".to_string(),
+                _nonexhaustive: (),
             }
         }
 

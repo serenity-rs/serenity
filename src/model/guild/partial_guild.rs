@@ -42,6 +42,8 @@ pub struct PartialGuild {
     pub premium_subscription_count: u64,
     pub banner: Option<String>,
     pub vanity_url_code: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

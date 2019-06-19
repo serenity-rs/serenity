@@ -25,6 +25,8 @@ pub struct BotGateway {
     pub shards: u64,
     /// The gateway to connect to.
     pub url: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Representation of an activity that a [`User`] is performing.
@@ -58,6 +60,8 @@ pub struct Activity {
     /// [`ActivityType::Streaming`]: enum.ActivityType.html#variant.Streaming
     /// [`kind`]: #structfield.kind
     pub url: Option<String>,
+    #[serde(skip_serializing)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -103,6 +107,7 @@ impl Activity {
             state: None,
             timestamps: None,
             url: None,
+            _nonexhaustive: (),
         }
     }
 
@@ -150,6 +155,7 @@ impl Activity {
             state: None,
             timestamps: None,
             url: Some(url.to_string()),
+            _nonexhaustive: (),
         }
     }
 
@@ -194,6 +200,7 @@ impl Activity {
             state: None,
             timestamps: None,
             url: None,
+            _nonexhaustive: (),
         }
     }
 }
@@ -261,6 +268,7 @@ impl<'de> Deserialize<'de> for Activity {
             state,
             timestamps,
             url,
+            _nonexhaustive: (),
         })
     }
 }
@@ -276,6 +284,8 @@ pub struct ActivityAssets {
     pub small_image: Option<String>,
     /// Text displayed when hovering over the small image of the activity.
     pub small_text: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 bitflags! {
@@ -304,6 +314,8 @@ pub struct ActivityParty {
     pub id: Option<String>,
     /// Used to show the party's current and maximum size.
     pub size: Option<[u64; 2]>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Secrets for an activity.
@@ -316,6 +328,8 @@ pub struct ActivitySecrets {
     pub match_: Option<String>,
     /// The secret for spectating an activity.
     pub spectate: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -364,6 +378,8 @@ impl Default for ActivityType {
 pub struct Gateway {
     /// The gateway to connect to.
     pub url: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Information detailing the current online status of a [`User`].
@@ -386,6 +402,7 @@ pub struct Presence {
     pub user_id: UserId,
     /// The associated user instance.
     pub user: Option<Arc<RwLock<User>>>,
+    pub(crate) _nonexhaustive: (),
 }
 
 impl<'de> Deserialize<'de> for Presence {
@@ -438,6 +455,7 @@ impl<'de> Deserialize<'de> for Presence {
             status,
             user,
             user_id,
+            _nonexhaustive: (),
         })
     }
 }
@@ -483,6 +501,8 @@ pub struct Ready {
     pub user: CurrentUser,
     #[serde(rename = "v")]
     pub version: u64,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Information describing how many gateway sessions you can initiate within a
@@ -496,10 +516,14 @@ pub struct SessionStartLimit {
     pub reset_after: u64,
     /// The total number of session starts within the ratelimit period allowed.
     pub total: u64,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 /// Timestamps of when a user started and/or is ending their activity.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ActivityTimestamps {
     pub end: Option<u64>,
     pub start: Option<u64>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }

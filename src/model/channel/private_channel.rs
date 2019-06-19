@@ -45,6 +45,8 @@ pub struct PrivateChannel {
             serialize_with = "serialize_single_recipient",
             rename = "recipients")]
     pub recipient: Arc<RwLock<User>>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
