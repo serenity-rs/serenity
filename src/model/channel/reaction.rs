@@ -39,6 +39,8 @@ pub struct Reaction {
     ///
     /// [`User`]: ../user/struct.User.html
     pub user_id: UserId,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

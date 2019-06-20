@@ -77,6 +77,8 @@ pub struct Member {
     #[serde(deserialize_with = "deserialize_sync_user",
             serialize_with = "serialize_sync_user")]
     pub user: Arc<RwLock<User>>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -512,4 +514,6 @@ pub struct PartialMember {
     pub mute: bool,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }

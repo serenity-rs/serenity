@@ -10,6 +10,10 @@ use super::Cache;
 /// Creating a custom struct implementation to update the cache with:
 ///
 /// ```rust
+/// extern crate serde_json;
+/// extern crate serenity;
+///
+/// use serde_json::json;
 /// use serenity::{
 ///     cache::{Cache, CacheUpdate},
 ///     model::{
@@ -61,13 +65,17 @@ use super::Cache;
 ///                 Some(old)
 ///             },
 ///             Entry::Vacant(entry) => {
-///                 entry.insert(Arc::new(RwLock::new(User {
-///                     id: self.user_id,
-///                     avatar: self.user_avatar.clone(),
-///                     bot: self.user_is_bot,
-///                     discriminator: self.user_discriminator,
-///                     name: self.user_name.clone(),
-///                 })));
+///                 // We can convert a `serde_json::Value` to a User for test
+///                 // purposes.
+///                 let user = serde_json::from_value::<User>(json!({
+///                     "id": self.user_id,
+///                     "avatar": self.user_avatar.clone(),
+///                     "bot": self.user_is_bot,
+///                     "discriminator": self.user_discriminator,
+///                     "username": self.user_name.clone(),
+///                 })).expect("Error making user");
+///
+///                 entry.insert(Arc::new(RwLock::new(user)));
 ///
 ///                 // There was no old copy, so return None.
 ///                 None
@@ -76,6 +84,7 @@ use super::Cache;
 ///     }
 /// }
 ///
+/// # fn main() {
 /// // Create an instance of the cache.
 /// let mut cache = Cache::new();
 ///
@@ -91,6 +100,7 @@ use super::Cache;
 ///
 /// // Update the cache with the message.
 /// cache.update(&mut update_message);
+/// # }
 /// ```
 ///
 /// [`Cache::update`]: struct.Cache.html#method.update

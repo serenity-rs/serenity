@@ -46,6 +46,8 @@ pub struct Emoji {
     ///
     /// [`Role`]: struct.Role.html
     pub roles: Vec<RoleId>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -64,20 +66,24 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
+    /// # extern crate serde_json;
+    /// # extern crate serenity;
+    /// #
+    /// # use serde_json::json;
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
-    /// # use serenity::model::prelude::{EmojiId, Emoji};
+    /// # use serenity::model::prelude::{EmojiId, Emoji, Role};
     /// #
     /// # #[command]
     /// # fn example(ctx: &mut Context) -> CommandResult {
-    /// #   let mut emoji = Emoji {
-    /// #       animated: false,
-    /// #       id: EmojiId(7),
-    /// #       name: String::from("blobface"),
-    /// #       managed: false,
-    /// #       require_colons: false,
-    /// #       roles: vec![],
-    /// #   };
+    /// #     let mut emoji = serde_json::from_value::<Emoji>(json!({
+    /// #         "animated": false,
+    /// #         "id": EmojiId(7),
+    /// #         "name": "blobface",
+    /// #         "managed": false,
+    /// #         "require_colons": false,
+    /// #         "roles": Vec::<Role>::new(),
+    /// #     })).unwrap();
     /// #
     /// // assuming emoji has been set already
     /// match emoji.delete(&ctx) {
@@ -86,6 +92,8 @@ impl Emoji {
     /// }
     /// #    Ok(())
     /// # }
+    /// #
+    /// # fn main() { }
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn delete<T>(&self, cache_and_http: T) -> Result<()>
@@ -136,25 +144,31 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::{guild::Emoji, id::EmojiId}};
+    /// # extern crate serde_json;
+    /// # extern crate serenity;
+    /// #
+    /// # use serde_json::json;
+    /// # use serenity::{cache::{Cache, CacheRwLock}, model::{guild::{Emoji, Role}, id::EmojiId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
+    /// # fn main() {
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #
-    /// # let mut emoji = Emoji {
-    /// #     animated: false,
-    /// #     id: EmojiId(7),
-    /// #     name: String::from("blobface"),
-    /// #     managed: false,
-    /// #     require_colons: false,
-    /// #     roles: vec![],
-    /// # };
+    /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
+    /// #     "animated": false,
+    /// #     "id": EmojiId(7),
+    /// #     "name": "blobface",
+    /// #     "managed": false,
+    /// #     "require_colons": false,
+    /// #     "roles": Vec::<Role>::new(),
+    /// # })).unwrap();
     /// #
     /// // assuming emoji has been set already
     /// if let Some(guild_id) = emoji.find_guild_id(&cache) {
     ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
+    /// # }
     /// ```
     #[cfg(feature = "cache")]
     pub fn find_guild_id(&self, cache: impl AsRef<CacheRwLock>) -> Option<GuildId> {
@@ -176,19 +190,25 @@ impl Emoji {
     /// Print the direct link to the given emoji:
     ///
     /// ```rust,no_run
-    /// # use serenity::model::{guild::Emoji, id::EmojiId};
+    /// # extern crate serde_json;
+    /// # extern crate serenity;
     /// #
-    /// # let mut emoji = Emoji {
-    /// #     animated: false,
-    /// #     id: EmojiId(7),
-    /// #     name: String::from("blobface"),
-    /// #     managed: false,
-    /// #     require_colons: false,
-    /// #     roles: vec![],
-    /// # };
+    /// # use serde_json::json;
+    /// # use serenity::model::{guild::{Emoji, Role}, id::EmojiId};
+    /// #
+    /// # fn main() {
+    /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
+    /// #     "animated": false,
+    /// #     "id": EmojiId(7),
+    /// #     "name": "blobface",
+    /// #     "managed": false,
+    /// #     "require_colons": false,
+    /// #     "roles": Vec::<Role>::new(),
+    /// # })).unwrap();
     /// #
     /// // assuming emoji has been set already
     /// println!("Direct link to emoji image: {}", emoji.url());
+    /// # }
     /// ```
     #[inline]
     pub fn url(&self) -> String {

@@ -26,20 +26,25 @@ macro_rules! colour {
 /// via [`g`]:
 ///
 /// ```rust
+/// # extern crate serde_json;
+/// # extern crate serenity;
+/// #
+/// # use serde_json::json;
 /// # use serenity::model::guild::Role;
 /// # use serenity::model::id::RoleId;
 /// # use serenity::model::permissions;
 /// #
-/// # let role = Role {
-/// #     colour: Colour::BLURPLE,
-/// #     hoist: false,
-/// #     id: RoleId(1),
-/// #     managed: false,
-/// #     mentionable: false,
-/// #     name: "test".to_string(),
-/// #     permissions: permissions::PRESET_GENERAL,
-/// #     position: 7,
-/// # };
+/// # fn main() {
+/// # let role = serde_json::from_value::<Role>(json!({
+/// #     "color": Colour::BLURPLE,
+/// #     "hoist": false,
+/// #     "id": RoleId(1),
+/// #     "managed": false,
+/// #     "mentionable": false,
+/// #     "name": "test",
+/// #     "permissions": permissions::PRESET_GENERAL,
+/// #     "position": 7,
+/// # })).unwrap();
 /// #
 /// use serenity::utils::Colour;
 ///
@@ -48,6 +53,7 @@ macro_rules! colour {
 /// let green = role.colour.g();
 ///
 /// println!("The green component is: {}", green);
+/// # }
 /// ```
 ///
 /// Creating an instance with the [`DARK_TEAL`] preset:

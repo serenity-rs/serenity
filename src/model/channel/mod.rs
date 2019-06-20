@@ -540,6 +540,7 @@ mod test {
                 name: None,
                 owner_id: UserId(2),
                 recipients: HashMap::new(),
+                _nonexhaustive: (),
             }
         }
 
@@ -559,6 +560,7 @@ mod test {
                 user_limit: None,
                 nsfw: false,
                 slow_mode_rate: Some(0),
+                _nonexhaustive: (),
             }
         }
 
@@ -574,7 +576,9 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "ab".to_string(),
+                    _nonexhaustive: (),
                 })),
+                _nonexhaustive: (),
             }
         }
 

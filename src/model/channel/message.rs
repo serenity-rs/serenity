@@ -83,6 +83,8 @@ pub struct Message {
     pub tts: bool,
     /// The Id of the webhook that sent this message, if one did.
     pub webhook_id: Option<WebhookId>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -649,6 +651,8 @@ pub struct MessageReaction {
     /// The type of reaction.
     #[serde(rename = "emoji")]
     pub reaction_type: ReactionType,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Differentiates between regular and different types of system messages.
