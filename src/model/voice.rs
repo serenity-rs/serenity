@@ -21,6 +21,8 @@ pub struct VoiceRegion {
     pub sample_port: u64,
     /// Indicator of whether the voice region is only for VIP guilds.
     pub vip: bool,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// A user's state within a voice channel.
@@ -35,4 +37,6 @@ pub struct VoiceState {
     pub suppress: bool,
     pub token: Option<String>,
     pub user_id: UserId,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }

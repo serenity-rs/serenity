@@ -53,6 +53,8 @@ pub struct Webhook {
     ///
     /// **Note**: This is not received when getting a webhook by its token.
     pub user: Option<User>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

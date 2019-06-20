@@ -37,6 +37,8 @@ pub struct ChannelCategory {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     pub permission_overwrites: Vec<PermissionOverwrite>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -135,6 +137,7 @@ impl ChannelCategory {
                 name,
                 position,
                 kind,
+                _nonexhaustive: (),
             };
         })
     }

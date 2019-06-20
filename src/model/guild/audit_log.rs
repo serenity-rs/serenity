@@ -230,6 +230,7 @@ pub struct AuditLogs {
     pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
     pub webhooks: Vec<Webhook>,
     pub users: Vec<User>,
+    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -257,6 +258,8 @@ pub struct AuditLogEntry {
     pub id: AuditLogEntryId,
     /// Some optional data assosiated with this entry.
     pub options: Option<Options>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
@@ -282,6 +285,8 @@ pub struct Options {
     /// Name of the role if type is "role"
     #[serde(default)]
     pub role_name: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 mod u64_handler {
@@ -457,6 +462,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
                         .collect(),
                     webhooks: webhooks.unwrap(),
                     users: users.unwrap(),
+                    _nonexhaustive: (),
                 })
             }
         }

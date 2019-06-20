@@ -20,17 +20,22 @@ use std::{
 /// value:
 ///
 /// ```rust,no_run
+/// # extern crate serde_json;
+/// # extern crate serenity;
+/// #
+/// # use serde_json::json;
 /// # use serenity::model::prelude::*;
 /// #
+/// # fn main() {
 /// # let user = UserId(1);
-/// # let emoji = Emoji {
-/// #     animated: false,
-/// #     id: EmojiId(2),
-/// #     name: "test".to_string(),
-/// #     managed: false,
-/// #     require_colons: true,
-/// #     roles: vec![],
-/// # };
+/// # let emoji = serde_json::from_value::<Emoji>(json!({
+/// #     "animated": false,
+/// #     "id": EmojiId(2),
+/// #     "name": "test",
+/// #     "managed": false,
+/// #     "require_colons": true,
+/// #     "roles": Vec::<Role>::new(),
+/// # })).unwrap();
 /// #
 /// use serenity::utils::MessageBuilder;
 ///
@@ -42,6 +47,7 @@ use std::{
 ///     .push("! ")
 ///     .mention(&emoji)
 ///     .build();
+/// # }
 /// ```
 ///
 /// [`build`]: #method.build
@@ -151,18 +157,26 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
+    /// # extern crate serde_json;
+    /// # extern crate serenity;
+    /// #
+    /// # use serde_json::json;
+    /// # use serenity::model::guild::Role;
+    /// #
+    /// # fn main() {
+    /// #
     /// use serenity::model::guild::Emoji;
     /// use serenity::model::id::EmojiId;
     /// use serenity::utils::MessageBuilder;
     ///
-    /// let emoji = Emoji {
-    ///     animated: false,
-    ///     id: EmojiId(302516740095606785),
-    ///     managed: true,
-    ///     name: "smugAnimeFace".to_string(),
-    ///     require_colons: true,
-    ///     roles: vec![],
-    /// };
+    /// # let emoji = serde_json::from_value::<Emoji>(json!({
+    /// #     "animated": false,
+    /// #     "id": EmojiId(302516740095606785),
+    /// #     "managed": true,
+    /// #     "name": "smugAnimeFace".to_string(),
+    /// #     "require_colons": true,
+    /// #     "roles": Vec::<Role>::new(),
+    /// # })).unwrap();
     ///
     /// let message = MessageBuilder::new()
     ///     .push("foo ")
@@ -171,6 +185,7 @@ impl MessageBuilder {
     ///     .build();
     ///
     /// assert_eq!(message, "foo <:smugAnimeFace:302516740095606785>.");
+    /// # }
     /// ```
     ///
     /// [Display implementation]: ../model/guild/struct.Emoji.html#method.fmt
@@ -1251,6 +1266,7 @@ mod test {
                 managed: false,
                 require_colons: true,
                 roles: vec![],
+                _nonexhaustive: (),
             })
             .build();
         let content_mentions = MessageBuilder::new()

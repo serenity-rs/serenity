@@ -42,6 +42,8 @@ pub struct Group {
     #[serde(deserialize_with = "deserialize_users",
             serialize_with = "serialize_users")]
     pub recipients: HashMap<UserId, Arc<RwLock<User>>>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

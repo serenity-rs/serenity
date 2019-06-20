@@ -46,6 +46,8 @@ pub struct ApplicationInfo {
     ///
     /// This is not equivalent to the application's bot user's token.
     pub secret: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Information about an application with an application's bot user.
@@ -72,6 +74,8 @@ pub struct BotApplication {
     /// **Note**: Keep this information private, as untrusted sources can use it
     /// to perform any action with a bot user.
     pub token: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Information about the current application and its owner.
@@ -85,4 +89,6 @@ pub struct CurrentApplicationInfo {
     #[serde(default)] pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }

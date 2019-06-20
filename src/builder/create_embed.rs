@@ -526,23 +526,27 @@ mod test {
                     inline: false,
                     name: "a".to_string(),
                     value: "b".to_string(),
+                    _nonexhaustive: (),
                 },
                 EmbedField {
                     inline: true,
                     name: "c".to_string(),
                     value: "z".to_string(),
+                    _nonexhaustive: (),
                 },
             ],
             footer: Some(EmbedFooter {
                 icon_url: Some("https://i.imgur.com/XfWpfCV.gif".to_string()),
                 proxy_icon_url: None,
                 text: "This is a hakase footer".to_string(),
+                _nonexhaustive: (),
             }),
             image: Some(EmbedImage {
                 height: 213,
                 proxy_url: "a".to_string(),
                 url: "https://i.imgur.com/XfWpfCV.gif".to_string(),
                 width: 224,
+                _nonexhaustive: (),
             }),
             kind: "rich".to_string(),
             provider: None,
@@ -554,7 +558,9 @@ mod test {
                 height: 213,
                 url: "https://i.imgur.com/XfWpfCV.mp4".to_string(),
                 width: 224,
+                _nonexhaustive: (),
             }),
+            _nonexhaustive: (),
         };
 
         let mut builder = CreateEmbed::from(embed);

@@ -160,6 +160,8 @@ pub struct Guild {
     pub banner: Option<String>,
     /// The vanity url code for the guild
     pub vanity_url_code: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -1809,6 +1811,7 @@ impl<'de> Deserialize<'de> for Guild {
             premium_subscription_count,
             banner,
             vanity_url_code,
+            _nonexhaustive: (),
         })
     }
 }
@@ -2167,6 +2170,7 @@ mod test {
                 bot: true,
                 discriminator: 1432,
                 name: "test".to_string(),
+                _nonexhaustive: (),
             }
         }
 
@@ -2185,6 +2189,7 @@ mod test {
                 nick: Some("aaaa".to_string()),
                 roles: vec1,
                 user: u,
+                _nonexhaustive: (),
             }
         }
 
@@ -2236,7 +2241,8 @@ mod test {
                 system_channel_id: Some(ChannelId(0)),
                 premium_subscription_count: 12,
                 banner: None,
-                vanity_url_code: Some("bruhmoment".to_string())
+                vanity_url_code: Some("bruhmoment".to_string()),
+                _nonexhaustive: (),
             }
         }
 

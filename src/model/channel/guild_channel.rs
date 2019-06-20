@@ -102,6 +102,8 @@ pub struct GuildChannel {
     /// channels.
     #[serde(default, rename = "rate_limit_per_user")]
     pub slow_mode_rate: Option<u64>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
