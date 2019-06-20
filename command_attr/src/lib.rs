@@ -100,6 +100,11 @@ macro_rules! match_options {
 ///
 /// `context` can be of "guilds" or "dms" (direct messages).
 ///
+/// - `#[bucket(name)]`/`#[bucket = name]`
+/// What bucket should impact this command.
+/// Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket)
+/// for its usage.
+/// 
 /// - `#[owners_only]`/`#[owners_only(bool)]`
 /// Whether this command is exclusive to owners.
 ///
