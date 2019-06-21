@@ -485,7 +485,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                 val.parse("embed_success_colour", values);
 
-                options.embed_error_colour = match Colour::from_str(&val) {
+                options.embed_success_colour = match Colour::from_str(&val) {
                     Some(c) => c,
                     None => {
                         return Error::new(span, &format!("invalid colour: {:?}", val))
