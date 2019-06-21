@@ -231,7 +231,7 @@ pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<
     deserializer.deserialize_any(U64Visitor)
 }
 
-/// Deserializes an u64, returning 0 if the deserialization failed
+/// Deserializes an u64, returning 0 if the deserialization failed.
 pub fn deserialize_u64_or_zero<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
     deserialize_u64(deserializer).or(Ok(0))
 }

@@ -39,7 +39,7 @@ pub struct PartialGuild {
     pub verification_level: VerificationLevel,
     pub description: Option<String>,
     pub premium_tier: PremiumTier,
-    // In some cases Discord returns `null` rather than 0
+    // In some cases Discord returns `null` rather than 0.
     #[serde(deserialize_with = "deserialize_u64_or_zero")]
     pub premium_subscription_count: u64,
     pub banner: Option<String>,
