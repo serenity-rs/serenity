@@ -1,7 +1,7 @@
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::{model::prelude::*};
-use super::super::utils::{deserialize_emojis, deserialize_roles};
+use super::super::utils::{deserialize_emojis, deserialize_roles, deserialize_u64_or_zero};
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
@@ -39,6 +39,8 @@ pub struct PartialGuild {
     pub verification_level: VerificationLevel,
     pub description: Option<String>,
     pub premium_tier: PremiumTier,
+    // In some cases Discord returns `null` rather than 0
+    #[serde(deserialize_with = "deserialize_u64_or_zero")]
     pub premium_subscription_count: u64,
     pub banner: Option<String>,
     pub vanity_url_code: Option<String>,
