@@ -3,6 +3,199 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.6.0] - 2019-6-21
+
+🎉 It has finally come for the biggest release of Serenity yet! 🎉 
+
+Thanks to the following for their contributions:
+
+- [@AregevDev]
+- [@acdenisSK]
+- [@andreasots]
+- [@Celti]
+- [@DarkKirb]
+- [@Erk-]
+- [@eatsfoobars]
+- [@Flat]
+- [@FelixMcFelix]
+- [@hyarsan]
+- [@icewind1991]
+- [@Kroisse]
+- [@Lakelezz]
+- [@Mishio595]
+- [@molenzwiebel]
+- [@mattico]
+- [@nycex]
+- [@PvdBerg1998]
+- [@Roughsketch]
+- [@xacrimon]
+- [@xSke]
+- [@zeyla]
+
+
+## Since rc-2.1:
+
+### Added
+- [framework/command_attr#docs] Add `#[bucket]` to the available attributes list. ([@acdenisSK]) [c:0daaac1]
+
+### Changed
+
+- [examples] Fix a typo of Serenity ([@Lakelezz]) [c:90b7829]
+- [gateway] Remove tungstenite buffer limits ([@molenzwiebel]) [c:638b642]
+- [framework/command_attr] Be more helpful when reporting errors on return types ([@acdenisSK]) [c:c8a8d4f]
+- [model] Make all structs non-exhaustive ([@zeyla]) [c:dddd417]
+- [http] No longer delay ratelimit sleeps by 500ms ([@acdenisSK]) [c:638bb1a]
+
+### Fixed
+
+- [framework/command_attr] Assign the new value to the correct colour ([@acdenisSK]) [c:d1addff]
+- [model] Fix panic on deserialising `PartialGuild` with no Nitro boosters. ([@xSke]) [c:5e77718]
+
+## rc-2
+
+### Added
+
+- [command_attr] Add some utility structs. ([@acdenisSK]) [c:9162929]
+- [command_attr] Add docs for `lacking_ownership`. ([@acdenisSK]) [c:15e7fde]
+- [example] Add new Example about Eventing and Timing. ([@Lakelezz]) [c:10b9cc2]
+- [example] Add example of embedding a local image in an embed. ([@Erk-]) [c:709c9e4]
+- [framework] Add back blocking guilds, channels, and users. ([@acdenisSK]) [c:33f8383]
+- [framework] Output the `#[example]` text in help ([@Flat]) [c:7aea26c]
+- [model] Add and use `AttachmentId`. ([@Lakelezz]) [c:c8a5f69]
+- [model] Add a `channel_id_from_name`-method on `Guild`. ([@xacrimon]) [c:aae22a2]
+- [model] Add `GuildChannel::members`. ([@Lakelezz]) [c:ddf7a3]
+- [model] Add more guild fields from guild boosting. ([@AregevDev]) [c:4541935] 
+- [utils] Add `EmbedMessageBuilding`-trait. ([@zeyla]) [c:7c61f95]
+
+### Fixed
+
+- [builder] Return `&mut self` on `voice_channel`. ([@Lakelezz]) [c:0e55b73]
+- [ci] Fix Azure Windows build. ([@Lakelezz]) [c:fc3a1f6]
+- [client] Fix updates giving only new data. ([@zeyla]) [c:5f7231d]
+- [clippy] Fix Clippy-lints. ([@Lakelezz]) [c:cd7d07e]
+- [clippy] Implement suggestions from Clippy & remove Clippy arg max config. ([@Flat]) [c:6586830]
+- [command_attr] Add missing `s`, `owner_only` became `owners_only`. ([@acdenisSK]) [c:3cf673e]
+- [command_attr] Report errors from parsing group options, if any. ([@acdenisSK]) [c:8e01ff6]
+- [doc] Small doc fixes for the command macro. ([@acdenisSK]) [c:186e914]
+- [doc] Revise Guild's `voice_states` doc. ([@nycex]) [c:0a640a4]
+- [example] Update the mentioned feature `methods` to `utils`. ([@Lakelezz]) [c:c970f44]
+- [framework] Fix Help displaying Groups and their Commands. ([@Lakelezz]) [c:eca204a]
+- [framework] Ensure to properly hide groups. ([@Lakelezz]) [c:5e66cd1]
+- [framework] Add help for nested groups and their commands. ([@Lakelezz]) [c:6a37535]
+- [framework] Get rid of a redundant feature gate. ([@acdenisSK]) [c:2ae3a48]
+- [framework] Treat the actual name and aliases equally. ([@Lakelezz]) [c:82d97c2] 
+- [framework] Check if message author is in owners HashSet. ([@Flat]) [c:d91594b]
+- [framework] Change `owners_privilege` to bypass all permission-checks. ([@Flat]) [c:98532da]
+- [http] Fix setting role positions ([@icewind1991]) [c:c14ca32]
+- [model] Fix lifetime issue with `send_message`. ([@acdenisSK]) [c:3902caf]
+- [model] Fix no-default-features compilation. ([@zeyla]) [c:3de5378]
+- [model] Fix `contains_case_insensitive` and `starts_with_case_insensitive`. ([@Flat]) [c:d27d391]
+- [voice] Pipe youtube-dl to ffmpeg directly. ([@Flat]) [c:4793a84] 
+
+### Changed
+
+- [builder] Use `ToString` on builder-arguments instead of `Display`. ([@acdenisSK]) [c:13fae29]
+- [builder] Increase the capabilities for creating a channel. ([@acdenisSK]) [c:f2ff97a] 
+- [client] Improve `cached`'s name and documentation. ([@Lakelezz]) [c:7706475]
+- [command_attr] Rectify command parsing. ([@acdenisSK]) [c:b1eff27]
+- [command_attr] Use the function-name. ([@acdenisSK]) [c:05254c8]
+- [command_attr] Change `only` to `only_in`. ([@acdenisSK]) [c:26b072f]
+- [command_attr] Reinvent `group!` parsing. ([@acdenisSK]) [c:7f9c4e1]
+- [command_attr] Stop appending `_HELP_COMMAND` to the generated instance from `#[help]` ([@acdenisSK]) [c:9783b35]
+- [example] Update the framework example. ([@acdenisSK]) [c:0fcb43c]
+- [example] Update to use shard manager. ([@zeyla]) [c:5375827]
+- [framework] Take into regard prefixless groups ([@acdenisSK]) [c:ef15739]
+- [framework] Ensure prefixes to be mandatory on help ([@Lakelezz]) [c:ab34f75]
+- [model] Update `*Id::created_at()` to return a `DateTime<FixedOffset>` instead. ([@AregevDev]) [c:8d50840]
+- [model] Replace `Context` as argument ([@Lakelezz]) [c:62e19a7] [c:58fa50c]
+- [rustc] Set minimum Rust version to `1.35.0`. ([@Lakelezz]) [c:8c83fec]
+- [voice] Add infinite retry arg to ytdl for rst packets. ([@Flat]) [c:86ec810]
+
+### Removed
+
+- [builder] Remove unused `build`-method. ([@Lakelezz]) [c:c6ae140]
+- [client] Remove `quit` method. ([@zeyla]) [c:f7109ee] 
+- [utils] Remove `VecMap`. ([@acdenisSK]) [c:9450d4b]
+
+## rc-1
+
+### Added
+
+- [model] Add missing fields of `current_application_info` ([@mattico]) [c:23bed41]
+- [builder] Allow for channels to be (or not be) set as nsfw ([@acdenisSK]) [c:1bd5bbc]
+- [framework] Bring back old parsing behaviour ([@acdenisSK]) [c:64e97c5]
+- [http] `AsRef<Http>` Implementation for `Http` ([@Lakelezz]) [c:b425ceb]
+
+### Fixed
+
+- [misc.] Fix Doc-Links and update Changelog ([@Lakelezz]) [c:c63eaea]
+
+### Changed
+
+- [framework] Take into equation ignoring bots and webhooks for help ([@acdenisSK]) [c:b1559bc]
+- [general] Increase minimum support Rust version ([@acdenisSK]) [c:61ac765]
+- [general/framework] Shackle the minimum version of uwl to 0.3.2 ([@acdenisSK]) [c:decbc04]
+
+## rc-0
+
+## Added
+
+- [builder/model] Permit sending files through the `CreateMessage` builder. ([@Roughsketch]) [c:5405ac2]
+- [client] Add Rich Presence parsing support ([@zeyla]) [c:f7360e6]
+- [model] Add Slow Mode Rate ([@Lakelezz]) [c:7512c19]
+- [voice] Voice reconnection ([@FelixMcFelix]) [c:25cb595] [c:4026d77] [c:2f613c0] [c:0a58e85]
+- [model] Add a position propagation method to Channel ([@Erk-]) [c:59b4c60]
+- [misc.] Re-export `typemap::sharemap` ([@zeyla]) [c:d2233e2]
+- [framework] Add new Check System ([@Lakelezz]) [c:2969561]
+- [http/gateway] Rustls support ([@Erk-]) [c:faa773a]
+- [model] Add news channel ([@Lakelezz]) [c:1074b28]
+- [client] Add EventHandler for raw Events ([@DarkKirb]) [c:2b453c3]
+- [model] Add millisecond accuracy to `ID.created_at()` ([@DarkKirb]) [c:965fa7b]
+- [http/gateway] Add Rustls and Native-TLS Backends ([@Lakelezz]) [c:15e2c41]
+
+## Changed
+
+- [model] Make MessageUpdateEvent::embeds a Vec<Embed> ([@zeyla]) [c:00f465c]
+- [voice] Voice fixes, better API adherence, bitrate control, documentation ([@FelixMcFelix]) [c:393a5ae]
+- [builder] Make builders mutably borrowed ([@zeyla], [@Flat], [@Lakelezz], [@Celti]) [c:1546171] [c:6d87d71] [c:b7a6fee] [c:b012ab7]
+- [utils] Make Message Builder use &mut self instead of self ([@PvdBerg1998]) [c:1546171]
+- [misc.] Update `parking_lot` and `multipart` dependencies ([@Kroisse]) [c:1e50d30]
+- [framework] Make sure `delimiter` clears current and default delimiters. ([@Lakelezz]) [c:3f81cf3]
+- [framework] Underline command name and "Commands" in plain help ([@hyarsan]) [c:87bc6ca]
+- [http]  Replace `hyper` with `reqwest` ([@Lakelezz]) [c:86a8b60]
+- [client/gateway] Switch to tungstenite from rust-websocket ([@zeyla]) [c:a5aa2a9]
+- [misc.] Update to Rust 2018 ([@Lakelezz]) [c:21518c8]
+- [http/model/all] Remove global Cache and HTTP ([@Lakelezz]) [c:712cfa5] [c:3f0ea69]
+- [client] Change the `Context::data` field to use an `RwLock` ([@Erk-]) [c:661d778]
+- [cache] Pass old Message to `message_update` ([@Mishio595]) [c:40bf272]
+- [framework] Check for Ownership in Help System ([@Lakelezz]) [c:fa0376c]
+- [framework] Improve Help Consistency ([@Lakelezz]) [c:51b48f4]
+- [misc.] Adhere to Rust 2018's idioms ([@Lakelezz]) [c:5d6dc37]
+- [client] Add different `Context::new`s based on feature-set. ([@Lakelezz]) [c:625b764]
+- [framework] Remodel `Args`'s API ([@acdenisSK]) [c:c472ddd]
+- [framework] Rewrite the framework to attributes ([@acdenisSK]) [c:cc81e47]
+- [framework] Handle Sub-Groups in the Help-System ([@Lakelezz]) [c:9b591ec]
+- [voice] Fewer ffprobe calls when playing audio through ffmpeg ([@FelixMcFelix]) [c:5dff7eb]
+- [voice] Optional impls and additional events for AudioReceiver ([@FelixMcFelix]) [c:d955df4]
+- [voice] ClientConnect message handling ([@FelixMcFelix]) [c:fa11a30]
+- [client] Pass the old voice state if the cache is enabled ([@andreasots]) [c:bd45e42]
+- [http] Specify Header's Content Length as `0` ([@eatsfoobars]) [c:a713b40]
+- [voice] Switch to `audiopus` ([@Lakelezz]) [c:4af7a98]
+- [model] Make `enum`s non-exhaustive ([@Lakelezz]) [c:9cc8816]
+- [http] Make the HttpError Send+Sync ([@Erk-]) [c:6cfc0e1]
+- [framework] Update `on_mention` to take a `UserId` ([@Celti]) [c:d995fa0]
+- [utils] Simplify `from_rgb`, turn some of Colour's functions to `const`. ([@hyarsan]) [c:c149e36]
+
+## Fixed
+
+- Fix ActivityFlags/ActivityTimestamps/ActivityParty deserialization ([@zeyla]) [c:0a77330] [c:d01eeae]
+- Fix `MessageBuilder`'s doctests ([@Flat]) [c:a3477a2]
+
+## Removed
+
+- [client] Remove deprecated `Context::edit_profile` ([@zeyla]) [c:bc0d82e]
+- [misc.] Remove everything marked `deprecated` since `v0.5.x` or older ([@Lakelezz]) [c:70720ae]
+
 ## [0.6.0-rc.2] - 2019-6-14
 
 Thanks to the following for their contributions:
@@ -2793,6 +2986,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.6.0]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.2...v0.6.0
 [0.6.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.2
 [0.6.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.1
 [0.6.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.5.14...v0.6.0-rc.0
@@ -2831,7 +3025,6 @@ Initial commit.
 
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
-
 
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
@@ -2879,6 +3072,7 @@ Initial commit.
 [@Lymia]: https://github.com/Lymia
 [@khazhyk]: https://github.com/khazhyk
 [@mattico]: https://github.com/mattico
+[@molenzwiebel]: https://github.com/molenzwiebel
 [@megumisonoda]: https://github.com/megumisonoda
 [@Mishio595]: https://github.com/Mishio595
 [@mshenrick]: https://github.com/mshenrick
@@ -2900,8 +3094,17 @@ Initial commit.
 [@vityafx]: https://github.com/vityafx
 [@xentec]: https://github.com/xentec
 [@xacrimon]: https://github.com/xacrimon
+[@xSke]: https://github.com/xSke
 [@zeyla]: https://github.com/zeyla
 
+[c:90b7829]: https://github.com/serenity-rs/serenity/commit/90b78294c74bb4fe7f861fad0a1896a5b1ee280f
+[c:638b642]: https://github.com/serenity-rs/serenity/commit/638b642c853e0567fe008298691daaa765ef4a5f
+[c:c8a8d4f]: https://github.com/serenity-rs/serenity/commit/c8a8d4f2f5b351def970b344045a16d0504d9d8f
+[c:0daaac1]: https://github.com/serenity-rs/serenity/commit/0daaac1519e7b583c9d1ea9e31779d7e6d00e5a0
+[c:dddd417]: https://github.com/serenity-rs/serenity/commit/dddd417c1b55b4a4908fd65e2cfd2a0010b31e0d
+[c:d1addff]: https://github.com/serenity-rs/serenity/commit/d1addff0dff6f199cacb0ed161ca013cb96d7d02
+[c:638bb1a]: https://github.com/serenity-rs/serenity/commit/638bb1af7711898267b67b1513d512d55de97d80
+[c:5e77718]: https://github.com/serenity-rs/serenity/commit/5e77718d93c97d0b118e4ad77842f311c9382ba9
 
 [c:ab34f75]: https://github.com/serenity-rs/serenity/commit/ab34f75281750ddca64ada640515fef4e01bdf23
 [c:58fa50c]: https://github.com/serenity-rs/serenity/commit/58fa50cd4d1fd6660ed6d3692e125cc4f292097b
