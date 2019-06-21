@@ -199,13 +199,14 @@ impl RateLimit {
         let diff = (self.reset - current_time) as u64;
 
         if self.remaining == 0 {
-            let delay = (diff * 1000) + 500;
+            let delay = diff * 1000;
 
             debug!(
                 "Pre-emptive ratelimit on route {:?} for {:?}ms",
                 route,
                 delay
             );
+			
             thread::sleep(Duration::from_millis(delay));
 
             return;
