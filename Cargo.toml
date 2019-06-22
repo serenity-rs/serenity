@@ -94,6 +94,10 @@ version = "0.19"
 optional = true
 version = "0.16"
 
+[dependencies.ccl]
+optional = true
+version = "4.5.3"
+
 [dev-dependencies.http_crate]
 version = "0.1"
 package = "http"
@@ -127,7 +131,7 @@ default_native_tls = [
     "native_tls_backend",
 ]
 builder = ["utils"]
-cache = []
+cache = ["ccl"]
 client = [
     "gateway",
     "http",

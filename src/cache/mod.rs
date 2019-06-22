@@ -56,6 +56,7 @@ use std::{
     ops::Deref,
     sync::Arc,
 };
+use ccl::nestedmap::NestedMap;
 
 mod cache_update;
 mod settings;
@@ -63,7 +64,7 @@ mod settings;
 pub use self::cache_update::CacheUpdate;
 pub use self::settings::Settings;
 
-type MessageCache = HashMap<ChannelId, HashMap<MessageId, Message>>;
+type MessageCache = NestedMap<ChannelId, RwLock<HashMap<MessageId, Message>>>;
 
 pub trait FromStrAndCache: Sized {
     type Err;
@@ -113,41 +114,41 @@ pub struct Cache {
     /// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html
     /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
     /// [`Guild`]: ../model/guild/struct.Guild.html
-    pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
+    pub channels: Arc<NestedMap<ChannelId, Arc<RwLock<GuildChannel>>>>,
     /// A map of channel categories.
-    pub categories: HashMap<ChannelId, Arc<RwLock<ChannelCategory>>>,
+    pub categories: Arc<NestedMap<ChannelId, Arc<RwLock<ChannelCategory>>>>,
     /// A map of the groups that the current user is in.
     ///
     /// For bot users this will always be empty, except for in [special cases].
     ///
     /// [special cases]: index.html#special-cases-in-the-cache
-    pub groups: HashMap<ChannelId, Arc<RwLock<Group>>>,
+    pub groups: Arc<NestedMap<ChannelId, Arc<RwLock<Group>>>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
     /// [`Emoji`]: ../model/guild/struct.Emoji.html
     /// [`Role`]: ../model/guild/struct.Role.html
-    pub guilds: HashMap<GuildId, Arc<RwLock<Guild>>>,
+    pub guilds: Arc<NestedMap<GuildId, Arc<RwLock<Guild>>>>,
     /// A map of channels to messages.
     ///
     /// This is a map of channel IDs to another map of message IDs to messages.
     ///
     /// This keeps only the ten most recent messages.
-    pub messages: MessageCache,
+    pub messages: Arc<MessageCache>,
     /// A map of notes that a user has made for individual users.
     ///
     /// An empty note is equivalent to having no note, and creating an empty
     /// note is equivalent to deleting a note.
     ///
     /// This will always be empty for bot users.
-    pub notes: HashMap<UserId, String>,
+    pub notes: Arc<NestedMap<UserId, RwLock<String>>>,
     /// A map of users' presences. This is updated in real-time. Note that
     /// status updates are often "eaten" by the gateway, and this should not
     /// be treated as being entirely 100% accurate.
-    pub presences: HashMap<UserId, Presence>,
+    pub presences: Arc<NestedMap<UserId, RwLock<Presence>>>,
     /// A map of direct message channels that the current user has open with
     /// other users.
-    pub private_channels: HashMap<ChannelId, Arc<RwLock<PrivateChannel>>>,
+    pub private_channels: Arc<NestedMap<ChannelId, Arc<RwLock<PrivateChannel>>>>,
     /// The total number of shards being used by the bot.
     pub shard_count: u64,
     /// A list of guilds which are "unavailable". Refer to the documentation for
@@ -159,7 +160,7 @@ pub struct Cache {
     ///
     /// [`Event::GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
     /// [`Event::GuildUnavailable`]: ../model/event/enum.Event.html#variant.GuildUnavailable
-    pub unavailable_guilds: HashSet<GuildId>,
+    pub unavailable_guilds: Arc<RwLock<HashSet<GuildId>>>,
     /// The current user "logged in" and for which events are being received
     /// for.
     ///
@@ -194,13 +195,13 @@ pub struct Cache {
     /// [`GuildMembersChunkEvent`]: ../model/event/struct.GuildMembersChunkEvent.html
     /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
     /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
-    pub users: HashMap<UserId, Arc<RwLock<User>>>,
+    pub users: Arc<NestedMap<UserId, Arc<RwLock<User>>>>,
     /// Queue of message IDs for each channel.
     ///
     /// This is simply a vecdeque so we can keep track of the order of messages
     /// inserted into the cache. When a maximum number of messages are in a
     /// channel's cache, we can pop the front and remove that ID from the cache.
-    pub(crate) message_queue: HashMap<ChannelId, VecDeque<MessageId>>,
+    pub(crate) message_queue: Arc<NestedMap<ChannelId, RwLock<VecDeque<MessageId>>>>,
     /// The settings for the cache.
     settings: Settings,
     __nonexhaustive: (),
@@ -284,8 +285,8 @@ impl Cache {
     pub fn unknown_members(&self) -> u64 {
         let mut total = 0;
 
-        for guild in self.guilds.values() {
-            let guild = guild.read();
+        for guild in self.guilds.iter() {
+            let guild = guild.value().read();
 
             let members = guild.members.len() as u64;
 
@@ -320,11 +321,15 @@ impl Cache {
     ///
     /// [`Group`]: ../model/channel/struct.Group.html
     /// [`PrivateChannel`]: ../model/channel/struct.PrivateChannel.html
-    pub fn all_private_channels(&self) -> Vec<&ChannelId> {
-        self.groups
-            .keys()
-            .chain(self.private_channels.keys())
-            .collect()
+    pub fn all_private_channels(&self) -> Vec<ChannelId> {
+        let mut v = Vec::new();
+        for i in self.groups.iter() {
+            v.push(i.key().clone());
+        }
+        for i in self.private_channels.iter() {
+            v.push(i.key().clone());
+        }
+        v
     }
 
     /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
@@ -361,10 +366,10 @@ impl Cache {
     /// [`Context`]: ../client/struct.Context.html
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`Shard`]: ../gateway/struct.Shard.html
-    pub fn all_guilds(&self) -> Vec<&GuildId> {
+    pub fn all_guilds(&self) -> Vec<GuildId> {
         self.guilds
-            .keys()
-            .chain(self.unavailable_guilds.iter())
+            .iter().map(|r| r.key().clone())
+            .chain(self.unavailable_guilds.read().iter().cloned())
             .collect()
     }
 
@@ -396,15 +401,15 @@ impl Cache {
 
     fn _channel(&self, id: ChannelId) -> Option<Channel> {
         if let Some(channel) = self.channels.get(&id) {
-            return Some(Channel::Guild(Arc::clone(channel)));
+            return Some(Channel::Guild(Arc::clone(&*channel)));
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(Arc::clone(private_channel)));
+            return Some(Channel::Private(Arc::clone(&*private_channel)));
         }
 
         if let Some(group) = self.groups.get(&id) {
-            return Some(Channel::Group(Arc::clone(group)));
+            return Some(Channel::Group(Arc::clone(&*group)));
         }
 
         None
@@ -441,7 +446,7 @@ impl Cache {
     }
 
     fn _guild(&self, id: GuildId) -> Option<Arc<RwLock<Guild>>> {
-        self.guilds.get(&id).cloned()
+        self.guilds.get(&id).map(|v| v.clone())
     }
 
     /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
@@ -500,7 +505,7 @@ impl Cache {
     }
 
     fn _guild_channel(&self, id: ChannelId) -> Option<Arc<RwLock<GuildChannel>>> {
-        self.channels.get(&id).cloned()
+        self.channels.get(&id).map(|v| v.clone())
     }
 
     /// Retrieves a reference to a [`Group`] from the cache based on the given
@@ -535,7 +540,7 @@ impl Cache {
     }
 
     fn _group(&self, id: ChannelId) -> Option<Arc<RwLock<Group>>> {
-        self.groups.get(&id).cloned()
+        self.groups.get(&id).map(|v| v.clone())
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -595,7 +600,7 @@ impl Cache {
 
     fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<Member> {
         self.guilds.get(&guild_id).and_then(|guild| {
-            guild.read().members.get(&user_id).cloned()
+            guild.read().members.get(&user_id).map(|v| v.clone())
         })
     }
 
@@ -641,7 +646,7 @@ impl Cache {
 
     fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
         self.messages.get(&channel_id).and_then(|messages| {
-            messages.get(&message_id).cloned()
+            messages.read().get(&message_id).map(|v| v.clone())
         })
     }
 
@@ -691,7 +696,7 @@ impl Cache {
     }
 
     fn _private_channel(&self, channel_id: ChannelId) -> Option<Arc<RwLock<PrivateChannel>>> {
-        self.private_channels.get(&channel_id).cloned()
+        self.private_channels.get(&channel_id).map(|v| v.clone())
     }
 
     /// Retrieves a [`Guild`]'s role by their Ids.
@@ -796,7 +801,7 @@ impl Cache {
     }
 
     fn _user(&self, user_id: UserId) -> Option<Arc<RwLock<User>>> {
-        self.users.get(&user_id).cloned()
+        self.users.get(&user_id).map(|v| v.clone())
     }
 
     #[inline]
@@ -807,7 +812,7 @@ impl Cache {
     }
 
     fn _categories(&self, channel_id: ChannelId) -> Option<Arc<RwLock<ChannelCategory>>> {
-        self.categories.get(&channel_id).cloned()
+        self.categories.get(&channel_id).map(|v| v.clone())
     }
 
     /// Updates the cache with the update implementation for an event or other
@@ -827,11 +832,11 @@ impl Cache {
 
     pub(crate) fn update_user_entry(&mut self, user: &User) {
         match self.users.entry(user.id) {
-            Entry::Vacant(e) => {
+            ccl::nestedmap::Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
             },
-            Entry::Occupied(mut e) => {
-                e.get_mut().write().clone_from(user);
+            ccl::nestedmap::Entry::Occupied(mut e) => {
+                e.get().write().clone_from(user);
             },
         }
     }
@@ -840,20 +845,20 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Cache {
         Cache {
-            channels: HashMap::default(),
-            categories: HashMap::default(),
-            groups: HashMap::with_capacity(128),
-            guilds: HashMap::default(),
-            messages: HashMap::default(),
-            notes: HashMap::default(),
-            presences: HashMap::default(),
-            private_channels: HashMap::with_capacity(128),
+            channels: Arc::new(NestedMap::new()),
+            categories: Arc::new(NestedMap::new()),
+            groups: Arc::new(NestedMap::new()),
+            guilds: Arc::new( NestedMap::new()),
+            messages: Arc::new(NestedMap::new()),
+            notes: Arc::new(NestedMap::new()),
+            presences: Arc::new(NestedMap::new()),
+            private_channels: Arc::new(NestedMap::new()),
             settings: Settings::default(),
             shard_count: 1,
-            unavailable_guilds: HashSet::default(),
+            unavailable_guilds: Arc::new(RwLock::new(HashSet::default())),
             user: CurrentUser::default(),
-            users: HashMap::default(),
-            message_queue: HashMap::default(),
+            users: Arc::new(NestedMap::new()),
+            message_queue: Arc::new(NestedMap::new()),
             __nonexhaustive: (),
         }
     }

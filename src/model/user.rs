@@ -575,11 +575,13 @@ impl User {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                private_channel_id = cache.read().private_channels
-                    .values()
-                    .map(|ch| ch.read())
-                    .find(|ch| ch.recipient.read().id == self.id)
-                    .map(|ch| ch.id);
+                for i in cache.read().private_channels.iter() {
+                    let i = i.value();
+                    let i = i.read();
+                    if i.recipient.read().id == self.id {
+                        private_channel_id = Some(i.id);
+                    }
+                }
             }
         }
 
