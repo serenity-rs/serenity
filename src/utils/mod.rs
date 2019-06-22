@@ -718,7 +718,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                         "@invalid-user".to_string()
                     }
                 } else {
-                    let user = cache.read().users.get(&id).cloned();
+                    let user = cache.read().users.get(&id).map(|v| v.clone());
 
                     if let Some(user) = user {
                         let user = user.read();

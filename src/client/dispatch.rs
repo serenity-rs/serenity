@@ -456,11 +456,12 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
             });
         },
         DispatchEvent::Model(Event::GuildCreate(mut event)) => {
+
             #[cfg(feature = "cache")]
             let _is_new = {
                 let cache = cache_and_http.cache.as_ref().read();
-
-                !cache.unavailable_guilds.contains(&event.guild.id)
+                let unavailable_guilds = cache.unavailable_guilds.read();
+                !unavailable_guilds.contains(&event.guild.id)
             };
 
             update(&cache_and_http, &mut event);
@@ -470,11 +471,12 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                 let locked_cache = cache_and_http.cache.as_ref().read();
                 let context = context.clone();
 
-                if locked_cache.unavailable_guilds.is_empty() {
+                let unavailable_guilds = locked_cache.unavailable_guilds.read();
+                if unavailable_guilds.is_empty() {
                     let guild_amount = locked_cache
                         .guilds
                         .iter()
-                        .map(|(&id, _)| id)
+                        .map(|v| *v.key())
                         .collect::<Vec<GuildId>>();
                     let event_handler = Arc::clone(event_handler);
 
@@ -618,7 +620,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
                     let before = cache_and_http.cache.as_ref().read()
                         .guilds
                         .get(&event.guild.id)
-                        .cloned();
+                        .map(|v| v.clone());
                     update(&cache_and_http, &mut event);
 
                     event_handler.guild_update(context, before, event.guild);

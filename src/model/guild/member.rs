@@ -177,20 +177,28 @@ impl Member {
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
         let cache = cache.as_ref().read();
-        let guild = cache.guilds.get(&self.guild_id)?.read();
 
-        let mut roles = self.roles
-            .iter()
-            .filter_map(|role_id| guild.roles.get(role_id))
-            .collect::<Vec<&Role>>();
-        roles.sort_by(|a, b| b.cmp(a));
+        use crate::cache::Cache;
+        let cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*cache) }; // TO-DO fix this
 
-        let default = Colour::default();
+        if let Some(guild) = cache.guilds.get(&self.guild_id) {
+            let guild = guild.read();
 
-        roles
-            .iter()
-            .find(|r| r.colour.0 != default.0)
-            .map(|r| r.colour)
+            let mut roles = self.roles
+                .iter()
+                .filter_map(|role_id| guild.roles.get(role_id))
+                .collect::<Vec<&Role>>();
+            roles.sort_by(|a, b| b.cmp(a));
+
+            let default = Colour::default();
+
+            roles
+                .iter()
+                .find(|r| r.colour.0 != default.0)
+                .map(|r| r.colour)
+        } else {
+            None
+        }
     }
 
     /// Returns the "default channel" of the guild for the member.
@@ -329,6 +337,9 @@ impl Member {
         {
             if let Some(cache) = cache_http.cache() {
                 let locked_cache = cache.read();
+
+                use crate::cache::Cache;
+                let locked_cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*locked_cache) }; // TO-DO fix this
 
                 if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
                     let req = Permissions::KICK_MEMBERS;

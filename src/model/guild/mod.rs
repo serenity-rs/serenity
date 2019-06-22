@@ -224,17 +224,23 @@ impl Guild {
     pub fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
         let name = name.as_ref();
         let cache = cache.as_ref().read();
-        let guild = cache.guilds.get(&self.id)?.read();
 
-        guild.channels
-            .iter()
-            .find_map(|(id, c)| {
-                if c.read().name == name {
-                    Some(*id)
-                } else {
-                    None
+        use crate::cache::Cache;
+        let cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*cache) }; // TO-DO fix this
+
+        if let Some(guild) = cache.guilds.get(&self.id) {
+            let guild = guild.read();
+
+            for (id, chan) in &guild.channels {
+                if chan.read().name == name {
+                    return Some(*id);
                 }
-            })
+            }
+
+            None
+        } else {
+            None
+        }
     }
 
     /// Ban a [`User`] from the guild. All messages by the
