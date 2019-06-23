@@ -1,6 +1,7 @@
 use crate::constants;
 use reqwest::{
     Client,
+    ClientBuilder,
     header::{AUTHORIZATION, USER_AGENT, CONTENT_TYPE, HeaderValue, HeaderMap as Headers},
     multipart::Part,
     Response as ReqwestResponse,
@@ -10,77 +11,43 @@ use reqwest::{
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 use super::{
-    ratelimiting::{perform, RateLimit},
+    ratelimiting::{Ratelimiter, RatelimitedRequest},
     request::Request,
-    routing::{Route, RouteInfo},
+    routing::RouteInfo,
     AttachmentType,
     GuildPagination,
     HttpError,
 };
-use parking_lot::Mutex;
 use serde::de::DeserializeOwned;
 use serde_json::json;
 use log::{debug, trace};
 use std::{
-    collections::{BTreeMap, HashMap},
-    io::ErrorKind as IoErrorKind,
+    collections::BTreeMap,
     sync::Arc,
 };
 
 pub struct Http {
     client: Arc<Client>,
+    pub ratelimiter: Ratelimiter,
     pub token: String,
-    pub limiter: Arc<Mutex<()>>,
-    /// The routes mutex is a HashMap of each [`Route`] and their respective
-    /// ratelimit information.
-    ///
-    /// See the documentation for [`RateLimit`] for more information on how the
-    /// library handles ratelimiting.
-    ///
-    /// # Examples
-    ///
-    /// View the `reset` time of the route for `ChannelsId(7)`:
-    ///
-    /// ```rust,no_run
-    /// use serenity::http::{ratelimiting::{Route}};
-    /// # use serenity::http::Http;
-    /// # let http = Http::default();
-    /// let routes = http.routes.lock();
-    ///
-    /// if let Some(route) = routes.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().reset);
-    /// }
-    /// ```
-    ///
-    /// [`RateLimit`]: struct.RateLimit.html
-    /// [`Route`]: ../routing/enum.Route.html
-    pub routes: Arc<Mutex<HashMap<Route, Arc<Mutex<RateLimit>>>>>,
 }
 
 impl Http {
     pub fn new(client: Arc<Client>, token: &str) -> Self {
+        let client2 = Arc::clone(&client);
+
         Http {
             client,
+            ratelimiter: Ratelimiter::new(client2, token.to_string()),
             token: token.to_string(),
-            limiter: Arc::new(Mutex::new(())),
-            routes: Arc::new(Mutex::new(HashMap::default())),
         }
     }
 
     pub fn new_with_token(token: &str) -> Self {
-        Http {
-            #[cfg(not(feature = "native_tls_backend"))]
-            client: Arc::new(Client::builder()
-                .use_rustls_tls()
-                .build().expect("Cannot build Reqwest::Client.")),
-            #[cfg(feature = "native_tls_backend")]
-            client: Arc::new(Client::builder()
-                .use_default_tls()
-                .build().expect("Cannot build Reqwest::Client.")),
-            token: token.to_string(),
-            limiter: Arc::new(Mutex::new(())),
-            routes: Arc::new(Mutex::new(HashMap::default())),
-        }
+        let builder = configure_client_backend(Client::builder());
+        let built = builder.build().expect("Cannot build reqwest::Client");
+
+        Self::new(Arc::new(built), token)
     }
 
     /// Adds a [`User`] as a recipient to a [`Group`].
@@ -1720,39 +1687,14 @@ impl Http {
     ///
     /// [`fire`]: fn.fire.html
     pub fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
-        let response = perform(&self, req)?;
+        let ratelimiting_req = RatelimitedRequest::from(req);
+        let response = self.ratelimiter.perform(ratelimiting_req)?;
 
         if response.status().is_success() {
             Ok(response)
         } else {
             Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
         }
-    }
-
-    pub(super) fn retry(&self, request: &Request<'_>) -> Result<ReqwestResponse> {
-        // Retry the request twice in a loop until it succeeds.
-        //
-        // If it doesn't and the loop breaks, try one last time.
-        for _ in 0..3 {
-
-            match request.build(&self.client, &self.token)?.send() {
-                Ok(response) => return Ok(response),
-                Err(reqwest_error) => {
-                    if let Some(io_error) = reqwest_error.get_ref().and_then(|e| e.downcast_ref::<std::io::Error>()) {
-
-                        if let IoErrorKind::ConnectionAborted = io_error.kind() {
-                            continue;
-                        }
-                    }
-
-                    return Err(reqwest_error.into());
-                },
-            }
-        }
-
-        request.build(&self.client, &self.token)
-            .map_err(Into::into)
-            .and_then(|b| Ok(b.send()?))
     }
 
     /// Performs a request and then verifies that the response status code is equal
@@ -1774,18 +1716,30 @@ impl Http {
     }
 }
 
+#[cfg(not(feature = "native_tls_backend"))]
+fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
+    builder.use_rustls_tls()
+}
+
+#[cfg(feature = "native_tls_backend")]
+fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
+    builder.use_default_tls()
+}
+
 impl AsRef<Http> for Http {
     fn as_ref(&self) -> &Http { &self }
 }
 
 impl Default for Http {
     fn default() -> Self {
-        let client = Client::builder().build().expect("Cannot build Reqwest::Client.");
+        let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
+        let client = Arc::new(built);
+        let client2 = Arc::clone(&client);
+
         Self {
-            client: Arc::new(client),
+            client,
+            ratelimiter: Ratelimiter::new(client2, ""),
             token: "".to_string(),
-            limiter: Arc::new(Mutex::new(())),
-            routes: Arc::new(Mutex::new(HashMap::default())),
         }
     }
 }
