@@ -153,7 +153,7 @@ impl Emoji {
     /// # use std::sync::Arc;
     /// #
     /// # fn main() {
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
     /// #
     /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
     /// #     "animated": false,

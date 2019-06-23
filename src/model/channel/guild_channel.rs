@@ -174,13 +174,13 @@ impl GuildChannel {
     /// # use std::error::Error;
     /// #
     /// # #[cfg(feature = "cache")]
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #     let http = Arc::new(Http::default());
-    /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #     let cache: CacheRwLock = Arc::new(Cache::default()).into();
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -195,7 +195,7 @@ impl GuildChannel {
     ///     deny: deny,
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
-    /// # let cache = cache.read();
+    /// # let cache = cache.as_ref();
     /// // assuming the cache has been unlocked
     /// let channel = cache
     ///     .guild_channel(channel_id)
@@ -206,7 +206,7 @@ impl GuildChannel {
     /// # }
     /// #
     /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() -> Result<(), Box<Error>> { Ok(()) }
+    /// # fn main() -> Result<(), Box<dyn Error>> { Ok(()) }
     /// ```
     ///
     /// Creating a permission overwrite for a role by specifying the
@@ -218,13 +218,13 @@ impl GuildChannel {
     /// # use std::error::Error;
     /// #
     /// # #[cfg(feature = "cache")]
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
     /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let http = Arc::new(Http::default());
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache: CacheRwLock = Arc::new(Cache::default()).into();
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -241,7 +241,7 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = cache.read();
+    /// let cache = cache.as_ref();
     /// let channel = cache
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
@@ -251,7 +251,7 @@ impl GuildChannel {
     /// # }
     /// #
     /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() -> Result<(), Box<Error>> { Ok(()) }
+    /// # fn main() -> Result<(), Box<dyn Error>> { Ok(()) }
     /// ```
     ///
     /// [`Channel`]: enum.Channel.html
@@ -488,7 +488,7 @@ impl GuildChannel {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, context: Context, msg: Message) {
-    ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
+    ///         let channel = match context.cache.as_ref().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
@@ -517,12 +517,12 @@ impl GuildChannel {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, context: Context, mut msg: Message) {
-    ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
+    ///         let channel = match context.cache.as_ref().guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = context.cache.read().user.id;
+    ///         let current_user_id = context.cache.as_ref().user.read().id;;
     ///         let permissions =
     ///             channel.read().permissions_for(&context.cache, current_user_id).unwrap();
     ///

@@ -41,10 +41,10 @@ use super::Cache;
 ///     // A copy of the old user's data, if it existed in the cache.
 ///     type Output = User;
 ///
-///     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+///     fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
 ///         // If an entry for the user already exists, update its fields.
 ///         match cache.users.entry(self.user_id) {
-///             Entry::Occupied(entry) => {
+///             ccl::nestedmap::Entry::Occupied(entry) => {
 ///                 let user = entry.get();
 ///                 let mut writer = user.write();
 ///                 let old = writer.clone();
@@ -64,7 +64,7 @@ use super::Cache;
 ///                 // Return the old copy for the user's sake.
 ///                 Some(old)
 ///             },
-///             Entry::Vacant(entry) => {
+///             ccl::nestedmap::Entry::Vacant(entry) => {
 ///                 // We can convert a `serde_json::Value` to a User for test
 ///                 // purposes.
 ///                 let user = serde_json::from_value::<User>(json!({

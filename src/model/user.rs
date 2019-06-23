@@ -67,10 +67,10 @@ impl CurrentUser {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// # let cache = cache.as_ref();
     /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// let user = cache.user.read();
     ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
@@ -163,11 +163,11 @@ impl CurrentUser {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// # let cache = cache.as_ref();
     /// # let http = Arc::new(Http::default());
     /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// let user = cache.user.read();
     ///
     /// if let Ok(guilds) = user.guilds(&http) {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
@@ -201,14 +201,15 @@ impl CurrentUser {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let mut cache = cache.write();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// # let mut cache = cache.as_ref();
     /// # let http = Arc::new(Http::default());
     ///
     /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(&http, Permissions::empty()) {
+    /// let mut user = cache.user.write();
+    /// let url = match user.invite_url(&http, Permissions::empty()) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -234,13 +235,13 @@ impl CurrentUser {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let mut cache = cache.write();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// # let mut cache = cache.as_ref();
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::Permissions;
     ///
     /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(&http, Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
+    /// let url = match cache.user.read().invite_url(&http, Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -300,10 +301,10 @@ impl CurrentUser {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// # let cache = cache.as_ref();
     /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// let user = cache.user.read();
     ///
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
@@ -332,10 +333,10 @@ impl CurrentUser {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// # let cache = cache.as_ref();
     /// // assuming the cache has been unlocked
-    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// println!("The current user's distinct identifier is {}", cache.user.read().tag());
     /// # }
     /// #
     /// # #[cfg(not(feature = "cache"))]
@@ -504,7 +505,7 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match ctx.cache.read().user.invite_url(&ctx, Permissions::empty()) {
+    ///             let url = match ctx.cache.as_ref().user.read().invite_url(&ctx, Permissions::empty()) {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);

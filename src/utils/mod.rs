@@ -771,7 +771,7 @@ fn clean_users(cache: &Cache, s: &mut String, show_discriminator: bool, guild: O
 /// # use serenity::client::{Cache, CacheRwLock};
 /// # use parking_lot::RwLock;
 /// #
-/// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+/// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
 /// use serenity::utils::{
 ///     content_safe,
 ///     ContentSafeOptions,

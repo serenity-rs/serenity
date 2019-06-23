@@ -264,7 +264,7 @@ impl CreateEmbed {
     ///
     /// impl EventHandler for Handler {
     ///     fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
-    ///         let cache = context.cache.read();
+    ///         let cache = context.cache.as_ref();
     ///
     ///         if let Ok(guild) = guild_id.to_partial_guild(&context) {
     ///             let channels = guild.channels(&context)

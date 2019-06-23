@@ -266,7 +266,7 @@ impl Cache {
     ///         // seconds.
     ///         thread::sleep(Duration::from_secs(5));
     ///
-    ///         println!("{} unknown members", ctx.cache.read().unknown_members());
+    ///         println!("{} unknown members", ctx.cache.unknown_members());
     ///     }
     /// }
     ///
@@ -313,8 +313,8 @@ impl Cache {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// let amount = cache.read().all_private_channels().len();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// let amount = cache.all_private_channels().len();
     ///
     /// println!("There are {} private channels", amount);
     /// ```
@@ -352,7 +352,7 @@ impl Cache {
     ///
     /// impl EventHandler for Handler {
     ///     fn ready(&self, context: Context, _: Ready) {
-    ///         let guilds = context.cache.read().guilds.len();
+    ///         let guilds = context.cache.guilds.len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
     ///     }
@@ -431,10 +431,10 @@ impl Cache {
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(guild) = cache.read().guild(7) {
+    /// if let Some(guild) = cache.guild(7) {
     ///     println!("Guild name: {}", guild.read().name);
     /// }
     /// #   Ok(())
@@ -470,7 +470,7 @@ impl Cache {
     ///
     /// impl EventHandler for Handler {
     ///     fn message(&self, context: Context, message: Message) {
-    ///         let cache = context.cache.read();
+    ///         let cache = context.cache.as_ref();
     ///
     ///         let channel = match cache.guild_channel(message.channel_id) {
     ///             Some(channel) => channel,
@@ -526,9 +526,9 @@ impl Cache {
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// if let Some(group) = cache.read().group(7) {
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();
+    /// if let Some(group) = cache.group(7) {
     ///     println!("Owner Id: {}", group.read().owner_id);
     /// }
     /// #     Ok(())
@@ -559,7 +559,7 @@ impl Cache {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// let cache = cache.read();
     ///
     /// let member = {
@@ -621,9 +621,9 @@ impl Cache {
     /// #
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
     /// # let message = ChannelId(0).message(&http, MessageId(1)).unwrap();
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// #
-    /// let cache = cache.read();
+    /// let cache = cache.as_ref();
     /// let fetched_message = cache.message(message.channel_id, message.id);
     ///
     /// match fetched_message {
@@ -635,7 +635,7 @@ impl Cache {
     ///     },
     /// }
     /// ```
-    ///
+    ///Arc::new(Cache::default()).into();
     /// [`EventHandler::message`]: ../client/trait.EventHandler.html#method.message
     /// [`Channel`]: ../model/channel/struct.Channel.html
     #[inline]
@@ -668,9 +668,9 @@ impl Cache {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// #   let cache = cache.read();
+    /// # fn try_main() -> Result<(), Box<dyn Error>> {
+    /// #   let cache: CacheRwLock = Arc::new(Cache::default()).into();;
+    /// #   let cache = cache.as_ref();
     /// // assuming the cache has been unlocked
     ///
     /// if let Some(channel) = cache.private_channel(7) {
@@ -716,10 +716,10 @@ impl Cache {
     /// # use parking_lot::RwLock;
     /// # use std::{error::Error, sync::Arc};
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// # fn main() -> Result<(), Box<dyn Error>> {
+    /// # let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(role) = cache.read().role(7, 77) {
+    /// if let Some(role) = cache.role(7, 77) {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
     /// #     Ok(())
@@ -787,7 +787,7 @@ impl Cache {
     /// #
     /// # #[command]
     /// # fn test(context: &mut Context) -> CommandResult {
-    /// if let Some(user) = context.cache.read().user(7) {
+    /// if let Some(user) = context.cache.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.read().name);
     /// }
     /// # Ok(())

@@ -86,7 +86,7 @@ impl Channel {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #     let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// #     let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.group() {
@@ -129,7 +129,7 @@ impl Channel {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.guild() {
@@ -168,7 +168,7 @@ impl Channel {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.private() {
@@ -210,7 +210,7 @@ impl Channel {
     /// # use parking_lot::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache: CacheRwLock = Arc::new(Cache::default()).into();;
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
     /// #
     /// match channel.category() {

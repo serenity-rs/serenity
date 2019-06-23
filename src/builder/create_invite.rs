@@ -23,7 +23,7 @@ use serde_json::Value;
 /// impl EventHandler for Handler {
 ///     fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
-///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
+///             let channel = match context.cache.guild_channel(msg.channel_id) {
 ///                 Some(channel) => channel,
 ///                 None => {
 ///                     let _ = msg.channel_id.say(&context, "Error creating invite");
@@ -90,7 +90,7 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(context, |i| {
@@ -127,7 +127,7 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(context, |i| {
@@ -162,7 +162,7 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(context, |i| {
@@ -196,7 +196,7 @@ impl CreateInvite {
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
     /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
+    /// #     let channel = context.cache.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
     /// let invite = channel.create_invite(context, |i| {

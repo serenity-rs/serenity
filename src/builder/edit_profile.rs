@@ -36,7 +36,7 @@ impl EditProfile {
     ///         let base64 = utils::read_image("./my_image.jpg")
     ///         .expect("Failed to read image");
     ///
-    ///         let _ = context.cache.write().user.edit(&context, |p|
+    ///         let _ = context.cache.user.write().edit(&context, |p|
     ///             p.avatar(Some(&base64)));
     ///    # }
     /// # }
