@@ -953,10 +953,10 @@ mod test {
             _nonexhaustive: (),
         };
 
-        let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+        let cache: CacheRwLock = Arc::new(Cache::default()).into();
 
         {
-            let mut cache = cache.try_write().unwrap();
+            //let mut cache = cache.try_write().unwrap();
             guild.members.insert(user.id, member.clone());
             guild.roles.insert(role.id, role.clone());
             cache.users.insert(user.id, Arc::new(RwLock::new(user.clone())));

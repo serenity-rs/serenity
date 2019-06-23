@@ -930,12 +930,12 @@ mod test {
         // None, it only returns the oldest message if the cache was already full.
         assert!(event.update(&mut cache).is_none());
         // Assert there's only 1 message in the channel's message cache.
-        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 1);
+        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().read().len(), 1);
 
         // Add a second message, assert that channel message cache length is 2.
         event.message.id = MessageId(4);
         assert!(event.update(&mut cache).is_none());
-        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 2);
+        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().read().len(), 2);
 
         // Add a third message, the first should now be removed.
         event.message.id = MessageId(5);
@@ -944,9 +944,9 @@ mod test {
         {
             let channel = cache.messages.get(&event.message.channel_id).unwrap();
 
-            assert_eq!(channel.len(), 2);
+            assert_eq!(channel.read().len(), 2);
             // Check that the first message is now removed.
-            assert!(!channel.contains_key(&MessageId(3)));
+            assert!(!channel.read().contains_key(&MessageId(3)));
         }
 
         let guild_channel = GuildChannel {
