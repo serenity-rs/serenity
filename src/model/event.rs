@@ -19,7 +19,7 @@ use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
 use crate::internal::RwLockExt;
 #[cfg(feature = "cache")]
-use std::collections::hash_map::Entry;
+
 #[cfg(feature = "cache")]
 use std::mem;
 
@@ -77,7 +77,7 @@ impl CacheUpdate for ChannelCreateEvent {
                     writer.channel_id
                 });
 
-                let ch = cache.groups.insert(channel_id, group);
+                let _ch = cache.groups.insert(channel_id, group);
 
                 None
             },
@@ -111,7 +111,7 @@ impl CacheUpdate for ChannelCreateEvent {
                     writer.id
                 });
 
-                let ch = cache.private_channels.insert(id, Arc::clone(&channel));
+                let _ch = cache.private_channels.insert(id, Arc::clone(&channel));
                 None
             },
             Channel::Category(ref category) => {
@@ -291,7 +291,7 @@ impl CacheUpdate for ChannelUpdateEvent {
                     ccl::nestedmap::Entry::Vacant(e) => {
                         e.insert(Arc::clone(group));
                     },
-                    ccl::nestedmap::Entry::Occupied(mut e) => {
+                    ccl::nestedmap::Entry::Occupied(e) => {
                         let mut dest = e.get().write();
 
                         if no_recipients {

@@ -46,7 +46,6 @@ use std::str::FromStr;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
 use std::collections::{
-    hash_map::Entry,
     HashMap,
     HashSet,
     VecDeque,
@@ -836,7 +835,7 @@ impl Cache {
             ccl::nestedmap::Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
             },
-            ccl::nestedmap::Entry::Occupied(mut e) => {
+            ccl::nestedmap::Entry::Occupied(e) => {
                 e.get().write().clone_from(user);
             },
         }

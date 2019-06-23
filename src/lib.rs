@@ -92,7 +92,7 @@ pub use crate::client::Client;
 #[cfg(feature = "cache")]
 use crate::cache::Cache;
 #[cfg(feature = "cache")]
-use parking_lot::RwLock;
+
 #[cfg(feature = "cache")]
 use std::time::Duration;
 #[cfg(any(feature = "client", feature = "http"))]
