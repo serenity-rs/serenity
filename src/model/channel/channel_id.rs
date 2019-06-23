@@ -17,8 +17,8 @@ use crate::builder::{
 use crate::cache:: {Cache, CacheRwLock};
 #[cfg(all(feature = "cache", feature = "model"))]
 
-#[cfg(feature = "model")]
 use crate::http::AttachmentType;
+
 #[cfg(feature = "model")]
 use crate::utils;
 #[cfg(feature = "http")]
