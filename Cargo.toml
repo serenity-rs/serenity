@@ -96,7 +96,7 @@ version = "0.16"
 
 [dependencies.ccl]
 optional = true
-version = "4.6.0"
+version = "4.6.1"
 
 [dev-dependencies.http_crate]
 version = "0.1"
