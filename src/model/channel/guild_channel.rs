@@ -420,7 +420,7 @@ impl GuildChannel {
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
     #[cfg(feature = "cache")]
-    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> { cache.as_ref().read().guild(self.guild_id) }
+    pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> { cache.as_ref().guild(self.guild_id) }
 
     /// Gets all of the channel's invites.
     ///
@@ -732,7 +732,7 @@ impl GuildChannel {
     #[inline]
     pub fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
-        let guild = cache.read().guild(self.guild_id).unwrap();
+        let guild = cache.guild(self.guild_id).unwrap();
 
         match self.kind {
             ChannelType::Voice => Ok(guild

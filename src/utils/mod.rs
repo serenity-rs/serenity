@@ -464,7 +464,7 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 #[cfg(feature = "cache")]
 pub fn with_cache<T, F>(cache: impl AsRef<CacheRwLock>, f: F) -> T
     where F: Fn(&Cache) -> T {
-    let cache = cache.as_ref().read();
+    let cache = cache.as_ref();
     f(&cache)
 }
 
@@ -484,8 +484,8 @@ pub fn with_cache<T, F>(cache: impl AsRef<CacheRwLock>, f: F) -> T
 /// [`with_cache`]: #fn.with_cache
 #[cfg(feature = "cache")]
 pub fn with_cache_mut<T, F>(cache: impl AsRef<CacheRwLock>, mut f: F) -> T
-    where F: FnMut(&mut Cache) -> T {
-    let mut cache = cache.as_ref().write();
+    where F: FnMut(&Cache) -> T {
+    let mut cache = cache.as_ref();
     f(&mut cache)
 }
 
@@ -642,7 +642,7 @@ fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
+fn clean_channels(cache: &Cache, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<#") {
@@ -681,7 +681,7 @@ fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
+fn clean_users(cache: &Cache, s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@") {
@@ -702,7 +702,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let replacement = if let Some(guild) = guild {
 
-                    if let Some(guild) = cache.read().guild(&guild) {
+                    if let Some(guild) = cache.guild(&guild) {
 
                         if let Some(member) = guild.read().members.get(&id) {
 
@@ -718,7 +718,7 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
                         "@invalid-user".to_string()
                     }
                 } else {
-                    let user = cache.read().users.get(&id).map(|v| v.clone());
+                    let user = cache.users.get(&id).map(|v| v.clone());
 
                     if let Some(user) = user {
                         let user = user.read();

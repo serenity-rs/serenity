@@ -84,7 +84,7 @@ impl Reaction {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.user_id == cache.read().user.id {
+                if self.user_id == cache.user.read().id {
                     user_id = None;
                 }
 

@@ -282,7 +282,7 @@ pub fn serialize_gen_locked_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 
 #[cfg(all(feature = "cache", feature = "model"))]
 pub fn user_has_perms(cache: impl AsRef<CacheRwLock>, channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
-    let cache = cache.as_ref().read();
+    let cache = cache.as_ref();
     let current_user = &cache.user;
 
     let channel = match cache.channel(channel_id) {
@@ -315,7 +315,7 @@ pub fn user_has_perms(cache: impl AsRef<CacheRwLock>, channel_id: ChannelId, mut
 
     let perms = guild
         .read()
-        .permissions_in(channel_id, current_user.id);
+        .permissions_in(channel_id, current_user.read().id);
 
     permissions.remove(perms);
 

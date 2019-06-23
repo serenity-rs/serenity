@@ -441,7 +441,7 @@ impl GuildId {
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_guild_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {cache.as_ref().read().guild(self) }
+    pub fn to_guild_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {cache.as_ref().guild(self) }
 
     /// Requests [`PartialGuild`] over REST API.
     ///
@@ -506,7 +506,7 @@ impl GuildId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(member) = cache.read().member(self.0, user_id) {
+                if let Some(member) = cache.member(self.0, user_id) {
                     return Ok(member);
                 }
             }
@@ -614,7 +614,7 @@ impl GuildId {
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub fn shard_id(self, cache: impl AsRef<CacheRwLock>) -> u64 {
-        crate::utils::shard_id(self.0, cache.as_ref().read().shard_count)
+        crate::utils::shard_id(self.0, *cache.as_ref().shard_count.lock())
     }
 
     /// Returns the Id of the shard associated with the guild.

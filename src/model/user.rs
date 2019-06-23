@@ -575,7 +575,7 @@ impl User {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                for i in cache.read().private_channels.iter() {
+                for i in cache.private_channels.iter() {
                     let i = i.value();
                     let i = i.read();
                     if i.recipient.read().id == self.id {
@@ -686,7 +686,7 @@ impl User {
                 {
                     if let Some(cache) = cache_http.cache() {
                         has_role = Some(
-                            cache.read()
+                            cache
                             .guilds
                             .get(&guild_id)
                             .map_or(false, |g| {
@@ -830,7 +830,7 @@ impl UserId {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {cache.as_ref().read().user(self) }
+    pub fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {cache.as_ref().user(self) }
 
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.
@@ -846,7 +846,7 @@ impl UserId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(user) = cache.read().user(self) {
+                if let Some(user) = cache.user(self) {
                     return Ok(user.read().clone());
                 }
             }

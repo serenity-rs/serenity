@@ -34,18 +34,7 @@ use log::warn;
 #[inline]
 #[cfg(feature = "cache")]
 fn update<E: CacheUpdate + fmt::Debug>(cache_and_http: &Arc<CacheAndHttp>, event: &mut E) -> Option<E::Output> {
-    if let Some(millis_timeout) = cache_and_http.update_cache_timeout {
-
-        if let Some(mut lock) = cache_and_http.cache.try_write_for(millis_timeout) {
-            lock.update(event)
-        } else {
-            warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", event);
-
-            None
-        }
-    } else {
-        cache_and_http.cache.write().update(event)
-    }
+    cache_and_http.cache.update(event)
 }
 
 #[inline]
@@ -59,7 +48,7 @@ fn context(
     data: &Arc<RwLock<ShareMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
-    cache: &Arc<RwLock<Cache>>,
+    cache: &Arc<Cache>,
     http: &Arc<Http>,
 ) -> Context {
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id, cache.clone(), Arc::clone(http))
@@ -429,7 +418,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    let before = cache_and_http.cache.as_ref().read().channel(event.channel.id());
+                    let before = cache_and_http.cache.as_ref().channel(event.channel.id());
                     update(&cache_and_http, &mut event);
 
                     event_handler.channel_update(context, before, event.channel);
@@ -459,7 +448,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             #[cfg(feature = "cache")]
             let _is_new = {
-                let cache = cache_and_http.cache.as_ref().read();
+                let cache = cache_and_http.cache.as_ref();
                 let unavailable_guilds = cache.unavailable_guilds.read();
                 !unavailable_guilds.contains(&event.guild.id)
             };
@@ -468,7 +457,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             #[cfg(feature = "cache")]
             {
-                let locked_cache = cache_and_http.cache.as_ref().read();
+                let locked_cache = cache_and_http.cache.as_ref();
                 let context = context.clone();
 
                 let unavailable_guilds = locked_cache.unavailable_guilds.read();
@@ -547,7 +536,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
         DispatchEvent::Model(Event::GuildMemberUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event);
             let _after: Option<Member> = feature_cache! {{
-                cache_and_http.cache.as_ref().read().member(event.guild_id, event.user.id)
+                cache_and_http.cache.as_ref().member(event.guild_id, event.user.id)
             } else {
                 None
             }};
@@ -617,7 +606,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    let before = cache_and_http.cache.as_ref().read()
+                    let before = cache_and_http.cache.as_ref()
                         .guilds
                         .get(&event.guild.id)
                         .map(|v| v.clone());
@@ -653,7 +642,7 @@ fn handle_event<H: EventHandler + Send + Sync + 'static>(
 
             threadpool.execute(move || {
                 feature_cache! {{
-                    let _after = cache_and_http.cache.as_ref().read().message(event.channel_id, event.id);
+                    let _after = cache_and_http.cache.as_ref().message(event.channel_id, event.id);
                     event_handler.message_update(context, _before, _after, event);
                 } else {
                     event_handler.message_update(context, event);

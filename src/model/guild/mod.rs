@@ -168,7 +168,7 @@ pub struct Guild {
 impl Guild {
     #[cfg(feature = "cache")]
     fn check_hierarchy(&self, cache: impl AsRef<CacheRwLock>, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().read().user.id;
+        let current_id = cache.as_ref().user.read().id;
 
         if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
             if higher != current_id {
@@ -212,7 +212,7 @@ impl Guild {
 
     #[cfg(feature = "cache")]
     fn has_perms(&self, cache: impl AsRef<CacheRwLock>, mut permissions: Permissions) -> bool {
-        let user_id = cache.as_ref().read().user.id;
+        let user_id = cache.as_ref().user.read().id;
 
         let perms = self.member_permissions(user_id);
         permissions.remove(perms);
@@ -223,7 +223,7 @@ impl Guild {
     #[cfg(feature = "cache")]
     pub fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
         let name = name.as_ref();
-        let cache = cache.as_ref().read();
+        let cache = cache.as_ref();
 
         use crate::cache::Cache;
         let cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*cache) }; // TO-DO fix this
@@ -511,7 +511,7 @@ impl Guild {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.owner_id != cache.read().user.id {
+                if self.owner_id != cache.user.read().id {
                     let req = Permissions::MANAGE_GUILD;
 
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));

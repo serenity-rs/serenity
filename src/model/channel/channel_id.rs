@@ -324,8 +324,8 @@ impl ChannelId {
     /// To allow testing pass their own cache instead of using the globale one.
     #[cfg(feature = "cache")]
     #[inline]
-    pub(crate) fn _to_channel_cached(self, cache: &RwLock<Cache>) -> Option<Channel> {
-        cache.read().channel(self)
+    pub(crate) fn _to_channel_cached(self, cache: &Cache) -> Option<Channel> {
+        cache.channel(self)
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache,
@@ -342,7 +342,7 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(channel) = cache.read().channel(self) {
+                if let Some(channel) = cache.channel(self) {
                     return Ok(channel);
                 }
             }
