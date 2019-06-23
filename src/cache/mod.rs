@@ -846,20 +846,20 @@ impl Cache {
 impl Default for Cache {
     fn default() -> Cache {
         Cache {
-            channels: Arc::new(NestedMap::new()),
-            categories: Arc::new(NestedMap::new()),
-            groups: Arc::new(NestedMap::new()),
-            guilds: Arc::new( NestedMap::new()),
-            messages: Arc::new(NestedMap::new()),
-            notes: Arc::new(NestedMap::new()),
-            presences: Arc::new(NestedMap::new()),
+            channels: Arc::new(NestedMap::new_layer_prefill()),
+            categories: Arc::new(NestedMap::new_layer_prefill()),
+            groups: Arc::new(NestedMap::new_layer_prefill()),
+            guilds: Arc::new(NestedMap::new_layer_prefill()),
+            messages: Arc::new(NestedMap::new_layer_prefill()),
+            notes: Arc::new(NestedMap::new_layer_prefill()),
+            presences: Arc::new(NestedMap::new_layer_prefill()),
             private_channels: Arc::new(NestedMap::new()),
             settings: Settings::default(),
             shard_count: Arc::new(Mutex::new(1)),
             unavailable_guilds: Arc::new(RwLock::new(HashSet::default())),
             user: Arc::new(RwLock::new(CurrentUser::default())),
-            users: Arc::new(NestedMap::new()),
-            message_queue: Arc::new(NestedMap::new()),
+            users: Arc::new(NestedMap::new_layer_prefill()),
+            message_queue: Arc::new(NestedMap::new_layer_prefill()),
             __nonexhaustive: (),
         }
     }
