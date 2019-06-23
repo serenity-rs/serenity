@@ -37,8 +37,9 @@ use std::{
     io::Read,
     path::Path,
 };
-#[cfg(feature = "cache")]
-use crate::prelude::RwLock;
+#[cfg(all(feature = "cache", test))]
+use parking_lot::RwLock;
+
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]

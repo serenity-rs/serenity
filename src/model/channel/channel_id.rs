@@ -16,7 +16,7 @@ use crate::builder::{
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache:: {Cache, CacheRwLock};
 #[cfg(all(feature = "cache", feature = "model"))]
-use parking_lot::RwLock;
+
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
 #[cfg(feature = "model")]

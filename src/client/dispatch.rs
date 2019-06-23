@@ -29,7 +29,7 @@ use crate::cache::CacheUpdate;
 #[cfg(feature = "cache")]
 use std::fmt;
 #[cfg(feature = "cache")]
-use log::warn;
+
 
 #[inline]
 #[cfg(feature = "cache")]
