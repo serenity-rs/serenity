@@ -38,117 +38,239 @@
 //! differentiating between different ratelimits.
 //!
 //! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
+
 pub use super::routing::Route;
 
 use chrono::{DateTime, Utc};
 use reqwest::{
+    Client,
     Response,
     header::HeaderMap,
     StatusCode,
 };
 use crate::internal::prelude::*;
-use parking_lot::Mutex;
+use parking_lot::{Mutex, RwLock};
 use std::{
-    sync::Arc,
+    collections::HashMap,
+    sync::{
+        atomic::{AtomicI64, Ordering},
+        Arc,
+    },
     time::Duration,
     str,
     thread,
     i64,
+    u64,
 };
-use super::{Http, HttpError, Request};
+use super::{HttpError, Request};
 use log::debug;
 
-/// Refer to [`offset`].
+/// Ratelimiter for requests to the Discord API.
 ///
-/// [`offset`]: fn.offset.html
-static mut OFFSET: Option<i64> = None;
+/// This keeps track of ratelimit data for known routes through the
+/// [`Ratelimit`] implementation for each route: how many tickets are
+/// [`remaining`] until the user needs to wait for the known [`reset`] time, and
+/// the [`limit`] of requests that can be made within that time.
+///
+/// When no tickets are available for some time, then the thread sleeps until
+/// that time passes. The mechanism is known as "pre-emptive ratelimiting".
+///
+/// Occasionally for very high traffic bots, a global ratelimit may be reached
+/// which blocks all future requests until the global ratelimit is over,
+/// regardless of route. The value of this global ratelimit is never given
+/// through the API, so it can't be pre-emptively ratelimited. This only affects
+/// the largest of bots.
+pub struct Ratelimiter {
+    client: Arc<Client>,
+    global: Arc<Mutex<()>>,
+    /// Refer to [`offset`].
+    ///
+    /// We do a small hacky thing here to keep this as an atomic rather than
+    /// wrapping it in an option. i64::MAX in this context means that no offset
+    /// has been calculated.
+    ///
+    /// [`offset`]: #method.offset
+    // We will probably start loading values into this more often than just once
+    // in the future, so let's future-proof a bit.
+    offset: AtomicI64,
+    // When futures is implemented, make tasks clear out their respective entry
+    // when the 'reset' passes.
+    routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
+    token: String,
+}
 
-pub(super) fn perform(http: &Http, req: Request<'_>) -> Result<Response> {
-    loop {
-        // This will block if another thread is trying to send
-        // an HTTP-request already (due to receiving an x-ratelimit-global).
-        let _ = http.limiter.lock();
+impl Ratelimiter {
+    /// Creates a new ratelimiter, with a shared `reqwest` client and the
+    /// bot's token.
+    ///
+    /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
+    /// prefix it.
+    pub fn new(client: Arc<Client>, token: impl Into<String>) -> Self {
+        Self::_new(client, token.into())
+    }
 
-        // Destructure the tuple instead of retrieving the third value to
-        // take advantage of the type system. If `RouteInfo::deconstruct`
-        // returns a different number of tuple elements in the future, directly
-        // accessing a certain index (e.g. `req.route.deconstruct().1`) would
-        // mean this code would not indicate it might need to be updated for the
-        // new tuple element amount.
-        //
-        // This isn't normally important, but might be for ratelimiting.
-        let (_, route, _) = req.route.deconstruct();
-
-        // Perform pre-checking here:
-        //
-        // - get the route's relevant rate
-        // - sleep if that route's already rate-limited until the end of the
-        //   'reset' time;
-        // - get the global rate;
-        // - sleep if there is 0 remaining
-        // - then, perform the request
-        let bucket = Arc::clone(http.routes
-            .lock()
-            .entry(route)
-            .or_insert_with(|| {
-                Arc::new(Mutex::new(RateLimit {
-                    limit: i64::MAX,
-                    remaining: i64::MAX,
-                    reset: i64::MAX,
-                }))
-            }));
-
-        let mut lock = bucket.lock();
-        lock.pre_hook(&route);
-
-        let response = http.retry(&req)?;
-
-        // Check if an offset has been calculated yet to determine the time
-        // difference from Discord can the client.
-        //
-        // Refer to the documentation for `OFFSET` for more information.
-        //
-        // This should probably only be a one-time check, although we may want
-        // to choose to check this often in the future.
-        if unsafe { OFFSET }.is_none() {
-            calculate_offset(&response.headers().get("date").and_then(|d| Some(d.as_bytes())));
+    fn _new(client: Arc<Client>, token: String) -> Self {
+        Self {
+            client,
+            global: Default::default(),
+            offset: AtomicI64::new(i64::MAX),
+            routes: Default::default(),
+            token,
         }
+    }
 
-        // Check if the request got ratelimited by checking for status 429,
-        // and if so, sleep for the value of the header 'retry-after' -
-        // which is in milliseconds - and then `continue` to try again
-        //
-        // If it didn't ratelimit, subtract one from the RateLimit's
-        // 'remaining'
-        //
-        // Update the 'reset' with the value of the 'x-ratelimit-reset'
-        // header
-        //
-        // It _may_ be possible for the limit to be raised at any time,
-        // so check if it did from the value of the 'x-ratelimit-limit'
-        // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
-        if route == Route::None {
-            return Ok(response);
+    /// The calculated offset of the time difference between Discord and the
+    /// client in seconds.
+    ///
+    /// This does not have millisecond precision as calculating that isn't
+    /// realistic.
+    ///
+    /// This is used in ratelimiting to help determine how long to wait for
+    /// pre-emptive ratelimits. For example, if the client is 2 seconds ahead,
+    /// then the client would think the ratelimit is over 2 seconds before it
+    /// actually is and would then send off queued requests. Using an offset, we
+    /// can know that there's actually still 2 seconds left
+    /// (+/- some milliseconds).
+    ///
+    /// This isn't a definitive solution to fix all problems, but it can help
+    /// with some precision gains.
+    ///
+    /// This will return `None` if an HTTP request hasn't been made, meaning
+    /// that no offset could have been calculated.
+    pub fn offset(&self) -> Option<i64> {
+        let offset = self.offset.load(Ordering::Relaxed);
+
+        // Refer to documentation for the structfield.
+        if offset == i64::MAX {
+            None
         } else {
-            let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                let _ = http.limiter.lock();
+            Some(offset)
+        }
+    }
 
-                Ok(
-                    if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
-                        debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                        thread::sleep(Duration::from_millis(retry_after as u64));
+    fn set_offset(&self, new_offset: i64) {
+        self.offset.store(new_offset, Ordering::Release);
+    }
 
-                        true
-                    } else {
-                        false
-                    },
-                )
-            } else {
-                lock.post_hook(&response, &route)
-            };
+    /// The routes mutex is a HashMap of each [`Route`] and their respective
+    /// ratelimit information.
+    ///
+    /// See the documentation for [`Ratelimit`] for more information on how the
+    /// library handles ratelimiting.
+    ///
+    /// # Examples
+    ///
+    /// View the `reset` time of the route for `ChannelsId(7)`:
+    ///
+    /// ```rust,no_run
+    /// use serenity::http::{ratelimiting::{Route}};
+    /// # use serenity::http::Http;
+    /// # let http = Http::default();
+    /// let routes = http.ratelimiter.routes();
+    /// let reader = routes.read();
+    ///
+    /// if let Some(route) = reader.get(&Route::ChannelsId(7)) {
+    ///     println!("Reset time at: {}", route.lock().reset());
+    /// }
+    /// ```
+    ///
+    /// [`Ratelimit`]: struct.Ratelimit.html
+    /// [`Route`]: ../routing/enum.Route.html
+    pub fn routes(&self) -> Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>> {
+        Arc::clone(&self.routes)
+    }
 
-            if !redo.unwrap_or(true) {
+    pub fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
+        let RatelimitedRequest { req } = req;
+
+        loop {
+            // This will block if another thread hit the global ratelimit.
+            let _ = self.global.lock();
+
+            // Destructure the tuple instead of retrieving the third value to
+            // take advantage of the type system. If `RouteInfo::deconstruct`
+            // returns a different number of tuple elements in the future,
+            // directly accessing a certain index
+            // (e.g. `req.route.deconstruct().1`) would mean this code would not
+            // indicate it might need to be updated for the new tuple element
+            // amount.
+            //
+            // This isn't normally important, but might be for ratelimiting.
+            let (_, route, _) = req.route.deconstruct();
+
+            // Perform pre-checking here:
+            //
+            // - get the route's relevant rate
+            // - sleep if that route's already rate-limited until the end of the
+            //   'reset' time;
+            // - get the global rate;
+            // - sleep if there is 0 remaining
+            // - then, perform the request
+            let bucket = Arc::clone(&self.routes
+                .write()
+                .entry(route)
+                .or_default());
+
+            bucket.lock().pre_hook(&route, self.offset());
+
+            let request = req.build(&self.client, &self.token)?;
+            let response = request.send()?;
+
+            // Check if an offset has been calculated yet to determine the time
+            // difference from Discord can the client.
+            //
+            // Refer to the documentation for `OFFSET` for more information.
+            //
+            // This should probably only be a one-time check, although we may
+            // want to choose to check this often in the future.
+            if self.offset().is_none() {
+                let date_header = response.headers()
+                    .get("date")
+                    .and_then(|d| Some(d.as_bytes()));
+
+                if let Some(offset) = calculate_offset(&date_header) {
+                    self.set_offset(offset);
+
+                    debug!("[ratelimiting] Set the ratelimit offset to {}", offset);
+                }
+            }
+
+            // Check if the request got ratelimited by checking for status 429,
+            // and if so, sleep for the value of the header 'retry-after' -
+            // which is in milliseconds - and then `continue` to try again
+            //
+            // If it didn't ratelimit, subtract one from the Ratelimit's
+            // 'remaining'
+            //
+            // Update the 'reset' with the value of the 'x-ratelimit-reset'
+            // header
+            //
+            // It _may_ be possible for the limit to be raised at any time,
+            // so check if it did from the value of the 'x-ratelimit-limit'
+            // header. If the limit was 5 and is now 7, add 2 to the 'remaining'
+            if route == Route::None {
                 return Ok(response);
+            } else {
+                let redo = if response.headers().get("x-ratelimit-global").is_some() {
+                    let _ = self.global.lock();
+
+                    Ok(
+                        if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
+                            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
+                            thread::sleep(Duration::from_millis(retry_after as u64));
+
+                            true
+                        } else {
+                            false
+                        },
+                    )
+                } else {
+                    bucket.lock().post_hook(&response, &route)
+                };
+
+                if !redo.unwrap_or(true) {
+                    return Ok(response);
+                }
             }
         }
     }
@@ -165,46 +287,46 @@ pub(super) fn perform(http: &Http, req: Request<'_>) -> Result<Response> {
 /// [`Http`]: ../client/struct.Http.html#structfield.routes
 /// [`Route`]: ../routing/enum.Route.html
 /// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
-#[derive(Clone, Debug, Default)]
-pub struct RateLimit {
+#[derive(Debug)]
+pub struct Ratelimit {
     /// The total number of requests that can be made in a period of time.
-    pub limit: i64,
+    limit: i64,
     /// The number of requests remaining in the period of time.
-    pub remaining: i64,
+    remaining: i64,
     /// When the interval resets and the the [`limit`] resets to the value of
     /// [`remaining`].
     ///
     /// [`limit`]: #structfield.limit
     /// [`remaining`]: #structfield.remaining
-    pub reset: i64,
+    reset: i64,
 }
 
-impl RateLimit {
-    pub(crate) fn pre_hook(&mut self, route: &Route) {
-        if self.limit == 0 {
+impl Ratelimit {
+    pub fn pre_hook(&mut self, route: &Route, offset: Option<i64>) {
+        if self.limit() == 0 {
             return;
         }
 
-        let offset = unsafe { OFFSET }.unwrap_or(0);
+        let offset = offset.unwrap_or(0);
         let now = Utc::now().timestamp();
         let current_time = now - offset;
 
         // The reset was in the past, so we're probably good.
-        if current_time > self.reset {
+        if current_time > self.reset() {
             self.remaining = self.limit;
 
             return;
         }
 
-        let diff = (self.reset - current_time) as u64;
+        let diff = (self.reset() - current_time) as u64;
 
-        if self.remaining == 0 {
+        if self.remaining() == 0 {
             let delay = diff * 1000;
 
             debug!(
                 "Pre-emptive ratelimit on route {:?} for {:?}ms",
                 route,
-                delay
+                delay,
             );
 			
             thread::sleep(Duration::from_millis(delay));
@@ -215,7 +337,7 @@ impl RateLimit {
         self.remaining -= 1;
     }
 
-    pub(crate) fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
+    pub fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
         }
@@ -239,30 +361,57 @@ impl RateLimit {
             false
         })
     }
+
+    /// The total number of requests that can be made in a period of time.
+    #[inline]
+    pub fn limit(&self) -> i64 {
+        self.limit
+    }
+
+    /// The number of requests remaining in the period of time.
+    #[inline]
+    pub fn remaining(&self) -> i64 {
+        self.remaining
+    }
+
+    /// When the interval resets and the the [`limit`] resets to the value of
+    /// [`remaining`].
+    ///
+    /// [`limit`]: #method.limit
+    /// [`remaining`]: #method.remaining
+    #[inline]
+    pub fn reset(&self) -> i64 {
+        self.reset
+    }
 }
 
-/// The calculated offset of the time difference between Discord and the client
-/// in seconds.
-///
-/// This does not have millisecond precision as calculating that isn't
-/// realistic.
-///
-/// This is used in ratelimiting to help determine how long to wait for
-/// pre-emptive ratelimits. For example, if the client is 2 seconds ahead, then
-/// the client would think the ratelimit is over 2 seconds before it actually is
-/// and would then send off queued requests. Using an offset, we can know that
-/// there's actually still 2 seconds left (+/- some milliseconds).
-///
-/// This isn't a definitive solution to fix all problems, but it can help with
-/// some precision gains.
-///
-/// This will return `None` if an HTTP request hasn't been made, meaning that
-/// no offset could have been calculated.
-pub fn offset() -> Option<i64> {
-    unsafe { OFFSET }
+impl Default for Ratelimit {
+    fn default() -> Self {
+        Self {
+            limit: i64::MAX,
+            remaining: i64::MAX,
+            reset: i64::MAX,
+        }
+    }
 }
 
-fn calculate_offset(header: &Option<&[u8]>) {
+/// Information about a request for the ratelimiter to perform.
+///
+/// This only contains the basic information needed by the ratelimiter to
+/// perform a full cycle of making the request and returning the response.
+///
+/// Use the `From` implementations for making one of these.
+pub struct RatelimitedRequest<'a> {
+    req: Request<'a>,
+}
+
+impl<'a> From<Request<'a>> for RatelimitedRequest<'a> {
+    fn from(req: Request<'a>) -> Self {
+        Self { req }
+    }
+}
+
+fn calculate_offset(header: &Option<&[u8]>) -> Option<i64> {
     // Get the current time as soon as possible.
     let now = Utc::now().timestamp();
 
@@ -281,14 +430,11 @@ fn calculate_offset(header: &Option<&[u8]>) {
 
             let diff = offset - now;
 
-            unsafe {
-                OFFSET = Some(diff);
-
-                debug!("[ratelimiting] Set the ratelimit offset to {}", diff);
-            }
+            return Some(diff);
         }
     }
 
+    None
 }
 
 fn parse_header(headers: &HeaderMap, header: &str) -> Result<Option<i64>> {
