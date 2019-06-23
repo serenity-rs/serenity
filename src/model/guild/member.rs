@@ -178,9 +178,6 @@ impl Member {
     pub fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
         let cache = cache.as_ref();
 
-        use crate::cache::Cache;
-        let cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*cache) }; // TO-DO fix this
-
         if let Some(guild) = cache.guilds.get(&self.guild_id) {
             let guild = guild.read();
 
@@ -337,9 +334,6 @@ impl Member {
         {
             if let Some(cache) = cache_http.cache() {
                 let locked_cache = cache.as_ref();
-
-                use crate::cache::Cache;
-                let locked_cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*locked_cache) }; // TO-DO fix this
 
                 if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
                     let req = Permissions::KICK_MEMBERS;

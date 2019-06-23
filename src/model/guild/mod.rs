@@ -225,9 +225,6 @@ impl Guild {
         let name = name.as_ref();
         let cache = cache.as_ref();
 
-        use crate::cache::Cache;
-        let cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*cache) }; // TO-DO fix this
-
         if let Some(guild) = cache.guilds.get(&self.id) {
             let guild = guild.read();
 
