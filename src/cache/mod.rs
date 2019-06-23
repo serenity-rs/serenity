@@ -51,6 +51,7 @@ use std::collections::{
     HashSet,
     VecDeque,
 };
+use parking_lot::Mutex;
 use std::{
     default::Default,
     ops::Deref,
@@ -150,7 +151,7 @@ pub struct Cache {
     /// other users.
     pub private_channels: Arc<NestedMap<ChannelId, Arc<RwLock<PrivateChannel>>>>,
     /// The total number of shards being used by the bot.
-    pub shard_count: u64,
+    pub shard_count: Arc<Mutex<u64>>,
     /// A list of guilds which are "unavailable". Refer to the documentation for
     /// [`Event::GuildUnavailable`] for more information on when this can occur.
     ///
@@ -171,7 +172,7 @@ pub struct Cache {
     ///
     /// [`CurrentUser`]: ../model/user/struct.CurrentUser.html
     /// [`User`]: ../model/user/struct.User.html
-    pub user: CurrentUser,
+    pub user: Arc<RwLock<CurrentUser>>,
     /// A map of users that the current user sees.
     ///
     /// Users are added to - and updated from - this map via the following
@@ -826,11 +827,11 @@ impl Cache {
     ///
     /// [`CacheUpdate`]: trait.CacheUpdate.html
     /// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples
-    pub fn update<E: CacheUpdate>(&mut self, e: &mut E) -> Option<E::Output> {
+    pub fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
         e.update(self)
     }
 
-    pub(crate) fn update_user_entry(&mut self, user: &User) {
+    pub(crate) fn update_user_entry(&self, user: &User) {
         match self.users.entry(user.id) {
             ccl::nestedmap::Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
@@ -854,9 +855,9 @@ impl Default for Cache {
             presences: Arc::new(NestedMap::new()),
             private_channels: Arc::new(NestedMap::new()),
             settings: Settings::default(),
-            shard_count: 1,
+            shard_count: Arc::new(Mutex::new(1)),
             unavailable_guilds: Arc::new(RwLock::new(HashSet::default())),
-            user: CurrentUser::default(),
+            user: Arc::new(RwLock::new(CurrentUser::default())),
             users: Arc::new(NestedMap::new()),
             message_queue: Arc::new(NestedMap::new()),
             __nonexhaustive: (),
@@ -1060,10 +1061,10 @@ mod test {
 /// A neworphantype to allow implementing `AsRef<CacheRwLock>`
 /// for the automatically dereferenced underlying type.
 #[derive(Clone)]
-pub struct CacheRwLock(Arc<RwLock<Cache>>);
+pub struct CacheRwLock(Arc<Cache>);
 
-impl From<Arc<RwLock<Cache>>> for CacheRwLock {
-    fn from(cache: Arc<RwLock<Cache>>) -> Self {
+impl From<Arc<Cache>> for CacheRwLock {
+    fn from(cache: Arc<Cache>) -> Self {
         Self(cache)
     }
 }
@@ -1075,9 +1076,9 @@ impl AsRef<CacheRwLock> for CacheRwLock {
 }
 
 impl Deref for CacheRwLock {
-    type Target = Arc<RwLock<Cache>>;
+    type Target = Arc<Cache>;
 
-    fn deref(&self) -> &Arc<RwLock<Cache>> {
+    fn deref(&self) -> &Arc<Cache> {
         &self.0
     }
 }

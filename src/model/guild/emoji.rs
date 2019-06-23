@@ -172,7 +172,7 @@ impl Emoji {
     /// ```
     #[cfg(feature = "cache")]
     pub fn find_guild_id(&self, cache: impl AsRef<CacheRwLock>) -> Option<GuildId> {
-        for guild in cache.as_ref().read().guilds.iter() {
+        for guild in cache.as_ref().guilds.iter() {
             let guild = guild.value().read();
 
             if guild.emojis.contains_key(&self.id) {

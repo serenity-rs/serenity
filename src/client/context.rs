@@ -51,7 +51,7 @@ impl Context {
         data: Arc<RwLock<ShareMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
-        cache: Arc<RwLock<Cache>>,
+        cache: Arc<Cache>,
         http: Arc<Http>,
     ) -> Context {
         Context {

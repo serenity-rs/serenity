@@ -176,7 +176,7 @@ impl Member {
     /// Determines the member's colour.
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
-        let cache = cache.as_ref().read();
+        let cache = cache.as_ref();
 
         use crate::cache::Cache;
         let cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*cache) }; // TO-DO fix this
@@ -336,7 +336,7 @@ impl Member {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let locked_cache = cache.read();
+                let locked_cache = cache.as_ref();
 
                 use crate::cache::Cache;
                 let locked_cache = unsafe { std::mem::transmute::<&'_ Cache, &'static Cache>(&*locked_cache) }; // TO-DO fix this

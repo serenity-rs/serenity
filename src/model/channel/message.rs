@@ -94,12 +94,12 @@ impl Message {
     /// Returns `None` if the channel is not in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> { cache.as_ref().read().channel(self.channel_id) }
+    pub fn channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> { cache.as_ref().channel(self.channel_id) }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn is_own(&self, cache: impl AsRef<CacheRwLock>) -> bool { self.author.id == cache.as_ref().read().user.id }
+    pub fn is_own(&self, cache: impl AsRef<CacheRwLock>) -> bool { self.author.id == cache.as_ref().user.read().id }
 
     /// Deletes the message.
     ///
@@ -121,7 +121,7 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
-                let is_author = self.author.id == cache.read().user.id;
+                let is_author = self.author.id == cache.user.read().id;
                 let has_perms = utils::user_has_perms(&cache, self.channel_id, req)?;
 
                 if !is_author && !has_perms {
@@ -201,7 +201,7 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.author.id != cache.read().user.id {
+                if self.author.id != cache.user.read().id {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -329,7 +329,7 @@ impl Message {
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
     pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
-       cache.as_ref().read().guild(self.guild_id?)
+       cache.as_ref().guild(self.guild_id?)
     }
 
     /// True if message was sent using direct messages.

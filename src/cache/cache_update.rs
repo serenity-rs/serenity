@@ -111,5 +111,5 @@ pub trait CacheUpdate {
     type Output;
 
     /// Updates the cache with the implementation.
-    fn update(&mut self, _: &mut Cache) -> Option<Self::Output>;
+    fn update(&mut self, _: &Cache) -> Option<Self::Output>;
 }

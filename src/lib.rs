@@ -105,7 +105,7 @@ use crate::http::Http;
 #[derive(Default)]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
+    pub cache: Arc<Cache>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     #[cfg(feature = "http")]
