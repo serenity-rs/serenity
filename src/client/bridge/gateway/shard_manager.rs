@@ -65,7 +65,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use serenity::prelude::*;
 /// use std::sync::Arc;
 /// use std::env;
-/// use threadpool::ThreadPool;
+/// use uvth::ThreadPool;
 ///
 /// struct Handler;
 ///
@@ -78,7 +78,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// let data = Arc::new(RwLock::new(ShareMap::custom()));
 /// let event_handler = Arc::new(Handler);
 /// let framework = Arc::new(Mutex::new(None));
-/// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
+/// let threadpool = ThreadPool::new(5);
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
