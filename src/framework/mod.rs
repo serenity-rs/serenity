@@ -68,7 +68,7 @@ pub use self::standard::StandardFramework;
 
 use crate::client::Context;
 use crate::model::channel::Message;
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 use std::sync::Arc;
 
 /// A trait for defining your own framework for serenity to use.
@@ -90,7 +90,7 @@ impl<F: Framework + ?Sized> Framework for Box<F> {
 
 impl<T: Framework + ?Sized> Framework for Arc<T> {
     #[inline]
-    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &threadpool::ThreadPool) {
+    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &uvth::ThreadPool) {
         if let Some(s) = Arc::get_mut(self) {
             (*s).dispatch(ctx, msg, threadpool)
         }

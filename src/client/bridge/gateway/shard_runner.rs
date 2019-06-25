@@ -22,7 +22,7 @@ use super::super::super::dispatch::{DispatchEvent, dispatch};
 use super::super::super::{EventHandler, RawEventHandler};
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 use tungstenite::{
     error::Error as TungsteniteError,
     protocol::frame::CloseFrame,

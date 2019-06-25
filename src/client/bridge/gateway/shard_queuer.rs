@@ -24,7 +24,7 @@ use super::{
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
 use log::{info, warn};

@@ -21,7 +21,7 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 use typemap::ShareMap;
 use log::{info, warn};
 

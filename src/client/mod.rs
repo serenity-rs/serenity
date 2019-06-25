@@ -42,7 +42,7 @@ use parking_lot::Mutex;
 use parking_lot::RwLock;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 use typemap::ShareMap;
 use log::{error, debug, info};
 
@@ -356,8 +356,7 @@ impl Client {
 
         let http = Http::new_with_token(&token);
 
-        let name = "serenity client".to_owned();
-        let threadpool = ThreadPool::with_name(name, 5);
+        let threadpool = ThreadPool::new(5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = handler.map(Arc::new);
@@ -460,8 +459,7 @@ impl Client {
 
         let http = Http::new_with_token(&token);
 
-        let name = "serenity client".to_owned();
-        let threadpool = ThreadPool::with_name(name, 5);
+        let threadpool = ThreadPool::new(5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
         let event_handler = Some(Arc::new(handler));

@@ -11,7 +11,7 @@ use super::{
     event_handler::{EventHandler, RawEventHandler},
     Context
 };
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 use typemap::ShareMap;
 
 #[cfg(feature = "http")]

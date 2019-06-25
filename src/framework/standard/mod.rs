@@ -24,7 +24,7 @@ use crate::model::{
 };
 use std::collections::HashMap;
 use std::sync::Arc;
-use threadpool::ThreadPool;
+use uvth::ThreadPool;
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
