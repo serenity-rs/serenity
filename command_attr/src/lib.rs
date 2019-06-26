@@ -829,7 +829,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// On standalone `GroupOptions`: `$name_of_options$`
 /// `GroupOptions` belonging to another `Group`: `$name_of_group$.options`
-///
+/// 
+/// Just like [`command`], this macro generates static instances of the group
+/// and its options. The identifiers of these instances are based off the `name` field given to differentiate
+/// this group from others. The field is also passed as the default value to the group's `help_name`, the name
+/// for use and display in the help command, which can be indepedent from the group's `name`.
+/// 
 /// [`command`]: #fn.command.html
 #[proc_macro]
 pub fn group(input: TokenStream) -> TokenStream {
