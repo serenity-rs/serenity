@@ -228,6 +228,7 @@ pub struct HelpOptions {
 
 #[derive(Debug, PartialEq)]
 pub struct CommandGroup {
+    pub help_name: &'static str,
     pub name: &'static str,
     pub options: &'static GroupOptions,
     pub commands: &'static [&'static Command],
