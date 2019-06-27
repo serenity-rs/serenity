@@ -297,6 +297,7 @@ fn find_any_command_matches(
                     if *found_prefix || starts_with_whole_word(&name_to_find, &prefix) {
 
                         if !*found_prefix {
+                            *found_prefix = true;
                             name_to_find.drain(..=prefix.len());
                         }
 
