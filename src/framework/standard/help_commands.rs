@@ -280,29 +280,27 @@ fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
 fn find_any_command_matches(
     command: &'static InternalCommand,
     group: &CommandGroup,
-    name: &mut String,
+    name_to_find: &mut String,
+    found_prefix: &mut bool,
 ) -> Option<&'static str> {
-    let mut found_prefix = false;
 
     command
         .options
         .names
         .iter()
-        .find(|n| {
+        .find(|command_name| {
             group
                 .options
                 .prefixes
                 .iter()
                 .any(|prefix| {
-                    if found_prefix || starts_with_whole_word(&name, &prefix) {
-                        
-                        if !found_prefix {
-                            name.drain(..=prefix.len());
+                    if *found_prefix || starts_with_whole_word(&name_to_find, &prefix) {
+
+                        if !*found_prefix {
+                            name_to_find.drain(..=prefix.len());
                         }
 
-                        found_prefix = true;
-
-                        n == &name
+                        &name_to_find == command_name
                     } else {
                         false
                     }
@@ -389,6 +387,7 @@ fn nested_group_command_search<'a>(
             }
         }
 
+        let mut found_group_prefix: bool = false;
         for command in group.commands {
             let command = *command;
 
@@ -404,7 +403,12 @@ fn nested_group_command_search<'a>(
                     .find(|n| **n == name)
                     .cloned()
             } else {
-                find_any_command_matches(&command, &group, name)
+                find_any_command_matches(
+                    &command,
+                    &group,
+                    name,
+                    &mut found_group_prefix
+                )
             };
 
             if search_command_name_matched.is_some() {
