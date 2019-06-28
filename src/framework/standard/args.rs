@@ -746,13 +746,27 @@ impl Args {
         &self.message[start..]
     }
 
+    /// Starting from the offset, return the remainder of available arguments.
+    ///
+    /// Returns `None` if there are no remaining arguments.
+    #[inline]
+    pub fn option_rest(&self) -> Option<&str> {
+        if self.is_empty() {
+            return None;
+        }
+
+        let (start, _) = self.span();
+
+        Some(&self.message[start..])
+    }
+
     /// Return the full amount of recognised arguments.
     /// The length of the "arguments queue".
     ///
     /// # Note
     ///
     /// The value returned is to be assumed to stay static.
-    /// However, if `find` was called previously, and was succesful, then the value is substracted by one.
+    /// However, if `find` was called previously, and was successful, then the value is substracted by one.
     #[inline]
     pub fn len(&self) -> usize {
         self.args.len()
