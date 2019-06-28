@@ -265,7 +265,7 @@ impl StandardFramework {
             }
         }
 
-        if (group.owner_privilege || command.owner_privilege)
+        if (group.owner_privilege && command.owner_privilege)
             && self.config.owners.contains(&msg.author.id)
         {
             return None;
