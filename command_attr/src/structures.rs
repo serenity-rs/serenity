@@ -707,6 +707,7 @@ impl ToTokens for GroupOptions {
 
 #[derive(Debug)]
 pub struct Group {
+    pub help_name: Ident,
     pub name: Ident,
     pub options: RefOrInstance<GroupOptions>,
     pub commands: Punctuated<Ident, Token![,]>,
@@ -716,6 +717,7 @@ pub struct Group {
 impl Parse for Group {
     fn parse(input: ParseStream) -> Result<Self> {
         enum GroupField {
+            HelpName(Ident),
             Name(Ident),
             Options(RefOrInstance<GroupOptions>),
             Commands(BracketedIdents),
@@ -729,6 +731,7 @@ impl Parse for Group {
                 input.parse::<Token![:]>()?;
 
                 match name.to_string().as_str() {
+                    "help_name" => Ok(GroupField::HelpName(input.parse::<Lit>()?.to_ident())),
                     "name" => Ok(GroupField::Name(input.parse::<Lit>()?.to_ident())),
                     "options" => Ok(GroupField::Options(input.parse()?)),
                     "commands" => Ok(GroupField::Commands(input.parse()?)),
@@ -747,6 +750,7 @@ impl Parse for Group {
         }
 
         let mut name = None;
+        let mut help_name = None;
         let mut options = None;
         let mut commands = None;
         let mut sub_groups = None;
@@ -754,6 +758,7 @@ impl Parse for Group {
         for field in fields {
             match field {
                 GroupField::Name(n) => name = Some(n),
+                GroupField::HelpName(n) => help_name = Some(n),
                 GroupField::Options(o) => options = Some(o),
                 GroupField::Commands(BracketedIdents(p)) => commands = Some(p),
                 GroupField::SubGroups(Bracketed(p)) => sub_groups = Some(p.into_iter().collect()),
@@ -771,6 +776,7 @@ impl Parse for Group {
         };
 
         Ok(Group {
+            help_name: help_name.unwrap_or_else(|| name.clone()),
             name,
             commands,
             options: options.unwrap_or_default(),
@@ -782,6 +788,7 @@ impl Parse for Group {
 impl ToTokens for Group {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let Group {
+            help_name,
             name,
             options: opts,
             commands,
@@ -812,6 +819,8 @@ impl ToTokens for Group {
         let n = name.to_string();
         let name = name.with_suffix(GROUP);
 
+        let help_name = help_name.to_string();
+
         let mut options = None;
         match opts {
             RefOrInstance::Ref(name) => group_ops = name.with_suffix(GROUP_OPTIONS),
@@ -829,6 +838,7 @@ impl ToTokens for Group {
 
         stream.extend(quote! {
             pub static #name: #group_path = #group_path {
+                help_name: #help_name,
                 name: #n,
                 options: &#group_ops,
                 commands: &[#(#commands),*],
