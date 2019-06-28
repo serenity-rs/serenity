@@ -309,7 +309,7 @@ impl StandardFramework {
             }
         }
 
-        for check in command.checks.iter().chain(group.checks.iter()) {
+        for check in group.checks.iter().chain(command.checks.iter()) {
             let res = (check.function)(ctx, msg, args, command);
 
             if let CheckResult::Failure(r) = res {
