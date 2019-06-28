@@ -707,7 +707,7 @@ impl ToTokens for GroupOptions {
 
 #[derive(Debug)]
 pub struct Group {
-    pub help_name: Ident,
+    pub help_name: String,
     pub name: Ident,
     pub options: RefOrInstance<GroupOptions>,
     pub commands: Punctuated<Ident, Token![,]>,
@@ -717,7 +717,7 @@ pub struct Group {
 impl Parse for Group {
     fn parse(input: ParseStream) -> Result<Self> {
         enum GroupField {
-            HelpName(Ident),
+            HelpName(String),
             Name(Ident),
             Options(RefOrInstance<GroupOptions>),
             Commands(BracketedIdents),
@@ -731,7 +731,7 @@ impl Parse for Group {
                 input.parse::<Token![:]>()?;
 
                 match name.to_string().as_str() {
-                    "help_name" => Ok(GroupField::HelpName(input.parse::<Lit>()?.to_ident())),
+                    "help_name" => Ok(GroupField::HelpName(input.parse::<Lit>()?.to_str())),
                     "name" => Ok(GroupField::Name(input.parse::<Lit>()?.to_ident())),
                     "options" => Ok(GroupField::Options(input.parse()?)),
                     "commands" => Ok(GroupField::Commands(input.parse()?)),
@@ -776,7 +776,7 @@ impl Parse for Group {
         };
 
         Ok(Group {
-            help_name: help_name.unwrap_or_else(|| name.clone()),
+            help_name: help_name.unwrap_or_else(|| name.to_string()),
             name,
             commands,
             options: options.unwrap_or_default(),
@@ -818,8 +818,6 @@ impl ToTokens for Group {
         let mut group_ops = name.with_suffix(GROUP_OPTIONS);
         let n = name.to_string();
         let name = name.with_suffix(GROUP);
-
-        let help_name = help_name.to_string();
 
         let mut options = None;
         match opts {
