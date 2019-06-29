@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.6.1] - 2019-6-29
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@hyarsan]
+- [@Lakelezz]
+- [@rsaihe]
+- [@xacrimon]
+- [@zeyla]
+
+## Added
+
+- [framework/command_attr] Add the option to override the display name of a group ([@acdenisSK]) [c:759a278]
+- [framework] Add `remains`, an optional alternative to `rest` ([@hyarsan]) [c:3e15bb8]
+
+## Changed
+
+- [meta] Update the versions to be latest in the README. ([@xacrimon]) [c:335701e]
+- [model] Change the generic of `members` to encompass the `Option` ([@zeyla]) [c:3a72058]
+- [framework] Remove `set_remove` with hint to the `#[check]` ([@Lakelezz]) [c:1527838]
+
+## Fixed
+
+- [model] Revert `say` taking `self` to `&self` ([@zeyla]) [c:e5081db]
+- [framework] Give the owner privilege if only both the group and its command give consent. ([@acdenisSK]) [c:030bb4d]
+- [command_attr] Fix `command_attr` documentation using `#[sub]` instead of `#[sub_commands]` ([@rsaihe]) [c:7a0d169]
+
 ## [0.6.0] - 2019-6-21
 
 🎉 It has finally come for the biggest release of Serenity yet! 🎉 
@@ -2986,6 +3014,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.6.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.2...v0.6.0
 [0.6.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.2
 [0.6.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.1
@@ -3083,6 +3112,7 @@ Initial commit.
 [@perryprog]: https://github.com/perryprog
 [@PvdBerg1998]: https://github.com/PvdBerg1998
 [@Roughsketch]: https://github.com/Roughsketch
+[@rsaihe]: https://github.com/rsaihe
 [@Scetch]: https://github.com/Scetch
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
@@ -3096,6 +3126,15 @@ Initial commit.
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@zeyla]: https://github.com/zeyla
+
+[c:335701e]: https://github.com/serenity-rs/serenity/commit/335701ee06f0083ab98cc245a59a0a77f6d6bd62
+[c:3a72058]: https://github.com/serenity-rs/serenity/commit/3a72058d3ef3aa7324c1348e05435575f46f7211
+[c:e5081db]: https://github.com/serenity-rs/serenity/commit/e5081db9f8adf370f193340f645f6ab54612b413
+[c:759a278]: https://github.com/serenity-rs/serenity/commit/759a2788896f08c79972f1e8fa91ca212c104e52
+[c:030bb4d]: https://github.com/serenity-rs/serenity/commit/030bb4d76df5a40fe90bc531d8cd05c4b99599f0
+[c:7a0d169]: https://github.com/serenity-rs/serenity/commit/7a0d1698576ecae1159b1079e5689ce0d483b85f
+[c:1527838]: https://github.com/serenity-rs/serenity/commit/1527838bfd8d3984ce6c57686d3aac70493e6c55
+[c:3e15bb8]: https://github.com/serenity-rs/serenity/commit/3e15bb8ad240431d4351a1ab00d5aed249434fd5
 
 [c:90b7829]: https://github.com/serenity-rs/serenity/commit/90b78294c74bb4fe7f861fad0a1896a5b1ee280f
 [c:638b642]: https://github.com/serenity-rs/serenity/commit/638b642c853e0567fe008298691daaa765ef4a5f
