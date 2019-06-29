@@ -737,13 +737,7 @@ impl Args {
     /// Starting from the offset, return the remainder of available arguments.
     #[inline]
     pub fn rest(&self) -> &str {
-        if self.is_empty() {
-            return "";
-        }
-
-        let (start, _) = self.span();
-
-        &self.message[start..]
+        self.remains().unwrap_or_default()
     }
 
     /// Starting from the offset, return the remainder of available arguments.
