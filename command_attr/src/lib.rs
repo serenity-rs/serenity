@@ -104,14 +104,14 @@ macro_rules! match_options {
 /// What bucket should impact this command.
 /// Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket)
 /// for its usage.
-/// 
+///
 /// - `#[owners_only]`/`#[owners_only(bool)]`
 /// Whether this command is exclusive to owners.
 ///
 /// - `#[owner_privilege]`/`#[owner_privilege]`
 /// Whether this command has a privilege for owners (i.e certain options are ignored for them).
 ///
-/// - `#[sub(commands)]`
+/// - `#[sub_commands(commands)]`
 /// A list of command names, separated by a comma, stating the subcommands of this command.
 /// These are executed in the form: `this-command sub-command`
 ///
@@ -829,12 +829,12 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// On standalone `GroupOptions`: `$name_of_options$`
 /// `GroupOptions` belonging to another `Group`: `$name_of_group$.options`
-/// 
+///
 /// Just like [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the `name` field given to differentiate
 /// this group from others. The field is also passed as the default value to the group's `help_name`, the name
 /// for use and display in the help command, which can be indepedent from the group's `name`.
-/// 
+///
 /// [`command`]: #fn.command.html
 #[proc_macro]
 pub fn group(input: TokenStream) -> TokenStream {
