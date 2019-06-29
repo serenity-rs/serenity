@@ -198,8 +198,7 @@ fn main() {
         // and the full name of the command that will be called.
         //
         // You can not use this to determine whether a command should be
-        // executed. Instead, `set_check` is provided to give you this
-        // functionality.
+        // executed. Instead, the `#[check]` macro gives you this functionality.
         .before(|ctx, msg, command_name| {
             println!("Got command '{}' by user '{}'",
                      command_name,
