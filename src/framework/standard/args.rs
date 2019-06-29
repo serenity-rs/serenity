@@ -750,7 +750,7 @@ impl Args {
     ///
     /// Returns `None` if there are no remaining arguments.
     #[inline]
-    pub fn option_rest(&self) -> Option<&str> {
+    pub fn remains(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
         }
