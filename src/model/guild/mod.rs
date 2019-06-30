@@ -153,8 +153,10 @@ pub struct Guild {
     /// The server's description
     pub description: Option<String>,
     /// The server's premium boosting level
+    #[serde(default)]
     pub premium_tier: PremiumTier,
     /// The total number of users currently boosting this server
+    #[serde(default)]
     pub premium_subscription_count: u64,
     /// The server's banner
     pub banner: Option<String>,
@@ -1763,14 +1765,14 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let premium_tier = map.remove("premium_tier")
-            .ok_or_else(|| DeError::custom("expected guild premium_tier"))
-            .and_then(PremiumTier::deserialize)
-            .map_err(DeError::custom)?;
-        let premium_subscription_count = map.remove("premium_subscription_count")
-            .ok_or_else(|| DeError::custom("expected guild premium_subscription_count"))
-            .and_then(u64::deserialize)
-            .map_err(DeError::custom)?;
+        let premium_tier = match map.remove("premium_tier") {
+            Some(v) => PremiumTier::deserialize(v).map_err(DeError::custom)?,
+            None => PremiumTier::default(),
+        };
+        let premium_subscription_count = match map.remove("premium_subscription_count") {
+            Some(Value::Null) | None => 0,
+            Some(v) => u64::deserialize(v).map_err(DeError::custom)?,
+        };
         let banner = match map.remove("banner") {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
@@ -1779,7 +1781,6 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-
 
         Ok(Self {
             afk_channel_id,
