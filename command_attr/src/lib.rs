@@ -790,7 +790,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// - `allowed_roles`: Array<String>
 /// Only which roles may execute this group's commands.
 ///
-/// - `only`: String
+/// - `only_in`: String
 /// Whether this group's commands are restricted to `guilds` or `dms`.
 ///
 /// - `owners_only`: Bool
