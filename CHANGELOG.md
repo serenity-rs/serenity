@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.6.2] - 2019-6-30
+
+A small release to address a severe deserialization bug.
+
+Thanks to the following for their contributions:
+- [@benjaminrsherman]
+- [@Lakelezz]
+- [@zeyla]
+
+### Changed
+
+- [meta] Reduce versioning in examples to major.minor ([@Lakelezz]) [c:13595ff]
+- [framework/command_attr] Escape tags and add newline in documentation ([@Lakelezz]) [c:b28716c]
+
+### Fixed
+
+- [framework/command_attr] Fix invalid documentation for the group macro ([@benjaminrsherman]) [c:17f1dc2]
+- [model] Fix guild deserialisation regression ([@zeyla]) [c:e628614]
+
 ## [0.6.1] - 2019-6-29
 
 Thanks to the following for their contributions:
@@ -3014,6 +3033,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.6.2]: https://github.com/serenity-rs/serenity/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.2...v0.6.0
 [0.6.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.0...v0.6.0-rc.2
@@ -3060,6 +3080,7 @@ Initial commit.
 [@abalabahaha]: https://github.com/abalabahaha
 [@acdenisSK]: https://github.com/acdenisSK
 [@andreasots]: https://github.com/andreasots
+[@benjaminrsherman]: https://github.com/benjaminrsherman
 [@Bond-009]: https://github.com/Bond-009
 [@barzamin]: https://github.com/barzamin
 [@bippum]: https://github.com/bippum
@@ -3126,6 +3147,11 @@ Initial commit.
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@zeyla]: https://github.com/zeyla
+
+[c:17f1dc2]: https://github.com/serenity-rs/serenity/commit/17f1dc214f95be129d0ade54ebe8e4e7ab93fbdc
+[c:13595ff]: https://github.com/serenity-rs/serenity/commit/13595ff25d35fcaf9bd69f7fe8d75c67f72e676e
+[c:e628614]: https://github.com/serenity-rs/serenity/commit/e62861464d96d42a150cce1678cd4afdbea6f121
+[c:b28716c]: https://github.com/serenity-rs/serenity/commit/b28716cf09a66b0fc717643c4c6a3e0e8c4afb57
 
 [c:335701e]: https://github.com/serenity-rs/serenity/commit/335701ee06f0083ab98cc245a59a0a77f6d6bd62
 [c:3a72058]: https://github.com/serenity-rs/serenity/commit/3a72058d3ef3aa7324c1348e05435575f46f7211
