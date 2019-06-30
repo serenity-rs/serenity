@@ -31,3 +31,9 @@ impl PremiumTier {
         }
     }
 }
+
+impl Default for PremiumTier {
+    fn default() -> Self {
+        PremiumTier::Tier0
+    }
+}
