@@ -784,47 +784,47 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// These appear inside the object of the `options` field:
 ///
-/// - `prefixes`: Array<String>
+/// - `prefixes`: Array\<String\>\
 /// The group's prefixes.
 ///
-/// - `allowed_roles`: Array<String>
+/// `allowed_roles`: Array\<String\>\
 /// Only which roles may execute this group's commands.
 ///
-/// - `only_in`: String
+/// - `only_in`: String\
 /// Whether this group's commands are restricted to `guilds` or `dms`.
 ///
-/// - `owners_only`: Bool
+/// - `owners_only`: Bool\
 /// If only the owners of the bot may execute this group's commands.
 ///
-/// - `owner_privilege`: Bool
+/// - `owner_privilege`: Bool\
 /// Whether the owners should be treated as normal users.
 ///
 /// Default value is `true`
 ///
-/// - `help_available`: bool
+/// - `help_available`: bool\
 /// Whether the group is visible to the help command.
 ///
 /// Default value is `true`
 ///
-/// - `checks`: Array<Ident>
+/// - `checks`: Array\<Ident\>\
 /// A set of preconditions that must be met before a group command's execution.
 /// Refer to [`command`]'s `checks` documentation.
 ///
-/// - `required_permissions`: Array<Ident>
+/// - `required_permissions`: Array\<Ident\>\
 /// A set of permissions needed by the user before a group command's execution.
 ///
-/// - `default_command`: Ident
+/// - `default_command`: Ident\
 /// Command to be executed if none of the group's prefixes are given.
 /// Identifier must refer to a `#[command]`'d function.
 ///
-/// - `prefix`: String
+/// - `prefix`: String\
 /// Assign a single prefix to this group.
 ///
-/// - `description`: String
+/// - `description`: String\
 /// The description of the group.
 /// Used in the help command.
 ///
-/// - `inherit`: Access
+/// - `inherit`: Access\
 /// Derive options from another `GroupOptions` instance.
 ///
 /// On standalone `GroupOptions`: `$name_of_options$`
