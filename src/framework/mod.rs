@@ -31,31 +31,47 @@
 //! Configuring a Client with a framework, which has a prefix of `"~"` and a
 //! ping and about command:
 //!
-//! ```rust,ignore
-//! use serenity::client::{Client, Context};
-//! use serenity::model::Message;
+//! ```rust,no_run
+//! use serenity::client::{Client, Context, EventHandler};
+//! use serenity::model::channel::Message;
+//! use serenity::framework::standard::macros::{command, group};
+//! use serenity::framework::standard::{StandardFramework, CommandResult};
 //! use std::env;
 //!
-//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
+//! #[command]
+//! fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
+//!     msg.channel_id.say(&ctx.http, "A simple test bot")?;
 //!
-//! client.with_framework(|f| f
-//!     .configure(|c| c.prefix("~"))
-//!     .on("about", |_, msg, _| {
-//!         msg.channel_id.say("A simple test bot")?;
+//!     Ok(())
+//! }
+//! 
+//! #[command]
+//! fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+//!     msg.channel_id.say(&ctx.http, "pong!")?;
 //!
-//!         // The `command!` macro implicitly puts an `Ok(())` at the end of each command definiton;
-//!         // signifying successful execution.
-//!         //
-//!         // However since we're using `on` that requires a function with the definition `Fn(Context, Message, Args) -> Result<(), _>`,
-//!         // we need to manually put the `Ok` ourselves.
-//!         Ok(())
-//!     })
-//!     .cmd("ping", ping));
-//!
-//!
-//! command!(ping(context, message) {
-//!     message.channel_id.say(&context.http, "Pong!")?;
+//!     Ok(())
+//! }
+//! 
+//! group!({
+//!     name: "general",
+//!     commands: [about, ping],
 //! });
+//! 
+//! struct Handler;
+//! 
+//! impl EventHandler for Handler {}
+//! 
+//! # fn main() {
+//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler).unwrap();
+//!
+//! client.with_framework(StandardFramework::new()
+//!     .configure(|c| c.prefix("~"))
+//!     // The `group!` (and similarly, `#[command]`) macro generates static instances 
+//!     // containing any options you gave it. For instance, the group `name` and its `commands`. 
+//!     // Their identifiers, names you can use to refer to these instances in code, are an 
+//!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
+//!     .group(&GENERAL_GROUP));
+//! # }
 //! ```
 //!
 //! [`Client::with_framework`]: ../client/struct.Client.html#method.with_framework
