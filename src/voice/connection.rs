@@ -26,7 +26,15 @@ use audiopus::{
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
+#[cfg(feature = "sodiumoxide")]
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
+#[cfg(feature = "secretbox")]
+use secretbox::{SecretBox, CipherType};
+#[cfg(feature = "secretbox")]
+type Key = SecretBox;
+#[cfg(feature = "secretbox")]
+struct Nonce(pub [u8; 24]);
+
 use std::{
     collections::HashMap,
     io::Write,
@@ -283,6 +291,17 @@ impl Connection {
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
     }
+    #[inline]
+    #[cfg(feature = "sodiumoxide")]
+    fn open_packet(c: &[u8], n: &Nonce, k: &Key) -> std::result::Result<Vec<u8>, ()> {
+        secretbox::open(c, n, k)
+    }
+
+    #[inline]
+    #[cfg(feature = "secretbox")]
+    fn open_packet(c: &[u8], n: &Nonce, k: &Key) -> std::result::Result<Vec<u8>, ()> {
+        k.unseal(c, n.0).ok_or(())
+    }
 
     #[inline]
     fn handle_received_udp(
@@ -303,7 +322,7 @@ impl Connection {
                 .clone_from_slice(&packet[..HEADER_LEN]);
 
             if let Ok(mut decrypted) =
-                secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
+                Self::open_packet(&packet[HEADER_LEN..], &nonce, &self.key) {
                 let channels = opus_packet::nb_channels(&decrypted)?;
 
                 let entry =
@@ -477,7 +496,7 @@ impl Connection {
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
-        let mut nonce = secretbox::Nonce([0; 24]);
+        let mut nonce = Nonce([0; 24]);
 
         while let Ok(status) = self.thread_items.rx.try_recv() {
             match status {
@@ -569,6 +588,17 @@ impl Connection {
 
         Ok(())
     }
+    #[cfg(feature = "sodiumoxide")]
+    #[inline]
+    fn seal_packet(m: &[u8], n: &Nonce, k: &Key) -> Vec<u8> {
+        secretbox::seal(m, n, k)
+    }
+
+    #[cfg(feature = "secretbox")]
+    #[inline]
+    fn seal_packet(m: &[u8], n: &Nonce, k: &Key) -> Vec<u8> {
+        k.seal(m, n.0)
+    }
 
     fn prep_packet(&mut self,
                    packet: &mut [u8],
@@ -602,7 +632,7 @@ impl Connection {
 
         let crypted = {
             let slice = &packet[HEADER_LEN..HEADER_LEN + len];
-            secretbox::seal(slice, &nonce, &self.key)
+            Self::seal_packet(slice, &nonce, &self.key)
         };
         let index = HEADER_LEN + crypted.len();
         packet[HEADER_LEN..index].clone_from_slice(&crypted);
@@ -662,6 +692,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
         .or(Err(Error::Voice(VoiceError::EndpointUrl)))
 }
 
+#[cfg(feature = "sodiumoxide")]
 #[inline]
 fn encryption_key(client: &mut WsClient) -> Result<Key> {
     loop {
@@ -690,6 +721,36 @@ fn encryption_key(client: &mut WsClient) -> Result<Key> {
         }
     }
 }
+
+#[cfg(feature = "secretbox")]
+#[inline]
+fn encryption_key(client: &mut WsClient) -> Result<Key> {
+    loop {
+        let value = match client.recv_json()? {
+            Some(value) => value,
+            None => continue,
+        };
+
+        match VoiceEvent::deserialize(value)? {
+            VoiceEvent::SessionDescription(desc) => {
+                if desc.mode != CRYPTO_MODE {
+                    return Err(Error::Voice(VoiceError::VoiceModeInvalid));
+                }
+                return Key::new(&desc.secret_key, CipherType::Salsa20)
+                    .ok_or(Error::Voice(VoiceError::KeyGen));
+            },
+            VoiceEvent::Unknown(op, value) => {
+                debug!(
+                    "[Voice] Expected ready for key; got: op{}/v{:?}",
+                    op.num(),
+                    value
+                );
+            },
+            _ => {},
+        }
+    }
+}
+
 
 #[inline]
 fn has_valid_mode<T, It> (modes: It) -> bool

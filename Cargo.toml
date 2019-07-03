@@ -69,6 +69,10 @@ features = ["std"]
 optional = true
 version = "0.2"
 
+[dependencies.secretbox]
+optional = true
+version = "0.1.0"
+
 [dependencies.threadpool]
 optional = true
 version = "1.7"
@@ -150,7 +154,10 @@ native_tls_backend = ["reqwest/default-tls", "tungstenite/tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide"]
+voice = ["byteorder", "gateway", "audiopus", "rand"]
+voice-secretbox = ["voice", "secretbox"]
+voice-sodiumoxide = ["voice", "sodiumoxide"]
+
 
 [package.metadata.docs.rs]
 all-features = true
