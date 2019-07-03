@@ -28,11 +28,11 @@ use rand::random;
 use serde::Deserialize;
 #[cfg(feature = "sodiumoxide")]
 use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
-#[cfg(feature = "secretbox")]
+#[cfg(not(feature = "sodiumoxide"))]
 use secretbox::{SecretBox, CipherType};
-#[cfg(feature = "secretbox")]
+#[cfg(not(feature = "sodiumoxide"))]
 type Key = SecretBox;
-#[cfg(feature = "secretbox")]
+#[cfg(not(feature = "sodiumoxide"))]
 struct Nonce(pub [u8; 24]);
 
 use std::{
@@ -298,7 +298,7 @@ impl Connection {
     }
 
     #[inline]
-    #[cfg(feature = "secretbox")]
+    #[cfg(not(feature = "sodiumoxide"))]
     fn open_packet(c: &[u8], n: &Nonce, k: &Key) -> std::result::Result<Vec<u8>, ()> {
         k.unseal(c, n.0).ok_or(())
     }
@@ -594,7 +594,7 @@ impl Connection {
         secretbox::seal(m, n, k)
     }
 
-    #[cfg(feature = "secretbox")]
+    #[cfg(not(feature = "sodiumoxide"))]
     #[inline]
     fn seal_packet(m: &[u8], n: &Nonce, k: &Key) -> Vec<u8> {
         k.seal(m, n.0)
@@ -722,7 +722,7 @@ fn encryption_key(client: &mut WsClient) -> Result<Key> {
     }
 }
 
-#[cfg(feature = "secretbox")]
+#[cfg(not(feature = "sodiumoxide"))]
 #[inline]
 fn encryption_key(client: &mut WsClient) -> Result<Key> {
     loop {
