@@ -62,7 +62,7 @@ pub enum AudioType {
 ///
 /// let handler: Handler = /* ... */;
 /// let source = ffmpeg("../audio/my-favourite-song.mp3")?;
-/// let safe_audio: LockedAudio = handler.play_only();
+/// let safe_audio: LockedAudio = handler.play_only(source);
 /// {
 ///     let audio_lock = safe_audio_control.clone();
 ///     let mut audio = audio_lock.lock();
