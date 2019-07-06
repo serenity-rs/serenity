@@ -375,7 +375,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a spoiler'd inline text to the content.
-    pub fn push_spoiler<D: I>(mut self, content: D) -> Self {
+    pub fn push_spoiler<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("||");
         self.0.push_str(&content.into().to_string());
         self.0.push_str("||");
@@ -516,8 +516,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "||hello||\nworld");
     /// ```
-    pub fn push_spoiler_line<D: I>(mut self, content: D) -> Self {
-        self = self.push_spoiler(content);
+    pub fn push_spoiler_line<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_spoiler(content);
         self.0.push('\n');
 
         self
@@ -624,7 +624,7 @@ impl MessageBuilder {
     }
 
     /// Pushes a spoiler'd inline text to the content normalizing content.
-    pub fn push_spoiler_safe<D: I>(mut self, content: D) -> Self {
+    pub fn push_spoiler_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.0.push_str("||");
         {
             let mut c = content.into();
@@ -785,8 +785,8 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content, "||@\u{200B}everyone||\nIsn't a mention.");
     /// ```
-    pub fn push_spoiler_line_safe<D: I>(mut self, content: D) -> Self {
-        self = self.push_spoiler_safe(content);
+    pub fn push_spoiler_line_safe<D: I>(&mut self, content: D) -> &mut Self {
+        self.push_spoiler_safe(content);
         self.0.push('\n');
 
         self
