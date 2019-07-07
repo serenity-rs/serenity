@@ -57,7 +57,7 @@ group!({
     options: {
         // Sets multiple prefixes for a group.
         // This requires us to call commands in this group
-        // via `~emoji` (or `~e`) instead of just `~`.
+        // via `~emoji` (or `~em`) instead of just `~`.
         prefixes: ["emoji", "em"],
         // Set a description to appear if a user wants to display a single group
         // e.g. via help using the group-name or one of its prefixes.
