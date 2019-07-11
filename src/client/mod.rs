@@ -340,17 +340,17 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn new<H>(token: &str, handler: H) -> Result<Self>
+    pub fn new<H>(token: impl AsRef<str>, handler: H) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
 
-        Self::new_with_handlers(token, Some(handler), None::<DummyRawEventHandler>)
+        Self::new_with_handlers(token.as_ref(), Some(handler), None::<DummyRawEventHandler>)
     }
     /// Creates a client with an optional Handler. If you pass `None`, events are never parsed, but
     /// they can be received by registering a RawHandler.
-    pub fn new_with_handlers<H, RH>(token: &str, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
+    pub fn new_with_handlers<H, RH>(token: impl AsRef<str>, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static,
               RH: RawEventHandler + Send + Sync + 'static {
-        let token = token.trim();
+        let token = token.as_ref().trim();
 
         let token = if token.starts_with("Bot ") {
             token.to_string()
@@ -452,9 +452,9 @@ impl Client {
     /// # }
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn new_with_cache_update_timeout<H>(token: &str, handler: H, duration: Option<Duration>) -> Result<Self>
+    pub fn new_with_cache_update_timeout<H>(token: impl AsRef<str>, handler: H, duration: Option<Duration>) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static {
-        let token = token.trim();
+        let token = token.as_ref().trim();
 
         let token = if token.starts_with("Bot ") {
             token.to_string()
@@ -1047,7 +1047,9 @@ impl Client {
 /// The type of failure is not specified.
 ///
 /// [`ClientError::InvalidToken`]: enum.ClientError.html#variant.InvalidToken
-pub fn validate_token(token: &str) -> Result<()> {
+pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
+    let token = token.as_ref();
+
     if token.is_empty() {
         return Err(Error::Client(ClientError::InvalidToken));
     }
