@@ -148,12 +148,12 @@ TLS implementation.
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
 and OpenSSL on other platforms.
 
-Serenity offers two Voice encryption backends. You need to pick one to use `voice`
+Serenity offers two Voice encryption backends. You need to pick one to use `voice`.
 
-- **secretbox**: Uses secretbox for all platforms, a pure Rust Secretbox implementation. Use this if you are compiling for windows or cross-compiling
+- **secretbox**: Uses secretbox for all platforms, a pure Rust Secretbox implementation. Use this if you are compiling for windows or cross-compiling.
 - **sodiumoxide**: Uses sodiumoxide for all platforms, a wrapper around the libsodium C library.
 
-If multiple are selected it will use the faster implementation by default.
+If multiple are selected, Serenity will use the faster implementation by default.
 
 
 If you want all of the default features except for `cache` for example, you can

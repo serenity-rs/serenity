@@ -155,8 +155,8 @@ model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "audiopus", "rand"]
-voice-secretbox = ["voice", "secretbox"]
-voice-sodiumoxide = ["voice", "sodiumoxide"]
+voice_secretbox = ["voice", "secretbox"]
+voice_sodiumoxide = ["voice", "sodiumoxide"]
 
 
 [package.metadata.docs.rs]
