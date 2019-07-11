@@ -1,4 +1,4 @@
-use uwl::StringStream;
+use uwl::UnicodeStream;
 
 use std::cell::Cell;
 use std::error::Error as StdError;
@@ -101,7 +101,7 @@ impl Token {
     }
 }
 
-fn lex(stream: &mut StringStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
+fn lex(stream: &mut UnicodeStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
     if stream.at_end() {
         return None;
     }
@@ -142,7 +142,7 @@ fn lex(stream: &mut StringStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
             Token::new(TokenKind::QuotedArgument, start, end)
         } else {
             // We're missing an end quote. View this as a normal argument.
-            Token::new(TokenKind::Argument, start, stream.src.len())
+            Token::new(TokenKind::Argument, start, stream.source().len())
         });
     }
 
@@ -331,7 +331,7 @@ impl Args {
             vec![Token::new(kind, 0, message.len())]
         } else {
             let mut args = Vec::new();
-            let mut stream = StringStream::new(message);
+            let mut stream = UnicodeStream::new(message);
 
             while let Some(token) = lex(&mut stream, &delims) {
                 if token.kind == TokenKind::Delimiter {

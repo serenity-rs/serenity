@@ -1,7 +1,7 @@
 use super::*;
 use crate::client::Context;
 use crate::model::channel::Message;
-use uwl::{StrExt, StringStream};
+use uwl::{StrExt, UnicodeStream};
 
 #[derive(Debug, Clone, PartialEq)]
 pub enum Prefix<'a> {
@@ -17,7 +17,7 @@ pub fn parse_prefix<'a>(
     msg: &'a Message,
     config: &Configuration,
 ) -> (Prefix<'a>, &'a str) {
-    let mut stream = StringStream::new(&msg.content);
+    let mut stream = UnicodeStream::new(&msg.content);
     stream.take_while(|s| s.is_whitespace());
 
     if let Some(ref mention) = config.on_mention {
@@ -79,7 +79,7 @@ pub fn parse_prefix<'a>(
 
 struct CommandParser<'msg, 'groups, 'config, 'ctx> {
     msg: &'msg Message,
-    stream: StringStream<'msg>,
+    stream: UnicodeStream<'msg>,
     groups: &'groups [&'static CommandGroup],
     config: &'config Configuration,
     ctx: &'ctx Context,
@@ -89,7 +89,7 @@ struct CommandParser<'msg, 'groups, 'config, 'ctx> {
 impl<'msg, 'groups, 'config, 'ctx> CommandParser<'msg, 'groups, 'config, 'ctx> {
     fn new(
         msg: &'msg Message,
-        stream: StringStream<'msg>,
+        stream: UnicodeStream<'msg>,
         groups: &'groups [&'static CommandGroup],
         config: &'config Configuration,
         ctx: &'ctx Context,
@@ -310,7 +310,7 @@ pub(crate) fn parse_command<'a>(
     ctx: &Context,
     help_was_set: Option<&[&'static str]>,
 ) -> Result<Invoke<'a>, Result<Option<&'a str>, DispatchError>> {
-    let mut stream = StringStream::new(message);
+    let mut stream = UnicodeStream::new(message);
     stream.take_while(|s| s.is_whitespace());
 
     // We take precedence over commands named help command's name.
