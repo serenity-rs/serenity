@@ -91,14 +91,13 @@ enum TokenKind {
 #[derive(Debug, Clone, Copy)]
 struct Token {
     kind: TokenKind,
-    start: usize,
-    end: usize,
+    span: (usize, usize),
 }
 
 impl Token {
     #[inline]
     fn new(kind: TokenKind, start: usize, end: usize) -> Self {
-        Token { kind, start, end }
+        Token { kind, span: (start, end) }
     }
 }
 
@@ -169,6 +168,14 @@ fn lex(stream: &mut StringStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
     }
 
     Some(Token::new(TokenKind::Argument, start, stream.offset()))
+}
+
+fn remove_quotes(s: &str) -> &str {
+    if s.starts_with('"') && s.ends_with('"') {
+        return &s[1..s.len() - 1];
+    }
+
+    s
 }
 
 #[derive(Debug, Clone, Copy)]
@@ -345,17 +352,9 @@ impl Args {
         }
     }
 
+    #[inline]
     fn span(&self) -> (usize, usize) {
-        let Token {
-            start,
-            end,
-            ..
-        } = &self.args[self.offset];
-
-        let start = *start;
-        let end = *end;
-
-        (start, end)
+        self.args[self.offset].span
     }
 
     #[inline]
@@ -401,14 +400,6 @@ impl Args {
     }
 
     fn apply<'a>(&self, s: &'a str) -> &'a str {
-        fn remove_quotes(s: &str) -> &str {
-            if s.starts_with('"') && s.ends_with('"') {
-                return &s[1..s.len() - 1];
-            }
-
-            s
-        }
-
         fn trim(s: &str) -> &str {
             let trimmed = s.trim();
 
@@ -649,6 +640,50 @@ impl Args {
         }
     }
 
+    /// Return an iterator over all unmodified arguments.
+    ///
+    /// # Examples
+    ///
+    /// Join the arguments by a comma and a space.
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::{Args, Delimiter};
+    ///
+    /// let args = Args::new("Harry Hermione Ronald", &[Delimiter::Single(' ')]);
+    ///
+    /// let protagonists = args.raw().collect::<Vec<&str>>().join(", ");
+    ///
+    /// assert_eq!(protagonists, "Harry, Hermione, Ronald");
+    /// ```
+    #[inline]
+    pub fn raw(&self) -> RawArguments<'_> {
+        RawArguments {
+            tokens: &self.args,
+            msg: &self.message,
+            quoted: false,
+        }
+    }
+
+    /// Return an iterator over all arguments, stripped of their quotations if any were present.
+    ///
+    /// # Examples
+    ///
+    /// ```rust
+    /// use serenity::framework::standard::{Args, Delimiter};
+    ///
+    /// let args = Args::new("Saw \"The Mist\" \"A Quiet Place\"", &[Delimiter::Single(' ')]);
+    ///
+    /// let horror_movies = args.raw_quoted().collect::<Vec<&str>>();
+    ///
+    /// assert_eq!(&*horror_movies, &["Saw", "The Mist", "A Quiet Place"]);
+    /// ```
+    #[inline]
+    pub fn raw_quoted(&self) -> RawArguments<'_> {
+        let mut raw = self.raw();
+        raw.quoted = true;
+        raw
+    }
+
     /// Search for any available argument that can be parsed, and remove it from the "arguments queue".
     ///
     /// # Note
@@ -839,5 +874,32 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> {
             self.args.advance();
             Some(arg)
         }
+    }
+}
+
+/// Access to all of the arguments, as an iterator.
+#[derive(Debug)]
+pub struct RawArguments<'a> {
+    msg: &'a str,
+    tokens: &'a [Token],
+    quoted: bool,
+}
+
+impl<'a> Iterator for RawArguments<'a> {
+    type Item = &'a str;
+
+    #[inline]
+    fn next(&mut self) -> Option<Self::Item> {
+        let (start, end) = self.tokens.get(0)?.span;
+
+        self.tokens = &self.tokens[1..];
+
+        let mut s = &self.msg[start..end];
+
+        if self.quoted {
+            s = remove_quotes(s);
+        }
+
+        Some(s)
     }
 }
