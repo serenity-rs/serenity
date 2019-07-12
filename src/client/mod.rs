@@ -350,17 +350,11 @@ impl Client {
     pub fn new_with_handlers<H, RH>(token: &str, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
         where H: EventHandler + Send + Sync + 'static,
               RH: RawEventHandler + Send + Sync + 'static {
-        let token = token.trim();
-
-        let token = if token.starts_with("Bot ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
+        let token = token.trim().to_string();
 
         let http = Http::new_with_token(&token);
 
-        let name = "serenity client".to_owned();
+        let name = "rust".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
