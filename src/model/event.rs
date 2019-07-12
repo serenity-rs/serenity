@@ -152,9 +152,17 @@ impl CacheUpdate for ChannelDeleteEvent {
 
                 cache.categories.remove(&channel_id);
             },
+            Channel::Private(ref channel) => {
+                let id = {
+                    channel.read().id
+                };
+
+                cache.private_channels.remove(&id);
+            },
+
             // We ignore these because the delete event does not fire for these.
-            Channel::Private(_) | Channel::Group(_)
-            | Channel::__Nonexhaustive => unreachable!(),
+            Channel::Group(_) |
+            Channel::__Nonexhaustive => unreachable!(),
         };
 
         // Remove the cached messages for the channel.
