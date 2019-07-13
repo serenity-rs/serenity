@@ -49,6 +49,10 @@ use std::{
 use crate::cache::CacheRwLock;
 #[cfg(feature = "client")]
 use crate::client::Context;
+#[cfg(feature = "client")]
+use crate::CacheAndHttp;
+#[cfg(feature = "client")]
+use std::sync::Arc;
 
 /// This trait will be required by functions that need [`Http`] and can
 /// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
@@ -99,6 +103,30 @@ impl CacheHttp for &mut Context {
 
 #[cfg(feature = "client")]
 impl CacheHttp for &&mut Context {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for CacheAndHttp {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for &CacheAndHttp {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for Arc<CacheAndHttp> {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
