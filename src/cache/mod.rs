@@ -1070,6 +1070,12 @@ impl AsRef<CacheRwLock> for CacheRwLock {
     }
 }
 
+impl Default for CacheRwLock {
+    fn default() -> Self {
+        Self(Arc::new(RwLock::new(Cache::default())))
+    }
+}
+
 impl Deref for CacheRwLock {
     type Target = Arc<RwLock<Cache>>;
 
