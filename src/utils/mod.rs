@@ -135,7 +135,9 @@ pub fn parse_invite(code: &str) -> &str {
 /// ```
 ///
 /// [`User`]: ../model/user/struct.User.html
-pub fn parse_username(mention: &str) -> Option<u64> {
+pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
+    let mention = mention.as_ref();
+
     if mention.len() < 4 {
         return None;
     }
@@ -174,7 +176,9 @@ pub fn parse_username(mention: &str) -> Option<u64> {
 /// ```
 ///
 /// [`Role`]: ../model/guild/struct.Role.html
-pub fn parse_role(mention: &str) -> Option<u64> {
+pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
+    let mention = mention.as_ref();
+
     if mention.len() < 4 {
         return None;
     }
@@ -211,7 +215,9 @@ pub fn parse_role(mention: &str) -> Option<u64> {
 /// ```
 ///
 /// [`Channel`]: ../model/channel/enum.Channel.html
-pub fn parse_channel(mention: &str) -> Option<u64> {
+pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
+    let mention = mention.as_ref();
+
     if mention.len() < 4 {
         return None;
     }
@@ -237,7 +243,9 @@ pub fn parse_channel(mention: &str) -> Option<u64> {
 /// assert_eq!(parse_mention("<@&137235212097683456>"), Some(137235212097683456));
 /// assert_eq!(parse_mention("<#137234234728251392>"), Some(137234234728251392));
 /// ```
-pub fn parse_mention(mention: &str) -> Option<u64> {
+pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
+    let mention = mention.as_ref();
+
     if mention.starts_with("<@&") {
         parse_role(mention)
     } else if mention.starts_with("<@") || mention.starts_with("<@!") {
@@ -280,7 +288,9 @@ pub fn parse_mention(mention: &str) -> Option<u64> {
 /// ```
 ///
 /// [`Emoji`]: ../model/guild/struct.Emoji.html
-pub fn parse_emoji(mention: &str) -> Option<EmojiIdentifier> {
+pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
+    let mention = mention.as_ref();
+
     let len = mention.len();
 
     if len < 6 || len > 56 {
@@ -385,7 +395,8 @@ fn _read_image(path: &Path) -> Result<String> {
 ///
 /// assert_eq!(parse_quotes(command), expected);
 /// ```
-pub fn parse_quotes(s: &str) -> Vec<String> {
+pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
+    let s = s.as_ref();
     let mut args = vec![];
     let mut in_string = false;
     let mut escaping = false;
@@ -784,8 +795,8 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(cache: impl AsRef<CacheRwLock>, s: &str, options: &ContentSafeOptions) -> String {
-    let mut s = s.to_string();
+pub fn content_safe(cache: impl AsRef<CacheRwLock>, s: impl AsRef<str>, options: &ContentSafeOptions) -> String {
+    let mut s = s.as_ref().to_string();
     let cache = cache.as_ref();
 
     if options.clean_role {
