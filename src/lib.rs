@@ -90,9 +90,7 @@ pub use crate::error::{Error, Result};
 pub use crate::client::Client;
 
 #[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "cache")]
-use parking_lot::RwLock;
+use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
 use std::time::Duration;
 #[cfg(any(feature = "client", feature = "http"))]
@@ -105,7 +103,7 @@ use crate::http::Http;
 #[derive(Default)]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
-    pub cache: Arc<RwLock<Cache>>,
+    pub cache: CacheRwLock,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     #[cfg(feature = "http")]
