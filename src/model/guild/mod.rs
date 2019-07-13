@@ -187,8 +187,11 @@ impl Guild {
     #[cfg(feature = "http")]
     pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
-            if self.permissions_in(*cid, uid).read_messages() {
-                return Some(Arc::clone(channel));
+            let kind = channel.read().kind;
+            if kind != ChannelType::News && kind != ChannelType::Category {
+                if self.permissions_in(*cid, uid).read_messages() {
+                    return Some(Arc::clone(channel));
+                }
             }
         }
 
