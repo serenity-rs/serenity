@@ -41,6 +41,7 @@ use crate::model::prelude::*;
 use self::{request::Request};
 use std::{
     fs::File,
+    sync::Arc,
     path::{Path, PathBuf},
 };
 
@@ -113,6 +114,11 @@ impl CacheHttp for (&CacheRwLock, &Http) {
 impl CacheHttp for &Http {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { *self }
+}
+
+impl CacheHttp for Arc<Http> {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &*self }
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
