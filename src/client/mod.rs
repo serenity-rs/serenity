@@ -373,7 +373,7 @@ impl Client {
 
         let cache_and_http = Arc::new(CacheAndHttp {
             #[cfg(feature = "cache")]
-            cache: Arc::new(RwLock::new(Cache::default())),
+            cache: CacheRwLock::default(),
             #[cfg(feature = "cache")]
             update_cache_timeout: None,
             #[cfg(feature = "http")]
@@ -475,7 +475,7 @@ impl Client {
         )));
 
         let cache_and_http = Arc::new(CacheAndHttp {
-            cache: Arc::new(RwLock::new(Cache::default())),
+            cache: CacheRwLock::default(),
             update_cache_timeout: duration,
             #[cfg(feature = "http")]
             http: Arc::new(http),
