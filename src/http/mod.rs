@@ -113,7 +113,6 @@ impl CacheHttp for (&CacheRwLock, &Http) {
 
 #[cfg(feature = "http")]
 impl CacheHttp for &Http {
-    #[cfg(feature = "http")]
     fn http(&self) -> &Http { *self }
 }
 
