@@ -111,11 +111,13 @@ impl CacheHttp for (&CacheRwLock, &Http) {
     fn http(&self) -> &Http { &self.1 }
 }
 
+#[cfg(feature = "http")]
 impl CacheHttp for &Http {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { *self }
 }
 
+#[cfg(feature = "http")]
 impl CacheHttp for Arc<Http> {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { &*self }
