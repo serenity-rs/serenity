@@ -131,7 +131,7 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(|i| i.max_uses(5));
+    /// let invite = channel.create_invite(&context, |i| i.max_uses(5));
     /// ```
     #[cfg(all(feature = "utils", feature = "client"))]
     pub fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
