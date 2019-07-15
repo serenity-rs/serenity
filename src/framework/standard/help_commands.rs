@@ -6,7 +6,14 @@
 //! embeds:
 //!
 //! ```rust,no_run
-//! use serenity::framework::standard::{StandardFramework, help_commands, Args, HelpOptions, CommandGroup, CommandResult};
+//! use serenity::framework::standard::{
+//!     StandardFramework,
+//!     help_commands,
+//!     Args,
+//!     HelpOptions,
+//!     CommandGroup,
+//!     CommandResult,
+//! };
 //! use serenity::framework::standard::macros::help;
 //! use serenity::model::prelude::{Message, UserId};
 //! use serenity::client::{EventHandler, Context, Client};
@@ -26,7 +33,13 @@
 //!    groups: &[&'static CommandGroup],
 //!    owners: HashSet<UserId>
 //! ) -> CommandResult {
+//! #  #[cfg(all(feature = "cache", feature = "http"))]
+//! # {
 //!    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+//! # }
+//! #
+//! # #[cfg(not(all(feature = "cache", feature = "http")))]
+//! # Ok(())
 //! }
 //!
 //! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler).unwrap();
