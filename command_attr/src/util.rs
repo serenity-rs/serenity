@@ -1,4 +1,5 @@
 use crate::structures::CommandFun;
+use proc_macro::TokenStream;
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
@@ -65,6 +66,20 @@ impl IdentExt2 for Ident {
             Span::call_site(),
         )
     }
+}
+
+#[inline]
+pub fn into_stream(e: Error) -> TokenStream {
+    e.to_compile_error().into()
+}
+
+macro_rules! try_r {
+    ($res:expr) => {{
+        match $res {
+            Ok(v) => v,
+            Err(e) => return $crate::util::into_stream(e),
+        }
+    }};
 }
 
 pub trait ParseStreamExt {
@@ -286,7 +301,7 @@ pub fn validate_declaration(fun: &mut CommandFun, dec_for: DeclarFor) -> Result<
     if fun.args.len() > len {
         return Err(Error::new(
             fun.args.last().unwrap().span(),
-            format!("function's arity exceeds more than {} arguments", len),
+            format_args!("function's arity exceeds more than {} arguments", len),
         ));
     }
 
@@ -394,7 +409,7 @@ pub fn validate_return_type(fun: &mut CommandFun, [relative, absolute]: [Type; 2
 
     Err(Error::new(
         ret.span(),
-        &format!(
+        format_args!(
             "expected either `{}` or `{}` as the return type, but got `{}`",
             quote!(#relative),
             quote!(#absolute),

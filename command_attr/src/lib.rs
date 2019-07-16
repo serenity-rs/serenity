@@ -20,6 +20,8 @@ use syn::{
 pub(crate) mod attributes;
 pub(crate) mod consts;
 pub(crate) mod structures;
+
+#[macro_use]
 pub(crate) mod util;
 
 use attributes::*;
@@ -31,10 +33,10 @@ macro_rules! match_options {
     ($v:expr, $values:ident, $options:ident, $span:expr => [$($name:ident);*]) => {
         match $v {
             $(
-                stringify!($name) => $options.$name.parse(stringify!($name), $values),
+                stringify!($name) => $options.$name = try_r!($crate::attributes::parse($values)),
             )*
             _ => {
-                return Error::new($span, &format!("invalid attribute: {:?}", $v))
+                return Error::new($span, format_args!("invalid attribute: {:?}", $v))
                     .to_compile_error()
                     .into();
             },
@@ -142,25 +144,20 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     for attribute in &fun.attributes {
         let span = attribute.span();
-        let values = match parse_values(attribute) {
-            Ok(vals) => vals,
-            Err(err) => return err.to_compile_error().into(),
-        };
+        let values = try_r!(parse_values(attribute));
 
         let name = values.name.to_string();
         let name = &name[..];
 
         match name {
             "num_args" => {
-                let mut args = 0;
-                args.parse("num_args", values);
+                let args = try_r!(u16::parse(values));
 
                 options.min_args = Some(args);
                 options.max_args = Some(args);
             }
             "required_permissions" => {
-                let mut p = Vec::<Ident>::new();
-                p.parse("required_permissions", values);
+                let p = try_r!(Vec::<Ident>::parse(values));
 
                 let mut permissions = Permissions::default();
                 for perm in p {
@@ -180,34 +177,19 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.required_permissions = permissions;
             }
             "checks" => {
-                let mut checks = Vec::<Ident>::new();
-                checks.parse("checks", values);
-
-                options.checks = Checks(checks);
+                options.checks = Checks(try_r!(attributes::parse(values)));
             }
             "bucket" => {
-                let mut buck = String::new();
-                buck.parse("bucket", values);
-
-                options.bucket = Some(buck);
+                options.bucket = Some(try_r!(attributes::parse(values)));
             }
             "description" => {
-                let mut desc = String::new();
-                desc.parse("description", values);
-
-                options.description = Some(desc);
+                options.description = Some(try_r!(attributes::parse(values)));
             }
             "usage" => {
-                let mut usage = String::new();
-                usage.parse("usage", values);
-
-                options.usage = Some(usage);
+                options.usage = Some(try_r!(attributes::parse(values)));
             }
             "example" => {
-                let mut ex = String::new();
-                ex.parse("example", values);
-
-                options.example = Some(ex);
+                options.example = Some(try_r!(attributes::parse(values)));
             }
             _ => {
                 match_options!(name, values, options, span => [
@@ -251,18 +233,14 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
 
-    if let Err(err) = validate_declaration(&mut fun, DeclarFor::Command) {
-        return err.to_compile_error().into();
-    }
+    try_r!(validate_declaration(&mut fun, DeclarFor::Command));
 
     let either = [
         parse_quote!(CommandResult),
         parse_quote!(serenity::framework::standard::CommandResult),
     ];
 
-    if let Err(err) = validate_return_type(&mut fun, either) {
-        return err.to_compile_error().into();
-    }
+    try_r!(validate_return_type(&mut fun, either));
 
     let Permissions(required_permissions) = required_permissions;
 
@@ -441,25 +419,21 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     for attribute in &fun.attributes {
         let span = attribute.span();
-        let values = match parse_values(attribute) {
-            Ok(vals) => vals,
-            Err(err) => return err.to_compile_error().into(),
-        };
+        let values = try_r!(parse_values(attribute));
 
         let name = values.name.to_string();
         let name = &name[..];
 
         match name {
             "lacking_role" => {
-                let mut behaviour = String::with_capacity(7);
-                behaviour.parse("lacking_role", values);
+                let val = try_r!(String::parse(values));
 
-                options.lacking_role = match HelpBehaviour::from_str(&behaviour) {
+                options.lacking_role = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
                     None => {
                         return Error::new(
                             span,
-                            &format!("invalid help behaviour: {:?}", behaviour),
+                            format_args!("invalid help behaviour: {:?}", val),
                         )
                         .to_compile_error()
                         .into();
@@ -467,43 +441,38 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "embed_error_colour" => {
-                let mut val = String::with_capacity(14);
-
-                val.parse("embed_error_colour", values);
+                let val = try_r!(String::parse(values));
 
                 options.embed_error_colour = match Colour::from_str(&val) {
                     Some(c) => c,
                     None => {
-                        return Error::new(span, &format!("invalid colour: {:?}", val))
+                        return Error::new(span, format_args!("invalid colour: {:?}", val))
                             .to_compile_error()
                             .into();
                     }
                 };
             }
             "embed_success_colour" => {
-                let mut val = String::with_capacity(14);
-
-                val.parse("embed_success_colour", values);
+                let val = try_r!(String::parse(values));
 
                 options.embed_success_colour = match Colour::from_str(&val) {
                     Some(c) => c,
                     None => {
-                        return Error::new(span, &format!("invalid colour: {:?}", val))
+                        return Error::new(span, format_args!("invalid colour: {:?}", val))
                             .to_compile_error()
                             .into();
                     }
                 };
             }
             "lacking_permissions" => {
-                let mut behaviour = String::with_capacity(7);
-                behaviour.parse("lacking_permissions", values);
+                let val = try_r!(String::parse(values));
 
-                options.lacking_permissions = match HelpBehaviour::from_str(&behaviour) {
+                options.lacking_permissions = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
                     None => {
                         return Error::new(
                             span,
-                            &format!("invalid help behaviour: {:?}", behaviour),
+                            format_args!("invalid help behaviour: {:?}", val),
                         )
                         .to_compile_error()
                         .into();
@@ -511,15 +480,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "lacking_ownership" => {
-                let mut behaviour = String::with_capacity(7);
-                behaviour.parse("lacking_ownership", values);
+                let val = try_r!(String::parse(values));
 
-                options.lacking_ownership = match HelpBehaviour::from_str(&behaviour) {
+                options.lacking_ownership = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
                     None => {
                         return Error::new(
                             span,
-                            &format!("invalid help behaviour: {:?}", behaviour),
+                            format_args!("invalid help behaviour: {:?}", val),
                         )
                         .to_compile_error()
                         .into();
@@ -527,15 +495,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "wrong_channel" => {
-                let mut behaviour = String::with_capacity(7);
-                behaviour.parse("wrong_channel", values);
+                let val = try_r!(String::parse(values));
 
-                options.wrong_channel = match HelpBehaviour::from_str(&behaviour) {
+                options.wrong_channel = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
                     None => {
                         return Error::new(
                             span,
-                            &format!("invalid help behaviour: {:?}", behaviour),
+                            format_args!("invalid help behaviour: {:?}", val),
                         )
                         .to_compile_error()
                         .into();
@@ -659,18 +626,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let Colour(embed_error_colour) = embed_error_colour;
     let Colour(embed_success_colour) = embed_success_colour;
 
-    if let Err(err) = validate_declaration(&mut fun, DeclarFor::Help) {
-        return err.to_compile_error().into();
-    }
+    try_r!(validate_declaration(&mut fun, DeclarFor::Help));
 
     let either = [
         parse_quote!(CommandResult),
         parse_quote!(serenity::framework::standard::CommandResult),
     ];
 
-    if let Err(err) = validate_return_type(&mut fun, either) {
-        return err.to_compile_error().into();
-    }
+    try_r!(validate_return_type(&mut fun, either));
 
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
@@ -850,7 +813,7 @@ pub fn group(input: TokenStream) -> TokenStream {
 /// use command_attr::group_options;
 ///
 /// // First argument is the name of the options; second the actual options.
-/// group_options!("foobar", {
+/// group_options!(Foobar {
 ///     description: "I'm an example group",
 /// });
 /// ```
@@ -893,38 +856,31 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     for attribute in &fun.attributes {
         let span = attribute.span();
-        let values = match parse_values(attribute) {
-            Ok(vals) => vals,
-            Err(err) => return err.to_compile_error().into(),
-        };
+        let values = try_r!(parse_values(attribute));
 
         let n = values.name.to_string();
         let n = &n[..];
 
         match n {
-            "name" => name.parse("name", values),
-            "display_in_help" => display_in_help.parse("display_in_help", values),
-            "check_in_help" => check_in_help.parse("check_in_help", values),
+            "name" => name = try_r!(attributes::parse(values)),
+            "display_in_help" => display_in_help = try_r!(attributes::parse(values)),
+            "check_in_help" => check_in_help = try_r!(attributes::parse(values)),
             _ => {
-                return Error::new(span, &format!("invalid attribute: {:?}", n))
+                return Error::new(span, format_args!("invalid attribute: {:?}", n))
                     .to_compile_error()
                     .into();
             }
         }
     }
 
-    if let Err(err) = validate_declaration(&mut fun, DeclarFor::Check) {
-        return err.to_compile_error().into();
-    }
+    try_r!(validate_declaration(&mut fun, DeclarFor::Check));
 
     let either = [
         parse_quote!(CheckResult),
         parse_quote!(serenity::framework::standard::CheckResult),
     ];
 
-    if let Err(err) = validate_return_type(&mut fun, either) {
-        return err.to_compile_error().into();
-    }
+    try_r!(validate_return_type(&mut fun, either));
 
     let n = fun.name.clone();
     let n2 = name.clone();
