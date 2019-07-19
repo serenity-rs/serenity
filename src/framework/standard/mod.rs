@@ -9,7 +9,7 @@ mod parse;
 mod structures;
 
 pub use args::{Args, Delimiter, Error as ArgError, Iter};
-pub use configuration::Configuration;
+pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
 use structures::buckets::{Bucket, Ratelimit};
@@ -598,6 +598,15 @@ impl StandardFramework {
 
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
+        if let Some(error) = self.should_fail_common(&msg) {
+		
+            if let Some(dispatch) = &self.dispatch {
+                dispatch(&mut ctx, &msg, error);
+            }
+
+            return;
+        }
+
         let (prefix, rest) = parse_prefix(&mut ctx, &msg, &self.config);
 
         if prefix != Prefix::None && rest.trim().is_empty() {
@@ -684,14 +693,6 @@ impl Framework for StandardFramework {
                 name,
                 args,
             } => {
-                if let Some(error) = self.should_fail_common(&msg) {
-                    if let Some(dispatch) = &self.dispatch {
-                        dispatch(&mut ctx, &msg, error);
-                    }
-
-                    return;
-                }
-
                 let args = Args::new(args, &self.config.delimiters);
 
                 let before = self.before.clone();
