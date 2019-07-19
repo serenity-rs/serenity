@@ -599,6 +599,7 @@ impl StandardFramework {
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
         if let Some(error) = self.should_fail_common(&msg) {
+		
             if let Some(dispatch) = &self.dispatch {
                 dispatch(&mut ctx, &msg, error);
             }
