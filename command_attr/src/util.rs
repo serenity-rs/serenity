@@ -73,7 +73,7 @@ pub fn into_stream(e: Error) -> TokenStream {
     e.to_compile_error().into()
 }
 
-macro_rules! try_r {
+macro_rules! propagate_err {
     ($res:expr) => {{
         match $res {
             Ok(v) => v,

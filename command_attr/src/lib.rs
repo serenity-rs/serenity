@@ -33,7 +33,7 @@ macro_rules! match_options {
     ($v:expr, $values:ident, $options:ident, $span:expr => [$($name:ident);*]) => {
         match $v {
             $(
-                stringify!($name) => $options.$name = try_r!($crate::attributes::parse($values)),
+                stringify!($name) => $options.$name = propagate_err!($crate::attributes::parse($values)),
             )*
             _ => {
                 return Error::new($span, format_args!("invalid attribute: {:?}", $v))
@@ -144,20 +144,20 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     for attribute in &fun.attributes {
         let span = attribute.span();
-        let values = try_r!(parse_values(attribute));
+        let values = propagate_err!(parse_values(attribute));
 
         let name = values.name.to_string();
         let name = &name[..];
 
         match name {
             "num_args" => {
-                let args = try_r!(u16::parse(values));
+                let args = propagate_err!(u16::parse(values));
 
                 options.min_args = Some(args);
                 options.max_args = Some(args);
             }
             "required_permissions" => {
-                let p = try_r!(Vec::<Ident>::parse(values));
+                let p = propagate_err!(Vec::<Ident>::parse(values));
 
                 let mut permissions = Permissions::default();
                 for perm in p {
@@ -177,19 +177,19 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.required_permissions = permissions;
             }
             "checks" => {
-                options.checks = Checks(try_r!(attributes::parse(values)));
+                options.checks = Checks(propagate_err!(attributes::parse(values)));
             }
             "bucket" => {
-                options.bucket = Some(try_r!(attributes::parse(values)));
+                options.bucket = Some(propagate_err!(attributes::parse(values)));
             }
             "description" => {
-                options.description = Some(try_r!(attributes::parse(values)));
+                options.description = Some(propagate_err!(attributes::parse(values)));
             }
             "usage" => {
-                options.usage = Some(try_r!(attributes::parse(values)));
+                options.usage = Some(propagate_err!(attributes::parse(values)));
             }
             "example" => {
-                options.example = Some(try_r!(attributes::parse(values)));
+                options.example = Some(propagate_err!(attributes::parse(values)));
             }
             _ => {
                 match_options!(name, values, options, span => [
@@ -233,14 +233,14 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
 
-    try_r!(validate_declaration(&mut fun, DeclarFor::Command));
+    propagate_err!(validate_declaration(&mut fun, DeclarFor::Command));
 
     let either = [
         parse_quote!(CommandResult),
         parse_quote!(serenity::framework::standard::CommandResult),
     ];
 
-    try_r!(validate_return_type(&mut fun, either));
+    propagate_err!(validate_return_type(&mut fun, either));
 
     let Permissions(required_permissions) = required_permissions;
 
@@ -419,14 +419,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     for attribute in &fun.attributes {
         let span = attribute.span();
-        let values = try_r!(parse_values(attribute));
+        let values = propagate_err!(parse_values(attribute));
 
         let name = values.name.to_string();
         let name = &name[..];
 
         match name {
             "lacking_role" => {
-                let val = try_r!(String::parse(values));
+                let val = propagate_err!(String::parse(values));
 
                 options.lacking_role = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
@@ -441,7 +441,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "embed_error_colour" => {
-                let val = try_r!(String::parse(values));
+                let val = propagate_err!(String::parse(values));
 
                 options.embed_error_colour = match Colour::from_str(&val) {
                     Some(c) => c,
@@ -453,7 +453,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "embed_success_colour" => {
-                let val = try_r!(String::parse(values));
+                let val = propagate_err!(String::parse(values));
 
                 options.embed_success_colour = match Colour::from_str(&val) {
                     Some(c) => c,
@@ -465,7 +465,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "lacking_permissions" => {
-                let val = try_r!(String::parse(values));
+                let val = propagate_err!(String::parse(values));
 
                 options.lacking_permissions = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
@@ -480,7 +480,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "lacking_ownership" => {
-                let val = try_r!(String::parse(values));
+                let val = propagate_err!(String::parse(values));
 
                 options.lacking_ownership = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
@@ -495,7 +495,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 };
             }
             "wrong_channel" => {
-                let val = try_r!(String::parse(values));
+                let val = propagate_err!(String::parse(values));
 
                 options.wrong_channel = match HelpBehaviour::from_str(&val) {
                     Some(h) => h,
@@ -626,14 +626,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let Colour(embed_error_colour) = embed_error_colour;
     let Colour(embed_success_colour) = embed_success_colour;
 
-    try_r!(validate_declaration(&mut fun, DeclarFor::Help));
+    propagate_err!(validate_declaration(&mut fun, DeclarFor::Help));
 
     let either = [
         parse_quote!(CommandResult),
         parse_quote!(serenity::framework::standard::CommandResult),
     ];
 
-    try_r!(validate_return_type(&mut fun, either));
+    propagate_err!(validate_return_type(&mut fun, either));
 
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
@@ -856,15 +856,15 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     for attribute in &fun.attributes {
         let span = attribute.span();
-        let values = try_r!(parse_values(attribute));
+        let values = propagate_err!(parse_values(attribute));
 
         let n = values.name.to_string();
         let n = &n[..];
 
         match n {
-            "name" => name = try_r!(attributes::parse(values)),
-            "display_in_help" => display_in_help = try_r!(attributes::parse(values)),
-            "check_in_help" => check_in_help = try_r!(attributes::parse(values)),
+            "name" => name = propagate_err!(attributes::parse(values)),
+            "display_in_help" => display_in_help = propagate_err!(attributes::parse(values)),
+            "check_in_help" => check_in_help = propagate_err!(attributes::parse(values)),
             _ => {
                 return Error::new(span, format_args!("invalid attribute: {:?}", n))
                     .to_compile_error()
@@ -873,14 +873,14 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
 
-    try_r!(validate_declaration(&mut fun, DeclarFor::Check));
+    propagate_err!(validate_declaration(&mut fun, DeclarFor::Check));
 
     let either = [
         parse_quote!(CheckResult),
         parse_quote!(serenity::framework::standard::CheckResult),
     ];
 
-    try_r!(validate_return_type(&mut fun, either));
+    propagate_err!(validate_return_type(&mut fun, either));
 
     let n = fun.name.clone();
     let n2 = name.clone();
