@@ -124,12 +124,12 @@ impl Parse for CommandFun {
                                     kind,
                                 })
                             }
-                            _ => Err(Error::new(span, &format!("unsupported pattern: {:?}", pat))),
+                            _ => Err(Error::new(span, format_args!("unsupported pattern: {:?}", pat))),
                         }
                     }
                     _ => Err(Error::new(
                         span,
-                        &format!("use of a prohibited argument type: {:?}", arg),
+                        format_args!("use of a prohibited argument type: {:?}", arg),
                     )),
                 }
             })
@@ -555,7 +555,7 @@ impl Parse for GroupOptions {
                 (name, _) => {
                     return Err(Error::new(
                         span,
-                        &format!("`{}` is not a valid group option", name),
+                        format_args!("`{}` is not a valid group option", name),
                     ));
                 }
             }
