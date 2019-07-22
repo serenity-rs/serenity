@@ -598,18 +598,12 @@ impl StandardFramework {
 
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        if let Some(error) = self.should_fail_common(&msg) {
-		
-            if let Some(dispatch) = &self.dispatch {
-                dispatch(&mut ctx, &msg, error);
-            }
 
-            return;
-        }
 
         let (prefix, rest) = parse_prefix(&mut ctx, &msg, &self.config);
 
         if prefix != Prefix::None && rest.trim().is_empty() {
+
             if let Some(prefix_only) = &self.prefix_only {
                 let prefix_only = Arc::clone(&prefix_only);
                 let msg = msg.clone();
@@ -623,6 +617,7 @@ impl Framework for StandardFramework {
         }
 
         if prefix == Prefix::None && !(self.config.no_dm_prefix && msg.is_private()) {
+
             if let Some(normal) = &self.normal_message {
                 let normal = Arc::clone(&normal);
                 let msg = msg.clone();
@@ -630,6 +625,15 @@ impl Framework for StandardFramework {
                 threadpool.execute(move || {
                     normal(&mut ctx, &msg);
                 });
+            }
+
+            return;
+        }
+
+        if let Some(error) = self.should_fail_common(&msg) {
+
+            if let Some(dispatch) = &self.dispatch {
+                dispatch(&mut ctx, &msg, error);
             }
 
             return;
