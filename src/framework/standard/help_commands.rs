@@ -999,7 +999,7 @@ fn flatten_group_to_plain_string(
         );
     }
 
-    let joined_commands = format!("`{}`", group.command_names.join("`, `"));
+    let joined_commands = format!("{}", group.command_names.join("`, `"));
 
     let _ = write!(group_text, "{}", joined_commands);
 
