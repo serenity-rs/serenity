@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.6.3] - 2019-7-24
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Erk-]
+- [@hyarsan]
+- [@Lakelezz]
+- [@Mendess2526]
+- [@NieDzejkob]
+- [@xacrimon]
+
+### Added
+
+- [cache] Implement `CacheHttp` for `Arc<Http>` ([@Lakelezz]) [c:1a209e8]
+
+### Changed
+
+- [framework] Update module-level example ([@acdenisSK]) [c:26192fa]
+- [client/model/utils] Changed some `&str`-parametres to `impl AsRef<str>` ([@xacrimon]) [c:abd84c2]
+- [framework] Try to always ignore bots and webhooks when configured by the user ([@acdenisSK]) [c:4cf4b21] [c:b7b3a85]
+- [framework] Apply case-insensitivity to help if needed ([@acdenisSK]) [c:cd4ca1b]
+
+### Fixed
+
+- [voice] Fix mistake in `voice::Audio`'s documentation with `play_only` ([@Mendess2526]) [c:e6c5d41]
+- [utils]  Make `MessageBuilder::push_spoiler_*` consistent with the other `push_` functions ([@hyarsan]) [c:d2df2b9]
+- [misc.] Update to the actual minimum Rust version Serenity supports ([@acdenisSK]) [c:d280ed1]
+- [misc.] Fix comment in the group prefixes example ([@NieDzejkob]) [c:81d5af1]:
+- [framework] Fix `Reason`'s doc-link by using `enum` ([@Lakelezz]) [c:a8f0387]
+- [client] Fix private channel deletions making serenity panic ([@Erk-]) [c:67f5e3d]
+- [model] Fix `create_invite`'s doc-example ([@Lakelezz]) [c:45d44cb]
+- [framework] Update `help_commands`'s module example ([@acdenisSK]) [c:8cdfd7c]
+- [framework] Remove unnecessary ticks ([@Lakelezz]) [c:eddef7b]
+
 ## [0.6.2] - 2019-6-30
 
 A small release to address a severe deserialization bug.
@@ -52,7 +87,7 @@ Thanks to the following for their contributions:
 
 ## [0.6.0] - 2019-6-21
 
-🎉 It has finally come for the biggest release of Serenity yet! 🎉 
+🎉 It has finally come for the biggest release of Serenity yet! 🎉
 
 Thanks to the following for their contributions:
 
@@ -111,7 +146,7 @@ Thanks to the following for their contributions:
 - [model] Add and use `AttachmentId`. ([@Lakelezz]) [c:c8a5f69]
 - [model] Add a `channel_id_from_name`-method on `Guild`. ([@xacrimon]) [c:aae22a2]
 - [model] Add `GuildChannel::members`. ([@Lakelezz]) [c:ddf7a3]
-- [model] Add more guild fields from guild boosting. ([@AregevDev]) [c:4541935] 
+- [model] Add more guild fields from guild boosting. ([@AregevDev]) [c:4541935]
 - [utils] Add `EmbedMessageBuilding`-trait. ([@zeyla]) [c:7c61f95]
 
 ### Fixed
@@ -130,19 +165,19 @@ Thanks to the following for their contributions:
 - [framework] Ensure to properly hide groups. ([@Lakelezz]) [c:5e66cd1]
 - [framework] Add help for nested groups and their commands. ([@Lakelezz]) [c:6a37535]
 - [framework] Get rid of a redundant feature gate. ([@acdenisSK]) [c:2ae3a48]
-- [framework] Treat the actual name and aliases equally. ([@Lakelezz]) [c:82d97c2] 
+- [framework] Treat the actual name and aliases equally. ([@Lakelezz]) [c:82d97c2]
 - [framework] Check if message author is in owners HashSet. ([@Flat]) [c:d91594b]
 - [framework] Change `owners_privilege` to bypass all permission-checks. ([@Flat]) [c:98532da]
 - [http] Fix setting role positions ([@icewind1991]) [c:c14ca32]
 - [model] Fix lifetime issue with `send_message`. ([@acdenisSK]) [c:3902caf]
 - [model] Fix no-default-features compilation. ([@zeyla]) [c:3de5378]
 - [model] Fix `contains_case_insensitive` and `starts_with_case_insensitive`. ([@Flat]) [c:d27d391]
-- [voice] Pipe youtube-dl to ffmpeg directly. ([@Flat]) [c:4793a84] 
+- [voice] Pipe youtube-dl to ffmpeg directly. ([@Flat]) [c:4793a84]
 
 ### Changed
 
 - [builder] Use `ToString` on builder-arguments instead of `Display`. ([@acdenisSK]) [c:13fae29]
-- [builder] Increase the capabilities for creating a channel. ([@acdenisSK]) [c:f2ff97a] 
+- [builder] Increase the capabilities for creating a channel. ([@acdenisSK]) [c:f2ff97a]
 - [client] Improve `cached`'s name and documentation. ([@Lakelezz]) [c:7706475]
 - [command_attr] Rectify command parsing. ([@acdenisSK]) [c:b1eff27]
 - [command_attr] Use the function-name. ([@acdenisSK]) [c:05254c8]
@@ -161,7 +196,7 @@ Thanks to the following for their contributions:
 ### Removed
 
 - [builder] Remove unused `build`-method. ([@Lakelezz]) [c:c6ae140]
-- [client] Remove `quit` method. ([@zeyla]) [c:f7109ee] 
+- [client] Remove `quit` method. ([@zeyla]) [c:f7109ee]
 - [utils] Remove `VecMap`. ([@acdenisSK]) [c:9450d4b]
 
 ## rc-1
@@ -3033,6 +3068,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.6.3]: https://github.com/serenity-rs/serenity/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/serenity-rs/serenity/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0...v0.6.1
 [0.6.0]: https://github.com/serenity-rs/serenity/compare/v0.6.0-rc.2...v0.6.0
@@ -3121,12 +3157,14 @@ Initial commit.
 [@lolzballs]: https://github.com/lolzballs
 [@Lymia]: https://github.com/Lymia
 [@khazhyk]: https://github.com/khazhyk
+[@Mendess2526]: https://github.com/Mendess2526
 [@mattico]: https://github.com/mattico
 [@molenzwiebel]: https://github.com/molenzwiebel
 [@megumisonoda]: https://github.com/megumisonoda
 [@Mishio595]: https://github.com/Mishio595
 [@mshenrick]: https://github.com/mshenrick
 [@MOZGIII]: https://github.com/MOZGIII
+[@NieDzejkob]: https://github.com/NieDzejkob
 [@nabijaczleweli]: https://github.com/nabijaczleweli
 [@nycex]: https://github.com/nycex
 [@Proximyst]: https://github.com/Proximyst
@@ -3147,6 +3185,22 @@ Initial commit.
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@zeyla]: https://github.com/zeyla
+
+[c:26192fa]: https://github.com/serenity-rs/serenity/commit/26192fa1e8df9a7bd7be6065657890a200432661
+[c:e6c5d41]: https://github.com/serenity-rs/serenity/commit/e6c5d418390a90632fb2dee75ddcfd5cc1cc2672
+[c:d2df2b9]: https://github.com/serenity-rs/serenity/commit/d2df2b9db9dd23bec2bb3bf8f217a8e437582e2f
+[c:d280ed1]: https://github.com/serenity-rs/serenity/commit/d280ed18fedf324699c1173432fd63fd5d0dd657
+[c:81d5af1]: https://github.com/serenity-rs/serenity/commit/81d5af16d0d4262f71fe9a3480ad57543d7e2d10
+[c:a8f0387]: https://github.com/serenity-rs/serenity/commit/a8f03870c423b4633d6490adb140f5be5d150f40
+[c:abd84c2]: https://github.com/serenity-rs/serenity/commit/abd84c202f4932bda8924349126757d1cee93e2a
+[c:67f5e3d]: https://github.com/serenity-rs/serenity/commit/67f5e3d970e23da320c091b19fc90314e15db83a
+[c:1a209e8]: https://github.com/serenity-rs/serenity/commit/1a209e8815e8319711e012639c90d3de9d322791
+[c:45d44cb]: https://github.com/serenity-rs/serenity/commit/45d44cbd65938a8d1f8f65ff865b45316f11a48e
+[c:8cdfd7c]: https://github.com/serenity-rs/serenity/commit/8cdfd7cd9a618d4a0edf6e5738979082462cea62
+[c:4cf4b21]: https://github.com/serenity-rs/serenity/commit/4cf4b21365bfcd17130867abcae42cee4ca4803b
+[c:b7b3a85]: https://github.com/serenity-rs/serenity/commit/b7b3a855c29a036b452f0fbf5ee3f19395bb42f1
+[c:eddef7b]: https://github.com/serenity-rs/serenity/commit/eddef7b57f9d1f1380d77ed42e7497015b97ba49
+[c:cd4ca1b]: https://github.com/serenity-rs/serenity/commit/cd4ca1b98071b3617e55407a30a3837c2dcfaebc
 
 [c:17f1dc2]: https://github.com/serenity-rs/serenity/commit/17f1dc214f95be129d0ade54ebe8e4e7ab93fbdc
 [c:13595ff]: https://github.com/serenity-rs/serenity/commit/13595ff25d35fcaf9bd69f7fe8d75c67f72e676e
