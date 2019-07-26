@@ -644,7 +644,6 @@ impl Framework for StandardFramework {
             &ctx,
             &msg,
             rest,
-            prefix,
             &self.groups,
             &self.config,
             self.help.as_ref().map(|h| h.options.names),
@@ -683,11 +682,7 @@ impl Framework for StandardFramework {
         };
 
         match invoke {
-            Invoke::Help {
-                prefix: _prefix,
-                name,
-                args,
-            } => {
+            Invoke::Help { name, args } => {
                 let args = Args::new(args, &self.config.delimiters);
 
                 let before = self.before.clone();
@@ -715,13 +710,7 @@ impl Framework for StandardFramework {
                     }
                 });
             }
-            Invoke::Command {
-                prefix: _prefix,
-                gprefix: _gprefix,
-                command,
-                group,
-                args,
-            } => {
+            Invoke::Command { command, group, args } => {
                 let mut args = Args::new(args, &self.config.delimiters);
 
                 if let Some(error) =

@@ -9,6 +9,15 @@ pub enum Map {
     Prefixless(GroupMap, CommandMap),
 }
 
+pub trait ParseMap {
+    type Storage;
+
+    fn get(&self, n: &str) -> Option<Self::Storage>;
+    fn min_length(&self) -> usize;
+    fn max_length(&self) -> usize;
+    fn is_empty(&self) -> bool;
+}
+
 #[derive(Debug, Default)]
 pub struct CommandMap {
     cmds: HashMap<&'static str, (&'static Command, Arc<CommandMap>)>,
@@ -27,30 +36,35 @@ impl CommandMap {
                 let len = name.chars().count();
                 map.min_length = std::cmp::min(len, map.min_length);
                 map.max_length = std::cmp::max(len, map.max_length);
+
                 map.cmds.insert(*name, (*cmd, sub_map.clone()));
             }
         }
 
         map
     }
+}
+
+impl ParseMap for CommandMap {
+    type Storage = (&'static Command, Arc<CommandMap>);
 
     #[inline]
-    pub fn min_length(&self) -> usize {
+    fn min_length(&self) -> usize {
         self.min_length
     }
 
     #[inline]
-    pub fn max_length(&self) -> usize {
+    fn max_length(&self) -> usize {
         self.max_length
     }
 
     #[inline]
-    pub fn get(&self, name: &str) -> Option<(&'static Command, Arc<CommandMap>)> {
+    fn get(&self, name: &str) -> Option<Self::Storage> {
         self.cmds.get(&name).cloned()
     }
 
     #[inline]
-    pub fn is_empty(&self) -> bool {
+    fn is_empty(&self) -> bool {
         self.cmds.is_empty()
     }
 }
@@ -81,24 +95,28 @@ impl GroupMap {
 
         map
     }
+}
+
+impl ParseMap for GroupMap {
+    type Storage = (&'static CommandGroup, Arc<GroupMap>, Arc<CommandMap>);
 
     #[inline]
-    pub fn min_length(&self) -> usize {
+    fn min_length(&self) -> usize {
         self.min_length
     }
 
     #[inline]
-    pub fn max_length(&self) -> usize {
+    fn max_length(&self) -> usize {
         self.max_length
     }
 
     #[inline]
-    pub fn get(&self, name: &str) -> Option<(&'static CommandGroup, Arc<GroupMap>, Arc<CommandMap>)> {
+    fn get(&self, name: &str) -> Option<Self::Storage> {
         self.groups.get(&name).cloned()
     }
 
     #[inline]
-    pub fn is_empty(&self) -> bool {
+    fn is_empty(&self) -> bool {
         self.groups.is_empty()
     }
 }

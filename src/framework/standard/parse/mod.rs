@@ -3,7 +3,7 @@ use crate::client::Context;
 use crate::model::channel::Message;
 use uwl::{StrExt, UnicodeStream};
 
-pub(crate) mod map;
+pub mod map;
 
 use map::*;
 
@@ -14,8 +14,6 @@ pub enum Prefix<'a> {
     Punct(&'a str),
     Mention(&'a str),
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 pub fn parse_prefix<'a>(
@@ -87,7 +85,7 @@ fn check_discrepancy(
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
-    options: &impl CommonOptions
+    options: &impl CommonOptions,
 ) -> Result<(), DispatchError> {
     if options.owners_only() && !config.owners.contains(&msg.author.id) {
         return Err(DispatchError::OnlyForOwners);
@@ -95,7 +93,7 @@ fn check_discrepancy(
 
     if options.only_in() == OnlyIn::Dm && !msg.is_private() {
         return Err(DispatchError::OnlyForDM);
-     }
+    }
 
     if (!config.allow_dm || options.only_in() == OnlyIn::Guild) && msg.is_private() {
         return Err(DispatchError::OnlyForGuilds);
@@ -113,10 +111,12 @@ fn check_discrepancy(
 
             let perms = guild.permissions_in(msg.channel_id, msg.author.id);
 
-            if !perms.contains(*options.required_permissions()) &&
-                !(options.owner_privilege() &&
-                    config.owners.contains(&msg.author.id)) {
-                return Err(DispatchError::LackingPermissions(*options.required_permissions()));
+            if !perms.contains(*options.required_permissions())
+                && !(options.owner_privilege() && config.owners.contains(&msg.author.id))
+            {
+                return Err(DispatchError::LackingPermissions(
+                    *options.required_permissions(),
+                ));
             }
 
             if let Some(member) = guild.members.get(&msg.author.id) {
@@ -124,7 +124,6 @@ fn check_discrepancy(
                     return Err(DispatchError::LackingRole);
                 }
             }
-
         }
     }
 
@@ -140,34 +139,30 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
     }
 }
 
-fn try_command<'msg>(
+fn try_parse<'msg, M: ParseMap>(
     stream: &mut UnicodeStream<'msg>,
-    map: &CommandMap,
-    config: &Configuration,
-) -> (Cow<'msg, str>, Option<(&'static Command, Arc<CommandMap>)>) {
-    if config.by_space {
-        let n = to_lowercase(config, stream.peek_until(|s| s.is_whitespace()));
+    map: &M,
+    by_space: bool,
+    f: impl Fn(&str) -> String,
+) -> (String, Option<M::Storage>) {
+    if by_space {
+        let n = f(stream.peek_until(|s| s.is_whitespace()));
+
         let o = map.get(&n);
+
         (n, o)
     } else {
-        let min = map.min_length();
-        let max = map.max_length();
-
-        let mut n = to_lowercase(config, stream.peek_for(max));
+        let mut n = f(stream.peek_for(map.max_length()));
         let mut o = None;
 
-        for len in (min..max).rev() {
+        for _ in 0..(map.max_length() - map.min_length()) {
             o = map.get(&n);
 
             if o.is_some() {
                 break;
             }
 
-            if stream.at_end() {
-                break;
-            }
-
-            n = to_lowercase(config, stream.peek_for(len));
+            n.pop();
         }
 
         (n, o)
@@ -179,12 +174,12 @@ fn parse_cmd(
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
-    map: &CommandMap
+    map: &CommandMap,
 ) -> Result<&'static Command, ParseError> {
-    let (n, r) = try_command(stream, map, config);
+    let (n, r) = try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).to_string());
 
-    if config.disabled_commands.contains(&*n) {
-        return Err(ParseError::DispatchFailure(DispatchError::CommandDisabled(n.to_string())));
+    if config.disabled_commands.contains(&n) {
+        return Err(From::from(DispatchError::CommandDisabled(n)));
     }
 
     if let Some((cmd, map)) = r {
@@ -209,49 +204,14 @@ fn parse_cmd(
     Err(ParseError::UnrecognisedCommand(Some(n.to_string())))
 }
 
-
-fn try_group<'msg>(
-    stream: &mut UnicodeStream<'msg>,
-    map: &GroupMap,
-    config: &Configuration,
-) -> (&'msg str, Option<(&'static CommandGroup, Arc<GroupMap>, Arc<CommandMap>)>) {
-    if config.by_space {
-        let n = stream.peek_until(|s| s.is_whitespace());
-
-        (n, map.get(n))
-    } else {
-        let min = map.min_length();
-        let max = map.max_length();
-
-        let mut n = stream.peek_for(max);
-        let mut o = None;
-
-        for len in (min..max).rev() {
-            o = map.get(&n);
-
-            if o.is_some() {
-                break;
-            }
-
-            if stream.at_end() {
-                break;
-            }
-
-            n = stream.peek_for(len);
-        }
-
-        (n, o)
-    }
-}
-
 fn parse_group<'msg>(
-    stream: &mut UnicodeStream<'msg>,
+    stream: &mut UnicodeStream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
-    map: &GroupMap
-) -> Result<(&'msg str, &'static CommandGroup, Arc<CommandMap>), ParseError> {
-    let (n, o) = try_group(stream, map, config);
+    map: &GroupMap,
+) -> Result<(&'static CommandGroup, Arc<CommandMap>), ParseError> {
+    let (n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
 
     if let Some((group, map, commands)) = o {
         stream.increment(n.len());
@@ -263,11 +223,11 @@ fn parse_group<'msg>(
         check_discrepancy(ctx, msg, config, &group.options)?;
 
         if map.is_empty() {
-            return Ok((n, group, commands));
+            return Ok((group, commands));
         }
 
         return match parse_group(stream, ctx, msg, config, &map) {
-            Err(ParseError::UnrecognisedCommand(None)) => Ok((n, group, commands)),
+            Err(ParseError::UnrecognisedCommand(None)) => Ok((group, commands)),
             res => res,
         };
     }
@@ -282,33 +242,22 @@ fn handle_command<'msg>(
     msg: &Message,
     config: &Configuration,
     map: &CommandMap,
-    prefix: Prefix<'msg>,
-    gprefix: Option<&'msg str>,
     group: &'static CommandGroup,
 ) -> Result<Invoke<'msg>, ParseError> {
     match parse_cmd(stream, ctx, msg, config, map) {
-        Ok(command) => {
-            Ok(Invoke::Command {
-                prefix,
-                gprefix,
+        Ok(command) => Ok(Invoke::Command {
+            group,
+            command,
+            args: stream.rest(),
+        }),
+        Err(err) => match group.options.default_command {
+            Some(command) => Ok(Invoke::Command {
                 group,
                 command,
                 args: stream.rest(),
-            })
+            }),
+            None => Err(err),
         },
-        Err(err) => {
-            if let Some(command) = group.options.default_command {
-                return Ok(Invoke::Command {
-                    prefix,
-                    gprefix,
-                    group,
-                    command,
-                    args: stream.rest(),
-                });
-            }
-
-            Err(err)
-        }
     }
 }
 
@@ -319,25 +268,13 @@ fn handle_group<'msg>(
     msg: &Message,
     config: &Configuration,
     map: &GroupMap,
-    prefix: Prefix<'msg>,
 ) -> Result<Invoke<'msg>, ParseError> {
     parse_group(stream, ctx, msg, config, map)
-        .and_then(|(gprefix, group, map)| {
-            handle_command(
-                stream,
-                ctx,
-                msg,
-                config,
-                &map,
-                prefix,
-                Some(gprefix),
-                group
-            )
-        })
+        .and_then(|(group, map)| handle_command(stream, ctx, msg, config, &map, group))
 }
 
 #[derive(Debug)]
-pub(crate) enum ParseError {
+pub enum ParseError {
     UnrecognisedCommand(Option<String>),
     DispatchFailure(DispatchError),
 }
@@ -349,11 +286,10 @@ impl From<DispatchError> for ParseError {
     }
 }
 
-pub(crate) fn parse_command<'a>(
+pub fn parse_command<'a>(
     ctx: &Context,
     msg: &'a Message,
     message: &'a str,
-    prefix: Prefix<'a>,
     groups: &[(&'static CommandGroup, Map)],
     config: &Configuration,
     help_was_set: Option<&[&'static str]>,
@@ -373,7 +309,7 @@ pub(crate) fn parse_command<'a>(
 
                 let args = stream.rest();
 
-                return Ok(Invoke::Help { prefix, name, args });
+                return Ok(Invoke::Help { name, args });
             }
         }
     }
@@ -384,16 +320,16 @@ pub(crate) fn parse_command<'a>(
         match map {
             // Includes [group] itself.
             Map::WithPrefixes(map) => {
-                let res = handle_group(&mut stream, ctx, msg, config, map, prefix.clone());
+                let res = handle_group(&mut stream, ctx, msg, config, map);
 
                 if res.is_ok() {
                     return res;
                 }
 
                 last = res;
-            },
-            Map::Prefixless(subgroups, commands) =>  {
-                let res = handle_group(&mut stream, ctx, msg, config, subgroups, prefix.clone());
+            }
+            Map::Prefixless(subgroups, commands) => {
+                let res = handle_group(&mut stream, ctx, msg, config, subgroups);
 
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
@@ -401,7 +337,7 @@ pub(crate) fn parse_command<'a>(
                     return res;
                 }
 
-                let res = handle_command(&mut stream, ctx, msg, config, commands, prefix.clone(), None, group);
+                let res = handle_command(&mut stream, ctx, msg, config, commands, group);
 
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
@@ -410,7 +346,7 @@ pub(crate) fn parse_command<'a>(
                 }
 
                 last = res;
-            },
+            }
         }
     }
 
@@ -420,16 +356,11 @@ pub(crate) fn parse_command<'a>(
 #[derive(Debug)]
 pub enum Invoke<'a> {
     Command {
-        prefix: Prefix<'a>,
-        // Group prefix
-        gprefix: Option<&'a str>,
-
         group: &'static CommandGroup,
         command: &'static Command,
         args: &'a str,
     },
     Help {
-        prefix: Prefix<'a>,
         name: &'static str,
         args: &'a str,
     },
