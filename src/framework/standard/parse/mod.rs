@@ -364,18 +364,16 @@ pub(crate) fn parse_command<'a>(
     // We take precedence over commands named help command's name.
     if let Some(names) = help_was_set {
         for name in names {
-            let present = if config.case_insensitive {
-                let n = stream.peek_for(name.chars().count());
+            let present = {
+                let n = to_lowercase(config, stream.peek_for(name.chars().count()));
 
-                if name == &n.to_lowercase() {
+                if name == &n {
                     stream.increment(n.len());
 
                     true
                 } else {
                     false
                 }
-            } else {
-                stream.eat(name)
             };
 
             if present {
