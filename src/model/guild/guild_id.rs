@@ -542,6 +542,8 @@ impl GuildId {
     ///
     /// # Examples
     /// ```rust,no_run
+    /// # use serenity::model::id::GuildId;
+    /// # use serenity::http::Http;
     /// # let guild_id = GuildId::default();
     /// # let ctx = Http::default();
     /// for member_result in guild_id.members_iter(&ctx) {
@@ -554,7 +556,7 @@ impl GuildId {
     ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
     ///     }
     /// }
-    #[cfg(feature = "http")]
+    #[cfg(all(feature = "http", feature = "cache"))]
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
         MembersIter::new(self, http)
     }
@@ -787,7 +789,7 @@ impl<'a> From<&'a Guild> for GuildId {
 ///
 /// [`GuildId.members_iter()`]: #method.members_iter
 #[derive(Clone, Debug)]
-#[cfg(feature = "http")]
+#[cfg(all(feature = "http", feature = "cache"))]
 pub struct MembersIter<H: AsRef<Http>> {
     guild_id: GuildId,
     http: H,
@@ -795,6 +797,7 @@ pub struct MembersIter<H: AsRef<Http>> {
     after: Option<UserId>,
 }
 
+#[cfg(all(feature = "http", feature = "cache"))]
 impl<H: AsRef<Http>> MembersIter<H> {
     fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
         MembersIter {
@@ -828,6 +831,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
     }
 }
 
+#[cfg(all(feature = "http", feature = "cache"))]
 impl<H: AsRef<Http>> Iterator for MembersIter<H> {
     type Item = Result<Member>;
 
@@ -851,4 +855,5 @@ impl<H: AsRef<Http>> Iterator for MembersIter<H> {
     }
 }
 
+#[cfg(all(feature = "http", feature = "cache"))]
 impl<H: AsRef<Http>> std::iter::FusedIterator for MembersIter<H> {}

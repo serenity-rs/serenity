@@ -910,7 +910,7 @@ impl Guild {
     ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
     ///     }
     /// }
-    #[cfg(feature = "http")]
+    #[cfg(all(feature = "http", feature = "cache"))]
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
         self.id.members_iter(http)
     }
