@@ -892,9 +892,11 @@ impl Guild {
         self.id.members(&http, limit, after)
     }
 
-    /// Iterates over all the members in a guild by repeated calls to
-    /// [`members`].  A buffer of at most 1,000 members is used to reduce the
-    /// number of calls necessary.
+    /// Iterates over all the members in a guild.
+    ///
+    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// A buffer of at most 1,000 members is used to reduce the number of calls
+    /// necessary.
     ///
     /// # Examples
     /// ```rust,ignore

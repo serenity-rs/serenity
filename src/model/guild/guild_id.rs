@@ -534,9 +534,11 @@ impl GuildId {
         http.as_ref().get_guild_members(self.0, limit, after.map(|x| x.0))
     }
 
-    /// Iterates over all the members in a guild by repeated calls to
-    /// [`members`].  A buffer of at most 1,000 members is used to reduce the
-    /// number of calls necessary.
+    /// Iterates over all the members in a guild.
+    ///
+    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// A buffer of at most 1,000 members is used to reduce the number of calls
+    /// necessary.
     ///
     /// # Examples
     /// ```rust,no_run
@@ -803,7 +805,9 @@ impl<H: AsRef<Http>> MembersIter<H> {
         }
     }
 
-    /// Fills the `self.buffer` cache of Members.  This drops any members that
+    /// Fills the `self.buffer` cache of Members.
+    ///
+    /// This drops any members that
     /// were currently in the buffer, so it should only be called when
     /// `self.buffer` is empty.  Additionally, this updates `self.after` so that
     /// the next call does not return duplicate items.  If there are no more
