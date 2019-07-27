@@ -784,6 +784,7 @@ impl<'a> From<&'a Guild> for GuildId {
 /// A helper class returned by [`GuildId.members_iter()`]
 ///
 /// [`GuildId.members_iter()`]: #method.members_iter
+#[derive(Clone, Debug)]
 pub struct MembersIter<H: AsRef<Http>> {
     guild_id: GuildId,
     http: H,
@@ -834,4 +835,15 @@ impl<H: AsRef<Http>> Iterator for MembersIter<H> {
 
         self.buffer.pop().map(|i| Ok(i))
     }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let buffer_size = self.buffer.len();
+        if self.after.is_none() {
+            (buffer_size, Some(buffer_size))
+        } else {
+            (buffer_size, None)
+        }
+    }
 }
+
+impl<H: AsRef<Http>> std::iter::FusedIterator for MembersIter<H> {}
