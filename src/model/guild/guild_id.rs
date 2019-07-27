@@ -795,6 +795,7 @@ pub struct MembersIter<H: AsRef<Http>> {
     http: H,
     buffer: Vec<Member>,
     after: Option<UserId>,
+    tried_fetch: bool,
 }
 
 #[cfg(all(feature = "http", feature = "cache"))]
@@ -805,6 +806,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
             http: http,
             buffer: Vec::new(),
             after: None,
+            tried_fetch: false,
         }
     }
 
@@ -817,15 +819,20 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// members to be fetched, then this marks `self.after` as None, indicating
     /// that no more calls ought to be made.
     fn refresh(&mut self) -> Result<()> {
+        // Number of profiles to fetch
+        let grab_size: u64 = 1000;
+
         let next_members = self.guild_id
-            ._members(self.http.as_ref(), Some(1000), self.after)?;
+            ._members(self.http.as_ref(), Some(grab_size), self.after)?;
 
          //Get the last member.  If shorter than 1000, there are no more results anyway
-        self.after = next_members.get(1000)
+        self.after = next_members.get(grab_size as usize - 1usize)
             .map(|member| member.user_id());
 
         // Reverse to optimize pop()
         self.buffer = next_members.into_iter().rev().collect();
+
+        self.tried_fetch = true;
 
         Ok(())
     }
@@ -836,7 +843,7 @@ impl<H: AsRef<Http>> Iterator for MembersIter<H> {
     type Item = Result<Member>;
 
     fn next(&mut self) -> Option<Result<Member>> {
-        if self.buffer.len() == 0 && self.after.is_some() {
+        if self.buffer.len() == 0 && self.after.is_some() || !self.tried_fetch {
             if let Err(e) = self.refresh() {
                 return Some(Err(e))
             }
@@ -847,7 +854,7 @@ impl<H: AsRef<Http>> Iterator for MembersIter<H> {
 
     fn size_hint(&self) -> (usize, Option<usize>) {
         let buffer_size = self.buffer.len();
-        if self.after.is_none() {
+        if self.after.is_none() && self.tried_fetch {
             (buffer_size, Some(buffer_size))
         } else {
             (buffer_size, None)
