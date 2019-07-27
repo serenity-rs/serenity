@@ -534,6 +534,29 @@ impl GuildId {
         http.as_ref().get_guild_members(self.0, limit, after.map(|x| x.0))
     }
 
+    /// Iterates over all the members in a guild by repeated calls to
+    /// [`members`].  A buffer of at most 1,000 members is used to reduce the
+    /// number of calls necessary.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// # let guild_id = GuildId::default();
+    /// # let ctx = Http::default();
+    /// for member_result in guild_id.members_iter(&ctx) {
+    ///     match member_result {
+    ///         Ok(member) => println!(
+    ///             "{} is {}",
+    ///             member,
+    ///             member.display_name()
+    ///         ),
+    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
+    ///     }
+    /// }
+    #[cfg(feature = "http")]
+    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
+        MembersIter::new(self, http)
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// Requires the [Move Members] permission.
@@ -756,4 +779,59 @@ impl From<Guild> for GuildId {
 impl<'a> From<&'a Guild> for GuildId {
     /// Gets the Id of Guild.
     fn from(live_guild: &Guild) -> GuildId { live_guild.id }
+}
+
+/// A helper class returned by [`GuildId.members_iter()`]
+///
+/// [`GuildId.members_iter()`]: #method.members_iter
+pub struct MembersIter<H: AsRef<Http>> {
+    guild_id: GuildId,
+    http: H,
+    buffer: Vec<Member>,
+    after: Option<UserId>,
+}
+
+impl<H: AsRef<Http>> MembersIter<H> {
+    fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
+        MembersIter {
+            guild_id,
+            http: http,
+            buffer: Vec::new(),
+            after: None,
+        }
+    }
+
+    /// Fills the `self.buffer` cache of Members.  This drops any members that
+    /// were currently in the buffer, so it should only be called when
+    /// `self.buffer` is empty.  Additionally, this updates `self.after` so that
+    /// the next call does not return duplicate items.  If there are no more
+    /// members to be fetched, then this marks `self.after` as None, indicating
+    /// that no more calls ought to be made.
+    fn refresh(&mut self) -> Result<()> {
+        let next_members = self.guild_id
+            ._members(self.http.as_ref(), Some(1000), self.after)?;
+
+         //Get the last member.  If shorter than 1000, there are no more results anyway
+        self.after = next_members.get(1000)
+            .map(|member| member.user_id());
+
+        // Reverse to optimize pop()
+        self.buffer = next_members.into_iter().rev().collect();
+
+        Ok(())
+    }
+}
+
+impl<H: AsRef<Http>> Iterator for MembersIter<H> {
+    type Item = Result<Member>;
+
+    fn next(&mut self) -> Option<Result<Member>> {
+        if self.buffer.len() == 0 && self.after.is_some() {
+            if let Err(e) = self.refresh() {
+                return Some(Err(e))
+            }
+        }
+
+        self.buffer.pop().map(|i| Ok(i))
+    }
 }
