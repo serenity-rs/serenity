@@ -911,7 +911,7 @@ impl Guild {
     ///     }
     /// }
     #[cfg(all(feature = "http", feature = "cache"))]
-    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
+    pub fn members_iter<H: AsRef<Http>>(&self, http: H) -> MembersIter<H> {
         self.id.members_iter(http)
     }
 
