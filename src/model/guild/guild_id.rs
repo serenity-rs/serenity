@@ -534,6 +534,33 @@ impl GuildId {
         http.as_ref().get_guild_members(self.0, limit, after.map(|x| x.0))
     }
 
+    /// Iterates over all the members in a guild.
+    ///
+    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// A buffer of at most 1,000 members is used to reduce the number of calls
+    /// necessary.
+    ///
+    /// # Examples
+    /// ```rust,no_run
+    /// # use serenity::model::id::GuildId;
+    /// # use serenity::http::Http;
+    /// # let guild_id = GuildId::default();
+    /// # let ctx = Http::default();
+    /// for member_result in guild_id.members_iter(&ctx) {
+    ///     match member_result {
+    ///         Ok(member) => println!(
+    ///             "{} is {}",
+    ///             member,
+    ///             member.display_name()
+    ///         ),
+    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
+    ///     }
+    /// }
+    #[cfg(all(feature = "http", feature = "cache"))]
+    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
+        MembersIter::new(self, http)
+    }
+
     /// Moves a member to a specific voice channel.
     ///
     /// Requires the [Move Members] permission.
@@ -757,3 +784,83 @@ impl<'a> From<&'a Guild> for GuildId {
     /// Gets the Id of Guild.
     fn from(live_guild: &Guild) -> GuildId { live_guild.id }
 }
+
+/// A helper class returned by [`GuildId.members_iter()`]
+///
+/// [`GuildId.members_iter()`]: #method.members_iter
+#[derive(Clone, Debug)]
+#[cfg(all(feature = "http", feature = "cache"))]
+pub struct MembersIter<H: AsRef<Http>> {
+    guild_id: GuildId,
+    http: H,
+    buffer: Vec<Member>,
+    after: Option<UserId>,
+    tried_fetch: bool,
+}
+
+#[cfg(all(feature = "http", feature = "cache"))]
+impl<H: AsRef<Http>> MembersIter<H> {
+    fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
+        MembersIter {
+            guild_id,
+            http: http,
+            buffer: Vec::new(),
+            after: None,
+            tried_fetch: false,
+        }
+    }
+
+    /// Fills the `self.buffer` cache of Members.
+    ///
+    /// This drops any members that
+    /// were currently in the buffer, so it should only be called when
+    /// `self.buffer` is empty.  Additionally, this updates `self.after` so that
+    /// the next call does not return duplicate items.  If there are no more
+    /// members to be fetched, then this marks `self.after` as None, indicating
+    /// that no more calls ought to be made.
+    fn refresh(&mut self) -> Result<()> {
+        // Number of profiles to fetch
+        let grab_size: u64 = 1000;
+
+        self.buffer = self.guild_id
+            ._members(self.http.as_ref(), Some(grab_size), self.after)?;
+
+         //Get the last member.  If shorter than 1000, there are no more results anyway
+        self.after = self.buffer.get(grab_size as usize - 1)
+            .map(|member| member.user_id());
+
+        // Reverse to optimize pop()
+        self.buffer.reverse();
+
+        self.tried_fetch = true;
+
+        Ok(())
+    }
+}
+
+#[cfg(all(feature = "http", feature = "cache"))]
+impl<H: AsRef<Http>> Iterator for MembersIter<H> {
+    type Item = Result<Member>;
+
+    fn next(&mut self) -> Option<Result<Member>> {
+        if self.buffer.is_empty() && self.after.is_some() || !self.tried_fetch {
+            if let Err(e) = self.refresh() {
+                return Some(Err(e))
+            }
+        }
+
+        self.buffer.pop().map(Ok)
+    }
+
+    fn size_hint(&self) -> (usize, Option<usize>) {
+        let buffer_size = self.buffer.len();
+        if self.after.is_none() && self.tried_fetch {
+            (buffer_size, Some(buffer_size))
+        } else {
+            (buffer_size, None)
+        }
+    }
+}
+
+#[cfg(all(feature = "http", feature = "cache"))]
+impl<H: AsRef<Http>> std::iter::FusedIterator for MembersIter<H> {}

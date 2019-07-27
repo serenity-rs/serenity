@@ -892,6 +892,29 @@ impl Guild {
         self.id.members(&http, limit, after)
     }
 
+    /// Iterates over all the members in a guild.
+    ///
+    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// A buffer of at most 1,000 members is used to reduce the number of calls
+    /// necessary.
+    ///
+    /// # Examples
+    /// ```rust,ignore
+    /// for member_result in guild.members_iter(&ctx) {
+    ///     match member_result {
+    ///         Ok(member) => println!(
+    ///             "{} is {}",
+    ///             member,
+    ///             member.display_name()
+    ///         ),
+    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
+    ///     }
+    /// }
+    #[cfg(all(feature = "http", feature = "cache"))]
+    pub fn members_iter<H: AsRef<Http>>(&self, http: H) -> MembersIter<H> {
+        self.id.members_iter(http)
+    }
+
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
     pub fn members_with_status(&self, status: OnlineStatus) -> Vec<&Member> {
