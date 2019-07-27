@@ -785,6 +785,7 @@ impl<'a> From<&'a Guild> for GuildId {
 ///
 /// [`GuildId.members_iter()`]: #method.members_iter
 #[derive(Clone, Debug)]
+#[cfg(feature = "http")]
 pub struct MembersIter<H: AsRef<Http>> {
     guild_id: GuildId,
     http: H,
