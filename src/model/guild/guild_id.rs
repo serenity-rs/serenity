@@ -822,15 +822,15 @@ impl<H: AsRef<Http>> MembersIter<H> {
         // Number of profiles to fetch
         let grab_size: u64 = 1000;
 
-        let next_members = self.guild_id
+        self.buffer = self.guild_id
             ._members(self.http.as_ref(), Some(grab_size), self.after)?;
 
          //Get the last member.  If shorter than 1000, there are no more results anyway
-        self.after = next_members.get(grab_size as usize - 1usize)
+        self.after = self.buffer.get(grab_size as usize - 1)
             .map(|member| member.user_id());
 
         // Reverse to optimize pop()
-        self.buffer = next_members.into_iter().rev().collect();
+        self.buffer.reverse();
 
         self.tried_fetch = true;
 
@@ -843,13 +843,13 @@ impl<H: AsRef<Http>> Iterator for MembersIter<H> {
     type Item = Result<Member>;
 
     fn next(&mut self) -> Option<Result<Member>> {
-        if self.buffer.len() == 0 && self.after.is_some() || !self.tried_fetch {
+        if self.buffer.is_empty() && self.after.is_some() || !self.tried_fetch {
             if let Err(e) = self.refresh() {
                 return Some(Err(e))
             }
         }
 
-        self.buffer.pop().map(|i| Ok(i))
+        self.buffer.pop().map(Ok)
     }
 
     fn size_hint(&self) -> (usize, Option<usize>) {
