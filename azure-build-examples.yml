@@ -1,0 +1,100 @@
+parameters:
+  name: ''
+  vmImage: ''
+  toolchain: 'stable'
+  features: 'all'
+
+jobs:
+- job: ${{ parameters.name }}
+  pool:
+    vmImage: ${{ parameters.vmImage }}
+  variables:
+    tc: ${{ parameters.toolchain }}
+    os: ${{ parameters.vmImage }}
+    features: ${{ parameters.features }}
+  steps:
+  - bash: |
+      if [[ "$OS" == "xcode9-macos10.13" ]]; then
+        HOMEBREW_NO_AUTO_UPDATE=1 brew install automake autoconf libtool libsodium pkg-config
+      fi
+      if [[ "$OS" == "ubuntu-16.04" ]]; then
+        sudo apt-get install -y --allow-downgrades libsodium-dev libssl-dev=1.0.2g-1ubuntu4.15
+      fi
+    displayName: 'Install dependencies'
+
+  - bash: |
+      curl -o rustup-init.sh https://sh.rustup.rs -sSf
+      sh rustup-init.sh --default-toolchain $(tc) -y
+    displayName: 'Install Rust'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/01_basic_ping_bot
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 1'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/02_transparent_guild_sharding
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 2'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/03_struct_utilities
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 3'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/04_message_builder
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 4'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/05_command_framework
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 5'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/06_voice
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 6'
+
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/07_sample_bot_structure
+      CARGO_TARGET_DIR='..' cargo build
+    displayName: 'Build example 7'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/08_env_logging
+      cargo build
+    displayName: 'Build example 8'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/09_shard_manager
+      cargo build
+    displayName: 'Build example 9'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/10_voice_receive
+      cargo build
+    displayName: 'Build example 10'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/11_crate_message_builder
+      cargo build
+    displayName: 'Build example 11'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/12_timing_and_events
+      cargo build
+    displayName: 'Build example 12'

@@ -42,3 +42,9 @@ jobs:
     name: 'Windows_stable'
     vmImage: 'vs2017-win2016'
     toolchain: 'stable'
+
+- template: 'azure-build-examples.yml'
+  parameters:
+    name: 'macOS_build_examples'
+    vmImage: 'xcode9-macos10.13'
+    toolchain: 'stable'

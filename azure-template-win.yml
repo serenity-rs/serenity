@@ -9,12 +9,12 @@ jobs:
   pool:
     vmImage: ${{ parameters.vmImage }}
   variables:
-    tc: ${{ parameters.toolchain }}
+    toolchain: ${{ parameters.toolchain }}
     features: ${{ parameters.features }}
-  steps: # TODO: Add installing of dependencies in the future
+  steps:
   - powershell: |
       Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-      &".\rustup-init.exe" --default-toolchain $(tc) -y
+      &".\rustup-init.exe" --default-toolchain $(toolchain) -y
     displayName: 'Install rust'
   - powershell: |
       If ("$(features)" -eq "all") {
