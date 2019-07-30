@@ -840,7 +840,7 @@ impl MessageBuilder {
     }
 
     /// Starts a multi-line quote, every push after this one will be quoted
-    pub fn start_quote(mut self) -> Self {
+    pub fn quote_rest(mut self) -> Self {
         self.0.push_str("\n>>> ");
 
         self
