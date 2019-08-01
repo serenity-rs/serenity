@@ -85,7 +85,6 @@ pub use self::standard::StandardFramework;
 use crate::client::Context;
 use crate::model::channel::Message;
 use threadpool::ThreadPool;
-use std::sync::Arc;
 
 /// A trait for defining your own framework for serenity to use.
 ///
