@@ -34,16 +34,16 @@ pub use reqwest::StatusCode;
 pub use self::client::*;
 pub use self::error::Error as HttpError;
 
-use reqwest::{
-    Method,
-};
+use reqwest::Method;
 use crate::model::prelude::*;
-use self::{request::Request};
+use self::request::Request;
 use std::{
     fs::File,
-    sync::Arc,
     path::{Path, PathBuf},
 };
+
+#[cfg(any(feature = "client", feature = "http"))]
+use std::sync::Arc;
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
@@ -51,8 +51,7 @@ use crate::cache::CacheRwLock;
 use crate::client::Context;
 #[cfg(feature = "client")]
 use crate::CacheAndHttp;
-#[cfg(feature = "client")]
-use std::sync::Arc;
+
 
 /// This trait will be required by functions that need [`Http`] and can
 /// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
