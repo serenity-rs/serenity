@@ -5,82 +5,119 @@ use uwl::{StrExt, UnicodeStream};
 
 pub mod map;
 
-use map::*;
+use map::{CommandMap, GroupMap, ParseMap};
 
 use std::borrow::Cow;
 
-#[derive(Debug, Clone, PartialEq)]
-pub enum Prefix<'a> {
-    Punct(&'a str),
-    Mention(&'a str),
-    None,
+#[inline]
+fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
+    if config.case_insensitive {
+        Cow::Owned(s.to_lowercase())
+    } else {
+        Cow::Borrowed(s)
+    }
 }
 
-pub fn parse_prefix<'a>(
+/// Parse a mention in the message that is of either the direct (`<@id>`) or nickname (`<@!id>`) syntax,
+/// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.
+/// Returns `Some(<id>)` on success, `None` otherwise.
+///
+/// [`Configuration::on_mention`]: ../struct.Configuration.html#method.on_mention
+pub fn mention<'a>(stream: &mut UnicodeStream<'a>, config: &Configuration) -> Option<&'a str> {
+    let on_mention = config.on_mention.as_ref().map(String::as_str)?;
+
+    let start = stream.offset();
+
+    if !stream.eat("<@") {
+        return None;
+    }
+
+    // Optional.
+    stream.eat("!");
+
+    let id = stream.take_while(|s| s.is_numeric());
+
+    if !stream.eat(">") {
+        // Backtrack to where we were.
+        stream.set(start);
+
+        return None;
+    }
+
+    if id == on_mention {
+        Some(id)
+    } else {
+        stream.set(start);
+
+        None
+    }
+}
+
+fn find_prefix<'a>(
     ctx: &mut Context,
-    msg: &'a Message,
+    msg: &Message,
     config: &Configuration,
-) -> (Prefix<'a>, &'a str) {
-    let mut stream = UnicodeStream::new(&msg.content);
-    stream.take_while(|s| s.is_whitespace());
+    stream: &UnicodeStream<'a>,
+) -> Option<&'a str> {
+    let try_match = |prefix: &str| {
+        let peeked = stream.peek_for(prefix.chars().count());
 
-    if let Some(ref mention) = config.on_mention {
-        if let Ok(id) = stream.parse("<@(!){}>") {
-            if id.is_numeric() && mention == id {
-                stream.take_while(|s| s.is_whitespace());
-                return (Prefix::Mention(id), stream.rest());
+        if prefix == peeked {
+            Some(peeked)
+        } else {
+            None
+        }
+    };
+
+    for f in &config.dynamic_prefixes {
+        if let Some(p) = f(ctx, msg) {
+            if let Some(p) = try_match(&p) {
+                return Some(p);
             }
         }
     }
 
-    let mut prefix = None;
-    if !config.prefixes.is_empty() || !config.dynamic_prefixes.is_empty() {
-        for f in &config.dynamic_prefixes {
-            if let Some(p) = f(ctx, msg) {
-                let pp = stream.peek_for(p.chars().count());
+    config.prefixes.iter().find_map(|p| try_match(&p))
+}
 
-                if p == pp {
-                    prefix = Some(pp);
-                    break;
-                }
-            }
-        }
+/// Parse a prefix in the message.
+///
+/// The "prefix" may be one of the following:
+/// - A mention (`<@id>`/`<@!id>`)
+/// - A dynamically constructed prefix ([`Configuration::dynamic_prefix`])
+/// - A static prefix ([`Configuration::prefix`])
+/// - Nothing
+///
+/// In all cases, whitespace after the prefix is cleared.
+///
+/// [`Configuration::dynamic_prefix`]: ../struct.Configuration.html#method.dynamic_prefix
+/// [`Configuration::prefix`]: ../struct.Configuration.html#method.prefix
+pub fn prefix<'a>(
+    ctx: &mut Context,
+    msg: &Message,
+    stream: &mut UnicodeStream<'a>,
+    config: &Configuration,
+) -> Option<&'a str> {
+    if let Some(id) = mention(stream, config) {
+        stream.take_while(|s| s.is_whitespace());
 
-        for p in &config.prefixes {
-            // If `dynamic_prefixes` succeeded, don't iterate through the normal prefixes.
-            if prefix.is_some() {
-                break;
-            }
-
-            let pp = stream.peek_for(p.chars().count());
-
-            if p == pp {
-                prefix = Some(pp);
-                break;
-            }
-        }
+        return Some(id);
     }
+
+    let prefix = find_prefix(ctx, msg, config, stream);
 
     if let Some(prefix) = prefix {
         stream.increment(prefix.len());
-
-        if config.with_whitespace.prefixes {
-            stream.take_while(|s| s.is_whitespace());
-        }
-
-        let args = stream.rest();
-
-        return (Prefix::Punct(prefix), args.trim());
     }
 
     if config.with_whitespace.prefixes {
         stream.take_while(|s| s.is_whitespace());
     }
 
-    let args = stream.rest();
-    (Prefix::None, args.trim())
+    prefix
 }
 
+/// Checked per valid group or command in the message.
 fn check_discrepancy(
     ctx: &Context,
     msg: &Message,
@@ -130,17 +167,8 @@ fn check_discrepancy(
     Ok(())
 }
 
-#[inline]
-fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
-    if config.case_insensitive {
-        Cow::Owned(s.to_lowercase())
-    } else {
-        Cow::Borrowed(s)
-    }
-}
-
-fn try_parse<'msg, M: ParseMap>(
-    stream: &mut UnicodeStream<'msg>,
+fn try_parse<M: ParseMap>(
+    stream: &mut UnicodeStream<'_>,
     map: &M,
     by_space: bool,
     f: impl Fn(&str) -> String,
@@ -176,10 +204,12 @@ fn parse_cmd(
     config: &Configuration,
     map: &CommandMap,
 ) -> Result<&'static Command, ParseError> {
-    let (n, r) = try_parse(stream, map, config.by_space, |s| to_lowercase(config, s).to_string());
+    let (n, r) = try_parse(stream, map, config.by_space, |s| {
+        to_lowercase(config, s).into_owned()
+    });
 
     if config.disabled_commands.contains(&n) {
-        return Err(From::from(DispatchError::CommandDisabled(n)));
+        return Err(ParseError::Dispatch(DispatchError::CommandDisabled(n)));
     }
 
     if let Some((cmd, map)) = r {
@@ -204,7 +234,7 @@ fn parse_cmd(
     Err(ParseError::UnrecognisedCommand(Some(n.to_string())))
 }
 
-fn parse_group<'msg>(
+fn parse_group(
     stream: &mut UnicodeStream<'_>,
     ctx: &Context,
     msg: &Message,
@@ -236,39 +266,31 @@ fn parse_group<'msg>(
 }
 
 #[inline]
-fn handle_command<'msg>(
-    stream: &mut UnicodeStream<'msg>,
+fn handle_command(
+    stream: &mut UnicodeStream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
     map: &CommandMap,
     group: &'static CommandGroup,
-) -> Result<Invoke<'msg>, ParseError> {
+) -> Result<Invoke, ParseError> {
     match parse_cmd(stream, ctx, msg, config, map) {
-        Ok(command) => Ok(Invoke::Command {
-            group,
-            command,
-            args: stream.rest(),
-        }),
+        Ok(command) => Ok(Invoke::Command { group, command }),
         Err(err) => match group.options.default_command {
-            Some(command) => Ok(Invoke::Command {
-                group,
-                command,
-                args: stream.rest(),
-            }),
+            Some(command) => Ok(Invoke::Command { group, command }),
             None => Err(err),
         },
     }
 }
 
 #[inline]
-fn handle_group<'msg>(
-    stream: &mut UnicodeStream<'msg>,
+fn handle_group(
+    stream: &mut UnicodeStream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
     map: &GroupMap,
-) -> Result<Invoke<'msg>, ParseError> {
+) -> Result<Invoke, ParseError> {
     parse_group(stream, ctx, msg, config, map)
         .and_then(|(group, map)| handle_command(stream, ctx, msg, config, &map, group))
 }
@@ -276,28 +298,34 @@ fn handle_group<'msg>(
 #[derive(Debug)]
 pub enum ParseError {
     UnrecognisedCommand(Option<String>),
-    DispatchFailure(DispatchError),
+    Dispatch(DispatchError),
 }
 
 impl From<DispatchError> for ParseError {
     #[inline]
     fn from(err: DispatchError) -> Self {
-        ParseError::DispatchFailure(err)
+        ParseError::Dispatch(err)
     }
 }
 
-pub fn parse_command<'a>(
+/// Parse a command from the message.
+///
+/// The "command" may be:
+/// 1. A *help command* that provides a friendly browsing interface of all groups and commands,
+/// explaining what each of them are, how they are layed out and how to invoke them.
+/// There can only one help command registered, but might have many names defined for invocation of itself.
+///
+/// 2. A command defined under another command or a group, which may also belong to another group and so on.
+/// To invoke this command, all names and prefixes of its parent commands and groups must be specified before it.
+pub fn command(
     ctx: &Context,
-    msg: &'a Message,
-    message: &'a str,
+    msg: &Message,
+    stream: &mut UnicodeStream<'_>,
     groups: &[(&'static CommandGroup, Map)],
     config: &Configuration,
     help_was_set: Option<&[&'static str]>,
-) -> Result<Invoke<'a>, ParseError> {
-    let mut stream = UnicodeStream::new(message);
-    stream.take_while(|s| s.is_whitespace());
-
-    // We take precedence over commands named help command's name.
+) -> Result<Invoke, ParseError> {
+    // Precedence is taken over commands named as one of the help names.
     if let Some(names) = help_was_set {
         for name in names {
             let n = to_lowercase(config, stream.peek_for(name.chars().count()));
@@ -307,9 +335,7 @@ pub fn parse_command<'a>(
 
                 stream.take_while(|s| s.is_whitespace());
 
-                let args = stream.rest();
-
-                return Ok(Invoke::Help { name, args });
+                return Ok(Invoke::Help(name));
             }
         }
     }
@@ -320,7 +346,7 @@ pub fn parse_command<'a>(
         match map {
             // Includes [group] itself.
             Map::WithPrefixes(map) => {
-                let res = handle_group(&mut stream, ctx, msg, config, map);
+                let res = handle_group(stream, ctx, msg, config, map);
 
                 if res.is_ok() {
                     return res;
@@ -329,7 +355,7 @@ pub fn parse_command<'a>(
                 last = res;
             }
             Map::Prefixless(subgroups, commands) => {
-                let res = handle_group(&mut stream, ctx, msg, config, subgroups);
+                let res = handle_group(stream, ctx, msg, config, subgroups);
 
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
@@ -337,7 +363,7 @@ pub fn parse_command<'a>(
                     return res;
                 }
 
-                let res = handle_command(&mut stream, ctx, msg, config, commands, group);
+                let res = handle_command(stream, ctx, msg, config, commands, group);
 
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
@@ -354,14 +380,10 @@ pub fn parse_command<'a>(
 }
 
 #[derive(Debug)]
-pub enum Invoke<'a> {
+pub enum Invoke {
     Command {
         group: &'static CommandGroup,
         command: &'static Command,
-        args: &'a str,
     },
-    Help {
-        name: &'static str,
-        args: &'a str,
-    },
+    Help(&'static str),
 }

@@ -15,17 +15,21 @@ pub use structures::*;
 use structures::buckets::{Bucket, Ratelimit};
 pub use structures::buckets::BucketBuilder;
 
-use parse::*;
+use parse::{ParseError, Invoke};
 use parse::map::{CommandMap, GroupMap, Map};
+
 use super::Framework;
 use crate::client::Context;
 use crate::model::{
     channel::{Channel, Message},
     permissions::Permissions,
 };
+
 use std::collections::HashMap;
 use std::sync::Arc;
+
 use threadpool::ThreadPool;
+use uwl::{UnicodeStream, StrExt};
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
@@ -240,10 +244,6 @@ impl StandardFramework {
         command: &'static CommandOptions,
         group: &'static GroupOptions,
     ) -> Option<DispatchError> {
-        if let Some(err) = self.should_fail_common(msg) {
-            return Some(err);
-        }
-
         if let Some(min) = command.min_args {
             if args.len() < min as usize {
                 return Some(DispatchError::NotEnoughArguments {
@@ -601,9 +601,13 @@ impl StandardFramework {
 
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        let (prefix, rest) = parse_prefix(&mut ctx, &msg, &self.config);
+        let mut stream = UnicodeStream::new(&msg.content);
 
-        if prefix != Prefix::None && rest.trim().is_empty() {
+        stream.take_while(|s| s.is_whitespace());
+
+        let prefix = parse::prefix(&mut ctx, &msg, &mut stream, &self.config);
+
+        if prefix.is_some() && stream.rest().is_empty() {
 
             if let Some(prefix_only) = &self.prefix_only {
                 let prefix_only = Arc::clone(&prefix_only);
@@ -617,7 +621,7 @@ impl Framework for StandardFramework {
             return;
         }
 
-        if prefix == Prefix::None && !(self.config.no_dm_prefix && msg.is_private()) {
+        if prefix.is_none() && !(self.config.no_dm_prefix && msg.is_private()) {
 
             if let Some(normal) = &self.normal_message {
                 let normal = Arc::clone(&normal);
@@ -640,14 +644,16 @@ impl Framework for StandardFramework {
             return;
         }
 
-        let invoke = match parse_command(
+        let invocation = parse::command(
             &ctx,
             &msg,
-            rest,
+            &mut stream,
             &self.groups,
             &self.config,
             self.help.as_ref().map(|h| h.options.names),
-        ) {
+        );
+
+        let invoke = match invocation {
             Ok(i) => i,
             Err(ParseError::UnrecognisedCommand(unreg)) => {
                 if let Some(unreg) = unreg {
@@ -672,7 +678,7 @@ impl Framework for StandardFramework {
 
                 return;
             }
-            Err(ParseError::DispatchFailure(error)) => {
+            Err(ParseError::Dispatch(error)) => {
                 if let Some(dispatch) = &self.dispatch {
                     dispatch(&mut ctx, &msg, error);
                 }
@@ -681,10 +687,10 @@ impl Framework for StandardFramework {
             }
         };
 
-        match invoke {
-            Invoke::Help { name, args } => {
-                let args = Args::new(args, &self.config.delimiters);
+        let mut args = Args::new(stream.rest(), &self.config.delimiters);
 
+        match invoke {
+            Invoke::Help(name) => {
                 let before = self.before.clone();
                 let after = self.after.clone();
                 let owners = self.config.owners.clone();
@@ -710,9 +716,7 @@ impl Framework for StandardFramework {
                     }
                 });
             }
-            Invoke::Command { command, group, args } => {
-                let mut args = Args::new(args, &self.config.delimiters);
-
+            Invoke::Command { command, group } => {
                 if let Some(error) =
                     self.should_fail(&mut ctx, &msg, &mut args, &command.options, &group.options)
                 {
