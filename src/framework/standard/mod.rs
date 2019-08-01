@@ -383,6 +383,15 @@ impl StandardFramework {
         self
     }
 
+    /// Removes a group from being used in the framework.
+    /// 
+    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// it's not intended to be chained as the other commands are.
+    pub fn remove_group(&mut self, group: &'static CommandGroup) {
+        // Iterates through the vector and if a given group _doesn't_ match, we retain it
+        self.groups.retain(|&(g, _)| g != group)
+    }
+
     /// Specify the function that's called in case a command wasn't executed for one reason or
     /// another.
     ///
