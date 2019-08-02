@@ -383,11 +383,31 @@ impl StandardFramework {
         self
     }
 
-    /// Removes a group from being used in the framework.
+    /// Adds a group to be used by the framework. Primary use-case is runtime modification
+    /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
+    /// [`group`] for adding groups in initial configuration.
     /// 
     /// Note: does _not_ return `Self` like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
-    pub fn remove_group(&mut self, group: &'static CommandGroup) {
+    /// 
+    /// [`group`]: #method.group
+    pub fn group_add(&mut self, group: &'static CommandGroup) {
+        // Implementation is duplicated from above group function
+        let map = if group.options.prefixes.is_empty() {
+            Map::Prefixless(GroupMap::new(&group.sub_groups), CommandMap::new(&group.commands))
+        } else {
+            Map::WithPrefixes(GroupMap::new(&[group]))
+        };
+
+        self.groups.push((group, map));
+    }
+
+    /// Removes a group from being used in the framework. Primary use-case is runtime modification
+    /// of groups in the framework.
+    /// 
+    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// it's not intended to be chained as the other commands are.
+    pub fn group_remove(&mut self, group: &'static CommandGroup) {
         // Iterates through the vector and if a given group _doesn't_ match, we retain it
         self.groups.retain(|&(g, _)| g != group)
     }
