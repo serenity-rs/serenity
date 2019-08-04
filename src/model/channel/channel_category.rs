@@ -63,23 +63,9 @@ impl ChannelCategory {
 
 
     /// Deletes this category if required permissions are met.
-    ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
-    /// owning the required permissions the HTTP-request will be issued.
     #[inline]
     #[cfg(feature = "http")]
     pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_CHANNELS;
-
-                if !utils::user_has_perms(&cache, self.id, req)? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
         self.id.delete(&cache_http.http()).map(|_| ())
     }
 
@@ -96,18 +82,8 @@ impl ChannelCategory {
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
     pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-        where F: FnOnce(&mut EditChannel) -> &mut EditChannel {
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_CHANNELS;
-
-                if !utils::user_has_perms(&cache, self.id, req)? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
-            }
-        }
-
+        where F: FnOnce(&mut EditChannel) -> &mut EditChannel
+    {
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));

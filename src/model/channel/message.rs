@@ -122,7 +122,7 @@ impl Message {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
                 let is_author = self.author.id == cache.read().user.id;
-                let has_perms = utils::user_has_perms(&cache, self.channel_id, req)?;
+                let has_perms = utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)?;
 
                 if !is_author && !has_perms {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -153,7 +153,7 @@ impl Message {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
 
-                if !utils::user_has_perms(cache, self.channel_id, req)? {
+                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -390,7 +390,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(&cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -430,7 +430,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::ADD_REACTIONS;
 
-                    if !utils::user_has_perms(cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -477,7 +477,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::SEND_MESSAGES;
 
-                    if !utils::user_has_perms(cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -536,7 +536,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
