@@ -676,6 +676,14 @@ pub enum MessageType {
     PinsAdd = 6,
     /// An indicator that a member joined the guild.
     MemberJoin = 7,
+    /// An indicator that someone has boosted the guild.
+    NitroBoost = 8,
+    /// An indicator that the guild has reached nitro tier 1
+    NitroTier1 = 9,
+    /// An indicator that the guild has reached nitro tier 2
+    NitroTier2 = 10,
+    /// An indicator that the guild has reached nitro tier 3
+    NitroTier3 = 11,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -690,6 +698,10 @@ enum_number!(
         GroupIconUpdate,
         PinsAdd,
         MemberJoin,
+        NitroBoost,
+        NitroTier1,
+        NitroTier2,
+        NitroTier3,
     }
 );
 
@@ -706,6 +718,10 @@ impl MessageType {
             GroupIconUpdate => 5,
             PinsAdd => 6,
             MemberJoin => 7,
+            NitroBoost => 8,
+            NitroTier1 => 9,
+            NitroTier2 => 10,
+            NitroTier3 => 11,
             __Nonexhaustive => unreachable!(),
         }
     }
