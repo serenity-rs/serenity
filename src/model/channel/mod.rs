@@ -296,7 +296,7 @@ impl Channel {
     /// If other channel types are used it will return None.
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`CatagoryChannel`]: struct.ChannelCategory.html
+    /// [`CategoryChannel`]: struct.ChannelCategory.html
     pub fn position(&self) -> Option<i64> {
         match *self {
             Channel::Guild(ref channel) => Some(channel.with(|c| c.position)),
@@ -316,7 +316,7 @@ impl<'de> Deserialize<'de> for Channel {
         };
 
         match kind {
-            0 | 2 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+            0 | 2 | 5 | 6 => serde_json::from_value::<GuildChannel>(Value::Object(v))
                 .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
                 .map_err(DeError::custom),
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
@@ -408,10 +408,18 @@ pub enum ChannelType {
     ///
     /// [`ChannelCategory`]: struct.ChannelCategory.html
     Category = 4,
-    /// An indicator that the channel is a [`NewsChannel`].
+    /// An indicator that the channel is a `NewsChannel`.
     ///
-    /// [`NewsChannel`]: struct.NewsChannel.html
+    /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
     News = 5,
+    /// An indicator that the channel is a `StoreChannel`
+    ///
+    /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
+    ///
+    /// [`GuildChannel`]: struct.GuildChannel.html
+    Store = 6,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -424,6 +432,7 @@ enum_number!(
         Group,
         Category,
         News,
+        Store,
     }
 );
 
@@ -436,6 +445,7 @@ impl ChannelType {
             ChannelType::Voice => "voice",
             ChannelType::Category => "category",
             ChannelType::News => "news",
+            ChannelType::Store => "store",
             ChannelType::__Nonexhaustive => unreachable!(),
         }
     }
@@ -448,6 +458,7 @@ impl ChannelType {
             ChannelType::Group => 3,
             ChannelType::Category => 4,
             ChannelType::News => 5,
+            ChannelType::Store => 6,
             ChannelType::__Nonexhaustive => unreachable!(),
         }
     }
