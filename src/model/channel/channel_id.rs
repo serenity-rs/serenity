@@ -644,7 +644,11 @@ impl ChannelId {
 
         if !msg.2.is_empty() {
             if let Some(e) = msg.0.remove(&"embed") {
-                msg.0.insert("payload_json", json!({ "embed": e }));
+                if let Some(c) = msg.0.remove(&"content") {
+                    msg.0.insert("payload_json", json!({ "content": c, "embed": e }));
+                } else {
+                    msg.0.insert("payload_json", json!({ "embed": e }));
+                }
             }
         }
 

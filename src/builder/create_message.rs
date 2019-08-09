@@ -61,12 +61,12 @@ impl<'a> CreateMessage<'a> {
     /// **Note**: Message contents must be under 2000 unicode code points.
     #[inline]
     pub fn content<D: ToString>(&mut self, content: D) -> &mut Self {
-        self.0.insert("content", Value::String(content.to_string()));
-        self
+        self._content(content.to_string())
     }
 
-    fn _content(&mut self, content: String) {
+    fn _content(&mut self, content: String) -> &mut Self {
         self.0.insert("content", Value::String(content));
+        self
     }
 
     /// Set an embed for the message.
