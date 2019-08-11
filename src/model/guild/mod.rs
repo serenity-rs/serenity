@@ -110,8 +110,14 @@ pub struct Guild {
     /// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by
     /// the library.
     ///
+    /// You can manually request that the remaining members be sent by calling
+    /// [`ShardManager::chunk_guilds`], after which chunks containing guild
+    /// members will be asynchronously received until all members are
+    /// available.
+    ///
     /// [`ReadyEvent`]: ../event/struct.ReadyEvent.html
     /// [`member_count`]: #structfield.member_count
+    /// [`ShardMessenger::chunk_guilds`]: ../../client/bridge/gateway/struct.ShardMessenger.html#method.chunk_guilds
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
