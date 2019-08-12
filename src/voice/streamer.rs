@@ -318,6 +318,8 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
     Ok(pcm(true, ChildContainer(ffmpeg)))
 }
 
+/// Creates a streamed audio source from youtube search results with `youtube-dl`,`ffmpeg` and `ytsearch`
+/// Searches for video in youtube with a limit of 1
 pub fn ytdl_search(name: &str) -> Result<Box<dyn AudioSource>> {
     let ytdl_args = [
         "-f",
