@@ -26,3 +26,7 @@ hardcode your token in.
 
 If you have any questions, feel free to submit an issue with what can be
 clarified.
+
+### Contributing
+
+If you add a new example also add it to the file `azure-build-examples.yml`.

@@ -5,16 +5,47 @@
 //! Using the [`with_embeds`] function to have the framework's help message use
 //! embeds:
 //!
-//! ```rs,no_run
-//! use serenity::framework::standard::help_commands;
-//! use serenity::Client;
+//! ```rust,no_run
+//! use serenity::framework::standard::{
+//!     StandardFramework,
+//!     help_commands,
+//!     Args,
+//!     HelpOptions,
+//!     CommandGroup,
+//!     CommandResult,
+//! };
+//! use serenity::framework::standard::macros::help;
+//! use serenity::model::prelude::{Message, UserId};
+//! use serenity::client::{EventHandler, Context, Client};
+//! use std::collections::HashSet;
 //! use std::env;
 //!
-//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap());
-//! use serenity::framework::StandardFramework;
+//! struct Handler;
+//!
+//! impl EventHandler for Handler {}
+//!
+//! #[help]
+//! fn my_help(
+//!    context: &mut Context,
+//!    msg: &Message,
+//!    args: Args,
+//!    help_options: &'static HelpOptions,
+//!    groups: &[&'static CommandGroup],
+//!    owners: HashSet<UserId>
+//! ) -> CommandResult {
+//! #  #[cfg(all(feature = "cache", feature = "http"))]
+//! # {
+//!    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+//! # }
+//! #
+//! # #[cfg(not(all(feature = "cache", feature = "http")))]
+//! # Ok(())
+//! }
+//!
+//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler).unwrap();
 //!
 //! client.with_framework(StandardFramework::new()
-//!     .command("help", |c| c.exec_help(help_commands::with_embeds)));
+//!     .help(&MY_HELP));
 //! ```
 //!
 //! The same can be accomplished with no embeds by substituting `with_embeds`
@@ -968,7 +999,7 @@ fn flatten_group_to_plain_string(
         );
     }
 
-    let joined_commands = format!("`{}`", group.command_names.join("`, `"));
+    let joined_commands = format!("{}", group.command_names.join(", "));
 
     let _ = write!(group_text, "{}", joined_commands);
 

@@ -35,7 +35,7 @@ pub enum Reason {
 /// information on the cause via [`Reason`].
 ///
 /// [`Check`]: struct.Check.html
-/// [`Reason`]: struct.Reason.html
+/// [`Reason`]: enum.Reason.html
 #[derive(Clone, Debug)]
 pub enum CheckResult {
    Success,
@@ -46,7 +46,7 @@ impl CheckResult {
     /// Creates a new [`CheckResult::Failure`] with [`Reason::User`].
     ///
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::User`]: struct.Reason.html#variant.User
+    /// [`Reason::User`]: enum.Reason.html#variant.User
     pub fn new_user<D>(d: D) -> Self
         where D: fmt::Display {
         CheckResult::Failure(Reason::User(d.to_string()))
@@ -55,7 +55,7 @@ impl CheckResult {
     /// Creates a new [`CheckResult::Failure`] with [`Reason::Log`].
     ///
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::Log`]: struct.Reason.html#variant.Log
+    /// [`Reason::Log`]: enum.Reason.html#variant.Log
     pub fn new_log<D>(d: D) -> Self
         where D: fmt::Display {
         CheckResult::Failure(Reason::Log(d.to_string()))
@@ -64,7 +64,7 @@ impl CheckResult {
     /// Creates a new [`CheckResult::Failure`] with [`Reason::Unknown`].
     ///
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::Unknown`]: struct.Reason.html#variant.Unknown
+    /// [`Reason::Unknown`]: enum.Reason.html#variant.Unknown
     pub fn new_unknown() -> Self {
         CheckResult::Failure(Reason::Unknown)
     }
@@ -72,7 +72,7 @@ impl CheckResult {
     /// Creates a new [`CheckResult::Failure`] with [`Reason::UserAndLog`].
     ///
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::UserAndLog`]: struct.Reason.html#variant.UserAndLog
+    /// [`Reason::UserAndLog`]: enum.Reason.html#variant.UserAndLog
     pub fn new_user_and_log<D>(user: D, log: D) -> Self
         where D: fmt::Display {
         CheckResult::Failure(Reason::UserAndLog {

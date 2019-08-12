@@ -131,7 +131,7 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(|i| i.max_uses(5));
+    /// let invite = channel.create_invite(&context, |i| i.max_uses(5));
     /// ```
     #[cfg(all(feature = "utils", feature = "client"))]
     pub fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
@@ -141,7 +141,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::CREATE_INVITE;
 
-                if !utils::user_has_perms(&cache, self.id, req)? {
+                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -283,7 +283,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_CHANNELS;
 
-                if !utils::user_has_perms(&cache, self.id, req)? {
+                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -365,7 +365,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_CHANNELS;
 
-                if !utils::user_has_perms(&cache, self.id, req)? {
+                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -683,7 +683,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::SEND_MESSAGES;
 
-                if !utils::user_has_perms(&cache, self.id, req)? {
+                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }

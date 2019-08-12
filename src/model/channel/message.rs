@@ -122,7 +122,7 @@ impl Message {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
                 let is_author = self.author.id == cache.read().user.id;
-                let has_perms = utils::user_has_perms(&cache, self.channel_id, req)?;
+                let has_perms = utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)?;
 
                 if !is_author && !has_perms {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -153,7 +153,7 @@ impl Message {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
 
-                if !utils::user_has_perms(cache, self.channel_id, req)? {
+                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -390,7 +390,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(&cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -430,7 +430,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::ADD_REACTIONS;
 
-                    if !utils::user_has_perms(cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -463,7 +463,9 @@ impl Message {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "client")]
-    pub fn reply(&self, cache_http: impl CacheHttp, content: &str) -> Result<Message> {
+    pub fn reply(&self, cache_http: impl CacheHttp, content: impl AsRef<str>) -> Result<Message> {
+        let content = content.as_ref();
+
         if let Some(length_over) = Message::overflow_length(content) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
         }
@@ -475,7 +477,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::SEND_MESSAGES;
 
-                    if !utils::user_has_perms(cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -534,7 +536,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(cache, self.channel_id, req)? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -674,6 +676,14 @@ pub enum MessageType {
     PinsAdd = 6,
     /// An indicator that a member joined the guild.
     MemberJoin = 7,
+    /// An indicator that someone has boosted the guild.
+    NitroBoost = 8,
+    /// An indicator that the guild has reached nitro tier 1
+    NitroTier1 = 9,
+    /// An indicator that the guild has reached nitro tier 2
+    NitroTier2 = 10,
+    /// An indicator that the guild has reached nitro tier 3
+    NitroTier3 = 11,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -688,6 +698,10 @@ enum_number!(
         GroupIconUpdate,
         PinsAdd,
         MemberJoin,
+        NitroBoost,
+        NitroTier1,
+        NitroTier2,
+        NitroTier3,
     }
 );
 
@@ -704,6 +718,10 @@ impl MessageType {
             GroupIconUpdate => 5,
             PinsAdd => 6,
             MemberJoin => 7,
+            NitroBoost => 8,
+            NitroTier1 => 9,
+            NitroTier2 => 10,
+            NitroTier3 => 11,
             __Nonexhaustive => unreachable!(),
         }
     }

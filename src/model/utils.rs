@@ -281,31 +281,40 @@ pub fn serialize_gen_locked_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub fn user_has_perms(cache: impl AsRef<CacheRwLock>, channel_id: ChannelId, mut permissions: Permissions) -> Result<bool> {
+pub fn user_has_perms(
+    cache: impl AsRef<CacheRwLock>,
+    channel_id: ChannelId,
+    guild_id: Option<GuildId>,
+    mut permissions: Permissions
+) -> Result<bool> {
     let cache = cache.as_ref().read();
     let current_user = &cache.user;
 
-    let channel = match cache.channel(channel_id) {
-        Some(channel) => channel,
-        None => return Err(Error::Model(ModelError::ItemMissing)),
-    };
+    let guild_id = match guild_id {
+        Some(id) => id,
+        None => {
+            let channel = match cache.channel(channel_id) {
+                Some(channel) => channel,
+                None => return Err(Error::Model(ModelError::ItemMissing)),
+            };
 
-    let guild_id = match channel {
-        Channel::Guild(channel) => channel.read().guild_id,
-        Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
-            // Both users in DMs, and all users in groups and maybe all channels in categories will
-            // have the same
-            // permissions.
-            //
-            // The only exception to this is when the current user is blocked by
-            // the recipient in a DM channel, which results in the current user
-            // not being able to send messages.
-            //
-            // Since serenity can't _reasonably_ check and keep track of these,
-            // just assume that all permissions are granted and return `true`.
-            return Ok(true);
-        },
-        Channel::__Nonexhaustive => unreachable!(),
+            match channel {
+                Channel::Guild(channel) => channel.read().guild_id,
+                Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
+                    // Both users in DMs, all users in groups, and maybe all channels in categories
+                    // will have the same permissions.
+                    //
+                    // The only exception to this is when the current user is blocked by
+                    // the recipient in a DM channel, preventing the current user
+                    // from sending messages.
+                    //
+                    // Since serenity can't _reasonably_ check and keep track of these,
+                    // just assume that all permissions are granted and return `true`.
+                    return Ok(true);
+                },
+                Channel::__Nonexhaustive => unreachable!(),
+            }
+        }
     };
 
     let guild = match cache.guild(guild_id) {

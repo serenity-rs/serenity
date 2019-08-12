@@ -383,6 +383,14 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a quoted inline text to the content
+    pub fn push_quote<D: I>(mut self, content: D) -> Self {
+        self.0.push_str("> ");
+        self.0.push_str(&content.into().to_string());
+
+        self
+    }
+
     /// Pushes the given text with a newline appended to the content.
     ///
     /// # Examples
@@ -523,6 +531,26 @@ impl MessageBuilder {
         self
     }
 
+    /// Pushes a quoted inline text to the content
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new().push_quote_line("hello").push("world").build();
+    ///
+    /// assert_eq!(content, "> hello\nworld");
+    /// ```
+    pub fn push_quote_line<D: I>(mut self, content: D) -> Self {
+        self = self.push_quote(content);
+        self.0.push('\n');
+
+        self
+    }
+
     /// Pushes text to your message, but normalizing content - that means
     /// ensuring that there's no unwanted formatting, mention spam etc.
     pub fn push_safe<C: I>(&mut self, content: C) -> &mut Self {
@@ -632,6 +660,18 @@ impl MessageBuilder {
             self.0.push_str(&c.to_string());
         }
         self.0.push_str("||");
+
+        self
+    }
+
+    /// Pushes a quoted inline text to the content normalizing content.
+    pub fn push_quote_safe<D: I>(mut self, content: D) -> Self {
+        self.0.push_str("> ");
+        {
+            let mut c = content.into();
+            c.inner = normalize(&c.inner).replace("> ", " ");
+            self.0.push_str(&c.to_string());
+        }
 
         self
     }
@@ -788,6 +828,36 @@ impl MessageBuilder {
     pub fn push_spoiler_line_safe<D: I>(&mut self, content: D) -> &mut Self {
         self.push_spoiler_safe(content);
         self.0.push('\n');
+
+        self
+    }
+
+    /// Pushes a quoted inline text with added newline to the content normalizing
+    /// content.
+    ///
+    /// # Examples
+    ///
+    /// Push content and then append a newline:
+    ///
+    /// ```rust
+    /// use serenity::utils::MessageBuilder;
+    ///
+    /// let content = MessageBuilder::new()
+    ///                 .push_quote_line_safe("@everyone")
+    ///                 .push("Isn't a mention.").build();
+    ///
+    /// assert_eq!(content, "> @\u{200B}everyone\nIsn't a mention.");
+    /// ```
+    pub fn push_quote_line_safe<D: I>(mut self, content: D) -> Self {
+        self = self.push_quote_safe(content);
+        self.0.push('\n');
+
+        self
+    }
+
+    /// Starts a multi-line quote, every push after this one will be quoted
+    pub fn quote_rest(mut self) -> Self {
+        self.0.push_str("\n>>> ");
 
         self
     }
