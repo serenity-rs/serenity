@@ -111,9 +111,7 @@ pub struct Guild {
     /// the library.
     ///
     /// You can manually request that the remaining members be sent by calling
-    /// [`ShardManager::chunk_guilds`], after which chunks containing guild
-    /// members will be asynchronously received until all members are
-    /// available.
+    /// [`ShardManager::chunk_guilds`].
     ///
     /// [`ReadyEvent`]: ../event/struct.ReadyEvent.html
     /// [`member_count`]: #structfield.member_count
