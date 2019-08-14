@@ -315,7 +315,7 @@ fn unmute(ctx: &mut Context, msg: &Message) -> CommandResult {
 
         check_msg(msg.channel_id.say(&ctx.http, "Unmuted"));
     } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to unmute in"));
     }
 
     Ok(())
