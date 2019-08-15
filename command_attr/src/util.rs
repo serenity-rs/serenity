@@ -5,8 +5,7 @@ use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     braced, bracketed, parenthesized,
-    ext::IdentExt,
-    parse::{Error, Parse, ParseBuffer, ParseStream, Result},
+    parse::{Error, Parse, ParseStream, Result},
     parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
@@ -82,28 +81,11 @@ macro_rules! propagate_err {
     }};
 }
 
-pub trait ParseStreamExt {
-    /// Do not advance unless the parse was successful.
-    fn try_parse<T: Parse>(&self) -> Result<T>;
-}
-
-impl<'a> ParseStreamExt for ParseBuffer<'a> {
-    fn try_parse<T: Parse>(&self) -> Result<T> {
-        let stream = self.fork();
-        let res = T::parse(&stream);
-        if res.is_ok() {
-            T::parse(self)?;
-        }
-
-        res
-    }
-}
-
 #[derive(Debug)]
 pub struct Bracketed<T>(pub Punctuated<T, Comma>);
 
 impl<T: Parse> Parse for Bracketed<T> {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let content;
         bracketed!(content in input);
 
@@ -111,25 +93,11 @@ impl<T: Parse> Parse for Bracketed<T> {
     }
 }
 
-// TODO: Replace this extraneous struct with a proper specialised impl on `Bracketed`
-// once the `specialisation` feature gets stabilised.
-#[derive(Debug)]
-pub struct BracketedIdents(pub Punctuated<Ident, Comma>);
-
-impl Parse for BracketedIdents {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let content;
-        bracketed!(content in input);
-
-        Ok(BracketedIdents(content.parse_terminated(Ident::parse_any)?))
-    }
-}
-
 #[derive(Debug)]
 pub struct Braced<T>(pub Punctuated<T, Comma>);
 
 impl<T: Parse> Parse for Braced<T> {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let content;
         braced!(content in input);
 
@@ -141,7 +109,7 @@ impl<T: Parse> Parse for Braced<T> {
 pub struct Parenthesised<T>(pub Punctuated<T, Comma>);
 
 impl<T: Parse> Parse for Parenthesised<T> {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let content;
         parenthesized!(content in input);
 
@@ -188,7 +156,7 @@ pub struct Field<T> {
 }
 
 impl<T: Parse> Parse for Field<T> {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let name = input.parse()?;
         input.parse::<Token![:]>()?;
 
@@ -205,7 +173,7 @@ pub enum RefOrInstance<T> {
 }
 
 impl<T: Parse> Parse for RefOrInstance<T> {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         if input.peek(Ident) {
             Ok(RefOrInstance::Ref(input.parse()?))
         } else {
@@ -224,22 +192,6 @@ impl<T: Default> Default for RefOrInstance<T> {
 #[derive(Debug)]
 pub struct IdentAccess(pub Ident, pub Option<Ident>);
 
-impl Parse for IdentAccess {
-    fn parse(input: ParseStream) -> Result<Self> {
-        let name = input.parse()?;
-
-        let name2 = if input.peek(Token![.]) {
-            input.parse::<Token![.]>()?;
-
-            Some(input.parse()?)
-        } else {
-            None
-        };
-
-        Ok(IdentAccess(name, name2))
-    }
-}
-
 #[derive(Debug)]
 pub enum Expr {
     Lit(Lit),
@@ -249,15 +201,34 @@ pub enum Expr {
 }
 
 impl Parse for Expr {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         if input.peek(Brace) {
             Ok(Expr::Object(input.parse()?))
         } else if input.peek(Bracket) {
             Ok(Expr::Array(input.parse()?))
-        } else if let Ok(access) = input.try_parse::<IdentAccess>() {
-            Ok(Expr::Access(access))
         } else {
-            Ok(Expr::Lit(input.parse()?))
+            // Because boolean literals are converted into `Ident` tokens,
+            // we must be more vigilant with how we parse the `IdentAccess` structure and `Lit`s.
+            let access = input.step(|cursor| match cursor.ident() {
+                Some((ref i, mut cursor)) if i != "true" && i != "false" => {
+                    let i2 = match cursor.punct() {
+                        Some((ref p, c)) if p.as_char() == '.' => c.ident().map(|(i2, c)| {
+                            cursor = c;
+
+                            i2
+                        }),
+                        _ => None,
+                    };
+
+                    return Ok((IdentAccess(i.clone(), i2), cursor));
+                }
+                _ => Err(cursor.error("...")),
+            });
+
+            match access {
+                Ok(access) => Ok(Expr::Access(access)),
+                Err(_) => Ok(Expr::Lit(input.parse()?)),
+            }
         }
     }
 }
@@ -266,7 +237,7 @@ impl Parse for Expr {
 pub struct Object(pub Vec<Field<Expr>>);
 
 impl Parse for Object {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let Braced(fields) = input.parse::<Braced<Field<Expr>>>()?;
 
         Ok(Object(fields.into_iter().collect()))
@@ -277,7 +248,7 @@ impl Parse for Object {
 pub struct Array(pub Vec<Expr>);
 
 impl Parse for Array {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let Bracketed(fields) = input.parse::<Bracketed<Expr>>()?;
 
         Ok(Array(fields.into_iter().collect()))

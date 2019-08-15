@@ -1,10 +1,9 @@
-// The `quote!` macro recurses a lot.
+#![deny(rust_2018_idioms)]
+// FIXME: Remove this in a foreseeable future.
+// Currently exists for backwards compatibility to previous Rust versions.
 #![recursion_limit = "128"]
 
 extern crate proc_macro;
-extern crate proc_macro2;
-extern crate quote;
-extern crate syn;
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -140,7 +139,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         fun.name.to_string()
     };
 
-    let mut options = Options::default();
+    let mut options = Options::new();
 
     for attribute in &fun.attributes {
         let span = attribute.span();
@@ -156,29 +155,6 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.min_args = Some(args);
                 options.max_args = Some(args);
             }
-            "required_permissions" => {
-                let p = propagate_err!(Vec::<Ident>::parse(values));
-
-                let mut permissions = Permissions::default();
-                for perm in p {
-                    let p = match Permissions::from_str(&perm.to_string()) {
-                        Some(p) => p,
-                        None => {
-                            return Error::new(perm.span(), "invalid permission")
-                                .to_compile_error()
-                                .into();
-                        }
-                    };
-
-                    // Add them together.
-                    permissions.0 |= p.0;
-                }
-
-                options.required_permissions = permissions;
-            }
-            "checks" => {
-                options.checks = Checks(propagate_err!(attributes::parse(values)));
-            }
             "bucket" => {
                 options.bucket = Some(propagate_err!(attributes::parse(values)));
             }
@@ -193,8 +169,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             }
             _ => {
                 match_options!(name, values, options, span => [
+                    checks;
                     min_args;
                     max_args;
+                    required_permissions;
                     aliases;
                     usage;
                     allowed_roles;
@@ -403,7 +381,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         struct Names(Vec<String>);
 
         impl Parse for Names {
-            fn parse(input: ParseStream) -> Result<Self> {
+            fn parse(input: ParseStream<'_>) -> Result<Self> {
                 let n: Punctuated<Lit, Token![,]> = input.parse_terminated(Lit::parse)?;
                 Ok(Names(n.into_iter().map(|l| l.to_str()).collect()))
             }
@@ -424,116 +402,34 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         let name = values.name.to_string();
         let name = &name[..];
 
-        match name {
-            "lacking_role" => {
-                let val = propagate_err!(String::parse(values));
-
-                options.lacking_role = match HelpBehaviour::from_str(&val) {
-                    Some(h) => h,
-                    None => {
-                        return Error::new(
-                            span,
-                            format_args!("invalid help behaviour: {:?}", val),
-                        )
-                        .to_compile_error()
-                        .into();
-                    }
-                };
-            }
-            "embed_error_colour" => {
-                let val = propagate_err!(String::parse(values));
-
-                options.embed_error_colour = match Colour::from_str(&val) {
-                    Some(c) => c,
-                    None => {
-                        return Error::new(span, format_args!("invalid colour: {:?}", val))
-                            .to_compile_error()
-                            .into();
-                    }
-                };
-            }
-            "embed_success_colour" => {
-                let val = propagate_err!(String::parse(values));
-
-                options.embed_success_colour = match Colour::from_str(&val) {
-                    Some(c) => c,
-                    None => {
-                        return Error::new(span, format_args!("invalid colour: {:?}", val))
-                            .to_compile_error()
-                            .into();
-                    }
-                };
-            }
-            "lacking_permissions" => {
-                let val = propagate_err!(String::parse(values));
-
-                options.lacking_permissions = match HelpBehaviour::from_str(&val) {
-                    Some(h) => h,
-                    None => {
-                        return Error::new(
-                            span,
-                            format_args!("invalid help behaviour: {:?}", val),
-                        )
-                        .to_compile_error()
-                        .into();
-                    }
-                };
-            }
-            "lacking_ownership" => {
-                let val = propagate_err!(String::parse(values));
-
-                options.lacking_ownership = match HelpBehaviour::from_str(&val) {
-                    Some(h) => h,
-                    None => {
-                        return Error::new(
-                            span,
-                            format_args!("invalid help behaviour: {:?}", val),
-                        )
-                        .to_compile_error()
-                        .into();
-                    }
-                };
-            }
-            "wrong_channel" => {
-                let val = propagate_err!(String::parse(values));
-
-                options.wrong_channel = match HelpBehaviour::from_str(&val) {
-                    Some(h) => h,
-                    None => {
-                        return Error::new(
-                            span,
-                            format_args!("invalid help behaviour: {:?}", val),
-                        )
-                        .to_compile_error()
-                        .into();
-                    }
-                };
-            }
-            _ => {
-                match_options!(name, values, options, span => [
-                    suggestion_text;
-                    no_help_available_text;
-                    usage_label;
-                    usage_sample_label;
-                    ungrouped_label;
-                    grouped_label;
-                    aliases_label;
-                    description_label;
-                    guild_only_text;
-                    checks_label;
-                    dm_only_text;
-                    dm_and_guild_text;
-                    available_text;
-                    command_not_found_text;
-                    individual_command_tip;
-                    group_prefix;
-                    strikethrough_commands_tip_in_dm;
-                    strikethrough_commands_tip_in_guild;
-                    max_levenshtein_distance;
-                    indention_prefix
-                ]);
-            }
-        }
+        match_options!(name, values, options, span => [
+            suggestion_text;
+            no_help_available_text;
+            usage_label;
+            usage_sample_label;
+            ungrouped_label;
+            grouped_label;
+            aliases_label;
+            description_label;
+            guild_only_text;
+            checks_label;
+            dm_only_text;
+            dm_and_guild_text;
+            available_text;
+            command_not_found_text;
+            individual_command_tip;
+            group_prefix;
+            lacking_role;
+            lacking_permissions;
+            lacking_ownership;
+            wrong_channel;
+            embed_error_colour;
+            embed_success_colour;
+            strikethrough_commands_tip_in_dm;
+            strikethrough_commands_tip_in_guild;
+            max_levenshtein_distance;
+            indention_prefix
+        ]);
     }
 
     fn produce_strike_text(options: &HelpOptions, dm_or_guild: &str) -> Option<String> {
@@ -825,7 +721,7 @@ pub fn group_options(input: TokenStream) -> TokenStream {
     }
 
     impl Parse for GroupOptionsName {
-        fn parse(input: ParseStream) -> Result<Self> {
+        fn parse(input: ParseStream<'_>) -> Result<Self> {
             let name = input.parse::<Ident>()?;
 
             let options = input.parse::<GroupOptions>()?;

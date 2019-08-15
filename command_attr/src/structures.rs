@@ -1,8 +1,9 @@
 use crate::consts::{CHECK, COMMAND, GROUP, GROUP_OPTIONS};
 use crate::util::{
-    Argument, Array, AsOption, Braced, Bracketed, BracketedIdents, Parenthesised, Expr, Field, IdentAccess,
-    IdentExt2, LitExt, Object, RefOrInstance,
+    Argument, Array, AsOption, Braced, Bracketed, Expr, Field, IdentAccess, IdentExt2, LitExt,
+    Object, Parenthesised, RefOrInstance,
 };
+use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
@@ -11,7 +12,7 @@ use syn::{
     punctuated::Punctuated,
     spanned::Spanned,
     token::Pub,
-    ArgCaptured, Attribute, Block, FnArg, Ident, Lit, Pat, Type, ReturnType, Stmt, Token,
+    Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token, Type,
 };
 
 #[derive(Debug, PartialEq)]
@@ -19,8 +20,17 @@ pub enum OnlyIn {
     Dm,
     Guild,
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
+}
+
+impl OnlyIn {
+    #[inline]
+    pub fn from_str(s: &str, span: Span) -> Result<Self> {
+        match s {
+            "guilds" | "guild" => Ok(OnlyIn::Guild),
+            "dms" | "dm" => Ok(OnlyIn::Dm),
+            _ => Err(Error::new(span, "invalid restriction type")),
+        }
+    }
 }
 
 impl ToTokens for OnlyIn {
@@ -30,7 +40,6 @@ impl ToTokens for OnlyIn {
             OnlyIn::Dm => stream.extend(quote!(#only_in_path::Dm)),
             OnlyIn::Guild => stream.extend(quote!(#only_in_path::Guild)),
             OnlyIn::None => stream.extend(quote!(#only_in_path::None)),
-            OnlyIn::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -39,6 +48,47 @@ impl Default for OnlyIn {
     #[inline]
     fn default() -> Self {
         OnlyIn::None
+    }
+}
+
+fn parse_argument(arg: FnArg) -> Result<Argument> {
+    match arg {
+        FnArg::Typed(typed) => {
+            let pat = typed.pat;
+            let kind = typed.ty;
+
+            match *pat {
+                Pat::Ident(id) => {
+                    let name = id.ident;
+                    let mutable = id.mutability;
+
+                    Ok(Argument {
+                        mutable,
+                        name,
+                        kind: *kind,
+                    })
+                }
+                Pat::Wild(wild) => {
+                    let token = wild.underscore_token;
+
+                    let name = Ident::new("_", token.spans[0]);
+
+                    Ok(Argument {
+                        mutable: None,
+                        name,
+                        kind: *kind,
+                    })
+                }
+                _ => Err(Error::new(
+                    pat.span(),
+                    format_args!("unsupported pattern: {:?}", pat),
+                )),
+            }
+        }
+        FnArg::Receiver(_) => Err(Error::new(
+            arg.span(),
+            format_args!("`self` arguments are prohibited: {:?}", arg),
+        )),
     }
 }
 
@@ -55,12 +105,12 @@ pub struct CommandFun {
 }
 
 impl Parse for CommandFun {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let attributes = input.call(Attribute::parse_outer)?;
 
         let (cfgs, attributes): (Vec<_>, Vec<_>) = attributes
             .into_iter()
-            // Split the cfgs from our attributes.
+            // Split the `#[cfg(...)]`s from our attributes.
             .partition(|a| a.path.is_ident("cfg"));
 
         // Filter out doc-comments as well.
@@ -91,51 +141,10 @@ impl Parse for CommandFun {
         braced!(bcont in input);
         let body = bcont.call(Block::parse_within)?;
 
-        let args: ::std::result::Result<Vec<Argument>, _> = args
+        let args = args
             .into_iter()
-            .map(|arg| {
-                let span = arg.span();
-                match arg {
-                    FnArg::Captured(ArgCaptured {
-                        pat,
-                        colon_token: _,
-                        ty: kind,
-                    }) => {
-                        let span = pat.span();
-                        match pat {
-                            Pat::Ident(id) => {
-                                let name = id.ident;
-                                let mutable = id.mutability;
-
-                                Ok(Argument {
-                                    mutable,
-                                    name,
-                                    kind,
-                                })
-                            }
-                            Pat::Wild(wild) => {
-                                let token = wild.underscore_token;
-
-                                let name = Ident::new("_", token.spans[0]);
-
-                                Ok(Argument {
-                                    mutable: None,
-                                    name,
-                                    kind,
-                                })
-                            }
-                            _ => Err(Error::new(span, format_args!("unsupported pattern: {:?}", pat))),
-                        }
-                    }
-                    _ => Err(Error::new(
-                        span,
-                        format_args!("use of a prohibited argument type: {:?}", arg),
-                    )),
-                }
-            })
-            .collect();
-
-        let args = args?;
+            .map(parse_argument)
+            .collect::<Result<Vec<_>>>()?;
 
         Ok(CommandFun {
             _pub,
@@ -266,7 +275,7 @@ impl ToTokens for Checks {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct Options {
     pub checks: Checks,
     pub bucket: Option<String>,
@@ -285,26 +294,15 @@ pub struct Options {
     pub sub_commands: Vec<Ident>,
 }
 
-impl Default for Options {
+impl Options {
     #[inline]
-    fn default() -> Self {
-        Options {
-            checks: Checks::default(),
-            bucket: None,
-            aliases: Vec::new(),
-            description: None,
-            usage: None,
-            example: None,
-            min_args: None,
-            max_args: None,
-            allowed_roles: Vec::new(),
-            required_permissions: Permissions::default(),
-            help_available: true,
-            only_in: OnlyIn::default(),
-            owners_only: false,
-            owner_privilege: true,
-            sub_commands: Vec::new(),
-        }
+    pub fn new() -> Self {
+        let mut options = Self::default();
+
+        options.help_available = true;
+        options.owner_privilege = true;
+
+        options
     }
 }
 
@@ -313,8 +311,6 @@ pub enum HelpBehaviour {
     Strike,
     Hide,
     Nothing,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl HelpBehaviour {
@@ -335,7 +331,6 @@ impl ToTokens for HelpBehaviour {
             HelpBehaviour::Strike => stream.extend(quote!(#help_behaviour_path::Strike)),
             HelpBehaviour::Hide => stream.extend(quote!(#help_behaviour_path::Hide)),
             HelpBehaviour::Nothing => stream.extend(quote!(#help_behaviour_path::Nothing)),
-            HelpBehaviour::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -405,7 +400,7 @@ impl Default for HelpOptions {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct GroupOptions {
     pub prefixes: Vec<String>,
     pub only_in: OnlyIn,
@@ -420,34 +415,28 @@ pub struct GroupOptions {
     pub inherit: Option<IdentAccess>,
 }
 
-impl Default for GroupOptions {
+impl GroupOptions {
     #[inline]
-    fn default() -> Self {
-        GroupOptions {
-            prefixes: Vec::new(),
-            only_in: OnlyIn::default(),
-            owners_only: false,
-            owner_privilege: true,
-            help_available: true,
-            allowed_roles: Vec::new(),
-            required_permissions: Permissions::default(),
-            checks: Checks::default(),
-            default_command: None,
-            description: None,
-            inherit: None,
-        }
+    pub fn new() -> Self {
+        let mut options = Self::default();
+
+        options.owner_privilege = true;
+        options.help_available = true;
+
+        options
     }
 }
 
 impl Parse for GroupOptions {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         let Object(fields) = input.parse::<Object>()?;
 
-        let mut options = GroupOptions::default();
+        let mut options = GroupOptions::new();
 
         for Field { name, value } in fields {
             let span = name.span();
             let name = name.to_string();
+
             match (&name[..], value) {
                 ("prefixes", Expr::Array(Array(values)))
                 | ("allowed_roles", Expr::Array(Array(values))) => {
@@ -477,16 +466,7 @@ impl Parse for GroupOptions {
                     }
                 }
                 ("only_in", Expr::Lit(value)) => {
-                    let span = value.span();
-                    let value = value.to_str();
-
-                    let only = match &value[..] {
-                        "dms" => OnlyIn::Dm,
-                        "guilds" => OnlyIn::Guild,
-                        _ => return Err(Error::new(span, "invalid only option")),
-                    };
-
-                    options.only_in = only;
+                    options.only_in = OnlyIn::from_str(&value.to_str()[..], value.span())?;
                 }
                 ("owners_only", Expr::Lit(value))
                 | ("owner_privilege", Expr::Lit(value))
@@ -715,17 +695,17 @@ pub struct Group {
 }
 
 impl Parse for Group {
-    fn parse(input: ParseStream) -> Result<Self> {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
         enum GroupField {
             HelpName(String),
             Name(Ident),
             Options(RefOrInstance<GroupOptions>),
-            Commands(BracketedIdents),
+            Commands(Bracketed<Ident>),
             SubGroups(Bracketed<RefOrInstance<Group>>),
         }
 
         impl Parse for GroupField {
-            fn parse(input: ParseStream) -> Result<Self> {
+            fn parse(input: ParseStream<'_>) -> Result<Self> {
                 let name = input.parse::<Ident>()?;
 
                 input.parse::<Token![:]>()?;
@@ -760,7 +740,7 @@ impl Parse for Group {
                 GroupField::Name(n) => name = Some(n),
                 GroupField::HelpName(n) => help_name = Some(n),
                 GroupField::Options(o) => options = Some(o),
-                GroupField::Commands(BracketedIdents(p)) => commands = Some(p),
+                GroupField::Commands(Bracketed(p)) => commands = Some(p),
                 GroupField::SubGroups(Bracketed(p)) => sub_groups = Some(p.into_iter().collect()),
             }
         }
@@ -780,7 +760,7 @@ impl Parse for Group {
             name,
             commands,
             options: options.unwrap_or_default(),
-            sub_groups: sub_groups.unwrap_or_else(Vec::new),
+            sub_groups: sub_groups.unwrap_or_default(),
         })
     }
 }
