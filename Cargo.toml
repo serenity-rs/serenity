@@ -11,9 +11,6 @@ repository = "https://github.com/serenity-rs/serenity.git"
 version = "0.6.3"
 edition = "2018"
 
-[workspace]
-members = ["./command_attr"]
-
 [dependencies]
 bitflags = "1.0"
 log = "0.4"
