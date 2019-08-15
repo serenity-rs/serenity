@@ -1,7 +1,7 @@
 use proc_macro2::Span;
 use syn::parse::{Error, Result};
 use syn::spanned::Spanned;
-use syn::{Attribute, Ident, Lit, LitStr, Meta, MetaList, MetaNameValue, NestedMeta};
+use syn::{Attribute, Ident, Lit, LitStr, Meta, NestedMeta, Path};
 
 use crate::structures::{Checks, Colour, HelpBehaviour, OnlyIn, Permissions};
 use crate::util::LitExt;
@@ -34,6 +34,31 @@ impl fmt::Display for ValueKind {
     }
 }
 
+fn to_ident(p: Path) -> Result<Ident> {
+    if p.segments.is_empty() {
+        return Err(Error::new(
+            p.span(),
+            "cannot convert an empty path to an identifier",
+        ));
+    }
+
+    if p.segments.len() > 1 {
+        return Err(Error::new(
+            p.span(),
+            "the path must not have more than one segment",
+        ));
+    }
+
+    if !p.segments[0].arguments.is_empty() {
+        return Err(Error::new(
+            p.span(),
+            "the singular path segment must not have any arguments",
+        ));
+    }
+
+    Ok(p.segments[0].ident.clone())
+}
+
 #[derive(Debug)]
 pub struct Values {
     pub name: Ident,
@@ -58,12 +83,15 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
     let meta = attr.parse_meta()?;
 
     match meta {
-        Meta::Word(name) => Ok(Values::new(name, ValueKind::Name, Vec::new(), attr.span())),
-        Meta::List(MetaList {
-            ident: name,
-            paren_token: _,
-            nested,
-        }) => {
+        Meta::Path(path) => {
+            let name = to_ident(path)?;
+
+            Ok(Values::new(name, ValueKind::Name, Vec::new(), attr.span()))
+        }
+        Meta::List(meta) => {
+            let name = to_ident(meta.path)?;
+            let nested = meta.nested;
+
             if nested.is_empty() {
                 return Err(Error::new(attr.span(), "list cannot be empty"));
             }
@@ -72,12 +100,14 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
 
             for meta in nested {
                 match meta {
-                    NestedMeta::Literal(l) => lits.push(l),
+                    NestedMeta::Lit(l) => lits.push(l),
                     NestedMeta::Meta(m) => match m {
-                        Meta::Word(w) => lits.push(Lit::Str(LitStr::new(&w.to_string(), w.span()))),
-                        Meta::List(_) => return Err(Error::new(attr.span(), "cannot nest a list")),
-                        Meta::NameValue(_) => {
-                            return Err(Error::new(attr.span(), "cannot nest a name-value pair"));
+                        Meta::Path(path) => {
+                            let i = to_ident(path)?;
+                            lits.push(Lit::Str(LitStr::new(&i.to_string(), i.span())))
+                        }
+                        Meta::List(_) | Meta::NameValue(_) => {
+                            return Err(Error::new(attr.span(), "cannot nest a list; only accept literals and identifiers at this level"))
                         }
                     },
                 }
@@ -91,11 +121,12 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
 
             Ok(Values::new(name, kind, lits, attr.span()))
         }
-        Meta::NameValue(MetaNameValue {
-            ident: name,
-            eq_token: _,
-            lit,
-        }) => Ok(Values::new(name, ValueKind::Equals, vec![lit], attr.span())),
+        Meta::NameValue(meta) => {
+            let name = to_ident(meta.path)?;
+            let lit = meta.lit;
+
+            Ok(Values::new(name, ValueKind::Equals, vec![lit], attr.span()))
+        }
     }
 }
 
@@ -281,7 +312,7 @@ macro_rules! attr_option_num {
                     validate(&values, &[ValueKind::SingleList])?;
 
                     Ok(match &values.literals[0] {
-                        Lit::Int(l) => l.value() as $n,
+                        Lit::Int(l) => l.base10_parse::<$n>()?,
                         l => {
                             let s = l.to_str();
                             // Use `as_str` to guide the compiler to use `&str`'s parse method.

@@ -1,7 +1,7 @@
 use crate::structures::CommandFun;
 use proc_macro::TokenStream;
-use proc_macro2::TokenStream as TokenStream2;
 use proc_macro2::Span;
+use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     braced, bracketed, parenthesized,
@@ -224,7 +224,7 @@ impl Parse for Expr {
                 }
                 _ => Err(cursor.error("...")),
             });
-			
+
             match access {
                 Ok(access) => Ok(Expr::Access(access)),
                 Err(_) => Ok(Expr::Lit(input.parse()?)),

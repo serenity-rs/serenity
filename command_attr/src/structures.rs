@@ -12,7 +12,7 @@ use syn::{
     punctuated::Punctuated,
     spanned::Spanned,
     token::Pub,
-    ArgCaptured, Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token, Type,
+    Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token, Type,
 };
 
 #[derive(Debug, PartialEq)]
@@ -53,40 +53,41 @@ impl Default for OnlyIn {
 
 fn parse_argument(arg: FnArg) -> Result<Argument> {
     match arg {
-        FnArg::Captured(ArgCaptured {
-            pat,
-            colon_token: _,
-            ty: kind,
-        }) => match pat {
-            Pat::Ident(id) => {
-                let name = id.ident;
-                let mutable = id.mutability;
+        FnArg::Typed(typed) => {
+            let pat = typed.pat;
+            let kind = typed.ty;
 
-                Ok(Argument {
-                    mutable,
-                    name,
-                    kind,
-                })
+            match *pat {
+                Pat::Ident(id) => {
+                    let name = id.ident;
+                    let mutable = id.mutability;
+
+                    Ok(Argument {
+                        mutable,
+                        name,
+                        kind: *kind,
+                    })
+                }
+                Pat::Wild(wild) => {
+                    let token = wild.underscore_token;
+
+                    let name = Ident::new("_", token.spans[0]);
+
+                    Ok(Argument {
+                        mutable: None,
+                        name,
+                        kind: *kind,
+                    })
+                }
+                _ => Err(Error::new(
+                    pat.span(),
+                    format_args!("unsupported pattern: {:?}", pat),
+                )),
             }
-            Pat::Wild(wild) => {
-                let token = wild.underscore_token;
-
-                let name = Ident::new("_", token.spans[0]);
-
-                Ok(Argument {
-                    mutable: None,
-                    name,
-                    kind,
-                })
-            }
-            _ => Err(Error::new(
-                pat.span(),
-                format_args!("unsupported pattern: {:?}", pat),
-            )),
-        },
-        _ => Err(Error::new(
+        }
+        FnArg::Receiver(_) => Err(Error::new(
             arg.span(),
-            format_args!("use of a prohibited argument type: {:?}", arg),
+            format_args!("`self` arguments are prohibited: {:?}", arg),
         )),
     }
 }

@@ -1,5 +1,4 @@
 #![deny(rust_2018_idioms)]
-
 // FIXME: Remove this in a foreseeable future.
 // Currently exists for backwards compatibility to previous Rust versions.
 #![recursion_limit = "128"]
