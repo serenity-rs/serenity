@@ -281,6 +281,7 @@ pub struct Options {
     pub bucket: Option<String>,
     pub aliases: Vec<String>,
     pub description: Option<String>,
+    pub delimiters: Vec<String>,
     pub usage: Option<String>,
     pub example: Option<String>,
     pub min_args: Option<u16>,

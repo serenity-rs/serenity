@@ -36,6 +36,9 @@ pub struct CommandOptions {
     pub names: &'static [&'static str],
     /// Command description, used by other commands.
     pub desc: Option<&'static str>,
+    /// Delimiters used to split the arguments of the command by.
+    /// If empty, the [global delimiters](struct.Configuration.html#method.delimiters) are used.
+    pub delimiters: &'static [&'static str],
     /// Command usage schema, used by other commands.
     pub usage: Option<&'static str>,
     /// Example arguments, used by other commands.
