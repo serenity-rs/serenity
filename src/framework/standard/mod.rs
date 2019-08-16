@@ -370,14 +370,7 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
-        let map = if group.options.prefixes.is_empty() {
-            Map::Prefixless(GroupMap::new(&group.sub_groups), CommandMap::new(&group.commands))
-        } else {
-            Map::WithPrefixes(GroupMap::new(&[group]))
-        };
-
-        self.groups.push((group, map));
-
+        self.group_add(group);
         self.initialized = true;
 
         self
@@ -392,7 +385,6 @@ impl StandardFramework {
     /// 
     /// [`group`]: #method.group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
-        // Implementation is duplicated from above group function
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(GroupMap::new(&group.sub_groups), CommandMap::new(&group.commands))
         } else {
