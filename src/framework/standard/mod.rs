@@ -370,6 +370,21 @@ impl StandardFramework {
     /// # }
     /// ```
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
+        self.group_add(group);
+        self.initialized = true;
+
+        self
+    }
+
+    /// Adds a group to be used by the framework. Primary use-case is runtime modification
+    /// of groups in the framework; will _not_ mark the framework as initialized. Refer to
+    /// [`group`] for adding groups in initial configuration.
+    /// 
+    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// it's not intended to be chained as the other commands are.
+    /// 
+    /// [`group`]: #method.group
+    pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(GroupMap::new(&group.sub_groups), CommandMap::new(&group.commands))
         } else {
@@ -377,10 +392,16 @@ impl StandardFramework {
         };
 
         self.groups.push((group, map));
+    }
 
-        self.initialized = true;
-
-        self
+    /// Removes a group from being used in the framework. Primary use-case is runtime modification
+    /// of groups in the framework.
+    /// 
+    /// Note: does _not_ return `Self` like many other commands. This is because
+    /// it's not intended to be chained as the other commands are.
+    pub fn group_remove(&mut self, group: &'static CommandGroup) {
+        // Iterates through the vector and if a given group _doesn't_ match, we retain it
+        self.groups.retain(|&(g, _)| g != group)
     }
 
     /// Specify the function that's called in case a command wasn't executed for one reason or
