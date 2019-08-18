@@ -825,7 +825,7 @@ pub fn searched_lowercase<'a>(
     None
 }
 
-/// Iterates over all commands and forges them into a `CustomisedHelpData`.
+/// Iterates over all commands and forges them into a `CustomisedHelpData`,
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
@@ -1393,7 +1393,7 @@ pub fn plain(
         CustomisedHelpData::SuggestedCommands {
             ref help_description,
             ref suggestions,
-        } => format!("{}: `{}`", help_description, suggestions.join("`, `")),
+        } => help_description.replace("{}", &suggestions.join("`, `")),
         CustomisedHelpData::NoCommandFound {
             ref help_error_message,
         } => help_error_message.to_string(),
