@@ -825,7 +825,7 @@ pub fn searched_lowercase<'a>(
     None
 }
 
-/// Iterates over all commands and forges them into a `CustomisedHelpData`.
+/// Iterates over all commands and forges them into a `CustomisedHelpData`,
 /// taking `HelpOptions` into consideration when deciding on whether a command
 /// shall be picked and in what textual format.
 #[cfg(feature = "cache")]
