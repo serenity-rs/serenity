@@ -141,11 +141,9 @@ gateway = [
     "http",
     "url",
     "utils",
-    "webpki",
-    "webpki-roots",
 ]
 http = []
-rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls"]
+rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls", "webpki", "webpki-roots"]
 native_tls_backend = ["reqwest/default-tls", "tungstenite/tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr"]
