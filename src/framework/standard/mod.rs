@@ -708,10 +708,10 @@ impl Framework for StandardFramework {
             }
         };
 
-        let mut args = Args::new(stream.rest(), &self.config.delimiters);
-
         match invoke {
             Invoke::Help(name) => {
+                let args = Args::new(stream.rest(), &self.config.delimiters);
+
                 let before = self.before.clone();
                 let after = self.after.clone();
                 let owners = self.config.owners.clone();
@@ -738,6 +738,31 @@ impl Framework for StandardFramework {
                 });
             }
             Invoke::Command { command, group } => {
+                let mut args = {
+                    use std::borrow::Cow;
+
+                    let mut delims = Cow::Borrowed(&self.config.delimiters);
+
+                    // If user has configured the command's own delimiters, use those instead.
+                    if !command.options.delimiters.is_empty() {
+                        // FIXME: Get rid of this allocation.
+                        let mut v = Vec::with_capacity(command.options.delimiters.len());
+
+                        for delim in command.options.delimiters {
+                            if delim.len() == 1 {
+                                v.push(Delimiter::Single(delim.chars().next().unwrap()));
+                            } else {
+                                // This too.
+                                v.push(Delimiter::Multiple(delim.to_string()));
+                            }
+                        }
+
+                        delims = Cow::Owned(v);
+                    }
+
+                    Args::new(stream.rest(), &delims)
+                };
+
                 if let Some(error) =
                     self.should_fail(&mut ctx, &msg, &mut args, &command.options, &group.options)
                 {

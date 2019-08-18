@@ -170,6 +170,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             _ => {
                 match_options!(name, values, options, span => [
                     checks;
+                    delimiters;
                     min_args;
                     max_args;
                     required_permissions;
@@ -191,6 +192,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         bucket,
         aliases,
         description,
+        delimiters,
         usage,
         example,
         min_args,
@@ -245,6 +247,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             bucket: #bucket,
             names: &[#_name, #(#aliases),*],
             desc: #description,
+            delimiters: &[#(#delimiters),*],
             usage: #usage,
             example: #example,
             min_args: #min_args,
