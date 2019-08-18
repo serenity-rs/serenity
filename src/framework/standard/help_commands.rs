@@ -1393,7 +1393,7 @@ pub fn plain(
         CustomisedHelpData::SuggestedCommands {
             ref help_description,
             ref suggestions,
-        } => format!("{}: `{}`", help_description, suggestions.join("`, `")),
+        } => help_description.replace("{}", &suggestions.join("`, `")),
         CustomisedHelpData::NoCommandFound {
             ref help_error_message,
         } => help_error_message.to_string(),
