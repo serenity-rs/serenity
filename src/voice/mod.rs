@@ -23,7 +23,8 @@ pub use self::{
         ffmpeg_optioned,
         opus,
         pcm,
-        ytdl
+        ytdl,
+        ytdl_search
     }
 };
 pub use audiopus::Bitrate;
