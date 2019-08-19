@@ -567,15 +567,148 @@ impl GuildChannel {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[inline]
+    #[deprecated(since="0.6.4", note="Please use `permissions_for_user` instead.")]
     pub fn permissions_for<U: Into<UserId>>(&self, cache: impl AsRef<CacheRwLock>, user_id: U) -> Result<Permissions> {
-        self._permissions_for(&cache, user_id.into())
+        self.permissions_for_user(&cache, user_id.into())
+    }
+
+    /// Calculates the permissions of a role.
+    ///
+    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the
+    /// channel is in.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
+    /// not be found in the [`Cache`].
+    ///
+    /// Returns a [`ModelError::RoleNotFound`] if the given role could not
+    /// be found in the [`Cache`].
+    ///
+    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [`ModelError::RoleNotFound`]: ../error/enum.Error.html#variant.RoleNotFound
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Role`]: ../guild/struct.Role.html
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn permissions_for_user<U: Into<UserId>>(&self, cache: impl AsRef<CacheRwLock>, user_id: U) -> Result<Permissions> {
+        self._permissions_for_user(&cache, user_id.into())
     }
 
     #[cfg(feature = "cache")]
-    fn _permissions_for(&self, cache: impl AsRef<CacheRwLock>, user_id: UserId) -> Result<Permissions> {
+    fn _permissions_for_user(&self, cache: impl AsRef<CacheRwLock>, user_id: UserId) -> Result<Permissions> {
         self.guild(&cache)
             .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().permissions_in(self.id, user_id))
+            .map(|g| g.read().user_permissions_in(self.id, user_id))
+    }
+
+    /// Calculates the permissions of a member.
+    ///
+    /// The Id of the argument must be a [`Member`] of the [`Guild`] that the
+    /// channel is in.
+    ///
+    /// # Examples
+    ///
+    /// Calculate the permissions of a [`User`] who posted a [`Message`] in a
+    /// channel:
+    ///
+    /// ```rust,no_run
+    /// use serenity::prelude::*;
+    /// use serenity::model::prelude::*;
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn message(&self, context: Context, msg: Message) {
+    ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
+    ///             Some(channel) => channel,
+    ///             None => return,
+    ///         };
+    ///
+    ///         let permissions = channel.read().permissions_for(&context.cache, &msg.author).unwrap();
+    ///
+    ///         println!("The user's permissions: {:?}", permissions);
+    ///     }
+    /// }
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
+    /// ```
+    ///
+    /// Check if the current user has the [Attach Files] and [Send Messages]
+    /// permissions (note: serenity will automatically check this for; this is
+    /// for demonstrative purposes):
+    ///
+    /// ```rust,no_run
+    /// use serenity::prelude::*;
+    /// use serenity::model::prelude::*;
+    /// use serenity::model::channel::Channel;
+    /// use std::fs::File;
+    ///
+    /// struct Handler;
+    ///
+    /// impl EventHandler for Handler {
+    ///     fn message(&self, context: Context, mut msg: Message) {
+    ///         let channel = match context.cache.read().guild_channel(msg.channel_id) {
+    ///             Some(channel) => channel,
+    ///             None => return,
+    ///         };
+    ///
+    ///         let current_user_id = context.cache.read().user.id;
+    ///         let permissions =
+    ///             channel.read().permissions_for(&context.cache, current_user_id).unwrap();
+    ///
+    ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
+    ///                 return;
+    ///             }
+    ///
+    ///             let file = match File::open("./cat.png") {
+    ///                 Ok(file) => file,
+    ///                 Err(why) => {
+    ///                     println!("Err opening file: {:?}", why);
+    ///
+    ///                     return;
+    ///                 },
+    ///             };
+    ///
+    ///         let _ = msg.channel_id.send_files(&context.http, vec![(&file, "cat.png")], |mut m| {
+    ///             m.content("here's a cat");
+    ///
+    ///             m
+    ///         });
+    ///     }
+    /// }
+    ///
+    /// let mut client = Client::new("token", Handler).unwrap();
+    ///
+    /// client.start().unwrap();
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
+    /// not be found in the [`Cache`].
+    ///
+    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Member`]: ../guild/struct.Member.html
+    /// [`Message`]: struct.Message.html
+    /// [`User`]: ../user/struct.User.html
+    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn permissions_for_role<R: Into<RoleId>>(&self, cache: impl AsRef<CacheRwLock>, role_id: R) -> Result<Permissions> {
+        self._permissions_for_role(&cache, role_id.into())
+    }
+
+    #[cfg(feature = "cache")]
+    fn _permissions_for_role(&self, cache: impl AsRef<CacheRwLock>, role_id: RoleId) -> Result<Permissions> {
+        self.guild(&cache)
+            .ok_or(Error::Model(ModelError::GuildNotFound))?
+            .read().role_permissions_in(self.id, role_id)
+            .ok_or(Error::Model(ModelError::GuildNotFound))
     }
 
     /// Pins a [`Message`] to the channel.
@@ -756,7 +889,7 @@ impl GuildChannel {
                     .members
                     .iter()
                     .filter_map(|e|
-                        if self.permissions_for(&cache, e.0).map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
+                        if self.permissions_for_user(&cache, e.0).map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
                             Some(e.1.clone())
                         } else {
                             None
