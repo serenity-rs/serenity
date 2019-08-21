@@ -58,11 +58,12 @@ fn find_prefix<'a>(
     msg: &Message,
     config: &Configuration,
     stream: &UnicodeStream<'a>,
-) -> Option<&'a str> {
+) -> Option<Cow<'a, str>> {
     let try_match = |prefix: &str| {
         let peeked = stream.peek_for(prefix.chars().count());
+        let peeked = to_lowercase(config, peeked);
 
-        if prefix == peeked {
+        if prefix == &peeked {
             Some(peeked)
         } else {
             None
@@ -97,16 +98,16 @@ pub fn prefix<'a>(
     msg: &Message,
     stream: &mut UnicodeStream<'a>,
     config: &Configuration,
-) -> Option<&'a str> {
+) -> Option<Cow<'a, str>> {
     if let Some(id) = mention(stream, config) {
         stream.take_while(|s| s.is_whitespace());
 
-        return Some(id);
+        return Some(Cow::Borrowed(id));
     }
 
     let prefix = find_prefix(ctx, msg, config, stream);
 
-    if let Some(prefix) = prefix {
+    if let Some(prefix) = &prefix {
         stream.increment(prefix.len());
     }
 
