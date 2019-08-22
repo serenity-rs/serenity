@@ -296,7 +296,6 @@ impl Options {
         let mut options = Self::default();
 
         options.help_available = true;
-        options.owner_privilege = true;
 
         options
     }
@@ -416,7 +415,6 @@ impl GroupOptions {
     pub fn new() -> Self {
         let mut options = Self::default();
 
-        options.owner_privilege = true;
         options.help_available = true;
 
         options
