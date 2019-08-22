@@ -206,7 +206,7 @@ impl Member {
         let reader = guild.read();
 
         for (cid, channel) in &reader.channels {
-            if reader.permissions_in(*cid, self.user.read().id).read_messages() {
+            if reader.user_permissions_in(*cid, self.user.read().id).read_messages() {
                 return Some(Arc::clone(channel));
             }
         }

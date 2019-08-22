@@ -92,6 +92,13 @@ pub enum Error {
     /// [`GuildId`]: ../id/struct.GuildId.html
     /// [`Cache`]: ../../cache/struct.Cache.html
     GuildNotFound,
+    /// An indication that a [role][`Role`] could not be found by
+    /// [Id][`RoleId`] in the [`Cache`].
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
+    /// [`RoleId`]: ../id/struct.GuildId.html
+    /// [`Cache`]: ../../cache/struct.Cache.html
+    RoleNotFound,
     /// Indicates that there are hierarchy problems restricting an action.
     ///
     /// For example, when banning a user, if the other user has a role with an
@@ -142,17 +149,18 @@ impl Display for Error {
 impl StdError for Error {
     fn description(&self) -> &str {
         match *self {
-            Error::BulkDeleteAmount => "Too few/many messages to bulk delete",
-            Error::DeleteMessageDaysAmount(_) => "Invalid delete message days",
-            Error::EmbedTooLarge(_) => "Embed too large",
-            Error::GuildNotFound => "Guild not found in the cache",
-            Error::Hierarchy => "Role hierarchy prevents this action",
+            Error::BulkDeleteAmount => "Too few/many messages to bulk delete.",
+            Error::DeleteMessageDaysAmount(_) => "Invalid delete message days.",
+            Error::EmbedTooLarge(_) => "Embed too large.",
+            Error::GuildNotFound => "Guild not found in the cache.",
+            Error::RoleNotFound => "Role not found in the cache.",
+            Error::Hierarchy => "Role hierarchy prevents this action.",
             Error::InvalidChannelType => "The channel cannot perform the action.",
-            Error::InvalidPermissions(_) => "Invalid permissions",
-            Error::InvalidUser => "The current user cannot perform the action",
-            Error::ItemMissing => "The required item is missing from the cache",
-            Error::MessageTooLong(_) => "Message too large",
-            Error::MessagingBot => "Attempted to message another bot user",
+            Error::InvalidPermissions(_) => "Invalid permissions.",
+            Error::InvalidUser => "The current user cannot perform the action.",
+            Error::ItemMissing => "The required item is missing from the cache.",
+            Error::MessageTooLong(_) => "Message too large.",
+            Error::MessagingBot => "Attempted to message another bot user.",
             Error::__Nonexhaustive => unreachable!(),
         }
     }

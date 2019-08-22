@@ -324,7 +324,7 @@ pub fn user_has_perms(
 
     let perms = guild
         .read()
-        .permissions_in(channel_id, current_user.id);
+        .user_permissions_in(channel_id, current_user.id);
 
     permissions.remove(perms);
 

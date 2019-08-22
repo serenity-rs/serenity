@@ -110,12 +110,8 @@ pub struct Guild {
     /// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by
     /// the library.
     ///
-    /// You can manually request that the remaining members be sent by calling
-    /// [`ShardManager::chunk_guilds`].
-    ///
     /// [`ReadyEvent`]: ../event/struct.ReadyEvent.html
     /// [`member_count`]: #structfield.member_count
-    /// [`ShardMessenger::chunk_guilds`]: ../../client/bridge/gateway/struct.ShardMessenger.html#method.chunk_guilds
     #[serde(serialize_with = "serialize_gen_map")]
     pub members: HashMap<UserId, Member>,
     /// Indicator of whether the guild requires multi-factor authentication for
@@ -191,7 +187,7 @@ impl Guild {
     #[cfg(feature = "http")]
     pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
-            if self.permissions_in(*cid, uid).read_messages() {
+            if self.user_permissions_in(*cid, uid).read_messages() {
                 return Some(Arc::clone(channel));
             }
         }
@@ -207,7 +203,7 @@ impl Guild {
     pub fn default_channel_guaranteed(&self) -> Option<Arc<RwLock<GuildChannel>>> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
-                if self.permissions_in(*cid, *memid).read_messages() {
+                if self.user_permissions_in(*cid, *memid).read_messages() {
                     return Some(Arc::clone(channel));
                 }
             }
@@ -896,29 +892,6 @@ impl Guild {
         self.id.members(&http, limit, after)
     }
 
-    /// Iterates over all the members in a guild.
-    ///
-    /// This is accomplished and equivilent to repeated calls to [`members`].
-    /// A buffer of at most 1,000 members is used to reduce the number of calls
-    /// necessary.
-    ///
-    /// # Examples
-    /// ```rust,ignore
-    /// for member_result in guild.members_iter(&ctx) {
-    ///     match member_result {
-    ///         Ok(member) => println!(
-    ///             "{} is {}",
-    ///             member,
-    ///             member.display_name()
-    ///         ),
-    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
-    ///     }
-    /// }
-    #[cfg(all(feature = "http", feature = "cache"))]
-    pub fn members_iter<H: AsRef<Http>>(&self, http: H) -> MembersIter<H> {
-        self.id.members_iter(http)
-    }
-
     /// Gets a list of all the members (satisfying the status provided to the function) in this
     /// guild.
     pub fn members_with_status(&self, status: OnlineStatus) -> Vec<&Member> {
@@ -1297,12 +1270,22 @@ impl Guild {
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
+    #[deprecated(since="0.6.4", note="Please use `user_permissions_in` instead.")]
     pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
         where C: Into<ChannelId>, U: Into<UserId> {
-        self._permissions_in(channel_id.into(), user_id.into())
+        self.user_permissions_in(channel_id.into(), user_id.into())
     }
 
-    fn _permissions_in(
+    /// Calculate a [`User`]'s permissions in a given channel in the guild.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    #[inline]
+    pub fn user_permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
+        where C: Into<ChannelId>, U: Into<UserId> {
+        self._user_permissions_in(channel_id.into(), user_id.into())
+    }
+
+    fn _user_permissions_in(
         &self,
         channel_id: ChannelId,
         user_id: UserId,
@@ -1414,28 +1397,62 @@ impl Guild {
             permissions |= Permissions::READ_MESSAGES;
         }
 
-        // No SEND_MESSAGES => no message-sending-related actions
-        // If the member does not have the `SEND_MESSAGES` permission, then
-        // throw out message-able permissions.
-        if !permissions.contains(Permissions::SEND_MESSAGES) {
-            permissions &= !(Permissions::SEND_TTS_MESSAGES
-                | Permissions::MENTION_EVERYONE
-                | Permissions::EMBED_LINKS
-                | Permissions::ATTACH_FILES);
-        }
-
-        // If the member does not have the `READ_MESSAGES` permission, then
-        // throw out actionable permissions.
-        if !permissions.contains(Permissions::READ_MESSAGES) {
-            permissions &= Permissions::KICK_MEMBERS
-                | Permissions::BAN_MEMBERS
-                | Permissions::ADMINISTRATOR
-                | Permissions::MANAGE_GUILD
-                | Permissions::CHANGE_NICKNAME
-                | Permissions::MANAGE_NICKNAMES;
-        }
+        self.remove_unusable_permissions(&mut permissions);
 
         permissions
+    }
+
+    /// Calculate a [`Role`]'s permissions in a given channel in the guild.
+    /// Returns `None` if given `role_id` cannot be found.
+    ///
+    /// [`Role`]: ../guild/struct.Role.html
+    #[inline]
+    pub fn role_permissions_in<C, R>(&self, channel_id: C, role_id: R) -> Option<Permissions>
+        where C: Into<ChannelId>, R: Into<RoleId> {
+        self._role_permissions_in(channel_id.into(), role_id.into())
+    }
+
+    fn _role_permissions_in(
+        &self,
+        channel_id: ChannelId,
+        role_id: RoleId,
+    ) -> Option<Permissions> {
+        let mut permissions = match self.roles.get(&role_id) {
+            Some(role) => role.permissions,
+            None => return None,
+        };
+
+        if permissions.contains(Permissions::ADMINISTRATOR) {
+            return Some(Permissions::all());
+        }
+
+        if let Some(channel) = self.channels.get(&channel_id) {
+            let channel = channel.read();
+
+            for overwrite in &channel.permission_overwrites {
+
+                if let PermissionOverwriteType::Role(permissions_role_id) = overwrite.kind {
+
+                    if permissions_role_id == role_id {
+                        permissions = (permissions & !overwrite.deny) | overwrite.allow;
+
+                        break;
+                    }
+                }
+            }
+        } else {
+            warn!(
+                "(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
+                self.id,
+                channel_id
+            );
+
+            return None;
+        }
+
+        self.remove_unusable_permissions(&mut permissions);
+
+        Some(permissions)
     }
 
     /// Retrieves the count of the number of [`Member`]s that would be pruned
@@ -1468,6 +1485,29 @@ impl Guild {
         }
 
         self.id.prune_count(cache_http.http(), days)
+    }
+
+    fn remove_unusable_permissions(&self, permissions: &mut Permissions) {
+        // No SEND_MESSAGES => no message-sending-related actions
+        // If the member does not have the `SEND_MESSAGES` permission, then
+        // throw out message-able permissions.
+        if !permissions.contains(Permissions::SEND_MESSAGES) {
+            *permissions &= !(Permissions::SEND_TTS_MESSAGES
+                | Permissions::MENTION_EVERYONE
+                | Permissions::EMBED_LINKS
+                | Permissions::ATTACH_FILES);
+        }
+
+        // If the permission does not have the `READ_MESSAGES` permission, then
+        // throw out actionable permissions.
+        if !permissions.contains(Permissions::READ_MESSAGES) {
+            *permissions &= Permissions::KICK_MEMBERS
+                | Permissions::BAN_MEMBERS
+                | Permissions::ADMINISTRATOR
+                | Permissions::MANAGE_GUILD
+                | Permissions::CHANGE_NICKNAME
+                | Permissions::MANAGE_NICKNAMES;
+        }
     }
 
     /// Re-orders the channels of the guild.
