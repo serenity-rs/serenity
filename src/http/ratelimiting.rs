@@ -427,7 +427,7 @@ mod tests {
 
         match parse_header::<i64>(&headers, "x-bad-num").unwrap_err() {
             Error::Http(x) => match *x {
-                HttpError::RateLimitI64 => assert!(true),
+                HttpError::RateLimitI64F64 => assert!(true),
                 _ => assert!(false),
             },
             _ => assert!(false),
