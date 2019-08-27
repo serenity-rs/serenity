@@ -922,6 +922,7 @@ mod test {
             premium_subscription_count: 0,
             banner: None,
             vanity_url_code: Some("bruhmoment1".to_string()),
+            preferred_locale: "en-US".to_string(),
             _nonexhaustive: (),
         };
 
