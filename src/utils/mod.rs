@@ -3,6 +3,7 @@
 
 mod colour;
 mod message_builder;
+mod custom_message;
 
 pub use self::{
     colour::Colour,
@@ -12,6 +13,7 @@ pub use self::{
         EmbedMessageBuilding,
         MessageBuilder,
     },
+	custom_message::CustomMessage,
 };
 
 use base64;
