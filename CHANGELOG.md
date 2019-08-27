@@ -3,6 +3,42 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.6.4] - 2019-8-27
+
+Thanks to the following for their contributions:
+- [@Alch-Emi]
+- [@AregevDev]
+- [@acdenisSK]
+- [@Erk-]
+- [@Jerald]
+- [@Lakelezz]
+- [@leo-lb]
+- [@Sreyas-Sreelal]
+
+### Added
+
+- [model] Add a method to create and iterable of `Member`s in a `Guild` ([@Alch-Emi]) [c:aa1070d]
+- [utils] Add quoting functionality to `MessageBuilder`  ([@AregevDev]) [c:720d9ad]
+- [model] Add support for new message types ([@Erk-]) [c:c45c1d4]
+- [model] Add support for store channel ([@Erk-]) [c:8594c29]
+- [model] Link to `ShardMessenger::chunk_guilds` in `Guild`'s `member` field ([@Alch-Emi]) [c:8e926f9]
+- [framework]  Add group-related removal and non-consuming adding functions to `StandardFramework` ([@Jerald]) [c:3a4e2ed]
+- [framework] Allow delimiters to be set on a per command basis ([@acdenisSK]) [c:6f7797e]
+- [voice] Play a YouTube Search's first video ([@Sreyas-Sreelal]) [c:ccbba0a]
+- [model] Add methods to get permissions of `Role`s in `GuildChannel`s ([@Lakelezz]) [c:09c1e01]
+- [utils] Allow users to create their own messages ([@acdenisSK]) [c:e8da420]
+
+### Changed
+
+- [model] Fetch the guild id only if necessary ([@acdenisSK]) [c:85dd1a0]
+- [meta] Move `webpki` and `webpki-roots` to the `rustls_backend`-feature ([@leo-lb]) [c:2439275]
+
+### Fixed
+
+- [model] Fix content of a message if there's an attachment ([@Erk-]) [c:6d06632]
+- [meta/examples] Fix a typo in the examples ([@Sreyas-Sreelal]) [c:22f3d2a]
+- [framework] Fix plain help suggestions ([@Lakelezz]) [c:ec687ad]
+
 ## [0.6.3] - 2019-7-24
 
 Thanks to the following for their contributions:
@@ -3068,6 +3104,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.6.4]: https://github.com/serenity-rs/serenity/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/serenity-rs/serenity/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/serenity-rs/serenity/compare/v0.6.1...v0.6.2
 [0.6.1]: https://github.com/serenity-rs/serenity/compare/v0.6.0...v0.6.1
@@ -3111,6 +3148,7 @@ Initial commit.
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
 
+[@Alch-Emi]: https://github.com/Alch-Emi
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
 [@abalabahaha]: https://github.com/abalabahaha
@@ -3149,11 +3187,13 @@ Initial commit.
 [@indiv0]: https://github.com/indiv0
 [@ijks]: https://github.com/ijks
 [@JellyWX]: https://github.com/JellyWX
+[@Jerald]: https://github.com/Jerald
 [@jhelwig]: https://github.com/jhelwig
 [@jkcclemens]: https://github.com/jkcclemens
 [@joek13]: https://github.com/joek13
 [@Kroisse]: https://github.com/Kroisse
 [@Lakelezz]: https://github.com/Lakelezz
+[@leo-lb]: https://github.com/leo-lb
 [@lolzballs]: https://github.com/lolzballs
 [@Lymia]: https://github.com/Lymia
 [@khazhyk]: https://github.com/khazhyk
@@ -3173,6 +3213,7 @@ Initial commit.
 [@Roughsketch]: https://github.com/Roughsketch
 [@rsaihe]: https://github.com/rsaihe
 [@Scetch]: https://github.com/Scetch
+[@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
 [@tahahawa]: https://github.com/tahahawa
@@ -3185,6 +3226,22 @@ Initial commit.
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@zeyla]: https://github.com/zeyla
+
+[c:aa1070d]: https://github.com/serenity-rs/serenity/commit/aa1070d05f23ea2a7a57857ee47e7b41af36815b
+[c:720d9ad]: https://github.com/serenity-rs/serenity/commit/720d9adda4d432cf3fb5ceb890fc0aa751f927bb
+[c:c45c1d4]: https://github.com/serenity-rs/serenity/commit/c45c1d47ec70168e90091e676d3fdf0a0d4e4c8c
+[c:8594c29]: https://github.com/serenity-rs/serenity/commit/8594c29a2e993da7960d0c63a571bae203e07ea3
+[c:85dd1a0]: https://github.com/serenity-rs/serenity/commit/85dd1a011593c293319c26a1fd5e7a45ba0c693d
+[c:6d06632]: https://github.com/serenity-rs/serenity/commit/6d066322e1a6a2fd0d2a577b2f7f0b59b842789f
+[c:22f3d2a]: https://github.com/serenity-rs/serenity/commit/22f3d2a32e16ef0a12a17ec67415e27a531b095d
+[c:8e926f9]: https://github.com/serenity-rs/serenity/commit/8e926f97bccf53e0a2637f81fa8fa6913ed96f9a
+[c:3a4e2ed]: https://github.com/serenity-rs/serenity/commit/3a4e2eda25dde94d377fee2bdc088a8c8a2d4e8e
+[c:6f7797e]: https://github.com/serenity-rs/serenity/commit/6f7797e45cb9cb887dd0f89eb2f5063fb04d32ee
+[c:2439275]: https://github.com/serenity-rs/serenity/commit/2439275d57630fd4e325efe149646c5ef25442bf
+[c:ec687ad]: https://github.com/serenity-rs/serenity/commit/ec687adbe0eeba513a462bfa26f779d3bcd4e63e
+[c:ccbba0a]: https://github.com/serenity-rs/serenity/commit/ccbba0a67da7514bf0abbdd976beebd0f3a6e30c
+[c:09c1e01]: https://github.com/serenity-rs/serenity/commit/09c1e015c2b4ce3c3ed94ca7a44988caf2aff187
+[c:e8da420]: https://github.com/serenity-rs/serenity/commit/e8da420e8bdb47da950f8344d7000c5a9d543460
 
 [c:26192fa]: https://github.com/serenity-rs/serenity/commit/26192fa1e8df9a7bd7be6065657890a200432661
 [c:e6c5d41]: https://github.com/serenity-rs/serenity/commit/e6c5d418390a90632fb2dee75ddcfd5cc1cc2672
