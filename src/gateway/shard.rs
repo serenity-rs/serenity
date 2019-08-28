@@ -834,7 +834,10 @@ impl Shard {
 #[cfg(not(feature = "native_tls_backend"))]
 fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
-    Ok(create_rustls_client(url)?)
+    Ok(WsClient {
+        stream: create_rustls_client(url)?,
+        buffer: Vec::new(),
+    })
 }
 
 #[cfg(feature = "native_tls_backend")]
@@ -842,7 +845,10 @@ fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
     let client = tungstenite::connect(Request::from(url))?;
 
-    Ok(client.0)
+    Ok(WsClient {
+        stream: client.0,
+        buffer: Vec::new(),
+    })
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {

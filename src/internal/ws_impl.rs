@@ -1,5 +1,5 @@
 use flate2::read::ZlibDecoder;
-use crate::gateway::WsClient;
+use crate::gateway::{WsClient, WsStream};
 use crate::internal::prelude::*;
 use serde_json;
 use tungstenite::{
@@ -156,7 +156,7 @@ impl StdError for RustlsError {
 
 // Create a tungstenite client with a rustls stream.
 #[cfg(not(feature = "native_tls_backend"))]
-pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
+pub(crate) fn create_rustls_client(url: Url) -> Result<WsStream> {
     let mut config = rustls::ClientConfig::new();
     config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
 
@@ -179,10 +179,5 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     let client = tungstenite::client(url, tls)
         .map_err(|_| RustlsError::HandshakeError)?;
 
-    Ok(
-        WsClient{
-            stream: client.0,
-            buffer: Vec::new(),
-        }
-    )
+    Ok(client.0)
 }
