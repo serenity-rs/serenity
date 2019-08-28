@@ -254,6 +254,7 @@ fn dummy_message() -> Message {
         member: None,
         mention_everyone: false,
         mention_roles: Vec::new(),
+        mention_channels: None,
         mentions: Vec::new(),
         nonce: Value::Null,
         pinned: false,
@@ -265,6 +266,10 @@ fn dummy_message() -> Message {
 
             FixedOffset::east(0).timestamp(now.timestamp(), 0)
         },
+        activity: None,
+        application: None,
+        message_reference: None,
+        flags: None,
         _nonexhaustive: (),
     }
 }
