@@ -22,6 +22,8 @@ use std::{
 };
 #[cfg(not(feature = "native_tls_backend"))]
 use url::Url;
+#[cfg(not(feature = "native_tls_backend"))]
+use std::net::ToSocketAddrs;
 
 pub trait ReceiverExt {
     fn recv_json(&mut self) -> Result<Option<Value>>;
@@ -138,7 +140,31 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
         .map_err(|_| RustlsError::WebPKI)?;
 
     let session = rustls::ClientSession::new(&Arc::new(config), dns_name);
-    let socket = TcpStream::connect(&url)?;
+
+    let host = url.host()
+        .ok_or_else(|| Error::Url("No host name in the URL.".into()))?;
+    let port = url.port_or_known_default()
+        .ok_or_else(|| Error::Url("No port number in the URL.".into()))?;
+    // We need these to ensure the lifetime is long enough,
+    // variables that would live inside the `match` would not live long enough.
+    let addr;
+    let addrs;
+    let addrs = match host {
+        url::Host::Domain(domain) => {
+            addrs = (domain, port).to_socket_addrs()?;
+            addrs.as_slice()
+        },
+        url::Host::Ipv4(ip) => {
+            addr = (ip, port).into();
+            std::slice::from_ref(&addr)
+        },
+        url::Host::Ipv6(ip) => {
+            addr = (ip, port).into();
+            std::slice::from_ref(&addr)
+        },
+    };
+
+    let socket = TcpStream::connect(&addrs)?;
     let tls = rustls::StreamOwned::new(session, socket);
 
     let client = tungstenite::client(url, tls)
