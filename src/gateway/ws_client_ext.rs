@@ -75,7 +75,7 @@ impl WebSocketGatewayClientExt for WsClient {
         self.send_json(&json!({
             "op": OpCode::Identify.num(),
             "d": {
-                "compression": true,
+                //"compression": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
                 "shard": shard_info,
                 "token": token,

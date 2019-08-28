@@ -73,10 +73,16 @@ use crate::client::bridge::gateway::ShardClientMessage;
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
 #[cfg(not(feature = "native_tls_backend"))]
-pub type WsClient = WebSocket<rustls::StreamOwned<rustls::ClientSession, std::net::TcpStream>>;
+pub type WsStream = WebSocket<rustls::StreamOwned<rustls::ClientSession, std::net::TcpStream>>;
 
 #[cfg(feature = "native_tls_backend")]
-pub type WsClient = WebSocket<AutoStream>;
+pub type WsStream = WebSocket<AutoStream>;
+
+pub struct WsClient {
+    // Should these be pub?
+    pub stream: WsStream,
+    pub buffer: Vec<u8>,
+}
 
 /// Indicates the current connection stage of a [`Shard`].
 ///

@@ -205,7 +205,7 @@ impl<H: EventHandler + Send + Sync + 'static,
             return true;
         }
 
-        let _ = self.shard.client.close(Some(CloseFrame {
+        let _ = self.shard.client.stream.close(Some(CloseFrame {
             code: 1000.into(),
             reason: Cow::from(""),
         }));
@@ -274,10 +274,10 @@ impl<H: EventHandler + Send + Sync + 'static,
                         code: code.into(),
                         reason: Cow::from(reason),
                     };
-                    self.shard.client.close(Some(close)).is_ok()
+                    self.shard.client.stream.close(Some(close)).is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Message(msg)) => {
-                    self.shard.client.write_message(msg).is_ok()
+                    self.shard.client.stream.write_message(msg).is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::SetActivity(activity)) => {
                     // To avoid a clone of `activity`, we do a little bit of

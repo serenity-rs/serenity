@@ -23,6 +23,8 @@ use std::{
 #[cfg(not(feature = "native_tls_backend"))]
 use url::Url;
 
+const ZLIB_SUFFIX: [u8; 4] = [0x00,0x00,0xff,0xff];
+
 pub trait ReceiverExt {
     fn recv_json(&mut self) -> Result<Option<Value>>;
     fn try_recv_json(&mut self) -> Result<Option<Value>>;
@@ -34,11 +36,11 @@ pub trait SenderExt {
 
 impl ReceiverExt for WsClient {
     fn recv_json(&mut self) -> Result<Option<Value>> {
-        convert_ws_message(Some(self.read_message()?))
+        dbg!(convert_ws_message(Some(self.read_message()?)))
     }
 
     fn try_recv_json(&mut self) -> Result<Option<Value>> {
-        convert_ws_message(self.read_message().no_block()?)
+        dbg!(convert_ws_message(Some(self.read_message()?)))
     }
 }
 
@@ -47,8 +49,41 @@ impl SenderExt for WsClient {
         serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
-            .and_then(|m| self.write_message(m).map_err(Error::from))
+            .and_then(|m| self.stream.write_message(m).map_err(Error::from))
     }
+}
+
+impl WsClient {
+    pub(crate) fn read_message(&mut self) -> Result<Message> {
+        let message;
+        loop {
+            match self.stream.read_message()? {
+                Message::Binary(bin) => {
+                    let len = bin.len();
+                    let has_suffix = bin[len-4..] == ZLIB_SUFFIX;
+                    self.buffer.extend(bin);
+                    if len < 4 || !has_suffix {
+                        continue;
+                    }
+                    message = Message::Text(decode_buffer(&self.buffer)?);
+                    self.buffer.clear();
+                    break;
+                },
+                _ => unreachable!(),                    
+            }
+        }
+        Ok(message)
+    }
+}
+
+#[inline]
+fn decode_buffer(bytes: &[u8]) -> Result<String> {
+    use flate2::bufread::ZlibDecoder as ZlibBufDecoder;
+    use std::io::Read;
+    let mut z = ZlibBufDecoder::new(&bytes[..]);
+    let mut s = String::new();
+    z.read_to_string(&mut s)?;
+    Ok(s)
 }
 
 #[inline]
@@ -144,5 +179,10 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     let client = tungstenite::client(url, tls)
         .map_err(|_| RustlsError::HandshakeError)?;
 
-    Ok(client.0)
+    Ok(
+        WsClient{
+            stream: client.0,
+            buffer: Vec::new(),
+        }
+    )
 }
