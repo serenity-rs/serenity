@@ -133,7 +133,7 @@ pub struct Command<'a> {
     availability: &'a str,
     description: Option<&'static str>,
     usage: Option<&'static str>,
-    usage_sample: Option<&'static str>,
+    usage_sample: Vec<&'static str>,
     checks: Vec<String>,
 }
 
@@ -527,7 +527,7 @@ fn nested_group_command_search<'a>(
                     aliases: options.names[1..].to_vec(),
                     availability: available_text,
                     usage: options.usage,
-                    usage_sample: options.example,
+                    usage_sample: options.examples.to_vec(),
                 },
             });
         }
@@ -1080,13 +1080,17 @@ fn send_single_command_embed(
                 embed.field(&help_options.usage_label, full_usage_text, true);
             }
 
-            if let Some(ref example) = command.usage_sample {
-                let full_example_text = if let Some(first_prefix) = command.group_prefixes.get(0) {
-                    format!("`{} {} {}`", first_prefix, command.name, example)
-                } else {
-                    format!("`{} {}`", command.name, example)
-                };
-
+            if !command.usage_sample.is_empty() {
+                let format_example: Box<dyn Fn(&str) -> String> =
+                    if let Some(first_prefix) = command.group_prefixes.get(0) {
+                        Box::new(move |example| format!("`{} {} {}`\n", first_prefix, command.name, example))
+                    } else {
+                        Box::new(|example| format!("`{} {}`\n", command.name, example))
+                    };
+                let full_example_text = command.usage_sample
+                    .iter()
+                    .map(|e| format_example(e))
+                    .collect::<String>();
                 embed.field(&help_options.usage_sample_label, full_example_text, true);
             }
 
@@ -1312,20 +1316,23 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
         }
     }
 
-    if let Some(ref example) = command.usage_sample {
-        if let Some(first_prefix) = command.group_prefixes.get(0) {
-            let _ = writeln!(
-                result,
-                "**{}**: `{} {} {}`",
-                help_options.usage_label, first_prefix, command.name, example
-            );
+    if !command.usage_sample.is_empty() {
+        let mut format_example: Box<dyn FnMut(&mut String, &str)> = if let Some(first_prefix) = command.group_prefixes.get(0) {
+            Box::new(move |result, example| {
+                let _ = writeln!(
+                    result,
+                    "**{}**: `{} {} {}`",
+                    help_options.usage_label, first_prefix, command.name, example);
+            })
         } else {
-            let _ = writeln!(
-                result,
-                "**{}**: `{} {}`",
-                help_options.usage_label, command.name, example
-            );
-        }
+            Box::new(|result, example| {
+                let _ = writeln!(
+                    result,
+                    "**{}**: `{} {}`",
+                    help_options.usage_label, command.name, example);
+            })
+        };
+        command.usage_sample.iter().for_each(|e| format_example(&mut result, e));
     }
 
     let _ = writeln!(
