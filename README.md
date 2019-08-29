@@ -137,6 +137,10 @@ the HTTP functions.
 connected to and audio can be sent/received.
 - **default_native_tls**: Default features but using `native_tls_backend`
 instead of `rustls_backend`.
+- **absolute_ratelimits**: Whether the library should use your system clock to avoid
+ratelimits, or use the interval given by Discord that might be less efficient
+due to latency in the network. If you turn this feature on, it is recommended to
+synchronise your clock with an NTP server (such as Google's).
 
 Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
 one if you do not use the default features:

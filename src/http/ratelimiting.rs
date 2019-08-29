@@ -41,6 +41,7 @@
 
 pub use super::routing::Route;
 
+use chrono::Utc;
 use reqwest::{
     Client,
     Response,
@@ -236,13 +237,33 @@ pub struct Ratelimit {
 }
 
 impl Ratelimit {
+    #[cfg(feature = "absolute_ratelimits")]
+    fn get_delay(&self) -> u64 {
+        let now = Utc::now().timestamp_millis();
+        let delta = self.reset - now;
+
+        if delta < 0 {
+            // We're probably past the reset time interval, so
+            // don't try sleeping the thread.
+
+            0
+        } else {
+            delta as u64
+        }
+    }
+
+    #[cfg(not(feature = "absolute_ratelimits"))]
+    fn get_delay(&self) -> u64 {
+        self.reset_after as u64
+    }
+
     pub fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
         }
 
         if self.remaining() == 0 {
-            let delay = self.reset_after() as u64;
+            let delay = self.get_delay();
 
             debug!(
                 "Pre-emptive ratelimit on route {:?} for {:?}ms",
