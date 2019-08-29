@@ -165,7 +165,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.usage = Some(propagate_err!(attributes::parse(values)));
             }
             "example" => {
-                options.examples.push(propagate_err!(attributes::parse(values)));
+                options
+                    .examples
+                    .push(propagate_err!(attributes::parse(values)));
             }
             _ => {
                 match_options!(name, values, options, span => [

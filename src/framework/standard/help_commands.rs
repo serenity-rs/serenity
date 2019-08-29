@@ -1083,11 +1083,14 @@ fn send_single_command_embed(
             if !command.usage_sample.is_empty() {
                 let format_example: Box<dyn Fn(&str) -> String> =
                     if let Some(first_prefix) = command.group_prefixes.get(0) {
-                        Box::new(move |example| format!("`{} {} {}`\n", first_prefix, command.name, example))
+                        Box::new(move |example| {
+                            format!("`{} {} {}`\n", first_prefix, command.name, example)
+                        })
                     } else {
                         Box::new(|example| format!("`{} {}`\n", command.name, example))
                     };
-                let full_example_text = command.usage_sample
+                let full_example_text = command
+                    .usage_sample
                     .iter()
                     .map(|e| format_example(e))
                     .collect::<String>();
@@ -1317,22 +1320,28 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     }
 
     if !command.usage_sample.is_empty() {
-        let mut format_example: Box<dyn FnMut(&mut String, &str)> = if let Some(first_prefix) = command.group_prefixes.get(0) {
-            Box::new(move |result, example| {
-                let _ = writeln!(
-                    result,
-                    "**{}**: `{} {} {}`",
-                    help_options.usage_label, first_prefix, command.name, example);
-            })
-        } else {
-            Box::new(|result, example| {
-                let _ = writeln!(
-                    result,
-                    "**{}**: `{} {}`",
-                    help_options.usage_label, command.name, example);
-            })
-        };
-        command.usage_sample.iter().for_each(|e| format_example(&mut result, e));
+        let mut format_example: Box<dyn FnMut(&mut String, &str)> =
+            if let Some(first_prefix) = command.group_prefixes.get(0) {
+                Box::new(move |result, example| {
+                    let _ = writeln!(
+                        result,
+                        "**{}**: `{} {} {}`",
+                        help_options.usage_label, first_prefix, command.name, example
+                    );
+                })
+            } else {
+                Box::new(|result, example| {
+                    let _ = writeln!(
+                        result,
+                        "**{}**: `{} {}`",
+                        help_options.usage_label, command.name, example
+                    );
+                })
+            };
+        command
+            .usage_sample
+            .iter()
+            .for_each(|e| format_example(&mut result, e));
     }
 
     let _ = writeln!(
