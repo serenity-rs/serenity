@@ -222,11 +222,11 @@ Voice + youtube-dl:
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
-[library:Discord.net]: https://github.com/RogueException/Discord.Net
+[library:Discord.net]: https://github.com/discord-net/Discord.Net
 [library:JDA]: https://github.com/DV8FromTheWorld/JDA
 [library:disco]: https://github.com/b1naryth1ef/disco
 [library:discordrb]: https://github.com/meew0/discordrb
-[library:discord.js]: https://github.com/hydrabolt/discord.js
+[library:discord.js]: https://github.com/discordjs/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
 [rust 1.37.0+ badge]: https://img.shields.io/badge/rust-1.37.0+-93450a.svg?style=flat-square
