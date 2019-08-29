@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.35.0+ badge]][rust 1.35.0+ link]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.37.0+ badge]][rust 1.37.0+ link]
 
 # serenity
 
@@ -229,5 +229,5 @@ Voice + youtube-dl:
 [library:discord.js]: https://github.com/hydrabolt/discord.js
 [library:discord.py]: https://github.com/Rapptz/discord.py
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust 1.35.0+ badge]: https://img.shields.io/badge/rust-1.35.0+-93450a.svg?style=flat-square
-[rust 1.35.0+ link]: https://blog.rust-lang.org/2019/05/23/Rust-1.35.0.html
+[rust 1.37.0+ badge]: https://img.shields.io/badge/rust-1.37.0+-93450a.svg?style=flat-square
+[rust 1.37.0+ link]: https://blog.rust-lang.org/2019/08/15/Rust-1.37.0.html
