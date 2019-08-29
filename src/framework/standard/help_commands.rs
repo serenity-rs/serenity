@@ -1081,19 +1081,24 @@ fn send_single_command_embed(
             }
 
             if !command.usage_sample.is_empty() {
-                let format_example: Box<dyn Fn(&str) -> String> =
+                let full_example_text =
                     if let Some(first_prefix) = command.group_prefixes.get(0) {
-                        Box::new(move |example| {
+                        let format_example = |example| {
                             format!("`{} {} {}`\n", first_prefix, command.name, example)
-                        })
+                        };
+                        command
+                           .usage_sample
+                           .iter()
+                           .map(format_example)
+                           .collect::<String>()
                     } else {
-                        Box::new(|example| format!("`{} {}`\n", command.name, example))
+                        let format_example = |example| format!("`{} {}`\n", command.name, example);
+                        command
+                           .usage_sample
+                           .iter()
+                           .map(format_example)
+                           .collect::<String>()
                     };
-                let full_example_text = command
-                    .usage_sample
-                    .iter()
-                    .map(|e| format_example(e))
-                    .collect::<String>();
                 embed.field(&help_options.usage_sample_label, full_example_text, true);
             }
 
@@ -1320,28 +1325,31 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     }
 
     if !command.usage_sample.is_empty() {
-        let mut format_example: Box<dyn FnMut(&mut String, &str)> =
-            if let Some(first_prefix) = command.group_prefixes.get(0) {
-                Box::new(move |result, example| {
-                    let _ = writeln!(
-                        result,
-                        "**{}**: `{} {} {}`",
-                        help_options.usage_label, first_prefix, command.name, example
-                    );
-                })
-            } else {
-                Box::new(|result, example| {
-                    let _ = writeln!(
-                        result,
-                        "**{}**: `{} {}`",
-                        help_options.usage_label, command.name, example
-                    );
-                })
+        if let Some(first_prefix) = command.group_prefixes.get(0) {
+            let format_example = |example| {
+                let _ = writeln!(
+                    result,
+                    "**{}**: `{} {} {}`",
+                    help_options.usage_label, first_prefix, command.name, example
+                );
             };
-        command
-            .usage_sample
-            .iter()
-            .for_each(|e| format_example(&mut result, e));
+            command
+                .usage_sample
+                .iter()
+                .for_each(format_example);
+        } else {
+            let format_example = |example| {
+                let _ = writeln!(
+                    result,
+                    "**{}**: `{} {}`",
+                    help_options.usage_label, command.name, example
+                );
+            };
+            command
+                .usage_sample
+                .iter()
+                .for_each(format_example);
+        }
     }
 
     let _ = writeln!(
