@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.0] - 2019-8-29
+
+An emergency release to fix a conflict in our [`ring`](https://github.com/briansmith/ring) dependency that prevents compilation if you pull in an older and newer version at the same time.
+
+Thanks to the following for their contributions:
+- [@Lakelezz]
+
+### Changed
+
+- [meta] Update all dependencies ([@Lakelezz]) [c:50d2a76]
+
 ## [0.6.4] - 2019-8-27
 
 Thanks to the following for their contributions:
@@ -3104,6 +3115,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.0]: https://github.com/serenity-rs/serenity/compare/v0.6.4...v0.7.0
 [0.6.4]: https://github.com/serenity-rs/serenity/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/serenity-rs/serenity/compare/v0.6.2...v0.6.3
 [0.6.2]: https://github.com/serenity-rs/serenity/compare/v0.6.1...v0.6.2
@@ -3226,6 +3238,8 @@ Initial commit.
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@zeyla]: https://github.com/zeyla
+
+[c:50d2a76]: https://github.com/serenity-rs/serenity/commit/50d2a7654e0aa5248c16941b68da30d758262419
 
 [c:aa1070d]: https://github.com/serenity-rs/serenity/commit/aa1070d05f23ea2a7a57857ee47e7b41af36815b
 [c:720d9ad]: https://github.com/serenity-rs/serenity/commit/720d9adda4d432cf3fb5ceb890fc0aa751f927bb
