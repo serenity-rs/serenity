@@ -165,7 +165,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.usage = Some(propagate_err!(attributes::parse(values)));
             }
             "example" => {
-                options.example = Some(propagate_err!(attributes::parse(values)));
+                options
+                    .examples
+                    .push(propagate_err!(attributes::parse(values)));
             }
             _ => {
                 match_options!(name, values, options, span => [
@@ -194,7 +196,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         description,
         delimiters,
         usage,
-        example,
+        examples,
         min_args,
         max_args,
         allowed_roles,
@@ -209,7 +211,6 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let description = AsOption(description);
     let usage = AsOption(usage);
     let bucket = AsOption(bucket);
-    let example = AsOption(example);
     let min_args = AsOption(min_args);
     let max_args = AsOption(max_args);
 
@@ -249,7 +250,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             desc: #description,
             delimiters: &[#(#delimiters),*],
             usage: #usage,
-            example: #example,
+            examples: &[#(#examples),*],
             min_args: #min_args,
             max_args: #max_args,
             allowed_roles: &[#(#allowed_roles),*],
