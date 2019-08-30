@@ -238,23 +238,14 @@ pub struct Ratelimit {
 
 impl Ratelimit {
     #[cfg(feature = "absolute_ratelimits")]
-    fn get_delay(&self) -> u64 {
+    fn get_delay(&self) -> i64 {
         let now = Utc::now().timestamp_millis();
-        let delta = self.reset - now;
-
-        if delta < 0 {
-            // We're probably past the reset time interval, so
-            // don't try sleeping the thread.
-
-            0
-        } else {
-            delta as u64
-        }
+        self.reset - now
     }
 
     #[cfg(not(feature = "absolute_ratelimits"))]
-    fn get_delay(&self) -> u64 {
-        self.reset_after as u64
+    fn get_delay(&self) -> i64 {
+        self.reset_after
     }
 
     pub fn pre_hook(&mut self, route: &Route) {
@@ -262,8 +253,17 @@ impl Ratelimit {
             return;
         }
 
+		let delay = self.get_delay();
+
+		if delay < 0 {
+			// We're probably in the past.
+			self.remaining = self.limit;
+
+			return;
+		}
+
         if self.remaining() == 0 {
-            let delay = self.get_delay();
+            let delay = delay as u64;
 
             debug!(
                 "Pre-emptive ratelimit on route {:?} for {:?}ms",
