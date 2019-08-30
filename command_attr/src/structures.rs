@@ -278,7 +278,7 @@ pub struct Options {
     pub description: Option<String>,
     pub delimiters: Vec<String>,
     pub usage: Option<String>,
-    pub example: Option<String>,
+    pub examples: Vec<String>,
     pub min_args: Option<u16>,
     pub max_args: Option<u16>,
     pub allowed_roles: Vec<String>,
