@@ -23,5 +23,6 @@
   "description": "Hmmmmmmmmm",
   "premium_tier": 0,
   "premium_subscription_count": 0,
-  "banner": null
+  "banner": null,
+  "preferred_locale": "en-US"
 }
