@@ -267,7 +267,7 @@ fn set_reminder(context: &mut Context, msg: &Message, mut args: Args) -> Command
                 .add_fn(DispatchEvent::ReactEvent(bot_msg.id, msg.author.id),
                     thanks_for_reacting(http, bot_msg.channel_id));
 
-            // The task is done and that's it, we do not to repeat it.
+            // The task is done and that's it, we don't need to repeat it.
             DateResult::Done
         });
     };
