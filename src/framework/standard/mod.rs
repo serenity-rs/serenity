@@ -1,6 +1,6 @@
 pub mod help_commands;
 pub mod macros {
-    pub use command_attr::{command, group, group_options, help, check};
+    pub use command_attr::{command, group, help, check};
 }
 
 mod args;
@@ -386,7 +386,7 @@ impl StandardFramework {
     /// [`group`]: #method.group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
-            Map::Prefixless(GroupMap::new(&group.sub_groups), CommandMap::new(&group.commands))
+            Map::Prefixless(GroupMap::new(&group.options.sub_groups), CommandMap::new(&group.options.commands))
         } else {
             Map::WithPrefixes(GroupMap::new(&[group]))
         };
