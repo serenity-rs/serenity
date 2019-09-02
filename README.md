@@ -97,7 +97,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.6"
+serenity = "0.7"
 ```
 
 Serenity supports a minimum of Rust 1.35.
