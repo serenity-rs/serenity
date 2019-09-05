@@ -691,7 +691,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         match name {
             "prefix" => {
                 options.prefixes = vec![propagate_err!(attributes::parse(values))];
-            },
+            }
             _ => match_options!(name, values, options, span => [
                 prefixes;
                 only_in;
@@ -728,6 +728,8 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let cooked2 = cooked.clone();
 
     let n = group.name.with_suffix(GROUP);
+
+    let default_command = default_command.map(|ident| ident.with_suffix(COMMAND));
 
     let commands = commands
         .into_iter()

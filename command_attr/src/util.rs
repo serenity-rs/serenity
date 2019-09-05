@@ -116,6 +116,16 @@ impl<T: Parse> Parse for Parenthesised<T> {
 #[derive(Debug)]
 pub struct AsOption<T>(pub Option<T>);
 
+impl<T> AsOption<T> {
+    #[inline]
+    pub fn map<U>(self, f: impl FnOnce(T) -> U) -> AsOption<U> {
+        AsOption(match self.0 {
+            Some(v) => Some(f(v)),
+            None => None,
+        })
+    }
+}
+
 impl<T: ToTokens> ToTokens for AsOption<T> {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         match &self.0 {
