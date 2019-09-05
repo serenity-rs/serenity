@@ -729,7 +729,11 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let n = group.name.with_suffix(GROUP);
 
-    let default_command = default_command.map(|ident| ident.with_suffix(COMMAND));
+    let default_command = default_command.map(|ident| {
+		let i = ident.with_suffix(COMMAND);
+		
+		quote!(&#i)
+	});
 
     let commands = commands
         .into_iter()
