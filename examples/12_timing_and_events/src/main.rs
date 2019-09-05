@@ -90,13 +90,10 @@ impl EventHandler for Handler {
     }
 }
 
-group!({
-    name: "remind_me",
-    options: {
-        prefixes: ["rm", "reminder"],
-    },
-    commands: [set_reminder],
-});
+#[group("remind me")]
+#[prefixes("rm", "reminder")]
+#[commands(set_reminder)]
+struct RemindMe;
 
 #[help]
 fn my_help(

@@ -355,13 +355,11 @@ impl StandardFramework {
     ///     Ok(())
     /// }
     ///
-    /// group!({
-    ///   name: "bingbong",
-    ///   options: {},
-    ///   commands: [ping, pong],
-    /// });
+    /// #[group("bingbong")]
+    /// #[commands(ping, pong)]
+    /// struct BingBong;
     ///
-    /// # fn main() -> Result<(), Box<StdError>> {
+    /// # fn main() -> Result<(), Box<dyn StdError>> {
     /// #   let mut client = Client::new("token", Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     // Groups' names are changed to all uppercase, plus appended with `_GROUP`.

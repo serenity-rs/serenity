@@ -52,10 +52,9 @@
 //!     Ok(())
 //! }
 //!
-//! group!({
-//!     name: "general",
-//!     commands: [about, ping],
-//! });
+//! #[group]
+//! #[commands(about, ping)]
+//! struct General;
 //!
 //! struct Handler;
 //!
@@ -66,7 +65,7 @@
 //!
 //! client.with_framework(StandardFramework::new()
 //!     .configure(|c| c.prefix("~"))
-//!     // The `group!` (and similarly, `#[command]`) macro generates static instances
+//!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances
 //!     // containing any options you gave it. For instance, the group `name` and its `commands`.
 //!     // Their identifiers, names you can use to refer to these instances in code, are an
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.

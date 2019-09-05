@@ -688,20 +688,25 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         let name = values.name.to_string();
         let name = &name[..];
 
-        match_options!(name, values, options, span => [
-            prefixes;
-            only_in;
-            owners_only;
-            owner_privilege;
-            help_available;
-            allowed_roles;
-            required_permissions;
-            checks;
-            default_command;
-            description;
-            commands;
-            sub_groups
-        ]);
+        match name {
+            "prefix" => {
+                options.prefixes = vec![propagate_err!(attributes::parse(values))];
+            },
+            _ => match_options!(name, values, options, span => [
+                prefixes;
+                only_in;
+                owners_only;
+                owner_privilege;
+                help_available;
+                allowed_roles;
+                required_permissions;
+                checks;
+                default_command;
+                description;
+                commands;
+                sub_groups
+            ]),
+        }
     }
 
     let GroupOptions {
