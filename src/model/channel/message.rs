@@ -19,9 +19,29 @@ use std::sync::Arc;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
-use std::mem;
+use bitflags::__impl_bitflags;
 #[cfg(feature = "model")]
-use crate::{constants, utils as serenity_utils};
+use serde::{
+    de::{Deserialize, Deserializer},
+    ser::{Serialize, Serializer},
+};
+#[cfg(feature = "model")]
+use super::utils::U64Visitor;
+#[cfg(feature = "model")]
+use std::{
+    mem,
+    result::Result as StdResult,
+};
+#[cfg(feature = "model")]
+use crate::{
+    constants,
+    utils as serenity_utils,
+    model::id::{
+        MessageId,
+        GuildId,
+        ChannelId,
+    },
+};
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -64,6 +84,8 @@ pub struct Message {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     pub mention_roles: Vec<RoleId>,
+    /// Channels specifically mentioned in this message.
+    pub mention_channels: Option<Vec<ChannelMention>>,
     /// Array of users mentioned in the message.
     pub mentions: Vec<User>,
     /// Non-repeating number used for ensuring message order.
@@ -83,6 +105,14 @@ pub struct Message {
     pub tts: bool,
     /// The Id of the webhook that sent this message, if one did.
     pub webhook_id: Option<WebhookId>,
+    /// Sent with Rich Presence-related chat embeds.
+    pub activity: Option<MessageActivity>,
+    /// Sent with Rich Presence-related chat embeds.
+    pub application: Option<MessageApplication>,
+    /// Reference data sent with crossposted messages.
+    pub message_reference: Option<MessageReference>,
+    /// Bit flags describing extra features of the message.
+    pub flags: Option<MessageFlags>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -724,5 +754,130 @@ impl MessageType {
             NitroTier3 => 11,
             __Nonexhaustive => unreachable!(),
         }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+pub enum MessageActivityKind {
+    JOIN = 1,
+    SPECTATE = 2,
+    LISTEN = 3,
+    #[allow(non_camel_case_types)]
+    JOIN_REQUEST = 5,
+    #[doc(hidden)]
+    __Nonexhaustive,
+}
+
+enum_number!(
+    MessageActivityKind {
+        JOIN,
+        SPECTATE,
+        LISTEN,
+        JOIN_REQUEST,
+    }
+);
+
+impl MessageActivityKind {
+    pub fn num(self) -> u64 {
+        use self::MessageActivityKind::*;
+
+        match self {
+            JOIN => 1,
+            SPECTATE => 2,
+            LISTEN => 3,
+            JOIN_REQUEST => 5,
+            __Nonexhaustive => unreachable!(),
+        }
+    }
+}
+
+/// Rich Presence application information.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MessageApplication {
+    /// ID of the application.
+    pub id: u64,
+    /// ID of the embed's image asset.
+    pub cover_image: Option<String>,
+    /// Application's description.
+    pub description: String,
+    /// ID of the application's icon.
+    pub icon: Option<String>,
+    /// Name of the application.
+    pub name: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
+}
+
+/// Rich Presence activity information.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MessageActivity {
+    /// Kind of message activity.
+    #[serde(rename = "type")]
+    pub kind: MessageActivityKind,
+    /// `party_id` from a Rich Presence event.
+    pub party_id: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
+}
+
+/// Reference data sent with crossposted messages.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct MessageReference {
+    /// ID of the originating message.
+    pub message_id: Option<MessageId>,
+    /// ID of the originating message's channel.
+    pub channel_id: ChannelId,
+    /// ID of the originating message's guild.
+    pub guild_id: Option<GuildId>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
+}
+
+/// Channel Mention Object
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ChannelMention {
+    /// ID of the channel.
+    pub id: ChannelId,
+    /// ID of the guild containing the channel.
+    pub guild_id: GuildId,
+    /// The kind of channel
+    #[serde(rename = "kind")]
+    pub kind: ChannelType,
+    /// The name of the channel
+    pub name: String,
+}
+
+/// Describes extra features of the message.
+#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
+pub struct MessageFlags {
+    pub bits: u64,
+}
+
+__impl_bitflags! {
+    MessageFlags: u64 {
+        /// This message has been published to subscribed channels (via Channel Following).
+        CROSSPOSTED = 0b0000_0000_0000_0000_0000_0000_0000_0001;
+        /// This message originated from a message in another channel (via Channel Following).
+        IS_CROSSPOST = 0b0000_0000_0000_0000_0000_0000_0000_0010;
+        /// Do not include any embeds when serializing this message.
+        SUPPRESS_EMBEDS = 0b0000_0000_0000_0000_0000_0000_0000_0100;
+    }
+}
+
+impl<'de> Deserialize<'de> for MessageFlags {
+    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
+    where D: Deserializer<'de>
+    {
+        Ok(MessageFlags::from_bits_truncate(
+            deserializer.deserialize_u64(U64Visitor)?,
+        ))
+    }
+}
+
+impl Serialize for MessageFlags {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where S: Serializer
+    {
+        serializer.serialize_u64(self.bits())
     }
 }
