@@ -547,13 +547,11 @@ impl Client {
     /// }
     ///
     /// // Commands must be intermediately handled through groups.
-    /// group!({
-    ///     name: "pingpong",
-    ///     options: {},
-    ///     commands: [ping],
-    /// });
+    /// #[group("pingpong")]
+    /// #[commands(ping)]
+    /// struct PingPong;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # fn try_main() -> Result<(), Box<dyn Error>> {
     ///
     /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
     /// client.with_framework(StandardFramework::new()
