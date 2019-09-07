@@ -81,8 +81,8 @@ impl GroupMap {
         let mut map = Self::default();
 
         for group in groups {
-            let subgroups_map = Arc::new(Self::new(&group.sub_groups));
-            let commands_map = Arc::new(CommandMap::new(&group.commands));
+            let subgroups_map = Arc::new(Self::new(&group.options.sub_groups));
+            let commands_map = Arc::new(CommandMap::new(&group.options.commands));
 
             for prefix in group.options.prefixes {
                 let len = prefix.chars().count();

@@ -1,18 +1,13 @@
-use crate::consts::{CHECK, COMMAND, GROUP, GROUP_OPTIONS};
-use crate::util::{
-    Argument, Array, AsOption, Braced, Bracketed, Expr, Field, IdentAccess, IdentExt2, LitExt,
-    Object, Parenthesised, RefOrInstance,
-};
+use crate::consts::CHECK;
+use crate::util::{Argument, AsOption, IdentExt2, Parenthesised};
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     braced,
     parse::{Error, Parse, ParseStream, Result},
-    punctuated::Punctuated,
     spanned::Spanned,
-    token::Pub,
-    Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token, Type,
+    Attribute, Block, FnArg, Ident, Pat, ReturnType, Stmt, Token, Type, Visibility,
 };
 
 #[derive(Debug, PartialEq)]
@@ -94,10 +89,11 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
 
 #[derive(Debug)]
 pub struct CommandFun {
-    pub _pub: Option<Pub>,
-    pub cfgs: Vec<Attribute>,
-    pub docs: Vec<Attribute>,
+    /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
+    /// Populated by either `#[cfg(...)]` or `#[doc = "..."]` (the desugared form of doc-comments) type of attributes.
+    pub cooked: Vec<Attribute>,
+    pub visibility: Visibility,
     pub name: Ident,
     pub args: Vec<Argument>,
     pub ret: Type,
@@ -108,19 +104,11 @@ impl Parse for CommandFun {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let attributes = input.call(Attribute::parse_outer)?;
 
-        let (cfgs, attributes): (Vec<_>, Vec<_>) = attributes
+        let (cooked, attributes): (Vec<_>, Vec<_>) = attributes
             .into_iter()
-            // Split the `#[cfg(...)]`s from our attributes.
-            .partition(|a| a.path.is_ident("cfg"));
+            .partition(|a| a.path.is_ident("cfg") || a.path.is_ident("doc"));
 
-        // Filter out doc-comments as well.
-        let (docs, attributes) = attributes.into_iter().partition(|a| a.path.is_ident("doc"));
-
-        let _pub = if input.peek(Token![pub]) {
-            Some(input.parse::<Token![pub]>()?)
-        } else {
-            None
-        };
+        let visibility = input.parse()?;
 
         input.parse::<Token![fn]>()?;
         let name = input.parse()?;
@@ -146,11 +134,10 @@ impl Parse for CommandFun {
             .map(parse_argument)
             .collect::<Result<Vec<_>>>()?;
 
-        Ok(CommandFun {
-            _pub,
-            cfgs,
-            docs,
+        Ok(Self {
             attributes,
+            cooked,
+            visibility,
             name,
             args,
             ret,
@@ -161,11 +148,10 @@ impl Parse for CommandFun {
 
 impl ToTokens for CommandFun {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        let CommandFun {
-            _pub,
-            cfgs,
-            docs,
+        let Self {
+            cooked,
             attributes: _,
+            visibility,
             name,
             args,
             ret,
@@ -173,9 +159,8 @@ impl ToTokens for CommandFun {
         } = self;
 
         stream.extend(quote! {
-            #(#cfgs)*
-            #(#docs)*
-            #_pub fn #name (#(#args),*) -> #ret {
+            #(#cooked)*
+            #visibility fn #name (#(#args),*) -> #ret {
                 #(#body)*
             }
         });
@@ -225,6 +210,18 @@ impl Permissions {
     }
 }
 
+impl ToTokens for Permissions {
+    fn to_tokens(&self, stream: &mut TokenStream2) {
+        let bits = self.0;
+
+        let path = quote!(serenity::model::permissions::Permissions);
+
+        stream.extend(quote! {
+            #path { bits: #bits }
+        });
+    }
+}
+
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Colour(pub u32);
 
@@ -264,6 +261,17 @@ impl Colour {
     }
 }
 
+impl ToTokens for Colour {
+    fn to_tokens(&self, stream: &mut TokenStream2) {
+        let value = self.0;
+        let path = quote!(serenity::utils::Colour);
+
+        stream.extend(quote! {
+            #path(#value)
+        });
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct Checks(pub Vec<Ident>);
 
@@ -278,14 +286,14 @@ impl ToTokens for Checks {
 #[derive(Debug, Default)]
 pub struct Options {
     pub checks: Checks,
-    pub bucket: Option<String>,
+    pub bucket: AsOption<String>,
     pub aliases: Vec<String>,
-    pub description: Option<String>,
+    pub description: AsOption<String>,
     pub delimiters: Vec<String>,
-    pub usage: Option<String>,
+    pub usage: AsOption<String>,
     pub examples: Vec<String>,
-    pub min_args: Option<u16>,
-    pub max_args: Option<u16>,
+    pub min_args: AsOption<u16>,
+    pub max_args: AsOption<u16>,
     pub allowed_roles: Vec<String>,
     pub required_permissions: Permissions,
     pub help_available: bool,
@@ -400,6 +408,55 @@ impl Default for HelpOptions {
     }
 }
 
+#[derive(Debug)]
+pub struct GroupStruct {
+    pub visibility: Visibility,
+    pub cooked: Vec<Attribute>,
+    pub attributes: Vec<Attribute>,
+    pub name: Ident,
+}
+
+impl Parse for GroupStruct {
+    fn parse(input: ParseStream<'_>) -> Result<Self> {
+        let attributes = input.call(Attribute::parse_outer)?;
+
+        let (cooked, attributes): (Vec<_>, Vec<_>) = attributes
+            .into_iter()
+            .partition(|a| a.path.is_ident("cfg") || a.path.is_ident("doc"));
+
+        let visibility = input.parse()?;
+
+        input.parse::<Token![struct]>()?;
+
+        let name = input.parse()?;
+
+        input.parse::<Token![;]>()?;
+
+        Ok(Self {
+            visibility,
+            cooked,
+            attributes,
+            name,
+        })
+    }
+}
+
+impl ToTokens for GroupStruct {
+    fn to_tokens(&self, stream: &mut TokenStream2) {
+        let Self {
+            visibility,
+            cooked,
+            attributes: _,
+            name,
+        } = self;
+
+        stream.extend(quote! {
+            #(#cooked)*
+            #visibility struct #name;
+        });
+    }
+}
+
 #[derive(Debug, Default)]
 pub struct GroupOptions {
     pub prefixes: Vec<String>,
@@ -410,9 +467,10 @@ pub struct GroupOptions {
     pub allowed_roles: Vec<String>,
     pub required_permissions: Permissions,
     pub checks: Checks,
-    pub default_command: Option<Ident>,
-    pub description: Option<String>,
-    pub inherit: Option<IdentAccess>,
+    pub default_command: AsOption<Ident>,
+    pub description: AsOption<String>,
+    pub commands: Vec<Ident>,
+    pub sub_groups: Vec<Ident>,
 }
 
 impl GroupOptions {
@@ -423,404 +481,5 @@ impl GroupOptions {
         options.help_available = true;
 
         options
-    }
-}
-
-impl Parse for GroupOptions {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let Object(fields) = input.parse::<Object>()?;
-
-        let mut options = GroupOptions::new();
-
-        for Field { name, value } in fields {
-            let span = name.span();
-            let name = name.to_string();
-
-            match (&name[..], value) {
-                ("prefixes", Expr::Array(Array(values)))
-                | ("allowed_roles", Expr::Array(Array(values))) => {
-                    let values = values
-                        .into_iter()
-                        .map(|l| match l {
-                            Expr::Lit(l) => Some(l.to_str()),
-                            _ => None,
-                        })
-                        .collect::<Option<Vec<String>>>();
-
-                    let values = match values {
-                        Some(values) => values,
-                        None => return Err(Error::new(span, "expected a list of strings")),
-                    };
-
-                    if name == "prefixes" {
-                        for v in &values {
-                            if v.is_empty() {
-                                return Err(Error::new(span, "prefixes cannot be empty"));
-                            }
-                        }
-
-                        options.prefixes = values;
-                    } else {
-                        options.allowed_roles = values;
-                    }
-                }
-                ("only_in", Expr::Lit(value)) => {
-                    options.only_in = OnlyIn::from_str(&value.to_str()[..], value.span())?;
-                }
-                ("owners_only", Expr::Lit(value))
-                | ("owner_privilege", Expr::Lit(value))
-                | ("help_available", Expr::Lit(value)) => {
-                    let b = value.to_bool();
-
-                    if name == "owners_only" {
-                        options.owners_only = b;
-                    } else if name == "owner_privilege" {
-                        options.owner_privilege = b;
-                    } else {
-                        options.help_available = b;
-                    }
-                }
-                ("checks", Expr::Array(Array(arr)))
-                | ("required_permissions", Expr::Array(Array(arr))) => {
-                    let idents = arr
-                        .into_iter()
-                        .map(|l| match l {
-                            Expr::Access(IdentAccess(l, None)) => Some(l),
-                            _ => None,
-                        })
-                        .collect::<Option<_>>();
-
-                    let idents = match idents {
-                        Some(idents) => idents,
-                        None => return Err(Error::new(span, "invalid value, expected ident")),
-                    };
-
-                    if name == "checks" {
-                        options.checks = Checks(idents);
-                    } else {
-                        let mut permissions = Permissions::default();
-                        for perm in idents {
-                            let p = match Permissions::from_str(&perm.to_string()) {
-                                Some(p) => p,
-                                None => return Err(Error::new(perm.span(), "invalid permission")),
-                            };
-
-                            // Add them together.
-                            permissions.0 |= p.0;
-                        }
-
-                        options.required_permissions = permissions;
-                    }
-                }
-                ("default_command", Expr::Access(IdentAccess(re, _))) => {
-                    options.default_command = Some(re);
-                }
-                ("prefix", Expr::Lit(s)) | ("description", Expr::Lit(s)) => {
-                    let s = s.to_str();
-
-                    if name == "prefix" {
-                        if s.is_empty() {
-                            return Err(Error::new(s.span(), "prefixes cannot be empty"));
-                        }
-
-                        options.prefixes = vec![s];
-                    } else {
-                        options.description = Some(s);
-                    }
-                }
-                ("inherit", Expr::Access(access)) => {
-                    options.inherit = Some(access);
-                }
-                (name, _) => {
-                    return Err(Error::new(
-                        span,
-                        format_args!("`{}` is not a valid group option", name),
-                    ));
-                }
-            }
-        }
-        Ok(options)
-    }
-}
-
-impl ToTokens for GroupOptions {
-    fn to_tokens(&self, stream: &mut TokenStream2) {
-        let GroupOptions {
-            prefixes,
-            allowed_roles,
-            required_permissions,
-            owner_privilege,
-            owners_only,
-            help_available,
-            only_in,
-            description,
-            checks,
-            default_command,
-            inherit,
-        } = self;
-
-        let description = AsOption(description.clone());
-        let mut dc = quote! { None };
-
-        if let Some(cmd) = default_command {
-            let cmd = cmd.with_suffix(COMMAND);
-            dc = quote! {
-                Some(&#cmd)
-            };
-        }
-
-        let options_path = quote!(serenity::framework::standard::GroupOptions);
-        let permissions_path = quote!(serenity::model::permissions::Permissions);
-        let required_permissions = required_permissions.0;
-
-        if let Some(IdentAccess(from, its)) = inherit {
-            let inherit = match its {
-                Some(its) => {
-                    if its != "options" {
-                        *stream = Error::new(its.span(), "field being accessed is not `options`")
-                            .to_compile_error();
-                        return;
-                    }
-                    let from = from.with_suffix(GROUP);
-                    quote! { *(#from).#its }
-                }
-                None => {
-                    let from = from.with_suffix(GROUP_OPTIONS);
-                    quote! { #from }
-                }
-            };
-
-            let description = if description.0.is_some() {
-                quote! { description: #description, }
-            } else {
-                quote!()
-            };
-
-            let prefixes = if !prefixes.is_empty() {
-                quote! { prefixes: &[#(#prefixes),*], }
-            } else {
-                quote!()
-            };
-
-            let allowed_roles = if !allowed_roles.is_empty() {
-                quote! { allowed_roles: &[#(#allowed_roles),*], }
-            } else {
-                quote!()
-            };
-
-            let required_permissions = if required_permissions != 0 {
-                quote! { required_permissions: #permissions_path { bits: #required_permissions }, }
-            } else {
-                quote!()
-            };
-
-            let owner_privilege = if !owner_privilege {
-                quote! { owner_privilege: #owner_privilege, }
-            } else {
-                quote!()
-            };
-
-            let owners_only = if *owners_only {
-                quote! { owners_only: #owners_only, }
-            } else {
-                quote!()
-            };
-
-            let help_available = if !help_available {
-                quote! { help_available: #help_available, }
-            } else {
-                quote!()
-            };
-
-            let only_in = if *only_in != OnlyIn::None {
-                quote! { only_in: #only_in, }
-            } else {
-                quote!()
-            };
-
-            let checks = if !checks.0.is_empty() {
-                quote! { checks: #checks, }
-            } else {
-                quote!()
-            };
-
-            let default_command = if default_command.is_some() {
-                quote! { default_command: #dc, }
-            } else {
-                quote!()
-            };
-
-            stream.extend(quote! {
-                #options_path {
-                    #prefixes
-                    #allowed_roles
-                    #required_permissions
-                    #owner_privilege
-                    #owners_only
-                    #help_available
-                    #only_in
-                    #description
-                    #checks
-                    #default_command
-                    ..#inherit
-                }
-            });
-        } else {
-            stream.extend(quote! {
-                #options_path {
-                    prefixes: &[#(#prefixes),*],
-                    allowed_roles: &[#(#allowed_roles),*],
-                    required_permissions: #permissions_path { bits: #required_permissions },
-                    owner_privilege: #owner_privilege,
-                    owners_only: #owners_only,
-                    help_available: #help_available,
-                    only_in: #only_in,
-                    description: #description,
-                    checks: #checks,
-                    default_command: #dc,
-                }
-            });
-        }
-    }
-}
-
-#[derive(Debug)]
-pub struct Group {
-    pub help_name: String,
-    pub name: Ident,
-    pub options: RefOrInstance<GroupOptions>,
-    pub commands: Punctuated<Ident, Token![,]>,
-    pub sub_groups: Vec<RefOrInstance<Group>>,
-}
-
-impl Parse for Group {
-    fn parse(input: ParseStream<'_>) -> Result<Self> {
-        enum GroupField {
-            HelpName(String),
-            Name(Ident),
-            Options(RefOrInstance<GroupOptions>),
-            Commands(Bracketed<Ident>),
-            SubGroups(Bracketed<RefOrInstance<Group>>),
-        }
-
-        impl Parse for GroupField {
-            fn parse(input: ParseStream<'_>) -> Result<Self> {
-                let name = input.parse::<Ident>()?;
-
-                input.parse::<Token![:]>()?;
-
-                match name.to_string().as_str() {
-                    "help_name" => Ok(GroupField::HelpName(input.parse::<Lit>()?.to_str())),
-                    "name" => Ok(GroupField::Name(input.parse::<Lit>()?.to_ident())),
-                    "options" => Ok(GroupField::Options(input.parse()?)),
-                    "commands" => Ok(GroupField::Commands(input.parse()?)),
-                    "sub_groups" => Ok(GroupField::SubGroups(input.parse()?)),
-                    n => Err(input.error(format_args!(
-                    "`{}` is not an acceptable field of the `group!` macro.
-                    Perhaps you meant one these fields? `name` / `options` / `commands` / `sub_groups`", n))),
-                }
-            }
-        }
-
-        let Braced(fields) = input.parse::<Braced<GroupField>>()?;
-
-        if input.peek(Token![,]) {
-            input.parse::<Token![,]>()?;
-        }
-
-        let mut name = None;
-        let mut help_name = None;
-        let mut options = None;
-        let mut commands = None;
-        let mut sub_groups = None;
-
-        for field in fields {
-            match field {
-                GroupField::Name(n) => name = Some(n),
-                GroupField::HelpName(n) => help_name = Some(n),
-                GroupField::Options(o) => options = Some(o),
-                GroupField::Commands(Bracketed(p)) => commands = Some(p),
-                GroupField::SubGroups(Bracketed(p)) => sub_groups = Some(p.into_iter().collect()),
-            }
-        }
-
-        let name = match name {
-            Some(n) => n,
-            None => return Err(input.error("every group must have a `name`")),
-        };
-
-        let commands = match commands {
-            Some(c) => c,
-            None => return Err(input.error("every group must have some runnable `commands`")),
-        };
-
-        Ok(Group {
-            help_name: help_name.unwrap_or_else(|| name.to_string()),
-            name,
-            commands,
-            options: options.unwrap_or_default(),
-            sub_groups: sub_groups.unwrap_or_default(),
-        })
-    }
-}
-
-impl ToTokens for Group {
-    fn to_tokens(&self, stream: &mut TokenStream2) {
-        let Group {
-            help_name,
-            name,
-            options: opts,
-            commands,
-            sub_groups,
-        } = self;
-
-        let commands = commands.into_iter().map(|cmd| {
-            let cmd = cmd.with_suffix(COMMAND);
-            quote! {
-                &#cmd
-            }
-        });
-
-        let sub_groups = sub_groups
-            .into_iter()
-            .map(|group| match group {
-                RefOrInstance::Instance(group) => {
-                    let name = group.name.with_suffix(GROUP);
-                    stream.extend(group.into_token_stream());
-
-                    name
-                }
-                RefOrInstance::Ref(name) => name.with_suffix(GROUP),
-            })
-            .collect::<Vec<_>>();
-
-        let mut group_ops = name.with_suffix(GROUP_OPTIONS);
-        let n = name.to_string();
-        let name = name.with_suffix(GROUP);
-
-        let mut options = None;
-        match opts {
-            RefOrInstance::Ref(name) => group_ops = name.with_suffix(GROUP_OPTIONS),
-            RefOrInstance::Instance(opt) => options = Some(opt),
-        }
-
-        let options_path = quote!(serenity::framework::standard::GroupOptions);
-        let group_path = quote!(serenity::framework::standard::CommandGroup);
-
-        if options.is_some() {
-            stream.extend(quote! {
-                pub static #group_ops: #options_path = #options;
-            });
-        }
-
-        stream.extend(quote! {
-            pub static #name: #group_path = #group_path {
-                help_name: #help_name,
-                name: #n,
-                options: &#group_ops,
-                commands: &[#(#commands),*],
-                sub_groups: &[#(&#sub_groups),*]
-            };
-        });
     }
 }

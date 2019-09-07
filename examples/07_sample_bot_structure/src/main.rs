@@ -49,11 +49,9 @@ impl EventHandler for Handler {
     }
 }
 
-group!({
-    name: "general",
-    options: {},
-    commands: [multiply, ping, quit]
-});
+#[group]
+#[commands(multiply, ping, quit)]
+struct General;
 
 fn main() {
     // This will load the environment variables located at `./.env`, relative to

@@ -90,13 +90,10 @@ impl EventHandler for Handler {
     }
 }
 
-group!({
-    name: "remind_me",
-    options: {
-        prefixes: ["rm", "reminder"],
-    },
-    commands: [set_reminder],
-});
+#[group("remind me")]
+#[prefixes("rm", "reminder")]
+#[commands(set_reminder)]
+struct RemindMe;
 
 #[help]
 fn my_help(
@@ -166,7 +163,7 @@ fn main() {
         }
     })
         .help(&MY_HELP)
-        .group(&REMIND_ME_GROUP)
+        .group(&REMINDME_GROUP)
     );
 
     if let Err(why) = client.start() {
@@ -178,7 +175,7 @@ fn main() {
 // It saves us from writing the same trigger twice for repeated and non-repeated
 // tasks (see remind-me command below).
 fn thanks_for_reacting(http: Arc<Http>, channel: ChannelId) ->
-    Box<Fn(&DispatchEvent) -> Option<DispatcherRequest> + Send + Sync> {
+    Box<dyn Fn(&DispatchEvent) -> Option<DispatcherRequest> + Send + Sync> {
 
     Box::new(move |_| {
         if let Err(why) = channel.say(&http, "Thanks for reacting!") {
