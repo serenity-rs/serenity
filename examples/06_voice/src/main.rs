@@ -52,11 +52,9 @@ impl EventHandler for Handler {
     }
 }
 
-group!({
-    name: "general",
-    options: {},
-    commands: [deafen, join, leave, mute, play, ping, undeafen, unmute]
-});
+#[group]
+#[commands(deafen, join, leave, mute, play, ping, undeafen, unmute)]
+struct General;
 
 fn main() {
     // Configure the client with your Discord bot token in the environment.

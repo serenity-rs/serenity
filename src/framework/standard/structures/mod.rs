@@ -233,13 +233,11 @@ pub struct HelpOptions {
     pub indention_prefix: &'static str,
 }
 
+
 #[derive(Debug, PartialEq)]
 pub struct CommandGroup {
-    pub help_name: &'static str,
     pub name: &'static str,
     pub options: &'static GroupOptions,
-    pub commands: &'static [&'static Command],
-    pub sub_groups: &'static [&'static CommandGroup],
 }
 
 #[cfg(test)]

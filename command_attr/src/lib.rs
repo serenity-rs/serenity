@@ -7,7 +7,7 @@ extern crate proc_macro;
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
     parse_macro_input, parse_quote,
@@ -152,17 +152,8 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             "num_args" => {
                 let args = propagate_err!(u16::parse(values));
 
-                options.min_args = Some(args);
-                options.max_args = Some(args);
-            }
-            "bucket" => {
-                options.bucket = Some(propagate_err!(attributes::parse(values)));
-            }
-            "description" => {
-                options.description = Some(propagate_err!(attributes::parse(values)));
-            }
-            "usage" => {
-                options.usage = Some(propagate_err!(attributes::parse(values)));
+                options.min_args = AsOption(Some(args));
+                options.max_args = AsOption(Some(args));
             }
             "example" => {
                 options
@@ -172,12 +163,14 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             _ => {
                 match_options!(name, values, options, span => [
                     checks;
+                    bucket;
+                    aliases;
+                    description;
                     delimiters;
+                    usage;
                     min_args;
                     max_args;
                     required_permissions;
-                    aliases;
-                    usage;
                     allowed_roles;
                     help_available;
                     only_in;
@@ -208,12 +201,6 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         sub_commands,
     } = options;
 
-    let description = AsOption(description);
-    let usage = AsOption(usage);
-    let bucket = AsOption(bucket);
-    let min_args = AsOption(min_args);
-    let max_args = AsOption(max_args);
-
     propagate_err!(validate_declaration(&mut fun, DeclarFor::Command));
 
     let either = [
@@ -222,8 +209,6 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     ];
 
     propagate_err!(validate_return_type(&mut fun, either));
-
-    let Permissions(required_permissions) = required_permissions;
 
     let name = fun.name.clone();
     let options = name.with_suffix(COMMAND_OPTIONS);
@@ -234,15 +219,14 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let n = name.with_suffix(COMMAND);
 
-    let cfgs = fun.cfgs.clone();
-    let cfgs2 = cfgs.clone();
+    let cooked = fun.cooked.clone();
+    let cooked2 = cooked.clone();
 
     let options_path = quote!(serenity::framework::standard::CommandOptions);
     let command_path = quote!(serenity::framework::standard::Command);
-    let permissions_path = quote!(serenity::model::permissions::Permissions);
 
     (quote! {
-        #(#cfgs)*
+        #(#cooked)*
         pub static #options: #options_path = #options_path {
             checks: #checks,
             bucket: #bucket,
@@ -254,7 +238,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             min_args: #min_args,
             max_args: #max_args,
             allowed_roles: &[#(#allowed_roles),*],
-            required_permissions: #permissions_path { bits: #required_permissions },
+            required_permissions: #required_permissions,
             help_available: #help_available,
             only_in: #only_in,
             owners_only: #owners_only,
@@ -262,7 +246,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             sub_commands: &[#(&#sub_commands),*],
         };
 
-        #(#cfgs2)*
+        #(#cooked2)*
         pub static #n: #command_path = #command_path {
             fun: #name,
             options: &#options,
@@ -523,9 +507,6 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
     let strikethrough_commands_tip_in_guild = AsOption(strikethrough_commands_tip_in_guild);
 
-    let Colour(embed_error_colour) = embed_error_colour;
-    let Colour(embed_success_colour) = embed_success_colour;
-
     propagate_err!(validate_declaration(&mut fun, DeclarFor::Help));
 
     let either = [
@@ -540,15 +521,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let n = fun.name.to_uppercase();
     let nn = fun.name.clone();
 
-    let cfgs = fun.cfgs.clone();
-    let cfgs2 = cfgs.clone();
+    let cooked = fun.cooked.clone();
+    let cooked2 = cooked.clone();
 
     let options_path = quote!(serenity::framework::standard::HelpOptions);
     let command_path = quote!(serenity::framework::standard::HelpCommand);
-    let colour_path = quote!(serenity::utils::Colour);
 
     (quote! {
-        #(#cfgs)*
+        #(#cooked)*
         pub static #options: #options_path = #options_path {
             names: &[#(#names),*],
             suggestion_text: #suggestion_text,
@@ -573,13 +553,13 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             lacking_permissions: #lacking_permissions,
             lacking_ownership: #lacking_ownership,
             wrong_channel: #wrong_channel,
-            embed_error_colour: #colour_path(#embed_error_colour),
-            embed_success_colour: #colour_path(#embed_success_colour),
+            embed_error_colour: #embed_error_colour,
+            embed_success_colour: #embed_success_colour,
             max_levenshtein_distance: #max_levenshtein_distance,
             indention_prefix: #indention_prefix,
         };
 
-        #(#cfgs2)*
+        #(#cooked2)*
         pub static #n: #command_path = #command_path {
             fun: #nn,
             options: &#options,
@@ -598,15 +578,13 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// A group might have one or more *prefixes* set. This will necessitate for
 /// one of the prefixes to appear before the group's command.
 /// For example, for a general prefix `!`, a group prefix `foo` and a command `bar`,
-/// the invocation would look like this: `!foo bar`.
+/// the invocation would be `!foo bar`.
 ///
 /// It might have some options apply to *all* of its commands. E.g. guild or dm only.
 ///
-/// Its options may be *inherited* from another group.
-///
 /// It may even couple other groups as well.
 ///
-/// This group macro purports all of the said purposes above, in a json-like syntax:
+/// This group macro purports all of the said purposes above, applied onto a `struct`:
 ///
 /// ```rust,no_run
 /// use command_attr::{command, group};
@@ -627,121 +605,174 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///     Ok(())
 /// }
 ///
-/// group!({
-///     name: "baz",
-///     options: {
-///         // All sub-groups must own at least one prefix.
-///         prefix: "baz",
-///     },
-///     commands: [answer_to_life],
-/// });
+/// #[group]
+/// // All sub-groups must own at least one prefix.
+/// #[prefix = "baz"]
+/// #[commands(answer_to_life)]
+/// struct Baz;
 ///
-/// group!({
-///     name: "foo",
-///     commands: [bar],
-///     sub_groups: [baz],
-/// });
+/// #[group]
+/// #[commands(bar)]
+/// // Case does not matter; the names will be all uppercased.
+/// #[sub_groups(baz)]
+/// struct Foo;
 /// ```
 ///
 /// # Options
 ///
-/// These appear inside the object of the `options` field:
+/// These appear after `#[group]` as a series of attributes:
 ///
-/// - `prefixes`: Array\<String\>\
+/// - `#[prefixes("foo", "bar", "baz")]`
 /// The group's prefixes.
 ///
-/// `allowed_roles`: Array\<String\>\
+/// - `#[allowed_roles("foo", "bar", "baz")]`
 /// Only which roles may execute this group's commands.
 ///
-/// - `only_in`: String\
+/// - `#[only_in(guilds/dms))]`
 /// Whether this group's commands are restricted to `guilds` or `dms`.
 ///
-/// - `owners_only`: Bool\
+/// - `#[owners_only(true/false)]`
 /// If only the owners of the bot may execute this group's commands.
 ///
-/// - `owner_privilege`: Bool\
+/// - `#[owner_privilege(true/false)]`
 /// Whether the owners should be treated as normal users.
 ///
 /// Default value is `true`
 ///
-/// - `help_available`: bool\
+/// - `#[help_available(true/false)]`
 /// Whether the group is visible to the help command.
 ///
 /// Default value is `true`
 ///
-/// - `checks`: Array\<Ident\>\
+/// - `#[checks(foo, bar, baz)]`
 /// A set of preconditions that must be met before a group command's execution.
 /// Refer to [`command`]'s `checks` documentation.
 ///
-/// - `required_permissions`: Array\<Ident\>\
+/// - `#[required_permissions(foo, bar, baz)]`
 /// A set of permissions needed by the user before a group command's execution.
 ///
-/// - `default_command`: Ident\
+/// - `#[default_command(foobar_baz)]`
 /// Command to be executed if none of the group's prefixes are given.
 /// Identifier must refer to a `#[command]`'d function.
 ///
-/// - `prefix`: String\
+/// - `#[prefix("...")]`/`#[prefix = "..."]`
 /// Assign a single prefix to this group.
 ///
-/// - `description`: String\
+/// - `#[description("...")]`/`#[description = "..."]`
 /// The description of the group.
 /// Used in the help command.
 ///
-/// - `inherit`: Access\
-/// Derive options from another `GroupOptions` instance.
-///
-/// On standalone `GroupOptions`: `$name_of_options$`
-/// `GroupOptions` belonging to another `Group`: `$name_of_group$.options`
-///
-/// Just like [`command`], this macro generates static instances of the group
-/// and its options. The identifiers of these instances are based off the `name` field given to differentiate
-/// this group from others. The field is also passed as the default value to the group's `help_name`, the name
-/// for use and display in the help command, which can be indepedent from the group's `name`.
+/// Similarly to [`command`], this macro generates static instances of the group
+/// and its options. The identifiers of these instances are based off the name of the struct to differentiate
+/// this group from others. This name is given as the default value of the group's `name` field,
+/// used in the help command for display and browsing of the group.
+/// It may also be passed as an argument to the macro. For example: `#[group("Banana Phone")]`.
 ///
 /// [`command`]: #fn.command.html
-#[proc_macro]
-pub fn group(input: TokenStream) -> TokenStream {
-    let group = parse_macro_input!(input as Group);
+#[proc_macro_attribute]
+pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
+    let group = parse_macro_input!(input as GroupStruct);
 
-    group.into_token_stream().into()
-}
+    let name = if !attr.is_empty() {
+        parse_macro_input!(attr as Lit).to_str()
+    } else {
+        group.name.to_string()
+    };
 
-/// Create an instance of `GroupOptions`.
-/// Useful when making default options and then deriving them for command groups.
-///
-/// ```rust,no_run
-/// use command_attr::group_options;
-///
-/// // First argument is the name of the options; second the actual options.
-/// group_options!(Foobar {
-///     description: "I'm an example group",
-/// });
-/// ```
-#[proc_macro]
-pub fn group_options(input: TokenStream) -> TokenStream {
-    struct GroupOptionsName {
-        name: Ident,
-        options: GroupOptions,
-    }
+    let mut options = GroupOptions::new();
 
-    impl Parse for GroupOptionsName {
-        fn parse(input: ParseStream<'_>) -> Result<Self> {
-            let name = input.parse::<Ident>()?;
+    for attribute in &group.attributes {
+        let span = attribute.span();
+        let values = propagate_err!(parse_values(attribute));
 
-            let options = input.parse::<GroupOptions>()?;
+        let name = values.name.to_string();
+        let name = &name[..];
 
-            Ok(GroupOptionsName { name, options })
+        match name {
+            "prefix" => {
+                options.prefixes = vec![propagate_err!(attributes::parse(values))];
+            }
+            _ => match_options!(name, values, options, span => [
+                prefixes;
+                only_in;
+                owners_only;
+                owner_privilege;
+                help_available;
+                allowed_roles;
+                required_permissions;
+                checks;
+                default_command;
+                description;
+                commands;
+                sub_groups
+            ]),
         }
     }
 
-    let GroupOptionsName { name, options } = parse_macro_input!(input as GroupOptionsName);
+    let GroupOptions {
+        prefixes,
+        only_in,
+        owners_only,
+        owner_privilege,
+        help_available,
+        allowed_roles,
+        required_permissions,
+        checks,
+        default_command,
+        description,
+        commands,
+        sub_groups,
+    } = options;
 
-    let name = name.with_suffix(GROUP_OPTIONS);
+    let cooked = group.cooked.clone();
+    let cooked2 = cooked.clone();
 
+    let n = group.name.with_suffix(GROUP);
+
+    let default_command = default_command.map(|ident| {
+        let i = ident.with_suffix(COMMAND);
+
+        quote!(&#i)
+    });
+
+    let commands = commands
+        .into_iter()
+        .map(|c| c.with_suffix(COMMAND))
+        .collect::<Vec<_>>();
+
+    let sub_groups = sub_groups
+        .into_iter()
+        .map(|c| c.with_suffix(GROUP))
+        .collect::<Vec<_>>();
+
+    let options = group.name.with_suffix(GROUP_OPTIONS);
     let options_path = quote!(serenity::framework::standard::GroupOptions);
+    let group_path = quote!(serenity::framework::standard::CommandGroup);
 
     (quote! {
-        pub static #name: #options_path = #options;
+        #(#cooked)*
+        pub static #options: #options_path = #options_path {
+            prefixes: &[#(#prefixes),*],
+            only_in: #only_in,
+            owners_only: #owners_only,
+            owner_privilege: #owner_privilege,
+            help_available: #help_available,
+            allowed_roles: &[#(#allowed_roles),*],
+            required_permissions: #required_permissions,
+            checks: #checks,
+            default_command: #default_command,
+            description: #description,
+            commands: &[#(&#commands),*],
+            sub_groups: &[#(&#sub_groups),*],
+        };
+
+        #(#cooked2)*
+        pub static #n: #group_path = #group_path {
+            name: #name,
+            options: &#options,
+        };
+
+        #group
     })
     .into()
 }

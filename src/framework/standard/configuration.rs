@@ -274,11 +274,9 @@ impl Configuration {
     ///     Ok(())
     /// }
     ///
-    /// group!({
-    ///     name: "peng",
-    ///     options: {},
-    ///     commands: [ping]
-    /// });
+    /// #[group]
+    /// #[commands(ping)]
+    /// struct Peng;
     ///
     /// # fn main() {
     /// # use serenity::prelude::*;

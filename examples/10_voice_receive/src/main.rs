@@ -87,11 +87,9 @@ impl AudioReceiver for Receiver {
     }
 }
 
-group!({
-    name: "general",
-    options: {},
-    commands: [join, leave, ping]
-});
+#[group]
+#[commands(join, leave, ping)]
+struct General;
 
 fn main() {
     // Configure the client with your Discord bot token in the environment.
