@@ -46,50 +46,39 @@ impl EventHandler for Handler {
     }
 }
 
-group!({
-    name: "general",
-    options: {},
-    commands: [about, say, commands, ping, some_long_command]
-});
+#[group]
+#[commands(about, say, commands, ping, some_long_command)]
+struct General;
 
-group!({
-    name: "emoji",
-    options: {
-        // Sets multiple prefixes for a group.
-        // This requires us to call commands in this group
-        // via `~emoji` (or `~em`) instead of just `~`.
-        prefixes: ["emoji", "em"],
-        // Set a description to appear if a user wants to display a single group
-        // e.g. via help using the group-name or one of its prefixes.
-        description: "A group with commands providing an emoji as response.",
-        // Sets a command that will be executed if only a group-prefix was passed.
-        default_command: bird,
-    },
-    commands: [cat, dog],
-});
+#[group]
+// Sets multiple prefixes for a group.
+// This requires us to call commands in this group
+// via `~emoji` (or `~em`) instead of just `~`.
+#[prefixes("emoji", "em")]
+// Set a description to appear if a user wants to display a single group
+// e.g. via help using the group-name or one of its prefixes.
+#[description = "A group with commands providing an emoji as response."]
+// Sets a command that will be executed if only a group-prefix was passed.
+#[default_command(bird)]
+#[commands(cat, dog)]
+struct Emoji;
 
-group!({
-    name: "math",
-    options: {
-        // Sets a single prefix for this group.
-        // So one has to call commands in this group
-        // via `~math` instead of just `~`.
-        prefix: "math",
-    },
-    commands: [multiply],
-});
+#[group]
+// Sets a single prefix for this group.
+// So one has to call commands in this group
+// via `~math` instead of just `~`.
+#[prefix = "math"]
+#[commands(multiply)]
+struct Math;
 
-group!({
-    name: "owner",
-    options: {
-        owners_only: true,
-        // Limit all commands to be guild-restricted.
-        only_in: "guilds",
-        // Adds checks that need to be passed.
-        checks: [Admin],
-    },
-    commands: [am_i_admin, slow_mode],
-});
+#[group]
+#[owners_only]
+// Limit all commands to be guild-restricted.
+#[only_in(guilds)]
+// Adds checks that need to be passed.
+#[checks(Admin)]
+#[commands(am_i_admin, slow_mode)]
+struct Owner;
 
 // The framework provides two built-in help commands for you to use.
 // But you can also make your own customized help command that forwards
@@ -244,7 +233,7 @@ fn main() {
         .bucket("emoji", |b| b.delay(5))
         // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
         .bucket("complicated", |b| b.delay(5).time_span(30).limit(2))
-        // The `group!` macro generates `static` instances of the options set for the group.
+        // The `#[group]` macro generates `static` instances of the options set for the group.
         // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
         // #name is turned all uppercase
         .group(&GENERAL_GROUP)

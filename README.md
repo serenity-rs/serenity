@@ -51,11 +51,9 @@ use serenity::framework::standard::{
     }
 };
 
-group!({
-    name: "general",
-    options: {},
-    commands: [ping],
-});
+#[group]
+#[commands(ping)]
+struct General;
 
 use std::env;
 
