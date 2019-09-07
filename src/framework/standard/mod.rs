@@ -1,6 +1,6 @@
 pub mod help_commands;
 pub mod macros {
-    pub use command_attr::{command, group, group_options, help, check};
+    pub use command_attr::{command, group, help, check};
 }
 
 mod args;
@@ -355,13 +355,11 @@ impl StandardFramework {
     ///     Ok(())
     /// }
     ///
-    /// group!({
-    ///   name: "bingbong",
-    ///   options: {},
-    ///   commands: [ping, pong],
-    /// });
+    /// #[group("bingbong")]
+    /// #[commands(ping, pong)]
+    /// struct BingBong;
     ///
-    /// # fn main() -> Result<(), Box<StdError>> {
+    /// # fn main() -> Result<(), Box<dyn StdError>> {
     /// #   let mut client = Client::new("token", Handler)?;
     /// client.with_framework(StandardFramework::new()
     ///     // Groups' names are changed to all uppercase, plus appended with `_GROUP`.
@@ -386,7 +384,7 @@ impl StandardFramework {
     /// [`group`]: #method.group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
-            Map::Prefixless(GroupMap::new(&group.sub_groups), CommandMap::new(&group.commands))
+            Map::Prefixless(GroupMap::new(&group.options.sub_groups), CommandMap::new(&group.options.commands))
         } else {
             Map::WithPrefixes(GroupMap::new(&[group]))
         };
