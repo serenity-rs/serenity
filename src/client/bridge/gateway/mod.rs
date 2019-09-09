@@ -123,6 +123,11 @@ pub enum ShardManagerMessage {
     /// component that receives this to also shutdown with no further action
     /// taken.
     ShutdownInitiated,
+    /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to
+    /// move toward the next one.
+    ///
+    /// [`ShardRunner`]: struct.ShardRunner.html
+    ShutdownFinished(ShardId)
 }
 
 /// A message to be sent to the [`ShardQueuer`].

@@ -1,10 +1,16 @@
 use parking_lot::Mutex;
-use std::sync::{
-    mpsc::Receiver,
-    Arc
+use std::{
+    sync::{
+        mpsc::{
+            Receiver,
+            Sender
+        },
+        Arc,
+    }
 };
 use super::{ShardManager, ShardManagerMessage};
-use log::debug;
+use super::super::gateway::ShardId;
+use log::{debug, warn};
 
 /// The shard manager monitor does what it says on the tin -- it monitors the
 /// shard manager and performs actions on it as received.
@@ -20,6 +26,8 @@ pub struct ShardManagerMonitor {
     pub manager: Arc<Mutex<ShardManager>>,
     /// The mpsc Receiver channel to receive shard manager messages over.
     pub rx: Receiver<ShardManagerMessage>,
+    /// The mpsc Sender channel to inform the manager that a shard has just properly shut down
+    pub shutdown: Sender<ShardId>,
 }
 
 impl ShardManagerMonitor {
@@ -61,6 +69,15 @@ impl ShardManagerMonitor {
                     break;
                 },
                 ShardManagerMessage::ShutdownInitiated => break,
+                ShardManagerMessage::ShutdownFinished(shard_id) => {
+                    if let Err(why) = self.shutdown.send(shard_id) {
+                        warn!(
+                            "[ShardMonitor] Could not forward Shutdown signal to ShardManager for shard {}: {:#?}",
+                            shard_id,
+                            why
+                        );
+                    }
+                }
             }
         }
     }

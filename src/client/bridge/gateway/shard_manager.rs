@@ -6,10 +6,11 @@ use parking_lot::RwLock;
 use std::{
     collections::{HashMap, VecDeque},
     sync::{
-        mpsc::{self, Sender},
-        Arc
+        mpsc::{self, channel, Sender, Receiver},
+        Arc,
     },
-    thread
+    thread,
+    time::Duration
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
@@ -127,6 +128,7 @@ pub struct ShardManager {
     /// The total shards in use, 1-indexed.
     shard_total: u64,
     shard_queuer: Sender<ShardQueuerMessage>,
+    shard_shutdown: Receiver<ShardId>,
 }
 
 impl ShardManager {
@@ -164,18 +166,21 @@ impl ShardManager {
             shard_queuer.run();
         });
 
+        let (shutdown_send, shutdown_recv) = channel();
         let manager = Arc::new(Mutex::new(Self {
             monitor_tx: thread_tx,
             shard_index: opt.shard_index,
             shard_init: opt.shard_init,
             shard_queuer: shard_queue_tx,
             shard_total: opt.shard_total,
+            shard_shutdown: shutdown_recv,
             runners,
         }));
 
         (Arc::clone(&manager), ShardManagerMonitor {
             rx: thread_rx,
             manager,
+            shutdown: shutdown_send,
         })
     }
 
@@ -297,6 +302,20 @@ impl ShardManager {
                     shard_id,
                     why,
                 );
+            }
+            match self.shard_shutdown.recv_timeout(Duration::from_secs(5)) {
+                Ok(shutdown_shard_id) =>
+                    if shutdown_shard_id != shard_id {
+                        warn!(
+                            "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
+                            shard_id,
+                        );
+                    },
+                Err(why) => warn!(
+                    "Failed to cleanly shutdown shard {}: {:?}",
+                    shard_id,
+                    why,
+                )
             }
         }
 
