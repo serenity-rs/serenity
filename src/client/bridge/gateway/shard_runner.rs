@@ -205,11 +205,36 @@ impl<H: EventHandler + Send + Sync + 'static,
             return true;
         }
 
+        // Send a Close Frame to Discord, which allows a bot to "log off"
         let _ = self.shard.client.close(Some(CloseFrame {
             code: 1000.into(),
             reason: Cow::from(""),
         }));
 
+        // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
+        // disconnected from Discord.
+        loop {
+            match self.shard.client.read_message() {
+                Ok(tungstenite::Message::Close(_)) => break,
+                Err(_) => {
+                    warn!(
+                        "[ShardRunner {:?}] Received an error awaiting close frame",
+                        self.shard.shard_info(),
+                    );
+                    break;
+                }
+                _ => continue,
+            }
+        }
+
+        // Inform the manager that shutdown for this shard has finished.
+        if let Err(why) = self.manager_tx.send(ShardManagerMessage::ShutdownFinished(id)) {
+            warn!(
+                "[ShardRunner {:?}] Could not send ShutdownFinished: {:#?}",
+                self.shard.shard_info(),
+                why,
+            );
+        }
         false
     }
 
@@ -257,6 +282,11 @@ impl<H: EventHandler + Send + Sync + 'static,
                         true
                     },
                     ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated) => {
+                        // nb: not sent here
+
+                        true
+                    },
+                    ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
                         // nb: not sent here
 
                         true
