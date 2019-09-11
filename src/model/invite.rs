@@ -17,6 +17,7 @@ use crate::utils;
 use crate::cache::CacheRwLock;
 #[cfg(feature = "http")]
 use crate::http::Http;
+use std::ops::Deref;
 
 /// Information about an invite code.
 ///
@@ -54,6 +55,14 @@ pub struct Invite {
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Group`]: ../channel/struct.Group.html
     pub guild: Option<InviteGuild>,
+    /// A representation of the minimal amount of information needed about the
+    /// [`User`] that created the invite.
+    ///
+    /// This can be `None` for invites created by Discord such as invite-widgets
+    /// or vanity invite links.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    pub inviter: Option<InviteUser>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -176,6 +185,12 @@ impl Invite {
     /// #         "text_channel_count": 7,
     /// #         "voice_channel_count": 3,
     /// #     },
+    /// #     "inviter": {
+    /// #         "id": UserId(3),
+    /// #         "username": "foo",
+    /// #         "discriminator": "1234",
+    /// #         "avatar": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+    /// #     },
     /// # })).unwrap();
     /// #
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
@@ -184,7 +199,30 @@ impl Invite {
     pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
 }
 
-/// A minimal information about the channel an invite points to.
+/// A minimal amount of information about the inviter (person who created the invite).
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InviteUser {
+    pub id: UserId,
+    #[serde(rename = "username")] pub name: String,
+    #[serde(deserialize_with = "deserialize_u16")] pub discriminator: u16,
+    pub avatar: Option<String>,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
+}
+
+/// InviteUser implements a Deref to UserId so it gains the convenience methods
+/// for converting it into a [`User`] instance.
+///
+/// [`User`]: ../user/struct.User.html
+impl Deref for InviteUser {
+    type Target = UserId;
+
+    fn deref(&self) -> &Self::Target {
+        &self.id
+    }
+}
+
+/// A minimal amount of information about the channel an invite points to.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct InviteChannel {
     pub id: ChannelId,
