@@ -218,7 +218,7 @@ impl Deref for InviteUser {
     type Target = UserId;
 
     fn deref(&self) -> &Self::Target {
-        return &self.id
+        &self.id
     }
 }
 
