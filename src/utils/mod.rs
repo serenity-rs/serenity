@@ -64,7 +64,8 @@ pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
 ///
 /// # Examples
 ///
-/// Three formats of [invite][`RichInvite`] codes are supported:
+/// Two formats of [invite][`RichInvite`] codes are supported, both regardless of protocol prefix.
+/// Some examples:
 ///
 /// 1. Retrieving the code from the URL `"https://discord.gg/0cDvIgU2voY8RSYL"`:
 ///
@@ -76,34 +77,24 @@ pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// 2. Retrieving the code from the URL `"http://discord.gg/0cDvIgU2voY8RSYL"`:
+/// 2. Retrieving the code from the URL `"http://discordapp.com/invite/0cDvIgU2voY8RSYL"`:
 ///
 /// ```rust
 /// use serenity::utils;
 ///
-/// let url = "http://discord.gg/0cDvIgU2voY8RSYL";
-///
-/// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
-/// ```
-///
-/// 3. Retrieving the code from the URL `"discord.gg/0cDvIgU2voY8RSYL"`:
-///
-/// ```rust
-/// use serenity::utils;
-///
-/// let url = "discord.gg/0cDvIgU2voY8RSYL";
+/// let url = "http://discordapp.com/invite/0cDvIgU2voY8RSYL";
 ///
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
 /// [`RichInvite`]: ../model/invite/struct.RichInvite.html
 pub fn parse_invite(code: &str) -> &str {
-    if code.starts_with("https://discord.gg/") {
-        &code[19..]
-    } else if code.starts_with("http://discord.gg/") {
-        &code[18..]
-    } else if code.starts_with("discord.gg/") {
+    let code = code.trim_start_matches("http://").trim_start_matches("https://");
+    let lower = code.to_lowercase();
+    if lower.starts_with("discord.gg/") {
         &code[11..]
+    } else if lower.starts_with("discordapp.com/invite/") {
+        &code[22..]
     } else {
         code
     }
@@ -836,6 +827,10 @@ mod test {
         assert_eq!(parse_invite("https://discord.gg/abc"), "abc");
         assert_eq!(parse_invite("http://discord.gg/abc"), "abc");
         assert_eq!(parse_invite("discord.gg/abc"), "abc");
+        assert_eq!(parse_invite("DISCORD.GG/ABC"), "ABC");
+        assert_eq!(parse_invite("https://discordapp.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("http://discordapp.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("discordapp.com/invite/abc"), "abc");
     }
 
     #[test]
