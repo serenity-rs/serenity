@@ -41,7 +41,7 @@
 
 pub use super::routing::Route;
 
-use chrono::{DateTime, Utc};
+use chrono::Utc;
 use reqwest::{
     Client,
     Response,
@@ -52,12 +52,12 @@ use crate::internal::prelude::*;
 use parking_lot::{Mutex, RwLock};
 use std::{
     collections::HashMap,
-    sync::{
-        atomic::{AtomicI64, Ordering},
-        Arc,
+    sync::Arc,
+    str::{
+        self,
+        FromStr,
     },
     time::Duration,
-    str,
     thread,
     i64,
     u64,
@@ -83,16 +83,6 @@ use log::debug;
 pub struct Ratelimiter {
     client: Arc<Client>,
     global: Arc<Mutex<()>>,
-    /// Refer to [`offset`].
-    ///
-    /// We do a small hacky thing here to keep this as an atomic rather than
-    /// wrapping it in an option. i64::MAX in this context means that no offset
-    /// has been calculated.
-    ///
-    /// [`offset`]: #method.offset
-    // We will probably start loading values into this more often than just once
-    // in the future, so let's future-proof a bit.
-    offset: AtomicI64,
     // When futures is implemented, make tasks clear out their respective entry
     // when the 'reset' passes.
     routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
@@ -113,43 +103,9 @@ impl Ratelimiter {
         Self {
             client,
             global: Default::default(),
-            offset: AtomicI64::new(i64::MAX),
             routes: Default::default(),
             token,
         }
-    }
-
-    /// The calculated offset of the time difference between Discord and the
-    /// client in seconds.
-    ///
-    /// This does not have millisecond precision as calculating that isn't
-    /// realistic.
-    ///
-    /// This is used in ratelimiting to help determine how long to wait for
-    /// pre-emptive ratelimits. For example, if the client is 2 seconds ahead,
-    /// then the client would think the ratelimit is over 2 seconds before it
-    /// actually is and would then send off queued requests. Using an offset, we
-    /// can know that there's actually still 2 seconds left
-    /// (+/- some milliseconds).
-    ///
-    /// This isn't a definitive solution to fix all problems, but it can help
-    /// with some precision gains.
-    ///
-    /// This will return `None` if an HTTP request hasn't been made, meaning
-    /// that no offset could have been calculated.
-    pub fn offset(&self) -> Option<i64> {
-        let offset = self.offset.load(Ordering::Relaxed);
-
-        // Refer to documentation for the structfield.
-        if offset == i64::MAX {
-            None
-        } else {
-            Some(offset)
-        }
-    }
-
-    fn set_offset(&self, new_offset: i64) {
-        self.offset.store(new_offset, Ordering::Release);
     }
 
     /// The routes mutex is a HashMap of each [`Route`] and their respective
@@ -211,29 +167,10 @@ impl Ratelimiter {
                 .entry(route)
                 .or_default());
 
-            bucket.lock().pre_hook(&route, self.offset());
+            bucket.lock().pre_hook(&route);
 
             let request = req.build(&self.client, &self.token)?;
             let response = request.send()?;
-
-            // Check if an offset has been calculated yet to determine the time
-            // difference from Discord can the client.
-            //
-            // Refer to the documentation for `OFFSET` for more information.
-            //
-            // This should probably only be a one-time check, although we may
-            // want to choose to check this often in the future.
-            if self.offset().is_none() {
-                let date_header = response.headers()
-                    .get("date")
-                    .and_then(|d| Some(d.as_bytes()));
-
-                if let Some(offset) = calculate_offset(&date_header) {
-                    self.set_offset(offset);
-
-                    debug!("[ratelimiting] Set the ratelimit offset to {}", offset);
-                }
-            }
 
             // Check if the request got ratelimited by checking for status 429,
             // and if so, sleep for the value of the header 'retry-after' -
@@ -242,8 +179,8 @@ impl Ratelimiter {
             // If it didn't ratelimit, subtract one from the Ratelimit's
             // 'remaining'
             //
-            // Update the 'reset' with the value of the 'x-ratelimit-reset'
-            // header
+            // Update `reset` with the value of 'x-ratelimit-reset' header.
+            // Similarly, update `reset-after` with the 'x-ratelimit-reset-after' header.
             //
             // It _may_ be possible for the limit to be raised at any time,
             // so check if it did from the value of the 'x-ratelimit-limit'
@@ -255,9 +192,9 @@ impl Ratelimiter {
                     let _ = self.global.lock();
 
                     Ok(
-                        if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
+                        if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
                             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                            thread::sleep(Duration::from_millis(retry_after as u64));
+                            thread::sleep(Duration::from_millis(retry_after));
 
                             true
                         } else {
@@ -293,42 +230,47 @@ pub struct Ratelimit {
     limit: i64,
     /// The number of requests remaining in the period of time.
     remaining: i64,
-    /// When the interval resets and the the [`limit`] resets to the value of
-    /// [`remaining`].
-    ///
-    /// [`limit`]: #structfield.limit
-    /// [`remaining`]: #structfield.remaining
+    /// The absolute time in milliseconds when the interval resets.
     reset: i64,
+    /// The total time in milliseconds when the interval resets.
+    reset_after: i64,
 }
 
 impl Ratelimit {
-    pub fn pre_hook(&mut self, route: &Route, offset: Option<i64>) {
+    #[cfg(feature = "absolute_ratelimits")]
+    fn get_delay(&self) -> i64 {
+        let now = Utc::now().timestamp_millis();
+        self.reset - now
+    }
+
+    #[cfg(not(feature = "absolute_ratelimits"))]
+    fn get_delay(&self) -> i64 {
+        self.reset_after
+    }
+
+    pub fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
         }
 
-        let offset = offset.unwrap_or(0);
-        let now = Utc::now().timestamp();
-        let current_time = now - offset;
+		let delay = self.get_delay();
 
-        // The reset was in the past, so we're probably good.
-        if current_time > self.reset() {
-            self.remaining = self.limit;
+		if delay < 0 {
+			// We're probably in the past.
+			self.remaining = self.limit;
 
-            return;
-        }
-
-        let diff = (self.reset() - current_time) as u64;
+			return;
+		}
 
         if self.remaining() == 0 {
-            let delay = diff * 1000;
+            let delay = delay as u64;
 
             debug!(
                 "Pre-emptive ratelimit on route {:?} for {:?}ms",
                 route,
                 delay,
             );
-			
+
             thread::sleep(Duration::from_millis(delay));
 
             return;
@@ -346,15 +288,19 @@ impl Ratelimit {
             self.remaining = remaining;
         }
 
-        if let Some(reset) = parse_header(&response.headers(), "x-ratelimit-reset")? {
-            self.reset = reset;
+        if let Some(reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
+            self.reset = (reset * 1000f64) as i64;
+        }
+
+        if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
+            self.reset_after = (reset_after * 1000f64) as i64;
         }
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
-        } else if let Some(retry_after) = parse_header(&response.headers(), "retry-after")? {
+        } else if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            thread::sleep(Duration::from_millis(retry_after as u64));
+            thread::sleep(Duration::from_millis(retry_after));
 
             true
         } else {
@@ -374,14 +320,16 @@ impl Ratelimit {
         self.remaining
     }
 
-    /// When the interval resets and the the [`limit`] resets to the value of
-    /// [`remaining`].
-    ///
-    /// [`limit`]: #method.limit
-    /// [`remaining`]: #method.remaining
+    /// The absolute time in milliseconds when the interval resets.
     #[inline]
     pub fn reset(&self) -> i64 {
         self.reset
+    }
+
+    /// The total time in milliseconds when the interval resets.
+    #[inline]
+    pub fn reset_after(&self) -> i64 {
+        self.reset_after
     }
 }
 
@@ -391,6 +339,7 @@ impl Default for Ratelimit {
             limit: i64::MAX,
             remaining: i64::MAX,
             reset: i64::MAX,
+            reset_after: i64::MAX,
         }
     }
 }
@@ -411,33 +360,7 @@ impl<'a> From<Request<'a>> for RatelimitedRequest<'a> {
     }
 }
 
-fn calculate_offset(header: &Option<&[u8]>) -> Option<i64> {
-    // Get the current time as soon as possible.
-    let now = Utc::now().timestamp();
-
-    let header = header.and_then(|x| str::from_utf8(x).ok());
-
-    if let Some(header) = header {
-        // Replace the `GMT` timezone with an offset, and then parse it
-        // into a chrono DateTime. If it parses correctly, calculate the
-        // diff and then set it as the offset.
-        let s = header.replace("GMT", "+0000");
-
-        let parsed = DateTime::parse_from_str(&s, "%a, %d %b %Y %T %z");
-
-        if let Ok(parsed) = parsed {
-            let offset = parsed.timestamp();
-
-            let diff = offset - now;
-
-            return Some(diff);
-        }
-    }
-
-    None
-}
-
-fn parse_header(headers: &HeaderMap, header: &str) -> Result<Option<i64>> {
+fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<T>> {
     let header = match headers.get(header) {
         Some(v) => v,
         None => return Ok(None),
@@ -448,7 +371,7 @@ fn parse_header(headers: &HeaderMap, header: &str) -> Result<Option<i64>> {
     })?;
 
     let num = unicode.parse().map_err(|_| {
-        Error::from(HttpError::RateLimitI64)
+        Error::from(HttpError::RateLimitI64F64)
     })?;
 
     Ok(Some(num))
@@ -481,7 +404,7 @@ mod tests {
             ),
             (
                 HeaderName::from_static("x-ratelimit-reset"),
-                HeaderValue::from_static("1560704880"),
+                HeaderValue::from_static("1560704880.423"),
             ),
             (
                 HeaderName::from_static("x-bad-num"),
@@ -506,14 +429,14 @@ mod tests {
     fn test_parse_header_good() -> Result<()> {
         let headers = headers();
 
-        assert_eq!(parse_header(&headers, "x-ratelimit-limit")?.unwrap(), 5);
+        assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-limit")?.unwrap(), 5);
         assert_eq!(
-            parse_header(&headers, "x-ratelimit-remaining")?.unwrap(),
+            parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(),
             4,
         );
         assert_eq!(
-            parse_header(&headers, "x-ratelimit-reset")?.unwrap(),
-            1_560_704_880,
+            parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(),
+            1_560_704_880.423,
         );
 
         Ok(())
@@ -523,15 +446,15 @@ mod tests {
     fn test_parse_header_errors() -> Result<()> {
         let headers = headers();
 
-        match parse_header(&headers, "x-bad-num").unwrap_err() {
+        match parse_header::<i64>(&headers, "x-bad-num").unwrap_err() {
             Error::Http(x) => match *x {
-                HttpError::RateLimitI64 => assert!(true),
+                HttpError::RateLimitI64F64 => assert!(true),
                 _ => assert!(false),
             },
             _ => assert!(false),
         }
 
-        match parse_header(&headers, "x-bad-unicode").unwrap_err() {
+        match parse_header::<i64>(&headers, "x-bad-unicode").unwrap_err() {
             Error::Http(http_err) => match *http_err {
                 HttpError::RateLimitUtf8 => assert!(true),
                 _ => assert!(false),

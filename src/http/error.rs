@@ -56,8 +56,8 @@ pub enum Error {
     /// When a non-successful status code was received for a request.
     UnsuccessfulRequest(ErrorResponse),
     /// When the decoding of a ratelimit header could not be properly decoded
-    /// into an `i64`.
-    RateLimitI64,
+    /// into an `i64` or `f64`.
+    RateLimitI64F64,
     /// When the decoding of a ratelimit header could not be properly decoded
     /// from UTF-8.
     RateLimitUtf8,
@@ -97,7 +97,7 @@ impl StdError for Error {
     fn description(&self) -> &str {
         match self {
             Error::UnsuccessfulRequest(ref e) => &e.error.message,
-            Error::RateLimitI64 => "Error decoding a header into an i64",
+            Error::RateLimitI64F64 => "Error decoding a header into an i64 or f64",
             Error::RateLimitUtf8 => "Error decoding a header from UTF-8",
             Error::Url(_) => "Provided URL is incorrect.",
             Error::InvalidHeader(_) => "Provided value is an invalid header value.",
