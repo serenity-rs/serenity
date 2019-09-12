@@ -86,6 +86,7 @@ impl<'a> Request<'a> {
             HeaderValue::from_str(&token).map_err(HttpError::InvalidHeader)?);
         headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
         headers.insert(CONTENT_LENGTH, HeaderValue::from_static(&"0"));
+        headers.insert("X-Ratelimit-Precision", HeaderValue::from_static("millisecond"));
 
         if let Some(ref request_headers) = request_headers {
             headers.extend(request_headers.clone());
