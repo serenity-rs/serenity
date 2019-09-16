@@ -7,10 +7,6 @@
 //! allows data to be "corrupted", and _may or may not_ cause misfunctions
 //! within the library. Mutate data at your own discretion.
 //!
-//! A "globally available" instance of the Cache is available at
-//! [`CACHE`]. This is the instance that is updated by the library,
-//! meaning you should _not_ need to maintain updating it yourself in any case.
-//!
 //! # Use by Models
 //!
 //! Most models of Discord objects, such as the [`Message`], [`GuildChannel`],
@@ -39,7 +35,6 @@
 //! [`Message`]: ../model/channel/struct.Message.html
 //! [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 //! [`Role`]: ../model/guild/struct.Role.html
-//! [`CACHE`]: ../struct.CACHE.html
 //! [`http`]: ../http/index.html
 
 use std::str::FromStr;
