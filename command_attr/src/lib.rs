@@ -74,8 +74,8 @@ macro_rules! match_options {
 /// | `#[help_available]` </br> `#[help_available(b)]`                             | If the command should be displayed in the help message.                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |
 /// | `#[only_in(ctx)]`                                                            | Which environment the command can be executed in.                                                        | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/`dms` (Direct Message).                                                                                                                                     |
 /// | `#[bucket(name)]` </br> `#[bucket = name]`                                   | What bucket will impact this command.                                                                    | `name` is a string containing the bucket's name.</br> Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket) for its usage. |
-/// | `#[owners_only]` </br> `#[owners_only(b)]`                                   | If this command is exclusive to owners.                                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `false`.                                                                                                                                                 |
-/// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`                           | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `false`.                                                                                                                                                 |
+/// | `#[owners_only]` </br> `#[owners_only(b)]`                                   | If this command is exclusive to owners.                                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                 |
+/// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`                           | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                 |
 /// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |
 ///
 /// # Notes
@@ -584,45 +584,19 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 ///
 /// These appear after `#[group]` as a series of attributes:
 ///
-/// - `#[prefixes("foo", "bar", "baz")]`
-/// The group's prefixes.
-///
-/// - `#[allowed_roles("foo", "bar", "baz")]`
-/// Only which roles may execute this group's commands.
-///
-/// - `#[only_in(guilds/dms))]`
-/// Whether this group's commands are restricted to `guilds` or `dms`.
-///
-/// - `#[owners_only(true/false)]`
-/// If only the owners of the bot may execute this group's commands.
-///
-/// - `#[owner_privilege(true/false)]`
-/// Whether the owners should be treated as normal users.
-///
-/// Default value is `true`
-///
-/// - `#[help_available(true/false)]`
-/// Whether the group is visible to the help command.
-///
-/// Default value is `true`
-///
-/// - `#[checks(foo, bar, baz)]`
-/// A set of preconditions that must be met before a group command's execution.
-/// Refer to [`command`]'s `checks` documentation.
-///
-/// - `#[required_permissions(foo, bar, baz)]`
-/// A set of permissions needed by the user before a group command's execution.
-///
-/// - `#[default_command(foobar_baz)]`
-/// Command to be executed if none of the group's prefixes are given.
-/// Identifier must refer to a `#[command]`'d function.
-///
-/// - `#[prefix("...")]`/`#[prefix = "..."]`
-/// Assign a single prefix to this group.
-///
-/// - `#[description("...")]`/`#[description = "..."]`
-/// The description of the group.
-/// Used in the help command.
+/// | Syntax                                               | Description                                                                        | Argument explanation                                                                                                                                                                 |
+/// |------------------------------------------------------|------------------------------------------------------------------------------------| -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|
+/// | `#[prefixes(prefs)]`                                 | Text that must appear   before an invocation of a command of this group may occur. | `prefs` is a comma separated list of strings                                                                                                                                         |
+/// | `#[prefix(pref)]`                                    | Assign just a single prefix.                                                       | `pref` is a string                                                                                                                                                                   |
+/// | `#[allowed_roles(roles)]`                            | Set of roles the user must possess                                                 | `roles` is a comma separated list of strings containing role names                                                                                                                   |
+/// | `#[only_in(ctx)]`                                    | Which environment the command can be executed in.                                  | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/ `dms` (Direct Message).                                                                                        |
+/// | `#[owners_only]` </br> `#[owners_only(b)]`           | If this command is exclusive to owners.                                            | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[owner_privilege]` </br> `#[owner_privlege(b)]`    | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[help_available]` </br> `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[checks(identifiers)]`                             | Preconditions that must met before the command's execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |
+/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discordapp.com/developers/docs/topics/permissions).     |
+/// | `#[default_command(cmd)]`                            | A command to execute if none of the group's prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |
+/// | `#[description(desc)]` </br> `#[description = desc]` | The group's description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |
 ///
 /// Similarly to [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the name of the struct to differentiate
@@ -631,6 +605,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// It may also be passed as an argument to the macro. For example: `#[group("Banana Phone")]`.
 ///
 /// [`command`]: #fn.command.html
+
 #[proc_macro_attribute]
 pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let group = parse_macro_input!(input as GroupStruct);
