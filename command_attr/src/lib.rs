@@ -45,76 +45,38 @@ macro_rules! match_options {
 
 /// The heart of the attribute-based framework.
 ///
-/// This is a function attribute macro; if you attempt to use this on other Rust constructs, it won't work.
+/// This is a function attribute macro. Using this on other Rust constructs won't work.
 ///
-/// # Options
+/// ## Options
 ///
 /// To alter how the framework will interpret the command,
 /// you can provide options as attributes following this `#[command]` macro.
 ///
 /// Each option has its own kind of data to stock and manipulate with.
 /// They're given to the option either with the `#[option(...)]` or `#[option = ...]` syntaxes.
-/// If an option doesn't require for any data to be supplied, then it's simply `#[option]`.
+/// If an option doesn't require for any data to be supplied, then it's simply an empty `#[option]`.
 ///
 /// If the input to the option is malformed, the macro will give you can error, describing
 /// the correct method for passing data, and what it should be.
 ///
 /// The list of available options, is, as follows:
 ///
-/// - `#[checks(idents)]`
-/// Preconditions that must be met. Executed before the command's execution.
-/// `idents` is a list of identifiers, seperated by a comma, referencing functions of the declaration:
-/// `fn(&mut Context, &Message, &mut Args, &CommandOptions) -> serenity::framework::standard::CheckResult`
-///
-/// - `#[aliases(names)]`
-/// A list of other names that can be used to execute this command.
-/// In `serenity::framework::standard::CommandOptions`, these are put in the `names` field, right after the command's name.
-///
-/// - `#[description(desc)]`/`#[description = desc]`
-/// A summary of the command.
-///
-/// - `#[usage(usg)]`/`#[usage = usg]`
-/// Usage schema of the command.
-///
-/// - `#[example(ex)]`/`#[example = ex]`
-/// Example of the command's usage.
-///
-/// - `#[min_args(min)]`, `#[max_args(max)]`, `#[num_args(min_and_max)]`
-/// The minimum and/or maximum amount of arguments that the command should/can receive.
-///
-/// `num_args` is a helper attribute, serving as a shorthand for calling
-/// `min_args` and `max_args` with the same amount of arguments.
-///
-/// - `#[required_permissions(perms)]`
-/// A list of permissions that the user must have.
-/// Refer to [Discord's offical documentation about available permissions](https://discordapp.com/developers/docs/topics/permissions).
-///
-/// - `#[allowed_roles(roles)]`
-/// A list of strings (role names), seperated by a comma,
-/// stating that only members of certain roles can execute this command.
-///
-/// - `#[help_available]`/`#[help_available(bool)]`
-/// Whether this command should be displayed in the help message.
-///
-/// - `#[only_in(context)]`
-/// Which context the command can only be executed in.
-///
-/// `context` can be of "guilds" or "dms" (direct messages).
-///
-/// - `#[bucket(name)]`/`#[bucket = name]`
-/// What bucket should impact this command.
-/// Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket)
-/// for its usage.
-///
-/// - `#[owners_only]`/`#[owners_only(bool)]`
-/// Whether this command is exclusive to owners.
-///
-/// - `#[owner_privilege]`/`#[owner_privilege]`
-/// Whether this command has a privilege for owners (i.e certain options are ignored for them).
-///
-/// - `#[sub_commands(commands)]`
-/// A list of command names, separated by a comma, stating the subcommands of this command.
-/// These are executed in the form: `this-command sub-command`
+/// | Syntax                                                                       | Description                                                                                              | Argument explanation                                                                                                                                                                                                             |
+/// | ---------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+/// | `#[checks(identifiers)]`                                                     | Preconditions that must met before the command's execution.                                              | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                                                                      |
+/// | `#[aliases(names)]`                                                          | Alternative names to refer to this command.                                                              | `names` is a comma separate list of desired aliases.                                                                                                                                                                             |
+/// | `#[description(desc)]` </br> `#[description = desc]`                         | The command's description or summary.                                                                    | `desc` is a string describing the command.                                                                                                                                                                                       |
+/// | `#[usage(use)]` </br> `#[usage = use]`                                       | The command's intended usage.                                                                            | `use` is a string stating the schema for the command's usage.                                                                                                                                                                    |
+/// | `#[example(ex)]` </br> `#[example = ex]`                                     | An example of the command's usage. May be called multiple times to add many examples at once.            | `ex` is a string                                                                                                                                                                                                                 |
+/// | `#[min_args(min)]` </br> `#[max_args(max)]` </br> `#[num_args(min_and_max)]` | The expected length of arguments that the command must receive in order to function correctly.           | `min`, `max` and `min_and_max` are 16-bit, unsigned integers.                                                                                                                                                                    |
+/// | `#[required_permissions(perms)]`                                             | Set of permissions the user must possess.                                                                | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discordapp.com/developers/docs/topics/permissions).                                                 |
+/// | `#[allowed_roles(roles)]`                                                    | Set of roles the user must possess.                                                                      | `roles` is a comma separated list of role names.                                                                                                                                                                                 |
+/// | `#[help_available]` </br> `#[help_available(b)]`                             | If the command should be displayed in the help message.                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                  |
+/// | `#[only_in(ctx)]`                                                            | Which environment the command can be executed in.                                                        | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/`dms` (Direct Message).                                                                                                                                     |
+/// | `#[bucket(name)]` </br> `#[bucket = name]`                                   | What bucket will impact this command.                                                                    | `name` is a string containing the bucket's name.</br> Refer to [the bucket example in the standard framework](https://docs.rs/serenity/*/serenity/framework/standard/struct.StandardFramework.html#method.bucket) for its usage. |
+/// | `#[owners_only]` </br> `#[owners_only(b)]`                                   | If this command is exclusive to owners.                                                                  | `b` is a boolean. If no boolean is provided, the value is assumed to be `false`.                                                                                                                                                 |
+/// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`                           | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `false`.                                                                                                                                                 |
+/// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |
 ///
 /// # Notes
 /// The name of the command is parsed from the applied function,
@@ -731,7 +693,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let default_command = default_command.map(|ident| {
 		let i = ident.with_suffix(COMMAND);
-		
+
 		quote!(&#i)
 	});
 
