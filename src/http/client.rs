@@ -1456,16 +1456,16 @@ impl Http {
         for file in files {
 
             match file.into() {
-                AttachmentType::Bytes((bytes, filename)) => {
+                AttachmentType::Bytes{ data, filename } => {
                     multipart = multipart
-                        .part(file_num.to_string(), Part::bytes(bytes.to_vec())
-                            .file_name(filename.to_string()));
+                        .part(file_num.to_string(), Part::bytes(data.into_owned())
+                            .file_name(filename));
                 },
-                AttachmentType::File((file, filename)) => {
+                AttachmentType::File{ file, filename } => {
                     multipart = multipart
                         .part(file_num.to_string(),
                             Part::reader(file.try_clone()?)
-                                .file_name(filename.to_string()));
+                                .file_name(filename));
                 },
                 AttachmentType::Path(path) => {
                     multipart = multipart
