@@ -205,8 +205,8 @@ pub enum AttachmentType<'a> {
     __Nonexhaustive,
 }
 
-impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &'a str)) -> AttachmentType<'_> { AttachmentType::Bytes{ data: Cow::Borrowed(params.0), filename: params.1.to_string() } }
+impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
+    fn from(params: (&'a [u8], &str)) -> AttachmentType<'a> { AttachmentType::Bytes{ data: Cow::Borrowed(params.0), filename: params.1.to_string() } }
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
@@ -223,8 +223,8 @@ impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
     fn from(pathbuf: &'a PathBuf) -> AttachmentType<'_> { AttachmentType::Path(pathbuf.as_path()) }
 }
 
-impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> { AttachmentType::File{ file: f.0, filename: f.1.to_string() } }
+impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
+    fn from(f: (&'a File, &str)) -> AttachmentType<'a> { AttachmentType::File{ file: f.0, filename: f.1.to_string() } }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]
