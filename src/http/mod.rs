@@ -38,6 +38,7 @@ use reqwest::Method;
 use crate::model::prelude::*;
 use self::request::Request;
 use std::{
+    borrow::Cow,
     fs::File,
     path::{Path, PathBuf},
 };
@@ -195,17 +196,17 @@ impl LightMethod {
 #[derive(Clone, Debug)]
 pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a byte slice with a filename.
-    Bytes((&'a [u8], &'a str)),
+    Bytes{ data: Cow<'a, [u8]>, filename: String } ,
     /// Indicates that the `AttachmentType` is a `File`
-    File((&'a File, &'a str)),
+    File{ file: &'a File, filename: String },
     /// Indicates that the `AttachmentType` is a `Path`
     Path(&'a Path),
     #[doc(hidden)]
     __Nonexhaustive,
 }
 
-impl<'a> From<(&'a [u8], &'a str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &'a str)) -> AttachmentType<'_> { AttachmentType::Bytes(params) }
+impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
+    fn from(params: (&'a [u8], &str)) -> AttachmentType<'a> { AttachmentType::Bytes{ data: Cow::Borrowed(params.0), filename: params.1.to_string() } }
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
@@ -222,8 +223,8 @@ impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
     fn from(pathbuf: &'a PathBuf) -> AttachmentType<'_> { AttachmentType::Path(pathbuf.as_path()) }
 }
 
-impl<'a> From<(&'a File, &'a str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &'a str)) -> AttachmentType<'a> { AttachmentType::File((f.0, f.1)) }
+impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
+    fn from(f: (&'a File, &str)) -> AttachmentType<'a> { AttachmentType::File{ file: f.0, filename: f.1.to_string() } }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]
