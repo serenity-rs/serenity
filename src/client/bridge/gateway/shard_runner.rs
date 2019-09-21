@@ -38,11 +38,10 @@ use log::{error, debug, warn};
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
 /// [`Shard`]: ../../../gateway/struct.Shard.html
-pub struct ShardRunner<H: EventHandler + Send + Sync + 'static,
-                       RH: RawEventHandler + Send + Sync + 'static> {
+pub struct ShardRunner {
     data: Arc<RwLock<ShareMap>>,
-    event_handler: Option<Arc<H>>,
-    raw_event_handler: Option<Arc<RH>>,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     manager_tx: Sender<ShardManagerMessage>,
@@ -57,10 +56,9 @@ pub struct ShardRunner<H: EventHandler + Send + Sync + 'static,
     cache_and_http: Arc<CacheAndHttp>,
 }
 
-impl<H: EventHandler + Send + Sync + 'static,
-     RH: RawEventHandler + Send + Sync + 'static> ShardRunner<H, RH> {
+impl ShardRunner {
     /// Creates a new runner for a Shard.
-    pub fn new(opt: ShardRunnerOptions<H, RH>) -> Self {
+    pub fn new(opt: ShardRunnerOptions) -> Self {
         let (tx, rx) = mpsc::channel();
 
         Self {
@@ -531,11 +529,10 @@ impl<H: EventHandler + Send + Sync + 'static,
 /// Options to be passed to [`ShardRunner::new`].
 ///
 /// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
-pub struct ShardRunnerOptions<H: EventHandler + Send + Sync + 'static,
-                              RH: RawEventHandler + Send  + Sync + 'static> {
+pub struct ShardRunnerOptions {
     pub data: Arc<RwLock<ShareMap>>,
-    pub event_handler: Option<Arc<H>>,
-    pub raw_event_handler: Option<Arc<RH>>,
+    pub event_handler: Option<Arc<dyn EventHandler>>,
+    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     pub manager_tx: Sender<ShardManagerMessage>,
