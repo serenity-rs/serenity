@@ -105,14 +105,12 @@ pub(crate) enum DispatchEvent {
 
 #[cfg(feature = "framework")]
 #[allow(clippy::too_many_arguments)]
-#[allow(clippy::too_many_arguments)]
-pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
-                       RH: RawEventHandler + Send + Sync + 'static>(
+pub(crate) fn dispatch(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     data: &Arc<RwLock<ShareMap>>,
-    event_handler: &Option<Arc<H>>,
-    raw_event_handler: &Option<Arc<RH>>,
+    event_handler: &Option<Arc<dyn EventHandler>>,
+    raw_event_handler: &Option<Arc<dyn RawEventHandler>>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
@@ -179,7 +177,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                     dispatch(DispatchEvent::Model(e.clone()),
                              framework,
                              data,
-                             &None::<Arc<H>>,
+                             &None,
                              raw_event_handler,
                              runner_tx,
                              threadpool,
@@ -190,7 +188,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                      framework,
                      data,
                      event_handler,
-                     &None::<Arc<RH>>,
+                     &None,
                      runner_tx,
                      threadpool,
                      shard_id,
@@ -200,12 +198,11 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
 }
 
 #[cfg(not(feature = "framework"))]
-pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
-                       RH: RawEventHandler + Send + Sync + 'static>(
+pub(crate) fn dispatch(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
-    event_handler: &Option<Arc<H>>,
-    raw_event_handler: &Option<Arc<RH>>,
+    event_handler: &Option<Arc<dyn EventHandler>>,
+    raw_event_handler: &Option<Arc<dyn RawEventHandler>>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
@@ -272,7 +269,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
                 DispatchEvent::Model(ref e) =>
                     dispatch(DispatchEvent::Model(e.clone()),
                              data,
-                             &None::<Arc<H>>,
+                             &None,
                              raw_event_handler,
                              runner_tx,
                              threadpool,
@@ -283,7 +280,7 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
             dispatch(event,
                      data,
                      event_handler,
-                     &None::<Arc<RH>>,
+                     &None,
                      runner_tx,
                      threadpool,
                      shard_id,
@@ -292,12 +289,12 @@ pub(crate) fn dispatch<H: EventHandler + Send + Sync + 'static,
     };
 }
 
-fn dispatch_message<H>(
+fn dispatch_message(
     context: Context,
     mut message: Message,
-    event_handler: &Arc<H>,
+    event_handler: &Arc<dyn EventHandler>,
     threadpool: &ThreadPool,
-) where H: EventHandler + Send + Sync + 'static {
+) {
     #[cfg(feature = "model")]
     {
         message.transform_content();
@@ -311,10 +308,10 @@ fn dispatch_message<H>(
 }
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::too_many_arguments)]
-fn handle_event<H: EventHandler + Send + Sync + 'static>(
+fn handle_event(
     event: DispatchEvent,
     data: &Arc<RwLock<ShareMap>>,
-    event_handler: &Arc<H>,
+    event_handler: &Arc<dyn EventHandler>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
     shard_id: u64,
