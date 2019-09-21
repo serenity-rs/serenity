@@ -336,16 +336,14 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
-    pub fn new<H>(token: impl AsRef<str>, handler: H) -> Result<Self>
-        where H: EventHandler + Send + Sync + 'static {
-
+    pub fn new<H: EventHandler + 'static>(token: impl AsRef<str>, handler: H) -> Result<Self> {
         Self::new_with_handlers(token.as_ref(), Some(handler), None::<DummyRawEventHandler>)
     }
     /// Creates a client with an optional Handler. If you pass `None`, events are never parsed, but
     /// they can be received by registering a RawHandler.
     pub fn new_with_handlers<H, RH>(token: impl AsRef<str>, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
-        where H: EventHandler + Send + Sync + 'static,
-              RH: RawEventHandler + Send + Sync + 'static {
+        where H: EventHandler + 'static, RH: RawEventHandler + 'static
+    {
         let token = token.as_ref().trim();
 
         let token = if token.starts_with("Bot ") {
@@ -360,8 +358,8 @@ impl Client {
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
-        let event_handler = handler.map(Arc::new);
-        let raw_event_handler = raw_handler.map(Arc::new);
+        let event_handler = handler.map(|eh| Arc::new(eh) as Arc<dyn EventHandler>);
+        let raw_event_handler = raw_handler.map(|rh| Arc::new(rh) as Arc<dyn RawEventHandler>);
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));
@@ -449,7 +447,8 @@ impl Client {
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn new_with_cache_update_timeout<H>(token: impl AsRef<str>, handler: H, duration: Option<Duration>) -> Result<Self>
-        where H: EventHandler + Send + Sync + 'static {
+        where H: EventHandler + 'static
+    {
         let token = token.as_ref().trim();
 
         let token = if token.starts_with("Bot ") {
@@ -464,7 +463,7 @@ impl Client {
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
         let data = Arc::new(RwLock::new(ShareMap::custom()));
-        let event_handler = Some(Arc::new(handler));
+        let event_handler = Some(Arc::new(handler) as Arc<dyn EventHandler>);
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));
@@ -486,7 +485,7 @@ impl Client {
             ShardManager::new(ShardManagerOptions {
                 data: &data,
                 event_handler: &event_handler,
-                raw_event_handler: &None::<Arc<DummyRawEventHandler>>,
+                raw_event_handler: &None,
                 #[cfg(feature = "framework")]
                 framework: &framework,
                 shard_index: 0,
