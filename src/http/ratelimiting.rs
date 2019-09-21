@@ -41,7 +41,6 @@
 
 pub use super::routing::Route;
 
-use chrono::Utc;
 use reqwest::{
     Client,
     Response,
