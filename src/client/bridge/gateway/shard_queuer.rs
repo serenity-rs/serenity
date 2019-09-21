@@ -42,8 +42,7 @@ const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 /// A shard queuer instance _should_ be run in its own thread, due to the
 /// blocking nature of the loop itself as well as a 5 second thread sleep
 /// between shard starts.
-pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static,
-                       RH: RawEventHandler + Send + Sync + 'static> {
+pub struct ShardQueuer {
     /// A copy of [`Client::data`] to be given to runners for contextual
     /// dispatching.
     ///
@@ -53,12 +52,12 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static,
     /// [`Client`].
     ///
     /// [`Client`]: ../../struct.Client.html
-    pub event_handler: Option<Arc<H>>,
+    pub event_handler: Option<Arc<dyn EventHandler>>,
     /// A reference to an `RawEventHandler`, such as the one given to the
     /// [`Client`].
     ///
     /// [`Client`]: ../../struct.Client.html
-    pub raw_event_handler: Option<Arc<RH>>,
+    pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
     pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
@@ -95,8 +94,7 @@ pub struct ShardQueuer<H: EventHandler + Send + Sync + 'static,
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 
-impl<H: EventHandler + Send + Sync + 'static,
-     RH: RawEventHandler + Send + Sync + 'static> ShardQueuer<H, RH> {
+impl ShardQueuer {
     /// Begins the shard queuer loop.
     ///
     /// This will loop over the internal [`rx`] for [`ShardQueuerMessage`]s,
