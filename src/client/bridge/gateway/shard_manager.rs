@@ -77,14 +77,14 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # let http = &cache_and_http.http;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
 /// let data = Arc::new(RwLock::new(ShareMap::custom()));
-/// let event_handler = Arc::new(Handler);
+/// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
 ///     event_handler: &Some(event_handler),
-///     raw_event_handler: &None::<Arc<Handler>>,
+///     raw_event_handler: &None,
 ///     framework: &framework,
 ///     // the shard index to start initiating from
 ///     shard_index: 0,
