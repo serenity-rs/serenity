@@ -9,7 +9,7 @@ use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 
 /// The core trait for handling events by serenity.
-pub trait EventHandler {
+pub trait EventHandler: Send + Sync {
     /// Dispatched when the cache has received and inserted all data from
     /// guilds.
     ///
@@ -314,7 +314,7 @@ pub trait EventHandler {
 }
 
 /// This core trait for handling raw events
-pub trait RawEventHandler {
+pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     fn raw_event(&self, _ctx: Context, _ev: Event) {}
 }
