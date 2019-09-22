@@ -9,12 +9,13 @@ use std::time::Duration;
 /// A builder to extra things for altering the [`Client`].
 ///
 /// [`Client`]: ../struct.Client.html
-#[derive(Clone, Default)]
+#[derive(Clone)]
 pub struct Extras {
     pub(crate) event_handler: Option<Arc<dyn EventHandler>>,
     pub(crate) raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "cache")]
     pub(crate) timeout: Option<Duration>,
+    pub(crate) guild_subscriptions: bool,
 }
 
 impl Extras {
@@ -48,6 +49,26 @@ impl Extras {
         self.timeout = Some(duration);
         self
     }
+
+    /// Set whether the library should subscribe for listening to presence and typing events.
+    ///
+    /// By default, this is `true`.
+    pub fn guild_subscriptions(&mut self, guild_subscriptions: bool) -> &mut Self {
+        self.guild_subscriptions = guild_subscriptions;
+        self
+    }
+}
+
+impl Default for Extras {
+    fn default() -> Self {
+        Extras {
+            event_handler: None,
+            raw_event_handler: None,
+            #[cfg(feature = "cache")]
+            timeout: None,
+            guild_subscriptions: true,
+        }
+    }
 }
 
 impl fmt::Debug for Extras {
@@ -63,8 +84,8 @@ impl fmt::Debug for Extras {
         ds.field("event_handler", &EventHandler);
         ds.field("raw_event_handler", &RawEventHandler);
         #[cfg(feature = "cache")]
-		ds.field("cache_update_timeout", &self.timeout);
+        ds.field("cache_update_timeout", &self.timeout);
 
-		ds.finish()
+        ds.finish()
     }
 }
