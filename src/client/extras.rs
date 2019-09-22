@@ -58,10 +58,13 @@ impl fmt::Debug for Extras {
         #[derive(Debug)]
         struct RawEventHandler;
 
-        f.debug_struct("Extras")
-            .field("event_handler", &EventHandler)
-            .field("raw_event_handler", &RawEventHandler)
-            .field("cache_update_timeout", &self.timeout)
-            .finish()
+        let mut ds = f.debug_struct("Extras");
+
+        ds.field("event_handler", &EventHandler);
+        ds.field("raw_event_handler", &RawEventHandler);
+        #[cfg(feature = "cache")]
+		ds.field("cache_update_timeout", &self.timeout);
+
+		ds.finish()
     }
 }
