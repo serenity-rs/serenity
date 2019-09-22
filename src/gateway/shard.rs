@@ -277,7 +277,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1]).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).unwrap();
     /// #
     /// use serenity::model::gateway::Activity;
     ///
@@ -328,7 +328,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1]).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
@@ -690,7 +690,7 @@ impl Shard {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -717,7 +717,7 @@ impl Shard {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
