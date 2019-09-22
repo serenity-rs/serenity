@@ -20,7 +20,7 @@ pub trait WebSocketGatewayClientExt {
     fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str)
+    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
         -> Result<()>;
 
     fn send_presence_update(
@@ -68,7 +68,7 @@ impl WebSocketGatewayClientExt for WsClient {
         })).map_err(From::from)
     }
 
-    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str)
+    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -77,6 +77,7 @@ impl WebSocketGatewayClientExt for WsClient {
             "d": {
                 "compression": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
+                "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,
                 "token": token,
                 "v": constants::GATEWAY_VERSION,

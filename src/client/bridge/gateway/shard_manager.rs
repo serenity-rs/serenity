@@ -97,6 +97,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
+///     guild_subscriptions: true,
 /// });
 /// #     Ok(())
 /// # }
@@ -156,6 +157,7 @@ impl ShardManager {
             voice_manager: Arc::clone(opt.voice_manager),
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
+            guild_subscriptions: opt.guild_subscriptions,
         };
 
         thread::spawn(move || {
@@ -385,4 +387,5 @@ pub struct ShardManagerOptions<'a> {
     pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
+    pub guild_subscriptions: bool,
 }
