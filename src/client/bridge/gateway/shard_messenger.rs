@@ -58,7 +58,7 @@ impl ShardMessenger {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -85,7 +85,7 @@ impl ShardMessenger {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -135,7 +135,7 @@ impl ShardMessenger {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// use serenity::model::gateway::Activity;
     ///
     /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
@@ -169,7 +169,7 @@ impl ShardMessenger {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// #
     /// use serenity::model::{Activity, OnlineStatus};
     ///
@@ -209,7 +209,7 @@ impl ShardMessenger {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1])?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
     /// #
     /// use serenity::model::user::OnlineStatus;
     ///
