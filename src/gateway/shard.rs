@@ -88,6 +88,7 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
+    guild_subscriptions: bool,
     /// Whether the shard has permanently shutdown.
     shutdown: bool,
     stage: ConnectionStage,
@@ -122,7 +123,7 @@ impl Shard {
     /// let token = env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway()?.url));
-    /// let shard = Shard::new(gateway, &token, [0, 1])?;
+    /// let shard = Shard::new(gateway, &token, [0, 1], true)?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -137,6 +138,7 @@ impl Shard {
         ws_url: Arc<Mutex<String>>,
         token: &str,
         shard_info: [u64; 2],
+        guild_subscriptions: bool,
     ) -> Result<Shard> {
         let mut client = connect(&*ws_url.lock())?;
 
@@ -166,6 +168,7 @@ impl Shard {
             token: token.to_string(),
             session_id,
             shard_info,
+            guild_subscriptions,
             ws_url,
         })
     }
@@ -753,7 +756,7 @@ impl Shard {
     // - the time that the last heartbeat sent as being now
     // - the `stage` to `Identifying`
     pub fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token)?;
+        self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions)?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
