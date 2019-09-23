@@ -1317,13 +1317,13 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
             let _ = writeln!(
                 result,
                 "**{}**: `{} {} {}`",
-                help_options.usage_label, first_prefix, command.name, example
+                help_options.usage_sample_label, first_prefix, command.name, example
             );
         } else {
             let _ = writeln!(
                 result,
                 "**{}**: `{} {}`",
-                help_options.usage_label, command.name, example
+                help_options.usage_sample_label, command.name, example
             );
         }
     }
