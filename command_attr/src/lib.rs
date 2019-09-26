@@ -78,6 +78,11 @@ macro_rules! match_options {
 /// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`                           | If owners can bypass certain options.                                                                    | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                                                                 |
 /// | `#[sub_commands(commands)]`                                                  | The sub or children commands of this command. They are executed in the form: `this-command sub-command`. | `commands` is a comma separated list of identifiers referencing functions marked by the `#[command]` macro.                                                                                                                      |
 ///
+/// Documentation comments (`///`) applied onto the function are interpreted as sugar for the
+/// `#[description]` option. When more than one application of the option is performed,
+/// the text is delimited by newlines. This mimics the behaviour of regular doc-comments,
+/// which are sugar for the `#[doc = "..."]` attribute.
+///
 /// # Notes
 /// The name of the command is parsed from the applied function,
 /// or may be specified inside the `#[command]` attribute, a lá `#[command("foobar")]`.
@@ -122,12 +127,22 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     .examples
                     .push(propagate_err!(attributes::parse(values)));
             }
+            "description" => {
+                let arg: String = propagate_err!(attributes::parse(values));
+
+                if let Some(desc) = &mut options.description.0 {
+                    use std::fmt::Write;
+
+                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
+                } else {
+                    options.description = AsOption(Some(arg));
+                }
+            }
             _ => {
                 match_options!(name, values, options, span => [
                     checks;
                     bucket;
                     aliases;
-                    description;
                     delimiters;
                     usage;
                     min_args;
@@ -562,6 +577,17 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
             "prefix" => {
                 options.prefixes = vec![propagate_err!(attributes::parse(values))];
             }
+            "description" => {
+                let arg: String = propagate_err!(attributes::parse(values));
+
+                if let Some(desc) = &mut options.description.0 {
+                    use std::fmt::Write;
+
+                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
+                } else {
+                    options.description = AsOption(Some(arg));
+                }
+            }
             _ => match_options!(name, values, options, span => [
                 prefixes;
                 only_in;
@@ -572,7 +598,6 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                 required_permissions;
                 checks;
                 default_command;
-                description;
                 commands;
                 sub_groups
             ]),
@@ -600,10 +625,10 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     let n = group.name.with_suffix(GROUP);
 
     let default_command = default_command.map(|ident| {
-		let i = ident.with_suffix(COMMAND);
+        let i = ident.with_suffix(COMMAND);
 
-		quote!(&#i)
-	});
+        quote!(&#i)
+    });
 
     let commands = commands
         .into_iter()
