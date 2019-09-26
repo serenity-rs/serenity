@@ -683,15 +683,13 @@ impl User {
                 #[cfg(feature = "cache")]
                 {
                     if let Some(cache) = cache_http.cache() {
-                        has_role = Some(
-                            cache.read()
+                        has_role = cache.read()
                             .guilds
                             .get(&guild_id)
-                            .map_or(false, |g| {
+                            .and_then(|g| {
                                 g.read().members.get(&self.id)
-                                    .map_or(false, |m| m.roles.contains(&role))
-                            })
-                        );
+                                    .and_then(|m| Some(m.roles.contains(&role)))
+                            });
                     }
                 }
 
