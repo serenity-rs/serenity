@@ -92,7 +92,7 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
 pub struct CommandFun {
     /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by `#[cfg(...)]` type of attributes.
+    /// Populated by `#[cfg(...)]` type attributes.
     pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
