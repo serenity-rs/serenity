@@ -7,7 +7,8 @@ use syn::{
     braced,
     parse::{Error, Parse, ParseStream, Result},
     spanned::Spanned,
-    Attribute, Block, FnArg, Ident, Pat, ReturnType, Stmt, Token, Type, Visibility,
+    Attribute, Block, FnArg, Ident, Pat, Path, PathSegment, ReturnType, Stmt, Token, Type,
+    Visibility,
 };
 
 #[derive(Debug, PartialEq)]
@@ -91,7 +92,7 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
 pub struct CommandFun {
     /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by either `#[cfg(...)]` or `#[doc = "..."]` (the desugared form of doc-comments) type of attributes.
+    /// Populated by `#[cfg(...)]` type attributes.
     pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
@@ -104,9 +105,18 @@ impl Parse for CommandFun {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let attributes = input.call(Attribute::parse_outer)?;
 
-        let (cooked, attributes): (Vec<_>, Vec<_>) = attributes
-            .into_iter()
-            .partition(|a| a.path.is_ident("cfg") || a.path.is_ident("doc"));
+        let (cooked, mut attributes): (Vec<_>, Vec<_>) =
+            attributes.into_iter().partition(|a| a.path.is_ident("cfg"));
+
+        for attr in &mut attributes {
+            // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
+            if attr.path.is_ident("doc") {
+                attr.path = Path::from(PathSegment::from(Ident::new(
+                    "description",
+                    Span::call_site(),
+                )));
+            }
+        }
 
         let visibility = input.parse::<Visibility>()?;
 
@@ -149,8 +159,8 @@ impl Parse for CommandFun {
 impl ToTokens for CommandFun {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let Self {
-            cooked,
             attributes: _,
+            cooked,
             visibility,
             name,
             args,
