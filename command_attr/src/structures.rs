@@ -88,20 +88,6 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
     }
 }
 
-#[inline]
-fn parse_doc(doc: Attribute) -> Attribute {
-    Attribute {
-        pound_token: doc.pound_token,
-        style: doc.style,
-        bracket_token: doc.bracket_token,
-        path: Path::from(PathSegment::from(Ident::new(
-            "description",
-            Span::call_site(),
-        ))),
-        tokens: doc.tokens,
-    }
-}
-
 #[derive(Debug)]
 pub struct CommandFun {
     /// `#[...]`-style attributes.
@@ -119,14 +105,17 @@ impl Parse for CommandFun {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let attributes = input.call(Attribute::parse_outer)?;
 
-        let (cooked, attributes): (Vec<_>, Vec<_>) =
+        let (cooked, mut attributes): (Vec<_>, Vec<_>) =
             attributes.into_iter().partition(|a| a.path.is_ident("cfg"));
 
-        let (docs, mut attributes): (Vec<_>, Vec<_>) =
-            attributes.into_iter().partition(|a| a.path.is_ident("doc"));
-
-        for doc in docs {
-            attributes.push(parse_doc(doc));
+        for attr in &mut attributes {
+            // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
+            if attr.path.is_ident("doc") {
+                attr.path = Path::from(PathSegment::from(Ident::new(
+                    "description",
+                    Span::call_site(),
+                )));
+            }
         }
 
         let visibility = input.parse()?;
