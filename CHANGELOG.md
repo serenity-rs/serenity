@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.1] - 2019-9-29
+
+## Departure of a lead developer
+
+It seems Discord has a thing against library developers. [They disabled the account of a discord.js developer because they were allegedly "underage" (below 13 years old)](https://github.com/discordjs/discord.js/issues/3440). There were credit card transactions to defend their innocence, but Discord argued that they need a photo of their face to properly verify their age, a request the developer declined to comply. Consequently, they chose to no longer be on Discord.
+
+Recently, they did the same thing to [@Lakelezz], a huge contributor to Serenity. However, this time they did not state their exact reason, simply saying "in violation of the ToS". Just like the JS developer, she decided to stop affiliating herself with the platform, if this is how it presents its "gratitude" towards her. But also, to cease development of the library.
+
+And thus, on her behalf, I, the main lead developer [@acdenisSK], announce her retirement of the project.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Erk-]
+- [@ikkerens]
+- [@kyranet]
+- [@Lakelezz]
+- [@shnarazk]
+- [@Zalaxx]
+
+### Added
+
+- [model] Add support for the `preferred_locale` field ([@Erk-]) [c:2d3e585]
+- [meta] Add missing word `need`. ([@Lakelezz]) [c:65837f5]
+- [model] Add new message fields ([@Erk-]) [c:e762ea9]
+- [gateway/client] Implement WebSocket shutdown support ([@ikkerens]) [c:711882b]
+- [utils] Add more formats and case insensitivity to `parse_invite` ([@ikkerens]) [c:0183714]
+- [model] Add optional inviter field to Invite ([@ikkerens]) [c:21c95fd]
+
+### Changed
+
+- [meta] Set minimum Rust version to `1.37.0`.  ([@Lakelezz]) [c:de9e8a6]
+- [meta] Update related project's hrefs ([@kyranet]) [c:445810f]
+
+### Fixed
+
+- [meta] Fix serenity version in the readme ([@Zalaxx]) [c:730c959]
+- [framework] Fix incorrect label usage in plain help commands ([@acdenisSK]) [c:d427da4]
+- [model]  Fix `has_role` returning an incorrect result if the member is not cached ([@ikkerens]) [c:96b49f9]
+
+### Removed
+
+- [meta] Remove the last mention of the global CACHE ([@shnarazk]) [c:ebdeb4e]
+
 ## [0.7.0] - 2019-8-29
 
 An emergency release to fix a conflict in our [`ring`](https://github.com/briansmith/ring) dependency that prevents compilation if you pull in an older and newer version at the same time.
@@ -3115,6 +3159,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.1]: https://github.com/serenity-rs/serenity/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/serenity-rs/serenity/compare/v0.6.4...v0.7.0
 [0.6.4]: https://github.com/serenity-rs/serenity/compare/v0.6.3...v0.6.4
 [0.6.3]: https://github.com/serenity-rs/serenity/compare/v0.6.2...v0.6.3
@@ -3195,6 +3240,7 @@ Initial commit.
 [@hyarsan]: https://github.com/hyarsan
 [@icewind1991]: https://github.com/icewind1991
 [@iCrawl]: https://github.com/iCrawl
+[@ikkerens]: https://github.com/ikkerens
 [@imnotbad]: https://github.com/imnotbad
 [@indiv0]: https://github.com/indiv0
 [@ijks]: https://github.com/ijks
@@ -3204,6 +3250,7 @@ Initial commit.
 [@jkcclemens]: https://github.com/jkcclemens
 [@joek13]: https://github.com/joek13
 [@Kroisse]: https://github.com/Kroisse
+[@kyranet]: https://github.com/kyranet
 [@Lakelezz]: https://github.com/Lakelezz
 [@leo-lb]: https://github.com/leo-lb
 [@lolzballs]: https://github.com/lolzballs
@@ -3225,6 +3272,7 @@ Initial commit.
 [@Roughsketch]: https://github.com/Roughsketch
 [@rsaihe]: https://github.com/rsaihe
 [@Scetch]: https://github.com/Scetch
+[@shnarazk]: https://github.com/shnarazk
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@sschroe]: https://github.com/sschroe
 [@SunDwarf]: https://github.com/SunDwarf
@@ -3237,7 +3285,21 @@ Initial commit.
 [@xentec]: https://github.com/xentec
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
+[@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:de9e8a6]: https://github.com/serenity-rs/serenity/commit/de9e8a673f906311957bb2f6e31026cc57fd86b1
+[c:445810f]: https://github.com/serenity-rs/serenity/commit/445810f0673319462b685d849c6ac87ab739f44d
+[c:2d3e585]: https://github.com/serenity-rs/serenity/commit/2d3e585506d20c4ffab34ff015679a1dcca30575
+[c:65837f5]: https://github.com/serenity-rs/serenity/commit/65837f54a671a30a869fe09e2a1abc70d64a5226
+[c:730c959]: https://github.com/serenity-rs/serenity/commit/730c959c73b0e3227a42dc2373aed646e286c3a4
+[c:e762ea9]: https://github.com/serenity-rs/serenity/commit/e762ea948d6ee3fdf76991f60e743adcb8c3d8ae
+[c:711882b]: https://github.com/serenity-rs/serenity/commit/711882baabde1127b9bf6e2e39116306961f671a
+[c:0183714]: https://github.com/serenity-rs/serenity/commit/0183714d450b2285cfae3c619063965783af95c1
+[c:21c95fd]: https://github.com/serenity-rs/serenity/commit/21c95fdfd9b4fe8a98d3a0e459e8ab94ceecaa23
+[c:ebdeb4e]: https://github.com/serenity-rs/serenity/commit/ebdeb4e456c206ea0cccd94318e4eb19660241a0
+[c:d427da4]: https://github.com/serenity-rs/serenity/commit/d427da4a17dd78fe5f4f681855e028abb3fbccee
+[c:96b49f9]: https://github.com/serenity-rs/serenity/commit/96b49f97c080ea6fdc2e1bbd1cd1e90958adceb1
 
 [c:50d2a76]: https://github.com/serenity-rs/serenity/commit/50d2a7654e0aa5248c16941b68da30d758262419
 
