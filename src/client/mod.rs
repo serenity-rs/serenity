@@ -39,6 +39,9 @@ pub use crate::CacheAndHttp;
 #[cfg(feature = "cache")]
 pub use crate::cache::{Cache, CacheRwLock};
 
+#[cfg(feature = "cache")]
+use std::time::Duration;
+
 use crate::internal::prelude::*;
 use parking_lot::Mutex;
 use parking_lot::RwLock;
@@ -334,8 +337,50 @@ impl Client {
     /// # }
     /// ```
     pub fn new<H: EventHandler + 'static>(token: impl AsRef<str>, handler: H) -> Result<Self> {
-        Self::new_with_extras(token.as_ref(), |e| e.event_handler(handler))
+        Self::new_with_extras(token, |e| e.event_handler(handler))
     }
+
+    /// Creates a client with an optional Handler. If you pass `None`, events are never parsed, but
+    /// they can be received by registering a RawHandler.
+    #[deprecated(since = "0.8.0", note = "Replaced by `new_with_extras`.")]
+    pub fn new_with_handlers<H, RH>(token: impl AsRef<str>, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
+        where H: EventHandler + 'static, RH: RawEventHandler + 'static
+    {
+        Self::new_with_extras(token, |e| {
+            if let Some(handler) = handler {
+                e.event_handler(handler);
+            }
+
+            if let Some(raw_handler) = raw_handler {
+                e.raw_event_handler(raw_handler);
+            }
+
+            e
+        })
+    }
+
+    /// Creates a Client for a bot user and sets a cache update timeout.
+    /// If set to some duration, updating the cache will try to claim a
+    /// write-lock for given duration and skip received event but also
+    /// issue a deadlock-warning upon failure.
+    /// If `duration` is set to `None`, updating the cache will try to claim
+    /// a write-lock until success and potentially deadlock.
+    #[cfg(feature = "cache")]
+    #[deprecated(since = "0.8.0", note = "Replaced by `new_with_extras`.")]
+    pub fn new_with_cache_update_timeout<H>(token: impl AsRef<str>, handler: H, duration: Option<Duration>) -> Result<Self>
+        where H: EventHandler + 'static
+    {
+        Self::new_with_extras(token, |e| {
+            e.event_handler(handler);
+
+            if let Some(duration) = duration {
+                e.cache_update_timeout(duration);
+            }
+
+            e
+        })
+    }
+
     /// Creates a client with extra configuration.
     pub fn new_with_extras(token: impl AsRef<str>, f: impl FnOnce(&mut Extras) -> &mut Extras) -> Result<Self>
     {
