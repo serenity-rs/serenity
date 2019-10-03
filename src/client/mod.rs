@@ -33,8 +33,6 @@ pub use self::{
     extras::Extras,
 };
 
-///
-#[cfg(any(feature = "cache", not(feature = "cache")))]
 pub use crate::CacheAndHttp;
 
 #[cfg(feature = "cache")]
