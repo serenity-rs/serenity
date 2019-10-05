@@ -93,9 +93,9 @@ pub use crate::client::Client;
 use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
 use std::time::Duration;
-#[cfg(any(feature = "client", feature = "http"))]
+#[cfg(feature = "client")]
 use std::sync::Arc;
-#[cfg(all(feature = "client", feature = "http"))]
+#[cfg(feature = "client")]
 use crate::http::Http;
 
 
@@ -106,7 +106,6 @@ pub struct CacheAndHttp {
     pub cache: CacheRwLock,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
-    #[cfg(feature = "http")]
     pub http: Arc<Http>,
     __nonexhaustive: (),
 }
