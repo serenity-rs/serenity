@@ -33,7 +33,6 @@ pub use self::{
     extras::Extras,
 };
 
-#[cfg(any(feature = "cache", feature = "http"))]
 pub use crate::CacheAndHttp;
 
 #[cfg(feature = "cache")]
@@ -57,7 +56,6 @@ use crate::framework::Framework;
 use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
-#[cfg(feature = "http")]
 use crate::http::Http;
 
 /// The Client is the way to be able to start sending authenticated requests
@@ -424,7 +422,6 @@ impl Client {
             cache: CacheRwLock::default(),
             #[cfg(feature = "cache")]
             update_cache_timeout: timeout,
-            #[cfg(feature = "http")]
             http: Arc::new(http),
             __nonexhaustive: (),
         });
@@ -624,7 +621,6 @@ impl Client {
     /// ```
     ///
     /// [gateway docs]: ../gateway/index.html#sharding
-    #[cfg(feature = "http")]
     pub fn start(&mut self) -> Result<()> {
         self.start_connection([0, 0, 1])
     }
@@ -677,7 +673,6 @@ impl Client {
     ///
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [gateway docs]: ../gateway/index.html#sharding
-    #[cfg(feature = "http")]
     pub fn start_autosharded(&mut self) -> Result<()> {
         let (x, y) = {
             let res = self.cache_and_http.http.get_bot_gateway()?;
@@ -765,7 +760,6 @@ impl Client {
     /// [`start`]: #method.start
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: ../gateway/index.html#sharding
-    #[cfg(feature = "http")]
     pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
         self.start_connection([shard, shard, shards])
     }
@@ -820,7 +814,6 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: ../gateway/index.html#sharding
-    #[cfg(feature = "http")]
     pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
         self.start_connection([0, total_shards - 1, total_shards])
     }
@@ -891,7 +884,6 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: ../gateway/index.html#sharding
-    #[cfg(feature = "http")]
     pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
         self.start_connection([range[0], range[1], total_shards])
     }
@@ -909,7 +901,6 @@ impl Client {
     // an error.
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    #[cfg(feature = "http")]
     fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         #[cfg(feature = "voice")]
         self.voice_manager.lock().set_shard_count(shard_data[2]);
