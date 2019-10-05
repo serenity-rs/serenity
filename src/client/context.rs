@@ -7,10 +7,11 @@ use std::sync::{
     mpsc::Sender,
 };
 use typemap::ShareMap;
+
+use crate::http::Http;
+
 #[cfg(feature = "cache")]
 pub use crate::cache::{Cache, CacheRwLock};
-#[cfg(feature = "http")]
-use crate::http::Http;
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -38,74 +39,43 @@ pub struct Context {
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
     pub shard_id: u64,
+    pub http: Arc<Http>,
     #[cfg(feature = "cache")]
     pub cache: CacheRwLock,
-    #[cfg(feature = "http")]
-    pub http: Arc<Http>,
 }
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    #[cfg(all(feature = "cache", feature = "http"))]
-    pub(crate) fn new(
-        data: Arc<RwLock<ShareMap>>,
-        runner_tx: Sender<InterMessage>,
-        shard_id: u64,
-        cache: Arc<RwLock<Cache>>,
-        http: Arc<Http>,
-    ) -> Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
-            shard_id,
-            data,
-            cache: cache.into(),
-            http,
-        }
-    }
-
-    /// Create a new Context to be passed to an event handler.
-    #[cfg(all(not(feature = "cache"), feature = "http"))]
+    #[cfg(feature = "cache")]
     pub(crate) fn new(
         data: Arc<RwLock<ShareMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         http: Arc<Http>,
-    ) -> Context {
-        Context {
-            shard: ShardMessenger::new(runner_tx),
-            shard_id,
-            data,
-            http,
-        }
-    }
-
-    /// Create a new Context to be passed to an event handler.
-    #[cfg(all(feature = "cache", not(feature = "http")))]
-    pub(crate) fn new(
-        data: Arc<RwLock<ShareMap>>,
-        runner_tx: Sender<InterMessage>,
-        shard_id: u64,
         cache: Arc<RwLock<Cache>>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
+            http,
             cache: cache.into(),
         }
     }
 
     /// Create a new Context to be passed to an event handler.
-    #[cfg(all(not(feature = "cache"), not(feature = "http")))]
+    #[cfg(not(feature = "cache"))]
     pub(crate) fn new(
         data: Arc<RwLock<ShareMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
+        http: Arc<Http>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
+            http,
         }
     }
 
@@ -371,7 +341,6 @@ impl Context {
     }
 }
 
-#[cfg(feature = "http")]
 impl AsRef<Http> for Context {
     fn as_ref(&self) -> &Http { &self.http }
 }
