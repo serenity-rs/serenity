@@ -201,6 +201,8 @@ pub struct HelpOptions {
     pub lacking_permissions: HelpBehaviour,
     /// If a user lacks ownership, this will treat how these commands will be displayed.
     pub lacking_ownership: HelpBehaviour,
+    /// If conditions (of a check) may be lacking by the user, this will treat how these commands will be displayed.
+    pub lacking_conditions: HelpBehaviour,
     /// If a user is using the help-command in a channel where a command is not available,
     /// this behaviour will be executed.
     pub wrong_channel: HelpBehaviour,
