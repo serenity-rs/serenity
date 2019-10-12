@@ -796,6 +796,7 @@ impl Framework for StandardFramework {
 pub trait CommonOptions {
     fn required_permissions(&self) -> &Permissions;
     fn allowed_roles(&self) -> &'static [&'static str];
+    fn checks(&self) -> &'static [&'static Check];
     fn only_in(&self) -> OnlyIn;
     fn help_available(&self) -> bool;
     fn owners_only(&self) -> bool;
@@ -809,6 +810,10 @@ impl CommonOptions for &GroupOptions {
 
     fn allowed_roles(&self) -> &'static [&'static str] {
         &self.allowed_roles
+    }
+
+    fn checks(&self) -> &'static [&'static Check] {
+        &self.checks
     }
 
     fn only_in(&self) -> OnlyIn {
@@ -835,6 +840,10 @@ impl CommonOptions for &CommandOptions {
 
     fn allowed_roles(&self) -> &'static [&'static str] {
         &self.allowed_roles
+    }
+
+    fn checks(&self) -> &'static [&'static Check] {
+        &self.checks
     }
 
     fn only_in(&self) -> OnlyIn {
