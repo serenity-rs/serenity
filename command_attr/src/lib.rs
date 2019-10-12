@@ -320,6 +320,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             lacking_role;
             lacking_permissions;
             lacking_ownership;
+            lacking_conditions;
             wrong_channel;
             embed_error_colour;
             embed_success_colour;
@@ -353,6 +354,17 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
                 strike_text.push_str(", require a specific role");
             } else {
                 strike_text.push_str(" require a specific role");
+                concat_with_comma = true;
+            }
+        }
+
+        if options.lacking_conditions == HelpBehaviour::Strike {
+            is_any_option_strike = true;
+
+            if concat_with_comma {
+                strike_text.push_str(", require certain conditions");
+            } else {
+                strike_text.push_str(" require certain conditions");
                 concat_with_comma = true;
             }
         }
@@ -407,6 +419,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         lacking_role,
         lacking_permissions,
         lacking_ownership,
+        lacking_conditions,
         wrong_channel,
         embed_error_colour,
         embed_success_colour,
@@ -462,6 +475,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             lacking_role: #lacking_role,
             lacking_permissions: #lacking_permissions,
             lacking_ownership: #lacking_ownership,
+            lacking_conditions: #lacking_conditions,
             wrong_channel: #wrong_channel,
             embed_error_colour: #embed_error_colour,
             embed_success_colour: #embed_success_colour,
