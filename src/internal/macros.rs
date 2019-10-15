@@ -47,19 +47,19 @@ macro_rules! feature_cache {
 }
 
 macro_rules! enum_number {
-    ($name:ident { $($variant:ident, )* }) => {
-        impl ::serde::Serialize for $name {
-            fn serialize<S>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error>
-                where S: ::serde::Serializer
+    ($name:ident { $( $variant:ident ),* }) => {
+        impl serde::Serialize for $name {
+            fn serialize<S>(&self, serializer: S) -> std::result::Result<S::Ok, S::Error>
+                where S: serde::Serializer
             {
                 // Serialize the enum as a u64.
                 serializer.serialize_u64(*self as u64)
             }
         }
 
-        impl<'de> ::serde::Deserialize<'de> for $name {
-            fn deserialize<D>(deserializer: D) -> ::std::result::Result<Self, D::Error>
-                where D: ::serde::Deserializer<'de>
+        impl<'de> serde::Deserialize<'de> for $name {
+            fn deserialize<D>(deserializer: D) -> std::result::Result<Self, D::Error>
+                where D: serde::Deserializer<'de>
             {
                 struct Visitor;
 
@@ -89,5 +89,8 @@ macro_rules! enum_number {
                 deserializer.deserialize_u64(Visitor)
             }
         }
-    }
+    };
+    ($name:ident { $( $variant:ident, )* }) => {
+        enum_number!($name { $($variant),* });
+    };
 }
