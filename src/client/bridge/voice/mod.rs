@@ -70,7 +70,7 @@ impl ClientVoiceManager {
     pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
         let (gid, sid) = self.manager_info(guild_id);
 
-        self.managers.get_mut(&sid).map(|manager| manager.leave(gid))
+        self.managers.get_mut(&sid).map(|manager| manager.remove(gid))
     }
 
     pub fn set(&mut self, shard_id: u64, sender: MpscSender<InterMessage>) {
