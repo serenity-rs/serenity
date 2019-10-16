@@ -16,7 +16,7 @@ use crate::utils;
 use parking_lot::RwLock;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
-#[cfg(feature = "model")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;

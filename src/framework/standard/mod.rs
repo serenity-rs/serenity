@@ -20,10 +20,9 @@ use parse::{Invoke, ParseError};
 
 use super::Framework;
 use crate::client::Context;
-use crate::model::{
-    channel::{Channel, Message},
-    permissions::Permissions,
-};
+#[cfg(feature = "cache")]
+use crate::model::channel::Channel;
+use crate::model::{channel::Message, permissions::Permissions};
 
 use std::collections::HashMap;
 use std::sync::Arc;
