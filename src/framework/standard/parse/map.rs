@@ -89,7 +89,10 @@ impl GroupMap {
                 map.min_length = std::cmp::min(len, map.min_length);
                 map.max_length = std::cmp::max(len, map.max_length);
 
-                map.groups.insert(*prefix, (*group, subgroups_map.clone(), commands_map.clone()));
+                map.groups.insert(
+                    *prefix,
+                    (*group, subgroups_map.clone(), commands_map.clone()),
+                );
             }
         }
 

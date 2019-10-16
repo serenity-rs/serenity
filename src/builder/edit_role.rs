@@ -1,8 +1,5 @@
 use crate::internal::prelude::*;
-use crate::model::{
-    guild::Role,
-    Permissions
-};
+use crate::model::{guild::Role, Permissions};
 use std::collections::HashMap;
 
 /// A builder to create or edit a [`Role`] for use via a number of model methods.
@@ -67,7 +64,10 @@ impl EditRole {
         map.insert("managed", Value::Bool(role.managed));
         map.insert("mentionable", Value::Bool(role.mentionable));
         map.insert("name", Value::String(role.name.clone()));
-        map.insert("permissions",Value::Number(Number::from(role.permissions.bits())));
+        map.insert(
+            "permissions",
+            Value::Number(Number::from(role.permissions.bits())),
+        );
         map.insert("position", Value::Number(Number::from(role.position)));
 
         EditRole(map)
@@ -110,7 +110,8 @@ impl EditRole {
     /// The position to assign the role in the role list. This correlates to the
     /// role's position in the user list.
     pub fn position(&mut self, position: u8) -> &mut Self {
-        self.0.insert("position", Value::Number(Number::from(position)));
+        self.0
+            .insert("position", Value::Number(Number::from(position)));
         self
     }
 }

@@ -1,48 +1,48 @@
 //! Models relating to guilds and types that it owns.
 
+mod audit_log;
 mod emoji;
 mod guild_id;
 mod integration;
 mod member;
 mod partial_guild;
-mod role;
-mod audit_log;
 mod premium_tier;
+mod role;
 
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+pub use self::audit_log::*;
 pub use self::emoji::*;
 pub use self::guild_id::*;
 pub use self::integration::*;
 pub use self::member::*;
 pub use self::partial_guild::*;
-pub use self::role::*;
-pub use self::audit_log::*;
 pub use self::premium_tier::*;
+pub use self::role::*;
+#[cfg(feature = "http")]
+use crate::http::CacheHttp;
 
-use chrono::{DateTime, FixedOffset};
-use crate::model::prelude::*;
-use serde::de::Error as DeError;
 use super::utils::*;
+use crate::model::prelude::*;
+use chrono::{DateTime, FixedOffset};
+use serde::de::Error as DeError;
 
+#[cfg(feature = "model")]
+use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
+#[cfg(feature = "model")]
+use crate::constants::LARGE_THRESHOLD;
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "model")]
+use log::{error, warn};
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
-#[cfg(feature = "model")]
-use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
-#[cfg(feature = "model")]
-use crate::constants::LARGE_THRESHOLD;
-#[cfg(feature = "model")]
-use log::{error, warn};
 #[cfg(feature = "model")]
 use std::borrow::Cow;
-#[cfg(feature = "http")]
-use crate::http::Http;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::sync::Arc;
 
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
@@ -226,20 +226,22 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    pub fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
+    pub fn channel_id_from_name(
+        &self,
+        cache: impl AsRef<CacheRwLock>,
+        name: impl AsRef<str>,
+    ) -> Option<ChannelId> {
         let name = name.as_ref();
         let cache = cache.as_ref().read();
         let guild = cache.guilds.get(&self.id)?.read();
 
-        guild.channels
-            .iter()
-            .find_map(|(id, c)| {
-                if c.read().name == name {
-                    Some(*id)
-                } else {
-                    None
-                }
-            })
+        guild.channels.iter().find_map(|(id, c)| {
+            if c.read().name == name {
+                Some(*id)
+            } else {
+                None
+            }
+        })
     }
 
     /// Ban a [`User`] from the guild. All messages by the
@@ -273,12 +275,22 @@ impl Guild {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "client")]
     #[inline]
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, cache_http: impl CacheHttp, user: U, options: &BO) -> Result<()> {
+    pub fn ban<U: Into<UserId>, BO: BanOptions>(
+        &self,
+        cache_http: impl CacheHttp,
+        user: U,
+        options: &BO,
+    ) -> Result<()> {
         self._ban(cache_http, user.into(), options)
     }
 
     #[cfg(feature = "client")]
-    fn _ban<BO: BanOptions>(&self, cache_http: impl CacheHttp, user: UserId, options: &BO) -> Result<()> {
+    fn _ban<BO: BanOptions>(
+        &self,
+        cache_http: impl CacheHttp,
+        user: UserId,
+        options: &BO,
+    ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -328,12 +340,16 @@ impl Guild {
     /// [`AuditLogs`]: audit_log/struct.AuditLogs.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn audit_logs(&self, http: impl AsRef<Http>,
-                             action_type: Option<u8>,
-                             user_id: Option<UserId>,
-                             before: Option<AuditLogEntryId>,
-                             limit: Option<u8>) -> Result<AuditLogs> {
-        self.id.audit_logs(&http, action_type, user_id, before, limit)
+    pub fn audit_logs(
+        &self,
+        http: impl AsRef<Http>,
+        action_type: Option<u8>,
+        user_id: Option<UserId>,
+        before: Option<AuditLogEntryId>,
+        limit: Option<u8>,
+    ) -> Result<AuditLogs> {
+        self.id
+            .audit_logs(&http, action_type, user_id, before, limit)
     }
 
     /// Gets all of the guild's channels over the REST API.
@@ -341,7 +357,9 @@ impl Guild {
     /// [`Guild`]: struct.Guild.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn channels(&self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> { self.id.channels(&http) }
+    pub fn channels(&self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.id.channels(&http)
+    }
 
     /// Creates a guild with the data provided.
     ///
@@ -369,7 +387,12 @@ impl Guild {
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
     #[cfg(feature = "http")]
-    pub fn create(http: impl AsRef<Http>, name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
+    pub fn create(
+        http: impl AsRef<Http>,
+        name: &str,
+        region: Region,
+        icon: Option<&str>,
+    ) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,
             "name": name,
@@ -402,7 +425,11 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "client")]
-    pub fn create_channel(&self, cache_http: impl CacheHttp, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+    pub fn create_channel(
+        &self,
+        cache_http: impl CacheHttp,
+        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+    ) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -449,8 +476,15 @@ impl Guild {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_integration<I>(&self, http: impl AsRef<Http>, integration_id: I, kind: &str) -> Result<()>
-        where I: Into<IntegrationId> {
+    pub fn create_integration<I>(
+        &self,
+        http: impl AsRef<Http>,
+        integration_id: I,
+        kind: &str,
+    ) -> Result<()>
+    where
+        I: Into<IntegrationId>,
+    {
         self.id.create_integration(&http, integration_id, kind)
     }
 
@@ -478,7 +512,9 @@ impl Guild {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "client")]
     pub fn create_role<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Role>
-        where F: FnOnce(&mut EditRole) -> &mut EditRole {
+    where
+        F: FnOnce(&mut EditRole) -> &mut EditRole,
+    {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -509,7 +545,6 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
                 if self.owner_id != cache.read().user.id {
                     let req = Permissions::MANAGE_GUILD;
 
@@ -529,7 +564,11 @@ impl Guild {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_emoji<E: Into<EmojiId>>(&self, http: impl AsRef<Http>, emoji_id: E) -> Result<()> {
+    pub fn delete_emoji<E: Into<EmojiId>>(
+        &self,
+        http: impl AsRef<Http>,
+        emoji_id: E,
+    ) -> Result<()> {
         self.id.delete_emoji(&http, emoji_id)
     }
 
@@ -540,7 +579,11 @@ impl Guild {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_integration<I: Into<IntegrationId>>(&self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
+    pub fn delete_integration<I: Into<IntegrationId>>(
+        &self,
+        http: impl AsRef<Http>,
+        integration_id: I,
+    ) -> Result<()> {
         self.id.delete_integration(&http, integration_id)
     }
 
@@ -590,7 +633,9 @@ impl Guild {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "client")]
     pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-        where F: FnOnce(&mut EditGuild) -> &mut EditGuild {
+    where
+        F: FnOnce(&mut EditGuild) -> &mut EditGuild,
+    {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -619,7 +664,7 @@ impl Guild {
                 self.verification_level = guild.verification_level;
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }
@@ -636,7 +681,12 @@ impl Guild {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_emoji<E: Into<EmojiId>>(&self, http: impl AsRef<Http>, emoji_id: E, name: &str) -> Result<Emoji> {
+    pub fn edit_emoji<E: Into<EmojiId>>(
+        &self,
+        http: impl AsRef<Http>,
+        emoji_id: E,
+        name: &str,
+    ) -> Result<Emoji> {
         self.id.edit_emoji(&http, emoji_id, name)
     }
 
@@ -656,7 +706,10 @@ impl Guild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
+    where
+        F: FnOnce(&mut EditMember) -> &mut EditMember,
+        U: Into<UserId>,
+    {
         self.id.edit_member(&http, user_id, f)
     }
 
@@ -675,7 +728,11 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
     #[cfg(feature = "client")]
-    pub fn edit_nickname(&self, cache_http: impl CacheHttp, new_nickname: Option<&str>) -> Result<()> {
+    pub fn edit_nickname(
+        &self,
+        cache_http: impl CacheHttp,
+        new_nickname: Option<&str>,
+    ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -706,7 +763,10 @@ impl Guild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn edit_role<F, R>(&self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(&mut EditRole) -> &mut EditRole, R: Into<RoleId> {
+    where
+        F: FnOnce(&mut EditRole) -> &mut EditRole,
+        R: Into<RoleId>,
+    {
         self.id.edit_role(&http, role_id, f)
     }
 
@@ -726,8 +786,15 @@ impl Guild {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn edit_role_position<R>(&self, http: impl AsRef<Http>, role_id: R, position: u64) -> Result<Vec<Role>>
-        where R: Into<RoleId> {
+    pub fn edit_role_position<R>(
+        &self,
+        http: impl AsRef<Http>,
+        role_id: R,
+        position: u64,
+    ) -> Result<Vec<Role>>
+    where
+        R: Into<RoleId>,
+    {
         self.id.edit_role_position(&http, role_id, position)
     }
 
@@ -736,7 +803,9 @@ impl Guild {
     /// Requires that the current user be in the guild.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn get<G: Into<GuildId>>(http: impl AsRef<Http>, guild_id: G) -> Result<PartialGuild> { guild_id.into().to_partial_guild(&http) }
+    pub fn get<G: Into<GuildId>>(http: impl AsRef<Http>, guild_id: G) -> Result<PartialGuild> {
+        guild_id.into().to_partial_guild(&http)
+    }
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
@@ -753,8 +822,16 @@ impl Guild {
     /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn greater_member_hierarchy<T, U>(&self, cache: impl AsRef<CacheRwLock>, lhs_id: T, rhs_id: U)
-        -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
+    pub fn greater_member_hierarchy<T, U>(
+        &self,
+        cache: impl AsRef<CacheRwLock>,
+        lhs_id: T,
+        rhs_id: U,
+    ) -> Option<UserId>
+    where
+        T: Into<UserId>,
+        U: Into<UserId>,
+    {
         self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
     }
 
@@ -777,10 +854,14 @@ impl Guild {
             return Some(rhs_id);
         }
 
-        let lhs = self.members.get(&lhs_id)?
+        let lhs = self
+            .members
+            .get(&lhs_id)?
             .highest_role_info(&cache)
             .unwrap_or((RoleId(0), 0));
-        let rhs = self.members.get(&rhs_id)?
+        let rhs = self
+            .members
+            .get(&rhs_id)?
             .highest_role_info(&cache)
             .unwrap_or((RoleId(0), 0));
 
@@ -792,7 +873,7 @@ impl Guild {
 
         // If LHS's top position is higher than RHS, then LHS wins.
         if lhs.1 > rhs.1 {
-            return Some(lhs_id)
+            return Some(lhs_id);
         }
 
         // If RHS's top position is higher than LHS, then RHS wins.
@@ -823,7 +904,9 @@ impl Guild {
     /// This performs a request over the REST API.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> { self.id.integrations(&http) }
+    pub fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
+        self.id.integrations(&http)
+    }
 
     /// Retrieves the active invites for the guild.
     ///
@@ -855,7 +938,9 @@ impl Guild {
     /// Checks if the guild is 'large'. A guild is considered large if it has
     /// more than 250 members.
     #[inline]
-    pub fn is_large(&self) -> bool { self.members.len() > LARGE_THRESHOLD as usize }
+    pub fn is_large(&self) -> bool {
+        self.members.len() > LARGE_THRESHOLD as usize
+    }
 
     /// Kicks a [`Member`] from the guild.
     ///
@@ -865,11 +950,15 @@ impl Guild {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn kick<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> { self.id.kick(&http, user_id) }
+    pub fn kick<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
+        self.id.kick(&http, user_id)
+    }
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self, http: impl AsRef<Http>) -> Result<()> { self.id.leave(&http) }
+    pub fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
+        self.id.leave(&http)
+    }
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
@@ -877,7 +966,11 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     #[inline]
     #[cfg(feature = "client")]
-    pub fn member<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<Member> {
+    pub fn member<U: Into<UserId>>(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: U,
+    ) -> Result<Member> {
         self.id.member(cache_http, user_id)
     }
 
@@ -890,8 +983,15 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn members<U>(&self, http: impl AsRef<Http>, limit: Option<u64>, after: U) -> Result<Vec<Member>>
-        where U: Into<Option<UserId>> {
+    pub fn members<U>(
+        &self,
+        http: impl AsRef<Http>,
+        limit: Option<u64>,
+        after: U,
+    ) -> Result<Vec<Member>>
+    where
+        U: Into<Option<UserId>>,
+    {
         self.id.members(&http, limit, after)
     }
 
@@ -902,9 +1002,11 @@ impl Guild {
 
         for (&id, member) in &self.members {
             match self.presences.get(&id) {
-                Some(presence) => if status == presence.status {
-                    members.push(member);
-                },
+                Some(presence) => {
+                    if status == presence.status {
+                        members.push(member);
+                    }
+                }
                 None => continue,
             }
         }
@@ -976,7 +1078,12 @@ impl Guild {
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+    pub fn members_starting_with(
+        &self,
+        prefix: &str,
+        case_sensitive: bool,
+        sorted: bool,
+    ) -> Vec<&Member> {
         let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member|
@@ -997,32 +1104,31 @@ impl Guild {
                     })).collect();
 
         if sorted {
-            members
-                .sort_by(|a, b| {
-                    let name_a = match a.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.read().name[..], prefix) {
-                                Cow::Owned(a.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(a.user.read().name.clone()),
-                    };
+            members.sort_by(|a, b| {
+                let name_a = match a.nick {
+                    Some(ref nick) => {
+                        if contains_case_insensitive(&a.user.read().name[..], prefix) {
+                            Cow::Owned(a.user.read().name.clone())
+                        } else {
+                            Cow::Borrowed(nick)
+                        }
+                    }
+                    None => Cow::Owned(a.user.read().name.clone()),
+                };
 
-                    let name_b = match b.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.read().name[..], prefix) {
-                                Cow::Owned(b.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(b.user.read().name.clone()),
-                    };
+                let name_b = match b.nick {
+                    Some(ref nick) => {
+                        if contains_case_insensitive(&b.user.read().name[..], prefix) {
+                            Cow::Owned(b.user.read().name.clone())
+                        } else {
+                            Cow::Borrowed(nick)
+                        }
+                    }
+                    None => Cow::Owned(b.user.read().name.clone()),
+                };
 
-                    closest_to_origin(prefix, &name_a[..], &name_b[..])
-                });
+                closest_to_origin(prefix, &name_a[..], &name_b[..])
+            });
             members
         } else {
             members
@@ -1051,7 +1157,12 @@ impl Guild {
     /// as both fields have to be considered again for sorting.
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
+    pub fn members_containing(
+        &self,
+        substring: &str,
+        case_sensitive: bool,
+        sorted: bool,
+    ) -> Vec<&Member> {
         let mut members: Vec<&Member> = self.members
             .values()
             .filter(|member|
@@ -1073,32 +1184,31 @@ impl Guild {
                     })).collect();
 
         if sorted {
-            members
-                .sort_by(|a, b| {
-                    let name_a = match a.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.read().name[..], substring) {
-                                Cow::Owned(a.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(a.user.read().name.clone()),
-                    };
+            members.sort_by(|a, b| {
+                let name_a = match a.nick {
+                    Some(ref nick) => {
+                        if contains_case_insensitive(&a.user.read().name[..], substring) {
+                            Cow::Owned(a.user.read().name.clone())
+                        } else {
+                            Cow::Borrowed(nick)
+                        }
+                    }
+                    None => Cow::Owned(a.user.read().name.clone()),
+                };
 
-                    let name_b = match b.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.read().name[..], substring) {
-                                Cow::Owned(b.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(b.user.read().name.clone()),
-                    };
+                let name_b = match b.nick {
+                    Some(ref nick) => {
+                        if contains_case_insensitive(&b.user.read().name[..], substring) {
+                            Cow::Owned(b.user.read().name.clone())
+                        } else {
+                            Cow::Borrowed(nick)
+                        }
+                    }
+                    None => Cow::Owned(b.user.read().name.clone()),
+                };
 
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
-                });
+                closest_to_origin(substring, &name_a[..], &name_b[..])
+            });
             members
         } else {
             members
@@ -1121,8 +1231,14 @@ impl Guild {
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_username_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
-        let mut members: Vec<&Member> = self.members
+    pub fn members_username_containing(
+        &self,
+        substring: &str,
+        case_sensitive: bool,
+        sorted: bool,
+    ) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self
+            .members
             .values()
             .filter(|member| {
                 if case_sensitive {
@@ -1130,15 +1246,15 @@ impl Guild {
                 } else {
                     contains_case_insensitive(&member.user.read().name, substring)
                 }
-            }).collect();
+            })
+            .collect();
 
         if sorted {
-            members
-                .sort_by(|a, b| {
-                    let name_a = &a.user.read().name;
-                    let name_b = &b.user.read().name;
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
-                });
+            members.sort_by(|a, b| {
+                let name_a = &a.user.read().name;
+                let name_b = &b.user.read().name;
+                closest_to_origin(substring, &name_a[..], &name_b[..])
+            });
             members
         } else {
             members
@@ -1164,39 +1280,40 @@ impl Guild {
     /// a nick, the username will be used (this should never happen).
     ///
     /// [`Member`]: struct.Member.html
-    pub fn members_nick_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
-        let mut members: Vec<&Member> = self.members
+    pub fn members_nick_containing(
+        &self,
+        substring: &str,
+        case_sensitive: bool,
+        sorted: bool,
+    ) -> Vec<&Member> {
+        let mut members: Vec<&Member> = self
+            .members
             .values()
-            .filter(|member|
-                member.nick.as_ref()
-                    .map_or(false, |nick| {
-
-                        if case_sensitive {
-                            nick.contains(substring)
-                        } else {
-                            contains_case_insensitive(nick, substring)
-                        }
-                    })).collect();
+            .filter(|member| {
+                member.nick.as_ref().map_or(false, |nick| {
+                    if case_sensitive {
+                        nick.contains(substring)
+                    } else {
+                        contains_case_insensitive(nick, substring)
+                    }
+                })
+            })
+            .collect();
 
         if sorted {
-            members
-                .sort_by(|a, b| {
-                    let name_a = match a.nick {
-                        Some(ref nick) => {
-                            Cow::Borrowed(nick)
-                        },
-                        None => Cow::Owned(a.user.read().name.clone()),
-                    };
+            members.sort_by(|a, b| {
+                let name_a = match a.nick {
+                    Some(ref nick) => Cow::Borrowed(nick),
+                    None => Cow::Owned(a.user.read().name.clone()),
+                };
 
-                    let name_b = match b.nick {
-                        Some(ref nick) => {
-                                Cow::Borrowed(nick)
-                            },
-                        None => Cow::Owned(b.user.read().name.clone()),
-                    };
+                let name_b = match b.nick {
+                    Some(ref nick) => Cow::Borrowed(nick),
+                    None => Cow::Owned(b.user.read().name.clone()),
+                };
 
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
-                });
+                closest_to_origin(substring, &name_a[..], &name_b[..])
+            });
             members
         } else {
             members
@@ -1208,7 +1325,9 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     #[inline]
     pub fn member_permissions<U>(&self, user_id: U) -> Permissions
-        where U: Into<UserId> {
+    where
+        U: Into<UserId>,
+    {
         self._member_permissions(user_id.into())
     }
 
@@ -1222,12 +1341,11 @@ impl Guild {
             None => {
                 error!(
                     "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
-                    self.id,
-                    self.name,
+                    self.id, self.name,
                 );
 
                 return Permissions::empty();
-            },
+            }
         };
 
         let member = match self.members.get(&user_id) {
@@ -1265,7 +1383,10 @@ impl Guild {
     #[cfg(feature = "http")]
     #[inline]
     pub fn move_member<C, U>(&self, http: impl AsRef<Http>, user_id: U, channel_id: C) -> Result<()>
-        where C: Into<ChannelId>, U: Into<UserId> {
+    where
+        C: Into<ChannelId>,
+        U: Into<UserId>,
+    {
         self.id.move_member(&http, user_id, channel_id)
     }
 
@@ -1273,9 +1394,12 @@ impl Guild {
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
-    #[deprecated(since="0.6.4", note="Please use `user_permissions_in` instead.")]
+    #[deprecated(since = "0.6.4", note = "Please use `user_permissions_in` instead.")]
     pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
-        where C: Into<ChannelId>, U: Into<UserId> {
+    where
+        C: Into<ChannelId>,
+        U: Into<UserId>,
+    {
         self.user_permissions_in(channel_id.into(), user_id.into())
     }
 
@@ -1284,15 +1408,14 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     #[inline]
     pub fn user_permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
-        where C: Into<ChannelId>, U: Into<UserId> {
+    where
+        C: Into<ChannelId>,
+        U: Into<UserId>,
+    {
         self._user_permissions_in(channel_id.into(), user_id.into())
     }
 
-    fn _user_permissions_in(
-        &self,
-        channel_id: ChannelId,
-        user_id: UserId,
-    ) -> Permissions {
+    fn _user_permissions_in(&self, channel_id: ChannelId, user_id: UserId) -> Permissions {
         // The owner has all permissions in all cases.
         if user_id == self.owner_id {
             return Permissions::all();
@@ -1304,12 +1427,11 @@ impl Guild {
             None => {
                 error!(
                     "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
-                    self.id,
-                    self.name
+                    self.id, self.name
                 );
 
                 return Permissions::empty();
-            },
+            }
         };
 
         // Create a base set of permissions, starting with `@everyone`s.
@@ -1390,8 +1512,7 @@ impl Guild {
         } else {
             warn!(
                 "(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
-                self.id,
-                channel_id
+                self.id, channel_id
             );
         }
 
@@ -1411,15 +1532,14 @@ impl Guild {
     /// [`Role`]: ../guild/struct.Role.html
     #[inline]
     pub fn role_permissions_in<C, R>(&self, channel_id: C, role_id: R) -> Option<Permissions>
-        where C: Into<ChannelId>, R: Into<RoleId> {
+    where
+        C: Into<ChannelId>,
+        R: Into<RoleId>,
+    {
         self._role_permissions_in(channel_id.into(), role_id.into())
     }
 
-    fn _role_permissions_in(
-        &self,
-        channel_id: ChannelId,
-        role_id: RoleId,
-    ) -> Option<Permissions> {
+    fn _role_permissions_in(&self, channel_id: ChannelId, role_id: RoleId) -> Option<Permissions> {
         let mut permissions = match self.roles.get(&role_id) {
             Some(role) => role.permissions,
             None => return None,
@@ -1433,9 +1553,7 @@ impl Guild {
             let channel = channel.read();
 
             for overwrite in &channel.permission_overwrites {
-
                 if let PermissionOverwriteType::Role(permissions_role_id) = overwrite.kind {
-
                     if permissions_role_id == role_id {
                         permissions = (permissions & !overwrite.deny) | overwrite.allow;
 
@@ -1446,8 +1564,7 @@ impl Guild {
         } else {
             warn!(
                 "(╯°□°）╯︵ ┻━┻ Guild {} does not contain channel {}",
-                self.id,
-                channel_id
+                self.id, channel_id
             );
 
             return None;
@@ -1520,7 +1637,9 @@ impl Guild {
     /// sometimes get weird.
     #[cfg(feature = "http")]
     pub fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
-        where It: IntoIterator<Item = (ChannelId, u64)> {
+    where
+        It: IntoIterator<Item = (ChannelId, u64)>,
+    {
         self.id.reorder_channels(&http, channels)
     }
 
@@ -1536,7 +1655,9 @@ impl Guild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 { self.id.shard_id(&cache) }
+    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+        self.id.shard_id(&cache)
+    }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -1560,7 +1681,9 @@ impl Guild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
+    pub fn shard_id(&self, shard_count: u64) -> u64 {
+        self.id.shard_id(shard_count)
+    }
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
@@ -1576,7 +1699,11 @@ impl Guild {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[cfg(feature = "http")]
     #[inline]
-    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
+    pub fn start_integration_sync<I: Into<IntegrationId>>(
+        &self,
+        http: impl AsRef<Http>,
+        integration_id: I,
+    ) -> Result<()> {
         self.id.start_integration_sync(&http, integration_id)
     }
 
@@ -1657,7 +1784,9 @@ impl Guild {
     /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> { self.id.webhooks(&http) }
+    pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
+        self.id.webhooks(&http)
+    }
 
     /// Obtain a reference to a role by its name.
     ///
@@ -1705,7 +1834,8 @@ impl<'de> Deserialize<'de> for Guild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id")
+        let id = map
+            .get("id")
             .and_then(|x| x.as_str())
             .and_then(|x| x.parse::<u64>().ok());
 
@@ -1713,8 +1843,10 @@ impl<'de> Deserialize<'de> for Guild {
             if let Some(array) = map.get_mut("channels").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(channel) = value.as_object_mut() {
-                        channel
-                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                        channel.insert(
+                            "guild_id".to_string(),
+                            Value::Number(Number::from(guild_id)),
+                        );
                     }
                 }
             }
@@ -1722,48 +1854,52 @@ impl<'de> Deserialize<'de> for Guild {
             if let Some(array) = map.get_mut("members").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(member) = value.as_object_mut() {
-                        member
-                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                        member.insert(
+                            "guild_id".to_string(),
+                            Value::Number(Number::from(guild_id)),
+                        );
                     }
                 }
             }
         }
 
         let afk_channel_id = match map.remove("afk_channel_id") {
-            Some(v) => serde_json::from_value::<Option<ChannelId>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let afk_timeout = map.remove("afk_timeout")
+        let afk_timeout = map
+            .remove("afk_timeout")
             .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
         let application_id = match map.remove("application_id") {
-            Some(v) => serde_json::from_value::<Option<ApplicationId>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => {
+                serde_json::from_value::<Option<ApplicationId>>(v).map_err(DeError::custom)?
+            }
             None => None,
         };
-        let channels = map.remove("channels")
+        let channels = map
+            .remove("channels")
             .ok_or_else(|| DeError::custom("expected guild channels"))
             .and_then(deserialize_guild_channels)
             .map_err(DeError::custom)?;
-        let default_message_notifications = map.remove("default_message_notifications")
-            .ok_or_else(|| {
-                DeError::custom("expected guild default_message_notifications")
-            })
+        let default_message_notifications = map
+            .remove("default_message_notifications")
+            .ok_or_else(|| DeError::custom("expected guild default_message_notifications"))
             .and_then(DefaultMessageNotificationLevel::deserialize)
             .map_err(DeError::custom)?;
-        let emojis = map.remove("emojis")
+        let emojis = map
+            .remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
             .and_then(deserialize_emojis)
             .map_err(DeError::custom)?;
-        let explicit_content_filter = map.remove("explicit_content_filter")
-            .ok_or_else(|| DeError::custom(
-                "expected guild explicit_content_filter"
-            ))
+        let explicit_content_filter = map
+            .remove("explicit_content_filter")
+            .ok_or_else(|| DeError::custom("expected guild explicit_content_filter"))
             .and_then(ExplicitContentFilter::deserialize)
             .map_err(DeError::custom)?;
-        let features = map.remove("features")
+        let features = map
+            .remove("features")
             .ok_or_else(|| DeError::custom("expected guild features"))
             .and_then(serde_json::from_value::<Vec<String>>)
             .map_err(DeError::custom)?;
@@ -1771,47 +1907,58 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let id = map.remove("id")
+        let id = map
+            .remove("id")
             .ok_or_else(|| DeError::custom("expected guild id"))
             .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
-        let joined_at = map.remove("joined_at")
+        let joined_at = map
+            .remove("joined_at")
             .ok_or_else(|| DeError::custom("expected guild joined_at"))
             .and_then(DateTime::deserialize)
             .map_err(DeError::custom)?;
-        let large = map.remove("large")
+        let large = map
+            .remove("large")
             .ok_or_else(|| DeError::custom("expected guild large"))
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
-        let member_count = map.remove("member_count")
+        let member_count = map
+            .remove("member_count")
             .ok_or_else(|| DeError::custom("expected guild member_count"))
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
-        let members = map.remove("members")
+        let members = map
+            .remove("members")
             .ok_or_else(|| DeError::custom("expected guild members"))
             .and_then(deserialize_members)
             .map_err(DeError::custom)?;
-        let mfa_level = map.remove("mfa_level")
+        let mfa_level = map
+            .remove("mfa_level")
             .ok_or_else(|| DeError::custom("expected guild mfa_level"))
             .and_then(MfaLevel::deserialize)
             .map_err(DeError::custom)?;
-        let name = map.remove("name")
+        let name = map
+            .remove("name")
             .ok_or_else(|| DeError::custom("expected guild name"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
-        let owner_id = map.remove("owner_id")
+        let owner_id = map
+            .remove("owner_id")
             .ok_or_else(|| DeError::custom("expected guild owner_id"))
             .and_then(UserId::deserialize)
             .map_err(DeError::custom)?;
-        let presences = map.remove("presences")
+        let presences = map
+            .remove("presences")
             .ok_or_else(|| DeError::custom("expected guild presences"))
             .and_then(deserialize_presences)
             .map_err(DeError::custom)?;
-        let region = map.remove("region")
+        let region = map
+            .remove("region")
             .ok_or_else(|| DeError::custom("expected guild region"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
-        let roles = map.remove("roles")
+        let roles = map
+            .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
             .and_then(deserialize_roles)
             .map_err(DeError::custom)?;
@@ -1823,11 +1970,13 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<ChannelId>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let verification_level = map.remove("verification_level")
+        let verification_level = map
+            .remove("verification_level")
             .ok_or_else(|| DeError::custom("expected guild verification_level"))
             .and_then(VerificationLevel::deserialize)
             .map_err(DeError::custom)?;
-        let voice_states = map.remove("voice_states")
+        let voice_states = map
+            .remove("voice_states")
             .ok_or_else(|| DeError::custom("expected guild voice_states"))
             .and_then(deserialize_voice_states)
             .map_err(DeError::custom)?;
@@ -1851,7 +2000,8 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let preferred_locale = map.remove("preferred_locale") 
+        let preferred_locale = map
+            .remove("preferred_locale")
             .ok_or_else(|| DeError::custom("expected preferred locale"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
@@ -1901,7 +2051,9 @@ fn contains_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
 /// Checks if a `&str` starts with another `&str`.
 #[cfg(feature = "model")]
 fn starts_with_case_insensitive(to_look_at: &str, to_find: &str) -> bool {
-    to_look_at.to_lowercase().starts_with(&to_find.to_lowercase())
+    to_look_at
+        .to_lowercase()
+        .starts_with(&to_find.to_lowercase())
 }
 
 /// Takes a `&str` as `origin` and tests if either
@@ -1988,15 +2140,21 @@ impl GuildInfo {
 }
 
 impl From<PartialGuild> for GuildContainer {
-    fn from(guild: PartialGuild) -> GuildContainer { GuildContainer::Guild(guild) }
+    fn from(guild: PartialGuild) -> GuildContainer {
+        GuildContainer::Guild(guild)
+    }
 }
 
 impl From<GuildId> for GuildContainer {
-    fn from(guild_id: GuildId) -> GuildContainer { GuildContainer::Id(guild_id) }
+    fn from(guild_id: GuildId) -> GuildContainer {
+        GuildContainer::Id(guild_id)
+    }
 }
 
 impl From<u64> for GuildContainer {
-    fn from(id: u64) -> GuildContainer { GuildContainer::Id(GuildId(id)) }
+    fn from(id: u64) -> GuildContainer {
+        GuildContainer::Id(GuildId(id))
+    }
 }
 
 #[cfg(feature = "model")]
@@ -2059,12 +2217,7 @@ pub enum DefaultMessageNotificationLevel {
     __Nonexhaustive,
 }
 
-enum_number!(
-    DefaultMessageNotificationLevel {
-        All,
-        Mentions,
-    }
-);
+enum_number!(DefaultMessageNotificationLevel { All, Mentions });
 
 impl DefaultMessageNotificationLevel {
     pub fn num(self) -> u64 {
@@ -2089,13 +2242,11 @@ pub enum ExplicitContentFilter {
     __Nonexhaustive,
 }
 
-enum_number!(
-    ExplicitContentFilter {
-        None,
-        WithoutRole,
-        All,
-    }
-);
+enum_number!(ExplicitContentFilter {
+    None,
+    WithoutRole,
+    All,
+});
 
 impl ExplicitContentFilter {
     pub fn num(self) -> u64 {
@@ -2119,12 +2270,7 @@ pub enum MfaLevel {
     __Nonexhaustive,
 }
 
-enum_number!(
-    MfaLevel {
-        None,
-        Elevated,
-    }
-);
+enum_number!(MfaLevel { None, Elevated });
 
 impl MfaLevel {
     pub fn num(self) -> u64 {
@@ -2139,24 +2285,42 @@ impl MfaLevel {
 /// The name of a region that a voice server can be located in.
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum Region {
-    #[serde(rename = "amsterdam")] Amsterdam,
-    #[serde(rename = "brazil")] Brazil,
-    #[serde(rename = "eu-central")] EuCentral,
-    #[serde(rename = "eu-west")] EuWest,
-    #[serde(rename = "frankfurt")] Frankfurt,
-    #[serde(rename = "hongkong")] HongKong,
-    #[serde(rename = "japan")] Japan,
-    #[serde(rename = "london")] London,
-    #[serde(rename = "russia")] Russia,
-    #[serde(rename = "singapore")] Singapore,
-    #[serde(rename = "sydney")] Sydney,
-    #[serde(rename = "us-central")] UsCentral,
-    #[serde(rename = "us-east")] UsEast,
-    #[serde(rename = "us-south")] UsSouth,
-    #[serde(rename = "us-west")] UsWest,
-    #[serde(rename = "vip-amsterdam")] VipAmsterdam,
-    #[serde(rename = "vip-us-east")] VipUsEast,
-    #[serde(rename = "vip-us-west")] VipUsWest,
+    #[serde(rename = "amsterdam")]
+    Amsterdam,
+    #[serde(rename = "brazil")]
+    Brazil,
+    #[serde(rename = "eu-central")]
+    EuCentral,
+    #[serde(rename = "eu-west")]
+    EuWest,
+    #[serde(rename = "frankfurt")]
+    Frankfurt,
+    #[serde(rename = "hongkong")]
+    HongKong,
+    #[serde(rename = "japan")]
+    Japan,
+    #[serde(rename = "london")]
+    London,
+    #[serde(rename = "russia")]
+    Russia,
+    #[serde(rename = "singapore")]
+    Singapore,
+    #[serde(rename = "sydney")]
+    Sydney,
+    #[serde(rename = "us-central")]
+    UsCentral,
+    #[serde(rename = "us-east")]
+    UsEast,
+    #[serde(rename = "us-south")]
+    UsSouth,
+    #[serde(rename = "us-west")]
+    UsWest,
+    #[serde(rename = "vip-amsterdam")]
+    VipAmsterdam,
+    #[serde(rename = "vip-us-east")]
+    VipUsEast,
+    #[serde(rename = "vip-us-west")]
+    VipUsWest,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -2187,7 +2351,7 @@ impl Region {
     }
 }
 
-#[doc="The level to set as criteria prior to a user being able to send
+#[doc = "The level to set as criteria prior to a user being able to send
     messages in a [`Guild`].
 
     [`Guild`]: struct.Guild.html"]
@@ -2207,15 +2371,13 @@ pub enum VerificationLevel {
     __Nonexhaustive,
 }
 
-enum_number!(
-    VerificationLevel {
-        None,
-        Low,
-        Medium,
-        High,
-        Higher,
-    }
-);
+enum_number!(VerificationLevel {
+    None,
+    Low,
+    Medium,
+    High,
+    Higher,
+});
 
 impl VerificationLevel {
     pub fn num(self) -> u64 {
@@ -2234,8 +2396,8 @@ impl VerificationLevel {
 mod test {
     #[cfg(feature = "model")]
     mod model {
-        use chrono::prelude::*;
         use crate::model::prelude::*;
+        use chrono::prelude::*;
         use std::collections::*;
         use std::sync::Arc;
 
@@ -2323,14 +2485,10 @@ mod test {
             }
         }
 
-
         #[test]
         fn member_named_username() {
             let guild = gen();
-            let lhs = guild
-                .member_named("test#1432")
-                .unwrap()
-                .display_name();
+            let lhs = guild.member_named("test#1432").unwrap().display_name();
 
             assert_eq!(lhs, gen_member().display_name());
         }

@@ -5,8 +5,8 @@ mod connection;
 mod connection_info;
 mod dca;
 mod error;
-mod manager;
 mod handler;
+mod manager;
 mod payload;
 mod streamer;
 mod threading;
@@ -17,15 +17,7 @@ pub use self::{
     error::{DcaError, VoiceError},
     handler::Handler,
     manager::Manager,
-    streamer::{
-        dca,
-        ffmpeg,
-        ffmpeg_optioned,
-        opus,
-        pcm,
-        ytdl,
-        ytdl_search
-    }
+    streamer::{dca, ffmpeg, ffmpeg_optioned, opus, pcm, ytdl, ytdl_search},
 };
 pub use audiopus::Bitrate;
 

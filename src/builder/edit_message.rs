@@ -1,5 +1,5 @@
-use crate::internal::prelude::*;
 use super::CreateEmbed;
+use crate::internal::prelude::*;
 use crate::utils;
 
 use std::collections::HashMap;
@@ -46,7 +46,9 @@ impl EditMessage {
 
     /// Set an embed for the message.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
         let map = utils::hashmap_to_json_map(create_embed.0);

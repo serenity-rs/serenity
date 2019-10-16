@@ -71,7 +71,8 @@ impl ExecuteWebhook {
     /// });
     /// ```
     pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
-        self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
+        self.0
+            .insert("avatar_url", Value::String(avatar_url.to_string()));
         self
     }
 
@@ -172,7 +173,8 @@ impl ExecuteWebhook {
     /// }
     /// ```
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
-        self.0.insert("username", Value::String(username.to_string()));
+        self.0
+            .insert("username", Value::String(username.to_string()));
         self
     }
 }

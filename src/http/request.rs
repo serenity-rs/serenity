@@ -1,13 +1,11 @@
+use super::{routing::RouteInfo, HttpError};
 use crate::constants;
-use reqwest::{
-    RequestBuilder as ReqwestRequestBuilder,
-    header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
-    Url,
-};
 use reqwest::Client;
-use super::{
-    HttpError,
-    routing::RouteInfo,
+use reqwest::{
+    header::{
+        HeaderMap as Headers, HeaderValue, AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT,
+    },
+    RequestBuilder as ReqwestRequestBuilder, Url,
 };
 
 pub struct RequestBuilder<'a> {
@@ -57,12 +55,24 @@ pub struct Request<'a> {
 
 impl<'a> Request<'a> {
     pub fn new(builder: RequestBuilder<'a>) -> Self {
-        let RequestBuilder { body, headers, route } = builder;
+        let RequestBuilder {
+            body,
+            headers,
+            route,
+        } = builder;
 
-        Self { body, headers, route }
+        Self {
+            body,
+            headers,
+            route,
+        }
     }
 
-    pub fn build(&'a self, client: &Client, token: &str) -> Result<ReqwestRequestBuilder, HttpError> {
+    pub fn build(
+        &'a self,
+        client: &Client,
+        token: &str,
+    ) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
             headers: ref request_headers,
@@ -71,10 +81,7 @@ impl<'a> Request<'a> {
 
         let (method, _, path) = route_info.deconstruct();
 
-        let mut builder = client.request(
-            method.reqwest_method(),
-            Url::parse(&path)?,
-        );
+        let mut builder = client.request(method.reqwest_method(), Url::parse(&path)?);
 
         if let Some(ref bytes) = body {
             builder = builder.body(Vec::from(*bytes));
@@ -82,11 +89,16 @@ impl<'a> Request<'a> {
 
         let mut headers = Headers::with_capacity(4);
         headers.insert(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT));
-        headers.insert(AUTHORIZATION,
-            HeaderValue::from_str(&token).map_err(HttpError::InvalidHeader)?);
+        headers.insert(
+            AUTHORIZATION,
+            HeaderValue::from_str(&token).map_err(HttpError::InvalidHeader)?,
+        );
         headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
         headers.insert(CONTENT_LENGTH, HeaderValue::from_static(&"0"));
-        headers.insert("X-Ratelimit-Precision", HeaderValue::from_static("millisecond"));
+        headers.insert(
+            "X-Ratelimit-Precision",
+            HeaderValue::from_static("millisecond"),
+        );
 
         if let Some(ref request_headers) = request_headers {
             headers.extend(request_headers.clone());

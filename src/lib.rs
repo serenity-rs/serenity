@@ -91,13 +91,12 @@ pub use crate::client::Client;
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
-use std::time::Duration;
-#[cfg(feature = "client")]
-use std::sync::Arc;
 #[cfg(feature = "client")]
 use crate::http::Http;
-
+#[cfg(feature = "client")]
+use std::sync::Arc;
+#[cfg(feature = "cache")]
+use std::time::Duration;
 
 #[cfg(feature = "client")]
 #[derive(Default)]

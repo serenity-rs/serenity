@@ -1,30 +1,21 @@
-use crate::constants;
-use reqwest::{
-    Client,
-    ClientBuilder,
-    header::{AUTHORIZATION, USER_AGENT, CONTENT_TYPE, HeaderValue, HeaderMap as Headers},
-    multipart::Part,
-    Response as ReqwestResponse,
-    StatusCode,
-    Url,
-};
-use crate::internal::prelude::*;
-use crate::model::prelude::*;
 use super::{
-    ratelimiting::{Ratelimiter, RatelimitedRequest},
+    ratelimiting::{RatelimitedRequest, Ratelimiter},
     request::Request,
     routing::RouteInfo,
-    AttachmentType,
-    GuildPagination,
-    HttpError,
+    AttachmentType, GuildPagination, HttpError,
+};
+use crate::constants;
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
+use log::{debug, trace};
+use reqwest::{
+    header::{HeaderMap as Headers, HeaderValue, AUTHORIZATION, CONTENT_TYPE, USER_AGENT},
+    multipart::Part,
+    Client, ClientBuilder, Response as ReqwestResponse, StatusCode, Url,
 };
 use serde::de::DeserializeOwned;
 use serde_json::json;
-use log::{debug, trace};
-use std::{
-    collections::BTreeMap,
-    sync::Arc,
-};
+use std::{collections::BTreeMap, sync::Arc};
 
 pub struct Http {
     client: Arc<Client>,
@@ -58,11 +49,14 @@ impl Http {
     /// [`Group::add_recipient`]: ../../model/channel/struct.Group.html#method.add_recipient
     /// [`User`]: ../../model/user/struct.User.html
     pub fn add_group_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::AddGroupRecipient { group_id, user_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::AddGroupRecipient { group_id, user_id },
+            },
+        )
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -75,11 +69,18 @@ impl Http {
     /// [`Role`]: ../../model/guild/struct.Role.html
     /// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub fn add_member_role(&self, guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::AddMemberRole { guild_id, role_id, user_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::AddMemberRole {
+                    guild_id,
+                    role_id,
+                    user_id,
+                },
+            },
+        )
     }
 
     /// Bans a [`User`] from a [`Guild`], removing their messages sent in the last
@@ -93,17 +94,26 @@ impl Http {
     /// [`Guild`]: ../../model/guild/struct.Guild.html
     /// [`User`]: ../../model/user/struct.User.html
     /// [Ban Members]: ../../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    pub fn ban_user(&self, guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::GuildBanUser {
-                delete_message_days: Some(delete_message_days),
-                reason: Some(reason),
-                guild_id,
-                user_id,
+    pub fn ban_user(
+        &self,
+        guild_id: u64,
+        user_id: u64,
+        delete_message_days: u8,
+        reason: &str,
+    ) -> Result<()> {
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::GuildBanUser {
+                    delete_message_days: Some(delete_message_days),
+                    reason: Some(reason),
+                    guild_id,
+                    user_id,
+                },
             },
-        })
+        )
     }
 
     /// Ban zeyla from a [`Guild`], removing her messages sent in the last X number
@@ -117,7 +127,12 @@ impl Http {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn ban_zeyla(&self, guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
-        self.ban_user(guild_id, 114_941_315_417_899_012, delete_message_days, reason)
+        self.ban_user(
+            guild_id,
+            114_941_315_417_899_012,
+            delete_message_days,
+            reason,
+        )
     }
 
     /// Ban luna from a [`Guild`], removing her messages sent in the last X number
@@ -131,7 +146,12 @@ impl Http {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     pub fn ban_luna(&self, guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
-        self.ban_user(guild_id, 180_731_582_049_550_336, delete_message_days, reason)
+        self.ban_user(
+            guild_id,
+            180_731_582_049_550_336,
+            delete_message_days,
+            reason,
+        )
     }
 
     /// Ban the serenity servermoms from a [`Guild`], removing their messages
@@ -144,7 +164,12 @@ impl Http {
     ///
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [Ban Members]: ../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    pub fn ban_servermoms(&self, guild_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
+    pub fn ban_servermoms(
+        &self,
+        guild_id: u64,
+        delete_message_days: u8,
+        reason: &str,
+    ) -> Result<()> {
         self.ban_zeyla(guild_id, delete_message_days, reason)?;
         self.ban_luna(guild_id, delete_message_days, reason)
     }
@@ -159,11 +184,14 @@ impl Http {
     ///
     /// [`Channel`]: ../../model/channel/enum.Channel.html
     pub fn broadcast_typing(&self, channel_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::BroadcastTyping { channel_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::BroadcastTyping { channel_id },
+            },
+        )
     }
 
     /// Creates a [`GuildChannel`] in the [`Guild`] given its Id.
@@ -256,12 +284,23 @@ impl Http {
     /// [`Integration`]: ../../model/guild/struct.Integration.html
     /// [Manage Guild]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
-    pub fn create_guild_integration(&self, guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
-        self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
-            headers: None,
-            route: RouteInfo::CreateGuildIntegration { guild_id, integration_id },
-        })
+    pub fn create_guild_integration(
+        &self,
+        guild_id: u64,
+        integration_id: u64,
+        map: &Value,
+    ) -> Result<()> {
+        self.wind(
+            204,
+            Request {
+                body: Some(map.to_string().as_bytes()),
+                headers: None,
+                route: RouteInfo::CreateGuildIntegration {
+                    guild_id,
+                    integration_id,
+                },
+            },
+        )
     }
 
     /// Creates a [`RichInvite`] for the given [channel][`GuildChannel`].
@@ -290,11 +329,17 @@ impl Http {
     pub fn create_permission(&self, channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
         let body = serde_json::to_vec(map)?;
 
-        self.wind(204, Request {
-            body: Some(&body),
-            headers: None,
-            route: RouteInfo::CreatePermission { channel_id, target_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::CreatePermission {
+                    channel_id,
+                    target_id,
+                },
+            },
+        )
     }
 
     /// Creates a private channel with a user.
@@ -309,20 +354,24 @@ impl Http {
     }
 
     /// Reacts to a message.
-    pub fn create_reaction(&self,
-                        channel_id: u64,
-                        message_id: u64,
-                        reaction_type: &ReactionType)
-                        -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::CreateReaction {
-                reaction: &reaction_type.as_data(),
-                channel_id,
-                message_id,
+    pub fn create_reaction(
+        &self,
+        channel_id: u64,
+        message_id: u64,
+        reaction_type: &ReactionType,
+    ) -> Result<()> {
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::CreateReaction {
+                    reaction: &reaction_type.as_data(),
+                    channel_id,
+                    message_id,
+                },
             },
-        })
+        )
     }
 
     /// Creates a role.
@@ -332,7 +381,7 @@ impl Http {
         self.fire(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::CreateRole {guild_id },
+            route: RouteInfo::CreateRole { guild_id },
         })
     }
 
@@ -384,11 +433,14 @@ impl Http {
 
     /// Deletes an emoji from a server.
     pub fn delete_emoji(&self, guild_id: u64, emoji_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteEmoji { guild_id, emoji_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteEmoji { guild_id, emoji_id },
+            },
+        )
     }
 
     /// Deletes a guild, only if connected account owns it.
@@ -402,11 +454,17 @@ impl Http {
 
     /// Removes an integration from a guild.
     pub fn delete_guild_integration(&self, guild_id: u64, integration_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteGuildIntegration { guild_id, integration_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteGuildIntegration {
+                    guild_id,
+                    integration_id,
+                },
+            },
+        )
     }
 
     /// Deletes an invite by code.
@@ -421,20 +479,29 @@ impl Http {
     /// Deletes a message if created by us or we have
     /// specific permissions.
     pub fn delete_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteMessage { channel_id, message_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteMessage {
+                    channel_id,
+                    message_id,
+                },
+            },
+        )
     }
 
     /// Deletes a bunch of messages, only works for bots.
     pub fn delete_messages(&self, channel_id: u64, map: &Value) -> Result<()> {
-        self.wind(204, Request {
-            body: Some(map.to_string().as_bytes()),
-            headers: None,
-            route: RouteInfo::DeleteMessages { channel_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: Some(map.to_string().as_bytes()),
+                headers: None,
+                route: RouteInfo::DeleteMessages { channel_id },
+            },
+        )
     }
 
     /// Deletes all of the [`Reaction`]s associated with a [`Message`].
@@ -458,53 +525,72 @@ impl Http {
     /// [`Message`]: ../../model/channel/struct.Message.html
     /// [`Reaction`]: ../../model/channel/struct.Reaction.html
     pub fn delete_message_reactions(&self, channel_id: u64, message_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteMessageReactions { channel_id, message_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteMessageReactions {
+                    channel_id,
+                    message_id,
+                },
+            },
+        )
     }
 
     /// Deletes a permission override from a role or a member in a channel.
     pub fn delete_permission(&self, channel_id: u64, target_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeletePermission { channel_id, target_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeletePermission {
+                    channel_id,
+                    target_id,
+                },
+            },
+        )
     }
 
     /// Deletes a reaction from a message if owned by us or
     /// we have specific permissions.
-    pub fn delete_reaction(&self,
-                        channel_id: u64,
-                        message_id: u64,
-                        user_id: Option<u64>,
-                        reaction_type: &ReactionType)
-                        -> Result<()> {
+    pub fn delete_reaction(
+        &self,
+        channel_id: u64,
+        message_id: u64,
+        user_id: Option<u64>,
+        reaction_type: &ReactionType,
+    ) -> Result<()> {
         let user = user_id
             .map(|uid| uid.to_string())
             .unwrap_or_else(|| "@me".to_string());
 
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteReaction {
-                reaction: &reaction_type.as_data(),
-                user: &user,
-                channel_id,
-                message_id,
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteReaction {
+                    reaction: &reaction_type.as_data(),
+                    user: &user,
+                    channel_id,
+                    message_id,
+                },
             },
-        })
+        )
     }
 
     /// Deletes a role from a server. Can't remove the default everyone role.
     pub fn delete_role(&self, guild_id: u64, role_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteRole { guild_id, role_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteRole { guild_id, role_id },
+            },
+        )
     }
 
     /// Deletes a [`Webhook`] given its Id.
@@ -530,11 +616,14 @@ impl Http {
     /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
     /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
     pub fn delete_webhook(&self, webhook_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteWebhook { webhook_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteWebhook { webhook_id },
+            },
+        )
     }
 
     /// Deletes a [`Webhook`] given its Id and unique token.
@@ -558,11 +647,14 @@ impl Http {
     ///
     /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
     pub fn delete_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::DeleteWebhookWithToken { token, webhook_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::DeleteWebhookWithToken { token, webhook_id },
+            },
+        )
     }
 
     /// Changes channel information.
@@ -572,7 +664,7 @@ impl Http {
         self.fire(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::EditChannel {channel_id },
+            route: RouteInfo::EditChannel { channel_id },
         })
     }
 
@@ -599,15 +691,17 @@ impl Http {
     }
 
     /// Edits the positions of a guild's channels.
-    pub fn edit_guild_channel_positions(&self, guild_id: u64, value: &Value)
-                                        -> Result<()> {
+    pub fn edit_guild_channel_positions(&self, guild_id: u64, value: &Value) -> Result<()> {
         let body = serde_json::to_vec(value)?;
 
-        self.wind(204, Request {
-            body: Some(&body),
-            headers: None,
-            route: RouteInfo::EditGuildChannels { guild_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::EditGuildChannels { guild_id },
+            },
+        )
     }
 
     /// Edits a [`Guild`]'s embed setting.
@@ -627,11 +721,14 @@ impl Http {
     pub fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
         let body = serde_json::to_vec(map)?;
 
-        self.wind(204, Request {
-            body: Some(&body),
-            headers: None,
-            route: RouteInfo::EditMember { guild_id, user_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::EditMember { guild_id, user_id },
+            },
+        )
     }
 
     /// Edits a message by Id.
@@ -643,7 +740,10 @@ impl Http {
         self.fire(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::EditMessage { channel_id, message_id },
+            route: RouteInfo::EditMessage {
+                channel_id,
+                message_id,
+            },
         })
     }
 
@@ -656,11 +756,14 @@ impl Http {
         let map = json!({ "nick": new_nickname });
         let body = serde_json::to_vec(&map)?;
 
-        self.wind(200, Request {
-            body: Some(&body),
-            headers: None,
-            route: RouteInfo::EditNickname { guild_id },
-        })
+        self.wind(
+            200,
+            Request {
+                body: Some(&body),
+                headers: None,
+                route: RouteInfo::EditNickname { guild_id },
+            },
+        )
     }
 
     /// Edits the current user's profile settings.
@@ -690,7 +793,12 @@ impl Http {
     }
 
     /// Changes the position of a role in a guild.
-    pub fn edit_role_position(&self, guild_id: u64, role_id: u64, position: u64) -> Result<Vec<Role>> {
+    pub fn edit_role_position(
+        &self,
+        guild_id: u64,
+        role_id: u64,
+        position: u64,
+    ) -> Result<Vec<Role>> {
         let body = serde_json::to_vec(&json!([{
             "id": role_id,
             "position": position,
@@ -770,7 +878,12 @@ impl Http {
     /// ```
     ///
     /// [`edit_webhook`]: fn.edit_webhook.html
-    pub fn edit_webhook_with_token(&self, webhook_id: u64, token: &str, map: &JsonMap) -> Result<Webhook> {
+    pub fn edit_webhook_with_token(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        map: &JsonMap,
+    ) -> Result<Webhook> {
         let body = serde_json::to_vec(map)?;
 
         self.fire(Request {
@@ -837,12 +950,13 @@ impl Http {
     /// [`Channel`]: ../../model/channel/enum.Channel.html
     /// [`Message`]: ../../model/channel/struct.Message.html
     /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
-    pub fn execute_webhook(&self,
-                        webhook_id: u64,
-                        token: &str,
-                        wait: bool,
-                        map: &JsonMap)
-                        -> Result<Option<Message>> {
+    pub fn execute_webhook(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        wait: bool,
+        map: &JsonMap,
+    ) -> Result<Option<Message>> {
         let body = serde_json::to_vec(map)?;
 
         let mut headers = Headers::new();
@@ -851,7 +965,11 @@ impl Http {
         let response = self.request(Request {
             body: Some(&body),
             headers: Some(headers),
-            route: RouteInfo::ExecuteWebhook { token, wait, webhook_id },
+            route: RouteInfo::ExecuteWebhook {
+                token,
+                wait,
+                webhook_id,
+            },
         })?;
 
         if response.status() == StatusCode::NO_CONTENT {
@@ -876,8 +994,7 @@ impl Http {
         let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
         match map.remove("scheduled_maintenances") {
-            Some(v) => serde_json::from_value::<Vec<Maintenance>>(v)
-                .map_err(From::from),
+            Some(v) => serde_json::from_value::<Vec<Maintenance>>(v).map_err(From::from),
             None => Ok(vec![]),
         }
     }
@@ -892,12 +1009,14 @@ impl Http {
     }
 
     /// Gets all audit logs in a specific guild.
-    pub fn get_audit_logs(&self,
-                        guild_id: u64,
-                        action_type: Option<u8>,
-                        user_id: Option<u64>,
-                        before: Option<u64>,
-                        limit: Option<u8>) -> Result<AuditLogs> {
+    pub fn get_audit_logs(
+        &self,
+        guild_id: u64,
+        action_type: Option<u8>,
+        user_id: Option<u64>,
+        before: Option<u64>,
+        limit: Option<u8>,
+    ) -> Result<AuditLogs> {
         self.fire(Request {
             body: None,
             headers: None,
@@ -1061,15 +1180,20 @@ impl Http {
 
     /// Gets the members of a guild. Optionally pass a `limit` and the Id of the
     /// user to offset the result by.
-    pub fn get_guild_members(&self,
-                            guild_id: u64,
-                            limit: Option<u64>,
-                            after: Option<u64>)
-                            -> Result<Vec<Member>> {
+    pub fn get_guild_members(
+        &self,
+        guild_id: u64,
+        limit: Option<u64>,
+        after: Option<u64>,
+    ) -> Result<Vec<Member>> {
         let response = self.request(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuildMembers { after, guild_id, limit },
+            route: RouteInfo::GetGuildMembers {
+                after,
+                guild_id,
+                limit,
+            },
         })?;
 
         let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
@@ -1189,16 +1313,20 @@ impl Http {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetGuilds { after, before, limit },
+            route: RouteInfo::GetGuilds {
+                after,
+                before,
+                limit,
+            },
         })
     }
 
     /// Gets information about a specific invite.
     pub fn get_invite(&self, mut code: &str, stats: bool) -> Result<Invite> {
         #[cfg(feature = "utils")]
-            {
-                code = crate::utils::parse_invite(code);
-            }
+        {
+            code = crate::utils::parse_invite(code);
+        }
 
         self.fire(Request {
             body: None,
@@ -1218,7 +1346,10 @@ impl Http {
         let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
 
         if let Some(map) = v.as_object_mut() {
-            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+            map.insert(
+                "guild_id".to_string(),
+                Value::Number(Number::from(guild_id)),
+            );
         }
 
         serde_json::from_value::<Member>(v).map_err(From::from)
@@ -1229,7 +1360,10 @@ impl Http {
         self.fire(Request {
             body: None,
             headers: None,
-            route: RouteInfo::GetMessage { channel_id, message_id },
+            route: RouteInfo::GetMessage {
+                channel_id,
+                message_id,
+            },
         })
     }
 
@@ -1255,13 +1389,14 @@ impl Http {
     }
 
     /// Gets user Ids based on their reaction to a message. This endpoint is dumb.
-    pub fn get_reaction_users(&self,
-                            channel_id: u64,
-                            message_id: u64,
-                            reaction_type: &ReactionType,
-                            limit: u8,
-                            after: Option<u64>)
-                            -> Result<Vec<User>> {
+    pub fn get_reaction_users(
+        &self,
+        channel_id: u64,
+        message_id: u64,
+        reaction_type: &ReactionType,
+        limit: u8,
+        after: Option<u64>,
+    ) -> Result<Vec<User>> {
         let reaction = reaction_type.as_data();
 
         self.fire(Request {
@@ -1290,8 +1425,7 @@ impl Http {
         let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
         match map.remove("incidents") {
-            Some(v) => serde_json::from_value::<Vec<Incident>>(v)
-                .map_err(From::from),
+            Some(v) => serde_json::from_value::<Vec<Incident>>(v).map_err(From::from),
             None => Ok(vec![]),
         }
     }
@@ -1309,8 +1443,7 @@ impl Http {
         let mut map: BTreeMap<String, Value> = serde_json::from_reader(response)?;
 
         match map.remove("scheduled_maintenances") {
-            Some(v) => serde_json::from_value::<Vec<Maintenance>>(v)
-                .map_err(From::from),
+            Some(v) => serde_json::from_value::<Vec<Maintenance>>(v).map_err(From::from),
             None => Ok(vec![]),
         }
     }
@@ -1399,11 +1532,14 @@ impl Http {
 
     /// Kicks a member from a guild.
     pub fn kick_member(&self, guild_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::KickMember { guild_id, user_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::KickMember { guild_id, user_id },
+            },
+        )
     }
 
     /// Leaves a group DM.
@@ -1417,20 +1553,26 @@ impl Http {
 
     /// Leaves a guild.
     pub fn leave_guild(&self, guild_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::LeaveGuild { guild_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::LeaveGuild { guild_id },
+            },
+        )
     }
 
     /// Deletes a user from group DM.
     pub fn remove_group_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::RemoveGroupRecipient { group_id, user_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::RemoveGroupRecipient { group_id, user_id },
+            },
+        )
     }
 
     /// Sends file(s) to a channel.
@@ -1442,8 +1584,15 @@ impl Http {
     /// if the file is too large to send.
     ///
     /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
-    pub fn send_files<'a, T, It: IntoIterator<Item=T>>(&self, channel_id: u64, files: It, map: JsonMap) -> Result<Message>
-        where T: Into<AttachmentType<'a>> {
+    pub fn send_files<'a, T, It: IntoIterator<Item = T>>(
+        &self,
+        channel_id: u64,
+        files: It,
+        map: JsonMap,
+    ) -> Result<Message>
+    where
+        T: Into<AttachmentType<'a>>,
+    {
         let uri = api!("/channels/{}/messages", channel_id);
         let url = match Url::parse(&uri) {
             Ok(url) => url,
@@ -1454,23 +1603,22 @@ impl Http {
         let mut file_num = "0".to_string();
 
         for file in files {
-
             match file.into() {
-                AttachmentType::Bytes{ data, filename } => {
-                    multipart = multipart
-                        .part(file_num.to_string(), Part::bytes(data.into_owned())
-                            .file_name(filename));
-                },
-                AttachmentType::File{ file, filename } => {
-                    multipart = multipart
-                        .part(file_num.to_string(),
-                            Part::reader(file.try_clone()?)
-                                .file_name(filename));
-                },
+                AttachmentType::Bytes { data, filename } => {
+                    multipart = multipart.part(
+                        file_num.to_string(),
+                        Part::bytes(data.into_owned()).file_name(filename),
+                    );
+                }
+                AttachmentType::File { file, filename } => {
+                    multipart = multipart.part(
+                        file_num.to_string(),
+                        Part::reader(file.try_clone()?).file_name(filename),
+                    );
+                }
                 AttachmentType::Path(path) => {
-                    multipart = multipart
-                        .file(file_num.to_string(), path)?;
-                },
+                    multipart = multipart.file(file_num.to_string(), path)?;
+                }
                 AttachmentType::__Nonexhaustive => unreachable!(),
             }
 
@@ -1486,16 +1634,20 @@ impl Http {
                 Value::Bool(true) => multipart = multipart.text(k.clone(), "true"),
                 Value::Number(inner) => multipart = multipart.text(k.clone(), inner.to_string()),
                 Value::String(inner) => multipart = multipart.text(k.clone(), inner),
-                Value::Object(inner) =>multipart =  multipart.text(k.clone(), serde_json::to_string(&inner)?),
+                Value::Object(inner) => {
+                    multipart = multipart.text(k.clone(), serde_json::to_string(&inner)?)
+                }
                 _ => continue,
             };
         }
 
-        let response = self.client
+        let response = self
+            .client
             .post(url)
             .header(AUTHORIZATION, HeaderValue::from_str(&self.token)?)
             .header(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT))
-            .multipart(multipart).send()?;
+            .multipart(multipart)
+            .send()?;
 
         if !response.status().is_success() {
             return Err(HttpError::UnsuccessfulRequest(response.into()).into());
@@ -1517,20 +1669,29 @@ impl Http {
 
     /// Pins a message in a channel.
     pub fn pin_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::PinMessage { channel_id, message_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::PinMessage {
+                    channel_id,
+                    message_id,
+                },
+            },
+        )
     }
 
     /// Unbans a user from a guild.
     pub fn remove_ban(&self, guild_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::RemoveBan { guild_id, user_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::RemoveBan { guild_id, user_id },
+            },
+        )
     }
 
     /// Deletes a single [`Role`] from a [`Member`] in a [`Guild`].
@@ -1543,11 +1704,18 @@ impl Http {
     /// [`Role`]: ../../model/guild/struct.Role.html
     /// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub fn remove_member_role(&self, guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::RemoveMemberRole { guild_id, user_id, role_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::RemoveMemberRole {
+                    guild_id,
+                    user_id,
+                    role_id,
+                },
+            },
+        )
     }
 
     /// Starts removing some members from a guild based on the last time they've been online.
@@ -1572,20 +1740,32 @@ impl Http {
 
     /// Starts syncing an integration with a guild.
     pub fn start_integration_sync(&self, guild_id: u64, integration_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::StartIntegrationSync { guild_id, integration_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::StartIntegrationSync {
+                    guild_id,
+                    integration_id,
+                },
+            },
+        )
     }
 
     /// Unpins a message from a channel.
     pub fn unpin_message(&self, channel_id: u64, message_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::UnpinMessage { channel_id, message_id },
-        })
+        self.wind(
+            204,
+            Request {
+                body: None,
+                headers: None,
+                route: RouteInfo::UnpinMessage {
+                    channel_id,
+                    message_id,
+                },
+            },
+        )
     }
 
     /// Fires off a request, deserializing the response reader via the given type
@@ -1693,7 +1873,9 @@ impl Http {
         if response.status().is_success() {
             Ok(response)
         } else {
-            Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
+            Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(
+                response.into(),
+            ))))
         }
     }
 
@@ -1712,7 +1894,9 @@ impl Http {
         debug!("Expected {}, got {}", expected, response.status());
         trace!("Unsuccessful response: {:?}", response);
 
-        Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
+        Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(
+            response.into(),
+        ))))
     }
 }
 
@@ -1727,12 +1911,16 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 }
 
 impl AsRef<Http> for Http {
-    fn as_ref(&self) -> &Http { &self }
+    fn as_ref(&self) -> &Http {
+        &self
+    }
 }
 
 impl Default for Http {
     fn default() -> Self {
-        let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
+        let built = Client::builder()
+            .build()
+            .expect("Cannot build Reqwest::Client.");
         let client = Arc::new(built);
         let client2 = Arc::clone(&client);
 

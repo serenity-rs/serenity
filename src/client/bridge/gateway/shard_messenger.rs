@@ -1,6 +1,6 @@
+use super::{ShardClientMessage, ShardRunnerMessage};
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use super::{ShardClientMessage, ShardRunnerMessage};
 use std::sync::mpsc::{SendError, Sender};
 use tungstenite::Message;
 
@@ -26,9 +26,7 @@ impl ShardMessenger {
     /// [`Client`]: ../../struct.Client.html
     #[inline]
     pub fn new(tx: Sender<InterMessage>) -> Self {
-        Self {
-            tx,
-        }
+        Self { tx }
     }
 
     /// Requests that one or multiple [`Guild`]s be chunked.
@@ -103,12 +101,10 @@ impl ShardMessenger {
     /// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../../../model/guild/struct.Guild.html
     /// [`Member`]: ../../../model/guild/struct.Member.html
-    pub fn chunk_guilds<It>(
-        &self,
-        guild_ids: It,
-        limit: Option<u16>,
-        query: Option<String>,
-    ) where It: IntoIterator<Item=GuildId> {
+    pub fn chunk_guilds<It>(&self, guild_ids: It, limit: Option<u16>, query: Option<String>)
+    where
+        It: IntoIterator<Item = GuildId>,
+    {
         let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
 
         let _ = self.send(ShardRunnerMessage::ChunkGuilds {
@@ -253,8 +249,10 @@ impl ShardMessenger {
     }
 
     #[inline]
-    fn send(&self, msg: ShardRunnerMessage)
-        -> Result<(), SendError<InterMessage>> {
-        self.tx.send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+    fn send(&self, msg: ShardRunnerMessage) -> Result<(), SendError<InterMessage>> {
+        self.tx
+            .send(InterMessage::Client(Box::new(ShardClientMessage::Runner(
+                msg,
+            ))))
     }
 }

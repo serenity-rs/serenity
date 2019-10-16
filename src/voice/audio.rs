@@ -1,9 +1,6 @@
-use parking_lot::Mutex;
 use audiopus::{Bitrate, SampleRate};
-use std::{
-    sync::Arc,
-    time::Duration,
-};
+use parking_lot::Mutex;
+use std::{sync::Arc, time::Duration};
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
@@ -19,25 +16,32 @@ pub trait AudioSource: Send {
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
+    fn decode_and_add_opus_frame(
+        &mut self,
+        float_buffer: &mut [f32; 1920],
+        volume: f32,
+    ) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) { }
+    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) {}
 
     #[allow(clippy::too_many_arguments)]
-    fn voice_packet(&mut self,
-                    _ssrc: u32,
-                    _sequence: u16,
-                    _timestamp: u32,
-                    _stereo: bool,
-                    _data: &[i16],
-                    _compressed_size: usize) { }
+    fn voice_packet(
+        &mut self,
+        _ssrc: u32,
+        _sequence: u16,
+        _timestamp: u32,
+        _stereo: bool,
+        _data: &[i16],
+        _compressed_size: usize,
+    ) {
+    }
 
-    fn client_connect(&mut self, _ssrc: u32, _user_id: u64) { }
+    fn client_connect(&mut self, _ssrc: u32, _user_id: u64) {}
 
-    fn client_disconnect(&mut self, _user_id: u64) { }
+    fn client_disconnect(&mut self, _user_id: u64) {}
 }
 
 #[derive(Clone, Copy)]
@@ -75,7 +79,6 @@ pub enum AudioType {
 /// [`Handler::play_only`]: struct.Handler.html#method.play_only
 /// [`Handler::play_returning`]: struct.Handler.html#method.play_returning
 pub struct Audio {
-
     /// Whether or not this sound is currently playing.
     ///
     /// Can be controlled with [`play`] or [`pause`] if chaining is desired.
@@ -166,7 +169,6 @@ impl Audio {
         self.position += Duration::from_millis(20);
         self.position_modified = false;
     }
-
 }
 
 /// Threadsafe form of an instance of the [`Audio`] struct, locked behind a

@@ -22,8 +22,8 @@ use crate::utils;
 use chrono::{DateTime, TimeZone};
 use serde_json::{json, Value};
 
-use std::fmt::Display;
 use std::collections::HashMap;
+use std::fmt::Display;
 
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
@@ -50,7 +50,9 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
     pub fn author<F>(&mut self, f: F) -> &mut Self
-        where F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor {
+    where
+        F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor,
+    {
         let mut author = CreateEmbedAuthor::default();
         f(&mut author);
 
@@ -82,10 +84,8 @@ impl CreateEmbed {
 
     #[cfg(feature = "utils")]
     fn _colour(&mut self, colour: Colour) {
-        self.0.insert(
-            "color",
-            Value::Number(Number::from(u64::from(colour.0))),
-        );
+        self.0
+            .insert("color", Value::Number(Number::from(u64::from(colour.0))));
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -112,7 +112,8 @@ impl CreateEmbed {
     /// **Note**: This can't be longer than 2048 characters.
     #[inline]
     pub fn description<D: ToString>(&mut self, description: D) -> &mut Self {
-        self.0.insert("description", Value::String(description.to_string()));
+        self.0
+            .insert("description", Value::String(description.to_string()));
         self
     }
 
@@ -122,15 +123,19 @@ impl CreateEmbed {
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
     #[inline]
-    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool)  -> &mut Self
-        where T: ToString, U: ToString {
+    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool) -> &mut Self
+    where
+        T: ToString,
+        U: ToString,
+    {
         self._field(name.to_string(), value.to_string(), inline);
         self
     }
 
     fn _field(&mut self, name: String, value: String, inline: bool) {
         {
-            let entry = self.0
+            let entry = self
+                .0
                 .entry("fields")
                 .or_insert_with(|| Value::Array(vec![]));
 
@@ -150,9 +155,11 @@ impl CreateEmbed {
     ///
     /// [`field`]: #method.field
     pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
-        where It: IntoIterator<Item=(T, U, bool)>,
-              T: ToString,
-              U: ToString {
+    where
+        It: IntoIterator<Item = (T, U, bool)>,
+        T: ToString,
+        U: ToString,
+    {
         for (name, value, inline) in fields {
             self.field(name, value, inline);
         }
@@ -167,7 +174,9 @@ impl CreateEmbed {
     ///
     /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
     pub fn footer<F>(&mut self, f: F) -> &mut Self
-        where F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter {
+    where
+        F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter,
+    {
         let mut create_embed_footer = CreateEmbedFooter::default();
         f(&mut create_embed_footer);
         let footer = create_embed_footer.0;
@@ -437,7 +446,8 @@ pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
 impl CreateEmbedAuthor {
     /// Set the URL of the author's icon.
     pub fn icon_url<S: ToString>(&mut self, icon_url: S) -> &mut Self {
-        self.0.insert("icon_url", Value::String(icon_url.to_string()));
+        self.0
+            .insert("icon_url", Value::String(icon_url.to_string()));
         self
     }
 
@@ -467,7 +477,8 @@ pub struct CreateEmbedFooter(pub HashMap<&'static str, Value>);
 impl CreateEmbedFooter {
     /// Set the icon URL's value. This only supports HTTP(S).
     pub fn icon_url<S: ToString>(&mut self, icon_url: S) -> &mut Self {
-        self.0.insert("icon_url", Value::String(icon_url.to_string()));
+        self.0
+            .insert("icon_url", Value::String(icon_url.to_string()));
         self
     }
 
@@ -485,22 +496,20 @@ pub struct Timestamp {
 
 impl From<String> for Timestamp {
     fn from(ts: String) -> Self {
-        Self {
-            ts,
-        }
+        Self { ts }
     }
 }
 
 impl<'a> From<&'a str> for Timestamp {
     fn from(ts: &'a str) -> Self {
-        Self {
-            ts: ts.to_string(),
-        }
+        Self { ts: ts.to_string() }
     }
 }
 
 impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
-    where Tz::Offset: Display {
+where
+    Tz::Offset: Display,
+{
     fn from(dt: &'a DateTime<Tz>) -> Self {
         Self {
             ts: dt.to_rfc3339(),
@@ -510,10 +519,12 @@ impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
 
 #[cfg(test)]
 mod test {
-    use crate::{model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
-        utils::{self, Colour}};
-    use serde_json::{json, Value};
     use super::CreateEmbed;
+    use crate::{
+        model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
+        utils::{self, Colour},
+    };
+    use serde_json::{json, Value};
 
     #[test]
     fn test_from_embed() {
@@ -564,11 +575,11 @@ mod test {
         };
 
         let mut builder = CreateEmbed::from(embed);
-            builder.colour(0xFF0011);
-            builder.description("This is a hakase description");
-            builder.image("https://i.imgur.com/XfWpfCV.gif");
-            builder.title("still a hakase");
-            builder.url("https://i.imgur.com/XfWpfCV.gif");
+        builder.colour(0xFF0011);
+        builder.description("This is a hakase description");
+        builder.image("https://i.imgur.com/XfWpfCV.gif");
+        builder.title("still a hakase");
+        builder.url("https://i.imgur.com/XfWpfCV.gif");
 
         let built = Value::Object(utils::hashmap_to_json_map(builder.0));
 

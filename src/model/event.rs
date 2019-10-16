@@ -1,18 +1,14 @@
 //! All the events this library handles.
 
-use chrono::{DateTime, FixedOffset};
-use serde::de::Error as DeError;
-use serde::ser::{
-    Serialize,
-    SerializeSeq,
-    Serializer
-};
-use serde_json;
-use std::collections::HashMap;
-use super::utils::{deserialize_emojis, deserialize_u64};
 use super::prelude::*;
+use super::utils::{deserialize_emojis, deserialize_u64};
 use crate::constants::{OpCode, VoiceOpCode};
 use crate::internal::prelude::*;
+use chrono::{DateTime, FixedOffset};
+use serde::de::Error as DeError;
+use serde::ser::{Serialize, SerializeSeq, Serializer};
+use serde_json;
+use std::collections::HashMap;
 
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
@@ -53,7 +49,9 @@ impl<'de> Deserialize<'de> for ChannelCreateEvent {
 
 impl Serialize for ChannelCreateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Channel::serialize(&self.channel, serializer)
     }
 }
@@ -80,7 +78,7 @@ impl CacheUpdate for ChannelCreateEvent {
                 let ch = cache.groups.insert(channel_id, group);
 
                 ch.map(Channel::Group)
-            },
+            }
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
@@ -90,11 +88,12 @@ impl CacheUpdate for ChannelCreateEvent {
                     .guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| {
-                        guild
-                            .with_mut(|guild| guild.channels.insert(channel_id, Arc::clone(channel)))
+                        guild.with_mut(|guild| {
+                            guild.channels.insert(channel_id, Arc::clone(channel))
+                        })
                     })
                     .map(Channel::Guild)
-            },
+            }
             Channel::Private(ref channel) => {
                 if let Some(channel) = cache.private_channels.get(&channel.with(|c| c.id)) {
                     return Some(Channel::Private(Arc::clone(&(*channel))));
@@ -115,7 +114,7 @@ impl CacheUpdate for ChannelCreateEvent {
 
                 let ch = cache.private_channels.insert(id, Arc::clone(&channel));
                 ch.map(Channel::Private)
-            },
+            }
             Channel::Category(ref category) => cache
                 .categories
                 .insert(category.read().id, Arc::clone(category))
@@ -146,23 +145,20 @@ impl CacheUpdate for ChannelDeleteEvent {
                     .guilds
                     .get_mut(&guild_id)
                     .and_then(|guild| guild.with_mut(|g| g.channels.remove(&channel_id)));
-            },
+            }
             Channel::Category(ref category) => {
                 let channel_id = category.with(|cat| cat.id);
 
                 cache.categories.remove(&channel_id);
-            },
+            }
             Channel::Private(ref channel) => {
-                let id = {
-                    channel.read().id
-                };
+                let id = { channel.read().id };
 
                 cache.private_channels.remove(&id);
-            },
+            }
 
             // We ignore these because the delete event does not fire for these.
-            Channel::Group(_) |
-            Channel::__Nonexhaustive => unreachable!(),
+            Channel::Group(_) | Channel::__Nonexhaustive => unreachable!(),
         };
 
         // Remove the cached messages for the channel.
@@ -183,7 +179,9 @@ impl<'de> Deserialize<'de> for ChannelDeleteEvent {
 
 impl Serialize for ChannelDeleteEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Channel::serialize(&self.channel, serializer)
     }
 }
@@ -229,7 +227,6 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
     }
 }
 
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelRecipientAddEvent {
     pub channel_id: ChannelId,
@@ -254,7 +251,6 @@ impl CacheUpdate for ChannelRecipientAddEvent {
     }
 }
 
-
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelRecipientRemoveEvent {
     pub channel_id: ChannelId,
@@ -268,9 +264,10 @@ impl CacheUpdate for ChannelRecipientRemoveEvent {
     type Output = ();
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.groups.get_mut(&self.channel_id).map(|group| {
-            group.with_mut(|g| g.recipients.remove(&self.user.id))
-        });
+        cache
+            .groups
+            .get_mut(&self.channel_id)
+            .map(|group| group.with_mut(|g| g.recipients.remove(&self.user.id)));
 
         None
     }
@@ -295,7 +292,7 @@ impl CacheUpdate for ChannelUpdateEvent {
                 match cache.groups.entry(ch_id) {
                     Entry::Vacant(e) => {
                         e.insert(Arc::clone(group));
-                    },
+                    }
                     Entry::Occupied(mut e) => {
                         let mut dest = e.get_mut().write();
 
@@ -308,30 +305,28 @@ impl CacheUpdate for ChannelUpdateEvent {
                         } else {
                             dest.clone_from(&group.read());
                         }
-                    },
+                    }
                 }
-            },
+            }
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
                 cache.channels.insert(channel_id, Arc::clone(channel));
 
                 if let Some(guild) = cache.guilds.get_mut(&guild_id) {
-                    guild
-                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)));
+                    guild.with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)));
                 }
-            },
+            }
             Channel::Private(ref channel) => {
                 if let Some(private) = cache.private_channels.get_mut(&channel.read().id) {
                     private.clone_from(channel);
                 }
-            },
+            }
             Channel::Category(ref category) => {
-                if let Some(c) = cache
-                    .categories
-                    .get_mut(&category.read().id)
-                    { c.clone_from(category) }
-            },
+                if let Some(c) = cache.categories.get_mut(&category.read().id) {
+                    c.clone_from(category)
+                }
+            }
             Channel::__Nonexhaustive => unreachable!(),
         }
 
@@ -350,7 +345,9 @@ impl<'de> Deserialize<'de> for ChannelUpdateEvent {
 
 impl Serialize for ChannelUpdateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Channel::serialize(&self.channel, serializer)
     }
 }
@@ -413,7 +410,9 @@ impl<'de> Deserialize<'de> for GuildCreateEvent {
 
 impl Serialize for GuildCreateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Guild::serialize(&self.guild, serializer)
     }
 }
@@ -455,14 +454,20 @@ impl<'de> Deserialize<'de> for GuildDeleteEvent {
 
 impl Serialize for GuildDeleteEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         PartialGuild::serialize(&self.guild, serializer)
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildEmojisUpdateEvent {
-    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(
+        serialize_with = "serialize_emojis",
+        deserialize_with = "deserialize_emojis"
+    )]
+    pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
@@ -474,9 +479,7 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
         if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
-            guild.with_mut(|g| {
-                g.emojis.clone_from(&self.emojis)
-            });
+            guild.with_mut(|g| g.emojis.clone_from(&self.emojis));
         }
 
         None
@@ -523,15 +526,15 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let map = JsonMap::deserialize(deserializer)?;
 
-        let guild_id = map.get("guild_id")
+        let guild_id = map
+            .get("guild_id")
             .ok_or_else(|| DeError::custom("missing member add guild id"))
             .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
 
         Ok(GuildMemberAddEvent {
             guild_id,
-            member: Member::deserialize(Value::Object(map))
-                .map_err(DeError::custom)?,
+            member: Member::deserialize(Value::Object(map)).map_err(DeError::custom)?,
             _nonexhaustive: (),
         })
     }
@@ -539,7 +542,9 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
 
 impl Serialize for GuildMemberAddEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where S: Serializer {
+    where
+        S: Serializer,
+    {
         let mut s: Vec<u8> = Vec::new();
         let mut ser = serde_json::Serializer::new(&mut s);
         Member::serialize(&self.member, &mut ser).unwrap(); // TODO find better way to do this
@@ -662,12 +667,14 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let guild_id = map.get("guild_id")
+        let guild_id = map
+            .get("guild_id")
             .ok_or_else(|| DeError::custom("missing member chunk guild id"))
             .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
 
-        let mut members = map.remove("members")
+        let mut members = map
+            .remove("members")
             .ok_or_else(|| DeError::custom("missing member chunk members"))?;
 
         if let Some(members) = members.as_array_mut() {
@@ -681,15 +688,15 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
         }
 
         let members = serde_json::from_value::<Vec<Member>>(members)
-            .map(|members| members
-                .into_iter()
-                .fold(HashMap::new(), |mut acc, member| {
+            .map(|members| {
+                members.into_iter().fold(HashMap::new(), |mut acc, member| {
                     let id = member.user.read().id;
 
                     acc.insert(id, member);
 
                     acc
-                }))
+                })
+            })
             .map_err(DeError::custom)?;
 
         Ok(GuildMembersChunkEvent {
@@ -713,12 +720,10 @@ impl CacheUpdate for GuildRoleCreateEvent {
     type Output = ();
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.guilds.get_mut(&self.guild_id).map(|guild| {
-            guild
-                .write()
-                .roles
-                .insert(self.role.id, self.role.clone())
-        });
+        cache
+            .guilds
+            .get_mut(&self.guild_id)
+            .map(|guild| guild.write().roles.insert(self.role.id, self.role.clone()));
 
         None
     }
@@ -769,7 +774,8 @@ impl CacheUpdate for GuildRoleUpdateEvent {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildUnavailableEvent {
-    #[serde(rename = "id")] pub guild_id: GuildId,
+    #[serde(rename = "id")]
+    pub guild_id: GuildId,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -825,7 +831,9 @@ impl<'de> Deserialize<'de> for GuildUpdateEvent {
 
 impl Serialize for GuildUpdateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         PartialGuild::serialize(&self.guild, serializer)
     }
 }
@@ -848,10 +856,12 @@ impl CacheUpdate for MessageCreateEvent {
             return None;
         }
 
-        let messages = cache.messages
+        let messages = cache
+            .messages
             .entry(self.message.channel_id)
             .or_insert_with(Default::default);
-        let queue = cache.message_queue
+        let queue = cache
+            .message_queue
             .entry(self.message.channel_id)
             .or_insert_with(Default::default);
 
@@ -881,7 +891,9 @@ impl<'de> Deserialize<'de> for MessageCreateEvent {
 
 impl Serialize for MessageCreateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Message::serialize(&self.message, serializer)
     }
 }
@@ -897,7 +909,8 @@ pub struct MessageDeleteBulkEvent {
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct MessageDeleteEvent {
     pub channel_id: ChannelId,
-    #[serde(rename = "id")] pub message_id: MessageId,
+    #[serde(rename = "id")]
+    pub message_id: MessageId,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -929,7 +942,6 @@ impl CacheUpdate for MessageUpdateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
         if let Some(messages) = cache.messages.get_mut(&self.channel_id) {
-
             if let Some(message) = messages.get_mut(&self.id) {
                 let item = message.clone();
 
@@ -1010,16 +1022,19 @@ impl CacheUpdate for PresenceUpdateEvent {
                     if let Some(user) = self.presence.user.as_ref() {
                         let roles = self.roles.clone().unwrap_or_default();
 
-                        guild.members.insert(self.presence.user_id, Member {
-                            deaf: false,
-                            guild_id,
-                            joined_at: None,
-                            mute: false,
-                            nick: self.presence.nick.clone(),
-                            user: Arc::clone(&user),
-                            roles,
-                            _nonexhaustive: (),
-                        });
+                        guild.members.insert(
+                            self.presence.user_id,
+                            Member {
+                                deaf: false,
+                                guild_id,
+                                joined_at: None,
+                                mute: false,
+                                nick: self.presence.nick.clone(),
+                                user: Arc::clone(&user),
+                                roles,
+                                _nonexhaustive: (),
+                            },
+                        );
                     }
                 }
             }
@@ -1040,17 +1055,14 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let guild_id = match map.remove("guild_id") {
-            Some(v) => serde_json::from_value::<Option<GuildId>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<GuildId>>(v).map_err(DeError::custom)?,
             None => None,
         };
         let roles = match map.remove("roles") {
-            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let presence = Presence::deserialize(Value::Object(map))
-            .map_err(DeError::custom)?;
+        let presence = Presence::deserialize(Value::Object(map)).map_err(DeError::custom)?;
 
         Ok(Self {
             guild_id,
@@ -1099,7 +1111,9 @@ impl<'de> Deserialize<'de> for PresencesReplaceEvent {
 
 impl Serialize for PresencesReplaceEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         let mut seq = serializer.serialize_seq(Some(self.presences.len()))?;
 
         for value in &self.presences {
@@ -1127,7 +1141,9 @@ impl<'de> Deserialize<'de> for ReactionAddEvent {
 
 impl Serialize for ReactionAddEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Reaction::serialize(&self.reaction, serializer)
     }
 }
@@ -1149,7 +1165,9 @@ impl<'de> Deserialize<'de> for ReactionRemoveEvent {
 
 impl Serialize for ReactionRemoveEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Reaction::serialize(&self.reaction, serializer)
     }
 }
@@ -1181,12 +1199,12 @@ impl CacheUpdate for ReadyEvent {
                 GuildStatus::Offline(unavailable) => {
                     cache.guilds.remove(&unavailable.id);
                     cache.unavailable_guilds.insert(unavailable.id);
-                },
+                }
                 GuildStatus::OnlineGuild(guild) => {
                     cache.unavailable_guilds.remove(&guild.id);
                     cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild)));
-                },
-                GuildStatus::OnlinePartialGuild(_) => {},
+                }
+                GuildStatus::OnlinePartialGuild(_) => {}
                 GuildStatus::__Nonexhaustive => unreachable!(),
             }
         }
@@ -1221,14 +1239,17 @@ impl<'de> Deserialize<'de> for ReadyEvent {
 
 impl Serialize for ReadyEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         Ready::serialize(&self.ready, serializer)
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ResumedEvent {
-    #[serde(rename = "_trace")] pub trace: Vec<Option<String>>,
+    #[serde(rename = "_trace")]
+    pub trace: Vec<Option<String>>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -1276,7 +1297,9 @@ impl<'de> Deserialize<'de> for UserUpdateEvent {
 
 impl Serialize for UserUpdateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         CurrentUser::serialize(&self.current_user, serializer)
     }
 }
@@ -1335,8 +1358,7 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
 
         Ok(VoiceStateUpdateEvent {
             guild_id,
-            voice_state: VoiceState::deserialize(Value::Object(map))
-                .map_err(DeError::custom)?,
+            voice_state: VoiceState::deserialize(Value::Object(map)).map_err(DeError::custom)?,
             _nonexhaustive: (),
         })
     }
@@ -1344,7 +1366,9 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
 
 impl Serialize for VoiceStateUpdateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where S: Serializer {
+    where
+        S: Serializer,
+    {
         let mut s: Vec<u8> = Vec::new();
         let mut ser = serde_json::Serializer::new(&mut s);
         VoiceState::serialize(&self.voice_state, &mut ser).unwrap(); // TODO find better way to do this
@@ -1383,65 +1407,69 @@ pub enum GatewayEvent {
 }
 
 impl<'de> Deserialize<'de> for GatewayEvent {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D)
-        -> StdResult<Self, D::Error> {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let op = map.remove("op")
+        let op = map
+            .remove("op")
             .ok_or_else(|| DeError::custom("expected op"))
             .and_then(OpCode::deserialize)
             .map_err(DeError::custom)?;
 
         Ok(match op {
             OpCode::Event => {
-                let s = map.remove("s")
+                let s = map
+                    .remove("s")
                     .ok_or_else(|| DeError::custom("expected gateway event sequence"))
                     .and_then(u64::deserialize)
                     .map_err(DeError::custom)?;
-                let kind = map.remove("t")
+                let kind = map
+                    .remove("t")
                     .ok_or_else(|| DeError::custom("expected gateway event type"))
                     .and_then(EventType::deserialize)
                     .map_err(DeError::custom)?;
-                let payload = map.remove("d").ok_or_else(|| {
-                    Error::Decode("expected gateway event d", Value::Object(map))
-                }).map_err(DeError::custom)?;
-
-                let x = deserialize_event_with_type(kind, payload)
+                let payload = map
+                    .remove("d")
+                    .ok_or_else(|| Error::Decode("expected gateway event d", Value::Object(map)))
                     .map_err(DeError::custom)?;
 
+                let x = deserialize_event_with_type(kind, payload).map_err(DeError::custom)?;
+
                 GatewayEvent::Dispatch(s, x)
-            },
+            }
             OpCode::Heartbeat => {
-                let s = map.remove("s")
+                let s = map
+                    .remove("s")
                     .ok_or_else(|| DeError::custom("Expected heartbeat s"))
                     .and_then(u64::deserialize)
                     .map_err(DeError::custom)?;
 
                 GatewayEvent::Heartbeat(s)
-            },
+            }
             OpCode::Reconnect => GatewayEvent::Reconnect,
             OpCode::InvalidSession => {
-                let resumable = map.remove("d")
-                    .ok_or_else(|| {
-                        DeError::custom("expected gateway invalid session d")
-                    })
+                let resumable = map
+                    .remove("d")
+                    .ok_or_else(|| DeError::custom("expected gateway invalid session d"))
                     .and_then(bool::deserialize)
                     .map_err(DeError::custom)?;
 
                 GatewayEvent::InvalidateSession(resumable)
-            },
+            }
             OpCode::Hello => {
-                let mut d = map.remove("d")
+                let mut d = map
+                    .remove("d")
                     .ok_or_else(|| DeError::custom("expected gateway hello d"))
                     .and_then(JsonMap::deserialize)
                     .map_err(DeError::custom)?;
-                let interval = d.remove("heartbeat_interval")
+                let interval = d
+                    .remove("heartbeat_interval")
                     .ok_or_else(|| DeError::custom("expected gateway hello interval"))
                     .and_then(u64::deserialize)
                     .map_err(DeError::custom)?;
 
                 GatewayEvent::Hello(interval)
-            },
+            }
             OpCode::HeartbeatAck => GatewayEvent::HeartbeatAck,
             _ => return Err(DeError::custom("invalid opcode")),
         })
@@ -1588,15 +1616,11 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
     Ok(match kind {
         EventType::ChannelCreate => Event::ChannelCreate(serde_json::from_value(v)?),
         EventType::ChannelDelete => Event::ChannelDelete(serde_json::from_value(v)?),
-        EventType::ChannelPinsUpdate => {
-            Event::ChannelPinsUpdate(serde_json::from_value(v)?)
-        },
-        EventType::ChannelRecipientAdd => {
-            Event::ChannelRecipientAdd(serde_json::from_value(v)?)
-        },
+        EventType::ChannelPinsUpdate => Event::ChannelPinsUpdate(serde_json::from_value(v)?),
+        EventType::ChannelRecipientAdd => Event::ChannelRecipientAdd(serde_json::from_value(v)?),
         EventType::ChannelRecipientRemove => {
             Event::ChannelRecipientRemove(serde_json::from_value(v)?)
-        },
+        }
         EventType::ChannelUpdate => Event::ChannelUpdate(serde_json::from_value(v)?),
         EventType::GuildBanAdd => Event::GuildBanAdd(serde_json::from_value(v)?),
         EventType::GuildBanRemove => Event::GuildBanRemove(serde_json::from_value(v)?),
@@ -1606,84 +1630,60 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 
             let mut map = JsonMap::deserialize(v)?;
 
-            if map.remove("unavailable")
-                    .and_then(|v| v.as_bool())
-                    .unwrap_or(false) {
+            if map
+                .remove("unavailable")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false)
+            {
                 let guild_data = serde_json::from_value(Value::Object(map))?;
 
                 Event::GuildUnavailable(guild_data)
             } else {
                 Event::GuildCreate(serde_json::from_value(Value::Object(map))?)
             }
-        },
+        }
         EventType::GuildDelete => {
             let mut map = JsonMap::deserialize(v)?;
 
-            if map.remove("unavailable")
-                    .and_then(|v| v.as_bool())
-                    .unwrap_or(false) {
+            if map
+                .remove("unavailable")
+                .and_then(|v| v.as_bool())
+                .unwrap_or(false)
+            {
                 let guild_data = serde_json::from_value(Value::Object(map))?;
 
                 Event::GuildUnavailable(guild_data)
             } else {
                 Event::GuildDelete(serde_json::from_value(Value::Object(map))?)
             }
-        },
-        EventType::GuildEmojisUpdate => {
-            Event::GuildEmojisUpdate(serde_json::from_value(v)?)
-        },
+        }
+        EventType::GuildEmojisUpdate => Event::GuildEmojisUpdate(serde_json::from_value(v)?),
         EventType::GuildIntegrationsUpdate => {
             Event::GuildIntegrationsUpdate(serde_json::from_value(v)?)
-        },
+        }
         EventType::GuildMemberAdd => Event::GuildMemberAdd(serde_json::from_value(v)?),
-        EventType::GuildMemberRemove => {
-            Event::GuildMemberRemove(serde_json::from_value(v)?)
-        },
-        EventType::GuildMemberUpdate => {
-            Event::GuildMemberUpdate(serde_json::from_value(v)?)
-        },
-        EventType::GuildMembersChunk => {
-            Event::GuildMembersChunk(serde_json::from_value(v)?)
-        },
-        EventType::GuildRoleCreate => {
-            Event::GuildRoleCreate(serde_json::from_value(v)?)
-        },
-        EventType::GuildRoleDelete => {
-            Event::GuildRoleDelete(serde_json::from_value(v)?)
-        },
-        EventType::GuildRoleUpdate => {
-            Event::GuildRoleUpdate(serde_json::from_value(v)?)
-        },
+        EventType::GuildMemberRemove => Event::GuildMemberRemove(serde_json::from_value(v)?),
+        EventType::GuildMemberUpdate => Event::GuildMemberUpdate(serde_json::from_value(v)?),
+        EventType::GuildMembersChunk => Event::GuildMembersChunk(serde_json::from_value(v)?),
+        EventType::GuildRoleCreate => Event::GuildRoleCreate(serde_json::from_value(v)?),
+        EventType::GuildRoleDelete => Event::GuildRoleDelete(serde_json::from_value(v)?),
+        EventType::GuildRoleUpdate => Event::GuildRoleUpdate(serde_json::from_value(v)?),
         EventType::GuildUpdate => Event::GuildUpdate(serde_json::from_value(v)?),
         EventType::MessageCreate => Event::MessageCreate(serde_json::from_value(v)?),
         EventType::MessageDelete => Event::MessageDelete(serde_json::from_value(v)?),
-        EventType::MessageDeleteBulk => {
-            Event::MessageDeleteBulk(serde_json::from_value(v)?)
-        },
-        EventType::ReactionAdd => {
-            Event::ReactionAdd(serde_json::from_value(v)?)
-        },
-        EventType::ReactionRemove => {
-            Event::ReactionRemove(serde_json::from_value(v)?)
-        },
-        EventType::ReactionRemoveAll => {
-            Event::ReactionRemoveAll(serde_json::from_value(v)?)
-        },
+        EventType::MessageDeleteBulk => Event::MessageDeleteBulk(serde_json::from_value(v)?),
+        EventType::ReactionAdd => Event::ReactionAdd(serde_json::from_value(v)?),
+        EventType::ReactionRemove => Event::ReactionRemove(serde_json::from_value(v)?),
+        EventType::ReactionRemoveAll => Event::ReactionRemoveAll(serde_json::from_value(v)?),
         EventType::MessageUpdate => Event::MessageUpdate(serde_json::from_value(v)?),
         EventType::PresenceUpdate => Event::PresenceUpdate(serde_json::from_value(v)?),
-        EventType::PresencesReplace => {
-            Event::PresencesReplace(serde_json::from_value(v)?)
-        },
+        EventType::PresencesReplace => Event::PresencesReplace(serde_json::from_value(v)?),
         EventType::Ready => Event::Ready(serde_json::from_value(v)?),
         EventType::Resumed => Event::Resumed(serde_json::from_value(v)?),
         EventType::TypingStart => Event::TypingStart(serde_json::from_value(v)?),
         EventType::UserUpdate => Event::UserUpdate(serde_json::from_value(v)?),
-        EventType::VoiceServerUpdate => {
-            Event::VoiceServerUpdate(serde_json::from_value(v)?)
-        },
-        EventType::VoiceStateUpdate => {
-            Event::VoiceStateUpdate(serde_json::from_value(v)?)
-        },
+        EventType::VoiceServerUpdate => Event::VoiceServerUpdate(serde_json::from_value(v)?),
+        EventType::VoiceStateUpdate => Event::VoiceStateUpdate(serde_json::from_value(v)?),
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind: kind.to_owned(),
@@ -1938,7 +1938,9 @@ pub enum EventType {
 
 impl<'de> Deserialize<'de> for EventType {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-        where D: Deserializer<'de> {
+    where
+        D: Deserializer<'de>,
+    {
         struct EventTypeVisitor;
 
         impl<'de> Visitor<'de> for EventTypeVisitor {
@@ -1949,7 +1951,9 @@ impl<'de> Deserialize<'de> for EventType {
             }
 
             fn visit_str<E>(self, v: &str) -> StdResult<Self::Value, E>
-                where E: DeError {
+            where
+                E: DeError,
+            {
                 Ok(match v {
                     "CHANNEL_CREATE" => EventType::ChannelCreate,
                     "CHANNEL_DELETE" => EventType::ChannelDelete,
@@ -2012,8 +2016,10 @@ pub struct VoiceHeartbeatAck {
 
 impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        deserialize_u64(deserializer)
-            .map(|nonce| Self { nonce, _nonexhaustive: () })
+        deserialize_u64(deserializer).map(|nonce| Self {
+            nonce,
+            _nonexhaustive: (),
+        })
     }
 }
 
@@ -2115,15 +2121,19 @@ pub enum VoiceEvent {
 
 impl<'de> Deserialize<'de> for VoiceEvent {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-        where D: Deserializer<'de> {
+    where
+        D: Deserializer<'de>,
+    {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let op = map.remove("op")
+        let op = map
+            .remove("op")
             .ok_or_else(|| DeError::custom("expected voice event op"))
             .and_then(VoiceOpCode::deserialize)
             .map_err(DeError::custom)?;
 
-        let v = map.remove("d")
+        let v = map
+            .remove("d")
             .ok_or_else(|| DeError::custom("expected voice gateway payload"))
             .and_then(Value::deserialize)
             .map_err(DeError::custom)?;
@@ -2133,39 +2143,38 @@ impl<'de> Deserialize<'de> for VoiceEvent {
                 let v = serde_json::from_value(v).map_err(DeError::custom)?;
 
                 VoiceEvent::HeartbeatAck(v)
-            },
+            }
             VoiceOpCode::Ready => {
                 let v = VoiceReady::deserialize(v).map_err(DeError::custom)?;
 
                 VoiceEvent::Ready(v)
-            },
+            }
             VoiceOpCode::Hello => {
                 let v = serde_json::from_value(v).map_err(DeError::custom)?;
 
                 VoiceEvent::Hello(v)
-            },
+            }
             VoiceOpCode::SessionDescription => {
-                let v = VoiceSessionDescription::deserialize(v)
-                    .map_err(DeError::custom)?;
+                let v = VoiceSessionDescription::deserialize(v).map_err(DeError::custom)?;
 
                 VoiceEvent::SessionDescription(v)
-            },
+            }
             VoiceOpCode::Speaking => {
                 let v = VoiceSpeaking::deserialize(v).map_err(DeError::custom)?;
 
                 VoiceEvent::Speaking(v)
-            },
+            }
             VoiceOpCode::Resumed => VoiceEvent::Resumed,
             VoiceOpCode::ClientConnect => {
                 let v = VoiceClientConnect::deserialize(v).map_err(DeError::custom)?;
 
                 VoiceEvent::ClientConnect(v)
-            },
+            }
             VoiceOpCode::ClientDisconnect => {
                 let v = VoiceClientDisconnect::deserialize(v).map_err(DeError::custom)?;
 
                 VoiceEvent::ClientDisconnect(v)
-            },
+            }
             other => VoiceEvent::Unknown(other, v),
         })
     }

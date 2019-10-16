@@ -97,7 +97,10 @@ struct Token {
 impl Token {
     #[inline]
     fn new(kind: TokenKind, start: usize, end: usize) -> Self {
-        Token { kind, span: (start, end) }
+        Token {
+            kind,
+            span: (start, end),
+        }
     }
 }
 

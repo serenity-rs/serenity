@@ -44,10 +44,8 @@ impl EditGuild {
     ///
     /// [`afk_channel`]: #method.afk_channel
     pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
-        self.0.insert(
-            "afk_timeout",
-            Value::Number(Number::from(timeout)),
-        );
+        self.0
+            .insert("afk_timeout", Value::Number(Number::from(timeout)));
         self
     }
 
@@ -143,7 +141,8 @@ impl EditGuild {
     ///
     /// [`Region::UsWest`]: ../model/guild/enum.Region.html#variant.UsWest
     pub fn region(&mut self, region: Region) -> &mut Self {
-        self.0.insert("region", Value::String(region.name().to_string()));
+        self.0
+            .insert("region", Value::String(region.name().to_string()));
         self
     }
 
@@ -203,7 +202,9 @@ impl EditGuild {
     /// [`VerificationLevel::High`]: ../model/guild/enum.VerificationLevel.html#variant.High
     #[inline]
     pub fn verification_level<V>(&mut self, verification_level: V) -> &mut Self
-        where V: Into<VerificationLevel> {
+    where
+        V: Into<VerificationLevel>,
+    {
         self._verification_level(verification_level.into());
         self
     }

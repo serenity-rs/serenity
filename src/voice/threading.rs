@@ -1,15 +1,11 @@
+use super::{audio, connection::Connection, Status};
 use crate::internal::Timer;
 use crate::model::id::GuildId;
+use log::{error, warn};
 use std::{
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
-    thread::Builder as ThreadBuilder
+    thread::Builder as ThreadBuilder,
 };
-use super::{
-    connection::Connection,
-    Status,
-    audio,
-};
-use log::{error, warn};
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);
@@ -37,35 +33,35 @@ fn runner(rx: &MpscReceiver<Status>) {
                             warn!("[Voice] Error connecting: {:?}", why);
 
                             None
-                        },
+                        }
                     };
-                },
+                }
                 Ok(Status::Disconnect) => {
                     connection = None;
-                },
+                }
                 Ok(Status::SetReceiver(r)) => {
                     receiver = r;
-                },
+                }
                 Ok(Status::SetSender(s)) => {
                     senders.clear();
 
                     if let Some(aud) = s {
                         senders.push(aud);
                     }
-                },
+                }
                 Ok(Status::AddSender(s)) => {
                     senders.push(s);
-                },
+                }
                 Ok(Status::SetBitrate(b)) => {
                     bitrate = b;
-                },
+                }
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
                     break;
-                },
+                }
                 Err(TryRecvError::Disconnected) => {
                     break 'runner;
-                },
+                }
             }
         }
 
@@ -84,29 +80,26 @@ fn runner(rx: &MpscReceiver<Status>) {
                 match cycle {
                     Ok(()) => false,
                     Err(why) => {
-                        error!(
-                            "(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",
-                            why
-                        );
+                        error!("(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}", why);
 
                         true
-                    },
+                    }
                 }
-            },
+            }
             None => {
                 timer.r#await();
 
                 false
-            },
+            }
         };
 
         // If there was an error, then just reset the connection and try to get
         // another.
         if error {
-            let mut conn = connection.expect("[Voice] Shouldn't have had a voice connection error without a connection.");
-            connection = conn.reconnect()
-                .ok()
-                .map(|_| conn);
+            let mut conn = connection.expect(
+                "[Voice] Shouldn't have had a voice connection error without a connection.",
+            );
+            connection = conn.reconnect().ok().map(|_| conn);
         }
     }
 }

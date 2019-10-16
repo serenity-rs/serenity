@@ -2,10 +2,7 @@ use crate::client::bridge::gateway::ShardMessenger;
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
-use std::sync::{
-    Arc,
-    mpsc::Sender,
-};
+use std::sync::{mpsc::Sender, Arc};
 use typemap::ShareMap;
 
 use crate::http::Http;
@@ -236,7 +233,8 @@ impl Context {
     /// [`set_presence`]: #method.set_presence
     #[inline]
     pub fn reset_presence(&self) {
-        self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
+        self.shard
+            .set_presence(None::<Activity>, OnlineStatus::Online);
     }
 
     /// Sets the current activity, defaulting to an online status of [`Online`].
@@ -280,7 +278,8 @@ impl Context {
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
     pub fn set_activity(&self, activity: Activity) {
-        self.shard.set_presence(Some(activity), OnlineStatus::Online);
+        self.shard
+            .set_presence(Some(activity), OnlineStatus::Online);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -342,7 +341,9 @@ impl Context {
 }
 
 impl AsRef<Http> for Context {
-    fn as_ref(&self) -> &Http { &self.http }
+    fn as_ref(&self) -> &Http {
+        &self.http
+    }
 }
 
 #[cfg(feature = "cache")]

@@ -1,9 +1,10 @@
-use chrono::Utc;
 use crate::client::Context;
 use crate::model::id::{ChannelId, GuildId, UserId};
+use chrono::Utc;
 use std::collections::HashMap;
 
-type Check = dyn Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
+type Check =
+    dyn Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
 
 pub(crate) struct Ratelimit {
     pub delay: i64,
@@ -26,7 +27,8 @@ pub(crate) struct Bucket {
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> i64 {
         let time = Utc::now().timestamp();
-        let user = self.users
+        let user = self
+            .users
             .entry(user_id)
             .or_insert_with(MemberRatelimit::default);
 
@@ -98,7 +100,7 @@ impl BucketBuilder {
     #[inline]
     pub fn check<F>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static
+        F: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static,
     {
         self.check = Some(Box::new(f));
 

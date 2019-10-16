@@ -4,10 +4,10 @@ use crate::model::prelude::*;
 
 #[cfg(all(feature = "builder", feature = "model"))]
 use crate::builder::EditChannel;
-#[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils as serenity_utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(all(feature = "model", feature = "utils"))]
+use crate::utils as serenity_utils;
 
 /// A category of [`GuildChannel`]s.
 ///
@@ -46,7 +46,11 @@ impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
+    pub fn create_permission(
+        &self,
+        http: impl AsRef<Http>,
+        target: &PermissionOverwrite,
+    ) -> Result<()> {
         self.id.create_permission(&http, target)
     }
 
@@ -57,10 +61,13 @@ impl ChannelCategory {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+    pub fn delete_permission(
+        &self,
+        http: impl AsRef<Http>,
+        permission_type: PermissionOverwriteType,
+    ) -> Result<()> {
         self.id.delete_permission(&http, permission_type)
     }
-
 
     /// Deletes this category if required permissions are met.
     #[inline]
@@ -80,42 +87,50 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
+    #[cfg(all(
+        feature = "builder",
+        feature = "model",
+        feature = "utils",
+        feature = "client"
+    ))]
     pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-        where F: FnOnce(&mut EditChannel) -> &mut EditChannel
+    where
+        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
 
-
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
         let map = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        cache_http.http().edit_channel(self.id.0, &map).map(|channel| {
-            let GuildChannel {
-                id,
-                category_id,
-                permission_overwrites,
-                nsfw,
-                name,
-                position,
-                kind,
-                ..
-            } = channel;
+        cache_http
+            .http()
+            .edit_channel(self.id.0, &map)
+            .map(|channel| {
+                let GuildChannel {
+                    id,
+                    category_id,
+                    permission_overwrites,
+                    nsfw,
+                    name,
+                    position,
+                    kind,
+                    ..
+                } = channel;
 
-            *self = ChannelCategory {
-                id,
-                category_id,
-                permission_overwrites,
-                nsfw,
-                name,
-                position,
-                kind,
-                _nonexhaustive: (),
-            };
-        })
+                *self = ChannelCategory {
+                    id,
+                    category_id,
+                    permission_overwrites,
+                    nsfw,
+                    name,
+                    position,
+                    kind,
+                    _nonexhaustive: (),
+                };
+            })
     }
 
     #[inline]
@@ -124,5 +139,7 @@ impl ChannelCategory {
     }
 
     /// Returns the name of the category.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
 }

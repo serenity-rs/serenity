@@ -1,33 +1,26 @@
+use super::super::super::{EventHandler, RawEventHandler};
+use super::{
+    ShardId, ShardManagerMessage, ShardQueuerMessage, ShardRunner, ShardRunnerInfo,
+    ShardRunnerOptions,
+};
+use crate::gateway::ConnectionStage;
 use crate::gateway::Shard;
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
+use log::{info, warn};
 use parking_lot::Mutex;
 use parking_lot::RwLock;
 use std::{
     collections::{HashMap, VecDeque},
     sync::{
-        mpsc::{
-            Receiver,
-            RecvTimeoutError,
-            Sender},
-        Arc
+        mpsc::{Receiver, RecvTimeoutError, Sender},
+        Arc,
     },
     thread,
-    time::{Duration, Instant}
-};
-use super::super::super::{EventHandler, RawEventHandler};
-use super::{
-    ShardId,
-    ShardManagerMessage,
-    ShardQueuerMessage,
-    ShardRunner,
-    ShardRunnerInfo,
-    ShardRunnerOptions,
+    time::{Duration, Instant},
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use crate::gateway::ConnectionStage;
-use log::{info, warn};
 
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
@@ -129,12 +122,12 @@ impl ShardQueuer {
                 Ok(ShardQueuerMessage::Shutdown) => break,
                 Ok(ShardQueuerMessage::Start(id, total)) => {
                     self.checked_start(id.0, total.0);
-                },
+                }
                 Err(RecvTimeoutError::Disconnected) => {
                     // If the sender half has disconnected then the queuer's
                     // lifespan has passed and can shutdown.
                     break;
-                },
+                }
                 Err(RecvTimeoutError::Timeout) => {
                     if let Some((id, total)) = self.queue.pop_front() {
                         self.checked_start(id, total);

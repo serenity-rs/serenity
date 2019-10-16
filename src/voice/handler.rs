@@ -1,21 +1,19 @@
+use super::connection_info::ConnectionInfo;
+use super::{
+    threading, Audio, AudioReceiver, AudioSource, Bitrate, LockedAudio, Status as VoiceStatus,
+};
 use crate::constants::VoiceOpCode;
 use crate::gateway::InterMessage;
 use crate::model::{
-    id::{
-        ChannelId,
-        GuildId,
-        UserId
-    },
-    voice::VoiceState
+    id::{ChannelId, GuildId, UserId},
+    voice::VoiceState,
 };
 use parking_lot::Mutex;
+use serde_json::json;
 use std::sync::{
     mpsc::{self, Sender as MpscSender},
-    Arc
+    Arc,
 };
-use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
-use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -106,11 +104,7 @@ pub struct Handler {
 impl Handler {
     /// Creates a new Handler.
     #[inline]
-    pub(crate) fn new(
-        guild_id: GuildId,
-        ws: MpscSender<InterMessage>,
-        user_id: UserId,
-    ) -> Self {
+    pub(crate) fn new(guild_id: GuildId, ws: MpscSender<InterMessage>, user_id: UserId) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 
@@ -291,7 +285,9 @@ impl Handler {
     }
 
     /// Stops playing audio from a source, if one is set.
-    pub fn stop(&mut self) { self.send(VoiceStatus::SetSender(None)) }
+    pub fn stop(&mut self) {
+        self.send(VoiceStatus::SetSender(None))
+    }
 
     /// Switches the current connected voice channel to the given `channel_id`.
     ///
@@ -321,12 +317,12 @@ impl Handler {
             Some(current_id) if current_id == channel_id => {
                 // If already connected to the given channel, do nothing.
                 return;
-            },
+            }
             _ => {
                 self.channel_id = Some(channel_id);
 
                 self.update();
-            },
+            }
         }
     }
 
@@ -382,11 +378,7 @@ impl Handler {
         }
     }
 
-    fn new_raw(
-        guild_id: GuildId,
-        ws: Option<MpscSender<InterMessage>>,
-        user_id: UserId,
-    ) -> Self {
+    fn new_raw(guild_id: GuildId, ws: Option<MpscSender<InterMessage>>, user_id: UserId) -> Self {
         let (tx, rx) = mpsc::channel();
 
         threading::start(guild_id, rx);
@@ -455,5 +447,7 @@ impl Handler {
 impl Drop for Handler {
     /// Leaves the current connected voice channel, if connected to one, and
     /// forgets all configurations relevant to this Handler.
-    fn drop(&mut self) { self.leave(); }
+    fn drop(&mut self) {
+        self.leave();
+    }
 }

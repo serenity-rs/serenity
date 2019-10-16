@@ -1,25 +1,20 @@
-use std::fmt::{
-    Display,
-    Formatter,
-    Result as FmtResult,
-    Write as FmtWrite
-};
 use super::super::id::{EmojiId, RoleId};
+use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::mem;
+use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::http::client::Http;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use serde_json::json;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::mem;
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -97,10 +92,13 @@ impl Emoji {
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn delete<T>(&self, cache_and_http: T) -> Result<()>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
+    where
+        T: AsRef<CacheRwLock> + AsRef<Http>,
+    {
         match self.find_guild_id(&cache_and_http) {
-            Some(guild_id) => AsRef::<Http>::as_ref(&cache_and_http)
-                .delete_emoji(guild_id.0, self.id.0),
+            Some(guild_id) => {
+                AsRef::<Http>::as_ref(&cache_and_http).delete_emoji(guild_id.0, self.id.0)
+            }
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
@@ -114,23 +112,25 @@ impl Emoji {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn edit<T>(&mut self, cache_and_http: T, name: &str) -> Result<()>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
+    where
+        T: AsRef<CacheRwLock> + AsRef<Http>,
+    {
         match self.find_guild_id(&cache_and_http) {
             Some(guild_id) => {
                 let map = json!({
                     "name": name,
                 });
 
-                match AsRef::<Http>::as_ref(&cache_and_http)
-                    .edit_emoji(guild_id.0, self.id.0, &map) {
+                match AsRef::<Http>::as_ref(&cache_and_http).edit_emoji(guild_id.0, self.id.0, &map)
+                {
                     Ok(emoji) => {
                         mem::replace(self, emoji);
 
                         Ok(())
-                    },
+                    }
                     Err(why) => Err(why),
                 }
-            },
+            }
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
@@ -212,7 +212,7 @@ impl Emoji {
     /// ```
     #[inline]
     pub fn url(&self) -> String {
-        let extension = if self.animated {"gif"} else {"png"};
+        let extension = if self.animated { "gif" } else { "png" };
         format!(cdn!("/emojis/{}.{}"), self.id, extension)
     }
 }
@@ -233,10 +233,14 @@ impl Display for Emoji {
 
 impl From<Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
-    fn from(emoji: Emoji) -> EmojiId { emoji.id }
+    fn from(emoji: Emoji) -> EmojiId {
+        emoji.id
+    }
 }
 
 impl<'a> From<&'a Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
-    fn from(emoji: &Emoji) -> EmojiId { emoji.id }
+    fn from(emoji: &Emoji) -> EmojiId {
+        emoji.id
+    }
 }

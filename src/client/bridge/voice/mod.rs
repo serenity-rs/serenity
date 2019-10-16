@@ -1,9 +1,9 @@
 use crate::gateway::InterMessage;
+use crate::model::id::{ChannelId, GuildId, UserId};
+use crate::utils;
+use crate::voice::{Handler, Manager};
 use std::collections::HashMap;
 use std::sync::mpsc::Sender as MpscSender;
-use crate::model::id::{ChannelId, GuildId, UserId};
-use crate::voice::{Handler, Manager};
-use crate::utils;
 
 pub struct ClientVoiceManager {
     managers: HashMap<u64, Manager>,
@@ -26,8 +26,7 @@ impl ClientVoiceManager {
         self.managers.get(&sid)?.get(gid)
     }
 
-    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
-        -> Option<&mut Handler> {
+    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<&mut Handler> {
         let (gid, sid) = self.manager_info(guild_id);
 
         self.managers.get_mut(&sid)?.get_mut(gid)
@@ -40,11 +39,16 @@ impl ClientVoiceManager {
     ///
     /// [`Manager`]: ../../../voice/struct.Manager.html
     /// [`Manager::join`]: ../../../voice/struct.Manager.html#method.join
-    pub fn join<C, G>(&mut self, guild_id: G, channel_id: C)
-        -> Option<&mut Handler> where C: Into<ChannelId>, G: Into<GuildId> {
+    pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> Option<&mut Handler>
+    where
+        C: Into<ChannelId>,
+        G: Into<GuildId>,
+    {
         let (gid, sid) = self.manager_info(guild_id);
 
-        self.managers.get_mut(&sid).map(|manager| manager.join(gid, channel_id))
+        self.managers
+            .get_mut(&sid)
+            .map(|manager| manager.join(gid, channel_id))
     }
 
     /// Refer to [`Manager::leave`].
@@ -57,7 +61,9 @@ impl ClientVoiceManager {
     pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
         let (gid, sid) = self.manager_info(guild_id);
 
-        self.managers.get_mut(&sid).map(|manager| manager.leave(gid))
+        self.managers
+            .get_mut(&sid)
+            .map(|manager| manager.leave(gid))
     }
 
     /// Refer to [`Manager::remove`].
@@ -70,11 +76,14 @@ impl ClientVoiceManager {
     pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
         let (gid, sid) = self.manager_info(guild_id);
 
-        self.managers.get_mut(&sid).map(|manager| manager.leave(gid))
+        self.managers
+            .get_mut(&sid)
+            .map(|manager| manager.leave(gid))
     }
 
     pub fn set(&mut self, shard_id: u64, sender: MpscSender<InterMessage>) {
-        self.managers.insert(shard_id, Manager::new(sender, self.user_id));
+        self.managers
+            .insert(shard_id, Manager::new(sender, self.user_id));
     }
 
     /// Sets the number of shards for the voice manager to use when calculating

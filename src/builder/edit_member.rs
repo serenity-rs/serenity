@@ -47,7 +47,7 @@ impl EditMember {
     /// Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(&mut self, roles: It) -> &mut Self {
+    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item = T>>(&mut self, roles: It) -> &mut Self {
         let role_ids = roles
             .into_iter()
             .map(|x| Value::Number(Number::from(x.as_ref().0)))

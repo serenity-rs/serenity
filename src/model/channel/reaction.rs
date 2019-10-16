@@ -1,17 +1,12 @@
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
-use serde::ser::{SerializeMap, Serialize, Serializer};
+use serde::ser::{Serialize, SerializeMap, Serializer};
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-        Write as FmtWrite
-    },
-    str::FromStr
+    fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite},
+    str::FromStr,
 };
 
 use crate::internal::prelude::*;
@@ -77,13 +72,11 @@ impl Reaction {
     /// [permissions]: ../permissions/index.html
     #[cfg(feature = "http")]
     pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-
         let mut user_id = Some(self.user_id.0);
 
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
                 if self.user_id == cache.read().user.id {
                     user_id = None;
                 }
@@ -98,7 +91,12 @@ impl Reaction {
             }
         }
 
-        cache_http.http().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+        cache_http.http().delete_reaction(
+            self.channel_id.0,
+            self.message_id.0,
+            user_id,
+            &self.emoji,
+        )
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -155,13 +153,17 @@ impl Reaction {
     /// [permissions]: ../permissions/index.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn users<R, U>(&self,
-                       http: impl AsRef<Http>,
-                       reaction_type: R,
-                       limit: Option<u8>,
-                       after: Option<U>)
-                       -> Result<Vec<User>>
-        where R: Into<ReactionType>, U: Into<UserId> {
+    pub fn users<R, U>(
+        &self,
+        http: impl AsRef<Http>,
+        reaction_type: R,
+        limit: Option<u8>,
+        after: Option<U>,
+    ) -> Result<Vec<User>>
+    where
+        R: Into<ReactionType>,
+        U: Into<UserId>,
+    {
         self._users(&http, &reaction_type.into(), limit, after.map(Into::into))
     }
 
@@ -249,7 +251,7 @@ impl<'de> Deserialize<'de> for ReactionType {
                             }
 
                             animated = Some(map.next_value()?);
-                        },
+                        }
                         Field::Id => {
                             if id.is_some() {
                                 return Err(DeError::duplicate_field("id"));
@@ -258,14 +260,14 @@ impl<'de> Deserialize<'de> for ReactionType {
                             if let Ok(emoji_id) = map.next_value::<EmojiId>() {
                                 id = Some(emoji_id)
                             }
-                        },
+                        }
                         Field::Name => {
                             if name.is_some() {
                                 return Err(DeError::duplicate_field("name"));
                             }
 
                             name = Some(map.next_value()?);
-                        },
+                        }
                     }
                 }
 
@@ -273,11 +275,7 @@ impl<'de> Deserialize<'de> for ReactionType {
                 let name = name.ok_or_else(|| DeError::missing_field("name"))?;
 
                 Ok(if let Some(id) = id {
-                    ReactionType::Custom {
-                        animated,
-                        id,
-                        name,
-                    }
+                    ReactionType::Custom { animated, id, name }
                 } else {
                     ReactionType::Unicode(name.unwrap())
                 })
@@ -290,9 +288,15 @@ impl<'de> Deserialize<'de> for ReactionType {
 
 impl Serialize for ReactionType {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         match *self {
-            ReactionType::Custom { animated, id, ref name } => {
+            ReactionType::Custom {
+                animated,
+                id,
+                ref name,
+            } => {
                 let mut map = serializer.serialize_map(Some(3))?;
 
                 map.serialize_entry("animated", &animated)?;
@@ -300,14 +304,14 @@ impl Serialize for ReactionType {
                 map.serialize_entry("name", &name)?;
 
                 map.end()
-            },
+            }
             ReactionType::Unicode(ref name) => {
                 let mut map = serializer.serialize_map(Some(1))?;
 
                 map.serialize_entry("name", &name)?;
 
                 map.end()
-            },
+            }
             ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
@@ -323,11 +327,9 @@ impl ReactionType {
     /// likely little use for it.
     pub fn as_data(&self) -> String {
         match *self {
-            ReactionType::Custom {
-                id,
-                ref name,
-                ..
-            } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
+            ReactionType::Custom { id, ref name, .. } => {
+                format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id)
+            }
             ReactionType::Unicode(ref unicode) => unicode.clone(),
             ReactionType::__Nonexhaustive => unreachable!(),
         }
@@ -360,7 +362,9 @@ impl From<char> for ReactionType {
     /// #
     /// # fn main() {}
     /// ```
-    fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
+    fn from(ch: char) -> ReactionType {
+        ReactionType::Unicode(ch.to_string())
+    }
 }
 
 impl From<Emoji> for ReactionType {
@@ -378,7 +382,7 @@ impl From<EmojiId> for ReactionType {
         ReactionType::Custom {
             animated: false,
             id: emoji_id,
-            name: None
+            name: None,
         }
     }
 }
@@ -388,13 +392,15 @@ impl From<EmojiIdentifier> for ReactionType {
         ReactionType::Custom {
             animated: false,
             id: emoji_id.id,
-            name: Some(emoji_id.name)
+            name: Some(emoji_id.name),
         }
     }
 }
 
 impl From<String> for ReactionType {
-    fn from(unicode: String) -> ReactionType { ReactionType::Unicode(unicode) }
+    fn from(unicode: String) -> ReactionType {
+        ReactionType::Unicode(unicode)
+    }
 }
 
 impl<'a> From<&'a str> for ReactionType {
@@ -414,7 +420,9 @@ impl<'a> From<&'a str> for ReactionType {
     ///
     /// foo("🍎");
     /// ```
-    fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_string()) }
+    fn from(unicode: &str) -> ReactionType {
+        ReactionType::Unicode(unicode.to_string())
+    }
 }
 
 // TODO: Change this to `!` once it becomes stable.
@@ -455,18 +463,14 @@ impl Display for ReactionType {
     /// [`ReactionType::Unicode`]: enum.ReactionType.html#variant.Unicode
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
-            ReactionType::Custom {
-                id,
-                ref name,
-                ..
-            } => {
+            ReactionType::Custom { id, ref name, .. } => {
                 f.write_char('<')?;
                 f.write_char(':')?;
                 f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
                 f.write_char(':')?;
                 Display::fmt(&id, f)?;
                 f.write_char('>')
-            },
+            }
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),
             ReactionType::__Nonexhaustive => unreachable!(),
         }

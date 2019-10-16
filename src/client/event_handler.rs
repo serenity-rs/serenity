@@ -1,12 +1,9 @@
+use super::context::Context;
+use crate::client::bridge::gateway::event::*;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
 use serde_json::Value;
-use std::{
-    collections::HashMap,
-    sync::Arc
-};
-use super::context::Context;
-use crate::client::bridge::gateway::event::*;
+use std::{collections::HashMap, sync::Arc};
 
 /// The core trait for handling events by serenity.
 pub trait EventHandler: Send + Sync {
@@ -102,7 +99,13 @@ pub trait EventHandler: Send + Sync {
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
     #[cfg(feature = "cache")]
-    fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Arc<RwLock<Guild>>>) {}
+    fn guild_delete(
+        &self,
+        _ctx: Context,
+        _incomplete: PartialGuild,
+        _full: Option<Arc<RwLock<Guild>>>,
+    ) {
+    }
 
     /// Dispatched when a guild is deleted.
     ///
@@ -115,7 +118,13 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when the emojis are updated.
     ///
     /// Provides the guild's id and the new state of the emojis in the guild.
-    fn guild_emojis_update(&self, _ctx: Context, _guild_id: GuildId, _current_state: HashMap<EmojiId, Emoji>) {}
+    fn guild_emojis_update(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _current_state: HashMap<EmojiId, Emoji>,
+    ) {
+    }
 
     /// Dispatched when a guild's integration is added, updated or removed.
     ///
@@ -131,7 +140,14 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id, the user's data, and the user's member data if available.
     #[cfg(feature = "cache")]
-    fn guild_member_removal(&self, _ctx: Context, _guild: GuildId, _user: User, _member_data_if_available: Option<Member>) {}
+    fn guild_member_removal(
+        &self,
+        _ctx: Context,
+        _guild: GuildId,
+        _user: User,
+        _member_data_if_available: Option<Member>,
+    ) {
+    }
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
@@ -154,7 +170,13 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when the data for offline members was requested.
     ///
     /// Provides the guild's id and the data.
-    fn guild_members_chunk(&self, _ctx: Context, _guild_id: GuildId, _offline_members: HashMap<UserId, Member>) {}
+    fn guild_members_chunk(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _offline_members: HashMap<UserId, Member>,
+    ) {
+    }
 
     /// Dispatched when a role is created.
     ///
@@ -165,7 +187,14 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id, the role's id and its data if available.
     #[cfg(feature = "cache")]
-    fn guild_role_delete(&self, _ctx: Context, _guild_id: GuildId, _removed_role_id: RoleId, _removed_role_data_if_available: Option<Role>) {}
+    fn guild_role_delete(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _removed_role_id: RoleId,
+        _removed_role_data_if_available: Option<Role>,
+    ) {
+    }
 
     /// Dispatched when a role is deleted.
     ///
@@ -177,7 +206,14 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id, the role's old (if available) and new data.
     #[cfg(feature = "cache")]
-    fn guild_role_update(&self, _ctx: Context, _guild_id: GuildId, _old_data_if_available: Option<Role>, _new: Role) {}
+    fn guild_role_update(
+        &self,
+        _ctx: Context,
+        _guild_id: GuildId,
+        _old_data_if_available: Option<Role>,
+        _new: Role,
+    ) {
+    }
 
     /// Dispatched when a role is updated.
     ///
@@ -194,7 +230,13 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's old full data (if available) and the new, albeit partial data.
     #[cfg(feature = "cache")]
-    fn guild_update(&self, _ctx: Context, _old_data_if_available: Option<Arc<RwLock<Guild>>>, _new_but_incomplete: PartialGuild) {}
+    fn guild_update(
+        &self,
+        _ctx: Context,
+        _old_data_if_available: Option<Arc<RwLock<Guild>>>,
+        _new_but_incomplete: PartialGuild,
+    ) {
+    }
 
     /// Dispatched when the guild is updated.
     ///
@@ -210,12 +252,24 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a message is deleted.
     ///
     /// Provides the channel's id and the message's id.
-    fn message_delete(&self, _ctx: Context, _channel_id: ChannelId, _deleted_message_id: MessageId) {}
+    fn message_delete(
+        &self,
+        _ctx: Context,
+        _channel_id: ChannelId,
+        _deleted_message_id: MessageId,
+    ) {
+    }
 
     /// Dispatched when multiple messages were deleted at once.
     ///
     /// Provides the channel's id and the deleted messages' ids.
-    fn message_delete_bulk(&self, _ctx: Context, _channel_id: ChannelId, _multiple_deleted_messages_ids: Vec<MessageId>) {}
+    fn message_delete_bulk(
+        &self,
+        _ctx: Context,
+        _channel_id: ChannelId,
+        _multiple_deleted_messages_ids: Vec<MessageId>,
+    ) {
+    }
 
     /// Dispatched when a message is updated.
     ///
@@ -225,7 +279,14 @@ pub trait EventHandler: Send + Sync {
     ///
     /// [`MessageUpdateEvent`]: ../model/event/struct.MessageUpdateEvent.html
     #[cfg(feature = "cache")]
-    fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Option<Message>, _event: MessageUpdateEvent) {}
+    fn message_update(
+        &self,
+        _ctx: Context,
+        _old_if_available: Option<Message>,
+        _new: Option<Message>,
+        _event: MessageUpdateEvent,
+    ) {
+    }
 
     /// Dispatched when a message is updated.
     ///
@@ -246,7 +307,13 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when all reactions of a message are detached from a message.
     ///
     /// Provides the channel's id and the message's id.
-    fn reaction_remove_all(&self, _ctx: Context, _channel_id: ChannelId, _removed_from_message_id: MessageId) {}
+    fn reaction_remove_all(
+        &self,
+        _ctx: Context,
+        _channel_id: ChannelId,
+        _removed_from_message_id: MessageId,
+    ) {
+    }
 
     fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}
 
@@ -298,7 +365,14 @@ pub trait EventHandler: Send + Sync {
     /// Provides the guild's id (if available) and
     /// the old and the new state of the guild's voice channels.
     #[cfg(feature = "cache")]
-    fn voice_state_update(&self, _ctx: Context, _: Option<GuildId>, _old: Option<VoiceState>, _new: VoiceState) {}
+    fn voice_state_update(
+        &self,
+        _ctx: Context,
+        _: Option<GuildId>,
+        _old: Option<VoiceState>,
+        _new: VoiceState,
+    ) {
+    }
 
     /// Dispatched when a user joins, leaves or moves to a voice channel.
     ///
@@ -310,7 +384,8 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a guild's webhook is updated.
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.
-    fn webhook_update(&self, _ctx: Context, _guild_id: GuildId, _belongs_to_channel_id: ChannelId) {}
+    fn webhook_update(&self, _ctx: Context, _guild_id: GuildId, _belongs_to_channel_id: ChannelId) {
+    }
 }
 
 /// This core trait for handling raw events

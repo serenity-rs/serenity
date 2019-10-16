@@ -13,8 +13,8 @@
 pub use super::application::*;
 pub use super::channel::*;
 pub use super::event::*;
-pub use super::guild::*;
 pub use super::gateway::*;
+pub use super::guild::*;
 pub use super::id::*;
 pub use super::invite::*;
 pub use super::misc::*;

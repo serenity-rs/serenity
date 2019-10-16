@@ -95,7 +95,8 @@ impl GetMessages {
     /// limitation. If an amount larger than 100 is supplied, it will be
     /// reduced.
     pub fn limit(&mut self, limit: u64) -> &mut Self {
-        self.0.insert("limit", if limit > 100 { 100 } else { limit });
+        self.0
+            .insert("limit", if limit > 100 { 100 } else { limit });
         self
     }
 }

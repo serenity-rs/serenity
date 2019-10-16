@@ -1,13 +1,13 @@
 //! Models pertaining to the gateway.
 
+use super::prelude::*;
+use super::utils::*;
+use bitflags::bitflags;
 use parking_lot::RwLock;
 use serde::de::Error as DeError;
-use serde::ser::{SerializeStruct, Serialize, Serializer};
+use serde::ser::{Serialize, SerializeStruct, Serializer};
 use serde_json;
 use std::sync::Arc;
-use super::utils::*;
-use super::prelude::*;
-use bitflags::bitflags;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -230,10 +230,12 @@ impl<'de> Deserialize<'de> for Activity {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let kind = map.remove("type")
+        let kind = map
+            .remove("type")
             .and_then(|v| ActivityType::deserialize(v).ok())
             .unwrap_or(ActivityType::Playing);
-        let name = map.remove("name")
+        let name = map
+            .remove("name")
             .and_then(|v| String::deserialize(v).ok())
             .unwrap_or_else(String::new);
         let party = match map.remove("party") {
@@ -252,7 +254,8 @@ impl<'de> Deserialize<'de> for Activity {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let url = map.remove("url")
+        let url = map
+            .remove("url")
             .and_then(|v| serde_json::from_value::<String>(v).ok());
 
         Ok(Activity {
@@ -344,13 +347,11 @@ pub enum ActivityType {
     __Nonexhaustive,
 }
 
-enum_number!(
-    ActivityType {
-        Playing,
-        Streaming,
-        Listening,
-    }
-);
+enum_number!(ActivityType {
+    Playing,
+    Streaming,
+    Listening,
+});
 
 impl ActivityType {
     pub fn num(self) -> u64 {
@@ -366,7 +367,9 @@ impl ActivityType {
 }
 
 impl Default for ActivityType {
-    fn default() -> Self { ActivityType::Playing }
+    fn default() -> Self {
+        ActivityType::Playing
+    }
 }
 
 /// A representation of the data retrieved from the gateway endpoint.
@@ -408,14 +411,14 @@ pub struct Presence {
 impl<'de> Deserialize<'de> for Presence {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Presence, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
-        let mut user_map = map.remove("user")
+        let mut user_map = map
+            .remove("user")
             .ok_or_else(|| DeError::custom("expected presence user"))
             .and_then(JsonMap::deserialize)
             .map_err(DeError::custom)?;
 
         let (user_id, user) = if user_map.len() > 1 {
-            let user = User::deserialize(Value::Object(user_map))
-                .map_err(DeError::custom)?;
+            let user = User::deserialize(Value::Object(user_map)).map_err(DeError::custom)?;
 
             (user.id, Some(Arc::new(RwLock::new(user))))
         } else {
@@ -429,21 +432,19 @@ impl<'de> Deserialize<'de> for Presence {
         };
 
         let activity = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Activity>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<Activity>>(v).map_err(DeError::custom)?,
             None => None,
         };
         let last_modified = match map.remove("last_modified") {
-            Some(v) => serde_json::from_value::<Option<u64>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<u64>>(v).map_err(DeError::custom)?,
             None => None,
         };
         let nick = match map.remove("nick") {
-            Some(v) => serde_json::from_value::<Option<String>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<String>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let status = map.remove("status")
+        let status = map
+            .remove("status")
             .ok_or_else(|| DeError::custom("expected presence status"))
             .and_then(OnlineStatus::deserialize)
             .map_err(DeError::custom)?;
@@ -462,7 +463,9 @@ impl<'de> Deserialize<'de> for Presence {
 
 impl Serialize for Presence {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         #[derive(Serialize)]
         struct UserId {
             id: u64,
@@ -477,9 +480,7 @@ impl Serialize for Presence {
         if let Some(ref user) = self.user {
             state.serialize_field("user", &*user.read())?;
         } else {
-            state.serialize_field("user", &UserId {
-                id: self.user_id.0,
-            })?;
+            state.serialize_field("user", &UserId { id: self.user_id.0 })?;
         }
 
         state.end()
@@ -490,9 +491,17 @@ impl Serialize for Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Ready {
     pub guilds: Vec<GuildStatus>,
-    #[serde(default, serialize_with = "serialize_presences", deserialize_with = "deserialize_presences")]
+    #[serde(
+        default,
+        serialize_with = "serialize_presences",
+        deserialize_with = "deserialize_presences"
+    )]
     pub presences: HashMap<UserId, Presence>,
-    #[serde(default, serialize_with = "serialize_private_channels", deserialize_with = "deserialize_private_channels")]
+    #[serde(
+        default,
+        serialize_with = "serialize_private_channels",
+        deserialize_with = "deserialize_private_channels"
+    )]
     pub private_channels: HashMap<ChannelId, Channel>,
     pub session_id: String,
     pub shard: Option<[u64; 2]>,

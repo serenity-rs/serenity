@@ -1,18 +1,9 @@
 use reqwest::{
-    Error as ReqwestError,
-    header::InvalidHeaderValue,
-    Response,
-    StatusCode,
-    Url,
-    UrlError,
+    header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url, UrlError,
 };
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
+    fmt::{Display, Formatter, Result as FmtResult},
 };
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
@@ -49,7 +40,6 @@ impl From<Response> for ErrorResponse {
         }
     }
 }
-
 
 #[derive(Debug)]
 pub enum Error {
@@ -90,7 +80,9 @@ impl From<InvalidHeaderValue> for Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.write_str(self.description())
+    }
 }
 
 impl StdError for Error {

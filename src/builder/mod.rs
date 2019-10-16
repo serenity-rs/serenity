@@ -5,8 +5,8 @@
 //! optional, and/or sane default values for required parameters can be applied
 //! by a builder.
 
-mod create_embed;
 mod create_channel;
+mod create_embed;
 mod create_invite;
 mod create_message;
 mod edit_channel;
@@ -19,8 +19,8 @@ mod execute_webhook;
 mod get_messages;
 
 pub use self::{
-    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
     create_channel::CreateChannel,
+    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
     create_invite::CreateInvite,
     create_message::CreateMessage,
     edit_channel::EditChannel,
@@ -30,5 +30,5 @@ pub use self::{
     edit_profile::EditProfile,
     edit_role::EditRole,
     execute_webhook::ExecuteWebhook,
-    get_messages::GetMessages
+    get_messages::GetMessages,
 };

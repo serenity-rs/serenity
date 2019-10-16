@@ -1,10 +1,10 @@
 //! A collection of newtypes defining type-strong IDs.
 
-use chrono::{FixedOffset, DateTime, NaiveDateTime};
+use super::utils::U64Visitor;
 use crate::internal::prelude::*;
+use chrono::{DateTime, FixedOffset, NaiveDateTime};
 use serde::de::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use super::utils::U64Visitor;
 
 macro_rules! id_u64 {
     ($($name:ident;)*) => {

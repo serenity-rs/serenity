@@ -3,21 +3,11 @@ use crate::model::ModelError;
 use serde_json::Error as JsonError;
 use std::{
     error::Error as StdError,
-    fmt::{
-        self,
-        Display,
-        Error as FormatError
-    },
+    fmt::{self, Display, Error as FormatError},
     io::Error as IoError,
-    num::ParseIntError
+    num::ParseIntError,
 };
 
-#[cfg(feature = "http")]
-use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
-#[cfg(feature = "voice")]
-use audiopus::Error as OpusError;
-#[cfg(feature = "gateway")]
-use tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use crate::client::ClientError;
 #[cfg(feature = "gateway")]
@@ -28,6 +18,12 @@ use crate::http::HttpError;
 use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
 use crate::voice::VoiceError;
+#[cfg(feature = "voice")]
+use audiopus::Error as OpusError;
+#[cfg(feature = "http")]
+use reqwest::{header::InvalidHeaderValue, Error as ReqwestError};
+#[cfg(feature = "gateway")]
+use tungstenite::error::Error as TungsteniteError;
 
 /// The common result type between most library functions.
 ///
@@ -113,63 +109,89 @@ pub enum Error {
 }
 
 impl From<FormatError> for Error {
-    fn from(e: FormatError) -> Error { Error::Format(e) }
+    fn from(e: FormatError) -> Error {
+        Error::Format(e)
+    }
 }
 
 #[cfg(feature = "gateway")]
 impl From<GatewayError> for Error {
-    fn from(e: GatewayError) -> Error { Error::Gateway(e) }
+    fn from(e: GatewayError) -> Error {
+        Error::Gateway(e)
+    }
 }
 
 impl From<IoError> for Error {
-    fn from(e: IoError) -> Error { Error::Io(e) }
+    fn from(e: IoError) -> Error {
+        Error::Io(e)
+    }
 }
 
 impl From<JsonError> for Error {
-    fn from(e: JsonError) -> Error { Error::Json(e) }
+    fn from(e: JsonError) -> Error {
+        Error::Json(e)
+    }
 }
 
 impl From<ParseIntError> for Error {
-    fn from(e: ParseIntError) -> Error { Error::Num(e) }
+    fn from(e: ParseIntError) -> Error {
+        Error::Num(e)
+    }
 }
 
 impl From<ModelError> for Error {
-    fn from(e: ModelError) -> Error { Error::Model(e) }
+    fn from(e: ModelError) -> Error {
+        Error::Model(e)
+    }
 }
 
 #[cfg(feature = "voice")]
 impl From<OpusError> for Error {
-    fn from(e: OpusError) -> Error { Error::Opus(e) }
+    fn from(e: OpusError) -> Error {
+        Error::Opus(e)
+    }
 }
 
 #[cfg(feature = "voice")]
 impl From<VoiceError> for Error {
-    fn from(e: VoiceError) -> Error { Error::Voice(e) }
+    fn from(e: VoiceError) -> Error {
+        Error::Voice(e)
+    }
 }
 
 #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
 impl From<RustlsError> for Error {
-    fn from(e: RustlsError) -> Error { Error::Rustls(e) }
+    fn from(e: RustlsError) -> Error {
+        Error::Rustls(e)
+    }
 }
 
 #[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
-    fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
+    fn from(e: TungsteniteError) -> Error {
+        Error::Tungstenite(e)
+    }
 }
 
 #[cfg(feature = "http")]
 impl From<HttpError> for Error {
-    fn from(e: HttpError) -> Error { Error::Http(Box::new(e)) }
+    fn from(e: HttpError) -> Error {
+        Error::Http(Box::new(e))
+    }
 }
 
 #[cfg(feature = "http")]
 impl From<InvalidHeaderValue> for Error {
-    fn from(e: InvalidHeaderValue) -> Error { HttpError::InvalidHeader(e).into() }
+    fn from(e: InvalidHeaderValue) -> Error {
+        HttpError::InvalidHeader(e).into()
+    }
 }
 
 #[cfg(feature = "http")]
 impl From<ReqwestError> for Error {
-    fn from(e: ReqwestError) -> Error { HttpError::Request(e).into() }
+    fn from(e: ReqwestError) -> Error {
+        HttpError::Request(e).into()
+    }
 }
 
 impl Display for Error {

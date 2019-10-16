@@ -1,29 +1,22 @@
-use flate2::read::ZlibDecoder;
 use crate::gateway::WsClient;
 use crate::internal::prelude::*;
-use serde_json;
-use tungstenite::{
-    util::NonBlockingResult,
-    Message,
-};
+use flate2::read::ZlibDecoder;
 use log::warn;
+use serde_json;
+use tungstenite::{util::NonBlockingResult, Message};
 
+#[cfg(not(feature = "native_tls_backend"))]
+use std::net::ToSocketAddrs;
 #[cfg(not(feature = "native_tls_backend"))]
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-    },
+    fmt::{Display, Formatter, Result as FmtResult},
     io::Error as IoError,
     net::TcpStream,
     sync::Arc,
 };
 #[cfg(not(feature = "native_tls_backend"))]
 use url::Url;
-#[cfg(not(feature = "native_tls_backend"))]
-use std::net::ToSocketAddrs;
 
 pub trait ReceiverExt {
     fn recv_json(&mut self) -> Result<Option<Value>>;
@@ -54,28 +47,22 @@ impl SenderExt for WsClient {
 }
 
 #[inline]
-fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>>{
+fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
     Ok(match message {
-        Some(Message::Binary(bytes)) => {
-            serde_json::from_reader(ZlibDecoder::new(&bytes[..]))
-                .map(Some)
-                .map_err(|why| {
-                    warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
+        Some(Message::Binary(bytes)) => serde_json::from_reader(ZlibDecoder::new(&bytes[..]))
+            .map(Some)
+            .map_err(|why| {
+                warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
-                    why
-                })?
-        },
+                why
+            })?,
         Some(Message::Text(payload)) => {
             serde_json::from_str(&payload).map(Some).map_err(|why| {
-                warn!(
-                    "Err deserializing text: {:?}; text: {}",
-                    why,
-                    payload,
-                );
+                warn!("Err deserializing text: {:?}; text: {}", why, payload,);
 
                 why
             })?
-        },
+        }
         // Ping/Pong message behaviour is internally handled by tungstenite.
         _ => None,
     })
@@ -104,7 +91,9 @@ impl From<IoError> for RustlsError {
 
 #[cfg(not(feature = "native_tls_backend"))]
 impl Display for RustlsError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.write_str(self.description())
+    }
 }
 
 #[cfg(not(feature = "native_tls_backend"))]
@@ -125,7 +114,9 @@ impl StdError for RustlsError {
 #[cfg(not(feature = "native_tls_backend"))]
 pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     let mut config = rustls::ClientConfig::new();
-    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
+    config
+        .root_store
+        .add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
 
     let base_host = if let Some(h) = url.host_str() {
         let (dot, _) = h.rmatch_indices('.').nth(1).unwrap_or((0, ""));
@@ -134,16 +125,20 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
         let split_at_index = if dot == 0 { 0 } else { dot + 1 };
         let (_, base) = h.split_at(split_at_index);
         base.to_owned()
-    } else { "discord.gg".to_owned() };
+    } else {
+        "discord.gg".to_owned()
+    };
 
-    let dns_name = webpki::DNSNameRef::try_from_ascii_str(&base_host)
-        .map_err(|_| RustlsError::WebPKI)?;
+    let dns_name =
+        webpki::DNSNameRef::try_from_ascii_str(&base_host).map_err(|_| RustlsError::WebPKI)?;
 
     let session = rustls::ClientSession::new(&Arc::new(config), dns_name);
 
-    let host = url.host()
+    let host = url
+        .host()
         .ok_or_else(|| Error::Url("No host name in the URL.".into()))?;
-    let port = url.port_or_known_default()
+    let port = url
+        .port_or_known_default()
         .ok_or_else(|| Error::Url("No port number in the URL.".into()))?;
     // We need these to ensure the lifetime is long enough,
     // variables that would live inside the `match` would not live long enough.
@@ -153,22 +148,21 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
         url::Host::Domain(domain) => {
             addrs = (domain, port).to_socket_addrs()?;
             addrs.as_slice()
-        },
+        }
         url::Host::Ipv4(ip) => {
             addr = (ip, port).into();
             std::slice::from_ref(&addr)
-        },
+        }
         url::Host::Ipv6(ip) => {
             addr = (ip, port).into();
             std::slice::from_ref(&addr)
-        },
+        }
     };
 
     let socket = TcpStream::connect(&addrs)?;
     let tls = rustls::StreamOwned::new(session, socket);
 
-    let client = tungstenite::client(url, tls)
-        .map_err(|_| RustlsError::HandshakeError)?;
+    let client = tungstenite::client(url, tls).map_err(|_| RustlsError::HandshakeError)?;
 
     Ok(client.0)
 }

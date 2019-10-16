@@ -3,16 +3,16 @@
 use super::prelude::*;
 use crate::internal::RwLockExt;
 
+#[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
+use crate::utils;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
+#[cfg(all(feature = "model", feature = "utils"))]
+use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
-#[cfg(all(feature = "model", feature = "utils"))]
-use std::fmt;
-#[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
-use crate::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
@@ -22,7 +22,9 @@ pub trait Mentionable {
 }
 
 impl Mentionable for ChannelId {
-    fn mention(&self) -> String { format!("<#{}>", self.0) }
+    fn mention(&self) -> String {
+        format!("<#{}>", self.0)
+    }
 }
 
 impl Mentionable for Channel {
@@ -50,7 +52,9 @@ impl Mentionable for CurrentUser {
 }
 
 impl Mentionable for Emoji {
-    fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
+    fn mention(&self) -> String {
+        format!("<:{}:{}>", self.name, self.id.0)
+    }
 }
 
 impl Mentionable for Group {
@@ -60,7 +64,9 @@ impl Mentionable for Group {
 }
 
 impl Mentionable for Member {
-    fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
+    fn mention(&self) -> String {
+        format!("<@{}>", self.user.with(|u| u.id.0))
+    }
 }
 
 impl Mentionable for PrivateChannel {
@@ -70,23 +76,33 @@ impl Mentionable for PrivateChannel {
 }
 
 impl Mentionable for RoleId {
-    fn mention(&self) -> String { format!("<@&{}>", self.0) }
+    fn mention(&self) -> String {
+        format!("<@&{}>", self.0)
+    }
 }
 
 impl Mentionable for Role {
-    fn mention(&self) -> String { format!("<@&{}>", self.id.0) }
+    fn mention(&self) -> String {
+        format!("<@&{}>", self.id.0)
+    }
 }
 
 impl Mentionable for UserId {
-    fn mention(&self) -> String { format!("<@{}>", self.0) }
+    fn mention(&self) -> String {
+        format!("<@{}>", self.0)
+    }
 }
 
 impl Mentionable for User {
-    fn mention(&self) -> String { format!("<@{}>", self.id.0) }
+    fn mention(&self) -> String {
+        format!("<@{}>", self.id.0)
+    }
 }
 
 impl Mentionable for GuildChannel {
-    fn mention(&self) -> String { format!("<#{}>", self.id.0) }
+    fn mention(&self) -> String {
+        format!("<#{}>", self.id.0)
+    }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -100,7 +116,9 @@ pub enum UserParseError {
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for UserParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{}", self.description())
+    }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -209,16 +227,19 @@ pub struct EmojiIdentifier {
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
     #[inline]
-    pub fn url(&self) -> String { format!(cdn!("/emojis/{}.png"), self.id) }
+    pub fn url(&self) -> String {
+        format!(cdn!("/emojis/{}.png"), self.id)
+    }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
-    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or_else(|| ()) }
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        utils::parse_emoji(s).ok_or_else(|| ())
+    }
 }
-
 
 /// A component that was affected during a service incident.
 ///
@@ -310,9 +331,9 @@ mod test {
     #[cfg(feature = "utils")]
     mod utils {
         use crate::model::prelude::*;
+        use crate::utils::Colour;
         use parking_lot::RwLock;
         use std::sync::Arc;
-        use crate::utils::Colour;
 
         #[test]
         fn test_mention() {

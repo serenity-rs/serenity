@@ -29,7 +29,8 @@ impl EditChannel {
     ///
     /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
     pub fn bitrate(&mut self, bitrate: u64) -> &mut Self {
-        self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
+        self.0
+            .insert("bitrate", Value::Number(Number::from(bitrate)));
         self
     }
 
@@ -43,7 +44,8 @@ impl EditChannel {
 
     /// The position of the channel in the channel list.
     pub fn position(&mut self, position: u64) -> &mut Self {
-        self.0.insert("position", Value::Number(Number::from(position)));
+        self.0
+            .insert("position", Value::Number(Number::from(position)));
         self
     }
 
@@ -76,7 +78,8 @@ impl EditChannel {
     ///
     /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
     pub fn user_limit(&mut self, user_limit: u64) -> &mut Self {
-        self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
+        self.0
+            .insert("user_limit", Value::Number(Number::from(user_limit)));
         self
     }
 
@@ -93,10 +96,13 @@ impl EditChannel {
     }
 
     fn _category(&mut self, category: Option<ChannelId>) {
-        self.0.insert("parent_id", match category {
-            Some(c) => Value::Number(Number::from(c.0)),
-            None => Value::Null
-        });
+        self.0.insert(
+            "parent_id",
+            match category {
+                Some(c) => Value::Number(Number::from(c.0)),
+                None => Value::Null,
+            },
+        );
     }
 
     /// The seconds a user has to wait before sending another message.
@@ -104,7 +110,8 @@ impl EditChannel {
     /// **Info**: Only values from 0 to 120 are valid.
     #[inline]
     pub fn slow_mode_rate(&mut self, seconds: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
+        self.0
+            .insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
 
         self
     }

@@ -41,22 +41,22 @@ pub use crate::cache::{Cache, CacheRwLock};
 #[cfg(feature = "cache")]
 use std::time::Duration;
 
+use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use crate::internal::prelude::*;
+use log::{debug, error, info};
 use parking_lot::Mutex;
 use parking_lot::RwLock;
-use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use log::{error, debug, info};
 
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
-#[cfg(feature = "voice")]
-use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
 use crate::http::Http;
+#[cfg(feature = "voice")]
+use crate::model::id::UserId;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -188,7 +188,8 @@ pub struct Client {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`on_ready`]: #method.on_ready
-    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
+    #[cfg(feature = "framework")]
+    framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -341,8 +342,14 @@ impl Client {
     /// Creates a client with an optional Handler. If you pass `None`, events are never parsed, but
     /// they can be received by registering a RawHandler.
     #[deprecated(since = "0.8.0", note = "Replaced by `new_with_extras`.")]
-    pub fn new_with_handlers<H, RH>(token: impl AsRef<str>, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
-        where H: EventHandler + 'static, RH: RawEventHandler + 'static
+    pub fn new_with_handlers<H, RH>(
+        token: impl AsRef<str>,
+        handler: Option<H>,
+        raw_handler: Option<RH>,
+    ) -> Result<Self>
+    where
+        H: EventHandler + 'static,
+        RH: RawEventHandler + 'static,
     {
         Self::new_with_extras(token, |e| {
             if let Some(handler) = handler {
@@ -365,8 +372,13 @@ impl Client {
     /// a write-lock until success and potentially deadlock.
     #[cfg(feature = "cache")]
     #[deprecated(since = "0.8.0", note = "Replaced by `new_with_extras`.")]
-    pub fn new_with_cache_update_timeout<H>(token: impl AsRef<str>, handler: H, duration: Option<Duration>) -> Result<Self>
-        where H: EventHandler + 'static
+    pub fn new_with_cache_update_timeout<H>(
+        token: impl AsRef<str>,
+        handler: H,
+        duration: Option<Duration>,
+    ) -> Result<Self>
+    where
+        H: EventHandler + 'static,
     {
         Self::new_with_extras(token, |e| {
             e.event_handler(handler);
@@ -380,8 +392,10 @@ impl Client {
     }
 
     /// Creates a client with extra configuration.
-    pub fn new_with_extras(token: impl AsRef<str>, f: impl FnOnce(&mut Extras) -> &mut Extras) -> Result<Self>
-    {
+    pub fn new_with_extras(
+        token: impl AsRef<str>,
+        f: impl FnOnce(&mut Extras) -> &mut Extras,
+    ) -> Result<Self> {
         let token = token.as_ref().trim();
 
         let token = if token.starts_with("Bot ") {
@@ -412,10 +426,7 @@ impl Client {
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));
         #[cfg(feature = "voice")]
-        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
-            0,
-            UserId(0),
-        )));
+        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0))));
 
         let cache_and_http = Arc::new(CacheAndHttp {
             #[cfg(feature = "cache")]
@@ -921,9 +932,7 @@ impl Client {
 
             debug!(
                 "Initializing shard info: {} - {}/{}",
-                shard_data[0],
-                init,
-                shard_data[2],
+                shard_data[0], init, shard_data[2],
             );
 
             if let Err(why) = manager.initialize() {

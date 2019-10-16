@@ -1,8 +1,5 @@
 use serde_json::{Error as JsonError, Value};
-use std::{
-    io::Error as IoError,
-    process::Output
-};
+use std::{io::Error as IoError, process::Output};
 
 /// An error returned from the voice module.
 // Errors which are not visible to the end user are hidden.
@@ -10,14 +7,20 @@ use std::{
 pub enum VoiceError {
     /// An indicator that an endpoint URL was invalid.
     EndpointUrl,
-    #[doc(hidden)] ExpectedHandshake,
-    #[doc(hidden)] FindingByte,
-    #[doc(hidden)] HostnameResolve,
-    #[doc(hidden)] KeyGen,
+    #[doc(hidden)]
+    ExpectedHandshake,
+    #[doc(hidden)]
+    FindingByte,
+    #[doc(hidden)]
+    HostnameResolve,
+    #[doc(hidden)]
+    KeyGen,
     /// An error occurred while checking if a path is stereo.
     Streams,
-    #[doc(hidden)] VoiceModeInvalid,
-    #[doc(hidden)] VoiceModeUnavailable,
+    #[doc(hidden)]
+    VoiceModeInvalid,
+    #[doc(hidden)]
+    VoiceModeUnavailable,
     /// An error occurred while running `youtube-dl`.
     YouTubeDLRun(Output),
     /// An error occurred while processing the JSON output from `youtube-dl`.

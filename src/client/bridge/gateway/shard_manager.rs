@@ -1,35 +1,30 @@
+use super::super::super::{EventHandler, RawEventHandler};
+use super::{
+    ShardClientMessage, ShardId, ShardManagerMessage, ShardManagerMonitor, ShardQueuer,
+    ShardQueuerMessage, ShardRunnerInfo,
+};
 use crate::gateway::InterMessage;
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
+use log::{info, warn};
 use parking_lot::Mutex;
 use parking_lot::RwLock;
 use std::{
     collections::{HashMap, VecDeque},
     sync::{
-        mpsc::{self, channel, Sender, Receiver},
+        mpsc::{self, channel, Receiver, Sender},
         Arc,
     },
     thread,
-    time::Duration
-};
-use super::super::super::{EventHandler, RawEventHandler};
-use super::{
-    ShardClientMessage,
-    ShardId,
-    ShardManagerMessage,
-    ShardManagerMonitor,
-    ShardQueuer,
-    ShardQueuerMessage,
-    ShardRunnerInfo,
+    time::Duration,
 };
 use threadpool::ThreadPool;
 use typemap::ShareMap;
-use log::{info, warn};
 
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -175,11 +170,14 @@ impl ShardManager {
             runners,
         }));
 
-        (Arc::clone(&manager), ShardManagerMonitor {
-            rx: thread_rx,
-            manager,
-            shutdown: shutdown_send,
-        })
+        (
+            Arc::clone(&manager),
+            ShardManagerMonitor {
+                rx: thread_rx,
+                manager,
+                shutdown: shutdown_send,
+            },
+        )
     }
 
     /// Returns whether the shard manager contains either an active instance of
@@ -295,25 +293,18 @@ impl ShardManager {
             let msg = InterMessage::Client(Box::new(client_msg));
 
             if let Err(why) = runner.runner_tx.send(msg) {
-                warn!(
-                    "Failed to cleanly shutdown shard {}: {:?}",
-                    shard_id,
-                    why,
-                );
+                warn!("Failed to cleanly shutdown shard {}: {:?}", shard_id, why,);
             }
             match self.shard_shutdown.recv_timeout(Duration::from_secs(5)) {
-                Ok(shutdown_shard_id) =>
+                Ok(shutdown_shard_id) => {
                     if shutdown_shard_id != shard_id {
                         warn!(
                             "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
                             shard_id,
                         );
-                    },
-                Err(why) => warn!(
-                    "Failed to cleanly shutdown shard {}: {:?}",
-                    shard_id,
-                    why,
-                )
+                    }
+                }
+                Err(why) => warn!("Failed to cleanly shutdown shard {}: {:?}", shard_id, why,),
             }
         }
 

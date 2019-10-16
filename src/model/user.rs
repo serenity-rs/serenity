@@ -1,50 +1,50 @@
 //! User information-related models.
 
+use super::prelude::*;
+use super::utils::deserialize_u16;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
+use crate::{internal::prelude::*, model::misc::Mentionable};
 use serde_json;
 use std::fmt;
-use super::utils::deserialize_u16;
-use super::prelude::*;
-use crate::{internal::prelude::*, model::misc::Mentionable};
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateMessage, EditProfile};
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::CacheRwLock;
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
+#[cfg(feature = "http")]
+use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::utils;
 #[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
+#[cfg(all(
+    feature = "model",
+    any(all(feature = "builder", feature = "client"), feature = "http",),
+))]
+use serde_json::json;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 #[cfg(feature = "model")]
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
-#[cfg(all(
-    feature = "model",
-    any(
-        all(feature = "builder", feature = "client"),
-        feature = "http",
-    ),
-))]
-use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
-#[cfg(feature = "model")]
-use crate::utils;
-#[cfg(feature = "http")]
-use crate::http::Http;
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
-    #[serde(default)] pub bot: bool,
-    #[serde(deserialize_with = "deserialize_u16")] pub discriminator: u16,
+    #[serde(default)]
+    pub bot: bool,
+    #[serde(deserialize_with = "deserialize_u16")]
+    pub discriminator: u16,
     pub email: Option<String>,
     pub mfa_enabled: bool,
-    #[serde(rename = "username")] pub name: String,
+    #[serde(rename = "username")]
+    pub name: String,
     pub verified: bool,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
@@ -82,13 +82,17 @@ impl CurrentUser {
     /// # fn main() {}
     /// ```
     #[inline]
-    pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
+    pub fn avatar_url(&self) -> Option<String> {
+        avatar_url(self.id, self.avatar.as_ref())
+    }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
     #[inline]
-    pub fn default_avatar_url(&self) -> String { default_avatar_url(self.discriminator) }
+    pub fn default_avatar_url(&self) -> String {
+        default_avatar_url(self.discriminator)
+    }
 
     /// Edits the current user's profile settings.
     ///
@@ -115,7 +119,9 @@ impl CurrentUser {
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
     #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-        where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
+    where
+        F: FnOnce(&mut EditProfile) -> &mut EditProfile,
+    {
         let mut map = HashMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
@@ -132,7 +138,7 @@ impl CurrentUser {
                 let _ = mem::replace(self, new);
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }
@@ -181,7 +187,8 @@ impl CurrentUser {
     /// ```
     #[cfg(feature = "http")]
     pub fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
-        http.as_ref().get_guilds(&GuildPagination::After(GuildId(1)), 100)
+        http.as_ref()
+            .get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -342,7 +349,9 @@ impl CurrentUser {
     /// # fn main() {}
     /// ```
     #[inline]
-    pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
+    }
 }
 
 /// An enum that represents a default avatar.
@@ -375,7 +384,9 @@ pub enum DefaultAvatar {
 
 impl DefaultAvatar {
     /// Retrieves the String hash of the default avatar.
-    pub fn name(self) -> Result<String> { serde_json::to_string(&self).map_err(From::from) }
+    pub fn name(self) -> Result<String> {
+        serde_json::to_string(&self).map_err(From::from)
+    }
 }
 
 /// The representation of a user's status.
@@ -389,11 +400,16 @@ impl DefaultAvatar {
 /// [`Invisible`]: #variant.Invisible
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum OnlineStatus {
-    #[serde(rename = "dnd")] DoNotDisturb,
-    #[serde(rename = "idle")] Idle,
-    #[serde(rename = "invisible")] Invisible,
-    #[serde(rename = "offline")] Offline,
-    #[serde(rename = "online")] Online,
+    #[serde(rename = "dnd")]
+    DoNotDisturb,
+    #[serde(rename = "idle")]
+    Idle,
+    #[serde(rename = "invisible")]
+    Invisible,
+    #[serde(rename = "offline")]
+    Offline,
+    #[serde(rename = "online")]
+    Online,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -412,7 +428,9 @@ impl OnlineStatus {
 }
 
 impl Default for OnlineStatus {
-    fn default() -> OnlineStatus { OnlineStatus::Online }
+    fn default() -> OnlineStatus {
+        OnlineStatus::Online
+    }
 }
 
 /// Information about a user.
@@ -440,8 +458,8 @@ pub struct User {
     pub(crate) _nonexhaustive: (),
 }
 
-use std::hash::{Hash, Hasher};
 use chrono::{DateTime, FixedOffset};
+use std::hash::{Hash, Hasher};
 
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
@@ -463,7 +481,9 @@ impl User {
     ///
     /// This will produce a WEBP image URL, or GIF if the user has a GIF avatar.
     #[inline]
-    pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
+    pub fn avatar_url(&self) -> Option<String> {
+        avatar_url(self.id, self.avatar.as_ref())
+    }
 
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
@@ -471,17 +491,23 @@ impl User {
     /// [current user]: struct.CurrentUser.html
     #[inline]
     #[cfg(feature = "http")]
-    pub fn create_dm_channel(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> { self.id.create_dm_channel(&http) }
+    pub fn create_dm_channel(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
+        self.id.create_dm_channel(&http)
+    }
 
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> DateTime<FixedOffset> { self.id.created_at() }
+    pub fn created_at(&self) -> DateTime<FixedOffset> {
+        self.id.created_at()
+    }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
     /// This will produce a PNG URL.
     #[inline]
-    pub fn default_avatar_url(&self) -> String { default_avatar_url(self.discriminator) }
+    pub fn default_avatar_url(&self) -> String {
+        default_avatar_url(self.discriminator)
+    }
 
     /// Sends a message to a user through a direct message channel. This is a
     /// channel that can only be accessed by you and the recipient.
@@ -565,7 +591,9 @@ impl User {
     #[allow(clippy::let_and_return)]
     #[cfg(all(feature = "builder", feature = "client"))]
     pub fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-        where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
+    where
+        for<'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+    {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
@@ -575,7 +603,9 @@ impl User {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                private_channel_id = cache.read().private_channels
+                private_channel_id = cache
+                    .read()
+                    .private_channels
                     .values()
                     .map(|ch| ch.read())
                     .find(|ch| ch.recipient.read().id == self.id)
@@ -619,7 +649,9 @@ impl User {
     #[cfg(all(feature = "builder", feature = "client"))]
     #[inline]
     pub fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
+    where
+        for<'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+    {
         self.direct_message(cache_http, f)
     }
 
@@ -659,7 +691,10 @@ impl User {
     /// [`Cache`]: ../../cache/struct.Cache.html
     #[cfg(feature = "client")]
     pub fn has_role<G, R>(&self, cache_http: impl CacheHttp, guild: G, role: R) -> Result<bool>
-        where G: Into<GuildContainer>, R: Into<RoleId> {
+    where
+        G: Into<GuildContainer>,
+        R: Into<RoleId>,
+    {
         self._has_role(cache_http, guild.into(), role.into())
     }
 
@@ -668,28 +703,24 @@ impl User {
         &self,
         cache_http: impl CacheHttp,
         guild: GuildContainer,
-        role: RoleId
+        role: RoleId,
     ) -> Result<bool> {
         match guild {
             GuildContainer::Guild(partial_guild) => {
-                self._has_role(
-                    cache_http,
-                    GuildContainer::Id(partial_guild.id), role
-                )
-            },
+                self._has_role(cache_http, GuildContainer::Id(partial_guild.id), role)
+            }
             GuildContainer::Id(guild_id) => {
                 let mut has_role = None;
 
                 #[cfg(feature = "cache")]
                 {
                     if let Some(cache) = cache_http.cache() {
-                        has_role = cache.read()
-                            .guilds
-                            .get(&guild_id)
-                            .and_then(|g| {
-                                g.read().members.get(&self.id)
-                                    .and_then(|m| Some(m.roles.contains(&role)))
-                            });
+                        has_role = cache.read().guilds.get(&guild_id).and_then(|g| {
+                            g.read()
+                                .members
+                                .get(&self.id)
+                                .and_then(|m| Some(m.roles.contains(&role)))
+                        });
                     }
                 }
 
@@ -698,7 +729,8 @@ impl User {
                     if let Some(has_role) = has_role {
                         Ok(has_role)
                     } else {
-                        cache_http.http()
+                        cache_http
+                            .http()
                             .get_member(guild_id.0, self.id.0)
                             .map(|m| m.roles.contains(&role))
                     }
@@ -707,7 +739,7 @@ impl User {
                 {
                     Err(Error::Model(ModelError::ItemMissing))
                 }
-            },
+            }
             GuildContainer::__Nonexhaustive => unreachable!(),
         }
     }
@@ -721,7 +753,6 @@ impl User {
             mem::replace(self, replacement);
         })
     }
-
 
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
@@ -771,7 +802,9 @@ impl User {
     /// # fn main() {}
     /// ```
     #[inline]
-    pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
+    pub fn tag(&self) -> String {
+        tag(&self.name, self.discriminator)
+    }
 
     /// Returns the user's nickname in the given `guild_id`.
     ///
@@ -779,7 +812,9 @@ impl User {
     #[inline]
     #[cfg(feature = "http")]
     pub fn nick_in<G>(&self, cache_http: impl CacheHttp, guild_id: G) -> Option<String>
-    where G: Into<GuildId> {
+    where
+        G: Into<GuildId>,
+    {
         self._nick_in(cache_http, guild_id.into())
     }
 
@@ -789,12 +824,19 @@ impl User {
         {
             if let Some(cache) = cache_http.cache() {
                 return guild_id.to_guild_cached(cache).and_then(|guild| {
-                    guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
+                    guild
+                        .read()
+                        .members
+                        .get(&self.id)
+                        .and_then(|member| member.nick.clone())
                 });
             }
         }
 
-        guild_id.member(cache_http, &self.id).ok().and_then(|member| member.nick.clone())
+        guild_id
+            .member(cache_http, &self.id)
+            .ok()
+            .and_then(|member| member.nick.clone())
     }
 }
 
@@ -826,7 +868,9 @@ impl UserId {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {cache.as_ref().read().user(self) }
+    pub fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {
+        cache.as_ref().read().user(self)
+    }
 
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.
@@ -841,7 +885,6 @@ impl UserId {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
                 if let Some(user) = cache.read().user(self) {
                     return Ok(user.read().clone());
                 }
@@ -880,32 +923,44 @@ impl<'a> From<&'a CurrentUser> for User {
 
 impl From<CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
-    fn from(current_user: CurrentUser) -> UserId { current_user.id }
+    fn from(current_user: CurrentUser) -> UserId {
+        current_user.id
+    }
 }
 
 impl<'a> From<&'a CurrentUser> for UserId {
     /// Gets the Id of a `CurrentUser` struct.
-    fn from(current_user: &CurrentUser) -> UserId { current_user.id }
+    fn from(current_user: &CurrentUser) -> UserId {
+        current_user.id
+    }
 }
 
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: Member) -> UserId { member.user.read().id }
+    fn from(member: Member) -> UserId {
+        member.user.read().id
+    }
 }
 
 impl<'a> From<&'a Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: &Member) -> UserId { member.user.read().id }
+    fn from(member: &Member) -> UserId {
+        member.user.read().id
+    }
 }
 
 impl From<User> for UserId {
     /// Gets the Id of a `User`.
-    fn from(user: User) -> UserId { user.id }
+    fn from(user: User) -> UserId {
+        user.id
+    }
 }
 
 impl<'a> From<&'a User> for UserId {
     /// Gets the Id of a `User`.
-    fn from(user: &User) -> UserId { user.id }
+    fn from(user: &User) -> UserId {
+        user.id
+    }
 }
 
 #[cfg(feature = "model")]
@@ -966,28 +1021,24 @@ mod test {
         fn test_core() {
             let mut user = gen();
 
-            assert!(
-                user.avatar_url()
-                    .unwrap()
-                    .ends_with("/avatars/210/abc.webp?size=1024")
-            );
-            assert!(
-                user.static_avatar_url()
-                    .unwrap()
-                    .ends_with("/avatars/210/abc.webp?size=1024")
-            );
+            assert!(user
+                .avatar_url()
+                .unwrap()
+                .ends_with("/avatars/210/abc.webp?size=1024"));
+            assert!(user
+                .static_avatar_url()
+                .unwrap()
+                .ends_with("/avatars/210/abc.webp?size=1024"));
 
             user.avatar = Some("a_aaa".to_string());
-            assert!(
-                user.avatar_url()
-                    .unwrap()
-                    .ends_with("/avatars/210/a_aaa.gif?size=1024")
-            );
-            assert!(
-                user.static_avatar_url()
-                    .unwrap()
-                    .ends_with("/avatars/210/a_aaa.webp?size=1024")
-            );
+            assert!(user
+                .avatar_url()
+                .unwrap()
+                .ends_with("/avatars/210/a_aaa.gif?size=1024"));
+            assert!(user
+                .static_avatar_url()
+                .unwrap()
+                .ends_with("/avatars/210/a_aaa.webp?size=1024"));
 
             user.avatar = None;
             assert!(user.avatar_url().is_none());

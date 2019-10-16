@@ -4,8 +4,8 @@
 mod benches {
     extern crate test;
 
-    use serenity::framework::standard::{Args, Delimiter};
     use self::test::Bencher;
+    use serenity::framework::standard::{Args, Delimiter};
 
     #[bench]
     fn single_with_one_delimiter(b: &mut Bencher) {
@@ -68,15 +68,26 @@ mod benches {
     fn iter_with_one_delimiter(b: &mut Bencher) {
         b.iter(|| {
             let mut args = Args::new("1,2,3,4,5,6,7,8,9,10", &[Delimiter::Single(',')]);
-            args.iter::<String>().collect::<Result<Vec<_>, _>>().unwrap();
+            args.iter::<String>()
+                .collect::<Result<Vec<_>, _>>()
+                .unwrap();
         })
     }
 
     #[bench]
     fn iter_with_three_delimiters(b: &mut Bencher) {
         b.iter(|| {
-            let mut args = Args::new("1-2<3,4,5,6,7<8,9,10", &[Delimiter::Single(','), Delimiter::Single('-'), Delimiter::Single('<')]);
-            args.iter::<String>().collect::<Result<Vec<_>, _>>().unwrap();
+            let mut args = Args::new(
+                "1-2<3,4,5,6,7<8,9,10",
+                &[
+                    Delimiter::Single(','),
+                    Delimiter::Single('-'),
+                    Delimiter::Single('<'),
+                ],
+            );
+            args.iter::<String>()
+                .collect::<Result<Vec<_>, _>>()
+                .unwrap();
         })
     }
 }

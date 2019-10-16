@@ -94,22 +94,20 @@ pub enum OpCode {
     __Nonexhaustive,
 }
 
-enum_number!(
-    OpCode {
-        Event,
-        Heartbeat,
-        Identify,
-        StatusUpdate,
-        VoiceStateUpdate,
-        VoiceServerPing,
-        Resume,
-        Reconnect,
-        GetGuildMembers,
-        InvalidSession,
-        Hello,
-        HeartbeatAck,
-    }
-);
+enum_number!(OpCode {
+    Event,
+    Heartbeat,
+    Identify,
+    StatusUpdate,
+    VoiceStateUpdate,
+    VoiceServerPing,
+    Resume,
+    Reconnect,
+    GetGuildMembers,
+    InvalidSession,
+    Hello,
+    HeartbeatAck,
+});
 
 impl OpCode {
     pub fn num(self) -> u64 {
@@ -162,22 +160,20 @@ pub enum VoiceOpCode {
     __Nonexhaustive,
 }
 
-enum_number!(
-    VoiceOpCode {
-        Identify,
-        SelectProtocol,
-        Ready,
-        Heartbeat,
-        SessionDescription,
-        Speaking,
-        HeartbeatAck,
-        Resume,
-        Hello,
-        Resumed,
-        ClientConnect,
-        ClientDisconnect,
-    }
-);
+enum_number!(VoiceOpCode {
+    Identify,
+    SelectProtocol,
+    Ready,
+    Heartbeat,
+    SessionDescription,
+    Speaking,
+    HeartbeatAck,
+    Resume,
+    Hello,
+    Resumed,
+    ClientConnect,
+    ClientDisconnect,
+});
 
 impl VoiceOpCode {
     pub fn num(self) -> u64 {

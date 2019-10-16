@@ -51,15 +51,10 @@ mod shard;
 mod ws_client_ext;
 
 pub use self::{
-    error::Error as GatewayError,
-    shard::Shard,
-    ws_client_ext::WebSocketGatewayClientExt
+    error::Error as GatewayError, shard::Shard, ws_client_ext::WebSocketGatewayClientExt,
 };
 
-use crate::model::{
-    gateway::Activity,
-    user::OnlineStatus,
-};
+use crate::model::{gateway::Activity, user::OnlineStatus};
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 use tungstenite::protocol::WebSocket;

@@ -1,14 +1,10 @@
 //! Error enum definition wrapping potential model implementation errors.
 
+use super::Permissions;
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
+    fmt::{Display, Formatter, Result as FmtResult},
 };
-use super::Permissions;
 
 /// An error returned from the [`model`] module.
 ///
@@ -143,7 +139,9 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        f.write_str(self.description())
+    }
 }
 
 impl StdError for Error {

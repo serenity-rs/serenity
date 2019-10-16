@@ -1,6 +1,9 @@
 use super::Delimiter;
 use crate::client::Context;
-use crate::model::{channel::Message, id::{UserId, GuildId, ChannelId}};
+use crate::model::{
+    channel::Message,
+    id::{ChannelId, GuildId, UserId},
+};
 use std::collections::HashSet;
 
 type DynamicPrefixHook = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
@@ -174,7 +177,7 @@ impl Configuration {
         self
     }
 
-       /// HashSet of channels Ids where commands will be working.
+    /// HashSet of channels Ids where commands will be working.
     ///
     /// **Note**: Defaults to an empty HashSet.
     ///
@@ -498,7 +501,6 @@ impl Configuration {
         T: ToString,
         It: IntoIterator<Item = T>,
     {
-
         self.prefixes = prefixes.into_iter().map(|p| p.to_string()).collect();
 
         self

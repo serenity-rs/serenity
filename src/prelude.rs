@@ -26,7 +26,7 @@ pub use crate::gateway::GatewayError;
 pub use crate::http::HttpError;
 #[cfg(feature = "model")]
 pub use crate::model::ModelError;
-#[cfg(feature = "typemap")]
-pub use typemap::{Key as TypeMapKey, ShareMap};
 #[cfg(feature = "voice")]
 pub use crate::voice::VoiceError;
+#[cfg(feature = "typemap")]
+pub use typemap::{Key as TypeMapKey, ShareMap};

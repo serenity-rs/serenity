@@ -2,35 +2,28 @@
 //! fully use the library.
 
 mod colour;
-mod message_builder;
 mod custom_message;
+mod message_builder;
 
 pub use self::{
     colour::Colour,
-    message_builder::{
-        Content,
-        ContentModifier,
-        EmbedMessageBuilding,
-        MessageBuilder,
-    },
-	custom_message::CustomMessage,
+    custom_message::CustomMessage,
+    message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder},
 };
 
-use base64;
-use crate::internal::prelude::*;
-use crate::model::{
-    misc::EmojiIdentifier,
-    id::EmojiId,
-};
 #[cfg(feature = "cache")]
-use crate::model::{
-    id::{
-        ChannelId,
-        GuildId,
-        RoleId,
-        UserId,
-    },
-};
+use crate::cache::{Cache, CacheRwLock};
+use crate::internal::prelude::*;
+#[cfg(feature = "cache")]
+use crate::model::channel::Channel;
+#[cfg(feature = "cache")]
+use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
+use crate::model::{id::EmojiId, misc::EmojiIdentifier};
+#[cfg(feature = "cache")]
+use crate::prelude::RwLock;
+use base64;
+#[cfg(feature = "cache")]
+use std::str::FromStr;
 use std::{
     collections::HashMap,
     ffi::OsStr,
@@ -39,18 +32,13 @@ use std::{
     io::Read,
     path::Path,
 };
-#[cfg(feature = "cache")]
-use crate::prelude::RwLock;
-#[cfg(feature = "cache")]
-use crate::model::channel::Channel;
-#[cfg(feature = "cache")]
-use std::str::FromStr;
-#[cfg(feature = "cache")]
-use crate::cache::{Cache, CacheRwLock};
 
 /// Converts a HashMap into a final `serde_json::Map` representation.
-pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
-    -> Map<String, Value> where H: BuildHasher, T: Eq + Hash + ToString {
+pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> Map<String, Value>
+where
+    H: BuildHasher,
+    T: Eq + Hash + ToString,
+{
     let mut json_map = Map::new();
 
     for (key, value) in map {
@@ -89,7 +77,9 @@ pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
 ///
 /// [`RichInvite`]: ../model/invite/struct.RichInvite.html
 pub fn parse_invite(code: &str) -> &str {
-    let code = code.trim_start_matches("http://").trim_start_matches("https://");
+    let code = code
+        .trim_start_matches("http://")
+        .trim_start_matches("https://");
     let lower = code.to_lowercase();
     if lower.starts_with("discord.gg/") {
         &code[11..]
@@ -449,7 +439,9 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(utils::shard_id(81384788765712384, 17), 7);
 /// ```
 #[inline]
-pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }
+pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 {
+    (guild_id >> 22) % shard_count
+}
 
 /// A function for doing automatic `read`ing (and the releasing of the guard as well)
 /// This is particularly useful if you just want to use the cache for this one time,
@@ -467,7 +459,9 @@ pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % sha
 /// ```
 #[cfg(feature = "cache")]
 pub fn with_cache<T, F>(cache: impl AsRef<CacheRwLock>, f: F) -> T
-    where F: Fn(&Cache) -> T {
+where
+    F: Fn(&Cache) -> T,
+{
     let cache = cache.as_ref().read();
     f(&cache)
 }
@@ -488,7 +482,9 @@ pub fn with_cache<T, F>(cache: impl AsRef<CacheRwLock>, f: F) -> T
 /// [`with_cache`]: #fn.with_cache
 #[cfg(feature = "cache")]
 pub fn with_cache_mut<T, F>(cache: impl AsRef<CacheRwLock>, mut f: F) -> T
-    where F: FnMut(&mut Cache) -> T {
+where
+    F: FnMut(&mut Cache) -> T,
+{
     let mut cache = cache.as_ref().write();
     f(&mut cache)
 }
@@ -626,11 +622,10 @@ fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
                 } else {
                     s.replace(&to_replace, &"@deleted-role")
                 };
-            } else  {
+            } else {
                 let id = &s[mention_start..mention_end].to_string();
 
-                if !id.is_empty() && id.as_bytes().iter()
-                    .all(u8::is_ascii_digit){
+                if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
                     let to_replace = format!("<@&{}>", id);
 
                     *s = s.replace(&to_replace, &"@deleted-role");
@@ -668,8 +663,7 @@ fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
             } else {
                 let id = &s[mention_start..mention_end].to_string();
 
-                if !id.is_empty() && id.as_bytes().iter()
-                    .all(u8::is_ascii_digit) {
+                if !id.is_empty() && id.as_bytes().iter().all(u8::is_ascii_digit) {
                     let to_replace = format!("<#{}>", id);
 
                     *s = s.replace(&to_replace, &"#deleted-channel");
@@ -685,7 +679,12 @@ fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
+fn clean_users(
+    cache: &RwLock<Cache>,
+    s: &mut String,
+    show_discriminator: bool,
+    guild: Option<GuildId>,
+) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@") {
@@ -695,7 +694,11 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
             mention_end += mention_start;
             mention_start += "<@".len();
 
-            let has_exclamation = if s[mention_start..].as_bytes().get(0).map_or(false, |c| *c == b'!') {
+            let has_exclamation = if s[mention_start..]
+                .as_bytes()
+                .get(0)
+                .map_or(false, |c| *c == b'!')
+            {
                 mention_start += "!".len();
 
                 true
@@ -705,11 +708,8 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
                 let replacement = if let Some(guild) = guild {
-
                     if let Some(guild) = cache.read().guild(&guild) {
-
                         if let Some(member) = guild.read().members.get(&id) {
-
                             if show_discriminator {
                                 format!("@{}", member.distinct())
                             } else {
@@ -788,7 +788,11 @@ fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, 
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub fn content_safe(cache: impl AsRef<CacheRwLock>, s: impl AsRef<str>, options: &ContentSafeOptions) -> String {
+pub fn content_safe(
+    cache: impl AsRef<CacheRwLock>,
+    s: impl AsRef<str>,
+    options: &ContentSafeOptions,
+) -> String {
     let mut s = s.as_ref().to_string();
     let cache = cache.as_ref();
 
@@ -801,7 +805,12 @@ pub fn content_safe(cache: impl AsRef<CacheRwLock>, s: impl AsRef<str>, options:
     }
 
     if options.clean_user {
-        clean_users(&cache, &mut s, options.show_discriminator, options.guild_reference);
+        clean_users(
+            &cache,
+            &mut s,
+            options.show_discriminator,
+            options.guild_reference,
+        );
     }
 
     if options.clean_here {
@@ -865,16 +874,9 @@ mod test {
     #[cfg(feature = "cache")]
     #[test]
     fn test_content_safe() {
-        use crate::model::{
-            user::User,
-            Permissions,
-            prelude::*,
-        };
+        use crate::model::{prelude::*, user::User, Permissions};
         use chrono::DateTime;
-        use std::{
-            collections::HashMap,
-            sync::Arc,
-        };
+        use std::{collections::HashMap, sync::Arc};
 
         let user = User {
             id: UserId(100000000000000000),
@@ -898,7 +900,9 @@ mod test {
             id: GuildId(381880193251409931),
             joined_at: DateTime::parse_from_str(
                 "1983 Apr 13 12:09:14.274 +0000",
-                "%Y %b %d %H:%M:%S%.3f %z").unwrap(),
+                "%Y %b %d %H:%M:%S%.3f %z",
+            )
+            .unwrap(),
             large: false,
             member_count: 1,
             members: HashMap::new(),
@@ -968,103 +972,142 @@ mod test {
             let mut cache = cache.try_write().unwrap();
             guild.members.insert(user.id, member.clone());
             guild.roles.insert(role.id, role.clone());
-            cache.users.insert(user.id, Arc::new(RwLock::new(user.clone())));
-            cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild.clone())));
-            cache.channels.insert(channel.id, Arc::new(RwLock::new(channel.clone())));
+            cache
+                .users
+                .insert(user.id, Arc::new(RwLock::new(user.clone())));
+            cache
+                .guilds
+                .insert(guild.id, Arc::new(RwLock::new(guild.clone())));
+            cache
+                .channels
+                .insert(channel.id, Arc::new(RwLock::new(channel.clone())));
         }
 
-        let with_user_metions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
-        <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
-        <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
-        <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
-        <@123invalid> <@> <@ ";
+        let with_user_metions =
+            "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
+             <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \
+             <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
+             <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
+             <@123invalid> <@> <@ ";
 
         let without_user_mentions = "@Crab#0000 @invalid-user @invalid-user @invalid-user \
-        @invalid-user @invalid-user @invalid-user <@!invalid> \
-        <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
-        <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
-        <@123invalid> <@> <@ ";
+                                     @invalid-user @invalid-user @invalid-user <@!invalid> \
+                                     <@invalid> <@日本語 한국어$§)[/__#\\(/&2032$§#> \
+                                     <@!i)/==(<<>z/9080)> <@!1231invalid> <@invalid123> \
+                                     <@123invalid> <@> <@ ";
 
         // User mentions
         let options = ContentSafeOptions::default();
-        assert_eq!(without_user_mentions, content_safe(&cache, with_user_metions, &options));
+        assert_eq!(
+            without_user_mentions,
+            content_safe(&cache, with_user_metions, &options)
+        );
 
         let options = ContentSafeOptions::default();
-        assert_eq!(format!("@{}#{:04}", user.name, user.discriminator),
-            content_safe(&cache, "<@!100000000000000000>", &options));
+        assert_eq!(
+            format!("@{}#{:04}", user.name, user.discriminator),
+            content_safe(&cache, "<@!100000000000000000>", &options)
+        );
 
         let options = ContentSafeOptions::default();
-        assert_eq!(format!("@{}#{:04}", user.name, user.discriminator),
-            content_safe(&cache, "<@100000000000000000>", &options));
+        assert_eq!(
+            format!("@{}#{:04}", user.name, user.discriminator),
+            content_safe(&cache, "<@100000000000000000>", &options)
+        );
 
         let options = options.show_discriminator(false);
-        assert_eq!(format!("@{}", user.name),
-            content_safe(&cache, "<@!100000000000000000>", &options));
+        assert_eq!(
+            format!("@{}", user.name),
+            content_safe(&cache, "<@!100000000000000000>", &options)
+        );
 
         let options = options.show_discriminator(false);
-        assert_eq!(format!("@{}", user.name),
-            content_safe(&cache, "<@100000000000000000>", &options));
+        assert_eq!(
+            format!("@{}", user.name),
+            content_safe(&cache, "<@100000000000000000>", &options)
+        );
 
         let options = options.display_as_member_from(guild.id);
-        assert_eq!(format!("@{}", member.nick.unwrap()),
-            content_safe(&cache, "<@!100000000000000000>", &options));
+        assert_eq!(
+            format!("@{}", member.nick.unwrap()),
+            content_safe(&cache, "<@!100000000000000000>", &options)
+        );
 
         let options = options.clean_user(false);
-        assert_eq!(with_user_metions,
-            content_safe(&cache, with_user_metions, &options));
+        assert_eq!(
+            with_user_metions,
+            content_safe(&cache, with_user_metions, &options)
+        );
 
         // Channel mentions
         let with_channel_mentions = "<#> <#deleted-channel> #deleted-channel <#0> \
-        #unsafe-club <#111880193700067777> <#ferrisferrisferris> \
-        <#000000000000000000>";
+                                     #unsafe-club <#111880193700067777> <#ferrisferrisferris> \
+                                     <#000000000000000000>";
 
-        let without_channel_mentions = "<#> <#deleted-channel> #deleted-channel \
-        #deleted-channel #unsafe-club #general <#ferrisferrisferris> \
-        #deleted-channel";
+        let without_channel_mentions =
+            "<#> <#deleted-channel> #deleted-channel \
+             #deleted-channel #unsafe-club #general <#ferrisferrisferris> \
+             #deleted-channel";
 
-        assert_eq!(without_channel_mentions,
-            content_safe(&cache, with_channel_mentions, &options));
+        assert_eq!(
+            without_channel_mentions,
+            content_safe(&cache, with_channel_mentions, &options)
+        );
 
         let options = options.clean_channel(false);
-        assert_eq!(with_channel_mentions,
-            content_safe(&cache, with_channel_mentions, &options));
+        assert_eq!(
+            with_channel_mentions,
+            content_safe(&cache, with_channel_mentions, &options)
+        );
 
         // Role mentions
         let with_role_mentions = "<@&> @deleted-role <@&9829> \
-        <@&333333333333333333> <@&000000000000000000>";
+                                  <@&333333333333333333> <@&000000000000000000>";
 
         let without_role_mentions = "<@&> @deleted-role @deleted-role \
-        @ferris-club-member @deleted-role";
+                                     @ferris-club-member @deleted-role";
 
-        assert_eq!(without_role_mentions,
-            content_safe(&cache, with_role_mentions, &options));
+        assert_eq!(
+            without_role_mentions,
+            content_safe(&cache, with_role_mentions, &options)
+        );
 
         let options = options.clean_role(false);
-        assert_eq!(with_role_mentions,
-            content_safe(&cache, with_role_mentions, &options));
+        assert_eq!(
+            with_role_mentions,
+            content_safe(&cache, with_role_mentions, &options)
+        );
 
         // Everyone mentions
         let with_everyone_mention = "@everyone";
 
         let without_everyone_mention = "@\u{200B}everyone";
 
-        assert_eq!(without_everyone_mention,
-            content_safe(&cache, with_everyone_mention, &options));
+        assert_eq!(
+            without_everyone_mention,
+            content_safe(&cache, with_everyone_mention, &options)
+        );
 
         let options = options.clean_everyone(false);
-        assert_eq!(with_everyone_mention,
-            content_safe(&cache, with_everyone_mention, &options));
+        assert_eq!(
+            with_everyone_mention,
+            content_safe(&cache, with_everyone_mention, &options)
+        );
 
         // Here mentions
         let with_here_mention = "@here";
 
         let without_here_mention = "@\u{200B}here";
 
-        assert_eq!(without_here_mention,
-            content_safe(&cache, with_here_mention, &options));
+        assert_eq!(
+            without_here_mention,
+            content_safe(&cache, with_here_mention, &options)
+        );
 
         let options = options.clean_here(false);
-        assert_eq!(with_here_mention,
-            content_safe(&cache, with_here_mention, &options));
+        assert_eq!(
+            with_here_mention,
+            content_safe(&cache, with_here_mention, &options)
+        );
     }
 }

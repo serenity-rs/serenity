@@ -64,16 +64,12 @@ pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
 pub use self::shard_runner_message::ShardRunnerMessage;
 
-use std::{
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    },
-    sync::mpsc::Sender,
-    time::Duration as StdDuration
-};
 use crate::gateway::{ConnectionStage, InterMessage};
+use std::{
+    fmt::{Display, Formatter, Result as FmtResult},
+    sync::mpsc::Sender,
+    time::Duration as StdDuration,
+};
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///
@@ -127,7 +123,7 @@ pub enum ShardManagerMessage {
     /// move toward the next one.
     ///
     /// [`ShardRunner`]: struct.ShardRunner.html
-    ShutdownFinished(ShardId)
+    ShutdownFinished(ShardId),
 }
 
 /// A message to be sent to the [`ShardQueuer`].

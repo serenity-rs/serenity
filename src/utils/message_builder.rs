@@ -1,12 +1,12 @@
 use crate::model::{
     guild::Emoji,
     id::{ChannelId, RoleId, UserId},
-    misc::Mentionable
+    misc::Mentionable,
 };
 use std::{
     default::Default,
     fmt::{self, Display, Write},
-    ops::Add
+    ops::Add,
 };
 
 /// The Message Builder is an ergonomic utility to easily build a message,
@@ -71,7 +71,9 @@ impl MessageBuilder {
     /// // alternatively:
     /// let message = MessageBuilder::default();
     /// ```
-    pub fn new() -> MessageBuilder { MessageBuilder::default() }
+    pub fn new() -> MessageBuilder {
+        MessageBuilder::default()
+    }
 
     /// Pulls the inner value out of the builder.
     ///
@@ -104,7 +106,9 @@ impl MessageBuilder {
     ///
     /// assert_eq!(content.build(), "test");
     /// ```
-    pub fn build(&mut self) -> String { self.clone().0 }
+    pub fn build(&mut self) -> String {
+        self.clone().0
+    }
 
     /// Mentions the [`GuildChannel`] in the built message.
     ///
@@ -912,7 +916,9 @@ impl Display for MessageBuilder {
     /// use serenity::utils::MessageBuilder;
     ///
     ///
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { fmt::Display::fmt(&self.0, f) }
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        fmt::Display::fmt(&self.0, f)
+    }
 }
 
 /// A trait with additional functionality over the [`MessageBuilder`] for
@@ -1122,22 +1128,22 @@ impl Content {
         match *modifier {
             ContentModifier::Italic => {
                 self.italic = true;
-            },
+            }
             ContentModifier::Bold => {
                 self.bold = true;
-            },
+            }
             ContentModifier::Strikethrough => {
                 self.strikethrough = true;
-            },
+            }
             ContentModifier::Code => {
                 self.code = true;
-            },
+            }
             ContentModifier::Underline => {
                 self.underline = true;
-            },
+            }
             ContentModifier::Spoiler => {
                 self.spoiler = true;
-            },
+            }
             ContentModifier::__Nonexhaustive => unreachable!(),
         }
     }
@@ -1157,14 +1163,13 @@ impl Content {
             }
         }
 
-        let capacity =
-            self.inner.len() +
-            self.spoiler.unwrap_with(4) +
-            self.bold.unwrap_with(4) +
-            self.italic.unwrap_with(2) +
-            self.strikethrough.unwrap_with(4) +
-            self.underline.unwrap_with(4) +
-            self.code.unwrap_with(2);
+        let capacity = self.inner.len()
+            + self.spoiler.unwrap_with(4)
+            + self.bold.unwrap_with(4)
+            + self.italic.unwrap_with(2)
+            + self.strikethrough.unwrap_with(4)
+            + self.underline.unwrap_with(4)
+            + self.code.unwrap_with(2);
 
         let mut new_str = String::with_capacity(capacity);
 
@@ -1223,7 +1228,9 @@ impl Content {
 }
 
 impl From<ContentModifier> for Content {
-    fn from(cm: ContentModifier) -> Content { cm.to_content() }
+    fn from(cm: ContentModifier) -> Content {
+        cm.to_content()
+    }
 }
 
 mod private {
@@ -1236,7 +1243,6 @@ mod private {
     impl A for Content {}
     impl<T: fmt::Display> A for T {}
 }
-
 
 /// This trait exists for the purpose of bypassing the "conflicting implementations" error from the compiler.
 pub trait I: self::private::A {
@@ -1258,11 +1264,15 @@ impl<T: fmt::Display> I for T {
 }
 
 impl I for ContentModifier {
-    fn into(self) -> Content { self.to_content() }
+    fn into(self) -> Content {
+        self.to_content()
+    }
 }
 
 impl I for Content {
-    fn into(self) -> Content { self }
+    fn into(self) -> Content {
+        self
+    }
 }
 
 fn normalize(text: &str) -> String {
@@ -1288,11 +1298,11 @@ fn normalize(text: &str) -> String {
 
 #[cfg(test)]
 mod test {
-    use crate::model::prelude::*;
     use super::{
-        ContentModifier::{Spoiler, Bold, Code, Italic},
+        ContentModifier::{Bold, Code, Italic, Spoiler},
         MessageBuilder,
     };
+    use crate::model::prelude::*;
 
     macro_rules! gen {
         ($($fn:ident => [$($text:expr => $expected:expr),+]),+) => ({
@@ -1397,14 +1407,17 @@ mod test {
 
         let content = &MessageBuilder::new()
             .push_codeblock("fn main() { }", Some("rs"))
-            .0.clone();
+            .0
+            .clone();
         assert_eq!(content, "```rs\nfn main() { }\n```");
     }
 
     #[test]
     fn push_codeblock_safe() {
         assert_eq!(
-            MessageBuilder::new().push_codeblock_safe("foo", Some("rs")).0,
+            MessageBuilder::new()
+                .push_codeblock_safe("foo", Some("rs"))
+                .0,
             "```rs\nfoo\n```",
         );
         assert_eq!(
@@ -1582,9 +1595,18 @@ mod test {
         assert_eq!(super::normalize("@here"), "@\u{200B}here");
         assert_eq!(super::normalize("discord.gg"), "discord\u{2024}gg");
         assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
-        assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
-        assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
-        assert_eq!(super::normalize("discordapp.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(
+            super::normalize("discordlist.net"),
+            "discordlist\u{2024}net"
+        );
+        assert_eq!(
+            super::normalize("discordservers.com"),
+            "discordservers\u{2024}com"
+        );
+        assert_eq!(
+            super::normalize("discordapp.com/invite"),
+            "discordapp\u{2024}com/invite"
+        );
         assert_eq!(super::normalize("\u{202E}"), " ");
         assert_eq!(super::normalize("\u{200F}"), " ");
         assert_eq!(super::normalize("\u{202B}"), " ");

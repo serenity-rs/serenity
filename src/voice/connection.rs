@@ -1,27 +1,16 @@
-use byteorder::{
-    BigEndian,
-    ByteOrder,
-    LittleEndian,
-    ReadBytesExt,
-    WriteBytesExt
-};
 use crate::constants::VOICE_GATEWAY_VERSION;
 use crate::gateway::WsClient;
 use crate::internal::prelude::*;
 use crate::internal::{
     ws_impl::{ReceiverExt, SenderExt},
-    Timer
+    Timer,
 };
 use crate::model::event::VoiceEvent;
+use byteorder::{BigEndian, ByteOrder, LittleEndian, ReadBytesExt, WriteBytesExt};
 
 use audiopus::{
-    packet as opus_packet,
-    Application as CodingMode,
-    Bitrate,
-    Channels,
-    coder::Decoder as OpusDecoder,
-    coder::Encoder as OpusEncoder,
-    softclip::SoftClip,
+    coder::Decoder as OpusDecoder, coder::Encoder as OpusEncoder, packet as opus_packet,
+    softclip::SoftClip, Application as CodingMode, Bitrate, Channels,
 };
 use parking_lot::Mutex;
 use rand::random;
@@ -32,26 +21,20 @@ use std::{
     io::Write,
     net::{SocketAddr, ToSocketAddrs, UdpSocket},
     sync::{
-        mpsc::{
-            self,
-            Receiver as MpscReceiver,
-            Sender as MpscSender
-        },
+        mpsc::{self, Receiver as MpscReceiver, Sender as MpscSender},
         Arc,
     },
-    thread::{
-        self,
-        Builder as ThreadBuilder,
-        JoinHandle
-    },
-    time::Duration
+    thread::{self, Builder as ThreadBuilder, JoinHandle},
+    time::Duration,
 };
 
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
+use super::audio::{
+    AudioReceiver, AudioType, LockedAudio, DEFAULT_BITRATE, HEADER_LEN, SAMPLE_RATE,
+};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
-use url::Url;
 use log::{debug, info, warn};
+use url::Url;
 
 #[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
@@ -114,26 +97,28 @@ impl Connection {
             match VoiceEvent::deserialize(value)? {
                 VoiceEvent::Ready(r) => {
                     ready = Some(r);
-                    if hello.is_some(){
+                    if hello.is_some() {
                         break;
                     }
-                },
+                }
                 VoiceEvent::Hello(h) => {
                     hello = Some(h);
                     if ready.is_some() {
                         break;
                     }
-                },
+                }
                 other => {
                     debug!("[Voice] Expected ready/hello; got: {:?}", other);
 
                     return Err(Error::Voice(VoiceError::ExpectedHandshake));
-                },
+                }
             }
-        };
+        }
 
-        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
-        let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
+        let hello = hello
+            .expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+        let ready = ready
+            .expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
         if !has_valid_mode(&ready.modes) {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
@@ -176,8 +161,7 @@ impl Connection {
             let port_pos = len - 2;
             let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
 
-            client
-                .send_json(&payload::build_select_protocol(addr, port))?;
+            client.send_json(&payload::build_select_protocol(addr, port))?;
         }
 
         let key = encryption_key(&mut client)?;
@@ -198,8 +182,7 @@ impl Connection {
         let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
         info!(
             "[Voice] WS heartbeat duration given as {}ms, adjusted to {}ms.",
-            hello.heartbeat_interval,
-            temp_heartbeat,
+            hello.heartbeat_interval, temp_heartbeat,
         );
 
         Ok(Connection {
@@ -251,25 +234,26 @@ impl Connection {
             match VoiceEvent::deserialize(value)? {
                 VoiceEvent::Resumed => {
                     resumed = Some(());
-                    if hello.is_some(){
+                    if hello.is_some() {
                         break;
                     }
-                },
+                }
                 VoiceEvent::Hello(h) => {
                     hello = Some(h);
                     if resumed.is_some() {
                         break;
                     }
-                },
+                }
                 other => {
                     debug!("[Voice] Expected resumed/hello; got: {:?}", other);
 
                     return Err(Error::Voice(VoiceError::ExpectedHandshake));
-                },
+                }
             }
-        };
+        }
 
-        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+        let hello = hello
+            .expect("[Voice] Hello packet expected in connection initialisation, but not found.");
 
         self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
 
@@ -291,25 +275,22 @@ impl Connection {
         buffer: &mut [i16; 1920],
         packet: &[u8],
         nonce: &mut Nonce,
-        ) -> Result<()> {
-
+    ) -> Result<()> {
         if let Some(receiver) = receiver.as_mut() {
             let mut handle = &packet[2..];
             let seq = handle.read_u16::<BigEndian>()?;
             let timestamp = handle.read_u32::<BigEndian>()?;
             let ssrc = handle.read_u32::<BigEndian>()?;
 
-            nonce.0[..HEADER_LEN]
-                .clone_from_slice(&packet[..HEADER_LEN]);
+            nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
 
-            if let Ok(mut decrypted) =
-                secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
+            if let Ok(mut decrypted) = secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
                 let channels = opus_packet::nb_channels(&decrypted)?;
 
-                let entry =
-                    self.decoder_map.entry((ssrc, channels)).or_insert_with(
-                        || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
-                    );
+                let entry = self
+                    .decoder_map
+                    .entry((ssrc, channels))
+                    .or_insert_with(|| OpusDecoder::new(SAMPLE_RATE, channels).unwrap());
 
                 // Strip RTP Header Extensions (one-byte)
                 if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
@@ -339,8 +320,14 @@ impl Connection {
 
                 let b = if is_stereo { len * 2 } else { len };
 
-                receiver
-                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
+                receiver.voice_packet(
+                    ssrc,
+                    seq,
+                    timestamp,
+                    is_stereo,
+                    &buffer[..b],
+                    decrypted.len(),
+                );
             }
         }
 
@@ -366,7 +353,9 @@ impl Connection {
             info!("[Voice] WS keepalive");
             let nonce = random::<u64>();
             self.last_heartbeat_nonce = Some(nonce);
-            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
+            self.client
+                .lock()
+                .send_json(&payload::build_heartbeat(nonce))?;
             info!("[Voice] WS keepalive sent");
         }
 
@@ -419,11 +408,16 @@ impl Connection {
                 }
 
                 let temp_len = match stream.get_type() {
-                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
+                    AudioType::Opus => {
+                        if stream
+                            .decode_and_add_opus_frame(&mut mix_buffer, vol)
+                            .is_some()
+                        {
                             opus_frame.len()
                         } else {
                             0
-                        },
+                        }
+                    }
                     AudioType::Pcm => {
                         let buffer_len = if source_stereo { 960 * 2 } else { 960 };
 
@@ -431,7 +425,7 @@ impl Connection {
                             Some(len) => len,
                             None => 0,
                         }
-                    },
+                    }
                     AudioType::__Nonexhaustive => unreachable!(),
                 };
 
@@ -454,18 +448,19 @@ impl Connection {
             if !finished {
                 aud.step_frame();
             }
-        };
+        }
 
         Ok(len)
     }
 
     #[allow(unused_variables)]
-    pub fn cycle(&mut self,
-                mut sources: &mut Vec<LockedAudio>,
-                mut receiver: &mut Option<Box<dyn AudioReceiver>>,
-                audio_timer: &mut Timer,
-                bitrate: Bitrate)
-                 -> Result<()> {
+    pub fn cycle(
+        &mut self,
+        mut sources: &mut Vec<LockedAudio>,
+        mut receiver: &mut Option<Box<dyn AudioReceiver>>,
+        audio_timer: &mut Timer,
+        bitrate: Bitrate,
+    ) -> Result<()> {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
             // If user specified, we can calculate. 20ms means 50fps.
@@ -483,37 +478,39 @@ impl Connection {
             match status {
                 ReceiverStatus::Udp(packet) => {
                     self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce)?;
-                },
+                }
                 ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
                         receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
                     }
-                },
+                }
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
                         receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
                     }
-                },
+                }
                 ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
                         receiver.client_disconnect(ev.user_id.0);
                     }
-                },
+                }
                 ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
                     if let Some(nonce) = self.last_heartbeat_nonce {
-
                         if ev.nonce == nonce {
                             info!("[Voice] Heartbeat ACK received.");
                         } else {
-                            warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            warn!(
+                                "[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.",
+                                nonce, ev.nonce
+                            );
                         }
 
                         self.last_heartbeat_nonce = None;
                     }
-                },
+                }
                 ReceiverStatus::Websocket(other) => {
                     info!("[Voice] Received other websocket data: {:?}", other);
-                },
+                }
             }
         }
 
@@ -533,7 +530,8 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer,&mut mix_buffer)?;
+        let len =
+            self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -570,12 +568,13 @@ impl Connection {
         Ok(())
     }
 
-    fn prep_packet(&mut self,
-                   packet: &mut [u8],
-                   buffer: [f32; 1920],
-                   opus_frame: &[u8],
-                   mut nonce: Nonce)
-                   -> Result<usize> {
+    fn prep_packet(
+        &mut self,
+        packet: &mut [u8],
+        buffer: [f32; 1920],
+        opus_frame: &[u8],
+        mut nonce: Nonce,
+    ) -> Result<usize> {
         {
             let mut cursor = &mut packet[..HEADER_LEN];
             cursor.write_all(&[0x80, 0x78])?;
@@ -584,8 +583,7 @@ impl Connection {
             cursor.write_u32::<BigEndian>(self.ssrc)?;
         }
 
-        nonce.0[..HEADER_LEN]
-            .clone_from_slice(&packet[..HEADER_LEN]);
+        nonce.0[..HEADER_LEN].clone_from_slice(&packet[..HEADER_LEN]);
 
         let sl_index = packet.len() - 16;
         let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
@@ -595,8 +593,7 @@ impl Connection {
                 .encode_float(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
         } else {
             let len = opus_frame.len();
-            packet[HEADER_LEN..HEADER_LEN + len]
-                .clone_from_slice(opus_frame);
+            packet[HEADER_LEN..HEADER_LEN + len].clone_from_slice(opus_frame);
             len
         };
 
@@ -621,7 +618,10 @@ impl Connection {
         self.speaking = speaking;
 
         info!("[Voice] Speaking update: {}", speaking);
-        let o = self.client.lock().send_json(&payload::build_speaking(speaking));
+        let o = self
+            .client
+            .lock()
+            .send_json(&payload::build_speaking(speaking));
         info!("[Voice] Speaking update confirmed.");
         o
     }
@@ -676,25 +676,25 @@ fn encryption_key(client: &mut WsClient) -> Result<Key> {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                return Key::from_slice(&desc.secret_key)
-                    .ok_or(Error::Voice(VoiceError::KeyGen));
-            },
+                return Key::from_slice(&desc.secret_key).ok_or(Error::Voice(VoiceError::KeyGen));
+            }
             VoiceEvent::Unknown(op, value) => {
                 debug!(
                     "[Voice] Expected ready for key; got: op{}/v{:?}",
                     op.num(),
                     value
                 );
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 }
 
 #[inline]
-fn has_valid_mode<T, It> (modes: It) -> bool
-where T: for<'a> PartialEq<&'a str>,
-      It : IntoIterator<Item=T>
+fn has_valid_mode<T, It>(modes: It) -> bool
+where
+    T: for<'a> PartialEq<&'a str>,
+    It: IntoIterator<Item = T>,
 {
     modes.into_iter().any(|s| s == CRYPTO_MODE)
 }
@@ -746,7 +746,10 @@ fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<Thread
 }
 
 #[inline]
-fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>) -> Result<(MpscSender<i32>, JoinHandle<()>)> {
+fn start_ws_thread(
+    client: Arc<Mutex<WsClient>>,
+    tx: &MpscSender<ReceiverStatus>,
+) -> Result<(MpscSender<i32>, JoinHandle<()>)> {
     let current_thread = thread::current();
     let thread_name = current_thread.name().unwrap_or("serenity voice");
 
@@ -791,6 +794,5 @@ fn unset_blocking(client: &mut WsClient) -> Result<()> {
         tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
     };
 
-    stream.set_nonblocking(true)
-        .map_err(Into::into)
+    stream.set_nonblocking(true).map_err(Into::into)
 }

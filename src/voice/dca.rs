@@ -10,5 +10,7 @@ struct OpusInfo {
 }
 
 impl DcaMetadata {
-    pub fn is_stereo(&self) -> bool { self.opus.channels == 2 }
+    pub fn is_stereo(&self) -> bool {
+        self.opus.channels == 2
+    }
 }

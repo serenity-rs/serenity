@@ -26,14 +26,16 @@ impl CreateChannel {
     }
     /// Specify what type the channel is, whether it's a text, voice, category or news channel.
     pub fn kind(&mut self, kind: ChannelType) -> &mut Self {
-        self.0.insert("type", Value::Number(Number::from(kind as u8)));
+        self.0
+            .insert("type", Value::Number(Number::from(kind as u8)));
 
         self
     }
 
     /// Specifiy the category, the "parent" of this channel.
     pub fn category<I: Into<ChannelId>>(&mut self, id: I) -> &mut Self {
-        self.0.insert("parent_id", Value::Number(Number::from(id.into().0)));
+        self.0
+            .insert("parent_id", Value::Number(Number::from(id.into().0)));
 
         self
     }
@@ -63,7 +65,8 @@ impl CreateChannel {
 
     /// [Voice-only] Set how many users may occupy this voice channel.
     pub fn user_limit(&mut self, limit: u32) -> &mut Self {
-        self.0.insert("user_limit", Value::Number(Number::from(limit)));
+        self.0
+            .insert("user_limit", Value::Number(Number::from(limit)));
 
         self
     }
@@ -75,7 +78,8 @@ impl CreateChannel {
     ///
     /// **Note**: Must be between 0 and 21600 seconds (360 minutes or 6 hours).
     pub fn rate_limit(&mut self, limit: u64) -> &mut Self {
-        self.0.insert("rate_limit_per_user", Value::Number(Number::from(limit)));
+        self.0
+            .insert("rate_limit_per_user", Value::Number(Number::from(limit)));
 
         self
     }
@@ -101,24 +105,29 @@ impl CreateChannel {
     ///     .permissions(channel.permissions.clone()))
     /// ```
     pub fn permissions<I>(&mut self, perms: I) -> &mut Self
-        where I: IntoIterator<Item=PermissionOverwrite>
+    where
+        I: IntoIterator<Item = PermissionOverwrite>,
     {
-        let overwrites = perms.into_iter().map(|perm| {
-            let (id, kind) = match perm.kind {
-                PermissionOverwriteType::Member(id) => (id.0, "member"),
-                PermissionOverwriteType::Role(id) => (id.0, "role"),
-                PermissionOverwriteType::__Nonexhaustive => unreachable!(),
-            };
+        let overwrites = perms
+            .into_iter()
+            .map(|perm| {
+                let (id, kind) = match perm.kind {
+                    PermissionOverwriteType::Member(id) => (id.0, "member"),
+                    PermissionOverwriteType::Role(id) => (id.0, "role"),
+                    PermissionOverwriteType::__Nonexhaustive => unreachable!(),
+                };
 
-            json!({
-                "allow": perm.allow.bits(),
-                "deny": perm.deny.bits(),
-                "id": id,
-                "type": kind,
+                json!({
+                    "allow": perm.allow.bits(),
+                    "deny": perm.deny.bits(),
+                    "id": id,
+                    "type": kind,
+                })
             })
-        }).collect();
+            .collect();
 
-        self.0.insert("permission_overwrites", Value::Array(overwrites));
+        self.0
+            .insert("permission_overwrites", Value::Array(overwrites));
 
         self
     }

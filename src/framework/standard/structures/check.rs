@@ -1,8 +1,8 @@
-use std::fmt::Debug;
-use std::fmt;
-use crate::model::channel::Message;
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
+use crate::model::channel::Message;
+use std::fmt;
+use std::fmt::Debug;
 
 /// This type describes why a check has failed and occurs on
 /// [`CheckResult::Failure`].
@@ -38,8 +38,8 @@ pub enum Reason {
 /// [`Reason`]: enum.Reason.html
 #[derive(Clone, Debug)]
 pub enum CheckResult {
-   Success,
-   Failure(Reason),
+    Success,
+    Failure(Reason),
 }
 
 impl CheckResult {
@@ -48,7 +48,9 @@ impl CheckResult {
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
     /// [`Reason::User`]: enum.Reason.html#variant.User
     pub fn new_user<D>(d: D) -> Self
-        where D: fmt::Display {
+    where
+        D: fmt::Display,
+    {
         CheckResult::Failure(Reason::User(d.to_string()))
     }
 
@@ -57,7 +59,9 @@ impl CheckResult {
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
     /// [`Reason::Log`]: enum.Reason.html#variant.Log
     pub fn new_log<D>(d: D) -> Self
-        where D: fmt::Display {
+    where
+        D: fmt::Display,
+    {
         CheckResult::Failure(Reason::Log(d.to_string()))
     }
 
@@ -74,7 +78,9 @@ impl CheckResult {
     /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
     /// [`Reason::UserAndLog`]: enum.Reason.html#variant.UserAndLog
     pub fn new_user_and_log<D>(user: D, log: D) -> Self
-        where D: fmt::Display {
+    where
+        D: fmt::Display,
+    {
         CheckResult::Failure(Reason::UserAndLog {
             user: user.to_string(),
             log: log.to_string(),

@@ -37,20 +37,11 @@
 //! [`Role`]: ../model/guild/struct.Role.html
 //! [`http`]: ../http/index.html
 
-use std::str::FromStr;
 use crate::model::prelude::*;
 use parking_lot::RwLock;
-use std::collections::{
-    hash_map::Entry,
-    HashMap,
-    HashSet,
-    VecDeque,
-};
-use std::{
-    default::Default,
-    ops::Deref,
-    sync::Arc,
-};
+use std::collections::{hash_map::Entry, HashMap, HashSet, VecDeque};
+use std::str::FromStr;
+use std::{default::Default, ops::Deref, sync::Arc};
 
 mod cache_update;
 mod settings;
@@ -67,11 +58,15 @@ pub trait FromStrAndCache: Sized {
 }
 
 pub trait StrExt: Sized {
-    fn parse_cached<F: FromStrAndCache>(&self, cache: impl AsRef<CacheRwLock>) -> Result<F, F::Err>;
+    fn parse_cached<F: FromStrAndCache>(&self, cache: impl AsRef<CacheRwLock>)
+        -> Result<F, F::Err>;
 }
 
 impl<'a> StrExt for &'a str {
-    fn parse_cached<F: FromStrAndCache>(&self, cache: impl AsRef<CacheRwLock>) -> Result<F, F::Err> {
+    fn parse_cached<F: FromStrAndCache>(
+        &self,
+        cache: impl AsRef<CacheRwLock>,
+    ) -> Result<F, F::Err> {
         F::from_str(&cache, &self)
     }
 }
@@ -584,14 +579,17 @@ impl Cache {
     /// [`members`]: ../model/guild/struct.Guild.html#structfield.members
     #[inline]
     pub fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
-        where G: Into<GuildId>, U: Into<UserId> {
+    where
+        G: Into<GuildId>,
+        U: Into<UserId>,
+    {
         self._member(guild_id.into(), user_id.into())
     }
 
     fn _member(&self, guild_id: GuildId, user_id: UserId) -> Option<Member> {
-        self.guilds.get(&guild_id).and_then(|guild| {
-            guild.read().members.get(&user_id).cloned()
-        })
+        self.guilds
+            .get(&guild_id)
+            .and_then(|guild| guild.read().members.get(&user_id).cloned())
     }
 
     /// Retrieves a [`Channel`]'s message from the cache based on the channel's and
@@ -630,14 +628,17 @@ impl Cache {
     /// [`Channel`]: ../model/channel/struct.Channel.html
     #[inline]
     pub fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<Message>
-        where C: Into<ChannelId>, M: Into<MessageId> {
+    where
+        C: Into<ChannelId>,
+        M: Into<MessageId>,
+    {
         self._message(channel_id.into(), message_id.into())
     }
 
     fn _message(&self, channel_id: ChannelId, message_id: MessageId) -> Option<Message> {
-        self.messages.get(&channel_id).and_then(|messages| {
-            messages.get(&message_id).cloned()
-        })
+        self.messages
+            .get(&channel_id)
+            .and_then(|messages| messages.get(&message_id).cloned())
     }
 
     /// Retrieves a [`PrivateChannel`] from the cache's [`private_channels`]
@@ -679,9 +680,10 @@ impl Cache {
     ///
     /// [`private_channels`]: #structfield.private_channels
     #[inline]
-    pub fn private_channel<C: Into<ChannelId>>(&self,
-                                               channel_id: C)
-                                               -> Option<Arc<RwLock<PrivateChannel>>> {
+    pub fn private_channel<C: Into<ChannelId>>(
+        &self,
+        channel_id: C,
+    ) -> Option<Arc<RwLock<PrivateChannel>>> {
         self._private_channel(channel_id.into())
     }
 
@@ -717,7 +719,10 @@ impl Cache {
     /// ```
     #[inline]
     pub fn role<G, R>(&self, guild_id: G, role_id: R) -> Option<Role>
-        where G: Into<GuildId>, R: Into<RoleId> {
+    where
+        G: Into<GuildId>,
+        R: Into<RoleId>,
+    {
         self._role(guild_id.into(), role_id.into())
     }
 
@@ -795,9 +800,10 @@ impl Cache {
     }
 
     #[inline]
-    pub fn categories<C: Into<ChannelId>>(&self,
-                                          channel_id: C)
-                                          -> Option<Arc<RwLock<ChannelCategory>>> {
+    pub fn categories<C: Into<ChannelId>>(
+        &self,
+        channel_id: C,
+    ) -> Option<Arc<RwLock<ChannelCategory>>> {
         self._categories(channel_id.into())
     }
 
@@ -824,10 +830,10 @@ impl Cache {
         match self.users.entry(user.id) {
             Entry::Vacant(e) => {
                 e.insert(Arc::new(RwLock::new(user.clone())));
-            },
+            }
             Entry::Occupied(mut e) => {
                 e.get_mut().write().clone_from(user);
-            },
+            }
         }
     }
 }
@@ -856,18 +862,15 @@ impl Default for Cache {
 
 #[cfg(test)]
 mod test {
-    use chrono::DateTime;
-    use serde_json::{Number, Value};
-    use std::{
-        collections::HashMap,
-        sync::Arc,
-    };
+    use crate::model::guild::PremiumTier::Tier2;
     use crate::{
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,
         prelude::RwLock,
     };
-    use crate::model::guild::PremiumTier::Tier2;
+    use chrono::DateTime;
+    use serde_json::{Number, Value};
+    use std::{collections::HashMap, sync::Arc};
 
     #[test]
     fn test_cache_messages() {
@@ -876,10 +879,9 @@ mod test {
         let mut cache = Cache::new_with_settings(settings);
 
         // Test inserting one message into a channel's message cache.
-        let datetime = DateTime::parse_from_str(
-            "1983 Apr 13 12:09:14.274 +0000",
-            "%Y %b %d %H:%M:%S%.3f %z",
-        ).unwrap();
+        let datetime =
+            DateTime::parse_from_str("1983 Apr 13 12:09:14.274 +0000", "%Y %b %d %H:%M:%S%.3f %z")
+                .unwrap();
         let mut event = MessageCreateEvent {
             message: Message {
                 id: MessageId(3),
@@ -924,12 +926,18 @@ mod test {
         // None, it only returns the oldest message if the cache was already full.
         assert!(event.update(&mut cache).is_none());
         // Assert there's only 1 message in the channel's message cache.
-        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 1);
+        assert_eq!(
+            cache.messages.get(&event.message.channel_id).unwrap().len(),
+            1
+        );
 
         // Add a second message, assert that channel message cache length is 2.
         event.message.id = MessageId(4);
         assert!(event.update(&mut cache).is_none());
-        assert_eq!(cache.messages.get(&event.message.channel_id).unwrap().len(), 2);
+        assert_eq!(
+            cache.messages.get(&event.message.channel_id).unwrap().len(),
+            2
+        );
 
         // Add a third message, the first should now be removed.
         event.message.id = MessageId(5);

@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
-use std::collections::HashMap;
 use serde_json::Value;
+use std::collections::HashMap;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///

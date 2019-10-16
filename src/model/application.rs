@@ -1,10 +1,6 @@
 //! Models about OAuth2 applications.
 
-use super::{
-    id::UserId,
-    user::User,
-    utils::default_true
-};
+use super::{id::UserId, user::User, utils::default_true};
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
@@ -86,7 +82,8 @@ pub struct CurrentApplicationInfo {
     pub id: UserId,
     pub name: String,
     pub owner: User,
-    #[serde(default)] pub rpc_origins: Vec<String>,
+    #[serde(default)]
+    pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
     #[serde(skip)]

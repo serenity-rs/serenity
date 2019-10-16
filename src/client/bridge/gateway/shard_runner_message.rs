@@ -1,8 +1,4 @@
-use crate::model::{
-    gateway::Activity,
-    id::GuildId,
-    user::OnlineStatus,
-};
+use crate::model::{gateway::Activity, id::GuildId, user::OnlineStatus};
 use tungstenite::Message;
 
 /// A message to send from a shard over a WebSocket.

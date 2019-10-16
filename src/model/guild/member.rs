@@ -1,59 +1,75 @@
+use super::deserialize_sync_user;
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use chrono::{DateTime, FixedOffset};
-use std::fmt::{
-    Display,
-    Formatter,
-    Result as FmtResult
-};
-use super::deserialize_sync_user;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
 use crate::builder::EditMember;
+#[cfg(all(feature = "http", feature = "cache"))]
+use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::{cache::CacheRwLock, utils};
-#[cfg(all(feature = "http", feature = "cache"))]
-use crate::http::Http;
+#[cfg(feature = "model")]
+use std::borrow::Cow;
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
-    fn dmd(&self) -> u8 { 0 }
-    fn reason(&self) -> &str { "" }
+    fn dmd(&self) -> u8 {
+        0
+    }
+    fn reason(&self) -> &str {
+        ""
+    }
 }
 
 impl BanOptions for u8 {
-    fn dmd(&self) -> u8 { *self }
+    fn dmd(&self) -> u8 {
+        *self
+    }
 }
 
 impl BanOptions for str {
-    fn reason(&self) -> &str { self }
+    fn reason(&self) -> &str {
+        self
+    }
 }
 
 impl<'a> BanOptions for &'a str {
-    fn reason(&self) -> &str { self }
+    fn reason(&self) -> &str {
+        self
+    }
 }
 
 impl BanOptions for String {
-    fn reason(&self) -> &str { self }
+    fn reason(&self) -> &str {
+        self
+    }
 }
 
 impl<'a> BanOptions for (u8, &'a str) {
-    fn dmd(&self) -> u8 { self.0 }
+    fn dmd(&self) -> u8 {
+        self.0
+    }
 
-    fn reason(&self) -> &str { self.1 }
+    fn reason(&self) -> &str {
+        self.1
+    }
 }
 
 impl BanOptions for (u8, String) {
-    fn dmd(&self) -> u8 { self.0 }
+    fn dmd(&self) -> u8 {
+        self.0
+    }
 
-    fn reason(&self) -> &str { &self.1 }
+    fn reason(&self) -> &str {
+        &self.1
+    }
 }
 
 /// Information about a member of a guild.
@@ -74,8 +90,10 @@ pub struct Member {
     /// Vector of Ids of [`Role`](struct.Role.html)s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
-    #[serde(deserialize_with = "deserialize_sync_user",
-            serialize_with = "serialize_sync_user")]
+    #[serde(
+        deserialize_with = "deserialize_sync_user",
+        serialize_with = "serialize_sync_user"
+    )]
     pub user: Arc<RwLock<User>>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
@@ -102,12 +120,15 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
+        match http
+            .as_ref()
+            .add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0)
+        {
             Ok(()) => {
                 self.roles.push(role_id);
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }
@@ -127,13 +148,16 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map) {
+        match http
+            .as_ref()
+            .edit_member(self.guild_id.0, self.user.read().id.0, &map)
+        {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
 
                 Err(why)
-            },
+            }
         }
     }
 
@@ -165,12 +189,8 @@ impl Member {
             return Err(Error::ExceededLimit(reason.to_string(), 512));
         }
 
-        http.as_ref().ban_user(
-            self.guild_id.0,
-            self.user.read().id.0,
-            dmd,
-            &*reason,
-        )
+        http.as_ref()
+            .ban_user(self.guild_id.0, self.user.read().id.0, dmd, &*reason)
     }
 
     /// Determines the member's colour.
@@ -179,7 +199,8 @@ impl Member {
         let cache = cache.as_ref().read();
         let guild = cache.guilds.get(&self.guild_id)?.read();
 
-        let mut roles = self.roles
+        let mut roles = self
+            .roles
             .iter()
             .filter_map(|role_id| guild.roles.get(role_id))
             .collect::<Vec<&Role>>();
@@ -197,7 +218,10 @@ impl Member {
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
     #[cfg(feature = "cache")]
-    pub fn default_channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub fn default_channel(
+        &self,
+        cache: impl AsRef<CacheRwLock>,
+    ) -> Option<Arc<RwLock<GuildChannel>>> {
         let guild = match self.guild_id.to_guild_cached(&cache) {
             Some(guild) => guild,
             None => return None,
@@ -206,7 +230,10 @@ impl Member {
         let reader = guild.read();
 
         for (cid, channel) in &reader.channels {
-            if reader.user_permissions_in(*cid, self.user.read().id).read_messages() {
+            if reader
+                .user_permissions_in(*cid, self.user.read().id)
+                .read_messages()
+            {
                 return Some(Arc::clone(channel));
             }
         }
@@ -228,11 +255,7 @@ impl Member {
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
     pub fn distinct(&self) -> String {
-        format!(
-            "{}#{}",
-            self.display_name(),
-            self.user.read().discriminator
-        )
+        format!("{}#{}", self.display_name(), self.user.read().discriminator)
     }
 
     /// Edits the member with the given data. See [`Guild::edit_member`] for
@@ -244,12 +267,17 @@ impl Member {
     /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
-    pub fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(&self, http: impl AsRef<Http>, f: F) -> Result<()> {
+    pub fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(
+        &self,
+        http: impl AsRef<Http>,
+        f: F,
+    ) -> Result<()> {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
         let map = utils::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map)
+        http.as_ref()
+            .edit_member(self.guild_id.0, self.user.read().id.0, &map)
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -387,7 +415,11 @@ impl Member {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn remove_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
+    pub fn remove_role<R: Into<RoleId>>(
+        &mut self,
+        http: impl AsRef<Http>,
+        role_id: R,
+    ) -> Result<()> {
         self._remove_role(&http, role_id.into())
     }
 
@@ -397,12 +429,15 @@ impl Member {
             return Ok(());
         }
 
-        match http.as_ref().remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
+        match http
+            .as_ref()
+            .remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0)
+        {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }
@@ -421,13 +456,16 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map) {
+        match http
+            .as_ref()
+            .edit_member(self.guild_id.0, self.user.read().id.0, &map)
+        {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
 
                 Err(why)
-            },
+            }
         }
     }
 
@@ -438,16 +476,14 @@ impl Member {
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
     pub fn roles(&self, cache: impl AsRef<CacheRwLock>) -> Option<Vec<Role>> {
-        self
-            .guild_id
-            .to_guild_cached(&cache)
-            .map(|g| g
-                .read()
+        self.guild_id.to_guild_cached(&cache).map(|g| {
+            g.read()
                 .roles
                 .values()
                 .filter(|role| self.roles.contains(&role.id))
                 .cloned()
-                .collect())
+                .collect()
+        })
     }
 
     /// Unbans the [`User`] from the guild.
@@ -464,7 +500,8 @@ impl Member {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(all(feature = "cache", feature = "http"))]
     pub fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.0, self.user.read().id.0)
+        http.as_ref()
+            .remove_ban(self.guild_id.0, self.user.read().id.0)
     }
 
     /// Retrieves the member's user ID.

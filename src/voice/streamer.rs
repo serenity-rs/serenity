@@ -1,10 +1,9 @@
-use byteorder::{LittleEndian, ReadBytesExt};
+use super::{audio, AudioSource, AudioType, DcaError, DcaMetadata, VoiceError};
 use crate::internal::prelude::*;
-use audiopus::{
-    Channels,
-    coder::Decoder as OpusDecoder,
-    Result as OpusResult,
-};
+use crate::prelude::SerenityError;
+use audiopus::{coder::Decoder as OpusDecoder, Channels, Result as OpusResult};
+use byteorder::{LittleEndian, ReadBytesExt};
+use log::{debug, warn};
 use parking_lot::Mutex;
 use serde_json;
 use std::{
@@ -15,9 +14,6 @@ use std::{
     result::Result as StdResult,
     sync::Arc,
 };
-use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
-use log::{debug, warn};
-use crate::prelude::SerenityError;
 
 struct ChildContainer(Child);
 
@@ -28,7 +24,7 @@ impl Read for ChildContainer {
 }
 
 impl Drop for ChildContainer {
-    fn drop (&mut self) {
+    fn drop(&mut self) {
         if let Err(e) = self.0.kill() {
             debug!("[Voice] Error awaiting child process: {:?}", e);
         }
@@ -56,9 +52,13 @@ struct InputSource<R: Read + Send + 'static> {
 }
 
 impl<R: Read + Send> AudioSource for InputSource<R> {
-    fn is_stereo(&mut self) -> bool { self.stereo }
+    fn is_stereo(&mut self) -> bool {
+        self.stereo
+    }
 
-    fn get_type(&self) -> AudioType { self.kind }
+    fn get_type(&self) -> AudioType {
+        self.kind
+    }
 
     fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize> {
         for (i, v) in buffer.iter_mut().enumerate() {
@@ -70,7 +70,7 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
                     } else {
                         None
                     }
-                },
+                }
             }
         }
 
@@ -96,16 +96,22 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
                 }
 
                 Some(frame)
-            },
-            Err(ref e) => if e.kind() == IoErrorKind::UnexpectedEof {
-                Some(Vec::new())
-            } else {
-                None
-            },
+            }
+            Err(ref e) => {
+                if e.kind() == IoErrorKind::UnexpectedEof {
+                    Some(Vec::new())
+                } else {
+                    None
+                }
+            }
         }
     }
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
+    fn decode_and_add_opus_frame(
+        &mut self,
+        float_buffer: &mut [f32; 1920],
+        volume: f32,
+    ) -> Option<usize> {
         let decoder_lock = self.decoder.as_mut()?.clone();
         let frame = self.read_opus_frame()?;
         let mut local_buf = [0f32; 960 * 2];
@@ -113,7 +119,9 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
         let count = {
             let mut decoder = decoder_lock.lock();
 
-            decoder.decode_float(frame.as_slice(), &mut local_buf, false).ok()?
+            decoder
+                .decode_float(frame.as_slice(), &mut local_buf, false)
+                .ok()?
         };
 
         for (i, float_buffer_element) in float_buffer.iter_mut().enumerate().take(1920) {
@@ -134,17 +142,21 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
     let is_stereo = is_stereo(path).unwrap_or(false);
     let stereo_val = if is_stereo { "2" } else { "1" };
 
-    _ffmpeg_optioned(path, &[
-        "-f",
-        "s16le",
-        "-ac",
-        stereo_val,
-        "-ar",
-        "48000",
-        "-acodec",
-        "pcm_s16le",
-        "-",
-    ], Some(is_stereo))
+    _ffmpeg_optioned(
+        path,
+        &[
+            "-f",
+            "s16le",
+            "-ac",
+            stereo_val,
+            "-ar",
+            "48000",
+            "-acodec",
+            "pcm_s16le",
+            "-",
+        ],
+        Some(is_stereo),
+    )
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source, with
@@ -173,14 +185,15 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
 ///     "pcm_s16le",
 ///     "-",
 /// ]);
-pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
-    path: P,
-    args: &[&str],
-) -> Result<Box<dyn AudioSource>> {
+pub fn ffmpeg_optioned<P: AsRef<OsStr>>(path: P, args: &[&str]) -> Result<Box<dyn AudioSource>> {
     _ffmpeg_optioned(path.as_ref(), args, None)
 }
 
-fn _ffmpeg_optioned(path: &OsStr, args: &[&str], is_stereo_known: Option<bool>) -> Result<Box<dyn AudioSource>> {
+fn _ffmpeg_optioned(
+    path: &OsStr,
+    args: &[&str],
+    is_stereo_known: Option<bool>,
+) -> Result<Box<dyn AudioSource>> {
     let is_stereo = is_stereo_known
         .or_else(|| is_stereo(path).ok())
         .unwrap_or(false);
@@ -253,12 +266,10 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn Aud
         stereo: is_stereo,
         reader,
         kind: AudioType::Opus,
-        decoder: Some(
-            Arc::new(Mutex::new(
-                // We always want to decode *to* stereo, for mixing reasons.
-                SendDecoder(OpusDecoder::new(audio::SAMPLE_RATE, Channels::Stereo).unwrap())
-            ))
-        ),
+        decoder: Some(Arc::new(Mutex::new(
+            // We always want to decode *to* stereo, for mixing reasons.
+            SendDecoder(OpusDecoder::new(audio::SAMPLE_RATE, Channels::Stereo).unwrap()),
+        ))),
     })
 }
 
@@ -283,7 +294,7 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
         "--ignore-config",
         uri,
         "-o",
-        "-"
+        "-",
     ];
 
     let ffmpeg_args = [
@@ -310,7 +321,11 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
         .arg("-i")
         .arg("-")
         .args(&ffmpeg_args)
-        .stdin(youtube_dl.stdout.ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?)
+        .stdin(
+            youtube_dl
+                .stdout
+                .ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?,
+        )
         .stderr(Stdio::null())
         .stdout(Stdio::piped())
         .spawn()?;
@@ -328,9 +343,9 @@ pub fn ytdl_search(name: &str) -> Result<Box<dyn AudioSource>> {
         "infinite",
         "--no-playlist",
         "--ignore-config",
-        &format!("ytsearch1:{}",name),
+        &format!("ytsearch1:{}", name),
         "-o",
-        "-"
+        "-",
     ];
 
     let ffmpeg_args = [
@@ -357,7 +372,11 @@ pub fn ytdl_search(name: &str) -> Result<Box<dyn AudioSource>> {
         .arg("-i")
         .arg("-")
         .args(&ffmpeg_args)
-        .stdin(youtube_dl.stdout.ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?)
+        .stdin(
+            youtube_dl
+                .stdout
+                .ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?,
+        )
         .stderr(Stdio::null())
         .stdout(Stdio::piped())
         .spawn()?;

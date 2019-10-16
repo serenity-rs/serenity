@@ -30,13 +30,13 @@ pub mod routing;
 
 mod error;
 
-pub use reqwest::StatusCode;
 pub use self::client::*;
 pub use self::error::Error as HttpError;
+pub use reqwest::StatusCode;
 
-use reqwest::Method;
-use crate::model::prelude::*;
 use self::request::Request;
+use crate::model::prelude::*;
+use reqwest::Method;
 use std::{
     borrow::Cow,
     fs::File,
@@ -52,7 +52,6 @@ use crate::cache::CacheRwLock;
 use crate::client::Context;
 #[cfg(feature = "client")]
 use crate::CacheAndHttp;
-
 
 /// This trait will be required by functions that need [`Http`] and can
 /// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
@@ -74,79 +73,117 @@ pub trait CacheHttp {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http;
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { None }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        None
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for Context {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for &Context {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for &mut Context {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for &&mut Context {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for CacheAndHttp {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for &CacheAndHttp {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for Arc<CacheAndHttp> {
     #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
+    fn http(&self) -> &Http {
+        &self.http
+    }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.cache)
+    }
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
 impl CacheHttp for (&CacheRwLock, &Http) {
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.0) }
-    fn http(&self) -> &Http { &self.1 }
+    fn cache(&self) -> Option<&CacheRwLock> {
+        Some(&self.0)
+    }
+    fn http(&self) -> &Http {
+        &self.1
+    }
 }
 
 #[cfg(feature = "http")]
 impl CacheHttp for &Http {
-    fn http(&self) -> &Http { *self }
+    fn http(&self) -> &Http {
+        *self
+    }
 }
 
 #[cfg(feature = "http")]
 impl CacheHttp for Arc<Http> {
-    fn http(&self) -> &Http { &*self }
+    fn http(&self) -> &Http {
+        &*self
+    }
 }
 
 #[cfg(all(feature = "cache", feature = "http"))]
@@ -196,9 +233,12 @@ impl LightMethod {
 #[derive(Clone, Debug)]
 pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a byte slice with a filename.
-    Bytes{ data: Cow<'a, [u8]>, filename: String } ,
+    Bytes {
+        data: Cow<'a, [u8]>,
+        filename: String,
+    },
     /// Indicates that the `AttachmentType` is a `File`
-    File{ file: &'a File, filename: String },
+    File { file: &'a File, filename: String },
     /// Indicates that the `AttachmentType` is a `Path`
     Path(&'a Path),
     #[doc(hidden)]
@@ -206,11 +246,18 @@ pub enum AttachmentType<'a> {
 }
 
 impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
-    fn from(params: (&'a [u8], &str)) -> AttachmentType<'a> { AttachmentType::Bytes{ data: Cow::Borrowed(params.0), filename: params.1.to_string() } }
+    fn from(params: (&'a [u8], &str)) -> AttachmentType<'a> {
+        AttachmentType::Bytes {
+            data: Cow::Borrowed(params.0),
+            filename: params.1.to_string(),
+        }
+    }
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
-    fn from(s: &'a str) -> AttachmentType<'_> { AttachmentType::Path(Path::new(s)) }
+    fn from(s: &'a str) -> AttachmentType<'_> {
+        AttachmentType::Path(Path::new(s))
+    }
 }
 
 impl<'a> From<&'a Path> for AttachmentType<'a> {
@@ -220,11 +267,18 @@ impl<'a> From<&'a Path> for AttachmentType<'a> {
 }
 
 impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
-    fn from(pathbuf: &'a PathBuf) -> AttachmentType<'_> { AttachmentType::Path(pathbuf.as_path()) }
+    fn from(pathbuf: &'a PathBuf) -> AttachmentType<'_> {
+        AttachmentType::Path(pathbuf.as_path())
+    }
 }
 
 impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &str)) -> AttachmentType<'a> { AttachmentType::File{ file: f.0, filename: f.1.to_string() } }
+    fn from(f: (&'a File, &str)) -> AttachmentType<'a> {
+        AttachmentType::File {
+            file: f.0,
+            filename: f.1.to_string(),
+        }
+    }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]
@@ -247,10 +301,12 @@ mod test {
 
     #[test]
     fn test_attachment_type() {
-        assert!(match AttachmentType::from(Path::new("./dogs/corgis/kona.png")) {
-            AttachmentType::Path(_) => true,
-            _ => false,
-        });
+        assert!(
+            match AttachmentType::from(Path::new("./dogs/corgis/kona.png")) {
+                AttachmentType::Path(_) => true,
+                _ => false,
+            }
+        );
         assert!(match AttachmentType::from("./cats/copycat.png") {
             AttachmentType::Path(_) => true,
             _ => false,

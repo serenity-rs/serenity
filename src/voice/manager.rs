@@ -1,10 +1,7 @@
+use super::Handler;
 use crate::gateway::InterMessage;
 use crate::model::id::{ChannelId, GuildId, UserId};
-use std::{
-    collections::HashMap,
-    sync::mpsc::Sender as MpscSender
-};
-use super::Handler;
+use std::{collections::HashMap, sync::mpsc::Sender as MpscSender};
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
 /// a single [`Shard`]. This is a fairly complex key-value store,
@@ -50,8 +47,7 @@ impl Manager {
 
     /// Retrieves a mutable handler for the given target, if one exists.
     #[inline]
-    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
-        -> Option<&mut Handler> {
+    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<&mut Handler> {
         self._get_mut(guild_id.into())
     }
 
@@ -82,15 +78,14 @@ impl Manager {
     /// [`get`]: #method.get
     #[inline]
     pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
-        where C: Into<ChannelId>, G: Into<GuildId> {
+    where
+        C: Into<ChannelId>,
+        G: Into<GuildId>,
+    {
         self._join(guild_id.into(), channel_id.into())
     }
 
-    fn _join(
-        &mut self,
-        guild_id: GuildId,
-        channel_id: ChannelId,
-    ) -> &mut Handler {
+    fn _join(&mut self, guild_id: GuildId, channel_id: ChannelId) -> &mut Handler {
         {
             let mut found = false;
 
