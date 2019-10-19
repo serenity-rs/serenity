@@ -806,6 +806,7 @@ impl Shard {
 
         match self.session_id.as_ref() {
             Some(session_id) => {
+                self.client.inflater.reset();
                 self.client.send_resume(
                     &self.shard_info,
                     session_id,
@@ -845,12 +846,15 @@ fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
     let client = tungstenite::connect(Request::from(url))?;
 
-    Ok(client.0)
+    Ok(WsClient {
+        inflater: crate::internal::inflater::Inflater::new(),
+        stream: client.0
+    })
 }
 
 fn set_client_timeout(client: &mut WsClient) -> Result<()> {
     #[cfg(not(feature = "native_tls_backend"))]
-    let stream = &client.get_mut().sock;
+    let stream = &client.stream.get_mut().sock;
 
     #[cfg(feature = "native_tls_backend")]
     let stream = match client.get_mut() {
@@ -874,14 +878,14 @@ fn set_client_buffer_sizes(client: &mut WsClient) {
     // Since we know all traffic is coming from a trusted source (Discord),
     // we can remove the buffer limit entirely. This eliminates the issue
     // where we have to keep upping buffer sizes because of growing guilds.
-    client.set_config(|c| {
+    client.stream.set_config(|c| {
         c.max_frame_size = None;
         c.max_message_size = None;
     })
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {
-    Url::parse(&format!("{}?v={}", base, constants::GATEWAY_VERSION))
+    Url::parse(&format!("{}?v={}&compress=zlib-stream", base, constants::GATEWAY_VERSION))
         .map_err(|why| {
             warn!("Error building gateway URL with base `{}`: {:?}", base, why);
 

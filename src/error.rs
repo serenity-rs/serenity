@@ -22,6 +22,8 @@ use tungstenite::error::Error as TungsteniteError;
 use crate::client::ClientError;
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
+#[cfg(feature = "gateway")]
+use flate2::DecompressError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
 #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
@@ -86,6 +88,9 @@ pub enum Error {
     /// [client]: client/index.html
     #[cfg(feature = "client")]
     Client(ClientError),
+    /// Error when decompressing a payload.
+    #[cfg(feature = "gateway")]
+    Flate2(DecompressError),
     /// An error from the `gateway` module.
     #[cfg(feature = "gateway")]
     Gateway(GatewayError),
@@ -152,6 +157,10 @@ impl From<RustlsError> for Error {
     fn from(e: RustlsError) -> Error { Error::Rustls(e) }
 }
 
+impl From<DecompressError> for Error {
+    fn from(e: DecompressError) -> Error { Error::Flate2(e) }
+}
+
 #[cfg(feature = "gateway")]
 impl From<TungsteniteError> for Error {
     fn from(e: TungsteniteError) -> Error { Error::Tungstenite(e) }
@@ -199,6 +208,8 @@ impl StdError for Error {
             Error::Opus(ref inner) => inner.description(),
             #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
             Error::Rustls(ref inner) => inner.description(),
+            #[cfg(feature = "gateway")]
+            Error::Flate2(ref inner) => inner.description(),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(ref inner) => inner.description(),
             #[cfg(feature = "voice")]

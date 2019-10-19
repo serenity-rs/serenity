@@ -1,6 +1,6 @@
-use flate2::read::ZlibDecoder;
 use crate::gateway::WsClient;
 use crate::internal::prelude::*;
+use crate::internal::inflater::Inflater;
 use serde_json;
 use tungstenite::{
     util::NonBlockingResult,
@@ -36,11 +36,11 @@ pub trait SenderExt {
 
 impl ReceiverExt for WsClient {
     fn recv_json(&mut self) -> Result<Option<Value>> {
-        convert_ws_message(Some(self.read_message()?))
+        convert_ws_message(&mut self.inflater, Some(self.stream.read_message()?))
     }
 
     fn try_recv_json(&mut self) -> Result<Option<Value>> {
-        convert_ws_message(self.read_message().no_block()?)
+        convert_ws_message(&mut self.inflater, self.stream.read_message().no_block()?)
     }
 }
 
@@ -49,21 +49,29 @@ impl SenderExt for WsClient {
         serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
-            .and_then(|m| self.write_message(m).map_err(Error::from))
+            .and_then(|m| self.stream.write_message(m).map_err(Error::from))
     }
 }
 
 #[inline]
-fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>>{
+fn convert_ws_message(inflater: &mut Inflater, message: Option<Message>) -> Result<Option<Value>>{
     Ok(match message {
         Some(Message::Binary(bytes)) => {
-            serde_json::from_reader(ZlibDecoder::new(&bytes[..]))
-                .map(Some)
-                .map_err(|why| {
-                    warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
+            inflater.extend(&bytes);
+            match inflater.msg()? {
+                Some(msg) => {
+                    let ret = serde_json::from_slice(&msg[..])
+                        .map(Some)
+                        .map_err(|why| {
+                            warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
 
-                    why
-                })?
+                            why
+                        })?;
+                    inflater.clear();
+                    ret
+                },
+                None => None,
+            }
         },
         Some(Message::Text(payload)) => {
             serde_json::from_str(&payload).map(Some).map_err(|why| {
@@ -170,5 +178,8 @@ pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
     let client = tungstenite::client(url, tls)
         .map_err(|_| RustlsError::HandshakeError)?;
 
-    Ok(client.0)
+    Ok(WsClient {
+        inflater: Inflater::new(),
+        stream: client.0
+    })
 }

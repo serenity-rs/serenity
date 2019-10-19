@@ -71,11 +71,10 @@ impl WebSocketGatewayClientExt for WsClient {
     fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
-
+        //"compress": true,
         self.send_json(&json!({
             "op": OpCode::Identify.num(),
             "d": {
-                "compress": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
                 "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,

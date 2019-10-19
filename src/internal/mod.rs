@@ -9,6 +9,8 @@ pub use self::rwlock_ext::RwLockExt;
 
 #[cfg(feature = "gateway")]
 pub mod ws_impl;
+#[cfg(feature = "gateway")]
+pub mod inflater;
 
 #[cfg(feature = "voice")]
 mod timer;

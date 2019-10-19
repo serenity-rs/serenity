@@ -203,7 +203,7 @@ impl ShardRunner {
         }
 
         // Send a Close Frame to Discord, which allows a bot to "log off"
-        let _ = self.shard.client.close(Some(CloseFrame {
+        let _ = self.shard.client.stream.close(Some(CloseFrame {
             code: 1000.into(),
             reason: Cow::from(""),
         }));
@@ -211,7 +211,7 @@ impl ShardRunner {
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
         loop {
-            match self.shard.client.read_message() {
+            match self.shard.client.stream.read_message() {
                 Ok(tungstenite::Message::Close(_)) => break,
                 Err(_) => {
                     warn!(
@@ -301,10 +301,10 @@ impl ShardRunner {
                         code: code.into(),
                         reason: Cow::from(reason),
                     };
-                    self.shard.client.close(Some(close)).is_ok()
+                    self.shard.client.stream.close(Some(close)).is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Message(msg)) => {
-                    self.shard.client.write_message(msg).is_ok()
+                    self.shard.client.stream.write_message(msg).is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::SetActivity(activity)) => {
                     // To avoid a clone of `activity`, we do a little bit of
