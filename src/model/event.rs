@@ -2021,6 +2021,7 @@ impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
 pub struct VoiceReady {
     pub heartbeat_interval: u64,
     pub modes: Vec<String>,
+    pub ip: String, 
     pub port: u16,
     pub ssrc: u32,
     #[serde(skip)]

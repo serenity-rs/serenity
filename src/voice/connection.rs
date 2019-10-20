@@ -139,7 +139,7 @@ impl Connection {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
 
-        let destination = (&info.endpoint[..], ready.port)
+        let destination = (&ready.ip[..], ready.port)
             .to_socket_addrs()?
             .next()
             .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
