@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.2] - 2019-10-21
+
+A tiny release for a fix to voice
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@MOZGIII]
+
+### Fixed
+
+- [voice] Fix `ClientVoiceManager::remove` to actually call `Manager::remove` ([@MOZGIII]) [c:2734e27]
+- [voice] Use the correct ip for the UDP socket ([@acdenisSK]) [c:c4b1c60]
+
 ## [0.7.1] - 2019-9-29
 
 ## Departure of a lead developer
@@ -3159,6 +3173,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.2]: https://github.com/serenity-rs/serenity/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/serenity-rs/serenity/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/serenity-rs/serenity/compare/v0.6.4...v0.7.0
 [0.6.4]: https://github.com/serenity-rs/serenity/compare/v0.6.3...v0.6.4
@@ -3287,6 +3302,9 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:2734e27]: https://github.com/serenity-rs/serenity/commit/2734e27a163a1cc585bd7f4f7b5aa0855792ed58
+[c:c4b1c60]: https://github.com/serenity-rs/serenity/commit/c4b1c6033c7b21ac314ce6845be957ca69b1d223
 
 [c:de9e8a6]: https://github.com/serenity-rs/serenity/commit/de9e8a673f906311957bb2f6e31026cc57fd86b1
 [c:445810f]: https://github.com/serenity-rs/serenity/commit/445810f0673319462b685d849c6ac87ab739f44d
