@@ -553,7 +553,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[allowed_roles(roles)]`                            | Set of roles the user must possess                                                 | `roles` is a comma separated list of strings containing role names                                                                                                                   |
 /// | `#[only_in(ctx)]`                                    | Which environment the command can be executed in.                                  | `ctx` is a string with the accepted values `guild`/`guilds` and `dm`/ `dms` (Direct Message).                                                                                        |
 /// | `#[owners_only]` </br> `#[owners_only(b)]`           | If this command is exclusive to owners.                                            | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
-/// | `#[owner_privilege]` </br> `#[owner_privlege(b)]`    | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
+/// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`   | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
 /// | `#[help_available]` </br> `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
 /// | `#[checks(identifiers)]`                             | Preconditions that must met before the command's execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |
 /// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discordapp.com/developers/docs/topics/permissions).     |
@@ -686,6 +686,15 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     .into()
 }
 
+/// A macro for marking a function as a condition checker to groups and commands.
+/// 
+/// ## Options
+/// 
+/// | Syntax                                             | Description                                                              | Argument explanation                                                                 |
+/// |----------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
+/// | `#[name(s)]` </br> `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn't provided, the value is assumed to be `"<fn>"`. |
+/// | `#[display_in_help]` </br> `#[display_in_help(b)]` | If the check should be listed in help. Has no effect on `check_in_help`. | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
+/// | `#[check_in_help]` </br> `#[check_in_help(b)]`     | If the check should be evaluated in help.                                | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.      |
 #[proc_macro_attribute]
 pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut fun = parse_macro_input!(input as CommandFun);
