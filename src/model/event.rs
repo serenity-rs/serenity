@@ -1451,6 +1451,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 /// Event received over a websocket connection
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[serde(untagged)]
 pub enum Event {
     /// A [`Channel`] was created.
     ///
