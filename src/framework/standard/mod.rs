@@ -8,7 +8,7 @@ mod configuration;
 mod parse;
 mod structures;
 
-pub use args::{Args, Delimiter, Error as ArgError, Iter};
+pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
 pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
