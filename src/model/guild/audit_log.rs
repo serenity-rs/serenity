@@ -454,7 +454,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
                             users = Some(map.next_value::<Vec<User>>()?);
                         }
                         Ok(None) => break, // No more keys
-                        Err(e) => if format!("{}", e).contains("unknown field") {
+                        Err(e) => if e.to_string().contains("unknown field") {
                             // e is of type <V as MapAccess>::Error, which is a macro-defined trait, ultimately
                             // implemented by serde::de::value::Error. Seeing as every error is a simple string and not
                             // using a proper Error num, the best we can do here is to check if the string contains
