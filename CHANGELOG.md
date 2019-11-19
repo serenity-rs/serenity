@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.3] - 2019-11-19
+
+Small release including fixes for Discord API changes. Please note with this version the minimum supported version of Rust is 1.37.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@ikkerens]
+
+### Fixed
+
+- [framework] Properly `pub`licise the iterator ([@acdenisSK]) [c:1924946]
+- [ci] Try to update repository information beforehand ([@acdenisSK]) [c:19b590a]
+- [audit log] Cover all error cases for audit log deserialization ([@ikkerens]) [c:beb4d5a] [c:afc04e4]
+
 ## [0.7.2] - 2019-10-21
 
 A tiny release for a fix to voice
