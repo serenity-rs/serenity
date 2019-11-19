@@ -11,7 +11,8 @@ use super::super::prelude::*;
 use std::{
     collections::HashMap,
     mem::transmute,
-    fmt
+    fmt,
+    error::Error,
 };
 
 /// Determines to what entity an action was used on.
@@ -428,29 +429,40 @@ impl<'de> Deserialize<'de> for AuditLogs {
                 let mut users = None;
                 let mut webhooks = None;
 
-                while let Some(field) = map.next_key()? {
-                    match field {
-                        Field::Entries => {
+                loop {
+                    match map.next_key() {
+                        Ok(Some(Field::Entries)) => {
                             if audit_log_entries.is_some() {
                                 return Err(de::Error::duplicate_field("entries"));
                             }
 
                             audit_log_entries = Some(map.next_value::<Vec<AuditLogEntry>>()?);
-                        },
-                        Field::Webhooks => {
+                        }
+                        Ok(Some(Field::Webhooks)) => {
                             if webhooks.is_some() {
                                 return Err(de::Error::duplicate_field("webhooks"));
                             }
 
                             webhooks = Some(map.next_value::<Vec<Webhook>>()?);
-                        },
-                        Field::Users => {
+                        }
+                        Ok(Some(Field::Users)) => {
                             if users.is_some() {
                                 return Err(de::Error::duplicate_field("users"));
                             }
 
                             users = Some(map.next_value::<Vec<User>>()?);
-                        },
+                        }
+                        Ok(None) => break, // No more keys
+                        Err(e) => if e.description().contains("unknown field") {
+                            // e is of type <V as MapAccess>::Error, which is a macro-defined trait, ultimately
+                            // implemented by serde::de::value::Error. Seeing as every error is a simple string and not
+                            // using a proper Error num, the best we can do here is to check if the string contains
+                            // this error. This was added because Discord randomly started sending new fields.
+                            // But no JSON deserializer should ever error over this.
+                            map.next_value::<serde_json::Value>()?; // Actually read the value to avoid syntax errors
+                        } else {
+                            return Err(e)
+                        }
                     }
                 }
 
