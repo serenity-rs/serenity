@@ -26,6 +26,7 @@ pub enum Target {
     Invite = 50,
     Webhook = 60,
     Emoji = 70,
+    Integration = 80,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -41,7 +42,8 @@ pub enum Action {
     Invite(ActionInvite),
     Webhook(ActionWebhook),
     Emoji(ActionEmoji),
-    MessageDelete,
+    Message(ActionMessage),
+    Integration(ActionIntegration),
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -59,7 +61,8 @@ impl Action {
             Action::Invite(ref x) => x.num(),
             Action::Webhook(ref x) => x.num(),
             Action::Emoji(ref x) => x.num(),
-            Action::MessageDelete => 72,
+            Action::Message(ref x) => x.num(),
+            Action::Integration(ref x) => x.num(),
             Action::__Nonexhaustive => unreachable!(),
         }
     }
@@ -116,6 +119,9 @@ pub enum ActionMember {
     BanRemove = 23,
     Update = 24,
     RoleUpdate = 25,
+    MemberMove = 26,
+    MemberDisconnect = 27,
+    BotAdd = 28,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -129,6 +135,9 @@ impl ActionMember {
             ActionMember::BanRemove => 23,
             ActionMember::Update => 24,
             ActionMember::RoleUpdate => 25,
+            ActionMember::MemberMove => 26,
+            ActionMember::MemberDisconnect => 27,
+            ActionMember::BotAdd => 28,
             ActionMember::__Nonexhaustive => unreachable!(),
         }
     }
@@ -214,6 +223,51 @@ impl ActionEmoji {
             ActionEmoji::Update => 61,
             ActionEmoji::Delete => 62,
             ActionEmoji::__Nonexhaustive => unreachable!(),
+        }
+    }
+}
+
+#[derive(Debug)]
+#[repr(u8)]
+pub enum ActionMessage {
+    Delete = 72,
+    BulkDelete = 73,
+    Pin = 74,
+    Unpin = 75,
+    #[doc(hidden)]
+    __Nonexhaustive,
+}
+
+impl ActionMessage {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionMessage::Delete => 72,
+            ActionMessage::BulkDelete => 73,
+            ActionMessage::Pin => 74,
+            ActionMessage::Unpin => 75,
+            ActionMessage::__Nonexhaustive => unreachable!(),
+        }
+    }
+}
+
+
+#[derive(Debug)]
+#[repr(u8)]
+pub enum ActionIntegration {
+    Create = 80,
+    Update = 81,
+    Delete = 82,
+    #[doc(hidden)]
+    __Nonexhaustive,
+}
+
+impl ActionIntegration {
+    pub fn num(&self) -> u8 {
+        match *self {
+            ActionIntegration::Create => 80,
+            ActionIntegration::Update => 81,
+            ActionIntegration::Delete => 82,
+            ActionIntegration::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -351,12 +405,13 @@ mod action_handler {
                     1 => Action::GuildUpdate,
                     10..=12 => Action::Channel(unsafe { transmute(value) }),
                     13..=15 => Action::ChannelOverwrite(unsafe { transmute(value) }),
-                    20..=25 => Action::Member(unsafe { transmute(value) }),
+                    20..=28 => Action::Member(unsafe { transmute(value) }),
                     30..=32 => Action::Role(unsafe { transmute(value) }),
                     40..=42 => Action::Invite(unsafe { transmute(value) }),
                     50..=52 => Action::Webhook(unsafe { transmute(value) }),
                     60..=62 => Action::Emoji(unsafe { transmute(value) }),
-                    72 => Action::MessageDelete,
+                    72..=75 => Action::Message(unsafe { transmute(value) }),
+                    80..=82 => Action::Integration(unsafe { transmute(value) }),
                     _ => return Err(E::custom(format!("Unexpected action number: {}", value))),
                 })
             }
