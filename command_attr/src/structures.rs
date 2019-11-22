@@ -11,8 +11,7 @@ use syn::{
     parse::{Error, Parse, ParseStream, Result},
     punctuated::Punctuated,
     spanned::Spanned,
-    token::Pub,
-    Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token, Type,
+    Attribute, Block, FnArg, Ident, Lit, Pat, ReturnType, Stmt, Token, Type, Visibility,
 };
 
 #[derive(Debug, PartialEq)]
@@ -94,7 +93,7 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
 
 #[derive(Debug)]
 pub struct CommandFun {
-    pub _pub: Option<Pub>,
+    pub visibility: Visibility,
     pub cfgs: Vec<Attribute>,
     pub docs: Vec<Attribute>,
     pub attributes: Vec<Attribute>,
@@ -116,11 +115,7 @@ impl Parse for CommandFun {
         // Filter out doc-comments as well.
         let (docs, attributes) = attributes.into_iter().partition(|a| a.path.is_ident("doc"));
 
-        let _pub = if input.peek(Token![pub]) {
-            Some(input.parse::<Token![pub]>()?)
-        } else {
-            None
-        };
+        let visibility = input.parse::<Visibility>()?;
 
         input.parse::<Token![fn]>()?;
         let name = input.parse()?;
@@ -147,7 +142,7 @@ impl Parse for CommandFun {
             .collect::<Result<Vec<_>>>()?;
 
         Ok(CommandFun {
-            _pub,
+            visibility,
             cfgs,
             docs,
             attributes,
@@ -162,7 +157,7 @@ impl Parse for CommandFun {
 impl ToTokens for CommandFun {
     fn to_tokens(&self, stream: &mut TokenStream2) {
         let CommandFun {
-            _pub,
+            visibility,
             cfgs,
             docs,
             attributes: _,
@@ -175,7 +170,7 @@ impl ToTokens for CommandFun {
         stream.extend(quote! {
             #(#cfgs)*
             #(#docs)*
-            #_pub fn #name (#(#args),*) -> #ret {
+            #visibility fn #name (#(#args),*) -> #ret {
                 #(#body)*
             }
         });
