@@ -163,7 +163,7 @@ impl Suggestions {
             .as_vec()
             .iter()
             .fold(0, |total_size, size| total_size + size.name.len());
-        let byte_len_of_sep = self.as_vec().len().checked_sub(1).unwrap_or(0) * separator.len();
+        let byte_len_of_sep = self.as_vec().len().saturating_sub(1) * separator.len();
         let mut result = String::with_capacity(size + byte_len_of_sep);
         result.push_str(first_iter_element.name.borrow());
 
@@ -999,7 +999,7 @@ fn flatten_group_to_plain_string(
         );
     }
 
-    let joined_commands = format!("{}", group.command_names.join(", "));
+    let joined_commands = group.command_names.join(", ");
 
     let _ = write!(group_text, "{}", joined_commands);
 

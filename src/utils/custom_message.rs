@@ -19,9 +19,7 @@ impl CustomMessage {
     /// of this message with valid data.
     #[inline]
     pub fn new() -> Self {
-        CustomMessage {
-            msg: dummy_message(),
-        }
+        Self::default()
     }
 
     /// Assign the dummy message a proper ID for identification.
@@ -229,6 +227,15 @@ impl CustomMessage {
     #[inline]
     pub fn build(self) -> Message {
         self.msg
+    }
+}
+
+impl Default for CustomMessage {
+    #[inline]
+    fn default() -> Self {
+        CustomMessage {
+            msg: dummy_message(),
+        }
     }
 }
 

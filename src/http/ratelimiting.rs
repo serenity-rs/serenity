@@ -111,7 +111,7 @@ pub(super) fn perform(http: &Http, req: Request<'_>) -> Result<Response> {
         // This should probably only be a one-time check, although we may want
         // to choose to check this often in the future.
         if unsafe { OFFSET }.is_none() {
-            calculate_offset(&response.headers().get("date").and_then(|d| Some(d.as_bytes())));
+            calculate_offset(&response.headers().get("date").map(|d| d.as_bytes()));
         }
 
         // Check if the request got ratelimited by checking for status 429,
@@ -206,7 +206,7 @@ impl RateLimit {
                 route,
                 delay
             );
-			
+
             thread::sleep(Duration::from_millis(delay));
 
             return;

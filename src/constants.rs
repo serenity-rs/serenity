@@ -21,7 +21,7 @@ pub const USER_AGENT: &str = concat!(
 );
 
 /// List of messages Discord shows on member join.
-pub static JOIN_MESSAGES: &'static [&'static str] = &[
+pub static JOIN_MESSAGES: &[&str] = &[
     "$user just joined the server - glhf!",
     "$user just joined. Everyone, look busy!",
     "$user just joined. Can I get a heal?",

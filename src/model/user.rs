@@ -688,7 +688,7 @@ impl User {
                             .get(&guild_id)
                             .and_then(|g| {
                                 g.read().members.get(&self.id)
-                                    .and_then(|m| Some(m.roles.contains(&role)))
+                                    .map(|m| m.roles.contains(&role))
                             });
                     }
                 }

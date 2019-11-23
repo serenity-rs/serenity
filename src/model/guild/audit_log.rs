@@ -12,7 +12,6 @@ use std::{
     collections::HashMap,
     mem::transmute,
     fmt,
-    error::Error,
 };
 
 /// Determines to what entity an action was used on.

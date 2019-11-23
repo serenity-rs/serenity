@@ -803,7 +803,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
     fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
         MembersIter {
             guild_id,
-            http: http,
+            http,
             buffer: Vec::new(),
             after: None,
             tried_fetch: false,
