@@ -755,7 +755,7 @@ impl Parse for Group {
             help_name: help_name.unwrap_or_else(|| name.to_string()),
             name,
             commands,
-            options: options.unwrap_or_default(),
+            options: options.unwrap_or_else(|| RefOrInstance::Instance(GroupOptions::new())),
             sub_groups: sub_groups.unwrap_or_default(),
         })
     }
