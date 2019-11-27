@@ -45,7 +45,7 @@ pub struct CurrentUser {
     pub email: Option<String>,
     pub mfa_enabled: bool,
     #[serde(rename = "username")] pub name: String,
-    pub verified: bool,
+    pub verified: Option<bool>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
