@@ -451,6 +451,10 @@ impl Permissions {
     pub fn use_vad(self) -> bool { self.contains(Self::USE_VAD) }
 }
 
+impl Default for Permissions {
+    fn default() -> Self { Self::empty() }
+}
+
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         Ok(Permissions::from_bits_truncate(
