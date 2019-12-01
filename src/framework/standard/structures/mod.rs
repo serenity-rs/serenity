@@ -25,7 +25,10 @@ pub enum OnlyIn {
     __Nonexhaustive,
 }
 
-#[derive(Debug, PartialEq)]
+impl Default for OnlyIn {
+    fn default() -> Self { Self::None }
+}
+
 pub struct CommandOptions {
     /// A set of checks to be called prior to executing the command. The checks
     /// will short-circuit on the first check that returns `false`.
