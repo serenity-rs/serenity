@@ -137,7 +137,7 @@ impl GuildId {
 
         let map = utils::hashmap_to_json_map(builder.0);
 
-        http.as_ref().create_channel(self.0, &map)
+        http.as_ref().create_channel(self.0, &map, builder.1)
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.

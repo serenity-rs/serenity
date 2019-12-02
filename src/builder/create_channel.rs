@@ -13,7 +13,7 @@ use std::collections::HashMap;
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [`name`]: #method.name
 #[derive(Debug, Clone)]
-pub struct CreateChannel(pub HashMap<&'static str, Value>);
+pub struct CreateChannel(pub HashMap<&'static str, Value>, pub Option<String>);
 
 impl CreateChannel {
     /// Specify how to call this new channel.
@@ -122,6 +122,13 @@ impl CreateChannel {
 
         self
     }
+
+    /// Set the reason explaining these changes. This will appear in
+    /// the guild's audit log.
+    pub fn reason<S: ToString>(&mut self, reason: Option<S>) -> &mut Self {
+        self.1 = reason.as_ref().map(ToString::to_string);
+        self
+    }
 }
 
 impl Default for CreateChannel {
@@ -137,7 +144,7 @@ impl Default for CreateChannel {
     /// let channel_builder = CreateChannel::default();
     /// ```
     fn default() -> Self {
-        let mut builder = CreateChannel(HashMap::new());
+        let mut builder = CreateChannel(HashMap::new(), None);
         builder.kind(ChannelType::Text);
 
         builder
