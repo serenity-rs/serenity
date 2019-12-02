@@ -12,7 +12,7 @@ use std::collections::HashMap;
 /// [`Guild`]: ../model/guild/struct.Guild.html
 /// [Manage Guild]: ../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
 #[derive(Clone, Debug, Default)]
-pub struct EditGuild(pub HashMap<&'static str, Value>);
+pub struct EditGuild(pub HashMap<&'static str, Value>, pub Option<String>);
 
 impl EditGuild {
     /// Set the "AFK voice channel" that users are to move to if they have been
@@ -211,5 +211,12 @@ impl EditGuild {
     fn _verification_level(&mut self, verification_level: VerificationLevel) {
         let num = Value::Number(Number::from(verification_level.num()));
         self.0.insert("verification_level", num);
+    }
+
+    /// Set the reason explaining these changes. This will appear in
+    /// the guild's audit log.
+    pub fn reason(&mut self, reason: Option<String>) -> &mut Self {
+        self.1 = reason;
+        self
     }
 }

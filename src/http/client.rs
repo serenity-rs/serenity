@@ -589,12 +589,12 @@ impl Http {
     }
 
     /// Changes guild information.
-    pub fn edit_guild(&self, guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
+    pub fn edit_guild(&self, guild_id: u64, map: &JsonMap, reason: Option<String>)
+                        -> Result<PartialGuild> {
         let body = serde_json::to_vec(map)?;
-
         self.fire(Request {
             body: Some(&body),
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::EditGuild { guild_id },
         })
     }
@@ -1716,8 +1716,8 @@ impl Http {
         Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
     }
 
-    pub fn reason_into_header(reason: &str) -> HeaderMap {
-        let mut headers = HeaderMap::new();
+    pub fn reason_into_header(reason: String) -> Headers {
+        let mut headers = Headers::new();
         let reason_encoded: String = percent_encode(reason.as_bytes(), NON_ALPHANUMERIC).collect();
         headers.insert("X-Audit-Log-Reason", reason_encoded.parse().unwrap());
         headers
