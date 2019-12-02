@@ -215,8 +215,8 @@ impl EditGuild {
 
     /// Set the reason explaining these changes. This will appear in
     /// the guild's audit log.
-    pub fn reason(&mut self, reason: Option<String>) -> &mut Self {
-        self.1 = reason;
+    pub fn reason<S: ToString>(&mut self, reason: Option<S>) -> &mut Self {
+        self.1 = reason.as_ref().map(ToString::to_string);
         self
     }
 }
