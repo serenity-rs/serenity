@@ -16,6 +16,7 @@ bitflags = "1"
 log = "0.4"
 parking_lot = "0.9"
 serde_json = "1"
+percent-encoding = "2.1"
 
 [dependencies.audiopus]
 optional = true

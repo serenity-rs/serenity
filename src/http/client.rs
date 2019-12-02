@@ -21,6 +21,7 @@ use super::{
 use serde::de::DeserializeOwned;
 use serde_json::json;
 use log::{debug, trace};
+use percent_encoding::{percent_encode, NON_ALPHANUMERIC};
 use std::{
     collections::BTreeMap,
     sync::Arc,
@@ -1713,6 +1714,13 @@ impl Http {
         trace!("Unsuccessful response: {:?}", response);
 
         Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
+    }
+
+    pub fn reason_into_header(reason: &str) -> HeaderMap {
+        let mut headers = HeaderMap::new();
+        let reason_encoded: String = percent_encode(reason.as_bytes(), NON_ALPHANUMERIC).collect();
+        headers.insert("X-Audit-Log-Reason", reason_encoded.parse().unwrap());
+        headers
     }
 }
 
