@@ -568,12 +568,13 @@ impl Http {
     }
 
     /// Changes channel information.
-    pub fn edit_channel(&self, channel_id: u64, map: &JsonMap) -> Result<GuildChannel> {
+    pub fn edit_channel(&self, channel_id: u64, map: &JsonMap, reason: Option<String>)
+                    -> Result<GuildChannel> {
         let body = serde_json::to_vec(map)?;
 
         self.fire(Request {
             body: Some(&body),
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::EditChannel {channel_id },
         })
     }

@@ -379,7 +379,7 @@ impl GuildChannel {
         f(&mut edit_channel);
         let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        match cache_http.http().edit_channel(self.id.0, &edited) {
+        match cache_http.http().edit_channel(self.id.0, &edited, edit_channel.1) {
             Ok(channel) => {
                 std::mem::replace(self, channel);
 

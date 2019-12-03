@@ -20,7 +20,7 @@ use std::collections::HashMap;
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
 /// [`GuildChannel::edit`]: ../model/channel/struct.GuildChannel.html#method.edit
 #[derive(Clone, Debug, Default)]
-pub struct EditChannel(pub HashMap<&'static str, Value>);
+pub struct EditChannel(pub HashMap<&'static str, Value>, pub Option<String>);
 
 impl EditChannel {
     /// The bitrate of the channel in bits.
@@ -106,6 +106,11 @@ impl EditChannel {
     pub fn slow_mode_rate(&mut self, seconds: u64) -> &mut Self {
         self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
 
+        self
+    }
+
+    pub fn reason<S: ToString>(&mut self, reason: Option<S>) -> &mut Self {
+        self.1 = reason.as_ref().map(ToString::to_string);
         self
     }
 }

@@ -265,7 +265,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(channel.0);
 
-        http.as_ref().edit_channel(self.0, &map)
+        http.as_ref().edit_channel(self.0, &map, channel.1)
     }
 
     /// Edits a [`Message`] in the channel given its Id.

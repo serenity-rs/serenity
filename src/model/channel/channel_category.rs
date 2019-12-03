@@ -93,7 +93,7 @@ impl ChannelCategory {
         f(&mut edit_channel);
         let map = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        cache_http.http().edit_channel(self.id.0, &map).map(|channel| {
+        cache_http.http().edit_channel(self.id.0, &map, edit_channel.1).map(|channel| {
             let GuildChannel {
                 id,
                 category_id,
