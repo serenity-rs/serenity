@@ -78,7 +78,10 @@ impl PrivateChannel {
     /// be re-opened.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> { self.id.delete(&http) }
+    pub fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
+        let reason: Option<String> = None;
+        self.id.delete(&http, reason)
+    }
 
     /// Deletes all messages by Ids from the given vector in the channel.
     ///

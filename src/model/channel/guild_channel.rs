@@ -277,7 +277,8 @@ impl GuildChannel {
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
     #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<Channel> {
+    pub fn delete<S:ToString>(&self, cache_http: impl CacheHttp, reason: Option<S>)
+                            -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -289,7 +290,7 @@ impl GuildChannel {
             }
         }
 
-        self.id.delete(&cache_http.http())
+        self.id.delete(&cache_http.http(), reason)
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.

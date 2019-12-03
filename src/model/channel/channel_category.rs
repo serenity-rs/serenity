@@ -65,8 +65,8 @@ impl ChannelCategory {
     /// Deletes this category if required permissions are met.
     #[inline]
     #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.id.delete(&cache_http.http()).map(|_| ())
+    pub fn delete<S:ToString>(&self, cache_http: impl CacheHttp, reason: Option<S>) -> Result<()> {
+        self.id.delete(&cache_http.http(), reason).map(|_| ())
     }
 
     /// Modifies the category's settings, such as its position or name.

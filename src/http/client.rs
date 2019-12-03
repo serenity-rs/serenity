@@ -376,10 +376,11 @@ impl Http {
     }
 
     /// Deletes a private channel or a channel in a guild.
-    pub fn delete_channel(&self, channel_id: u64) -> Result<Channel> {
+    pub fn delete_channel(&self, channel_id: u64, reason: Option<String>)
+                        -> Result<Channel> {
         self.fire(Request {
             body: None,
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::DeleteChannel { channel_id },
         })
     }

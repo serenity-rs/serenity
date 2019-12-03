@@ -115,7 +115,10 @@ impl ChannelId {
     /// Deletes this channel, returning the channel on a successful deletion.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete(self, http: impl AsRef<Http>) -> Result<Channel> { http.as_ref().delete_channel(self.0) }
+    pub fn delete<S:ToString>(self, http: impl AsRef<Http>, reason: Option<S>)
+                            -> Result<Channel> { 
+        http.as_ref().delete_channel(self.0, reason.as_ref().map(ToString::to_string))
+    }
 
     /// Deletes a [`Message`] given its Id.
     ///
