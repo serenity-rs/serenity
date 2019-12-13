@@ -1,7 +1,7 @@
 use super::super::id::AttachmentId;
 
 #[cfg(feature = "model")]
-use reqwest::Client as ReqwestClient;
+use reqwest::blocking::Client as ReqwestClient;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
