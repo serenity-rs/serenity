@@ -1,10 +1,9 @@
 use reqwest::{
     Error as ReqwestError,
+    blocking::Response,
     header::InvalidHeaderValue,
-    Response,
     StatusCode,
     Url,
-    UrlError,
 };
 use std::{
     error::Error as StdError,
@@ -14,6 +13,7 @@ use std::{
         Result as FmtResult
     }
 };
+use url::ParseError as UrlError;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
 pub struct DiscordJsonError {
@@ -37,7 +37,7 @@ pub struct ErrorResponse {
 }
 
 impl From<Response> for ErrorResponse {
-    fn from(mut r: Response) -> Self {
+    fn from(r: Response) -> Self {
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
@@ -111,7 +111,7 @@ impl StdError for Error {
 mod test {
     use super::*;
     use http_crate::response::Builder;
-    use reqwest::r#async::ResponseBuilderExt;
+    use reqwest::ResponseBuilderExt;
 
     #[test]
     fn test_error_response_into() {
@@ -122,12 +122,12 @@ mod test {
         };
 
         let mut builder = Builder::new();
-        builder.status(403);
-        builder.url(String::from("https://ferris.crab").parse().unwrap());
+        builder = builder.status(403);
+        builder = builder.url(String::from("https://ferris.crab").parse().unwrap());
         let body_string = serde_json::to_string(&error).unwrap();
         let response = builder.body(body_string.into_bytes()).unwrap();
 
-        let reqwest_response: reqwest::Response = response.into();
+        let reqwest_response: reqwest::blocking::Response = response.into();
         let error_response: ErrorResponse = reqwest_response.into();
 
         let known = ErrorResponse {

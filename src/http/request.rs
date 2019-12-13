@@ -1,10 +1,12 @@
 use crate::constants;
-use reqwest::{
+use reqwest::blocking::{
+    Client,
     RequestBuilder as ReqwestRequestBuilder,
+};
+use reqwest::{
     header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
     Url,
 };
-use reqwest::Client;
 use super::{
     HttpError,
     routing::RouteInfo,

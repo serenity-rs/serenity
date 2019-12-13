@@ -41,12 +41,8 @@
 
 pub use super::routing::Route;
 
-use reqwest::{
-    Client,
-    Response,
-    header::HeaderMap,
-    StatusCode,
-};
+use reqwest::blocking::{Client, Response};
+use reqwest::{header::HeaderMap, StatusCode};
 use crate::internal::prelude::*;
 use parking_lot::{Mutex, RwLock};
 use std::{

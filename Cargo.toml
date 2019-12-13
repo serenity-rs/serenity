@@ -56,8 +56,9 @@ version = "1"
 
 [dependencies.reqwest]
 default-features = false
+features = ["blocking", "json"]
 optional = true
-version = "0.9"
+version = "0.10"
 
 [dependencies.rand]
 optional = true
@@ -99,7 +100,7 @@ optional = true
 version = "0.17"
 
 [dev-dependencies.http_crate]
-version = "0.1"
+version = "0.2"
 package = "http"
 
 [dev-dependencies.matches]
@@ -146,10 +147,10 @@ gateway = [
     "url",
     "utils",
 ]
-http = []
+http = ["url"]
 absolute_ratelimits = ["http"]
 rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls", "webpki", "webpki-roots"]
-native_tls_backend = ["reqwest/default-tls", "tungstenite/tls"]
+native_tls_backend = ["reqwest/native-tls", "tungstenite/tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]

@@ -1,10 +1,12 @@
 use crate::constants;
-use reqwest::{
+use reqwest::blocking::{
+    multipart::Part,
     Client,
     ClientBuilder,
-    header::{AUTHORIZATION, USER_AGENT, CONTENT_TYPE, HeaderValue, HeaderMap as Headers},
-    multipart::Part,
     Response as ReqwestResponse,
+};
+use reqwest::{
+    header::{AUTHORIZATION, USER_AGENT, CONTENT_TYPE, HeaderValue, HeaderMap as Headers},
     StatusCode,
     Url,
 };
@@ -1450,7 +1452,7 @@ impl Http {
             Err(_) => return Err(Error::Url(uri)),
         };
 
-        let mut multipart = reqwest::multipart::Form::new();
+        let mut multipart = reqwest::blocking::multipart::Form::new();
         let mut file_num = "0".to_string();
 
         for file in files {
@@ -1723,7 +1725,7 @@ fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
 
 #[cfg(feature = "native_tls_backend")]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
-    builder.use_default_tls()
+    builder.use_native_tls()
 }
 
 impl AsRef<Http> for Http {
