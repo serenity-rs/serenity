@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.4] - 2019-12-13
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@LeSeulArtichaut]
+
+### Added
+
+- [framework] Enable pub restrictions ([@acdenisSK]) [c:e6ed1b5]
+- [framework] Implement Default for CommandOptions and GroupOptions ([@LeSeulArtichaut]) [c:918273b]
+
+### Fixed
+
+- [framework] Fix regression of default option initialisation ([@acdenisSK]) [c:42937e9]
+
+
 ## [0.7.3] - 2019-11-19
 
 Small release including fixes for Discord API changes. Please note with this version the minimum supported version of Rust is 1.37.
@@ -3188,6 +3205,8 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.4]: https://github.com/serenity-rs/serenity/compare/v0.7.3...v0.7.4
+[0.7.3]: https://github.com/serenity-rs/serenity/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/serenity-rs/serenity/compare/v0.7.1...v0.7.2
 [0.7.1]: https://github.com/serenity-rs/serenity/compare/v0.7.0...v0.7.1
 [0.7.0]: https://github.com/serenity-rs/serenity/compare/v0.6.4...v0.7.0
@@ -3234,6 +3253,7 @@ Initial commit.
 
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
+
 
 [@Alch-Emi]: https://github.com/Alch-Emi
 [@Arcterus]: https://github.com/Arcterus
@@ -3282,6 +3302,7 @@ Initial commit.
 [@Kroisse]: https://github.com/Kroisse
 [@kyranet]: https://github.com/kyranet
 [@Lakelezz]: https://github.com/Lakelezz
+[@LeSeulArtichaut]: https://github.com/LeSeulArtichaut
 [@leo-lb]: https://github.com/leo-lb
 [@lolzballs]: https://github.com/lolzballs
 [@Lymia]: https://github.com/Lymia
@@ -3317,6 +3338,10 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:e6ed1b5]: https://github.com/serenity-rs/serenity/commit/e6ed1b5987814174fcf66dff084be45386a68136
+[c:42937e9]: https://github.com/serenity-rs/serenity/commit/42937e9b7414455a9baefeb0c902ba81ff242de4
+[c:918273b]: https://github.com/serenity-rs/serenity/commit/918273b8e936796e6424b0c28c0a929f7ce6bf03
 
 [c:2734e27]: https://github.com/serenity-rs/serenity/commit/2734e27a163a1cc585bd7f4f7b5aa0855792ed58
 [c:c4b1c60]: https://github.com/serenity-rs/serenity/commit/c4b1c6033c7b21ac314ce6845be957ca69b1d223
