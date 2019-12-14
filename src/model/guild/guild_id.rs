@@ -479,7 +479,7 @@ impl GuildId {
     #[cfg(feature = "http")]
     #[inline]
     pub fn kick<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
-        http.as_ref().kick_member(self.0, user_id.into().0, reason.as_ref().map(ToString::to_string))
+        http.as_ref().kick_member(self.0, user_id.into().0, reason)
     }
 
     /// Leaves the guild.
@@ -705,7 +705,7 @@ impl GuildId {
             "days": days,
         });
 
-        http.as_ref().start_guild_prune(self.0, &map, reason.as_ref().map(ToString::to_string))
+        http.as_ref().start_guild_prune(self.0, &map, reason)
     }
 
     /// Unbans a [`User`] from the guild.
@@ -717,12 +717,12 @@ impl GuildId {
     #[cfg(feature = "http")]
     #[inline]
     pub fn unban<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
-        self._unban(&http, user_id.into(), reason.as_ref().map(ToString::to_string))
+        self._unban(&http, user_id.into(), reason)
     }
 
     #[cfg(feature = "http")]
     fn _unban<S: ToString>(self, http: impl AsRef<Http>, user_id: UserId, reason: Option<S>) -> Result<()> {
-        http.as_ref().remove_ban(self.0, user_id.0, reason.as_ref().map(ToString::to_string))
+        http.as_ref().remove_ban(self.0, user_id.0, reason)
     }
 
     /// Retrieve's the guild's vanity URL.

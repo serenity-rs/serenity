@@ -117,7 +117,7 @@ impl ChannelId {
     #[inline]
     pub fn delete<S:ToString>(self, http: impl AsRef<Http>, reason: Option<S>)
                             -> Result<Channel> { 
-        http.as_ref().delete_channel(self.0, reason.as_ref().map(ToString::to_string))
+        http.as_ref().delete_channel(self.0, reason)
     }
 
     /// Deletes a [`Message`] given its Id.

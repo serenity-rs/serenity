@@ -1610,7 +1610,7 @@ impl Guild {
             }
         }
 
-        self.id.start_prune(cache_http.http(), days, reason.as_ref().map(ToString::to_string))
+        self.id.start_prune(cache_http.http(), days, reason)
     }
 
     /// Unbans the given [`User`] from the guild.
