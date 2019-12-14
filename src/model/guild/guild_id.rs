@@ -716,13 +716,13 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn unban<U: Into<UserId>>(self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
-        self._unban(&http, user_id.into())
+    pub fn unban<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
+        self._unban(&http, user_id.into(), reason.as_ref().map(ToString::to_string))
     }
 
     #[cfg(feature = "http")]
-    fn _unban(self, http: impl AsRef<Http>, user_id: UserId) -> Result<()> {
-        http.as_ref().remove_ban(self.0, user_id.0)
+    fn _unban<S: ToString>(self, http: impl AsRef<Http>, user_id: UserId, reason: Option<S>) -> Result<()> {
+        http.as_ref().remove_ban(self.0, user_id.0, reason.as_ref().map(ToString::to_string))
     }
 
     /// Retrieve's the guild's vanity URL.

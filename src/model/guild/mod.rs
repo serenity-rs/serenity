@@ -1626,7 +1626,7 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "client")]
-    pub fn unban<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<()> {
+    pub fn unban<U: Into<UserId>, S: ToString>(&self, cache_http: impl CacheHttp, user_id: U, reason: Option<S>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -1638,7 +1638,7 @@ impl Guild {
             }
         }
 
-        self.id.unban(&cache_http.http(), user_id)
+        self.id.unban(&cache_http.http(), user_id, reason)
     }
 
     /// Retrieve's the guild's vanity URL.

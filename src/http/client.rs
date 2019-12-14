@@ -1529,10 +1529,10 @@ impl Http {
     }
 
     /// Unbans a user from a guild.
-    pub fn remove_ban(&self, guild_id: u64, user_id: u64) -> Result<()> {
+    pub fn remove_ban(&self, guild_id: u64, user_id: u64, reason: Option<String>) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::RemoveBan { guild_id, user_id },
         })
     }

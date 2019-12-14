@@ -463,8 +463,8 @@ impl Member {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.0, self.user.read().id.0)
+    pub fn unban<S: ToString>(&self, http: impl AsRef<Http>, reason: Option<S>) -> Result<()> {
+        http.as_ref().remove_ban(self.guild_id.0, self.user.read().id.0, reason.as_ref().map(ToString::to_string))
     }
 
     /// Retrieves the member's user ID.

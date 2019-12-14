@@ -474,7 +474,9 @@ impl PartialGuild {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn unban<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> { self.id.unban(&http, user_id) }
+    pub fn unban<U: Into<UserId>, S: ToString>(&self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
+        self.id.unban(&http, user_id, reason)
+    }
 
     /// Retrieve's the guild's vanity URL.
     ///
