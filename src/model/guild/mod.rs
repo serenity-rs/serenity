@@ -1598,7 +1598,7 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "client")]
-    pub fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+    pub fn start_prune<S:ToString>(&self, cache_http: impl CacheHttp, days: u16, reason: Option<S>) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -1610,7 +1610,7 @@ impl Guild {
             }
         }
 
-        self.id.start_prune(cache_http.http(), days)
+        self.id.start_prune(cache_http.http(), days, reason.as_ref().map(ToString::to_string))
     }
 
     /// Unbans the given [`User`] from the guild.

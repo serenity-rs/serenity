@@ -700,12 +700,12 @@ impl GuildId {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn start_prune(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
+    pub fn start_prune<S: ToString>(self, http: impl AsRef<Http>, days: u16, reason: Option<S>) -> Result<GuildPrune> {
         let map = json!({
             "days": days,
         });
 
-        http.as_ref().start_guild_prune(self.0, &map)
+        http.as_ref().start_guild_prune(self.0, &map, reason.as_ref().map(ToString::to_string))
     }
 
     /// Unbans a [`User`] from the guild.

@@ -1555,7 +1555,7 @@ impl Http {
     }
 
     /// Starts removing some members from a guild based on the last time they've been online.
-    pub fn start_guild_prune(&self, guild_id: u64, map: &Value) -> Result<GuildPrune> {
+    pub fn start_guild_prune(&self, guild_id: u64, map: &Value, reason: Option<String>) -> Result<GuildPrune> {
         // Note for 0.6.x: turn this into a function parameter.
         #[derive(Deserialize)]
         struct StartGuildPruneRequest {
@@ -1566,7 +1566,7 @@ impl Http {
 
         self.fire(Request {
             body: None,
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::StartGuildPrune {
                 days: req.days,
                 guild_id,
