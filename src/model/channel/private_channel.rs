@@ -114,8 +114,9 @@ impl PrivateChannel {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(&http, permission_type)
+    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<S>)
+                        -> Result<()> {
+        self.id.delete_permission(&http, permission_type, reason)
     }
 
     /// Deletes the given [`Reaction`] from the channel.

@@ -190,7 +190,8 @@ impl ChannelId {
     ///
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
-    pub fn delete_permission(self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+    pub fn delete_permission<S: ToString>(self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<S>)
+                        -> Result<()> {
         http.as_ref().delete_permission(
             self.0,
             match permission_type {
@@ -198,6 +199,7 @@ impl ChannelId {
                 PermissionOverwriteType::Role(id) => id.0,
                 PermissionOverwriteType::__Nonexhaustive => unreachable!(),
             },
+            reason
         )
     }
 

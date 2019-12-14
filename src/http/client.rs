@@ -469,10 +469,10 @@ impl Http {
     }
 
     /// Deletes a permission override from a role or a member in a channel.
-    pub fn delete_permission(&self, channel_id: u64, target_id: u64) -> Result<()> {
+    pub fn delete_permission<S: ToString>(&self, channel_id: u64, target_id: u64, reason: Option<S>) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::DeletePermission { channel_id, target_id },
         })
     }
