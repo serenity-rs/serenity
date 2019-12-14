@@ -131,7 +131,7 @@ impl Group {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<S>)
+    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<&S>)
                                             -> Result<()> {
         self.channel_id.delete_permission(&http, permission_type, reason)
     }

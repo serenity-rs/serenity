@@ -324,7 +324,7 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
-    pub fn kick<S: ToString>(&self, cache_http: impl CacheHttp, reason: Option<S>) -> Result<()> {
+    pub fn kick<S: ToString>(&self, cache_http: impl CacheHttp, reason: Option<&S>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -463,7 +463,7 @@ impl Member {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn unban<S: ToString>(&self, http: impl AsRef<Http>, reason: Option<S>) -> Result<()> {
+    pub fn unban<S: ToString>(&self, http: impl AsRef<Http>, reason: Option<&S>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id.0, self.user.read().id.0, reason)
     }
 

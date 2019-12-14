@@ -242,7 +242,7 @@ impl Channel {
     ///
     /// [`Group`]: struct.Group.html
     #[cfg(all(feature = "model", feature = "http"))]
-    pub fn delete<S:ToString>(&self, cache_http: impl CacheHttp, reason: Option<S>) -> Result<()> {
+    pub fn delete<S:ToString>(&self, cache_http: impl CacheHttp, reason: Option<&S>) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
                 let _ = group.read().leave(cache_http.http())?;

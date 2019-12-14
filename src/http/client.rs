@@ -177,7 +177,7 @@ impl Http {
     /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
     /// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    pub fn create_channel<S: ToString>(&self, guild_id: u64, map: &JsonMap, reason: Option<S>)
+    pub fn create_channel<S: ToString>(&self, guild_id: u64, map: &JsonMap, reason: Option<&S>)
                         -> Result<GuildChannel> {
         let body = serde_json::to_vec(map)?;
 
@@ -376,7 +376,7 @@ impl Http {
     }
 
     /// Deletes a private channel or a channel in a guild.
-    pub fn delete_channel<S: ToString>(&self, channel_id: u64, reason: Option<S>)
+    pub fn delete_channel<S: ToString>(&self, channel_id: u64, reason: Option<&S>)
                         -> Result<Channel> {
         self.fire(Request {
             body: None,
@@ -469,7 +469,7 @@ impl Http {
     }
 
     /// Deletes a permission override from a role or a member in a channel.
-    pub fn delete_permission<S: ToString>(&self, channel_id: u64, target_id: u64, reason: Option<S>) -> Result<()> {
+    pub fn delete_permission<S: ToString>(&self, channel_id: u64, target_id: u64, reason: Option<&S>) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: reason.map(Self::reason_into_header),
@@ -569,7 +569,7 @@ impl Http {
     }
 
     /// Changes channel information.
-    pub fn edit_channel<S: ToString>(&self, channel_id: u64, map: &JsonMap, reason: Option<S>)
+    pub fn edit_channel<S: ToString>(&self, channel_id: u64, map: &JsonMap, reason: Option<&S>)
                     -> Result<GuildChannel> {
         let body = serde_json::to_vec(map)?;
 
@@ -592,7 +592,7 @@ impl Http {
     }
 
     /// Changes guild information.
-    pub fn edit_guild<S: ToString>(&self, guild_id: u64, map: &JsonMap, reason: Option<S>)
+    pub fn edit_guild<S: ToString>(&self, guild_id: u64, map: &JsonMap, reason: Option<&S>)
                         -> Result<PartialGuild> {
         let body = serde_json::to_vec(map)?;
         self.fire(Request {
@@ -1402,7 +1402,7 @@ impl Http {
     }
 
     /// Kicks a member from a guild.
-    pub fn kick_member<S: ToString>(&self, guild_id: u64, user_id: u64, reason: Option<S>) -> Result<()> {
+    pub fn kick_member<S: ToString>(&self, guild_id: u64, user_id: u64, reason: Option<&S>) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: reason.map(Self::reason_into_header),
@@ -1529,7 +1529,7 @@ impl Http {
     }
 
     /// Unbans a user from a guild.
-    pub fn remove_ban<S: ToString>(&self, guild_id: u64, user_id: u64, reason: Option<S>) -> Result<()> {
+    pub fn remove_ban<S: ToString>(&self, guild_id: u64, user_id: u64, reason: Option<&S>) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: reason.map(Self::reason_into_header),
@@ -1555,7 +1555,7 @@ impl Http {
     }
 
     /// Starts removing some members from a guild based on the last time they've been online.
-    pub fn start_guild_prune<S: ToString>(&self, guild_id: u64, map: &Value, reason: Option<S>) -> Result<GuildPrune> {
+    pub fn start_guild_prune<S: ToString>(&self, guild_id: u64, map: &Value, reason: Option<&S>) -> Result<GuildPrune> {
         // Note for 0.6.x: turn this into a function parameter.
         #[derive(Deserialize)]
         struct StartGuildPruneRequest {
@@ -1719,7 +1719,7 @@ impl Http {
         Err(Error::Http(Box::new(HttpError::UnsuccessfulRequest(response.into()))))
     }
 
-    pub fn reason_into_header<S: ToString>(reason: S) -> Headers {
+    pub fn reason_into_header<S: ToString>(reason: &S) -> Headers {
         let mut headers = Headers::new();
         let reason_encoded: String = percent_encode(reason.to_string().as_bytes(), NON_ALPHANUMERIC).collect();
         headers.insert("X-Audit-Log-Reason", reason_encoded.parse().unwrap());

@@ -277,7 +277,7 @@ impl GuildChannel {
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
     #[cfg(feature = "http")]
-    pub fn delete<S:ToString>(&self, cache_http: impl CacheHttp, reason: Option<S>)
+    pub fn delete<S:ToString>(&self, cache_http: impl CacheHttp, reason: Option<&S>)
                             -> Result<Channel> {
         #[cfg(feature = "cache")]
         {
@@ -324,7 +324,7 @@ impl GuildChannel {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<S>)
+    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<&S>)
                         -> Result<()> {
         self.id.delete_permission(&http, permission_type, reason)
     }
@@ -381,7 +381,7 @@ impl GuildChannel {
         f(&mut edit_channel);
         let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        match cache_http.http().edit_channel(self.id.0, &edited, edit_channel.1) {
+        match cache_http.http().edit_channel(self.id.0, &edited, edit_channel.1.as_ref()) {
             Ok(channel) => {
                 std::mem::replace(self, channel);
 

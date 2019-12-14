@@ -137,7 +137,7 @@ impl GuildId {
 
         let map = utils::hashmap_to_json_map(builder.0);
 
-        http.as_ref().create_channel(self.0, &map, builder.1)
+        http.as_ref().create_channel(self.0, &map, builder.1.as_ref())
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image.
@@ -302,7 +302,7 @@ impl GuildId {
         f(&mut edit_guild);
         let map = utils::hashmap_to_json_map(edit_guild.0);
 
-        http.as_ref().edit_guild(self.0, &map, edit_guild.1)
+        http.as_ref().edit_guild(self.0, &map, edit_guild.1.as_ref())
     }
 
     /// Edits an [`Emoji`]'s name in the guild.
@@ -478,7 +478,7 @@ impl GuildId {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn kick<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
+    pub fn kick<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<&S>) -> Result<()> {
         http.as_ref().kick_member(self.0, user_id.into().0, reason)
     }
 
@@ -700,7 +700,7 @@ impl GuildId {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn start_prune<S: ToString>(self, http: impl AsRef<Http>, days: u16, reason: Option<S>) -> Result<GuildPrune> {
+    pub fn start_prune<S: ToString>(self, http: impl AsRef<Http>, days: u16, reason: Option<&S>) -> Result<GuildPrune> {
         let map = json!({
             "days": days,
         });
@@ -716,12 +716,12 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn unban<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
+    pub fn unban<U: Into<UserId>, S: ToString>(self, http: impl AsRef<Http>, user_id: U, reason: Option<&S>) -> Result<()> {
         self._unban(&http, user_id.into(), reason)
     }
 
     #[cfg(feature = "http")]
-    fn _unban<S: ToString>(self, http: impl AsRef<Http>, user_id: UserId, reason: Option<S>) -> Result<()> {
+    fn _unban<S: ToString>(self, http: impl AsRef<Http>, user_id: UserId, reason: Option<&S>) -> Result<()> {
         http.as_ref().remove_ban(self.0, user_id.0, reason)
     }
 

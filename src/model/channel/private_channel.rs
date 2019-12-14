@@ -79,8 +79,7 @@ impl PrivateChannel {
     #[cfg(feature = "http")]
     #[inline]
     pub fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
-        let reason: Option<String> = None;
-        self.id.delete(&http, reason)
+        self.id.delete(&http, None::<&String>)
     }
 
     /// Deletes all messages by Ids from the given vector in the channel.
@@ -114,7 +113,7 @@ impl PrivateChannel {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<S>)
+    pub fn delete_permission<S: ToString>(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<&S>)
                         -> Result<()> {
         self.id.delete_permission(&http, permission_type, reason)
     }

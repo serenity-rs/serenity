@@ -115,7 +115,7 @@ impl ChannelId {
     /// Deletes this channel, returning the channel on a successful deletion.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete<S:ToString>(self, http: impl AsRef<Http>, reason: Option<S>)
+    pub fn delete<S:ToString>(self, http: impl AsRef<Http>, reason: Option<&S>)
                             -> Result<Channel> { 
         http.as_ref().delete_channel(self.0, reason)
     }
@@ -190,7 +190,7 @@ impl ChannelId {
     ///
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
-    pub fn delete_permission<S: ToString>(self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<S>)
+    pub fn delete_permission<S: ToString>(self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType, reason: Option<&S>)
                         -> Result<()> {
         http.as_ref().delete_permission(
             self.0,
@@ -270,7 +270,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(channel.0);
 
-        http.as_ref().edit_channel(self.0, &map, channel.1)
+        http.as_ref().edit_channel(self.0, &map, channel.1.as_ref())
     }
 
     /// Edits a [`Message`] in the channel given its Id.

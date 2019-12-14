@@ -865,7 +865,7 @@ impl Guild {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn kick<U: Into<UserId>, S: ToString>(&self, http: impl AsRef<Http>, user_id: U, reason: Option<S>) -> Result<()> {
+    pub fn kick<U: Into<UserId>, S: ToString>(&self, http: impl AsRef<Http>, user_id: U, reason: Option<&S>) -> Result<()> {
         self.id.kick(&http, user_id, reason)
     }
 
@@ -1598,7 +1598,7 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "client")]
-    pub fn start_prune<S:ToString>(&self, cache_http: impl CacheHttp, days: u16, reason: Option<S>) -> Result<GuildPrune> {
+    pub fn start_prune<S:ToString>(&self, cache_http: impl CacheHttp, days: u16, reason: Option<&S>) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -1626,7 +1626,7 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "client")]
-    pub fn unban<U: Into<UserId>, S: ToString>(&self, cache_http: impl CacheHttp, user_id: U, reason: Option<S>) -> Result<()> {
+    pub fn unban<U: Into<UserId>, S: ToString>(&self, cache_http: impl CacheHttp, user_id: U, reason: Option<&S>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
