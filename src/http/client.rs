@@ -1402,10 +1402,10 @@ impl Http {
     }
 
     /// Kicks a member from a guild.
-    pub fn kick_member(&self, guild_id: u64, user_id: u64) -> Result<()> {
+    pub fn kick_member(&self, guild_id: u64, user_id: u64, reason: Option<String>) -> Result<()> {
         self.wind(204, Request {
             body: None,
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::KickMember { guild_id, user_id },
         })
     }

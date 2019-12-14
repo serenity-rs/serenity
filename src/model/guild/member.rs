@@ -324,7 +324,7 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
-    pub fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub fn kick<S: ToString>(&self, cache_http: impl CacheHttp, reason: Option<S>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -343,7 +343,7 @@ impl Member {
             }
         }
 
-        self.guild_id.kick(cache_http.http(), self.user.read().id)
+        self.guild_id.kick(cache_http.http(), self.user.read().id, reason)
     }
 
     /// Returns the guild-level permissions for the member.
