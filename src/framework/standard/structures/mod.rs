@@ -67,20 +67,6 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-#[derive(Debug, Default, PartialEq)]
-pub struct GroupOptions {
-    pub prefixes: &'static [&'static str],
-    pub only_in: OnlyIn,
-    pub owners_only: bool,
-    pub owner_privilege: bool,
-    pub help_available: bool,
-    pub allowed_roles: &'static [&'static str],
-    pub required_permissions: Permissions,
-    pub checks: &'static [&'static Check],
-    pub default_command: Option<&'static Command>,
-    pub description: Option<&'static str>,
-}
-
 #[derive(Debug, Clone)]
 pub struct CommandError(pub String);
 
@@ -235,6 +221,21 @@ pub struct HelpOptions {
     pub indention_prefix: &'static str,
 }
 
+#[derive(Debug, Default, PartialEq)]
+pub struct GroupOptions {
+    pub prefixes: &'static [&'static str],
+    pub only_in: OnlyIn,
+    pub owners_only: bool,
+    pub owner_privilege: bool,
+    pub help_available: bool,
+    pub allowed_roles: &'static [&'static str],
+    pub required_permissions: Permissions,
+    pub checks: &'static [&'static Check],
+    pub default_command: Option<&'static Command>,
+    pub description: Option<&'static str>,
+    pub commands: &'static [&'static Command],
+    pub sub_groups: &'static [&'static CommandGroup],
+}
 
 #[derive(Debug, PartialEq)]
 pub struct CommandGroup {
