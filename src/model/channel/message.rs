@@ -751,7 +751,6 @@ impl MessageType {
             NitroTier1 => 9,
             NitroTier2 => 10,
             NitroTier3 => 11,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -784,7 +783,6 @@ impl MessageActivityKind {
             SPECTATE => 2,
             LISTEN => 3,
             JOIN_REQUEST => 5,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }

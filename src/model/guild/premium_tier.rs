@@ -25,7 +25,6 @@ impl PremiumTier {
             PremiumTier::Tier1 => 1,
             PremiumTier::Tier2 => 2,
             PremiumTier::Tier3 => 3,
-            PremiumTier::__Nonexhaustive => unreachable!(),
         }
     }
 }

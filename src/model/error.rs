@@ -160,7 +160,6 @@ impl StdError for Error {
             Error::ItemMissing => "The required item is missing from the cache.",
             Error::MessageTooLong(_) => "Message too large.",
             Error::MessagingBot => "Attempted to message another bot user.",
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

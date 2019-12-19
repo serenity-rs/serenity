@@ -115,7 +115,6 @@ impl StdError for RustlsError {
             WebPKI => "Failed to validate X.509 certificate",
             HandshakeError => "TLS handshake failed when making the websocket connection",
             Io(ref inner) => inner.description(),
-            __Nonexhaustive => unreachable!(),
         }
     }
 }

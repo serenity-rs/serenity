@@ -404,7 +404,6 @@ impl OnlineStatus {
             OnlineStatus::Invisible => "invisible",
             OnlineStatus::Offline => "offline",
             OnlineStatus::Online => "online",
-            OnlineStatus::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -706,7 +705,6 @@ impl User {
                     Err(Error::Model(ModelError::ItemMissing))
                 }
             },
-            GuildContainer::__Nonexhaustive => unreachable!(),
         }
     }
 

@@ -60,7 +60,6 @@ impl Action {
             Action::Emoji(ref x) => x.num(),
             Action::Message(ref x) => x.num(),
             Action::Integration(ref x) => x.num(),
-            Action::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -80,7 +79,6 @@ impl ActionChannel {
             ActionChannel::Create => 10,
             ActionChannel::Update => 11,
             ActionChannel::Delete => 12,
-            ActionChannel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -100,7 +98,6 @@ impl ActionChannelOverwrite {
             ActionChannelOverwrite::Create => 13,
             ActionChannelOverwrite::Update => 14,
             ActionChannelOverwrite::Delete => 15,
-            ActionChannelOverwrite::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -132,7 +129,6 @@ impl ActionMember {
             ActionMember::MemberMove => 26,
             ActionMember::MemberDisconnect => 27,
             ActionMember::BotAdd => 28,
-            ActionMember::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -152,7 +148,6 @@ impl ActionRole {
             ActionRole::Create => 30,
             ActionRole::Update => 31,
             ActionRole::Delete => 32,
-            ActionRole::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -172,7 +167,6 @@ impl ActionInvite {
             ActionInvite::Create => 40,
             ActionInvite::Update => 41,
             ActionInvite::Delete => 42,
-            ActionInvite::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -192,7 +186,6 @@ impl ActionWebhook {
             ActionWebhook::Create => 50,
             ActionWebhook::Update => 51,
             ActionWebhook::Delete => 52,
-            ActionWebhook::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -212,7 +205,6 @@ impl ActionEmoji {
             ActionEmoji::Create => 60,
             ActionEmoji::Update => 61,
             ActionEmoji::Delete => 62,
-            ActionEmoji::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -234,7 +226,6 @@ impl ActionMessage {
             ActionMessage::BulkDelete => 73,
             ActionMessage::Pin => 74,
             ActionMessage::Unpin => 75,
-            ActionMessage::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -255,7 +246,6 @@ impl ActionIntegration {
             ActionIntegration::Create => 80,
             ActionIntegration::Update => 81,
             ActionIntegration::Delete => 82,
-            ActionIntegration::__Nonexhaustive => unreachable!(),
         }
     }
 }

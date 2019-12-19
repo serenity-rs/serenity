@@ -120,7 +120,6 @@ impl CacheUpdate for ChannelCreateEvent {
                 .categories
                 .insert(category.read().id, Arc::clone(category))
                 .map(Channel::Category),
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -161,8 +160,7 @@ impl CacheUpdate for ChannelDeleteEvent {
             },
 
             // We ignore these because the delete event does not fire for these.
-            Channel::Group(_) |
-            Channel::__Nonexhaustive => unreachable!(),
+            Channel::Group(_) => unreachable!(),
         };
 
         // Remove the cached messages for the channel.
@@ -332,7 +330,6 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .get_mut(&category.read().id)
                     { c.clone_from(category) }
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
 
         None
@@ -1187,7 +1184,6 @@ impl CacheUpdate for ReadyEvent {
                     cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild)));
                 },
                 GuildStatus::OnlinePartialGuild(_) => {},
-                GuildStatus::__Nonexhaustive => unreachable!(),
             }
         }
 
@@ -1689,7 +1685,6 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             value: v,
             _nonexhaustive: (),
         }),
-        EventType::__Nonexhaustive => unreachable!(),
     })
 }
 

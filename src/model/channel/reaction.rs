@@ -307,7 +307,6 @@ impl Serialize for ReactionType {
 
                 map.end()
             },
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -328,7 +327,6 @@ impl ReactionType {
                 ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -467,7 +465,6 @@ impl Display for ReactionType {
                 f.write_char('>')
             },
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }

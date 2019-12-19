@@ -432,7 +432,6 @@ impl Connection {
                             None => 0,
                         }
                     },
-                    AudioType::__Nonexhaustive => unreachable!(),
                 };
 
                 // May need to force interleave/copy.

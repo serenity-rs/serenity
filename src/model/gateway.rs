@@ -359,7 +359,6 @@ impl ActivityType {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }

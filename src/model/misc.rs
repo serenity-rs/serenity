@@ -32,7 +32,6 @@ impl Mentionable for Channel {
             Channel::Private(ref x) => x.with(Mentionable::mention),
             Channel::Group(ref x) => x.with(Mentionable::mention),
             Channel::Category(ref x) => x.with(Mentionable::mention),
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -110,7 +109,6 @@ impl StdError for UserParseError {
         match *self {
             InvalidUsername => "invalid username",
             Rest(_) => "could not fetch",
-            __Nonexhaustive => unreachable!(),
         }
     }
 }

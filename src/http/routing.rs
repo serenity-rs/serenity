@@ -1438,7 +1438,6 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdPinsMessageId(channel_id),
                 Cow::from(Route::channel_pin(channel_id, message_id)),
             ),
-            RouteInfo::__Nonexhaustive => unreachable!(),
         }
     }
 }

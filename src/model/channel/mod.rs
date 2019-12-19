@@ -255,7 +255,6 @@ impl Channel {
             Channel::Category(ref category) => {
                 category.read().delete(cache_http)?;
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
 
         Ok(())
@@ -269,7 +268,6 @@ impl Channel {
             Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
             Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
             Channel::Group(_) | Channel::Private(_) => false,
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -285,7 +283,6 @@ impl Channel {
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
             Channel::Category(ref category) => category.with(|c| c.id),
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -348,7 +345,6 @@ impl Serialize for Channel {
             Channel::Private(ref c) => {
                 PrivateChannel::serialize(&*c.read(), serializer)
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -379,7 +375,6 @@ impl Display for Channel {
                 Display::fmt(&recipient.name, f)
             },
             Channel::Category(ref category) => Display::fmt(&category.read().name, f),
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -444,7 +439,6 @@ impl ChannelType {
             ChannelType::Category => "category",
             ChannelType::News => "news",
             ChannelType::Store => "store",
-            ChannelType::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -457,7 +451,6 @@ impl ChannelType {
             ChannelType::Category => 4,
             ChannelType::News => 5,
             ChannelType::Store => 6,
-            ChannelType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -503,7 +496,6 @@ impl Serialize for PermissionOverwrite {
         let (id, kind) = match self.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
-            PermissionOverwriteType::__Nonexhaustive => unreachable!(),
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;

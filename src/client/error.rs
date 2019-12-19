@@ -43,7 +43,6 @@ impl StdError for Error {
             Error::InvalidToken => "The provided token was invalid",
             Error::ShardBootFailure => "Failed to (re-)boot a shard",
             Error::Shutdown => "The clients shards shutdown",
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

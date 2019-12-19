@@ -125,7 +125,6 @@ impl OpCode {
             OpCode::InvalidSession => 9,
             OpCode::Hello => 10,
             OpCode::HeartbeatAck => 11,
-            OpCode::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -192,7 +191,6 @@ impl VoiceOpCode {
             VoiceOpCode::Resumed => 9,
             VoiceOpCode::ClientConnect => 12,
             VoiceOpCode::ClientDisconnect => 13,
-            VoiceOpCode::__Nonexhaustive => unreachable!(),
         }
     }
 }

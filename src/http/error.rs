@@ -101,7 +101,6 @@ impl StdError for Error {
             Error::Url(_) => "Provided URL is incorrect.",
             Error::InvalidHeader(_) => "Provided value is an invalid header value.",
             Error::Request(_) => "Error while sending HTTP request.",
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

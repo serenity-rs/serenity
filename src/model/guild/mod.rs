@@ -2041,7 +2041,6 @@ impl GuildStatus {
             GuildStatus::Offline(offline) => offline.id,
             GuildStatus::OnlineGuild(ref guild) => guild.id,
             GuildStatus::OnlinePartialGuild(ref partial_guild) => partial_guild.id,
-            GuildStatus::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -2068,7 +2067,6 @@ impl DefaultMessageNotificationLevel {
         match self {
             DefaultMessageNotificationLevel::All => 0,
             DefaultMessageNotificationLevel::Mentions => 1,
-            DefaultMessageNotificationLevel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -2099,7 +2097,6 @@ impl ExplicitContentFilter {
             ExplicitContentFilter::None => 0,
             ExplicitContentFilter::WithoutRole => 1,
             ExplicitContentFilter::All => 2,
-            ExplicitContentFilter::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -2126,7 +2123,6 @@ impl MfaLevel {
         match self {
             MfaLevel::None => 0,
             MfaLevel::Elevated => 1,
-            MfaLevel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -2176,7 +2172,6 @@ impl Region {
             Region::VipAmsterdam => "vip-amsterdam",
             Region::VipUsEast => "vip-us-east",
             Region::VipUsWest => "vip-us-west",
-            Region::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -2218,7 +2213,6 @@ impl VerificationLevel {
             VerificationLevel::Medium => 2,
             VerificationLevel::High => 3,
             VerificationLevel::Higher => 4,
-            VerificationLevel::__Nonexhaustive => unreachable!(),
         }
     }
 }

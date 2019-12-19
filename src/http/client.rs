@@ -1183,7 +1183,6 @@ impl Http {
         let (after, before) = match *target {
             GuildPagination::After(id) => (Some(id.0), None),
             GuildPagination::Before(id) => (None, Some(id.0)),
-            GuildPagination::__Nonexhaustive => unreachable!(),
         };
 
         self.fire(Request {
@@ -1471,7 +1470,6 @@ impl Http {
                     multipart = multipart
                         .file(file_num.to_string(), path)?;
                 },
-                AttachmentType::__Nonexhaustive => unreachable!(),
             }
 
             unsafe {

@@ -157,7 +157,6 @@ impl ConnectionStage {
         match self {
             Connecting | Handshake | Identifying | Resuming => true,
             Connected | Disconnected => false,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -173,7 +172,6 @@ impl Display for ConnectionStage {
             Handshake => "handshaking",
             Identifying => "identifying",
             Resuming => "resuming",
-            __Nonexhaustive => unreachable!(),
         })
     }
 }

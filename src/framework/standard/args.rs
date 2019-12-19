@@ -28,7 +28,6 @@ impl<E: fmt::Display> fmt::Display for Error<E> {
         match *self {
             Eos => write!(f, "ArgError(\"end of string\")"),
             Parse(ref e) => write!(f, "ArgError(\"{}\")", e),
-            __Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -38,7 +37,6 @@ impl<E: fmt::Debug + fmt::Display> StdError for Error<E> {
         match self {
             Error::Eos => "end-of-string",
             Error::Parse(_) => "parse-failure",
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

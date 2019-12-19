@@ -1137,7 +1137,6 @@ impl Content {
             ContentModifier::Spoiler => {
                 self.spoiler = true;
             },
-            ContentModifier::__Nonexhaustive => unreachable!(),
         }
     }
 
