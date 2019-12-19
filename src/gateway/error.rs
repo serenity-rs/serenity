@@ -12,6 +12,7 @@ use tungstenite::protocol::CloseFrame;
 ///
 /// Note that - from a user standpoint - there should be no situation in which
 /// you manually handle these.
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum Error {
     /// There was an error building a URL.
@@ -50,8 +51,6 @@ pub enum Error {
     OverloadedShard,
     /// Failed to reconnect after a number of attempts.
     ReconnectFailure,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Display for Error {

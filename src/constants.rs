@@ -64,6 +64,7 @@ pub static JOIN_MESSAGES: &[&str] = &[
 ];
 
 /// Enum to map gateway opcodes.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum OpCode {
     /// Dispatches an event.
@@ -90,8 +91,6 @@ pub enum OpCode {
     Hello = 10,
     /// Sent immediately following a client heartbeat that was received.
     HeartbeatAck = 11,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -132,6 +131,7 @@ impl OpCode {
 }
 
 /// Enum to map voice opcodes.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum VoiceOpCode {
     /// Used to begin a voice websocket connection.
@@ -158,8 +158,6 @@ pub enum VoiceOpCode {
     ClientConnect = 12,
     /// Message indicating that another user has disconnected from the voice channel.
     ClientDisconnect = 13,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(

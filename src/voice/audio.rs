@@ -40,12 +40,11 @@ pub trait AudioReceiver: Send {
     fn client_disconnect(&mut self, _user_id: u64) { }
 }
 
+#[non_exhaustive]
 #[derive(Clone, Copy)]
 pub enum AudioType {
     Opus,
     Pcm,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Control object for audio playback.

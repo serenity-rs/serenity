@@ -96,6 +96,7 @@ impl<F: FromStr> FromStrAndCache for F {
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [`http`]: ../http/index.html
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub struct Cache {
     /// A map of channels in [`Guild`]s that the current user has received data
@@ -198,7 +199,6 @@ pub struct Cache {
     pub(crate) message_queue: HashMap<ChannelId, VecDeque<MessageId>>,
     /// The settings for the cache.
     settings: Settings,
-    __nonexhaustive: (),
 }
 
 impl Cache {
@@ -849,7 +849,6 @@ impl Default for Cache {
             user: CurrentUser::default(),
             users: HashMap::default(),
             message_queue: HashMap::default(),
-            __nonexhaustive: (),
         }
     }
 }

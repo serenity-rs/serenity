@@ -74,11 +74,10 @@ fn context(
 
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
 pub(crate) enum DispatchEvent {
     Client(ClientEvent),
     Model(Event),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(feature = "framework")]

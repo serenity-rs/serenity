@@ -74,6 +74,7 @@ use super::Permissions;
 /// [`Error::Model`]: ../../enum.Error.html#variant.Model
 /// [`GuildId::ban`]: ../id/struct.GuildId.html#method.ban
 /// [`model`]: ../index.html
+#[non_exhaustive]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
@@ -138,8 +139,6 @@ pub enum Error {
     ///
     /// [`ChannelType`]: ../channel/enum.ChannelType.html
     InvalidChannelType,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Display for Error {

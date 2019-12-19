@@ -332,6 +332,7 @@ pub struct ActivitySecrets {
     pub(crate) _nonexhaustive: (),
 }
 
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug)]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.
@@ -340,8 +341,6 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(

@@ -688,6 +688,7 @@ pub struct MessageReaction {
 }
 
 /// Differentiates between regular and different types of system messages.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum MessageType {
     /// A regular message.
@@ -714,8 +715,6 @@ pub enum MessageType {
     NitroTier2 = 10,
     /// An indicator that the guild has reached nitro tier 3
     NitroTier3 = 11,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -757,6 +756,7 @@ impl MessageType {
     }
 }
 
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum MessageActivityKind {
     JOIN = 1,
@@ -764,8 +764,6 @@ pub enum MessageActivityKind {
     LISTEN = 3,
     #[allow(non_camel_case_types)]
     JOIN_REQUEST = 5,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(

@@ -51,6 +51,7 @@ pub type Result<T> = StdResult<T, Error>;
 /// [`Gateway`]: #variant.Gateway
 /// [`GatewayError`]: gateway/enum.GatewayError.html
 /// [`Result`]: type.Result.html
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum Error {
     /// An error while decoding a payload.
@@ -108,8 +109,6 @@ pub enum Error {
     /// [voice module]: voice/index.html
     #[cfg(feature = "voice")]
     Voice(VoiceError),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl From<FormatError> for Error {

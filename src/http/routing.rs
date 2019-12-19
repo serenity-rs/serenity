@@ -9,6 +9,7 @@ use super::LightMethod;
 /// in the [`http`] module.
 ///
 /// [`http`]: ../index.html
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum Route {
     /// Route for the `/channels/:channel_id` path.
@@ -261,8 +262,6 @@ pub enum Route {
     /// This is a special case, in that if the route is `None` then pre- and
     /// post-hooks are not executed.
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Route {
@@ -619,6 +618,7 @@ impl Route {
     }
 }
 
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum RouteInfo<'a> {
     AddGroupRecipient {
@@ -915,8 +915,6 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'a> RouteInfo<'a> {

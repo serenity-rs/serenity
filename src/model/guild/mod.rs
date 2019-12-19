@@ -1851,7 +1851,7 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let preferred_locale = map.remove("preferred_locale") 
+        let preferred_locale = map.remove("preferred_locale")
             .ok_or_else(|| DeError::custom("expected preferred locale"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
@@ -1931,14 +1931,13 @@ fn closest_to_origin(origin: &str, word_a: &str, word_b: &str) -> std::cmp::Orde
 /// This is used to differentiate whether a guild itself can be used or whether
 /// a guild needs to be retrieved from the cache.
 #[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum GuildContainer {
     /// A guild which can have its contents directly searched.
     Guild(PartialGuild),
     /// A guild's id, which can be used to search the cache for a guild.
     Id(GuildId),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Information relating to a guild's widget embed.
@@ -2023,14 +2022,13 @@ pub struct GuildUnavailable {
 }
 
 #[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum GuildStatus {
     OnlinePartialGuild(PartialGuild),
     OnlineGuild(Guild),
     Offline(GuildUnavailable),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(feature = "model")]
@@ -2049,14 +2047,13 @@ impl GuildStatus {
 }
 
 /// Default message notification level for a guild.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum DefaultMessageNotificationLevel {
     /// Receive notifications for everything.
     All = 0,
     /// Receive only mentions.
     Mentions = 1,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -2077,6 +2074,7 @@ impl DefaultMessageNotificationLevel {
 }
 
 /// Setting used to filter explicit messages from members.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ExplicitContentFilter {
     /// Don't scan any messages.
@@ -2085,8 +2083,6 @@ pub enum ExplicitContentFilter {
     WithoutRole = 1,
     /// Scan messages sent by all members.
     All = 2,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -2109,14 +2105,13 @@ impl ExplicitContentFilter {
 }
 
 /// Multi-Factor Authentication level for guild moderators.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum MfaLevel {
     /// MFA is disabled.
     None = 0,
     /// MFA is enabled.
     Elevated = 1,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -2137,6 +2132,7 @@ impl MfaLevel {
 }
 
 /// The name of a region that a voice server can be located in.
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum Region {
     #[serde(rename = "amsterdam")] Amsterdam,
@@ -2157,8 +2153,6 @@ pub enum Region {
     #[serde(rename = "vip-amsterdam")] VipAmsterdam,
     #[serde(rename = "vip-us-east")] VipUsEast,
     #[serde(rename = "vip-us-west")] VipUsWest,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Region {
@@ -2191,6 +2185,7 @@ impl Region {
     messages in a [`Guild`].
 
     [`Guild`]: struct.Guild.html"]
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum VerificationLevel {
     /// Does not require any verification.
@@ -2203,8 +2198,6 @@ pub enum VerificationLevel {
     High = 3,
     /// Must have a verified phone on the user's Discord account.
     Higher = 4,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(

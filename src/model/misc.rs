@@ -90,12 +90,11 @@ impl Mentionable for GuildChannel {
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum UserParseError {
     InvalidUsername,
     Rest(Box<Error>),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -269,6 +268,7 @@ pub struct IncidentUpdate {
 }
 
 /// The type of status update during a service incident.
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 #[serde(rename_all = "snake_case")]
 pub enum IncidentStatus {
@@ -277,8 +277,6 @@ pub enum IncidentStatus {
     Monitoring,
     Postmortem,
     Resolved,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// A Discord status maintenance message. This can be either for active

@@ -1359,6 +1359,7 @@ impl Serialize for VoiceStateUpdateEvent {
     }
 }
 
+#[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct WebhookUpdateEvent {
     pub channel_id: ChannelId,
@@ -1378,8 +1379,6 @@ pub enum GatewayEvent {
     InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for GatewayEvent {
@@ -1450,6 +1449,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 
 /// Event received over a websocket connection
 #[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[serde(untagged)]
 pub enum Event {
@@ -1564,8 +1564,6 @@ pub enum Event {
     WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Deserializes a `serde_json::Value` into an `Event`.
@@ -1704,6 +1702,7 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 /// [`EventType::ChannelCreate`].
 ///
 /// [`EventType::ChannelCreate`]: enum.EventType.html#variant.ChannelCreate
+#[non_exhaustive]
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 pub enum EventType {
     /// Indicator that a channel create payload was received.
@@ -1933,8 +1932,6 @@ pub enum EventType {
     /// This should be logged so that support for it can be added in the
     /// library.
     Other(String),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for EventType {
@@ -2022,7 +2019,7 @@ impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
 pub struct VoiceReady {
     pub heartbeat_interval: u64,
     pub modes: Vec<String>,
-    pub ip: String, 
+    pub ip: String,
     pub port: u16,
     pub ssrc: u32,
     #[serde(skip)]
@@ -2081,6 +2078,7 @@ pub struct VoiceClientDisconnect {
 /// A representation of data received for [`voice`] events.
 ///
 /// [`voice`]: ../../voice/index.html
+#[non_exhaustive]
 #[derive(Clone, Debug, Serialize)]
 #[serde(untagged)]
 pub enum VoiceEvent {
@@ -2111,8 +2109,6 @@ pub enum VoiceEvent {
     ClientDisconnect(VoiceClientDisconnect),
     /// An unknown voice event not registered.
     Unknown(VoiceOpCode, Value),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for VoiceEvent {

@@ -16,13 +16,12 @@ pub mod buckets;
 
 pub use self::check::*;
 
+#[non_exhaustive]
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum OnlyIn {
     Dm,
     Guild,
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Default for OnlyIn {
@@ -136,6 +135,7 @@ impl PartialEq for HelpCommand {
 /// Lacking required permissions to execute the command.
 /// Lacking required roles to execute the command.
 /// The command can't be used in the current channel (as in `DM only` or `guild only`).
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, PartialOrd, Ord, Eq, PartialEq)]
 pub enum HelpBehaviour {
     /// The command will be displayed, hence nothing will be done.
@@ -144,8 +144,6 @@ pub enum HelpBehaviour {
     Strike,
     /// Does not list a command in the help-menu.
     Hide,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[derive(Clone, Debug, PartialEq)]

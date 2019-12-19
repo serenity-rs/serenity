@@ -15,6 +15,7 @@ use std::{
 };
 
 /// Determines to what entity an action was used on.
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum Target {
@@ -26,11 +27,10 @@ pub enum Target {
     Webhook = 60,
     Emoji = 70,
     Integration = 80,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Determines the action that was done on a target.
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum Action {
     GuildUpdate,
@@ -43,8 +43,6 @@ pub enum Action {
     Emoji(ActionEmoji),
     Message(ActionMessage),
     Integration(ActionIntegration),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Action {
@@ -67,14 +65,13 @@ impl Action {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionChannel {
     Create = 10,
     Update = 11,
     Delete = 12,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionChannel {
@@ -88,14 +85,13 @@ impl ActionChannel {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionChannelOverwrite {
     Create = 13,
     Update = 14,
     Delete = 15,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionChannelOverwrite {
@@ -109,6 +105,7 @@ impl ActionChannelOverwrite {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionMember {
@@ -121,8 +118,6 @@ pub enum ActionMember {
     MemberMove = 26,
     MemberDisconnect = 27,
     BotAdd = 28,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionMember {
@@ -142,14 +137,13 @@ impl ActionMember {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionRole {
     Create = 30,
     Update = 31,
     Delete = 32,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionRole {
@@ -163,14 +157,13 @@ impl ActionRole {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionInvite {
     Create = 40,
     Update = 41,
     Delete = 42,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionInvite {
@@ -184,14 +177,13 @@ impl ActionInvite {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionWebhook {
     Create = 50,
     Update = 51,
     Delete = 52,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionWebhook {
@@ -205,14 +197,13 @@ impl ActionWebhook {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionEmoji {
     Create = 60,
     Delete = 61,
     Update = 62,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionEmoji {
@@ -226,6 +217,7 @@ impl ActionEmoji {
     }
 }
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionMessage {
@@ -233,8 +225,6 @@ pub enum ActionMessage {
     BulkDelete = 73,
     Pin = 74,
     Unpin = 75,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionMessage {
@@ -250,14 +240,13 @@ impl ActionMessage {
 }
 
 
+#[non_exhaustive]
 #[derive(Debug)]
 #[repr(u8)]
 pub enum ActionIntegration {
     Create = 80,
     Update = 81,
     Delete = 82,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionIntegration {

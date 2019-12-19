@@ -352,6 +352,7 @@ impl CurrentUser {
 /// The has of the avatar can be retrieved via calling [`name`] on the enum.
 ///
 /// [`name`]: #method.name
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum DefaultAvatar {
     /// The avatar when the result is `0`.
@@ -369,8 +370,6 @@ pub enum DefaultAvatar {
     /// The avatar when the result is `4`.
     #[serde(rename = "1cbd08c76f8af6dddce02c5138971129")]
     Red,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl DefaultAvatar {
@@ -387,6 +386,7 @@ impl DefaultAvatar {
 ///
 /// [`DoNotDisturb`]: #variant.DoNotDisturb
 /// [`Invisible`]: #variant.Invisible
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub enum OnlineStatus {
     #[serde(rename = "dnd")] DoNotDisturb,
@@ -394,8 +394,6 @@ pub enum OnlineStatus {
     #[serde(rename = "invisible")] Invisible,
     #[serde(rename = "offline")] Offline,
     #[serde(rename = "online")] Online,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl OnlineStatus {

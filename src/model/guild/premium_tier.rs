@@ -1,4 +1,5 @@
 /// The guild's premium tier, depends on the amount of users boosting the guild currently
+#[non_exhaustive]
 #[derive(Debug, Clone, Copy, Eq, PartialEq, Ord, PartialOrd, Hash)]
 pub enum PremiumTier {
     /// No tier, considered None
@@ -6,8 +7,6 @@ pub enum PremiumTier {
     Tier1,
     Tier2,
     Tier3,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -16,7 +15,6 @@ enum_number!(
         Tier1,
         Tier2,
         Tier3,
-        __Nonexhaustive,
     }
 );
 

@@ -45,6 +45,7 @@ use std::sync::Arc;
 use parking_lot::RwLock;
 
 /// A container for any channel.
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum Channel {
     /// A group. A group comprises of only one channel.
@@ -64,8 +65,6 @@ pub enum Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     Category(Arc<RwLock<ChannelCategory>>),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Channel {
@@ -386,6 +385,7 @@ impl Display for Channel {
 }
 
 /// A representation of a type of channel.
+#[non_exhaustive]
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ChannelType {
     /// An indicator that the channel is a text [`GuildChannel`].
@@ -420,8 +420,6 @@ pub enum ChannelType {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     Store = 6,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -523,14 +521,13 @@ impl Serialize for PermissionOverwrite {
 /// This is for use with methods such as `GuildChannel::create_permission`.
 ///
 /// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.
     Member(UserId),
     /// A role which is having its permission overwrites edited.
     Role(RoleId),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(test)]

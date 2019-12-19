@@ -6,14 +6,13 @@ use std::marker::PhantomData;
 use std::{fmt, str::FromStr};
 
 /// Defines how an operation on an `Args` method failed.
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum Error<E> {
     /// "END-OF-STRING". We reached the end. There's nothing to parse anymore.
     Eos,
     /// Parsing operation failed. Contains how it did.
     Parse(E),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<E> From<E> for Error<E> {

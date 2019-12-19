@@ -40,6 +40,7 @@ use crate::internal::RwLockExt;
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum DispatchError {
     /// When a custom function check has failed.
@@ -76,8 +77,6 @@ pub enum DispatchError {
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 pub type DispatchHook = dyn Fn(&mut Context, &Message, DispatchError) + Send + Sync + 'static;

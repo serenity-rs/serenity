@@ -193,6 +193,7 @@ impl Reaction {
 /// The type of a [`Reaction`] sent.
 ///
 /// [`Reaction`]: struct.Reaction.html
+#[non_exhaustive]
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
 pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
@@ -213,8 +214,6 @@ pub enum ReactionType {
     },
     /// A reaction with a twemoji.
     Unicode(String),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for ReactionType {

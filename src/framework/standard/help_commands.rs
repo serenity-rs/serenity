@@ -180,6 +180,7 @@ impl Suggestions {
 /// Covers possible outcomes of a help-request and
 /// yields relevant data in customised textual
 /// representation.
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum CustomisedHelpData<'a> {
     /// To display suggested commands.
@@ -196,8 +197,6 @@ pub enum CustomisedHelpData<'a> {
     SingleCommand { command: Command<'a> },
     /// To display failure in finding a fitting command.
     NoCommandFound { help_error_message: &'a str },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Wraps around a `Vec<Vec<T>>` and provides access

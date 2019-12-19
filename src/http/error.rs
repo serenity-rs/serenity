@@ -51,6 +51,7 @@ impl From<Response> for ErrorResponse {
 }
 
 
+#[non_exhaustive]
 #[derive(Debug)]
 pub enum Error {
     /// When a non-successful status code was received for a request.
@@ -67,8 +68,6 @@ pub enum Error {
     InvalidHeader(InvalidHeaderValue),
     /// Reqwest's Error contain information on why sending a request failed.
     Request(ReqwestError),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl From<ReqwestError> for Error {

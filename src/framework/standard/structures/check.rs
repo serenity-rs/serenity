@@ -15,6 +15,7 @@ use crate::framework::standard::{Args, CommandOptions};
 ///
 /// [`Check`]: struct.Check.html
 /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum Reason {
     /// No information on the failure.
@@ -25,8 +26,6 @@ pub enum Reason {
     Log(String),
     /// Information for the user but also for logging purposes.
     UserAndLog { user: String, log: String },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Returned from [`Check`]s.

@@ -82,6 +82,7 @@ fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>>{
 }
 
 /// An error that occured while connecting over rustls
+#[non_exhaustive]
 #[derive(Debug)]
 #[cfg(not(feature = "native_tls_backend"))]
 pub enum RustlsError {
@@ -91,8 +92,6 @@ pub enum RustlsError {
     HandshakeError,
     /// Standard IO error happening while creating the tcp stream
     Io(IoError),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(not(feature = "native_tls_backend"))]

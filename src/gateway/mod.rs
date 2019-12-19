@@ -83,6 +83,7 @@ pub type WsClient = WebSocket<AutoStream>;
 /// This can be useful for knowing which shards are currently "down"/"up".
 ///
 /// [`Shard`]: struct.Shard.html
+#[non_exhaustive]
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
@@ -114,8 +115,6 @@ pub enum ConnectionStage {
     ///
     /// [`Shard`]: struct.Shard.html
     Resuming,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ConnectionStage {
@@ -184,29 +183,26 @@ impl Display for ConnectionStage {
 /// As a user you usually don't need to worry about this, but when working with
 /// the lower-level internals of the `client`, `gateway, and `voice` modules it
 /// may be necessary.
+#[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum InterMessage {
     #[cfg(feature = "client")]
     Client(Box<ShardClientMessage>),
     Json(Value),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
+#[non_exhaustive]
 pub enum ShardAction {
     Heartbeat,
     Identify,
     Reconnect(ReconnectType),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// The type of reconnection that should be performed.
+#[non_exhaustive]
 pub enum ReconnectType {
     /// Indicator that a new connection should be made by sending an IDENTIFY.
     Reidentify,
     /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
