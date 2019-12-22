@@ -268,8 +268,9 @@ impl GuildChannel {
     /// [Send TTS Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_TTS_MESSAGES
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(&http, target)
+    pub fn create_permission<S: ToString>(&self, http: impl AsRef<Http>, target: &PermissionOverwrite, reason: Option<&S>)
+                -> Result<()> {
+        self.id.create_permission(&http, target, reason)
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.

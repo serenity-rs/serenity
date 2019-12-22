@@ -289,12 +289,13 @@ impl Http {
     }
 
     /// Creates a permission override for a member or a role in a channel.
-    pub fn create_permission(&self, channel_id: u64, target_id: u64, map: &Value) -> Result<()> {
+    pub fn create_permission<S: ToString>(&self, channel_id: u64, target_id: u64, map: &Value, reason: Option<&S>)
+                    -> Result<()> {
         let body = serde_json::to_vec(map)?;
 
         self.wind(204, Request {
             body: Some(&body),
-            headers: None,
+            headers: reason.map(Self::reason_into_header),
             route: RouteInfo::CreatePermission { channel_id, target_id },
         })
     }

@@ -46,8 +46,9 @@ impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(&http, target)
+    pub fn create_permission<S: ToString>(&self, http: impl AsRef<Http>, target: &PermissionOverwrite, reason: Option<&S>)
+                -> Result<()> {
+        self.id.create_permission(&http, target, reason)
     }
 
     /// Deletes all permission overrides in the category from the channels.
