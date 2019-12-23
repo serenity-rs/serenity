@@ -53,6 +53,8 @@ pub struct Activity {
     pub secrets: Option<ActivitySecrets>,
     /// The user's current party status.
     pub state: Option<String>,
+    /// Emoji currently used in custom status
+    pub emoji: Option<ActivityEmoji>,
     /// Unix timestamps for the start and/or end times of the activity.
     pub timestamps: Option<ActivityTimestamps>,
     /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
@@ -105,6 +107,7 @@ impl Activity {
             party: None,
             secrets: None,
             state: None,
+            emoji: None,
             timestamps: None,
             url: None,
             _nonexhaustive: (),
@@ -153,6 +156,7 @@ impl Activity {
             party: None,
             secrets: None,
             state: None,
+            emoji: None,
             timestamps: None,
             url: Some(url.to_string()),
             _nonexhaustive: (),
@@ -198,6 +202,7 @@ impl Activity {
             party: None,
             secrets: None,
             state: None,
+            emoji: None,
             timestamps: None,
             url: None,
             _nonexhaustive: (),
@@ -248,6 +253,10 @@ impl<'de> Deserialize<'de> for Activity {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+        let emoji = match map.remove("emoji") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
         let timestamps = match map.remove("timestamps") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
@@ -266,6 +275,7 @@ impl<'de> Deserialize<'de> for Activity {
             party,
             secrets,
             state,
+            emoji,
             timestamps,
             url,
             _nonexhaustive: (),
@@ -332,7 +342,19 @@ pub struct ActivitySecrets {
     pub(crate) _nonexhaustive: (),
 }
 
-#[derive(Clone, Copy, Debug)]
+/// Representation of an emoji used in a custom status
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ActivityEmoji {
+    /// The name of the emoji.
+    pub name: String,
+    /// The id of the emoji.
+    pub id: Option<EmojiId>,
+    /// Whether this emoji is animated.
+    pub animated: Option<bool>,
+}
+
+
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.
     Playing = 0,
@@ -340,6 +362,8 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
+    /// An indicator that the user uses custum statuses
+    Custom = 4,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -349,6 +373,7 @@ enum_number!(
         Playing,
         Streaming,
         Listening,
+        Custom,
     }
 );
 
@@ -360,6 +385,7 @@ impl ActivityType {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
+            Custom => 4,
             __Nonexhaustive => unreachable!(),
         }
     }
