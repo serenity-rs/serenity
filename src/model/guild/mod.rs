@@ -718,8 +718,8 @@ impl Guild {
     /// Change the order of a role:
     ///
     /// ```rust,ignore
-    /// use serenity::model::RoleId;
-    /// guild.edit_role_position(RoleId(8), 2);
+    /// use serenity::model::id::RoleId;
+    /// guild.edit_role_position(&context, RoleId(8), 2);
     /// ```
     ///
     /// [`Role`]: struct.Role.html
