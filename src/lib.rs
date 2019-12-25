@@ -116,5 +116,6 @@ pub struct CacheAndHttp {
 extern crate self as serenity;
 
 // For the procedural macros in `command_attr`.
+#[cfg(feature = "standard_framework")]
 #[doc(hidden)]
 pub use static_assertions;
