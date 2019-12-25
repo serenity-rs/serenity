@@ -178,14 +178,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         sub_commands,
     } = options;
 
-    propagate_err!(validate_declaration(&mut fun, DeclarFor::Command));
+    propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Command));
 
-    let either = [
-        parse_quote!(CommandResult),
-        parse_quote!(serenity::framework::standard::CommandResult),
-    ];
-
-    propagate_err!(validate_return_type(&mut fun, either));
+    let res = parse_quote!(serenity::framework::standard::CommandResult);
+    create_return_type_validation(&mut fun, res);
 
     let name = fun.name.clone();
     let options = name.with_suffix(COMMAND_OPTIONS);
@@ -430,14 +426,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let strikethrough_commands_tip_in_dm = AsOption(strikethrough_commands_tip_in_dm);
     let strikethrough_commands_tip_in_guild = AsOption(strikethrough_commands_tip_in_guild);
 
-    propagate_err!(validate_declaration(&mut fun, DeclarFor::Help));
+    propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Help));
 
-    let either = [
-        parse_quote!(CommandResult),
-        parse_quote!(serenity::framework::standard::CommandResult),
-    ];
-
-    propagate_err!(validate_return_type(&mut fun, either));
+    let res = parse_quote!(serenity::framework::standard::CommandResult);
+    create_return_type_validation(&mut fun, res);
 
     let options = fun.name.with_suffix(HELP_OPTIONS);
 
@@ -687,9 +679,9 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
 }
 
 /// A macro for marking a function as a condition checker to groups and commands.
-/// 
+///
 /// ## Options
-/// 
+///
 /// | Syntax                                             | Description                                                              | Argument explanation                                                                 |
 /// |----------------------------------------------------|--------------------------------------------------------------------------|--------------------------------------------------------------------------------------|
 /// | `#[name(s)]` </br> `#[name = s]`                   | How the check should be listed in help.                                  | `s` is a string. If this option isn't provided, the value is assumed to be `"<fn>"`. |
@@ -722,14 +714,10 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
         }
     }
 
-    propagate_err!(validate_declaration(&mut fun, DeclarFor::Check));
+    propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Check));
 
-    let either = [
-        parse_quote!(CheckResult),
-        parse_quote!(serenity::framework::standard::CheckResult),
-    ];
-
-    propagate_err!(validate_return_type(&mut fun, either));
+    let res = parse_quote!(serenity::framework::standard::CheckResult);
+    create_return_type_validation(&mut fun, res);
 
     let n = fun.name.clone();
     let n2 = name.clone();
