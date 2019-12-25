@@ -17,6 +17,10 @@ log = "0.4"
 parking_lot = "0.9"
 serde_json = "1"
 
+[dependencies.static_assertions]
+optional = true
+version = "1.1"
+
 [dependencies.audiopus]
 optional = true
 version = "0.1"
@@ -147,7 +151,7 @@ absolute_ratelimits = ["http"]
 rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls", "webpki", "webpki-roots"]
 native_tls_backend = ["reqwest/default-tls", "tungstenite/tls"]
 model = ["builder", "http"]
-standard_framework = ["framework", "uwl", "command_attr"]
+standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide"]
 
