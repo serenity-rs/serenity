@@ -441,6 +441,7 @@ pub struct User {
 }
 
 use std::hash::{Hash, Hasher};
+#[cfg(feature = "model")]
 use chrono::{DateTime, FixedOffset};
 
 impl PartialEq for User {
