@@ -89,7 +89,7 @@ version = "0.3"
 
 [dependencies.url]
 optional = true
-version = "2"
+version = "^2.1"
 
 [dependencies.webpki]
 optional = true
@@ -97,7 +97,7 @@ version = "0.21"
 
 [dependencies.webpki-roots]
 optional = true
-version = "0.17"
+version = "0.18"
 
 [dev-dependencies.http_crate]
 version = "0.2"
