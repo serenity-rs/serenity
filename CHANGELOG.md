@@ -3,6 +3,69 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.0] - 2019-01-12
+
+The next major release of Serenity, coupled with improvements, bugfixes and some breaking changes.
+
+### `group!` is now `#[group]`
+
+To stay consistent with the `#[command]`, `#[help]` and `#[check]` macros,
+the function-like `group!` procedural macro has also joined in to
+the squad of the attribute procedural macros.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@CarlGroth]
+- [@Erk-]
+- [@ikkerens]
+- [@Lakelezz]
+- [@LeSeulArtichaut]
+- [@Mendess2526]
+- [@nickelc]
+- [@TheUnitedStatesOfAmerica]
+- [@zeyla]
+
+### Added
+
+- [framework] Allow multiple examples in commands ([@Mendess2526]) [c:08d894e]
+- [gateway] Add support for receiving custom statuses ([@Erk-]) [c:f897a8d]
+
+### Changed
+
+- [http] Rename 'raw' module to 'client' ([@zeyla]) [c:8326dc7]
+- [http] Rework ratelimit structure ([@zeyla]) [c:5dbe078]
+- [cache/http] Use `CacheRwLock` in `CacheAndHttp` ([@Lakelezz]) [c:28a91c6]
+- [framework] Apply case-insensitivity on prefixes ([@acdenisSK]) [c:b2c951d]
+- [framework] Turn off the `owner_privilege` option ([@acdenisSK]) [c:d4b45f4]
+- [model] Ensure nullable Discord API values are optional in audit log fields ([@ikkerens]) [c:3a3f9b3]
+- [framework] Turn the function-like group macro to an attribute macro ([@acdenisSK]) [c:5b01290]
+- [http] Utilise Discord's new precision and reset-after headers ([@acdenisSK]) [c:6916bfc]
+- [http] Change `AttachmentType` to use `Cow`s instead ([@ikkerens]) [c:b5deb39]
+- [framework] Format the list of attribute options with tables ([@acdenisSK]) [c:3c2f9ad]
+- [framework] Impose thread-safety requirements on the event handlers ([@acdenisSK]) [c:3a449ee]
+- [framework] Deduplicate Client initialisation code ([@acdenisSK]) [c:e807288] [c:ab7f631]
+- [client/gateway] Add an option to turn off guild subscriptions ([@acdenisSK]) [c:db5a09e]
+- [framework] Interpret doc-comments as the description attribute ([@acdenisSK]) [c:cc2f918]
+- [framework] Account for checks in the help command ([@acdenisSK]) [c:240d3e6]
+- [framework] Add documentation to the `check` macro ([@acdenisSK]) [c:0b3ad00]
+- [model] Mark the `Event` enum as untagged (serde) ([@CarlGroth]) [c:173f7fa]
+- [model] Add new auditlog type enums ([@ikkerens]) [c:aed4b24]
+- [framework] Abuse the compiler to do type checking for us ([@acdenisSK]) [c:d6699c2]
+- [meta] Upgrade to reqwest v0.10.0 ([@nickelc]) [c:69f2dff]
+
+### Fixed
+
+- [http] Fix crash due to Bearer token not having the 'email' scope ([@LeSeulArtichaut]) [c:ae0acd0]
+- [model] Fix `Guild::edit_role_position` example ([@LeSeulArtichaut]) [c:346a7fe]
+- [utils] Fix compilation of the `utils` feature without the `model` feature ([@Erk-]) [c:487fa04]
+
+### Removed
+
+- [framework] Get rid of the `Arc` implementation for `Framework` ([@acdenisSK]) [c:05044b6]
+- [client] Turn the function-like group macro to an attribute macro ([@acdenisSK]) [c:5b01290]
+- [http] Remove april fools functions ([@TheUnitedStatesOfAmerica]) [c:caeeda1]
+
 ## [0.7.5] - 2019-01-13
 
 An emergency release to fix build breakage due to violation of SemVer for the `command_attr` crate.
@@ -3209,6 +3272,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.8.0]: https://github.com/serenity-rs/serenity/compare/v0.7.5...v0.8.0
 [0.7.5]: https://github.com/serenity-rs/serenity/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/serenity-rs/serenity/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/serenity-rs/serenity/compare/v0.7.2...v0.7.3
@@ -3259,7 +3323,6 @@ Initial commit.
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
 
-
 [@Alch-Emi]: https://github.com/Alch-Emi
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
@@ -3272,6 +3335,7 @@ Initial commit.
 [@bippum]: https://github.com/bippum
 [@blaenk]: https://github.com/blaenk
 [@Caemor]: https://github.com/Caemor
+[@CarlGroth]: https://github.com/CarlGroth
 [@Celti]: https://github.com/Celti
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@DarkKirb]: https://github.com/DarkKirb
@@ -3321,6 +3385,7 @@ Initial commit.
 [@MOZGIII]: https://github.com/MOZGIII
 [@NieDzejkob]: https://github.com/NieDzejkob
 [@nabijaczleweli]: https://github.com/nabijaczleweli
+[@nickelc]: https://github.com/nickelc
 [@nycex]: https://github.com/nycex
 [@Proximyst]: https://github.com/Proximyst
 [@perryprog]: https://github.com/perryprog
@@ -3343,6 +3408,36 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:05044b6]: https://github.com/serenity-rs/serenity/commit/05044b6f1bdf9047ebfc447e19d199f4a35816e6
+[c:8326dc7]: https://github.com/serenity-rs/serenity/commit/8326dc761e0c86672e37a78eecfd8cab22589c82
+[c:d189624]: https://github.com/serenity-rs/serenity/commit/d18962468010b7beed1b6311b8b1df42edff4530
+[c:5dbe078]: https://github.com/serenity-rs/serenity/commit/5dbe078c5395d0d39bda6a202e1dde367bf0de33
+[c:28a91c6]: https://github.com/serenity-rs/serenity/commit/28a91c61f13e08e15adc2b0cb7f211e4cf610c86
+[c:b2c951d]: https://github.com/serenity-rs/serenity/commit/b2c951d90acc2061824926573cc1dfe331d0c1e5
+[c:d4b45f4]: https://github.com/serenity-rs/serenity/commit/d4b45f4758e8545e913c70dcbf41a122e487ce5d
+[c:3a3f9b3]: https://github.com/serenity-rs/serenity/commit/3a3f9b380bfda440c002876eb0726d2f0a8a7d14
+[c:08d894e]: https://github.com/serenity-rs/serenity/commit/08d894ef5937c1877c1209816f103421b4c67b80
+[c:5b01290]: https://github.com/serenity-rs/serenity/commit/5b0129018301a2235d7cb97b52c9f89cff75da39
+[c:6916bfc]: https://github.com/serenity-rs/serenity/commit/6916bfc4d7a30ff331acc4635cd3f30a19c80f80
+[c:b5deb39]: https://github.com/serenity-rs/serenity/commit/b5deb391bf0521d049152218a8d774c8db474e5a
+[c:3c2f9ad]: https://github.com/serenity-rs/serenity/commit/3c2f9adf4d540597b620866773ac4b574eb71d12
+[c:3a449ee]: https://github.com/serenity-rs/serenity/commit/3a449ee8a11cadf1c09d93f860c97ef2dfb522a8
+[c:e807288]: https://github.com/serenity-rs/serenity/commit/e8072881af7cf8f826c2f3ae77684ad2a4893841
+[c:ab7f631]: https://github.com/serenity-rs/serenity/commit/ab7f6316b551ed0485dac99d328321d8363405e2
+[c:db5a09e]: https://github.com/serenity-rs/serenity/commit/db5a09e8c513befd5f41894baededd259f8b6df7
+[c:cc2f918]: https://github.com/serenity-rs/serenity/commit/cc2f918fba4b3a1dc8f0bb939a24bf020007de42
+[c:240d3e6]: https://github.com/serenity-rs/serenity/commit/240d3e63432f6a1d35ef0a40cbe48d5e9826409c
+[c:0b3ad00]: https://github.com/serenity-rs/serenity/commit/0b3ad00853d23db316e2bd0b5759617b598e61aa
+[c:173f7fa]: https://github.com/serenity-rs/serenity/commit/173f7fad1486e31c473293ed2ef7ff25a6ce2a08
+[c:aed4b24]: https://github.com/serenity-rs/serenity/commit/aed4b24e8e8c511748ae28f33a5ff81280ad1069
+[c:ae0acd0]: https://github.com/serenity-rs/serenity/commit/ae0acd0c6442e937c90e49843d66dfd11c544cfa
+[c:f897a8d]: https://github.com/serenity-rs/serenity/commit/f897a8dfc39598e055a838e92550de915aa4ef50
+[c:346a7fe]: https://github.com/serenity-rs/serenity/commit/346a7feb0da9167760bd69d1d1cc3478c6c379b6
+[c:d6699c2]: https://github.com/serenity-rs/serenity/commit/d6699c26c2ae2c29be1e1463b254e104fbd80064
+[c:69f2dff]: https://github.com/serenity-rs/serenity/commit/69f2dffdb3caa24e3387a2702593bcb57ba5e690
+[c:caeeda1]: https://github.com/serenity-rs/serenity/commit/caeeda155d1853125d2100f3d55b7060d9a27888
+[c:487fa04]: https://github.com/serenity-rs/serenity/commit/487fa0413c05f5c1ad688bb534dcedb15a428de8
 
 [c:e6ed1b5]: https://github.com/serenity-rs/serenity/commit/e6ed1b5987814174fcf66dff084be45386a68136
 [c:42937e9]: https://github.com/serenity-rs/serenity/commit/42937e9b7414455a9baefeb0c902ba81ff242de4
