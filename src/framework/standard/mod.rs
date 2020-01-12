@@ -29,7 +29,7 @@ use std::collections::HashMap;
 use std::sync::Arc;
 
 use threadpool::ThreadPool;
-use uwl::{UnicodeStream, StrExt};
+use uwl::Stream;
 
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
@@ -620,7 +620,7 @@ impl StandardFramework {
 
 impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        let mut stream = UnicodeStream::new(&msg.content);
+        let mut stream = Stream::new(&msg.content);
 
         stream.take_while(|s| s.is_whitespace());
 

@@ -1,4 +1,4 @@
-use uwl::UnicodeStream;
+use uwl::Stream;
 
 use std::cell::Cell;
 use std::error::Error as StdError;
@@ -101,7 +101,7 @@ impl Token {
     }
 }
 
-fn lex(stream: &mut UnicodeStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
+fn lex(stream: &mut Stream<'_>, delims: &[&Delimiter]) -> Option<Token> {
     if stream.at_end() {
         return None;
     }
@@ -109,31 +109,33 @@ fn lex(stream: &mut UnicodeStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
     for delim in delims {
         match delim {
             Delimiter::Single(c) => {
-                if stream.current()?.contains(*c) {
+                if stream.current()? == *c {
                     let start = stream.offset();
                     stream.next();
-                    return Some(Token::new(TokenKind::Delimiter, start, stream.offset()));
+                    return Some(Token::new(TokenKind::Delimiter, start, c.len_utf8()));
                 }
             }
             Delimiter::Multiple(s) => {
                 if *s == stream.peek_for(s.chars().count()) {
                     let start = stream.offset();
-                    // Move the offset pointer by `s.len()` bytes.
-                    unsafe { stream.set_unchecked(start + s.len()) };
+                    let end = start + s.len();
 
-                    return Some(Token::new(TokenKind::Delimiter, start, stream.offset()));
+                    // Move the offset pointer by `s.len()` bytes.
+                    stream.set(end);
+
+                    return Some(Token::new(TokenKind::Delimiter, start, end));
                 }
             }
         }
     }
 
-    if stream.current()? == "\"" {
+    if stream.current()? == '"' {
         let start = stream.offset();
         stream.next();
 
-        stream.take_until(|s| s == "\"");
+        stream.take_until(|s| s == '"');
 
-        let is_quote = stream.current().map_or(false, |s| s == "\"");
+        let is_quote = stream.current().map_or(false, |s| s == '"');
         stream.next();
 
         let end = stream.offset();
@@ -152,7 +154,7 @@ fn lex(stream: &mut UnicodeStream<'_>, delims: &[&Delimiter]) -> Option<Token> {
         for delim in delims {
             match delim {
                 Delimiter::Single(c) => {
-                    if stream.current()?.contains(*c) {
+                    if stream.current()? == *c {
                         break 'outer;
                     }
                 }
@@ -331,7 +333,7 @@ impl Args {
             vec![Token::new(kind, 0, message.len())]
         } else {
             let mut args = Vec::new();
-            let mut stream = UnicodeStream::new(message);
+            let mut stream = Stream::new(message);
 
             while let Some(token) = lex(&mut stream, &delims) {
                 if token.kind == TokenKind::Delimiter {

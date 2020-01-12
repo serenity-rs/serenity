@@ -36,11 +36,11 @@ features = ["derive"]
 
 [dependencies.uwl]
 optional = true
-version = "0.4.2"
+version = "0.5"
 
 [dependencies.base64]
 optional = true
-version = "0.10"
+version = "0.11"
 
 [dependencies.byteorder]
 optional = true
