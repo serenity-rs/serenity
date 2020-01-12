@@ -1,7 +1,7 @@
 use super::*;
 use crate::client::Context;
 use crate::model::channel::Message;
-use uwl::{StrExt, UnicodeStream};
+use uwl::Stream;
 
 pub mod map;
 
@@ -23,7 +23,7 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
 /// Returns `Some(<id>)` on success, `None` otherwise.
 ///
 /// [`Configuration::on_mention`]: ../struct.Configuration.html#method.on_mention
-pub fn mention<'a>(stream: &mut UnicodeStream<'a>, config: &Configuration) -> Option<&'a str> {
+pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'a str> {
     let on_mention = config.on_mention.as_ref().map(String::as_str)?;
 
     let start = stream.offset();
@@ -57,7 +57,7 @@ fn find_prefix<'a>(
     ctx: &mut Context,
     msg: &Message,
     config: &Configuration,
-    stream: &UnicodeStream<'a>,
+    stream: &Stream<'a>,
 ) -> Option<Cow<'a, str>> {
     let try_match = |prefix: &str| {
         let peeked = stream.peek_for(prefix.chars().count());
@@ -96,7 +96,7 @@ fn find_prefix<'a>(
 pub fn prefix<'a>(
     ctx: &mut Context,
     msg: &Message,
-    stream: &mut UnicodeStream<'a>,
+    stream: &mut Stream<'a>,
     config: &Configuration,
 ) -> Option<Cow<'a, str>> {
     if let Some(id) = mention(stream, config) {
@@ -169,7 +169,7 @@ fn check_discrepancy(
 }
 
 fn try_parse<M: ParseMap>(
-    stream: &mut UnicodeStream<'_>,
+    stream: &mut Stream<'_>,
     map: &M,
     by_space: bool,
     f: impl Fn(&str) -> String,
@@ -199,7 +199,7 @@ fn try_parse<M: ParseMap>(
 }
 
 fn parse_cmd(
-    stream: &mut UnicodeStream<'_>,
+    stream: &mut Stream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
@@ -236,7 +236,7 @@ fn parse_cmd(
 }
 
 fn parse_group(
-    stream: &mut UnicodeStream<'_>,
+    stream: &mut Stream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
@@ -268,7 +268,7 @@ fn parse_group(
 
 #[inline]
 fn handle_command(
-    stream: &mut UnicodeStream<'_>,
+    stream: &mut Stream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
@@ -286,7 +286,7 @@ fn handle_command(
 
 #[inline]
 fn handle_group(
-    stream: &mut UnicodeStream<'_>,
+    stream: &mut Stream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
@@ -321,7 +321,7 @@ impl From<DispatchError> for ParseError {
 pub fn command(
     ctx: &Context,
     msg: &Message,
-    stream: &mut UnicodeStream<'_>,
+    stream: &mut Stream<'_>,
     groups: &[(&'static CommandGroup, Map)],
     config: &Configuration,
     help_was_set: Option<&[&'static str]>,
