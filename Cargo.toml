@@ -27,7 +27,12 @@ version = "0.1"
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "=0.1.6"
+# FIXME: A terrible mistake was done. The version of command_attr
+# should've incremented from 0.1.6 to 0.2.0 as 0.1.7 is incompatible
+# with serenity 0.7.x, therefore violating the SemVer specification.
+# Upon a new release of `command_attr`, please increment to 0.2.0
+# and yank 0.1.7 from crates.io.
+version = "0.1.7"
 optional = true
 
 [dependencies.serde]
