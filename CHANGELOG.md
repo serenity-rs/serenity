@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.5] - 2019-01-13
+
+An emergency release to fix build breakage due to violation of SemVer for the `command_attr` crate.
+
 ## [0.7.4] - 2019-12-13
 
 Thanks to the following for their contributions:
@@ -3205,6 +3209,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.5]: https://github.com/serenity-rs/serenity/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/serenity-rs/serenity/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/serenity-rs/serenity/compare/v0.7.2...v0.7.3
 [0.7.2]: https://github.com/serenity-rs/serenity/compare/v0.7.1...v0.7.2
