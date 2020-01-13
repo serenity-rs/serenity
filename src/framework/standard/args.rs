@@ -716,10 +716,14 @@ impl Args {
 
         let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
             Some(p) => p,
-            None => return Err(Error::Eos),
+            None => {
+                self.offset = before;
+                return Err(Error::Eos);
+            },
         };
 
         self.offset = pos;
+
         let parsed = self.single_quoted::<T>()?;
 
         self.args.remove(pos);
@@ -752,12 +756,17 @@ impl Args {
 
         let before = self.offset;
         self.restore();
+
         let pos = match self.iter::<T>().quoted().position(|res| res.is_ok()) {
             Some(p) => p,
-            None => return Err(Error::Eos),
+            None => {
+                self.offset = before;
+                return Err(Error::Eos);
+            },
         };
 
         self.offset = pos;
+
         let parsed = self.quoted().parse::<T>()?;
 
         self.offset = before;
