@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.8.0] - 2019-01-12
+## [0.8.0] - 2020-01-12
 
 The next major release of Serenity, coupled with improvements, bugfixes and some breaking changes.
 
@@ -66,7 +66,7 @@ Thanks to the following for their contributions:
 - [client] Turn the function-like group macro to an attribute macro ([@acdenisSK]) [c:5b01290]
 - [http] Remove april fools functions ([@TheUnitedStatesOfAmerica]) [c:caeeda1]
 
-## [0.7.5] - 2019-01-13
+## [0.7.5] - 2020-01-13
 
 An emergency release to fix build breakage due to violation of SemVer for the `command_attr` crate.
 
