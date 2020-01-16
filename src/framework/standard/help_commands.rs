@@ -725,7 +725,7 @@ fn create_command_group_commands_pair_from_groups<'a>(
 
         let group_with_cmds = create_single_group(ctx, msg, group, &owners, &help_options);
 
-        if !group_with_cmds.command_names.is_empty() {
+        if !group_with_cmds.command_names.is_empty() || !group_with_cmds.sub_groups.is_empty() {
             listed_groups.push(group_with_cmds);
         }
     }
