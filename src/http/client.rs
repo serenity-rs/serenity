@@ -1644,7 +1644,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`fire`]: fn.fire.html
+    /// [`fire`]: #method.fire
     pub fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let ratelimiting_req = RatelimitedRequest::from(req);
         let response = self.ratelimiter.perform(ratelimiting_req)?;
