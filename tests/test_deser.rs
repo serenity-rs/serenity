@@ -148,12 +148,14 @@ fn message_update() {
 fn message_reaction_add() {
     p!(ReactionAddEvent, "message_reaction_add_1");
     p!(ReactionAddEvent, "message_reaction_add_2");
+    p!(ReactionAddEvent, "message_reaction_add_3");
 }
 
 #[test]
 fn message_reaction_remove() {
     p!(ReactionRemoveEvent, "message_reaction_remove_1");
     p!(ReactionRemoveEvent, "message_reaction_remove_2");
+    p!(ReactionRemoveEvent, "message_reaction_remove_3");
 }
 
 #[test]
