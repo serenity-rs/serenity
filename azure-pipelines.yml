@@ -2,49 +2,49 @@ jobs:
 - template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_stable'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-latest'
     toolchain: 'stable'
 
 - template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_beta'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-latest'
     toolchain: 'beta'
 
 - template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_nightly'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-latest'
     toolchain: 'nightly'
 
 - template: 'azure-template-unix.yml'
   parameters:
     name: 'Linux_stable'
-    vmImage: 'ubuntu-16.04'
+    vmImage: 'ubuntu-latest'
     toolchain: 'stable'
 
 - template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_stable_no_cache'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-latest'
     toolchain: 'stable'
     features: 'builder client framework gateway model http standard_framework utils rustls_backend'
 
 - template: 'azure-template-unix.yml'
   parameters:
     name: 'macOS_no_gateway'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-latest'
     toolchain: 'stable'
     features: 'model http rustls_backend'
 
 - template: 'azure-template-win.yml'
   parameters:
     name: 'Windows_stable'
-    vmImage: 'vs2017-win2016'
+    vmImage: 'windows-latest'
     toolchain: 'stable'
 
 - template: 'azure-build-examples.yml'
   parameters:
     name: 'macOS_build_examples'
-    vmImage: 'xcode9-macos10.13'
+    vmImage: 'macOS-latest'
     toolchain: 'stable'
