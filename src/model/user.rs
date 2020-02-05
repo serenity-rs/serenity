@@ -458,6 +458,19 @@ impl Hash for User {
     }
 }
 
+impl Default for User {
+    fn default() -> Self {
+        User {
+            id: UserId(210),
+            avatar: Some("abc".to_string()),
+            bot: true,
+            discriminator: 1432,
+            name: "test".to_string(),
+            _nonexhaustive: (),
+        }
+    }
+}
+
 #[cfg(feature = "model")]
 impl User {
     /// Returns the formatted URL of the user's icon, if one exists.
@@ -952,20 +965,9 @@ mod test {
         use crate::model::id::UserId;
         use crate::model::user::User;
 
-        fn gen() -> User {
-            User {
-                id: UserId(210),
-                avatar: Some("abc".to_string()),
-                bot: true,
-                discriminator: 1432,
-                name: "test".to_string(),
-                _nonexhaustive: (),
-            }
-        }
-
         #[test]
         fn test_core() {
-            let mut user = gen();
+            let mut user = User::default();
 
             assert!(
                 user.avatar_url()
@@ -998,7 +1000,7 @@ mod test {
 
         #[test]
         fn default_avatars() {
-            let mut user = gen();
+            let mut user = User::default();
 
             user.discriminator = 0;
             assert!(user.default_avatar_url().ends_with("0.png"));
