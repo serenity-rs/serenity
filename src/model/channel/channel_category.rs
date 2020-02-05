@@ -16,6 +16,8 @@ use crate::http::Http;
 pub struct ChannelCategory {
     /// Id of this category.
     pub id: ChannelId,
+    /// Id this category belongs to.
+    pub guild_id: GuildId,
     /// If this category belongs to another category.
     #[serde(rename = "parent_id")]
     pub category_id: Option<ChannelId>,
