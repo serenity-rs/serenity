@@ -1240,6 +1240,7 @@ pub struct ResumedEvent {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TypingStartEvent {
+    pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub timestamp: u64,
     pub user_id: UserId,
