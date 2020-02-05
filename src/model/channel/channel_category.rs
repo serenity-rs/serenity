@@ -98,6 +98,7 @@ impl ChannelCategory {
         cache_http.http().edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {
                 id,
+                guild_id,
                 category_id,
                 permission_overwrites,
                 nsfw,
@@ -109,6 +110,7 @@ impl ChannelCategory {
 
             *self = ChannelCategory {
                 id,
+                guild_id,
                 category_id,
                 permission_overwrites,
                 nsfw,
