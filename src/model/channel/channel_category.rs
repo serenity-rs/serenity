@@ -16,6 +16,8 @@ use crate::http::Http;
 pub struct ChannelCategory {
     /// Id of this category.
     pub id: ChannelId,
+    /// Guild Id this category belongs to.
+    pub guild_id: GuildId,
     /// If this category belongs to another category.
     #[serde(rename = "parent_id")]
     pub category_id: Option<ChannelId>,
@@ -96,6 +98,7 @@ impl ChannelCategory {
         cache_http.http().edit_channel(self.id.0, &map).map(|channel| {
             let GuildChannel {
                 id,
+                guild_id,
                 category_id,
                 permission_overwrites,
                 nsfw,
@@ -107,6 +110,7 @@ impl ChannelCategory {
 
             *self = ChannelCategory {
                 id,
+                guild_id,
                 category_id,
                 permission_overwrites,
                 nsfw,
