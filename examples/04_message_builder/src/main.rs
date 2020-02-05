@@ -26,7 +26,7 @@ impl EventHandler for Handler {
             // emojis, and more.
             let response = MessageBuilder::new()
                 .push("User ")
-                .push_bold_safe(msg.author.name)
+                .push_bold_safe(&msg.author.name)
                 .push(" used the 'ping' command in the ")
                 .mention(&channel)
                 .push(" channel")
