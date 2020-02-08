@@ -229,7 +229,7 @@ impl Member {
     #[inline]
     pub fn distinct(&self) -> String {
         format!(
-            "{}#{}",
+            "{}#{:04}",
             self.display_name(),
             self.user.read().discriminator
         )
