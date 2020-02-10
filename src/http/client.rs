@@ -26,6 +26,7 @@ use log::{debug, trace};
 use std::{
     collections::BTreeMap,
     sync::Arc,
+    borrow::Cow,
 };
 
 pub struct Http {
@@ -1429,6 +1430,14 @@ impl Http {
                 AttachmentType::Path(path) => {
                     multipart = multipart
                         .file(file_num.to_string(), path)?;
+                },
+                AttachmentType::Image(url) => {
+                    let mut picture: Vec<u8> = vec![];
+                    let mut req = reqwest::blocking::get(url).unwrap();
+                    let _ = std::io::copy(&mut req, &mut picture);
+                    multipart = multipart
+                        .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
+                            .file_name(format!("{}.webp", file_num)));
                 },
                 AttachmentType::__Nonexhaustive => unreachable!(),
             }
