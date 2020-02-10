@@ -202,7 +202,7 @@ pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a `Path`
     Path(&'a Path),
     /// Indicates that the `AttachmentType` is an image URL.
-    Image(&'a String),
+    Image(&'a str),
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -212,11 +212,13 @@ impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
-    fn from(s: &'a str) -> AttachmentType<'_> { AttachmentType::Path(Path::new(s)) }
-}
-
-impl<'a> From<&'a String> for AttachmentType<'a> {
-    fn from(s: &'a String) -> AttachmentType<'_> { AttachmentType::Image(s) }
+    fn from(s: &'a str) -> AttachmentType<'_> {
+        if s.starts_with("http://") || s.starts_with("https://") {
+            AttachmentType::Image(s)
+        } else {
+            AttachmentType::Path(Path::new(s))
+        }
+    }
 }
 
 impl<'a> From<&'a Path> for AttachmentType<'a> {
