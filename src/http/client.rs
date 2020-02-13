@@ -1440,7 +1440,10 @@ impl Http {
                         Some(p) => p,
                         None => return Err(Error::Url(url.to_string())),
                     };
-                    let filename = path_segments.last().unwrap();
+                    let filename = match path_segments.last() {
+                        Some(l) => l,
+                        None => return Err(Error::Url(url.to_string())),
+                    };
                     let mut picture: Vec<u8> = vec![];
                     let req = &mut self.client.get(url).send()?;
                     std::io::copy(&mut *req, &mut picture)?;
