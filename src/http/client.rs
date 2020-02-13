@@ -1432,12 +1432,21 @@ impl Http {
                         .file(file_num.to_string(), path)?;
                 },
                 AttachmentType::Image(url) => {
+                    let parsed_url = match Url::parse(url) {
+                        Ok(url) => url,
+                        Err(_) => return Err(Error::Url(url.to_string())),
+                    };
+                    let path_segments = match parsed_url.path_segments() {
+                        Some(p) => p,
+                        None => return Err(Error::Url(url.to_string())),
+                    };
+                    let filename = path_segments.last().unwrap();
                     let mut picture: Vec<u8> = vec![];
                     let req = &mut self.client.get(url).send()?;
                     std::io::copy(&mut *req, &mut picture)?;
                     multipart = multipart
                         .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
-                            .file_name(format!("{}.webp", file_num)));
+                            .file_name(filename.to_string()));
                 },
                 AttachmentType::__Nonexhaustive => unreachable!(),
             }
