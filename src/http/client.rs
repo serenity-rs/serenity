@@ -1434,7 +1434,7 @@ impl Http {
                 AttachmentType::Image(url) => {
                     let mut picture: Vec<u8> = vec![];
                     let req = &mut self.client.get(url).send()?;
-                    let _ = std::io::copy(&mut *req, &mut picture);
+                    std::io::copy(&mut *req, &mut picture)?;
                     multipart = multipart
                         .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
                             .file_name(format!("{}.webp", file_num)));
