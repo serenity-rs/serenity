@@ -35,7 +35,14 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Error::InvalidToken => f.write_str("The provided token was invalid"),
+            Error::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
+            Error::Shutdown => f.write_str("The clients shards shutdown"),
+            Error::__Nonexhaustive => unreachable!(),
+        }
+    }
 }
 
 impl StdError for Error {
