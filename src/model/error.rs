@@ -143,25 +143,23 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
-}
-
-impl StdError for Error {
-    fn description(&self) -> &str {
-        match *self {
-            Error::BulkDeleteAmount => "Too few/many messages to bulk delete.",
-            Error::DeleteMessageDaysAmount(_) => "Invalid delete message days.",
-            Error::EmbedTooLarge(_) => "Embed too large.",
-            Error::GuildNotFound => "Guild not found in the cache.",
-            Error::RoleNotFound => "Role not found in the cache.",
-            Error::Hierarchy => "Role hierarchy prevents this action.",
-            Error::InvalidChannelType => "The channel cannot perform the action.",
-            Error::InvalidPermissions(_) => "Invalid permissions.",
-            Error::InvalidUser => "The current user cannot perform the action.",
-            Error::ItemMissing => "The required item is missing from the cache.",
-            Error::MessageTooLong(_) => "Message too large.",
-            Error::MessagingBot => "Attempted to message another bot user.",
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Error::BulkDeleteAmount => f.write_str("Too few/many messages to bulk delete."),
+            Error::DeleteMessageDaysAmount(_) => f.write_str("Invalid delete message days."),
+            Error::EmbedTooLarge(_) => f.write_str("Embed too large."),
+            Error::GuildNotFound => f.write_str("Guild not found in the cache."),
+            Error::RoleNotFound => f.write_str("Role not found in the cache."),
+            Error::Hierarchy => f.write_str("Role hierarchy prevents this action."),
+            Error::InvalidChannelType => f.write_str("The channel cannot perform the action."),
+            Error::InvalidPermissions(_) => f.write_str("Invalid permissions."),
+            Error::InvalidUser => f.write_str("The current user cannot perform the action."),
+            Error::ItemMissing => f.write_str("The required item is missing from the cache."),
+            Error::MessageTooLong(_) => f.write_str("Message too large."),
+            Error::MessagingBot => f.write_str("Attempted to message another bot user."),
             Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
+
+impl StdError for Error {}

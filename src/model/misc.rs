@@ -100,21 +100,17 @@ pub enum UserParseError {
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl fmt::Display for UserParseError {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
-}
-
-#[cfg(all(feature = "model", feature = "utils"))]
-impl StdError for UserParseError {
-    fn description(&self) -> &str {
-        use self::UserParseError::*;
-
-        match *self {
-            InvalidUsername => "invalid username",
-            Rest(_) => "could not fetch",
-            __Nonexhaustive => unreachable!(),
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            UserParseError::InvalidUsername => f.write_str("invalid username"),
+            UserParseError::Rest(_) => f.write_str("could not fetch"),
+            UserParseError::__Nonexhaustive => unreachable!(),
         }
     }
 }
+
+#[cfg(all(feature = "model", feature = "utils"))]
+impl StdError for UserParseError {}
 
 macro_rules! impl_from_str {
     (id: $($id:tt, $err:ident;)*) => {
@@ -127,19 +123,15 @@ macro_rules! impl_from_str {
 
             #[cfg(all(feature = "model", feature = "utils"))]
             impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
-            }
-
-            #[cfg(all(feature = "model", feature = "utils"))]
-            impl StdError for $err {
-                fn description(&self) -> &str {
-                    use self::$err::*;
-
-                    match *self {
-                        InvalidFormat => "invalid id format",
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    match self {
+                        $err::InvalidFormat => f.write_str("invalid id format"),
                     }
                 }
             }
+
+            #[cfg(all(feature = "model", feature = "utils"))]
+            impl StdError for $err {}
 
             #[cfg(all(feature = "model", feature = "utils"))]
             impl FromStr for $id {
@@ -166,20 +158,16 @@ macro_rules! impl_from_str {
 
             #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
             impl fmt::Display for $err {
-                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result { write!(f, "{}", self.description()) }
-            }
-
-            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-            impl StdError for $err {
-                fn description(&self) -> &str {
-                    use self::$err::*;
-
-                    match *self {
-                        NotPresentInCache => "not present in cache",
-                        $invalid_variant => $desc,
+                fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+                    match self {
+                        $err::NotPresentInCache => f.write_str("not present in cache"),
+                        $err::$invalid_variant => f.write_str($desc),
                     }
                 }
             }
+
+            #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+            impl StdError for $err {}
         )*
     };
 }
