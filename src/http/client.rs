@@ -1436,18 +1436,7 @@ impl Http {
                         .ok()
                         .and_then(|url| url.path_segments())
                         .and_then(|segments| segments.last())
-                        .ok_or_else(|| Error::Url(url.to_string())?;
-                        Ok(url) => url,
-                        Err(_) => return Err(Error::Url(url.to_string())),
-                    };
-                    let path_segments = match parsed_url.path_segments() {
-                        Some(p) => p,
-                        None => return Err(Error::Url(url.to_string())),
-                    };
-                    let filename = match path_segments.last() {
-                        Some(l) => l,
-                        None => return Err(Error::Url(url.to_string())),
-                    };
+                        .ok_or_else(|| Error::Url(url.to_string()))?;
                     let mut picture: Vec<u8> = vec![];
                     let mut req = self.client.get(url).send()?;
                     std::io::copy(&mut req, &mut picture)?;
