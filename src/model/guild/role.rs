@@ -27,6 +27,8 @@ use crate::http::client::Http;
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
     pub id: RoleId,
+    /// The Id of the Guild the Role is in.
+    pub guild_id: GuildId,
     /// The colour of the role. This is an ergonomic representation of the inner
     /// value.
     #[cfg(feature = "utils")]

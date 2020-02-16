@@ -344,6 +344,7 @@ mod test {
             };
             let role = Role {
                 id: RoleId(2),
+                guild_id: GuildId(1),
                 colour: Colour::ROSEWATER,
                 hoist: false,
                 managed: false,
