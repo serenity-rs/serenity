@@ -1432,7 +1432,11 @@ impl Http {
                         .file(file_num.to_string(), path)?;
                 },
                 AttachmentType::Image(url) => {
-                    let parsed_url = match Url::parse(url) {
+                    let filename = Url::parse(url)
+                        .ok()
+                        .and_then(|url| url.path_segments())
+                        .and_then(|segments| segments.last())
+                        .ok_or_else(|| Error::Url(url.to_string())?;
                         Ok(url) => url,
                         Err(_) => return Err(Error::Url(url.to_string())),
                     };
