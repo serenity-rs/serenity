@@ -34,7 +34,7 @@ impl EventHandler for Handler {
 
                     e
                 });
-                m.add_file(AttachmentType::Image("https://puu.sh/Faamu/20387bc120.png"));
+                m.add_file(AttachmentType::Path(Path::new("./ferris_eyes.png")));
                 m
             });
 
