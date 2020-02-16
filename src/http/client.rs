@@ -1445,7 +1445,7 @@ impl Http {
                         None => return Err(Error::Url(url.to_string())),
                     };
                     let mut picture: Vec<u8> = vec![];
-                    let req = &mut self.client.get(url).send()?;
+                    let mut req = self.client.get(url).send()?;
                     std::io::copy(&mut *req, &mut picture)?;
                     multipart = multipart
                         .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
