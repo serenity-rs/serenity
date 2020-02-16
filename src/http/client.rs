@@ -1432,7 +1432,11 @@ impl Http {
                         .file(file_num.to_string(), path)?;
                 },
                 AttachmentType::Image(url) => {
-                    let parsed_url = match Url::parse(url) {
+                    let filename = Url::parse(url)
+                        .ok()
+                        .and_then(|url| url.path_segments())
+                        .and_then(|segments| segments.last())
+                        .ok_or_else(|| Error::Url(url.to_string())?;
                         Ok(url) => url,
                         Err(_) => return Err(Error::Url(url.to_string())),
                     };
@@ -1445,8 +1449,8 @@ impl Http {
                         None => return Err(Error::Url(url.to_string())),
                     };
                     let mut picture: Vec<u8> = vec![];
-                    let req = &mut self.client.get(url).send()?;
-                    std::io::copy(&mut *req, &mut picture)?;
+                    let mut req = self.client.get(url).send()?;
+                    std::io::copy(&mut req, &mut picture)?;
                     multipart = multipart
                         .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
                             .file_name(filename.to_string()));

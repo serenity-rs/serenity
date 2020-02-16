@@ -212,6 +212,8 @@ impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
 }
 
 impl<'a> From<&'a str> for AttachmentType<'a> {
+    /// Constructs an `AttachmentType` from a string.
+    /// This string may refer to the path of a file on disk, or the http url to an image on the internet.
     fn from(s: &'a str) -> AttachmentType<'_> {
         if s.starts_with("http://") || s.starts_with("https://") {
             AttachmentType::Image(s)
