@@ -3,7 +3,7 @@ use syn::parse::{Error, Result};
 use syn::spanned::Spanned;
 use syn::{Attribute, Ident, Lit, LitStr, Meta, NestedMeta, Path};
 
-use crate::structures::{Checks, Colour, Color, HelpBehaviour, OnlyIn, Permissions};
+use crate::structures::{Checks, Colour, HelpBehaviour, OnlyIn, Permissions};
 use crate::util::{AsOption, LitExt};
 
 use std::fmt::{self, Write};
@@ -270,26 +270,12 @@ impl AttributeOption for OnlyIn {
 
 impl AttributeOption for Colour {
     fn parse(values: Values) -> Result<Self> {
-        cl_parse(values)
+        let span = values.span;
+        let value = String::parse(values)?;
+
+        Colour::from_str(&value)
+            .ok_or_else(|| Error::new(span, format_args!("invalid colour: \"{}\"", value)))
     }
-}
-
-impl AttributeOption for Color {
-    fn parse(values: Values) -> Result<Self> {
-        let c = cl_parse(values);
-        match c {
-            Ok(r) => return Ok(r.into()),
-            Err(e) => return Err(e)
-        }
-    }
-}
-
-fn cl_parse(values: Values) -> Result<Colour> {
-    let span = values.span;
-    let value = String::parse(values)?;
-
-    Colour::from_str(&value)
-        .ok_or_else(|| Error::new(span, format_args!("invalid colour: \"{}\"", value)))
 }
 
 impl AttributeOption for HelpBehaviour {

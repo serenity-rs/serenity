@@ -235,9 +235,6 @@ impl ToTokens for Permissions {
 #[derive(Debug, Default, Clone, Copy, PartialEq)]
 pub struct Colour(pub u32);
 
-#[derive(Debug, Default, Clone, Copy, PartialEq)]
-pub struct Color(pub u32);
-
 impl Colour {
     pub fn from_str(s: &str) -> Option<Self> {
         Some(Colour(match s.to_uppercase().as_str() {
@@ -274,30 +271,15 @@ impl Colour {
     }
 }
 
-impl From<Colour> for Color {
-    fn from(item: Colour) -> Self {
-        Color(item.0)
-    }
-}
-
 impl ToTokens for Colour {
     fn to_tokens(&self, stream: &mut TokenStream2) {
-        cl_to_tokens(self.0, stream)
+        let value = self.0;
+        let path = quote!(serenity::utils::Colour);
+
+        stream.extend(quote! {
+            #path(#value)
+        });
     }
-}
-
-impl ToTokens for Color {
-    fn to_tokens(&self, stream: &mut TokenStream2) {
-        cl_to_tokens(self.0, stream)
-    }
-}
-
-fn cl_to_tokens(value: u32, stream: &mut TokenStream2) {
-    let path = quote!(serenity::utils::Colour);
-
-    stream.extend(quote! {
-        #path(#value)
-    });
 }
 
 #[derive(Debug, Default)]
