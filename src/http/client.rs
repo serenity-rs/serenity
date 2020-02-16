@@ -1599,7 +1599,7 @@ impl Http {
     pub fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req)?;
 
-        serde_json::from_str(&response.text()?).map_err(From::from)
+        response.json::<T>().map_err(From::from)
     }
 
     /// Performs a request, ratelimiting it if necessary.
