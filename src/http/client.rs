@@ -1432,11 +1432,10 @@ impl Http {
                         .file(file_num.to_string(), path)?;
                 },
                 AttachmentType::Image(url) => {
-                    let filename = Url::parse(url)
-                        .ok()
-                        .and_then(|url| url.path_segments())
-                        .and_then(|segments| segments.last())
-                        .ok_or_else(|| Error::Url(url.to_string()))?;
+                    let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                    let filename = url.path_segments()
+                      .and_then(|segments| segments.last().map(ToString::to_string))
+                      .ok_or_else(|| Error::Url(url.to_string()))?;
                     let mut picture: Vec<u8> = vec![];
                     let mut req = self.client.get(url).send()?;
                     std::io::copy(&mut req, &mut picture)?;
