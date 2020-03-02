@@ -24,11 +24,10 @@
 //! [model]: ../model/index.html
 
 pub mod client;
+pub mod error;
 pub mod ratelimiting;
 pub mod request;
 pub mod routing;
-
-mod error;
 
 pub use reqwest::StatusCode;
 pub use self::client::*;
