@@ -478,8 +478,8 @@ impl GuildId {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn kick<U: Into<UserId>>(self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
-        http.as_ref().kick_member(self.0, user_id.into().0)
+    pub fn kick<U: Into<UserId>>(self, http: impl AsRef<Http>, user_id: U, reason: Option<&str>) -> Result<()> {
+        http.as_ref().kick_member(self.0, user_id.into().0, reason)
     }
 
     /// Leaves the guild.

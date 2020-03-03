@@ -420,6 +420,19 @@ impl Route {
         )
     }
 
+    pub fn guild_kick_optioned(
+        guild_id: u64,
+        user_id: u64,
+        reason: &str,
+    ) -> String {
+        format!(
+            api!("/guilds/{}/members/{}?reason={}"),
+            guild_id,
+            user_id,
+            reason,
+        )
+    }
+
     pub fn guild_bans(guild_id: u64) -> String {
         format!(api!("/guilds/{}/bans"), guild_id)
     }
@@ -876,6 +889,7 @@ pub enum RouteInfo<'a> {
     KickMember {
         guild_id: u64,
         user_id: u64,
+        reason: Option<&'a str>
     },
     LeaveGroup {
         group_id: u64,
@@ -1372,10 +1386,14 @@ impl<'a> RouteInfo<'a> {
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token(webhook_id, token)),
             ),
-            RouteInfo::KickMember { guild_id, user_id } => (
+            RouteInfo::KickMember { guild_id, user_id, reason } => (
                 LightMethod::Delete,
                 Route::GuildsIdMembersId(guild_id),
-                Cow::from(Route::guild_member(guild_id, user_id)),
+                Cow::from(Route::guild_kick_optioned(
+                        guild_id,
+                        user_id,
+                        reason.unwrap_or(""),
+                    )),
             ),
             RouteInfo::LeaveGroup { group_id } => (
                 LightMethod::Delete,
