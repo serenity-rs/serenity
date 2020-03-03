@@ -15,6 +15,7 @@ pub use self::{
     },
 	custom_message::CustomMessage,
 };
+pub type Color = Colour;
 
 use base64;
 use crate::internal::prelude::*;
