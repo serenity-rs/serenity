@@ -56,7 +56,7 @@ version = "1"
 
 [dependencies.reqwest]
 default-features = false
-features = ["blocking", "json"]
+features = ["json", "stream"]
 optional = true
 version = "0.10"
 
@@ -97,7 +97,15 @@ version = "0.21"
 
 [dependencies.webpki-roots]
 optional = true
-version = "0.18"
+version = "0.19"
+
+[dependencies.tokio]
+version = "0.2"
+default-features = false
+features = ["fs", "macros", "rt-core", "sync", "time"]
+
+[dependencies.futures]
+version = "0.3"
 
 [dev-dependencies.http_crate]
 version = "0.2"

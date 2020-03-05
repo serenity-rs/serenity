@@ -70,7 +70,7 @@ use crate::CacheAndHttp;
 /// [`CacheRwLock`]: ../cache/struct.CacheRwLock.html
 /// [`Http`]: client/struct.Http.html
 /// [`Context`]: ../client/struct.Context.html
-pub trait CacheHttp {
+pub trait CacheHttp: Send + Sync {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http;
     #[cfg(feature = "cache")]
@@ -110,6 +110,22 @@ impl CacheHttp for &&mut Context {
 }
 
 #[cfg(feature = "client")]
+impl CacheHttp for Arc<Context> {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for &Arc<Context> {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
 impl CacheHttp for CacheAndHttp {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
@@ -127,6 +143,14 @@ impl CacheHttp for &CacheAndHttp {
 
 #[cfg(feature = "client")]
 impl CacheHttp for Arc<CacheAndHttp> {
+    #[cfg(feature = "http")]
+    fn http(&self) -> &Http { &self.http }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+}
+
+#[cfg(feature = "client")]
+impl CacheHttp for &Arc<CacheAndHttp> {
     #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
@@ -224,7 +248,7 @@ impl<'a> From<&'a PathBuf> for AttachmentType<'a> {
 }
 
 impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
-    fn from(f: (&'a File, &str)) -> AttachmentType<'a> { AttachmentType::File{ file: f.0, filename: f.1.to_string() } }
+    fn from(f: (&'a File, &str)) -> AttachmentType<'a> { AttachmentType::File { file: f.0, filename: f.1.to_string() } }
 }
 
 /// Representation of the method of a query to send for the [`get_guilds`]
