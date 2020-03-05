@@ -1,11 +1,11 @@
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use parking_lot::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use std::sync::{
     Arc,
-    mpsc::Sender,
 };
+use futures::channel::mpsc::UnboundedSender as Sender;
 use typemap::ShareMap;
 
 use crate::http::Http;
@@ -36,7 +36,7 @@ pub struct Context {
     /// [`Client::data`]: struct.Client.html#structfield.data
     pub data: Arc<RwLock<ShareMap>>,
     /// The messenger to communicate with the shard runner.
-    pub shard: ShardMessenger,
+    pub shard: Arc<Mutex<ShardMessenger>>,
     /// The ID of the shard this context is related to.
     pub shard_id: u64,
     pub http: Arc<Http>,
@@ -55,7 +55,7 @@ impl Context {
         cache: Arc<RwLock<Cache>>,
     ) -> Context {
         Context {
-            shard: ShardMessenger::new(runner_tx),
+            shard: Arc::new(Mutex::new(ShardMessenger::new(runner_tx))),
             shard_id,
             data,
             http,
@@ -72,7 +72,7 @@ impl Context {
         http: Arc<Http>,
     ) -> Context {
         Context {
-            shard: ShardMessenger::new(runner_tx),
+            shard: Arc::new(Mutex::new(ShardMessenger::new(runner_tx))),
             shard_id,
             data,
             http,
@@ -107,8 +107,8 @@ impl Context {
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
-    pub fn online(&self) {
-        self.shard.set_status(OnlineStatus::Online);
+    pub async fn online(&self) {
+        self.shard.lock().await.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
@@ -138,8 +138,8 @@ impl Context {
     ///
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
-    pub fn idle(&self) {
-        self.shard.set_status(OnlineStatus::Idle);
+    pub async fn idle(&self) {
+        self.shard.lock().await.set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
@@ -169,8 +169,8 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
     #[inline]
-    pub fn dnd(&self) {
-        self.shard.set_status(OnlineStatus::DoNotDisturb);
+    pub async fn dnd(&self) {
+        self.shard.lock().await.set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
@@ -201,8 +201,8 @@ impl Context {
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible
     #[inline]
-    pub fn invisible(&self) {
-        self.shard.set_status(OnlineStatus::Invisible);
+    pub async fn invisible(&self) {
+        self.shard.lock().await.set_status(OnlineStatus::Invisible);
     }
 
     /// "Resets" the current user's presence, by setting the activity to `None`
@@ -235,8 +235,8 @@ impl Context {
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
     #[inline]
-    pub fn reset_presence(&self) {
-        self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
+    pub async fn reset_presence(&self) {
+        self.shard.lock().await.set_presence(None::<Activity>, OnlineStatus::Online);
     }
 
     /// Sets the current activity, defaulting to an online status of [`Online`].
@@ -279,8 +279,8 @@ impl Context {
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
-    pub fn set_activity(&self, activity: Activity) {
-        self.shard.set_presence(Some(activity), OnlineStatus::Online);
+    pub async fn set_activity(&self, activity: Activity) {
+        self.shard.lock().await.set_presence(Some(activity), OnlineStatus::Online);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -336,8 +336,8 @@ impl Context {
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
-    pub fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
-        self.shard.set_presence(activity, status);
+    pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
+        self.shard.lock().await.set_presence(activity, status);
     }
 }
 
@@ -345,8 +345,19 @@ impl AsRef<Http> for Context {
     fn as_ref(&self) -> &Http { &self.http }
 }
 
+impl AsRef<Http> for Arc<Context> {
+    fn as_ref(&self) -> &Http { &self.http }
+}
+
 #[cfg(feature = "cache")]
 impl AsRef<CacheRwLock> for Context {
+    fn as_ref(&self) -> &CacheRwLock {
+        &self.cache
+    }
+}
+
+#[cfg(feature = "cache")]
+impl AsRef<CacheRwLock> for Arc<Context> {
     fn as_ref(&self) -> &CacheRwLock {
         &self.cache
     }
