@@ -41,10 +41,10 @@
 
 pub use super::routing::Route;
 
-use reqwest::blocking::{Client, Response};
+use reqwest::{Client, Response};
 use reqwest::{header::HeaderMap, StatusCode};
 use crate::internal::prelude::*;
-use parking_lot::{Mutex, RwLock};
+use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::HashMap,
     sync::Arc,
@@ -52,11 +52,11 @@ use std::{
         self,
         FromStr,
     },
-    time::Duration,
     thread,
     i64,
     u64,
 };
+use tokio::time::{Duration, delay_for};
 use super::{HttpError, Request};
 use log::debug;
 
@@ -118,10 +118,10 @@ impl Ratelimiter {
     /// # use serenity::http::Http;
     /// # let http = Http::default();
     /// let routes = http.ratelimiter.routes();
-    /// let reader = routes.read();
+    /// let reader = routes.read().await;
     ///
     /// if let Some(route) = reader.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().reset());
+    ///     println!("Reset time at: {}", route.lock().await.reset());
     /// }
     /// ```
     ///
@@ -131,12 +131,12 @@ impl Ratelimiter {
         Arc::clone(&self.routes)
     }
 
-    pub fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
+    pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
         let RatelimitedRequest { req } = req;
 
         loop {
             // This will block if another thread hit the global ratelimit.
-            let _ = self.global.lock();
+            let _ = self.global.lock().await;
 
             // Destructure the tuple instead of retrieving the third value to
             // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -158,14 +158,14 @@ impl Ratelimiter {
             // - sleep if there is 0 remaining
             // - then, perform the request
             let bucket = Arc::clone(&self.routes
-                .write()
+                .write().await
                 .entry(route)
                 .or_default());
 
-            bucket.lock().pre_hook(&route);
+            bucket.lock().await.pre_hook(&route);
 
-            let request = req.build(&self.client, &self.token)?;
-            let response = request.send()?;
+            let request = req.build(&self.client, &self.token)?.build()?;
+            let response = self.client.execute(request).await?;
 
             // Check if the request got ratelimited by checking for status 429,
             // and if so, sleep for the value of the header 'retry-after' -
@@ -184,20 +184,20 @@ impl Ratelimiter {
                 return Ok(response);
             } else {
                 let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                    let _ = self.global.lock();
+                    let _ = self.global.lock().await;
 
                     Ok(
                         if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
                             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                            thread::sleep(Duration::from_millis(retry_after));
+                            delay_for(Duration::from_millis(retry_after)).await;
 
                             true
                         } else {
                             false
                         },
-                    )
+                    )     
                 } else {
-                    bucket.lock().post_hook(&response, &route)
+                    bucket.lock().await.post_hook(&response, &route)
                 };
 
                 if !redo.unwrap_or(true) {
