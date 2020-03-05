@@ -1,6 +1,6 @@
 //! Models pertaining to the gateway.
 
-use parking_lot::RwLock;
+use tokio::sync::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
@@ -501,11 +501,10 @@ impl Serialize for Presence {
         state.serialize_field("status", &self.status)?;
 
         if let Some(ref user) = self.user {
-            state.serialize_field("user", &*user.read())?;
+            let user = futures::executor::block_on(user.read());
+            state.serialize_field("user", &*user)?;
         } else {
-            state.serialize_field("user", &UserId {
-                id: self.user_id.0,
-            })?;
+            state.serialize_field("user", &self.user_id.0)?;
         }
 
         state.end()

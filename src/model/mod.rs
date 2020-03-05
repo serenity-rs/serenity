@@ -41,7 +41,7 @@ pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 
 use crate::internal::prelude::*;
-use parking_lot::RwLock;
+use tokio::sync::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
 use std::{

@@ -88,20 +88,20 @@ impl Invite {
     /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
     /// [permission]: ../permissions/index.html
     #[cfg(feature = "client")]
-    pub fn create<C, F>(cache_http: impl CacheHttp, channel_id: C, f: F) -> Result<RichInvite>
+    pub async fn create<C, F>(cache_http: impl CacheHttp, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
-        Self::_create(cache_http, channel_id.into(), f)
+        Self::_create(cache_http, channel_id.into(), f).await
     }
 
     #[cfg(feature = "client")]
-    fn _create<F>(cache_http: impl CacheHttp, channel_id: ChannelId, f: F) -> Result<RichInvite>
+    async fn _create<F>(cache_http: impl CacheHttp, channel_id: ChannelId, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::CREATE_INVITE;
 
-                if !model_utils::user_has_perms(cache, channel_id, None, req)? {
+                if !model_utils::user_has_perms(cache, channel_id, None, req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -109,7 +109,7 @@ impl Invite {
 
         let map = utils::hashmap_to_json_map(f(CreateInvite::default()).0);
 
-        cache_http.http().create_invite(channel_id.0, &map)
+        cache_http.http().create_invite(channel_id.0, &map).await
     }
 
     /// Deletes the invite.
@@ -125,25 +125,25 @@ impl Invite {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [permission]: ../permissions/index.html
     #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_GUILD;
 
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req)? {
+                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code)
+        cache_http.http().as_ref().delete_invite(&self.code).await
     }
 
     /// Gets the information about an invite.
     #[cfg(feature = "http")]
-    pub fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
+    pub async fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
         #[cfg(feature = "utils")]
@@ -151,7 +151,7 @@ impl Invite {
             invite = crate::utils::parse_invite(invite);
         }
 
-        http.as_ref().get_invite(invite, stats)
+        http.as_ref().get_invite(invite, stats).await
     }
 
     /// Returns a URL to use for the invite.
@@ -259,7 +259,9 @@ impl InviteGuild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 { self.id.shard_id(&cache) }
+    pub async fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+        self.id.shard_id(&cache).await
+    }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -283,7 +285,9 @@ impl InviteGuild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
+    pub async fn shard_id(&self, shard_count: u64) -> u64 {
+        self.id.shard_id(shard_count).await
+    }
 }
 
 /// Detailed information about an invite.
@@ -355,20 +359,20 @@ impl RichInvite {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
     #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_GUILD;
 
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req)? {
+                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        cache_http.http().as_ref().delete_invite(&self.code)
+        cache_http.http().as_ref().delete_invite(&self.code).await
     }
 
     /// Returns a URL to use for the invite.

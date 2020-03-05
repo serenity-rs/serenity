@@ -21,6 +21,10 @@ use crate::utils::Colour;
 use crate::{cache::CacheRwLock, utils};
 #[cfg(all(feature = "http", feature = "cache"))]
 use crate::http::Http;
+#[cfg(all(feature = "cache", feature = "model"))]
+use tokio::time::timeout;
+#[cfg(all(feature = "cache", feature = "model"))]
+use std::time::Duration;
 
 /// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
 pub trait BanOptions {
@@ -92,17 +96,17 @@ impl Member {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn add_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
-        self._add_role(&http, role_id.into())
+    pub async fn add_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
+        self._add_role(&http, role_id.into()).await
     }
 
     #[cfg(all(feature = "cache", feature = "http"))]
-    fn _add_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+    async fn _add_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         if self.roles.contains(&role_id) {
             return Ok(());
         }
 
-        match http.as_ref().add_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
+        match http.as_ref().add_member_role(self.guild_id.0, self.user.read().await.id.0, role_id.0).await {
             Ok(()) => {
                 self.roles.push(role_id);
 
@@ -120,14 +124,14 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map) {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.read().await.id.0, &map).await {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
@@ -151,12 +155,12 @@ impl Member {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn ban<BO: BanOptions>(&self, http: impl AsRef<Http>, ban_options: &BO) -> Result<()> {
-        self._ban(&http, ban_options.dmd(), ban_options.reason())
+    pub async fn ban<BO: BanOptions>(&self, http: impl AsRef<Http>, ban_options: &BO) -> Result<()> {
+        self._ban(&http, ban_options.dmd(), ban_options.reason()).await
     }
 
     #[cfg(all(feature = "cache", feature = "http"))]
-    fn _ban(&self, http: impl AsRef<Http>, dmd: u8, reason: &str) -> Result<()> {
+    async fn _ban(&self, http: impl AsRef<Http>, dmd: u8, reason: &str) -> Result<()> {
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
@@ -167,17 +171,17 @@ impl Member {
 
         http.as_ref().ban_user(
             self.guild_id.0,
-            self.user.read().id.0,
+            self.user.read().await.id.0,
             dmd,
             &*reason,
-        )
+        ).await
     }
 
     /// Determines the member's colour.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
-        let cache = cache.as_ref().read();
-        let guild = cache.guilds.get(&self.guild_id)?.read();
+    pub async fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
+        let cache = cache.as_ref().read().await;
+        let guild = cache.guilds.get(&self.guild_id)?.read().await;
 
         let mut roles = self.roles
             .iter()
@@ -197,16 +201,16 @@ impl Member {
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
     #[cfg(feature = "cache")]
-    pub fn default_channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<GuildChannel>>> {
-        let guild = match self.guild_id.to_guild_cached(&cache) {
+    pub async fn default_channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<GuildChannel>>> {
+        let guild = match self.guild_id.to_guild_cached(&cache).await {
             Some(guild) => guild,
             None => return None,
         };
 
-        let reader = guild.read();
+        let reader = guild.read().await;
 
         for (cid, channel) in &reader.channels {
-            if reader.user_permissions_in(*cid, self.user.read().id).read_messages() {
+            if reader.user_permissions_in(*cid, self.user.read().await.id).await.read_messages() {
                 return Some(Arc::clone(channel));
             }
         }
@@ -218,20 +222,20 @@ impl Member {
     ///
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
-    pub fn display_name(&self) -> Cow<'_, String> {
-        self.nick
-            .as_ref()
-            .map(Cow::Borrowed)
-            .unwrap_or_else(|| Cow::Owned(self.user.read().name.clone()))
+    pub async fn display_name(&self) -> Cow<'_, String> {
+        match self.nick.as_ref().map(Cow::Borrowed) {
+            Some(nick) => nick,
+            None => Cow::Owned(self.user.read().await.name.clone())
+        }
     }
 
     /// Returns the DiscordTag of a Member, taking possible nickname into account.
     #[inline]
-    pub fn distinct(&self) -> String {
+    pub async fn distinct(&self) -> String {
         format!(
             "{}#{}",
-            self.display_name(),
-            self.user.read().discriminator
+            self.display_name().await,
+            self.user.read().await.discriminator
         )
     }
 
@@ -244,12 +248,15 @@ impl Member {
     /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../../builder/struct.EditMember.html
     #[cfg(feature = "cache")]
-    pub fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(&self, http: impl AsRef<Http>, f: F) -> Result<()> {
+    pub async fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(&self, http: impl AsRef<Http>, f: F) -> Result<()> {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
         let map = utils::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map)
+        http
+            .as_ref()
+            .edit_member(self.guild_id.0, self.user.read().await.id.0, &map)
+            .await
     }
 
     /// Retrieves the ID and position of the member's highest role in the
@@ -259,20 +266,24 @@ impl Member {
     ///
     /// - the user has roles, but they are not present in the cache for cache
     /// inconsistency reasons
-    /// - you already have a write lock to the member's guild
+    /// - you already have a write lock to the member's guild and 10ms passed
     ///
     /// The "highest role in hierarchy" is defined as the role with the highest
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub fn highest_role_info(&self, cache: impl AsRef<CacheRwLock>) -> Option<(RoleId, i64)> {
-        let guild = self.guild_id.to_guild_cached(&cache)?;
-        let reader = guild.try_read()?;
+    pub async fn highest_role_info(&self, cache: impl AsRef<CacheRwLock>) -> Option<(RoleId, i64)> {
+        const TIMEOUT: Duration = Duration::from_millis(10);
+        let guild = self.guild_id.to_guild_cached(&cache).await?;
+        let guild = match timeout(TIMEOUT, guild.read()).await {
+            Ok(guild) => guild,
+            _ => return None,
+        };
 
         let mut highest = None;
 
         for role_id in &self.roles {
-            if let Some(role) = reader.roles.get(&role_id) {
+            if let Some(role) = guild.roles.get(&role_id) {
                 // Skip this role if this role in iteration has:
                 //
                 // - a position less than the recorded highest
@@ -324,26 +335,26 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
-    pub fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let locked_cache = cache.read();
+                let locked_cache = cache.read().await;
 
                 if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
                     let req = Permissions::KICK_MEMBERS;
-                    let reader = guild.read();
+                    let reader = guild.read().await;
 
-                    if !reader.has_perms(cache, req) {
+                    if !reader.has_perms(cache, req).await {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
 
-                    reader.check_hierarchy(cache, self.user.read().id)?;
+                    reader.check_hierarchy(cache, self.user.read().await.id).await?;
                 }
             }
         }
 
-        self.guild_id.kick(cache_http.http(), self.user.read().id)
+        self.guild_id.kick(cache_http.http(), self.user.read().await.id).await
     }
 
     /// Returns the guild-level permissions for the member.
@@ -367,15 +378,15 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
-    pub fn permissions(&self, cache: impl AsRef<CacheRwLock>) -> Result<Permissions> {
-        let guild = match self.guild_id.to_guild_cached(&cache) {
+    pub async fn permissions(&self, cache: impl AsRef<CacheRwLock>) -> Result<Permissions> {
+        let guild = match self.guild_id.to_guild_cached(&cache).await {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        let reader = guild.read();
+        let reader = guild.read().await;
 
-        Ok(reader.member_permissions(self.user.read().id))
+        Ok(reader.member_permissions(self.user.read().await.id).await)
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the
@@ -387,17 +398,17 @@ impl Member {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn remove_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
-        self._remove_role(&http, role_id.into())
+    pub async fn remove_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
+        self._remove_role(&http, role_id.into()).await
     }
 
     #[cfg(all(feature = "cache", feature = "http"))]
-    fn _remove_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
+    async fn _remove_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         if !self.roles.contains(&role_id) {
             return Ok(());
         }
 
-        match http.as_ref().remove_member_role(self.guild_id.0, self.user.read().id.0, role_id.0) {
+        match http.as_ref().remove_member_role(self.guild_id.0, self.user.read().await.id.0, role_id.0).await {
             Ok(()) => {
                 self.roles.retain(|r| r.0 != role_id.0);
 
@@ -414,14 +425,14 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map) {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.read().await.id.0, &map).await {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -437,17 +448,18 @@ impl Member {
     ///
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
-    pub fn roles(&self, cache: impl AsRef<CacheRwLock>) -> Option<Vec<Role>> {
-        self
-            .guild_id
-            .to_guild_cached(&cache)
-            .map(|g| g
+    pub async fn roles(&self, cache: impl AsRef<CacheRwLock>) -> Option<Vec<Role>> {
+        match self.guild_id.to_guild_cached(cache).await {
+            Some(guild) => Some(guild
                 .read()
+                .await
                 .roles
                 .values()
                 .filter(|role| self.roles.contains(&role.id))
                 .cloned()
-                .collect())
+                .collect()),
+            None => None,
+        }
     }
 
     /// Unbans the [`User`] from the guild.
@@ -463,8 +475,8 @@ impl Member {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(all(feature = "cache", feature = "http"))]
-    pub fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
-        http.as_ref().remove_ban(self.guild_id.0, self.user.read().id.0)
+    pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().remove_ban(self.guild_id.0, self.user.read().await.id.0).await
     }
 
     /// Retrieves the member's user ID.
@@ -477,8 +489,8 @@ impl Member {
     /// This function can deadlock while retrieving a read guard to the user
     /// object if your application infinitely holds a write lock elsewhere.
     #[cfg(feature = "cache")]
-    pub fn user_id(&self) -> UserId {
-        self.user.read().id
+    pub async fn user_id(&self) -> UserId {
+        self.user.read().await.id
     }
 }
 
@@ -494,7 +506,7 @@ impl Display for Member {
     ///
     // This is in the format of `<@USER_ID>`.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        Display::fmt(&self.user.read().mention(), f)
+        Display::fmt(&futures::executor::block_on(futures::executor::block_on(self.user.read()).mention()), f)
     }
 }
 

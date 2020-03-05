@@ -56,8 +56,8 @@ impl Reaction {
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
     #[cfg(feature = "http")]
-    pub fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
-        self.channel_id.to_channel(cache_http)
+    pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
+        self.channel_id.to_channel(cache_http).await
     }
 
     /// Deletes the reaction, but only if the current user is the user who made
@@ -76,7 +76,7 @@ impl Reaction {
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
     #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
 
         let mut user_id = Some(self.user_id.0);
 
@@ -84,21 +84,24 @@ impl Reaction {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.user_id == cache.read().user.id {
+                if self.user_id == cache.read().await.user.id {
                     user_id = None;
                 }
 
                 if user_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(cache, self.channel_id, None, req).unwrap_or(true) {
+                    if !utils::user_has_perms(cache, self.channel_id, None, req).await.unwrap_or(true) {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
             }
         }
 
-        cache_http.http().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+        cache_http
+            .http()
+            .delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+            .await
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -113,8 +116,8 @@ impl Reaction {
     /// [`Message`]: struct.Message.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
-        self.channel_id.message(&http, self.message_id)
+    pub async fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
+        self.channel_id.message(&http, self.message_id).await
     }
 
     /// Retrieves the user that made the reaction.
@@ -124,8 +127,8 @@ impl Reaction {
     /// the REST API for the user.
     #[inline]
     #[cfg(feature = "http")]
-    pub fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
-        self.user_id.to_user(cache_http)
+    pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
+        self.user_id.to_user(cache_http).await
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -155,18 +158,18 @@ impl Reaction {
     /// [permissions]: ../permissions/index.html
     #[cfg(feature = "http")]
     #[inline]
-    pub fn users<R, U>(&self,
+    pub async fn users<R, U>(&self,
                        http: impl AsRef<Http>,
                        reaction_type: R,
                        limit: Option<u8>,
                        after: Option<U>)
                        -> Result<Vec<User>>
         where R: Into<ReactionType>, U: Into<UserId> {
-        self._users(&http, &reaction_type.into(), limit, after.map(Into::into))
+        self._users(&http, &reaction_type.into(), limit, after.map(Into::into)).await
     }
 
     #[cfg(feature = "http")]
-    fn _users(
+    async fn _users(
         &self,
         http: impl AsRef<Http>,
         reaction_type: &ReactionType,
@@ -186,7 +189,7 @@ impl Reaction {
             reaction_type,
             limit,
             after.map(|u| u.0),
-        )
+        ).await
     }
 }
 

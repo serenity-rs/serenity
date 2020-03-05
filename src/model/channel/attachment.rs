@@ -1,11 +1,9 @@
 use super::super::id::AttachmentId;
 
 #[cfg(feature = "model")]
-use reqwest::blocking::Client as ReqwestClient;
+use reqwest::Client as ReqwestClient;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use std::io::Read;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
@@ -116,13 +114,16 @@ impl Attachment {
     /// [`Error::Http`]: ../../enum.Error.html#variant.Http
     /// [`Error::Io`]: ../../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
-    pub fn download(&self) -> Result<Vec<u8>> {
+    pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
-        let mut response = reqwest.get(&self.url).send()?;
 
-        let mut bytes = vec![];
-        response.read_to_end(&mut bytes)?;
-
-        Ok(bytes)
+        Ok(reqwest
+            .get(&self.url)
+            .send()
+            .await?
+            .bytes()
+            .await?
+            .into_iter()
+            .collect::<Vec<u8>>())
     }
 }

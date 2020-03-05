@@ -46,8 +46,8 @@ impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(&http, target)
+    pub async fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
+        self.id.create_permission(&http, target).await
     }
 
     /// Deletes all permission overrides in the category from the channels.
@@ -57,16 +57,16 @@ impl ChannelCategory {
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(&http, permission_type)
+    pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+        self.id.delete_permission(&http, permission_type).await
     }
 
 
     /// Deletes this category if required permissions are met.
     #[inline]
     #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.id.delete(&cache_http.http()).map(|_| ())
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+        self.id.delete(&cache_http.http()).await.map(|_| ())
     }
 
     /// Modifies the category's settings, such as its position or name.
@@ -81,7 +81,7 @@ impl ChannelCategory {
     /// category.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
-    pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
         where F: FnOnce(&mut EditChannel) -> &mut EditChannel
     {
         let mut map = HashMap::new();
@@ -93,7 +93,7 @@ impl ChannelCategory {
         f(&mut edit_channel);
         let map = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        cache_http.http().edit_channel(self.id.0, &map).map(|channel| {
+        cache_http.http().edit_channel(self.id.0, &map).await.map(|channel| {
             let GuildChannel {
                 id,
                 category_id,
