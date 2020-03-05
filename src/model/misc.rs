@@ -13,80 +13,99 @@ use std::str::FromStr;
 use std::fmt;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
+use async_trait::async_trait;
 
+#[async_trait]
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
     /// Creates a mentionable string, that will be able to notify and/or create
     /// a link to the item.
-    fn mention(&self) -> String;
+    async fn mention(&self) -> String;
 }
 
+#[async_trait]
 impl Mentionable for ChannelId {
-    fn mention(&self) -> String { format!("<#{}>", self.0) }
+    async fn mention(&self) -> String { format!("<#{}>", self.0) }
 }
 
+#[async_trait]
 impl Mentionable for Channel {
-    fn mention(&self) -> String {
+    async fn mention(&self) -> String {
         match *self {
-            Channel::Guild(ref x) => x.with(Mentionable::mention),
-            Channel::Private(ref x) => x.with(Mentionable::mention),
-            Channel::Group(ref x) => x.with(Mentionable::mention),
-            Channel::Category(ref x) => x.with(Mentionable::mention),
+            Channel::Guild(ref x) => x.read().await.mention().await,
+            Channel::Private(ref x) => x.read().await.mention().await,
+            Channel::Group(ref x) => x.read().await.mention().await,
+            Channel::Category(ref x) => x.read().await.mention().await,
             Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
+#[async_trait]
 impl Mentionable for ChannelCategory {
-    fn mention(&self) -> String {
+    async fn mention(&self) -> String {
         format!("<#{}>", self.name)
     }
 }
 
+#[async_trait]
 impl Mentionable for CurrentUser {
-    fn mention(&self) -> String {
+    async fn mention(&self) -> String {
         format!("<@{}>", self.id.0)
     }
 }
 
+#[async_trait]
 impl Mentionable for Emoji {
-    fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
+    async fn mention(&self) -> String {
+        format!("<:{}:{}>", self.name, self.id.0)
+    }
 }
 
+#[async_trait]
 impl Mentionable for Group {
-    fn mention(&self) -> String {
+  async fn mention(&self) -> String {
         format!("<#{}>", self.channel_id.0)
     }
 }
 
+#[async_trait]
 impl Mentionable for Member {
-    fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
+    async fn mention(&self) -> String {
+        format!("<@{}>", self.user.with(|u| u.id.0).await)
+    }
 }
 
+#[async_trait]
 impl Mentionable for PrivateChannel {
-    fn mention(&self) -> String {
+    async fn mention(&self) -> String {
         format!("<#{}>", self.id.0)
     }
 }
 
+#[async_trait]
 impl Mentionable for RoleId {
-    fn mention(&self) -> String { format!("<@&{}>", self.0) }
+    async fn mention(&self) -> String { format!("<@&{}>", self.0) }
 }
 
+#[async_trait]
 impl Mentionable for Role {
-    fn mention(&self) -> String { format!("<@&{}>", self.id.0) }
+    async fn mention(&self) -> String { format!("<@&{}>", self.id.0) }
 }
 
+#[async_trait]
 impl Mentionable for UserId {
-    fn mention(&self) -> String { format!("<@{}>", self.0) }
+    async fn mention(&self) -> String { format!("<@{}>", self.0) }
 }
 
+#[async_trait]
 impl Mentionable for User {
-    fn mention(&self) -> String { format!("<@{}>", self.id.0) }
+    async fn mention(&self) -> String { format!("<@{}>", self.id.0) }
 }
 
+#[async_trait]
 impl Mentionable for GuildChannel {
-    fn mention(&self) -> String { format!("<#{}>", self.id.0) }
+    async fn mention(&self) -> String { format!("<#{}>", self.id.0) }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -310,12 +329,12 @@ mod test {
     #[cfg(feature = "utils")]
     mod utils {
         use crate::model::prelude::*;
-        use parking_lot::RwLock;
+        use tokio::sync::RwLock;
         use std::sync::Arc;
         use crate::utils::Colour;
 
-        #[test]
-        fn test_mention() {
+        #[tokio::test]
+        async fn test_mention() {
             let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
                 bitrate: None,
                 category_id: None,
@@ -372,14 +391,14 @@ mod test {
                 _nonexhaustive: (),
             };
 
-            assert_eq!(ChannelId(1).mention(), "<#1>");
-            assert_eq!(channel.mention(), "<#4>");
-            assert_eq!(emoji.mention(), "<:a:5>");
-            assert_eq!(member.mention(), "<@6>");
-            assert_eq!(role.mention(), "<@&2>");
-            assert_eq!(role.id.mention(), "<@&2>");
-            assert_eq!(user.mention(), "<@6>");
-            assert_eq!(user.id.mention(), "<@6>");
+            assert_eq!(ChannelId(1).mention().await, "<#1>");
+            assert_eq!(channel.mention().await, "<#4>");
+            assert_eq!(emoji.mention().await, "<:a:5>");
+            assert_eq!(member.mention().await, "<@6>");
+            assert_eq!(role.mention().await, "<@&2>");
+            assert_eq!(role.id.mention().await, "<@&2>");
+            assert_eq!(user.mention().await, "<@6>");
+            assert_eq!(user.id.mention().await, "<@6>");
         }
     }
 }

@@ -42,7 +42,9 @@ use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]
 use std::sync::Arc;
 #[cfg(feature = "cache")]
-use parking_lot::RwLock;
+use tokio::sync::RwLock;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use async_trait::async_trait;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -83,7 +85,7 @@ impl Channel {
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
-    /// # use parking_lot::RwLock;
+    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
@@ -91,7 +93,7 @@ impl Channel {
     /// #
     /// match channel.group() {
     ///     Some(group_lock) => {
-    ///         if let Some(ref name) = group_lock.read().name {
+    ///         if let Some(ref name) = group_lock.read().await.name {
     ///             println!("It's a group named {}!", name);
     ///         } else {
     ///              println!("It's an unnamed group!");
@@ -126,7 +128,7 @@ impl Channel {
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
-    /// # use parking_lot::RwLock;
+    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
@@ -134,7 +136,7 @@ impl Channel {
     /// #
     /// match channel.guild() {
     ///     Some(guild_lock) => {
-    ///         println!("It's a guild named {}!", guild_lock.read().name);
+    ///         println!("It's a guild named {}!", guild_lock.read().await.name);
     ///     },
     ///     None => { println!("It's not a guild!"); },
     /// }
@@ -165,7 +167,7 @@ impl Channel {
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
-    /// # use parking_lot::RwLock;
+    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
@@ -173,9 +175,9 @@ impl Channel {
     /// #
     /// match channel.private() {
     ///     Some(private_lock) => {
-    ///         let private = private_lock.read();
+    ///         let private = private_lock.read().await;
     ///         let recipient_lock = &private.recipient;
-    ///         let recipient = recipient_lock.read();
+    ///         let recipient = recipient_lock.read().await;
     ///         println!("It's a private channel with {}!", recipient.name);
     ///     },
     ///     None => { println!("It's not a private channel!"); },
@@ -207,7 +209,7 @@ impl Channel {
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # fn main() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
-    /// # use parking_lot::RwLock;
+    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
@@ -215,7 +217,7 @@ impl Channel {
     /// #
     /// match channel.category() {
     ///     Some(category_lock) => {
-    ///         println!("It's a category named {}!", category_lock.read().name);
+    ///         println!("It's a category named {}!", category_lock.read().await.name);
     ///     },
     ///     None => { println!("It's not a category!"); },
     /// }
@@ -242,19 +244,19 @@ impl Channel {
     ///
     /// [`Group`]: struct.Group.html
     #[cfg(all(feature = "model", feature = "http"))]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match *self {
             Channel::Group(ref group) => {
-                let _ = group.read().leave(cache_http.http())?;
+                let _ = group.read().await.leave(cache_http.http()).await?;
             },
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.read().delete(cache_http)?;
+                let _ = public_channel.read().await.delete(cache_http).await?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.read().delete(cache_http.http())?;
+                let _ = private_channel.read().await.delete(cache_http.http()).await?;
             },
             Channel::Category(ref category) => {
-                category.read().delete(cache_http)?;
+                category.read().await.delete(cache_http).await?;
             },
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -265,10 +267,10 @@ impl Channel {
     /// Determines if the channel is NSFW.
     #[cfg(feature = "model")]
     #[inline]
-    pub fn is_nsfw(&self) -> bool {
+    pub async fn is_nsfw(&self) -> bool {
         match *self {
-            Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()),
-            Channel::Category(ref category) => category.with(|c| c.is_nsfw()),
+            Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()).await,
+            Channel::Category(ref category) => category.with(|c| c.is_nsfw()).await,
             Channel::Group(_) | Channel::Private(_) => false,
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -280,14 +282,14 @@ impl Channel {
     /// [`Group`]: struct.Group.html
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
-    pub fn id(&self) -> ChannelId {
+    pub async fn id(&self) -> ChannelId {
         match *self {
             Channel::Group(ref group) => group.with(|g| g.channel_id),
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
             Channel::Category(ref category) => category.with(|c| c.id),
             Channel::__Nonexhaustive => unreachable!(),
-        }
+        }.await
     }
 
     /// Retrieves the position of the inner [`GuildChannel`] or
@@ -297,10 +299,10 @@ impl Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`CategoryChannel`]: struct.ChannelCategory.html
-    pub fn position(&self) -> Option<i64> {
+    pub async fn position(&self) -> Option<i64> {
         match *self {
-            Channel::Guild(ref channel) => Some(channel.with(|c| c.position)),
-            Channel::Category(ref catagory) => Some(catagory.with(|c| c.position)),
+            Channel::Guild(ref channel) => Some(channel.with(|c| c.position).await),
+            Channel::Category(ref catagory) => Some(catagory.with(|c| c.position).await),
             _ => None
         }
     }
@@ -338,16 +340,16 @@ impl Serialize for Channel {
         where S: Serializer {
         match *self {
             Channel::Category(ref c) => {
-                ChannelCategory::serialize(&*c.read(), serializer)
+                ChannelCategory::serialize(&*futures::executor::block_on(c.read()), serializer)
             },
             Channel::Group(ref c) => {
-                Group::serialize(&*c.read(), serializer)
+                Group::serialize(&*futures::executor::block_on(c.read()), serializer)
             },
             Channel::Guild(ref c) => {
-                GuildChannel::serialize(&*c.read(), serializer)
+                GuildChannel::serialize(&*futures::executor::block_on(c.read()), serializer)
             },
             Channel::Private(ref c) => {
-                PrivateChannel::serialize(&*c.read(), serializer)
+                PrivateChannel::serialize(&*futures::executor::block_on(c.read()), serializer)
             },
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -371,15 +373,18 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
-            Channel::Group(ref group) => Display::fmt(&group.read().name(), f),
-            Channel::Guild(ref ch) => Display::fmt(&ch.read().id.mention(), f),
+            Channel::Group(ref group) =>
+                Display::fmt(&futures::executor::block_on(futures::executor::block_on(group.read()).name()), f),
+            Channel::Guild(ref ch) =>
+                Display::fmt(&futures::executor::block_on(futures::executor::block_on(ch.read()).id.mention()), f),
             Channel::Private(ref ch) => {
-                let channel = ch.read();
-                let recipient = channel.recipient.read();
+                let channel = futures::executor::block_on(ch.read());
+                let recipient = futures::executor::block_on(channel.recipient.read());
 
                 Display::fmt(&recipient.name, f)
             },
-            Channel::Category(ref category) => Display::fmt(&category.read().name, f),
+            Channel::Category(ref category) =>
+                Display::fmt(&futures::executor::block_on(category.read()).name, f),
             Channel::__Nonexhaustive => unreachable!(),
         }
     }
@@ -538,7 +543,7 @@ mod test {
     #[cfg(all(feature = "model", feature = "utils"))]
     mod model_utils {
         use crate::model::prelude::*;
-        use parking_lot::RwLock;
+        use tokio::sync::RwLock;
         use std::collections::HashMap;
         use std::sync::Arc;
 
@@ -593,8 +598,8 @@ mod test {
             }
         }
 
-        #[test]
-        fn nsfw_checks() {
+        #[tokio::test]
+        async fn nsfw_checks() {
             let mut channel = guild_channel();
             assert!(!channel.is_nsfw());
             channel.kind = ChannelType::Voice;
@@ -617,7 +622,7 @@ mod test {
             assert!(!channel.is_nsfw());
 
             let channel = Channel::Guild(Arc::new(RwLock::new(channel)));
-            assert!(!channel.is_nsfw());
+            assert!(!channel.is_nsfw().await);
 
             let group = group();
             assert!(!group.is_nsfw());
@@ -629,12 +634,13 @@ mod test {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+#[async_trait]
 impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
-    fn from_str(cache: impl AsRef<CacheRwLock>, s: &str) -> StdResult<Self, Self::Err> {
+    async fn from_str<CRL: AsRef<CacheRwLock> + Send + Sync>(cache: CRL, s: &str) -> StdResult<Self, Self::Err> {
         match parse_channel(s) {
-            Some(x) => match ChannelId(x).to_channel_cached(&cache) {
+            Some(x) => match ChannelId(x).to_channel_cached(&cache).await {
                 Some(channel) => Ok(channel),
                 _ => Err(ChannelParseError::NotPresentInCache),
             },

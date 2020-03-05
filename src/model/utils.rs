@@ -1,4 +1,4 @@
-use parking_lot::RwLock;
+use tokio::sync::RwLock;
 use serde::de::Error as DeError;
 use serde::de::MapAccess;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
@@ -67,7 +67,7 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     let mut members = HashMap::new();
 
     for member in vec {
-        let user_id = member.user.read().id;
+        let user_id = futures::executor::block_on(member.user.read()).id;
 
         members.insert(user_id, member);
     }
@@ -109,8 +109,8 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Group(ref group) => group.read().channel_id,
-            Channel::Private(ref channel) => channel.read().id,
+            Channel::Group(ref group) => futures::executor::block_on(group.read()).channel_id,
+            Channel::Private(ref channel) => futures::executor::block_on(channel.read()).id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
             Channel::__Nonexhaustive => unreachable!(),
@@ -180,7 +180,7 @@ pub fn serialize_single_recipient<S: Serializer>(
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(1))?;
 
-    seq.serialize_element(&*user.read())?;
+    seq.serialize_element(&*futures::executor::block_on(user.read()))?;
 
     seq.end()
 }
@@ -194,7 +194,7 @@ pub fn serialize_sync_user<S: Serializer>(
     user: &Arc<RwLock<User>>,
     serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
-    User::serialize(&*user.read(), serializer)
+    User::serialize(&*futures::executor::block_on(user.read()), serializer)
 }
 
 pub fn deserialize_users<'de, D: Deserializer<'de>>(
@@ -217,7 +217,7 @@ pub fn serialize_users<S: Serializer>(
     let mut seq = serializer.serialize_seq(Some(users.len()))?;
 
     for user in users.values() {
-        seq.serialize_element(&*user.read())?;
+        seq.serialize_element(&*futures::executor::block_on(user.read()))?;
     }
 
     seq.end()
@@ -274,20 +274,20 @@ pub fn serialize_gen_locked_map<K: Eq + Hash, S: Serializer, V: Serialize>(
     let mut seq = serializer.serialize_seq(Some(map.len()))?;
 
     for value in map.values() {
-        seq.serialize_element(&*value.read())?;
+        seq.serialize_element(&*(futures::executor::block_on(value.read())))?;
     }
 
     seq.end()
 }
 
 #[cfg(all(feature = "cache", feature = "model"))]
-pub fn user_has_perms(
+pub async fn user_has_perms(
     cache: impl AsRef<CacheRwLock>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
     mut permissions: Permissions
 ) -> Result<bool> {
-    let cache = cache.as_ref().read();
+    let cache = cache.as_ref().read().await;
     let current_user = &cache.user;
 
     let guild_id = match guild_id {
@@ -299,7 +299,7 @@ pub fn user_has_perms(
             };
 
             match channel {
-                Channel::Guild(channel) => channel.read().guild_id,
+                Channel::Guild(channel) => channel.read().await.guild_id,
                 Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
                     // Both users in DMs, all users in groups, and maybe all channels in categories
                     // will have the same permissions.
@@ -324,7 +324,9 @@ pub fn user_has_perms(
 
     let perms = guild
         .read()
-        .user_permissions_in(channel_id, current_user.id);
+        .await
+        .user_permissions_in(channel_id, current_user.id)
+        .await;
 
     permissions.remove(perms);
 

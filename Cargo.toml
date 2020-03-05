@@ -16,6 +16,9 @@ bitflags = "1"
 log = "0.4"
 parking_lot = "0.9"
 serde_json = "1"
+async-trait = "0.1"
+async-tls = "0.6"
+tokio-tls = "0.3"
 
 [dependencies.static_assertions]
 optional = true
