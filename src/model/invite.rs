@@ -49,11 +49,7 @@ pub struct Invite {
     /// A representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
     ///
-    /// This can be `None` if the invite is to a [`Group`] and not to a
-    /// Guild.
-    ///
     /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`Group`]: ../channel/struct.Group.html
     pub guild: Option<InviteGuild>,
     /// A representation of the minimal amount of information needed about the
     /// [`User`] that created the invite.
@@ -305,11 +301,7 @@ pub struct RichInvite {
     /// A representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
     ///
-    /// This can be `None` if the invite is to a [`Group`] and not to a
-    /// Guild.
-    ///
     /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`Group`]: ../channel/struct.Group.html
     pub guild: Option<InviteGuild>,
     /// The user that created the invite.
     pub inviter: User,

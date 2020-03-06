@@ -305,7 +305,6 @@ fn handle_event(
                         event_handler.private_channel_create(context, channel);
                     });
                 },
-                Channel::Group(_) => {},
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
@@ -327,7 +326,7 @@ fn handle_event(
             update(&cache_and_http, &mut event);
 
             match event.channel {
-                Channel::Private(_) | Channel::Group(_) => {},
+                Channel::Private(_) => {},
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 

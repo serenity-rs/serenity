@@ -3,8 +3,6 @@ use crate::http::CacheHttp;
 use crate::{internal::RwLockExt, model::prelude::*};
 
 #[cfg(feature = "model")]
-use std::borrow::Cow;
-#[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -426,10 +424,6 @@ impl ChannelId {
 
         Some(match channel {
             Channel::Guild(channel) => channel.read().name().to_string(),
-            Channel::Group(channel) => match channel.read().name() {
-                Cow::Borrowed(name) => name.to_string(),
-                Cow::Owned(name) => name,
-            },
             Channel::Category(category) => category.read().name().to_string(),
             Channel::Private(channel) => channel.read().name(),
             Channel::__Nonexhaustive => unreachable!(),
@@ -703,7 +697,6 @@ impl From<Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: Channel) -> ChannelId {
         match channel {
-            Channel::Group(group) => group.with(|g| g.channel_id),
             Channel::Guild(ch) => ch.with(|c| c.id),
             Channel::Private(ch) => ch.with(|c| c.id),
             Channel::Category(ch) => ch.with(|c| c.id),
@@ -716,7 +709,6 @@ impl<'a> From<&'a Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: &Channel) -> ChannelId {
         match *channel {
-            Channel::Group(ref group) => group.with(|g| g.channel_id),
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
             Channel::Category(ref ch) => ch.with(|c| c.id),

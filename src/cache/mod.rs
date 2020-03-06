@@ -29,7 +29,6 @@
 //! is "yes".
 //!
 //! [`Emoji`]: ../model/guild/struct.Emoji.html
-//! [`Group`]: ../model/channel/struct.Group.html
 //! [`Guild`]: ../model/guild/struct.Guild.html
 //! [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit
 //! [`Message`]: ../model/channel/struct.Message.html
@@ -111,12 +110,6 @@ pub struct Cache {
     pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
     /// A map of channel categories.
     pub categories: HashMap<ChannelId, Arc<RwLock<ChannelCategory>>>,
-    /// A map of the groups that the current user is in.
-    ///
-    /// For bot users this will always be empty, except for in [special cases].
-    ///
-    /// [special cases]: index.html#special-cases-in-the-cache
-    pub groups: HashMap<ChannelId, Arc<RwLock<Group>>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
     ///
@@ -292,7 +285,7 @@ impl Cache {
         total
     }
 
-    /// Fetches a vector of all [`PrivateChannel`] and [`Group`] Ids that are
+    /// Fetches a vector of all [`PrivateChannel`] Ids that are
     /// stored in the cache.
     ///
     /// # Examples
@@ -313,13 +306,9 @@ impl Cache {
     /// println!("There are {} private channels", amount);
     /// ```
     ///
-    /// [`Group`]: ../model/channel/struct.Group.html
     /// [`PrivateChannel`]: ../model/channel/struct.PrivateChannel.html
     pub fn all_private_channels(&self) -> Vec<&ChannelId> {
-        self.groups
-            .keys()
-            .chain(self.private_channels.keys())
-            .collect()
+        self.private_channels.keys().collect()
     }
 
     /// Fetches a vector of all [`Guild`]s' Ids that are stored in the cache.
@@ -365,21 +354,17 @@ impl Cache {
 
     /// Retrieves a [`Channel`] from the cache based on the given Id.
     ///
-    /// This will search the [`channels`] map, the [`private_channels`] map, and
-    /// then the map of [`groups`] to find the channel.
+    /// This will search the [`channels`] map, then the [`private_channels`] map.
     ///
     /// If you know what type of channel you're looking for, you should instead
     /// manually retrieve from one of the respective maps or methods:
     ///
     /// - [`GuildChannel`]: [`guild_channel`] or [`channels`]
     /// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]
-    /// - [`Group`]: [`group`] or [`groups`]
     ///
     /// [`Channel`]: ../model/channel/enum.Channel.html
-    /// [`Group`]: ../model/channel/struct.Group.html
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`channels`]: #structfield.channels
-    /// [`group`]: #method.group
     /// [`guild_channel`]: #method.guild_channel
     /// [`private_channel`]: #method.private_channel
     /// [`groups`]: #structfield.groups
@@ -396,10 +381,6 @@ impl Cache {
 
         if let Some(private_channel) = self.private_channels.get(&id) {
             return Some(Channel::Private(Arc::clone(private_channel)));
-        }
-
-        if let Some(group) = self.groups.get(&id) {
-            return Some(Channel::Group(Arc::clone(group)));
         }
 
         None
@@ -496,41 +477,6 @@ impl Cache {
 
     fn _guild_channel(&self, id: ChannelId) -> Option<Arc<RwLock<GuildChannel>>> {
         self.channels.get(&id).cloned()
-    }
-
-    /// Retrieves a reference to a [`Group`] from the cache based on the given
-    /// associated channel Id.
-    ///
-    /// The only advantage of this method is that you can pass in anything that
-    /// is indirectly a [`ChannelId`].
-    ///
-    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
-    /// [`Group`]: ../model/channel/struct.Group.html
-    ///
-    /// # Examples
-    ///
-    /// Retrieve a group from the cache and print its owner's id:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::cache::{Cache, CacheRwLock};
-    /// # use parking_lot::RwLock;
-    /// # use std::{error::Error, sync::Arc};
-    /// #
-    /// # fn main() -> Result<(), Box<Error>> {
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// if let Some(group) = cache.read().group(7) {
-    ///     println!("Owner Id: {}", group.read().owner_id);
-    /// }
-    /// #     Ok(())
-    /// # }
-    /// ```
-    #[inline]
-    pub fn group<C: Into<ChannelId>>(&self, id: C) -> Option<Arc<RwLock<Group>>> {
-        self._group(id.into())
-    }
-
-    fn _group(&self, id: ChannelId) -> Option<Arc<RwLock<Group>>> {
-        self.groups.get(&id).cloned()
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -837,7 +783,6 @@ impl Default for Cache {
         Cache {
             channels: HashMap::default(),
             categories: HashMap::default(),
-            groups: HashMap::with_capacity(128),
             guilds: HashMap::default(),
             messages: HashMap::default(),
             notes: HashMap::default(),

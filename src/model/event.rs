@@ -19,8 +19,6 @@ use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
 use crate::internal::RwLockExt;
 #[cfg(feature = "cache")]
-use std::collections::hash_map::Entry;
-#[cfg(feature = "cache")]
 use std::mem;
 
 /// Event data for the channel creation event.
@@ -29,10 +27,8 @@ use std::mem;
 ///
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
-/// - The current user is added to a [`Group`]
 ///
 /// [`Channel`]: ../channel/enum.Channel.html
-/// [`Group`]: ../channel/struct.Group.html
 /// [`Guild`]: ../guild/struct.Guild.html
 /// [`PrivateChannel`]: ../channel/struct.PrivateChannel.html
 #[derive(Clone, Debug)]
@@ -64,23 +60,6 @@ impl CacheUpdate for ChannelCreateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
         match self.channel {
-            Channel::Group(ref group) => {
-                let group = Arc::clone(group);
-
-                let channel_id = group.with_mut(|writer| {
-                    for (recipient_id, recipient) in &mut writer.recipients {
-                        cache.update_user_entry(&recipient.read());
-
-                        *recipient = Arc::clone(&cache.users[recipient_id]);
-                    }
-
-                    writer.channel_id
-                });
-
-                let ch = cache.groups.insert(channel_id, group);
-
-                ch.map(Channel::Group)
-            },
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
@@ -159,9 +138,6 @@ impl CacheUpdate for ChannelDeleteEvent {
 
                 cache.private_channels.remove(&id);
             },
-
-            // We ignore these because the delete event does not fire for these.
-            Channel::Group(_) |
             Channel::__Nonexhaustive => unreachable!(),
         };
 
@@ -218,14 +194,6 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
             return None;
         }
 
-        if let Some(group) = cache.groups.get_mut(&self.channel_id) {
-            group.with_mut(|c| {
-                c.last_pin_timestamp = self.last_pin_timestamp;
-            });
-
-            return None;
-        }
-
         None
     }
 }
@@ -247,10 +215,6 @@ impl CacheUpdate for ChannelRecipientAddEvent {
         cache.update_user_entry(&self.user);
         let user = Arc::clone(&cache.users[&self.user.id]);
 
-        if let Some(group) = cache.groups.get_mut(&self.channel_id) {
-            group.write().recipients.insert(self.user.id, user);
-        }
-
         None
     }
 }
@@ -268,11 +232,7 @@ pub struct ChannelRecipientRemoveEvent {
 impl CacheUpdate for ChannelRecipientRemoveEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.groups.get_mut(&self.channel_id).map(|group| {
-            group.with_mut(|g| g.recipients.remove(&self.user.id))
-        });
-
+    fn update(&mut self, _cache: &mut Cache) -> Option<()> {
         None
     }
 }
@@ -289,29 +249,6 @@ impl CacheUpdate for ChannelUpdateEvent {
 
     fn update(&mut self, cache: &mut Cache) -> Option<()> {
         match self.channel {
-            Channel::Group(ref group) => {
-                let (ch_id, no_recipients) =
-                    group.with(|g| (g.channel_id, g.recipients.is_empty()));
-
-                match cache.groups.entry(ch_id) {
-                    Entry::Vacant(e) => {
-                        e.insert(Arc::clone(group));
-                    },
-                    Entry::Occupied(mut e) => {
-                        let mut dest = e.get_mut().write();
-
-                        if no_recipients {
-                            let recipients = mem::replace(&mut dest.recipients, HashMap::new());
-
-                            dest.clone_from(&group.read());
-
-                            dest.recipients = recipients;
-                        } else {
-                            dest.clone_from(&group.read());
-                        }
-                    },
-                }
-            },
             Channel::Guild(ref channel) => {
                 let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
 
@@ -2028,7 +1965,7 @@ impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
 pub struct VoiceReady {
     pub heartbeat_interval: u64,
     pub modes: Vec<String>,
-    pub ip: String, 
+    pub ip: String,
     pub port: u16,
     pub ssrc: u32,
     #[serde(skip)]
