@@ -47,7 +47,7 @@ use std::{
     time::Duration
 };
 
-use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
+use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
 use super::{payload, VoiceError, CRYPTO_MODE};
 use url::Url;
@@ -376,7 +376,7 @@ impl Connection {
     #[inline]
     fn remove_unfinished_files(
         &mut self,
-        sources: &mut Vec<LockedAudio>,
+        sources: &mut Vec<Audio>,
         opus_frame: &[u8],
         buffer: &mut [i16; 1920],
         mut mix_buffer: &mut [f32; 1920],
@@ -387,73 +387,67 @@ impl Connection {
         while i < sources.len() {
             let mut finished = false;
 
-            let aud_lock = (&sources[i]).clone();
-            let mut aud = aud_lock.lock();
+            // let aud_lock = (&sources[i]).clone();
+            let mut aud = sources.get_mut(i).unwrap();
 
             let vol = aud.volume;
             let skip = !aud.playing;
 
-            {
-                let stream = &mut aud.source;
+            let stream = &mut aud.source;
 
-                if skip {
-                    i += 1;
+            if skip {
+                i += 1;
 
-                    continue;
-                }
+                continue;
+            }
 
-                // Assume this for now, at least.
-                // We'll be fusing streams, so we can either keep
-                // as stereo or downmix to mono.
-                let is_stereo = true;
-                let source_stereo = stream.is_stereo();
+            // Assume this for now, at least.
+            // We'll be fusing streams, so we can either keep
+            // as stereo or downmix to mono.
+            let is_stereo = true;
+            let source_stereo = stream.is_stereo();
 
-                if is_stereo != self.encoder_stereo {
-                    let channels = if is_stereo {
-                        Channels::Stereo
-                    } else {
-                        Channels::Mono
-                    };
-                    self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                    self.encoder_stereo = is_stereo;
-                }
-
-                let temp_len = match stream.get_type() {
-                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
-                            opus_frame.len()
-                        } else {
-                            0
-                        },
-                    AudioType::Pcm => {
-                        let buffer_len = if source_stereo { 960 * 2 } else { 960 };
-
-                        match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
-                            Some(len) => len,
-                            None => 0,
-                        }
-                    },
-                    AudioType::__Nonexhaustive => unreachable!(),
-                };
-
-                // May need to force interleave/copy.
-                combine_audio(*buffer, &mut mix_buffer, source_stereo, vol);
-
-                len = len.max(temp_len);
-                i += if temp_len > 0 {
-                    1
+            if is_stereo != self.encoder_stereo {
+                let channels = if is_stereo {
+                    Channels::Stereo
                 } else {
-                    sources.remove(i);
-                    finished = true;
-
-                    0
+                    Channels::Mono
                 };
+                self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
+                self.encoder_stereo = is_stereo;
             }
 
-            aud.finished = finished;
+            let temp_len = match stream.get_type() {
+                AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
+                        opus_frame.len()
+                    } else {
+                        0
+                    },
+                AudioType::Pcm => {
+                    let buffer_len = if source_stereo { 960 * 2 } else { 960 };
 
-            if !finished {
+                    match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                        Some(len) => len,
+                        None => 0,
+                    }
+                },
+                AudioType::__Nonexhaustive => unreachable!(),
+            };
+
+            // May need to force interleave/copy.
+            combine_audio(*buffer, &mut mix_buffer, source_stereo, vol);
+
+            len = len.max(temp_len);
+            i += if temp_len > 0 {
                 aud.step_frame();
-            }
+
+                1
+            } else {
+                aud.finished = true;
+                sources.remove(i);
+                
+                0
+            };
         };
 
         Ok(len)
@@ -461,7 +455,7 @@ impl Connection {
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
-                mut sources: &mut Vec<LockedAudio>,
+                mut sources: &mut Vec<Audio>,
                 mut receiver: &mut Option<Box<dyn AudioReceiver>>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate)

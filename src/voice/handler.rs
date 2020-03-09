@@ -14,7 +14,7 @@ use std::sync::{
     Arc
 };
 use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
+use super::{Audio, AudioHandle, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
 use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting
@@ -247,23 +247,28 @@ impl Handler {
         }
     }
 
-    /// Plays audio from a source.
+    /// Plays audio from a source, returning a handle for futehr control.
     ///
     /// This can be a source created via [`voice::ffmpeg`] or [`voice::ytdl`].
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play(&mut self, source: Box<dyn AudioSource>) {
-        self.play_returning(source);
+    pub fn play(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
+        let (tx, rx) = mpsc::channel();
+        let can_seek = source.is_seekable();
+        let player = Audio::new(source, rx);
+        self.send(VoiceStatus::AddSender(player));
+
+        AudioHandle::new(tx, can_seek)
     }
 
-    /// Plays audio from a source, returning the locked audio source.
-    pub fn play_returning(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
-        let player = Arc::new(Mutex::new(Audio::new(source)));
-        self.send(VoiceStatus::AddSender(player.clone()));
+    // /// Plays audio from a source, returning the locked audio source.
+    // pub fn play_returning(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
+    //     let player = Arc::new(Mutex::new(Audio::new(source)));
+    //     self.send(VoiceStatus::AddSender(player.clone()));
 
-        player
-    }
+    //     player
+    // }
 
     /// Plays audio from a source.
     ///
@@ -272,11 +277,13 @@ impl Handler {
     ///
     /// [`play`]: #method.play
     /// [`play_returning`]: #method.play_returning
-    pub fn play_only(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
-        let player = Arc::new(Mutex::new(Audio::new(source)));
-        self.send(VoiceStatus::SetSender(Some(player.clone())));
+    pub fn play_only(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
+        let (tx, rx) = mpsc::channel();
+        let can_seek = source.is_seekable();
+        let player = Audio::new(source, rx);
+        self.send(VoiceStatus::SetSender(Some(player)));
 
-        player
+        AudioHandle::new(tx, can_seek)
     }
 
     /// Sets the bitrate for encoding Opus packets sent along

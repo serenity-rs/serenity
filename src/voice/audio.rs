@@ -1,9 +1,17 @@
 use parking_lot::Mutex;
 use audiopus::{Bitrate, SampleRate};
 use std::{
-    sync::Arc,
+    sync::{
+        mpsc::{
+            channel,
+            Receiver,
+            Sender,
+        },
+        Arc,
+    },
     time::Duration,
 };
+use super::events::Event;
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
@@ -20,6 +28,8 @@ pub trait AudioSource: Send {
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 
     fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
+
+    fn is_seekable(&self) -> bool;
 }
 
 /// A receiver for incoming audio.
@@ -108,10 +118,24 @@ pub struct Audio {
     /// Consider the position fields **read-only** for now.
     pub position: Duration,
     pub position_modified: bool,
+
+
+    /// List of events attached to this audio track.
+    ///
+    /// Currently, events are visited by linear scan for eligibility.
+    /// This can likely be accelerated.
+    pub events: Vec<Event>,
+
+    /// Channel from which commands are received.
+    ///
+    /// Audio commands are sent in this manner to ensure that access
+    /// occurs in a thread-safe manner, without allowing any external
+    /// code to lock access to audio objects and block packet generation.
+    pub commands: Receiver<AudioCommand>,
 }
 
 impl Audio {
-    pub fn new(source: Box<dyn AudioSource>) -> Self {
+    pub fn new(source: Box<dyn AudioSource>, in_channel: Receiver<AudioCommand>) -> Self {
         Self {
             playing: true,
             volume: 1.0,
@@ -119,6 +143,8 @@ impl Audio {
             source,
             position: Duration::new(0, 0),
             position_modified: false,
+            events: vec![],
+            commands: in_channel,
         }
     }
 
@@ -174,3 +200,45 @@ impl Audio {
 ///
 /// [`Audio`]: struct.Audio.html
 pub type LockedAudio = Arc<Mutex<Audio>>;
+
+pub struct AudioHandle {
+    command_channel: Sender<AudioCommand>,
+    seekable: bool,
+}
+
+impl AudioHandle {
+    pub fn new(command_channel: Sender<AudioCommand>, seekable: bool) -> Self {
+        Self {
+            command_channel,
+            seekable,
+        }
+    }
+
+    pub fn play(&self) {
+        self.command_channel.send(AudioCommand::Play);
+    }
+}
+
+pub enum AudioCommand {
+    Play,
+    Pause,
+    Stop,
+    Volume(f32),
+    Seek(Duration),
+    RegisterEvent(Event),
+    Do(fn(&mut Audio) -> ()),
+    // FIXME: should be an actual type...
+    Request(Vec<AudioRequest>, Sender<()>),
+}
+
+pub enum AudioRequest {
+    Playing,
+    Volume,
+    Position,
+}
+
+pub enum PlayMode {
+    Play,
+    Pause,
+    Stop,
+}

@@ -122,6 +122,10 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
 
         Some(count)
     }
+
+    fn is_seekable(&self) -> bool {
+        false
+    }
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.

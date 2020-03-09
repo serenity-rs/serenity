@@ -5,6 +5,7 @@ mod connection;
 mod connection_info;
 mod dca;
 mod error;
+mod events;
 mod manager;
 mod handler;
 mod payload;
@@ -12,7 +13,7 @@ mod streamer;
 mod threading;
 
 pub use self::{
-    audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio},
+    audio::{Audio, AudioHandle, AudioReceiver, AudioSource, AudioType, LockedAudio},
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
     handler::Handler,
@@ -37,7 +38,7 @@ pub(crate) enum Status {
     Connect(ConnectionInfo),
     Disconnect,
     SetReceiver(Option<Box<dyn AudioReceiver>>),
-    SetSender(Option<LockedAudio>),
-    AddSender(LockedAudio),
+    SetSender(Option<Audio>),
+    AddSender(Audio),
     SetBitrate(Bitrate),
 }
