@@ -889,7 +889,7 @@ pub enum RouteInfo<'a> {
     KickMember {
         guild_id: u64,
         user_id: u64,
-        reason: Option<&'a str>
+        reason: &'a str
     },
     LeaveGroup {
         group_id: u64,
@@ -1392,7 +1392,7 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild_kick_optioned(
                         guild_id,
                         user_id,
-                        reason.unwrap_or(""),
+                        reason,
                     )),
             ),
             RouteInfo::LeaveGroup { group_id } => (

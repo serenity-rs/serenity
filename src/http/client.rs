@@ -1358,7 +1358,7 @@ impl Http {
     }
 
     /// Kicks a member from a guild.
-    pub fn kick_member(&self, guild_id: u64, user_id: u64, reason: Option<&str>) -> Result<()> {
+    pub fn kick_member(&self, guild_id: u64, user_id: u64, reason: &str) -> Result<()> {
 
         self.wind(204, Request {
             body: None,
@@ -1367,7 +1367,7 @@ impl Http {
                 guild_id,
                 user_id,
                 // Supplement an empty string when `reason` is `None`.
-                reason: reason.or(Some("")),
+                reason: reason,
             },
         })
     }

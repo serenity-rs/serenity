@@ -325,7 +325,7 @@ impl Member {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     pub fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.kick_with_reason(cache_http, None)
+        self.kick_with_reason(cache_http, "")
     }
 
     /// Kicks the member from the guild, with a reason.
@@ -355,7 +355,7 @@ impl Member {
     ///
     /// [`kick`]: #method.kick
     #[cfg(feature = "http")]
-    pub fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: Option<&str>) -> Result<()> {
+    pub fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
