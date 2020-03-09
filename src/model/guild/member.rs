@@ -337,7 +337,7 @@ impl Member {
     /// Kicks a member from it's guild, with an optional reason:
     ///
     /// ```rust,ignore
-    /// match member.kick(&ctx.http, Some("Reasons")) {
+    /// match member.kick(&ctx.http, "A Reason") {
     ///     Ok(()) => println!("Successfully kicked member"),
     ///     Err(Error::Model(ModelError::GuildNotFound)) => {
     ///         println!("Couldn't determine guild of member");
