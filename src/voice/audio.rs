@@ -3,9 +3,11 @@ use audiopus::{Bitrate, SampleRate};
 use std::{
     sync::{
         mpsc::{
-            channel,
+            self,
             Receiver,
+            SendError,
             Sender,
+            TryRecvError,
         },
         Arc,
     },
@@ -135,7 +137,7 @@ pub struct Audio {
 }
 
 impl Audio {
-    pub fn new(source: Box<dyn AudioSource>, in_channel: Receiver<AudioCommand>) -> Self {
+    pub fn new(source: Box<dyn AudioSource>, commands: Receiver<AudioCommand>) -> Self {
         Self {
             playing: true,
             volume: 1.0,
@@ -144,7 +146,7 @@ impl Audio {
             position: Duration::new(0, 0),
             position_modified: false,
             events: vec![],
-            commands: in_channel,
+            commands,
         }
     }
 
@@ -162,6 +164,12 @@ impl Audio {
     /// [`playing`]: #structfield.playing
     pub fn pause(&mut self) -> &mut Self {
         self.playing = false;
+
+        self
+    }
+
+    pub fn stop(&mut self) -> &mut Self {
+        self.finished = true;
 
         self
     }
@@ -193,6 +201,53 @@ impl Audio {
         self.position_modified = false;
     }
 
+    pub fn process_commands(&mut self) {
+        // Note: disconnection and an empty channel are both valid,
+        // and should allow the audio object to keep running as intended.
+        //
+        // However, a paused and disconnected stream MUST be stopped
+        // to prevent resource leakage.
+        loop {
+            match self.commands.try_recv() {
+                Ok(cmd) => {
+                    use AudioCommand::*;
+                    match cmd {
+                        Play => {self.play();},
+                        Pause => {self.pause();},
+                        Stop => {self.stop();},
+                        Volume(vol) => {self.volume(vol);},
+                        Seek(time) => unimplemented!(),
+                        AddEvent(evt) => self.events.push(evt),
+                        Do(action) => action(self),
+                        Request(tx) => {tx.send(Box::new(AudioState {
+                            playing: self.playing,
+                            volume: self.volume,
+                            finished: self.finished,
+                            position: self.position,
+                        }));},
+                    }
+                },
+                Err(TryRecvError::Disconnected) => {
+                    if !self.playing {
+                        self.finished = true;
+                    }
+                    break;
+                },
+                Err(TryRecvError::Empty) => {
+                    break;
+                },
+            }
+        }
+    }
+
+}
+
+#[derive(Debug)]
+pub struct AudioState {
+    pub playing: bool,
+    pub volume: f32,
+    pub finished: bool,
+    pub position: Duration,
 }
 
 /// Threadsafe form of an instance of the [`Audio`] struct, locked behind a
@@ -201,6 +256,11 @@ impl Audio {
 /// [`Audio`]: struct.Audio.html
 pub type LockedAudio = Arc<Mutex<Audio>>;
 
+pub type AudioResult = Result<(), SendError<AudioCommand>>;
+pub type AudioQueryResult = Result<Receiver<Box<AudioState>>, SendError<AudioCommand>>;
+pub type AudioFn = fn(&mut Audio) -> ();
+
+#[derive(Debug)]
 pub struct AudioHandle {
     command_channel: Sender<AudioCommand>,
     seekable: bool,
@@ -214,8 +274,48 @@ impl AudioHandle {
         }
     }
 
-    pub fn play(&self) {
-        self.command_channel.send(AudioCommand::Play);
+    pub fn play(&self) -> AudioResult {
+        self.send(AudioCommand::Play)
+    }
+
+    pub fn pause(&self) -> AudioResult {
+        self.send(AudioCommand::Pause)
+    }
+
+    pub fn stop(&self) -> AudioResult {
+        self.send(AudioCommand::Stop)
+    }
+
+    pub fn set_volume(&self, volume: f32) -> AudioResult {
+        self.send(AudioCommand::Volume(volume))
+    }
+
+    pub fn seek(&self, position: Duration) -> AudioResult {
+        if self.seekable {
+            self.send(AudioCommand::Seek(position))
+        } else {
+            Err(SendError(AudioCommand::Seek(position)))
+        }
+    }
+
+    pub fn add_event(&self, event: Event) -> AudioResult {
+        self.send(AudioCommand::AddEvent(event))
+    }
+
+    /// Warn user of taking too much time here...
+    pub fn action(&self, action: AudioFn) -> AudioResult {
+        self.send(AudioCommand::Do(action))
+    }
+
+    pub fn request(&self, action: AudioFn) -> AudioQueryResult {
+        let (tx, rx) = mpsc::channel();
+        self.send(AudioCommand::Request(tx))
+            .map(move |_| rx)
+    }
+
+    #[inline]
+    pub fn send(&self, cmd: AudioCommand) -> AudioResult {
+        self.command_channel.send(cmd)
     }
 }
 
@@ -225,16 +325,25 @@ pub enum AudioCommand {
     Stop,
     Volume(f32),
     Seek(Duration),
-    RegisterEvent(Event),
-    Do(fn(&mut Audio) -> ()),
-    // FIXME: should be an actual type...
-    Request(Vec<AudioRequest>, Sender<()>),
+    AddEvent(Event),
+    Do(AudioFn),
+    Request(Sender<Box<AudioState>>),
 }
 
-pub enum AudioRequest {
-    Playing,
-    Volume,
-    Position,
+impl std::fmt::Debug for AudioCommand {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(),std::fmt::Error> {
+        use AudioCommand::*;
+        write!(f, "AudioCommand::{}", match self {
+            Play => "Play".to_string(),
+            Pause => "Pause".to_string(),
+            Stop => "Stop".to_string(),
+            Volume(vol) => format!("Volume({})", vol),
+            Seek(d) => format!("Seek({:?})", d),
+            AddEvent(evt) => format!("AddEvent({:?})", evt),
+            Do(f) => "Do([function])".to_string(),
+            Request(tx) => format!("Request({:?})", tx),
+        })
+    }
 }
 
 pub enum PlayMode {

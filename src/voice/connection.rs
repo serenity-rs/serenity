@@ -385,17 +385,18 @@ impl Connection {
         let mut i = 0;
 
         while i < sources.len() {
-            let mut finished = false;
-
-            // let aud_lock = (&sources[i]).clone();
             let mut aud = sources.get_mut(i).unwrap();
 
             let vol = aud.volume;
-            let skip = !aud.playing;
+            let skip = !aud.playing || aud.finished;
 
             let stream = &mut aud.source;
 
             if skip {
+                if aud.finished {
+                    sources.remove(i);
+                }
+            
                 i += 1;
 
                 continue;
@@ -444,13 +445,28 @@ impl Connection {
                 1
             } else {
                 aud.finished = true;
-                sources.remove(i);
                 
                 0
             };
+
+            if aud.finished {
+                sources.remove(i);
+            }
         };
 
         Ok(len)
+    }
+
+    #[inline]
+    pub fn audio_commands_events(&mut self, mut sources: &mut Vec<Audio>) {
+        for audio in sources.iter_mut() {
+            audio.process_commands();
+        }
+    }
+
+    #[inline]
+    pub fn global_events(&mut self) {
+        // TODO
     }
 
     #[allow(unused_variables)]
@@ -560,6 +576,9 @@ impl Connection {
 
         self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
+
+        self.audio_commands_events(&mut sources);
+        self.global_events();
 
         Ok(())
     }

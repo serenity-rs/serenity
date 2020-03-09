@@ -260,7 +260,9 @@ fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             },
         };
 
-        handler.play(source);
+        // This handler object will allow you to, as needed,
+        // control the audio track.
+        let _song = handler.play(source);
 
         check_msg(msg.channel_id.say(&ctx.http, "Playing song"));
     } else {
