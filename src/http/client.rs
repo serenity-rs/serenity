@@ -1366,7 +1366,7 @@ impl Http {
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
-                reason: reason,
+                reason,
             },
         })
     }
