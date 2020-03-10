@@ -1366,7 +1366,6 @@ impl Http {
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
-                // Supplement an empty string when `reason` is `None`.
                 reason: reason,
             },
         })
