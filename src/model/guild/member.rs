@@ -374,7 +374,7 @@ impl Member {
             }
         }
 
-        self.guild_id.kick(cache_http.http(), self.user.read().id, reason)
+        self.guild_id.kick_with_reason(cache_http.http(), self.user.read().id, reason)
     }
 
 

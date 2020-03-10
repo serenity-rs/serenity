@@ -1358,7 +1358,12 @@ impl Http {
     }
 
     /// Kicks a member from a guild.
-    pub fn kick_member(&self, guild_id: u64, user_id: u64, reason: &str) -> Result<()> {
+    pub fn kick_member(&self, guild_id: u64, user_id: u64) -> Result<()> {
+        self.kick_member_with_reason(guild_id, user_id, "")
+    }
+
+    /// Kicks a member from a guild with a provided reason.
+    pub fn kick_member_with_reason(&self, guild_id: u64, user_id: u64, reason: &str) -> Result<()> {
 
         self.wind(204, Request {
             body: None,
