@@ -16,6 +16,7 @@ pub use self::{
     audio::{Audio, AudioHandle, AudioReceiver, AudioSource, AudioType, LockedAudio},
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
+    events::{Event, EventContext, EventData, EventFn, TrackEvent},
     handler::Handler,
     manager::Manager,
     streamer::{

@@ -30,3 +30,5 @@ pub use crate::model::ModelError;
 pub use typemap::{Key as TypeMapKey, ShareMap};
 #[cfg(feature = "voice")]
 pub use crate::voice::VoiceError;
+#[cfg(feature = "voice")]
+pub use chrono::Duration as ChronoDuration;

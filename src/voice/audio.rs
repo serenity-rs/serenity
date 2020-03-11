@@ -258,6 +258,7 @@ pub type LockedAudio = Arc<Mutex<Audio>>;
 
 pub type AudioResult = Result<(), SendError<AudioCommand>>;
 pub type AudioQueryResult = Result<Receiver<Box<AudioState>>, SendError<AudioCommand>>;
+pub type BlockingAudioQueryResult = Result<Box<AudioState>, SendError<AudioCommand>>;
 pub type AudioFn = fn(&mut Audio) -> ();
 
 #[derive(Debug)]
@@ -307,10 +308,16 @@ impl AudioHandle {
         self.send(AudioCommand::Do(action))
     }
 
-    pub fn request(&self, action: AudioFn) -> AudioQueryResult {
+    pub fn get_info(&self) -> AudioQueryResult {
         let (tx, rx) = mpsc::channel();
         self.send(AudioCommand::Request(tx))
             .map(move |_| rx)
+    }
+
+    pub fn get_info_blocking(&self) -> BlockingAudioQueryResult {
+        // FIXME: combine into audio error type.
+        self.get_info()
+            .map(|c| c.recv().unwrap())
     }
 
     #[inline]
