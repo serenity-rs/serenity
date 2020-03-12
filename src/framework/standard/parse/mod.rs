@@ -8,6 +8,7 @@ pub mod map;
 use map::{CommandMap, GroupMap, ParseMap};
 
 use std::borrow::Cow;
+use futures::future::{BoxFuture, FutureExt};
 
 #[inline]
 fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
@@ -119,7 +120,7 @@ pub fn prefix<'a>(
 }
 
 /// Checked per valid group or command in the message.
-fn check_discrepancy(
+async fn check_discrepancy(
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
@@ -140,14 +141,14 @@ fn check_discrepancy(
     #[cfg(feature = "cache")]
     {
         if let Some(guild_id) = msg.guild_id {
-            let guild = match guild_id.to_guild_cached(&ctx) {
+            let guild = match guild_id.to_guild_cached(&ctx).await {
                 Some(g) => g,
                 None => return Ok(()),
             };
 
-            let guild = guild.read();
+            let guild = guild.read().await;
 
-            let perms = guild.user_permissions_in(msg.channel_id, msg.author.id);
+            let perms = guild.user_permissions_in(msg.channel_id, msg.author.id).await;
 
             if !perms.contains(*options.required_permissions())
                 && !(options.owner_privilege() && config.owners.contains(&msg.author.id))
@@ -198,84 +199,91 @@ fn try_parse<M: ParseMap>(
     }
 }
 
-fn parse_cmd(
-    stream: &mut Stream<'_>,
-    ctx: &Context,
-    msg: &Message,
-    config: &Configuration,
-    map: &CommandMap,
-) -> Result<&'static Command, ParseError> {
-    let (n, r) = try_parse(stream, map, config.by_space, |s| {
-        to_lowercase(config, s).into_owned()
-    });
+// Recursive function returning the actual async logic.
+fn parse_cmd<'a>(
+    stream: &'a mut Stream<'_>,
+    ctx: &'a Context,
+    msg: &'a Message,
+    config: &'a Configuration,
+    map: &'a CommandMap,
+) -> BoxFuture<'a, Result<&'static Command, ParseError>> {
+    async move {
+        let (n, r) = try_parse(stream, map, config.by_space, |s| {
+            to_lowercase(config, s).into_owned()
+        });
 
-    if config.disabled_commands.contains(&n) {
-        return Err(ParseError::Dispatch(DispatchError::CommandDisabled(n)));
-    }
-
-    if let Some((cmd, map)) = r {
-        stream.increment(n.len());
-
-        if config.with_whitespace.commands {
-            stream.take_while(|s| s.is_whitespace());
+        if config.disabled_commands.contains(&n) {
+            return Err(ParseError::Dispatch(DispatchError::CommandDisabled(n)));
         }
 
-        check_discrepancy(ctx, msg, config, &cmd.options)?;
+        if let Some((cmd, map)) = r {
+            stream.increment(n.len());
 
-        if map.is_empty() {
-            return Ok(cmd);
+            if config.with_whitespace.commands {
+                stream.take_while(|s| s.is_whitespace());
+            }
+
+            check_discrepancy(ctx, msg, config, &cmd.options).await?;
+
+            if map.is_empty() {
+                return Ok(cmd);
+            }
+
+            return match parse_cmd(stream, ctx, msg, config, &map).await {
+                Err(ParseError::UnrecognisedCommand(Some(_))) => Ok(cmd),
+                res => res,
+            };
         }
 
-        return match parse_cmd(stream, ctx, msg, config, &map) {
-            Err(ParseError::UnrecognisedCommand(Some(_))) => Ok(cmd),
-            res => res,
-        };
-    }
-
-    Err(ParseError::UnrecognisedCommand(Some(n.to_string())))
+        Err(ParseError::UnrecognisedCommand(Some(n.to_string())))
+    }.boxed()
 }
 
-fn parse_group(
-    stream: &mut Stream<'_>,
-    ctx: &Context,
-    msg: &Message,
-    config: &Configuration,
-    map: &GroupMap,
-) -> Result<(&'static CommandGroup, Arc<CommandMap>), ParseError> {
-    let (n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
 
-    if let Some((group, map, commands)) = o {
-        stream.increment(n.len());
+// Recursive blocking function that calls its async variant.
+fn parse_group<'a>(
+    stream: &'a mut Stream<'_>,
+    ctx: &'a Context,
+    msg: &'a Message,
+    config: &'a Configuration,
+    map: &'a GroupMap,
+) -> BoxFuture<'a, Result<(&'static CommandGroup, Arc<CommandMap>), ParseError>> {
+    async move {
+        let (n, o) = try_parse(stream, map, config.by_space, ToString::to_string);
 
-        if config.with_whitespace.groups {
-            stream.take_while(|s| s.is_whitespace());
+        if let Some((group, map, commands)) = o {
+            stream.increment(n.len());
+
+            if config.with_whitespace.groups {
+                stream.take_while(|s| s.is_whitespace());
+            }
+
+            check_discrepancy(ctx, msg, config, &group.options).await?;
+
+            if map.is_empty() {
+                return Ok((group, commands));
+            }
+
+            return match parse_group(stream, ctx, msg, config, &map).await {
+                Err(ParseError::UnrecognisedCommand(None)) => Ok((group, commands)),
+                res => res,
+            };
         }
 
-        check_discrepancy(ctx, msg, config, &group.options)?;
-
-        if map.is_empty() {
-            return Ok((group, commands));
-        }
-
-        return match parse_group(stream, ctx, msg, config, &map) {
-            Err(ParseError::UnrecognisedCommand(None)) => Ok((group, commands)),
-            res => res,
-        };
-    }
-
-    Err(ParseError::UnrecognisedCommand(None))
+        Err(ParseError::UnrecognisedCommand(None))
+    }.boxed()
 }
 
 #[inline]
-fn handle_command(
-    stream: &mut Stream<'_>,
-    ctx: &Context,
-    msg: &Message,
-    config: &Configuration,
-    map: &CommandMap,
+async fn handle_command<'a>(
+    stream: &'a mut Stream<'_>,
+    ctx: &'a Context,
+    msg: &'a Message,
+    config: &'a Configuration,
+    map: &'a CommandMap,
     group: &'static CommandGroup,
 ) -> Result<Invoke, ParseError> {
-    match parse_cmd(stream, ctx, msg, config, map) {
+    match parse_cmd(stream, ctx, msg, config, map).await {
         Ok(command) => Ok(Invoke::Command { group, command }),
         Err(err) => match group.options.default_command {
             Some(command) => Ok(Invoke::Command { group, command }),
@@ -285,15 +293,17 @@ fn handle_command(
 }
 
 #[inline]
-fn handle_group(
+async fn handle_group(
     stream: &mut Stream<'_>,
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
     map: &GroupMap,
 ) -> Result<Invoke, ParseError> {
-    parse_group(stream, ctx, msg, config, map)
-        .and_then(|(group, map)| handle_command(stream, ctx, msg, config, &map, group))
+    match parse_group(stream, ctx, msg, config, map).await {
+        Ok((group, map)) => handle_command(stream, ctx, msg, config, &map, group).await,
+        Err(error) => Err(error),
+    }
 }
 
 #[derive(Debug)]
@@ -318,7 +328,7 @@ impl From<DispatchError> for ParseError {
 ///
 /// 2. A command defined under another command or a group, which may also belong to another group and so on.
 /// To invoke this command, all names and prefixes of its parent commands and groups must be specified before it.
-pub fn command(
+pub async fn command(
     ctx: &Context,
     msg: &Message,
     stream: &mut Stream<'_>,
@@ -347,7 +357,7 @@ pub fn command(
         match map {
             // Includes [group] itself.
             Map::WithPrefixes(map) => {
-                let res = handle_group(stream, ctx, msg, config, map);
+                let res = handle_group(stream, ctx, msg, config, map).await;
 
                 if res.is_ok() {
                     return res;
@@ -356,18 +366,18 @@ pub fn command(
                 last = res;
             }
             Map::Prefixless(subgroups, commands) => {
-                let res = handle_group(stream, ctx, msg, config, subgroups);
+                let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
                 if res.is_ok() {
-                    check_discrepancy(ctx, msg, config, &group.options)?;
+                    check_discrepancy(ctx, msg, config, &group.options).await?;
 
                     return res;
                 }
 
-                let res = handle_command(stream, ctx, msg, config, commands, group);
+                let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
                 if res.is_ok() {
-                    check_discrepancy(ctx, msg, config, &group.options)?;
+                    check_discrepancy(ctx, msg, config, &group.options).await?;
 
                     return res;
                 }

@@ -1,9 +1,13 @@
 use chrono::Utc;
 use crate::client::Context;
 use crate::model::id::{ChannelId, GuildId, UserId};
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+};
+use futures::future::BoxFuture;
 
-type Check = dyn Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
+type Check = for<'fut> fn(&'fut mut Context, Option<GuildId>, ChannelId, UserId)
+    -> BoxFuture<'fut, bool>;
 
 pub(crate) struct Ratelimit {
     pub delay: i64,
@@ -20,7 +24,7 @@ pub(crate) struct MemberRatelimit {
 pub(crate) struct Bucket {
     pub ratelimit: Ratelimit,
     pub users: HashMap<u64, MemberRatelimit>,
-    pub check: Option<Box<Check>>,
+    pub check: Option<Check>,
 }
 
 impl Bucket {
@@ -57,7 +61,7 @@ pub struct BucketBuilder {
     pub(crate) delay: i64,
     pub(crate) time_span: i64,
     pub(crate) limit: i32,
-    pub(crate) check: Option<Box<Check>>,
+    pub(crate) check: Option<Check>,
 }
 
 impl BucketBuilder {
@@ -96,11 +100,8 @@ impl BucketBuilder {
     /// Middleware confirming (or denying) that the bucket is eligible to apply.
     /// For instance, to limit the bucket to just one user.
     #[inline]
-    pub fn check<F>(&mut self, f: F) -> &mut Self
-    where
-        F: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static
-    {
-        self.check = Some(Box::new(f));
+    pub fn check(&mut self, f: Check) -> &mut Self {
+        self.check = Some(f);
 
         self
     }

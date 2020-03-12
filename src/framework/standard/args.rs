@@ -1,9 +1,10 @@
 use uwl::Stream;
 
-use std::cell::Cell;
+use std::sync::Arc;
 use std::error::Error as StdError;
 use std::marker::PhantomData;
 use std::{fmt, str::FromStr};
+use tokio::sync::RwLock;
 
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]
@@ -282,7 +283,7 @@ pub struct Args {
     message: String,
     args: Vec<Token>,
     offset: usize,
-    state: Cell<State>,
+    state: Arc<RwLock<State>>,
 }
 
 impl Args {
@@ -350,7 +351,7 @@ impl Args {
             args,
             message: message.to_string(),
             offset: 0,
-            state: Cell::new(State::None),
+            state: Arc::new(RwLock::new(State::None)),
         }
     }
 
@@ -401,7 +402,7 @@ impl Args {
         self.offset = 0;
     }
 
-    fn apply<'a>(&self, s: &'a str) -> &'a str {
+    async fn apply<'a>(&self, s: &'a str) -> &'a str {
         fn trim(s: &str) -> &str {
             let trimmed = s.trim();
 
@@ -414,25 +415,29 @@ impl Args {
 
         let mut s = s;
 
-        match self.state.get() {
-            State::None => {}
-            State::Quoted => {
-                s = remove_quotes(s);
-            }
-            State::Trimmed => {
-                s = trim(s);
-            }
-            State::QuotedTrimmed => {
-                s = remove_quotes(s);
-                s = trim(s);
-            }
-            State::TrimmedQuoted => {
-                s = trim(s);
-                s = remove_quotes(s);
-            }
-        }
+        {
+            let mut state = self.state.write().await;
 
-        self.state.set(State::None);
+            match *state {
+                State::None => {}
+                State::Quoted => {
+                    s = remove_quotes(s);
+                }
+                State::Trimmed => {
+                    s = trim(s);
+                }
+                State::QuotedTrimmed => {
+                    s = remove_quotes(s);
+                    s = trim(s);
+                }
+                State::TrimmedQuoted => {
+                    s = trim(s);
+                    s = remove_quotes(s);
+                }
+            }
+
+            *state = State::None;
+        }
 
         s
     }
@@ -462,13 +467,13 @@ impl Args {
     /// [`trimmed`]: #method.trimmed
     /// [`quoted`]: #method.quoted
     #[inline]
-    pub fn current(&self) -> Option<&str> {
+    pub async fn current(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
         }
 
         let mut s = self.slice();
-        s = self.apply(s);
+        s = self.apply(s).await;
 
         Some(s)
     }
@@ -487,15 +492,19 @@ impl Args {
     /// assert_eq!(args.current(), Some("     42     "));
     /// assert_eq!(args.message(), "     42     ");
     /// ```
-    pub fn trimmed(&mut self) -> &mut Self {
+    pub async fn trimmed(&mut self) -> &mut Self {
         if self.is_empty() {
             return self;
         }
 
-        match self.state.get() {
-            State::None => self.state.set(State::Trimmed),
-            State::Quoted => self.state.set(State::QuotedTrimmed),
-            _ => {}
+        {
+            let mut state = self.state.write().await;
+
+            match *state {
+                State::None => *state = State::Trimmed,
+                State::Quoted => *state = State::QuotedTrimmed,
+                _ => {}
+            }
         }
 
         self
@@ -517,7 +526,7 @@ impl Args {
     /// assert_eq!(args.current(), Some("\"42\""));
     /// assert_eq!(args.message(), "\"42\"");
     /// ```
-    pub fn quoted(&mut self) -> &mut Self {
+    pub async fn quoted(&mut self) -> &mut Self {
         if self.is_empty() {
             return self;
         }
@@ -525,9 +534,11 @@ impl Args {
         let is_quoted = self.args[self.offset].kind == TokenKind::QuotedArgument;
 
         if is_quoted {
-            match self.state.get() {
-                State::None => self.state.set(State::Quoted),
-                State::Trimmed => self.state.set(State::TrimmedQuoted),
+            let mut state = self.state.write().await;
+
+            match *state {
+                State::None => *state = State::Quoted,
+                State::Trimmed => *state = State::TrimmedQuoted,
                 _ => {}
             }
         }
@@ -553,8 +564,8 @@ impl Args {
     /// [`trimmed`]: #method.trimmed
     /// [`quoted`]: #method.quoted
     #[inline]
-    pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
-        T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
+    pub async fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
+        T::from_str(self.current().await.ok_or(Error::Eos)?).map_err(Error::Parse)
     }
 
     /// Parse the current argument and advance.
@@ -579,8 +590,8 @@ impl Args {
     /// [`parse`]: #method.parse
     /// [`next`]: #method.next
     #[inline]
-    pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
-        let p = self.parse::<T>()?;
+    pub async fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
+        let p = self.parse::<T>().await?;
         self.advance();
         Ok(p)
     }
@@ -602,8 +613,8 @@ impl Args {
     /// ```
     ///
     #[inline]
-    pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
-        let p = self.quoted().parse::<T>()?;
+    pub async fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
+        let p = self.quoted().await.parse::<T>().await?;
         self.advance();
         Ok(p)
     }
@@ -706,7 +717,7 @@ impl Args {
     /// assert_eq!(args.single::<String>().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
-    pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
+    pub async fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
         }
@@ -723,8 +734,7 @@ impl Args {
         };
 
         self.offset = pos;
-
-        let parsed = self.single_quoted::<T>()?;
+        let parsed = self.single_quoted::<T>().await?;
 
         self.args.remove(pos);
         self.offset = before;
@@ -749,7 +759,7 @@ impl Args {
     /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
-    pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
+    pub async fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
         }
@@ -766,8 +776,7 @@ impl Args {
         };
 
         self.offset = pos;
-
-        let parsed = self.quoted().parse::<T>()?;
+        let parsed = self.quoted().await.parse::<T>().await?;
 
         self.offset = before;
 
@@ -838,15 +847,15 @@ pub struct Iter<'a, T: FromStr> {
 
 impl<'a, T: FromStr> Iter<'a, T> {
     /// Retrieve the current argument.
-    pub fn current(&self) -> Option<&str> {
-        self.args.state.set(self.state);
-        self.args.current()
+    pub async fn current(&self) -> Option<&str> {
+        *self.args.state.write().await = self.state;
+        self.args.current().await
     }
 
     /// Parse the current argument independently.
-    pub fn parse(&self) -> Result<T, T::Err> {
-        self.args.state.set(self.state);
-        self.args.parse::<T>()
+    pub async fn parse(&self) -> Result<T, T::Err> {
+        *self.args.state.write().await = self.state;
+        self.args.parse::<T>().await
     }
 
     /// Remove surrounding quotation marks from all of the arguments.
@@ -881,7 +890,7 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> {
         if self.args.is_empty() {
             None
         } else {
-            let arg = self.parse();
+            let arg = futures::executor::block_on(self.parse());
             self.args.advance();
             Some(arg)
         }

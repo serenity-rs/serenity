@@ -180,13 +180,6 @@ pub struct Client {
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
     pub data: Arc<RwLock<ShareMap>>,
-    /// A vector of all active shards that have received their [`Event::Ready`]
-    /// payload, and have dispatched to [`on_ready`] if an event handler was
-    /// configured.
-    ///
-    /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`on_ready`]: #method.on_ready
-    #[cfg(feature = "framework")] framework: Arc<Option<Box<dyn Framework + Send + Sync>>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -332,8 +325,11 @@ impl Client {
     /// #    try_main().unwrap();
     /// # }
     /// ```
+    #[cfg(feature = "framework")]
     pub async fn new_with_framework<H: EventHandler + 'static, F: Framework + Send + Sync + 'static>(token: impl AsRef<str>, handler: H, framework: F) -> Result<Self> {
-        Self::new_with_extras(token, |e| e.event_handler(handler), Some(Box::new(framework))).await
+        Self::new_with_extras(token, |e|
+            e.event_handler(handler).framework(framework)
+        ).await
     }
 
     /// Creates a Client for a bot user but without framework.
@@ -342,12 +338,11 @@ impl Client {
     /// this function will automatically do for you if not already included.
     ///
     pub async fn new<H: EventHandler + 'static>(token: impl AsRef<str>, handler: H) -> Result<Self> {
-        Self::new_with_extras(token, |e| e.event_handler(handler), None::<Box<dyn Framework + Send + Sync + 'static>>).await
+        Self::new_with_extras(token, |e| e.event_handler(handler)).await
     }
 
     /// Creates a client with extra configuration.
-    pub async fn new_with_extras(token: impl AsRef<str>, f: impl FnOnce(&mut Extras) -> &mut Extras, fw: Option<Box<dyn Framework + Send + Sync + 'static>>) -> Result<Self>
-    {
+    pub async fn new_with_extras(token: impl AsRef<str>, f: impl FnOnce(&mut Extras) -> &mut Extras) -> Result<Self> {
         let token = token.as_ref().trim();
 
         let token = if token.starts_with("Bot ") {
@@ -363,6 +358,8 @@ impl Client {
         let Extras {
             event_handler,
             raw_event_handler,
+            #[cfg(feature = "framework")]
+            framework,
             #[cfg(feature = "cache")]
             timeout,
             guild_subscriptions,
@@ -391,7 +388,7 @@ impl Client {
         });
 
         #[cfg(feature = "framework")]
-        let framework: Arc<Option<Box<dyn Framework + Send + Sync>>> = Arc::new(fw);
+        let framework: Arc<Option<Box<dyn Framework + Send + Sync>>> = framework;
 
         let (shard_manager, shard_manager_worker) = {
             ShardManager::new(ShardManagerOptions {
@@ -414,8 +411,6 @@ impl Client {
 
         Ok(Client {
             ws_uri: url,
-            #[cfg(feature = "framework")]
-            framework,
             data,
             shard_manager,
             shard_manager_worker,
@@ -424,126 +419,6 @@ impl Client {
             voice_manager,
             cache_and_http,
         })
-    }
-
-    /// Sets a framework to be used with the client. All message events will be
-    /// passed through the framework _after_ being passed to the [`message`]
-    /// event handler.
-    ///
-    /// See the [framework module-level documentation][framework docs] for more
-    /// information on usage.
-    ///
-    /// # Examples
-    ///
-    /// Create a simple framework that responds to a `~ping` command:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
-    /// # use std::error::Error;
-    /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// use std::env;
-    ///
-    /// use serenity::framework::StandardFramework;
-    /// use serenity::client::{Client, Context};
-    /// use serenity::model::channel::Message;
-    /// use serenity::framework::standard::{CommandResult, macros::{group, command}};
-    ///
-    /// #[command]
-    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "Pong!")?;
-    ///     Ok(())
-    /// }
-    ///
-    /// // Commands must be intermediately handled through groups.
-    /// #[group("pingpong")]
-    /// #[commands(ping)]
-    /// struct PingPong;
-    /// #
-    /// # fn try_main() -> Result<(), Box<dyn Error>> {
-    ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
-    /// client.with_framework(StandardFramework::new()
-    ///     .configure(|c| c.prefix("~"))
-    ///     // The macros generate instances of command and group structs, which reside as `static` variables.
-    ///     // Hence the uppercase name, and the suffix for distinguishment.
-    ///     .group(&PINGPONG_GROUP));
-    /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
-    /// ```
-    ///
-    /// Using your own framework:
-    ///
-    /// ```rust,ignore
-    /// # use serenity::prelude::EventHandler;
-    /// # use std::error::Error;
-    /// #
-    /// use serenity::Framework;
-    /// use serenity::client::Context;
-    /// use serenity::model::*;
-    /// use tokio_core::reactor::Handle;
-    /// use std::collections::HashMap;
-    ///
-    ///
-    /// struct MyFramework {
-    ///     commands: HashMap<String, Box<Fn(Message, Vec<String>)>>,
-    /// }
-    ///
-    /// impl Framework for MyFramework {
-    ///     fn dispatch(&mut self, _: Context, msg: Message, tokio_handle: &Handle) {
-    ///         let args = msg.content.split_whitespace();
-    ///         let command = match args.advance() {
-    ///             Some(command) => {
-    ///                 if !command.starts_with('*') { return; }
-    ///                 command
-    ///             },
-    ///             None => return,
-    ///         };
-    ///
-    ///         let command = match self.commands.get(&command) {
-    ///             Some(command) => command, None => return,
-    ///         };
-    ///
-    ///         tokio_handle.spawn_fn(move || { (command)(msg, args); Ok() });
-    ///     }
-    /// }
-    ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
-    /// use std::env;
-    ///
-    /// let mut client = Client::new(&token, Handler).unwrap();
-    /// client.with_framework(MyFramework { commands: {
-    ///     let mut map = HashMap::new();
-    ///     map.insert("ping".to_string(), Box::new(|msg, _| msg.channel_id.say("pong!")));
-    ///     map
-    /// }});
-    /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
-    /// ```
-    /// Refer to the documentation for the `framework` module for more in-depth
-    /// information.
-    ///
-    /// [`message`]: trait.EventHandler.html#method.message
-    /// [framework docs]: ../framework/index.html
-    #[cfg(feature = "framework")]
-    pub fn with_framework<F: Framework + Send + Sync + 'static>(&mut self, f: F) {
-        self.framework = Arc::new(Some(Box::new(f)));
     }
 
     /// Establish the connection and start listening for events.

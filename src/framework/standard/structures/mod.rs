@@ -10,6 +10,7 @@ use crate::model::{
 };
 use crate::utils::Colour;
 use super::Args;
+use futures::future::BoxFuture;
 
 mod check;
 pub mod buckets;
@@ -77,9 +78,8 @@ impl<T: fmt::Display> From<T> for CommandError {
     }
 }
 
-pub type CommandResult = ::std::result::Result<(), CommandError>;
-
-pub type CommandFn = fn(&mut Context, &Message, Args) -> CommandResult;
+pub type CommandResult = std::result::Result<(), CommandError>;
+pub type CommandFn = for<'fut> fn(&'fut mut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
     pub fun: CommandFn,
@@ -101,14 +101,14 @@ impl PartialEq for Command {
     }
 }
 
-pub type HelpCommandFn = fn(
-    &mut Context,
-    &Message,
+pub type HelpCommandFn = for<'fut> fn(
+    &'fut mut Context,
+    &'fut Message,
     Args,
-    &'static HelpOptions,
-    &[&'static CommandGroup],
+    &'fut HelpOptions,
+    &'fut [&'static CommandGroup],
     HashSet<UserId>,
-) -> CommandResult;
+) -> BoxFuture<'fut, CommandResult>;
 
 pub struct HelpCommand {
     pub fun: HelpCommandFn,
