@@ -1,16 +1,16 @@
-use parking_lot::Mutex;
+use tokio::sync::Mutex;
 use std::{
     sync::{
-        mpsc::{
-            Receiver,
-            Sender
-        },
         Arc,
     }
 };
 use super::{ShardManager, ShardManagerMessage};
 use super::super::gateway::ShardId;
 use log::{debug, warn};
+use futures::{
+    channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
+    StreamExt,
+};
 
 /// The shard manager monitor does what it says on the tin -- it monitors the
 /// shard manager and performs actions on it as received.
@@ -43,17 +43,18 @@ impl ShardManagerMonitor {
     /// channel (probably indicating that the shard manager should stop anyway)
     ///
     /// [`ShardManagerMessage::ShutdownAll`]: enum.ShardManagerMessage.html#variant.ShutdownAll
-    pub fn run(&mut self) {
+    pub async fn run(&mut self) {
         debug!("Starting shard manager worker");
 
-        while let Ok(value) = self.rx.recv() {
+        while let Some(value) = self.rx.next().await {
+            
             match value {
                 ShardManagerMessage::Restart(shard_id) => {
-                    self.manager.lock().restart(shard_id);
+                    self.manager.lock().await.restart(shard_id).await;
                 },
                 ShardManagerMessage::ShardUpdate { id, latency, stage } => {
-                    let manager = self.manager.lock();
-                    let mut runners = manager.runners.lock();
+                    let manager = self.manager.lock().await;
+                    let mut runners = manager.runners.lock().await;
 
                     if let Some(runner) = runners.get_mut(&id) {
                         runner.latency = latency;
@@ -61,16 +62,16 @@ impl ShardManagerMonitor {
                     }
                 }
                 ShardManagerMessage::Shutdown(shard_id) => {
-                    self.manager.lock().shutdown(shard_id);
+                    self.manager.lock().await.shutdown(shard_id).await;
                 },
                 ShardManagerMessage::ShutdownAll => {
-                    self.manager.lock().shutdown_all();
+                    self.manager.lock().await.shutdown_all().await;
 
                     break;
                 },
                 ShardManagerMessage::ShutdownInitiated => break,
                 ShardManagerMessage::ShutdownFinished(shard_id) => {
-                    if let Err(why) = self.shutdown.send(shard_id) {
+                    if let Err(why) = self.shutdown.unbounded_send(shard_id) {
                         warn!(
                             "[ShardMonitor] Could not forward Shutdown signal to ShardManager for shard {}: {:#?}",
                             shard_id,
@@ -80,5 +81,6 @@ impl ShardManagerMonitor {
                 }
             }
         }
+        warn!("deads");
     }
 }

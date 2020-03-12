@@ -1,8 +1,8 @@
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
-use std::sync::mpsc::{SendError, Sender};
-use tungstenite::Message;
+use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
+use async_tungstenite::tungstenite::Message;
 
 /// A lightweight wrapper around an mpsc sender.
 ///
@@ -50,7 +50,7 @@ impl ShardMessenger {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -77,7 +77,7 @@ impl ShardMessenger {
     /// query parameter of `"do"`:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -127,7 +127,7 @@ impl ShardMessenger {
     /// Setting the current activity to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -161,7 +161,7 @@ impl ShardMessenger {
     /// online:
     ///
     /// ```rust,ignore
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -201,7 +201,7 @@ impl ShardMessenger {
     /// Setting the current online status for the shard to [`DoNotDisturb`].
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
@@ -252,9 +252,10 @@ impl ShardMessenger {
         let _ = self.send(ShardRunnerMessage::Message(message));
     }
 
+    /// Sends a message to the shard. You
     #[inline]
     fn send(&self, msg: ShardRunnerMessage)
-        -> Result<(), SendError<InterMessage>> {
-        self.tx.send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+        -> Result<(), TrySendError<InterMessage>> {
+        self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
     }
 }

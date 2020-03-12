@@ -6,7 +6,7 @@ use std::{
         Result as FmtResult
     }
 };
-use tungstenite::protocol::CloseFrame;
+use async_tungstenite::tungstenite::protocol::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///

@@ -3,7 +3,7 @@ use crate::model::{
     id::GuildId,
     user::OnlineStatus,
 };
-use tungstenite::Message;
+use async_tungstenite::tungstenite::Message;
 
 /// A message to send from a shard over a WebSocket.
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
