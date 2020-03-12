@@ -1,4 +1,5 @@
 use super::Cache;
+use async_trait::async_trait;
 
 /// Trait used for updating the cache with a type.
 ///
@@ -46,7 +47,7 @@ use super::Cache;
 ///         match cache.users.entry(self.user_id) {
 ///             Entry::Occupied(entry) => {
 ///                 let user = entry.get();
-///                 let mut writer = user.write();
+///                 let mut writer = user.write().await;
 ///                 let old = writer.clone();
 ///
 ///                 writer.bot = self.user_is_bot;
@@ -104,6 +105,7 @@ use super::Cache;
 /// ```
 ///
 /// [`Cache::update`]: struct.Cache.html#method.update
+#[async_trait]
 pub trait CacheUpdate {
     /// The return type of an update.
     ///
@@ -111,5 +113,5 @@ pub trait CacheUpdate {
     type Output;
 
     /// Updates the cache with the implementation.
-    fn update(&mut self, _: &mut Cache) -> Option<Self::Output>;
+    async fn update(&mut self, _: &mut Cache) -> Option<Self::Output>;
 }
