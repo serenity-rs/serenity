@@ -14,7 +14,6 @@ edition = "2018"
 [dependencies]
 bitflags = "1"
 log = "0.4"
-parking_lot = "0.9"
 serde_json = "1"
 async-trait = "0.1"
 async-tls = "0.6"
@@ -26,7 +25,7 @@ version = "1.1"
 
 [dependencies.audiopus]
 optional = true
-version = "0.1"
+version = "0.2"
 
 [dependencies.command_attr]
 path = "./command_attr"
@@ -86,10 +85,11 @@ version = "0.2"
 optional = true
 version = "1"
 
-[dependencies.tungstenite]
+[dependencies.async-tungstenite]
 default-features = false
+features = ["tokio-runtime", "tokio-tls"]
 optional = true
-version = "0.9"
+version = "0.4"
 
 [dependencies.typemap]
 optional = true
@@ -165,8 +165,8 @@ gateway = [
 ]
 http = ["url"]
 absolute_ratelimits = ["http"]
-rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls", "webpki", "webpki-roots"]
-native_tls_backend = ["reqwest/native-tls", "tungstenite/tls"]
+rustls_backend = ["reqwest/rustls-tls", "async-tungstenite", "rustls", "webpki", "webpki-roots"]
+native_tls_backend = ["reqwest/native-tls", "async-tungstenite/async-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
