@@ -184,12 +184,15 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let res = parse_quote!(serenity::framework::standard::CommandResult);
     create_return_type_validation(&mut fun, res);
 
+    let visibility = fun.visibility;
     let name = fun.name.clone();
     let options = name.with_suffix(COMMAND_OPTIONS);
     let sub_commands = sub_commands
         .into_iter()
         .map(|i| i.with_suffix(COMMAND))
         .collect::<Vec<_>>();
+    let body = fun.body;
+    let ret = fun.ret;
 
     let n = name.with_suffix(COMMAND);
 
@@ -198,6 +201,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let options_path = quote!(serenity::framework::standard::CommandOptions);
     let command_path = quote!(serenity::framework::standard::Command);
+
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
 
     (quote! {
         #(#cooked)*
@@ -226,7 +232,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             options: &#options,
         };
 
-        #fun
+        #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
     })
     .into()
 }
@@ -443,6 +453,11 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let options_path = quote!(serenity::framework::standard::HelpOptions);
     let command_path = quote!(serenity::framework::standard::HelpCommand);
 
+    let body = fun.body;
+    let ret = fun.ret;
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
+
     (quote! {
         #(#cooked)*
         pub static #options: #options_path = #options_path {
@@ -476,13 +491,17 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             indention_prefix: #indention_prefix,
         };
 
+        pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
+
         #(#cooked2)*
         pub static #n: #command_path = #command_path {
             fun: #nn,
             options: &#options,
         };
-
-        #fun
     })
     .into()
 }
@@ -722,6 +741,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let n = fun.name.clone();
     let n2 = name.clone();
+    let visibility = fun.visibility;
     let name = if name.is_empty() {
         fun.name.clone()
     } else {
@@ -730,6 +750,11 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);
+    let body = fun.body;
+    let ret = fun.ret;
+
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
 
     (quote! {
         pub static #name: #check = #check {
@@ -739,7 +764,33 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
             check_in_help: #check_in_help
         };
 
-        #fun
+        #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
+    })
+    .into()
+}
+
+#[proc_macro_attribute]
+pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    let mut fun = parse_macro_input!(input as Hook);
+
+    let visibility = fun.visibility;
+    let fun_name = fun.name;
+    let body = fun.body;
+    let ret = fun.ret;
+
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
+
+    (quote! {
+        #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
     })
     .into()
 }

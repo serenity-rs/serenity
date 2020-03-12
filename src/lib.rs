@@ -119,3 +119,7 @@ extern crate self as serenity;
 #[cfg(feature = "standard_framework")]
 #[doc(hidden)]
 pub use static_assertions;
+
+pub use async_trait::async_trait;
+pub use futures;
+pub use futures::future::FutureExt;

@@ -83,7 +83,7 @@ pub use self::standard::StandardFramework;
 
 use crate::client::Context;
 use crate::model::channel::Message;
-use threadpool::ThreadPool;
+use async_trait::async_trait;
 
 /// A trait for defining your own framework for serenity to use.
 ///
@@ -91,20 +91,15 @@ use threadpool::ThreadPool;
 /// However, using this will benefit you by abstracting the `EventHandler` away,
 /// and providing a reference to serenity's threadpool,
 /// so that you may run your commands in separate threads.
+#[async_trait]
 pub trait Framework {
-    fn dispatch(&mut self, _: Context, _: Message, _: &ThreadPool);
+    async fn dispatch(&self, _: Context, _: Message);
 }
 
-impl<F: Framework + ?Sized> Framework for Box<F> {
+#[async_trait]
+impl<'a, F: Framework + ?Sized + Send + Sync> Framework for &'a mut F {
     #[inline]
-    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        (**self).dispatch(ctx, msg, threadpool);
-    }
-}
-
-impl<'a, F: Framework + ?Sized> Framework for &'a mut F {
-    #[inline]
-    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        (**self).dispatch(ctx, msg, threadpool);
+    async fn dispatch(&self, ctx: Context, msg: Message) {
+        (**self).dispatch(ctx, msg);
     }
 }

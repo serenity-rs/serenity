@@ -3,6 +3,7 @@ use std::fmt;
 use crate::model::channel::Message;
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
+use futures::future::BoxFuture;
 
 /// This type describes why a check has failed and occurs on
 /// [`CheckResult::Failure`].
@@ -111,7 +112,12 @@ impl From<Reason> for CheckResult {
     }
 }
 
-pub type CheckFunction = fn(&mut Context, &Message, &mut Args, &CommandOptions) -> CheckResult;
+pub type CheckFunction = for<'fut> fn(
+    &'fut mut Context,
+    &'fut Message,
+    &'fut mut Args,
+    &'fut CommandOptions,
+) -> BoxFuture<'fut, CheckResult>;
 
 /// A check can be part of a command or group and will be executed to
 /// determine whether a user is permitted to use related item.
