@@ -70,9 +70,9 @@ use std::{
         Formatter,
         Result as FmtResult
     },
-    sync::mpsc::Sender,
     time::Duration as StdDuration
 };
+use futures::channel::mpsc::UnboundedSender as Sender;
 use crate::gateway::{ConnectionStage, InterMessage};
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].

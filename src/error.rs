@@ -17,7 +17,7 @@ use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
 #[cfg(feature = "voice")]
 use audiopus::Error as OpusError;
 #[cfg(feature = "gateway")]
-use tungstenite::error::Error as TungsteniteError;
+use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use crate::client::ClientError;
 #[cfg(feature = "gateway")]

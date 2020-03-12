@@ -1,16 +1,21 @@
 use crate::gateway::InterMessage;
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
-use parking_lot::Mutex;
-use parking_lot::RwLock;
+use tokio::{
+    time::timeout,
+    sync::{Mutex, RwLock},
+};
 use std::{
     collections::{HashMap, VecDeque},
-    sync::{
-        mpsc::{self, channel, Sender, Receiver},
-        Arc,
+    sync::Arc,
+};
+use futures::{
+    stream::StreamExt,
+    channel::mpsc::{
+        self,
+        UnboundedSender as Sender,
+        UnboundedReceiver as Receiver,
     },
-    thread,
-    time::Duration
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
@@ -55,7 +60,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # #[cfg(feature = "framework")]
 /// # fn try_main() -> Result<(), Box<Error>> {
 /// #
-/// use parking_lot::{Mutex, RwLock};
+/// use tokio::sync::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// // Of note, this imports `typemap`'s `ShareMap` type.
@@ -135,9 +140,9 @@ pub struct ShardManager {
 impl ShardManager {
     /// Creates a new shard manager, returning both the manager and a monitor
     /// for usage in a separate thread.
-    pub fn new(opt: ShardManagerOptions<'_>) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
-        let (thread_tx, thread_rx) = mpsc::channel();
-        let (shard_queue_tx, shard_queue_rx) = mpsc::channel();
+    pub async fn new(opt: ShardManagerOptions<'_>) -> (Arc<Mutex<Self>>, ShardManagerMonitor) {
+        let (thread_tx, thread_rx) = mpsc::unbounded();
+        let (shard_queue_tx, shard_queue_rx) = mpsc::unbounded();
 
         let runners = Arc::new(Mutex::new(HashMap::new()));
 
@@ -152,7 +157,6 @@ impl ShardManager {
             queue: VecDeque::new(),
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
-            threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: Arc::clone(opt.voice_manager),
             ws_url: Arc::clone(opt.ws_url),
@@ -160,11 +164,11 @@ impl ShardManager {
             guild_subscriptions: opt.guild_subscriptions,
         };
 
-        thread::spawn(move || {
-            shard_queuer.run();
+        tokio::spawn(async move {
+            shard_queuer.run().await;
         });
 
-        let (shutdown_send, shutdown_recv) = channel();
+        let (shutdown_send, shutdown_recv) = mpsc::unbounded();
         let manager = Arc::new(Mutex::new(Self {
             monitor_tx: thread_tx,
             shard_index: opt.shard_index,
@@ -190,8 +194,8 @@ impl ShardManager {
     /// determine whether this shard manager is responsible for the given shard.
     ///
     /// [`is_responsible_for`]: #method.is_responsible_for
-    pub fn has(&self, shard_id: ShardId) -> bool {
-        self.runners.lock().contains_key(&shard_id)
+    pub async fn has(&self, shard_id: ShardId) -> bool {
+        self.runners.lock().await.contains_key(&shard_id)
     }
 
     /// Initializes all shards that the manager is responsible for.
@@ -205,7 +209,6 @@ impl ShardManager {
 
         for shard_id in self.shard_index..shard_to {
             let shard_total = self.shard_total;
-
             self.boot([ShardId(shard_id), ShardId(shard_total)]);
         }
 
@@ -217,8 +220,8 @@ impl ShardManager {
     /// This will shutdown all existing shards.
     ///
     /// This will _not_ instantiate the new shards.
-    pub fn set_shards(&mut self, index: u64, init: u64, total: u64) {
-        self.shutdown_all();
+    pub async fn set_shards(&mut self, index: u64, init: u64, total: u64) {
+        self.shutdown_all().await;
 
         self.shard_index = index;
         self.shard_init = init;
@@ -252,15 +255,15 @@ impl ShardManager {
     /// let mut client = Client::new(&token, Handler).unwrap();
     ///
     /// // restart shard ID 7
-    /// client.shard_manager.lock().restart(ShardId(7));
+    /// client.shard_manager.lock().await.restart(ShardId(7));
     /// ```
     ///
     /// [`ShardQueuer`]: struct.ShardQueuer.html
     /// [`ShardRunner`]: struct.ShardRunner.html
     /// [`initialize`]: #method.initialize
-    pub fn restart(&mut self, shard_id: ShardId) {
+    pub async fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
-        self.shutdown(shard_id);
+        self.shutdown(shard_id).await;
 
         let shard_total = self.shard_total;
 
@@ -272,8 +275,8 @@ impl ShardManager {
     ///
     /// [`ShardId`]: struct.ShardId.html
     /// [`ShardRunner`]: struct.ShardRunner.html
-    pub fn shards_instantiated(&self) -> Vec<ShardId> {
-        self.runners.lock().keys().cloned().collect()
+    pub async fn shards_instantiated(&self) -> Vec<ShardId> {
+        self.runners.lock().await.keys().cloned().collect()
     }
 
     /// Attempts to shut down the shard runner by Id.
@@ -286,38 +289,42 @@ impl ShardManager {
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
-    pub fn shutdown(&mut self, shard_id: ShardId) -> bool {
+    pub async fn shutdown(&mut self, shard_id: ShardId) -> bool {
         info!("Shutting down shard {}", shard_id);
 
-        if let Some(runner) = self.runners.lock().get(&shard_id) {
+        if let Some(runner) = self.runners.lock().await.get(&shard_id) {
             let shutdown = ShardManagerMessage::Shutdown(shard_id);
             let client_msg = ShardClientMessage::Manager(shutdown);
             let msg = InterMessage::Client(Box::new(client_msg));
 
-            if let Err(why) = runner.runner_tx.send(msg) {
+            if let Err(why) = runner.runner_tx.unbounded_send(msg) {
                 warn!(
                     "Failed to cleanly shutdown shard {}: {:?}",
                     shard_id,
                     why,
                 );
             }
-            match self.shard_shutdown.recv_timeout(Duration::from_secs(5)) {
-                Ok(shutdown_shard_id) =>
+
+            const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
+
+            match timeout(TIMEOUT, self.shard_shutdown.next()).await {
+                Ok(Some(shutdown_shard_id)) =>
                     if shutdown_shard_id != shard_id {
                         warn!(
                             "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
                             shard_id,
                         );
                     },
+                Ok(None) => (),
                 Err(why) => warn!(
                     "Failed to cleanly shutdown shard {}: {:?}",
                     shard_id,
                     why,
-                )
+                ),
             }
         }
 
-        self.runners.lock().remove(&shard_id).is_some()
+        self.runners.lock().await.remove(&shard_id).is_some()
     }
 
     /// Sends a shutdown message for all shards that the manager is responsible
@@ -327,9 +334,9 @@ impl ShardManager {
     /// over the [`shutdown`] method.
     ///
     /// [`shutdown`]: #method.shutdown
-    pub fn shutdown_all(&mut self) {
+    pub async fn shutdown_all(&mut self) {
         let keys = {
-            let runners = self.runners.lock();
+            let runners = self.runners.lock().await;
 
             if runners.is_empty() {
                 return;
@@ -341,18 +348,18 @@ impl ShardManager {
         info!("Shutting down all shards");
 
         for shard_id in keys {
-            self.shutdown(shard_id);
+            self.shutdown(shard_id).await;
         }
 
-        let _ = self.shard_queuer.send(ShardQueuerMessage::Shutdown);
-        let _ = self.monitor_tx.send(ShardManagerMessage::ShutdownInitiated);
+        let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown);
+        let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);
     }
 
     fn boot(&mut self, shard_info: [ShardId; 2]) {
         info!("Telling shard queuer to start shard {}", shard_info[0]);
 
         let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
-        let _ = self.shard_queuer.send(msg);
+        let _ = self.shard_queuer.unbounded_send(msg);
     }
 }
 
@@ -365,9 +372,9 @@ impl Drop for ShardManager {
     /// [`ShardQueuer`]: struct.ShardQueuer.html
     /// [`ShardRunner`]: struct.ShardRunner.html
     fn drop(&mut self) {
-        self.shutdown_all();
+        futures::executor::block_on(self.shutdown_all());
 
-        if let Err(why) = self.shard_queuer.send(ShardQueuerMessage::Shutdown) {
+        if let Err(why) = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown) {
             warn!("Failed to send shutdown to shard queuer: {:?}", why);
         }
     }
@@ -378,7 +385,7 @@ pub struct ShardManagerOptions<'a> {
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: &'a Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
+    pub framework: &'a Arc<Option<Box<dyn Framework + Send + Sync>>>,
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
