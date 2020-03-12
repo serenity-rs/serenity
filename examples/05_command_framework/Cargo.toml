@@ -7,3 +7,7 @@ edition = "2018"
 [dependencies.serenity]
 features = ["framework", "standard_framework", "rustls_backend"]
 path = "../../"
+
+[dependencies.tokio]
+version = "0.2"
+features = ["macros"]

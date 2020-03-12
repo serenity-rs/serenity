@@ -1,6 +1,7 @@
 use std::env;
 
 use serenity::{
+    async_trait,
     model::{channel::Message, gateway::Ready},
     prelude::*,
     utils::MessageBuilder,
@@ -8,10 +9,11 @@ use serenity::{
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn message(&self, context: Context, msg: Message) {
+    async fn message(&self, context: Context, msg: Message) {
         if msg.content == "!ping" {
-            let channel = match msg.channel_id.to_channel(&context) {
+            let channel = match msg.channel_id.to_channel(&context).await {
                 Ok(channel) => channel,
                 Err(why) => {
                     println!("Error getting channel: {:?}", why);
@@ -29,27 +31,29 @@ impl EventHandler for Handler {
                 .push_bold_safe(msg.author.name)
                 .push(" used the 'ping' command in the ")
                 .mention(&channel)
+                .await
                 .push(" channel")
                 .build();
 
-            if let Err(why) = msg.channel_id.say(&context.http, &response) {
+            if let Err(why) = msg.channel_id.say(&context.http, &response).await {
                 println!("Error sending message: {:?}", why);
             }
         }
     }
 
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+    let mut client = Client::new(&token, Handler).await.expect("Err creating client");
 
-    if let Err(why) = client.start() {
+    if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);
     }
 }

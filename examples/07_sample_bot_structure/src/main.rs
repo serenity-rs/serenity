@@ -16,11 +16,13 @@ use std::{
     sync::Arc,
 };
 use serenity::{
+    async_trait,
     client::bridge::gateway::ShardManager,
     framework::{
         StandardFramework,
         standard::macros::group,
     },
+    http::Http,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
@@ -39,12 +41,13 @@ impl TypeMapKey for ShardManagerContainer {
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         info!("Connected as {}", ready.user.name);
     }
 
-    fn resume(&self, _: Context, _: ResumedEvent) {
+    async fn resume(&self, _: Context, _: ResumedEvent) {
         info!("Resumed");
     }
 }
@@ -53,7 +56,8 @@ impl EventHandler for Handler {
 #[commands(multiply, ping, quit)]
 struct General;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // This will load the environment variables located at `./.env`, relative to
     // the CWD. See `./.env.example` for an example on how to structure this.
     kankyo::load().expect("Failed to load .env file");
@@ -67,14 +71,36 @@ fn main() {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+    let http = Http::new_with_token(&token);
+
+    // We will fetch your bot's owners and id
+    let (owners, _bot_id) = match http.get_current_application_info().await {
+        Ok(info) => {
+            let mut owners = HashSet::new();
+            owners.insert(info.owner.id);
+
+            (owners, info.id)
+        },
+        Err(why) => panic!("Could not access application info: {:?}", why),
+    };
+
+    // Create the framework
+    let framework = StandardFramework::new()
+        .configure(|c| c
+            .owners(owners)
+            .prefix("~"))
+        .group(&GENERAL_GROUP);
+
+    let mut client = Client::new_with_framework(&token, Handler, framework)
+        .await
+        .expect("Err creating client");
 
     {
-        let mut data = client.data.write();
+        let mut data = client.data.write().await;
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
 
-    let owners = match client.cache_and_http.http.get_current_application_info() {
+    let _owners = match client.cache_and_http.http.get_current_application_info().await {
         Ok(info) => {
             let mut set = HashSet::new();
             set.insert(info.owner.id);
@@ -84,13 +110,7 @@ fn main() {
         Err(why) => panic!("Couldn't get application info: {:?}", why),
     };
 
-    client.with_framework(StandardFramework::new()
-        .configure(|c| c
-            .owners(owners)
-            .prefix("~"))
-        .group(&GENERAL_GROUP));
-
-    if let Err(why) = client.start() {
+    if let Err(why) = client.start().await {
         error!("Client error: {:?}", why);
     }
 }

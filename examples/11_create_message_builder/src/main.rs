@@ -1,6 +1,7 @@
 use std::{env, path::Path};
 
 use serenity::{
+    async_trait,
     model::{channel::Message, gateway::Ready},
     prelude::*,
     http::AttachmentType,
@@ -8,8 +9,9 @@ use serenity::{
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn message(&self, ctx: Context, msg: Message) {
+    async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!hello" {
             // The create message builder allows you to easily create embeds and messages
             // using a builder syntax.
@@ -36,7 +38,7 @@ impl EventHandler for Handler {
                 });
                 m.add_file(AttachmentType::Path(Path::new("./ferris_eyes.png")));
                 m
-            });
+            }).await;
 
             if let Err(why) = msg {
                 println!("Error sending message: {:?}", why);
@@ -44,18 +46,19 @@ impl EventHandler for Handler {
         }
     }
 
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+    let mut client = Client::new(&token, Handler).await.expect("Err creating client");
 
-    if let Err(why) = client.start() {
+    if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);
     }
 }
