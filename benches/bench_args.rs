@@ -37,7 +37,7 @@ mod benches {
                     Delimiter::Single('@'),
                 ],
             );
-            args.single::<String>().await.unwrap();
+            futures::executor::block_on(args.single::<String>()).unwrap();
         })
     }
 
@@ -52,7 +52,7 @@ mod benches {
                     Delimiter::Single('@'),
                 ],
             );
-            args.single::<String>().unwrap();
+            futures::executor::block_on(args.single::<String>()).unwrap();
         })
     }
 
