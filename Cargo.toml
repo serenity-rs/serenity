@@ -105,6 +105,10 @@ version = "0.3"
 optional = true
 version = "^2.1"
 
+[dependencies.bytes]
+optional = true
+version = "0.5"
+
 [dependencies.webpki]
 optional = true
 version = "0.21"
@@ -169,7 +173,7 @@ gateway = [
     "url",
     "utils",
 ]
-http = ["url"]
+http = ["url", "bytes"]
 absolute_ratelimits = ["http"]
 rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls", "rustls", "webpki", "webpki-roots", "async-tls"]
 native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-tls", "tokio-tls"]

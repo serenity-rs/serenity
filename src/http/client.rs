@@ -20,6 +20,7 @@ use super::{
     GuildPagination,
     HttpError,
 };
+use bytes::buf::Buf;
 use serde::de::DeserializeOwned;
 use serde_json::json;
 use log::{debug, trace};
@@ -1466,8 +1467,8 @@ impl Http {
                       .and_then(|segments| segments.last().map(ToString::to_string))
                       .ok_or_else(|| Error::Url(url.to_string()))?;
                     let mut picture: Vec<u8> = vec![];
-                    let mut req = self.client.get(url).send()?;
-                    std::io::copy(&mut req, &mut picture)?;
+                    let mut req_bytes = self.client.get(url).send().await?.bytes().await?;
+                    req_bytes.copy_to_slice(&mut picture);
                     multipart = multipart
                         .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
                             .file_name(filename.to_string()));
