@@ -16,8 +16,6 @@ bitflags = "1"
 log = "0.4"
 serde_json = "1"
 async-trait = "0.1"
-async-tls = "0.6"
-tokio-tls = "0.3"
 
 [dependencies.static_assertions]
 optional = true
@@ -75,6 +73,14 @@ version = "0.7"
 optional = true
 version = "0.16"
 
+[dependencies.tokio-tls]
+optional = true
+version = "0.3"
+
+[dependencies.async-tls]
+optional = true
+version = "0.6"
+
 [dependencies.sodiumoxide]
 default-features = false
 features = ["std"]
@@ -87,7 +93,7 @@ version = "1"
 
 [dependencies.async-tungstenite]
 default-features = false
-features = ["tokio-runtime", "tokio-tls"]
+features = ["tokio-runtime"]
 optional = true
 version = "0.4"
 
@@ -165,8 +171,8 @@ gateway = [
 ]
 http = ["url"]
 absolute_ratelimits = ["http"]
-rustls_backend = ["reqwest/rustls-tls", "async-tungstenite", "rustls", "webpki", "webpki-roots"]
-native_tls_backend = ["reqwest/native-tls", "async-tungstenite/async-tls"]
+rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls", "rustls", "webpki", "webpki-roots", "async-tls"]
+native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-tls", "tokio-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]

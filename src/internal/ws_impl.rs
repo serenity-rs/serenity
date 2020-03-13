@@ -8,7 +8,7 @@ use log::warn;
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 use std::{
     error::Error as StdError,
     fmt::{
@@ -92,7 +92,7 @@ fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
 
 /// An error that occured while connecting over rustls
 #[derive(Debug)]
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 pub enum RustlsError {
     /// WebPKI X.509 Certificate Validation Error.
     WebPKI,
@@ -104,19 +104,19 @@ pub enum RustlsError {
     __Nonexhaustive,
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 impl From<IoError> for RustlsError {
     fn from(e: IoError) -> Self {
         RustlsError::Io(e)
     }
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 impl StdError for RustlsError {
     fn description(&self) -> &str {
         use self::RustlsError::*;
@@ -131,7 +131,7 @@ impl StdError for RustlsError {
 }
 
 // Create a tungstenite client with a rustls stream.
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),
@@ -142,6 +142,20 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
         }))
         .await
         .map_err(|_| RustlsError::HandshakeError)?;
+
+    Ok(stream)
+}
+
+#[cfg(feature = "native_tls_backend")]
+pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
+    let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
+        url.into(),
+        Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
+            max_message_size: None,
+            max_frame_size: None,
+            max_send_queue: None,
+        }))
+        .await?;
 
     Ok(stream)
 }

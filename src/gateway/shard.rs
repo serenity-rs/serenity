@@ -27,11 +27,11 @@ use async_tungstenite::tungstenite::{
 use url::Url;
 use log::{error, debug, info, trace, warn};
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 use crate::internal::ws_impl::create_rustls_client;
 
 #[cfg(feature = "native_tls_backend")]
-use async_tungstenite::tungstenite::handshake::client::Request;
+use crate::internal::ws_impl::create_native_tls_client;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -831,7 +831,7 @@ impl Shard {
     }
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(feature = "rustls_backend")]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 
@@ -839,11 +839,10 @@ async fn connect(base_url: &str) -> Result<WsStream> {
 }
 
 #[cfg(feature = "native_tls_backend")]
-fn connect(base_url: &str) -> Result<WsStream> {
+async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
-    let client = tungstenite::connect(Request::from(url))?;
 
-    Ok(client.0)
+    Ok(create_native_tls_client(url).await?)
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {
