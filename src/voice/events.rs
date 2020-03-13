@@ -1,7 +1,7 @@
 use chrono::Duration;
 use super::Audio;
 
-pub type EventFn = fn(&mut EventContext<'_>) -> ();
+pub type EventFn = dyn FnMut(&mut EventContext<'_>) -> Option<Event> + Send + 'static;
 
 // #[derive(Debug)]
 pub enum EventContext<'a> {
@@ -10,10 +10,11 @@ pub enum EventContext<'a> {
 }
 
 #[derive(Debug)]
-pub enum EventData {
-	Periodic(Duration),
+pub enum Event {
+	Periodic(Duration, Option<Duration>),
 	Delayed(Duration),
-	Track(TrackEvent)
+	Track(TrackEvent),
+	Cancel,
 }
 
 #[derive(Debug)]
@@ -22,25 +23,25 @@ pub enum TrackEvent {
 	TrackLoop,
 }
 
-pub struct Event<F>
-	where F: Fn(&mut EventContext<'_>) -> ()
-{
-	event: EventData,
+pub struct EventData {
+	event: Event,
 	fire_time: Option<Duration>,
-	action: F,
+	action: Box<dyn FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static>,
 }
 
-impl Event {
-	pub fn new<F: Fn(&mut EventContext<'_>) -> ()>(event: EventData, action: F) -> Self {
+impl EventData {
+	pub fn new<F>(event: Event, action: F) -> Self
+		where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
+	{
 		Self {
 			event,
 			fire_time: None,
-			action,
+			action: Box::new(action),
 		}
 	}
 }
 
-impl std::fmt::Debug for Event<> {
+impl std::fmt::Debug for EventData {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(),std::fmt::Error> {
         write!(f, "Event {{ event: {:?}, fire_time: {:?}, action: <fn> }}", self.event, self.fire_time)
     }

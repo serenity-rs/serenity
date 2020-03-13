@@ -272,8 +272,8 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
 
         // This shows how t0 periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
-        song.add_event(Event::new(
-            EventData::Periodic(ChronoDuration::seconds(2)),
+        song.add_event(
+            Event::Periodic(ChronoDuration::seconds(2), None),
             |evt_ctx| {
                 if let EventContext::Track(aud) = evt_ctx {
                     aud.volume /= 2.0;
@@ -281,12 +281,19 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
                     if aud.volume < 1e-2 {
                         aud.stop();
 
-                        check_msg(msg.channel_id.say(&ctx.http, "Song stopped"));
+                        // check_msg(msg.channel_id.say(&ctx.http, "Song stopped"));
+
+                        Some(Event::Cancel)
+                    } else {
+                        // check_msg(msg.channel_id.say(&ctx.http, "Volume reduced"));
+
+                        None
                     }
+                } else {
+                    None
                 }
-                check_msg(msg.channel_id.say(&ctx.http, "Volume reduced"));
             },
-        ));
+        );
 
         check_msg(msg.channel_id.say(&ctx.http, "Playing song"));
     } else {

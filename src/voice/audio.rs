@@ -13,7 +13,11 @@ use std::{
     },
     time::Duration,
 };
-use super::events::Event;
+use super::events::{
+    Event,
+    EventContext,
+    EventData,
+};
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
@@ -126,7 +130,7 @@ pub struct Audio {
     ///
     /// Currently, events are visited by linear scan for eligibility.
     /// This can likely be accelerated.
-    pub events: Vec<Event>,
+    pub events: Vec<EventData>,
 
     /// Channel from which commands are received.
     ///
@@ -299,8 +303,10 @@ impl AudioHandle {
         }
     }
 
-    pub fn add_event(&self, event: Event) -> AudioResult {
-        self.send(AudioCommand::AddEvent(event))
+    pub fn add_event<F>(&self, event: Event, action: F) -> AudioResult 
+        where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
+    {
+        self.send(AudioCommand::AddEvent(EventData::new(event, action)))
     }
 
     /// Warn user of taking too much time here...
@@ -332,7 +338,7 @@ pub enum AudioCommand {
     Stop,
     Volume(f32),
     Seek(Duration),
-    AddEvent(Event),
+    AddEvent(EventData),
     Do(AudioFn),
     Request(Sender<Box<AudioState>>),
 }
