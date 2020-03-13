@@ -408,6 +408,16 @@ pub struct Gateway {
     pub(crate) _nonexhaustive: (),
 }
 
+/// Information detailing the current active status of a [`User`].
+///
+/// [`User`]: ../user/struct.User.html
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct ClientStatus {
+    pub desktop: Option<OnlineStatus>,
+    pub mobile: Option<OnlineStatus>,
+    pub web: Option<OnlineStatus>,
+}
+
 /// Information detailing the current online status of a [`User`].
 ///
 /// [`User`]: ../user/struct.User.html
@@ -417,6 +427,8 @@ pub struct Presence {
     ///
     /// [`User`]: struct.User.html
     pub activity: Option<Activity>,
+    /// The devices a user are currently active on, if available.
+    pub client_status: Option<ClientStatus>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
     /// The nickname of the member, if applicable.
@@ -459,23 +471,35 @@ impl<'de> Deserialize<'de> for Presence {
                 .map_err(DeError::custom)?,
             None => None,
         };
+
+        let client_status = match map.remove("client_status") {
+            Some(v) => {
+                serde_json::from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?
+            }
+            None => None,
+        };
+        
         let last_modified = match map.remove("last_modified") {
             Some(v) => serde_json::from_value::<Option<u64>>(v)
                 .map_err(DeError::custom)?,
             None => None,
         };
+
         let nick = match map.remove("nick") {
             Some(v) => serde_json::from_value::<Option<String>>(v)
                 .map_err(DeError::custom)?,
             None => None,
         };
-        let status = map.remove("status")
+
+        let status = map
+            .remove("status")
             .ok_or_else(|| DeError::custom("expected presence status"))
             .and_then(OnlineStatus::deserialize)
             .map_err(DeError::custom)?;
 
         Ok(Presence {
             activity,
+            client_status,
             last_modified,
             nick,
             status,
@@ -496,6 +520,7 @@ impl Serialize for Presence {
 
         let mut state = serializer.serialize_struct("Presence", 5)?;
         state.serialize_field("game", &self.activity)?;
+        state.serialize_field("client_status", &self.client_status)?;
         state.serialize_field("last_modified", &self.last_modified)?;
         state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
@@ -504,7 +529,12 @@ impl Serialize for Presence {
             let user = futures::executor::block_on(user.read());
             state.serialize_field("user", &*user)?;
         } else {
-            state.serialize_field("user", &self.user_id.0)?;
+            state.serialize_field(
+                "user",
+                &UserId {
+                    id: *self.user_id.as_u64(),
+                },
+            )?;
         }
 
         state.end()

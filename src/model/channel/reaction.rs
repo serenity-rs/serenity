@@ -39,6 +39,10 @@ pub struct Reaction {
     ///
     /// [`User`]: ../user/struct.User.html
     pub user_id: UserId,
+    /// The optional Id of the [`Guild`] where the reaction was sent.
+    ///
+    /// [`Guild`]: ../guild/struct.Guild.html
+    pub guild_id: Option<GuildId>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }

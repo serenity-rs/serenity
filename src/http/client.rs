@@ -26,6 +26,7 @@ use log::{debug, trace};
 use std::{
     collections::BTreeMap,
     sync::Arc,
+    borrow::Cow,
 };
 use std::io::Read;
 use tokio::{
@@ -1458,6 +1459,18 @@ impl Http {
                     };
 
                     multipart = multipart.part(file_num.to_string(), part);
+                },
+                AttachmentType::Image(url) => {
+                    let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                    let filename = url.path_segments()
+                      .and_then(|segments| segments.last().map(ToString::to_string))
+                      .ok_or_else(|| Error::Url(url.to_string()))?;
+                    let mut picture: Vec<u8> = vec![];
+                    let mut req = self.client.get(url).send()?;
+                    std::io::copy(&mut req, &mut picture)?;
+                    multipart = multipart
+                        .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
+                            .file_name(filename.to_string()));
                 },
                 AttachmentType::__Nonexhaustive => unreachable!(),
             }

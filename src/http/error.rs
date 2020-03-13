@@ -107,19 +107,25 @@ impl From<InvalidHeaderValue> for Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Error::UnsuccessfulRequest(e) => f.write_str(&e.error.message),
+            Error::RateLimitI64F64 => f.write_str("Error decoding a header into an i64 or f64"),
+            Error::RateLimitUtf8 => f.write_str("Error decoding a header from UTF-8"),
+            Error::Url(_) => f.write_str("Provided URL is incorrect."),
+            Error::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
+            Error::Request(_) => f.write_str("Error while sending HTTP request."),
+            Error::__Nonexhaustive => unreachable!(),
+        }
+    }
 }
 
 impl StdError for Error {
-    fn description(&self) -> &str {
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
-            Error::UnsuccessfulRequest(ref e) => &e.error.message,
-            Error::RateLimitI64F64 => "Error decoding a header into an i64 or f64",
-            Error::RateLimitUtf8 => "Error decoding a header from UTF-8",
-            Error::Url(_) => "Provided URL is incorrect.",
-            Error::InvalidHeader(_) => "Provided value is an invalid header value.",
-            Error::Request(_) => "Error while sending HTTP request.",
-            Error::__Nonexhaustive => unreachable!(),
+            Error::Url(inner) => Some(inner),
+            Error::Request(inner) => Some(inner),
+            _ => None,
         }
     }
 }

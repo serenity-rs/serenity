@@ -237,7 +237,7 @@ impl AttributeOption for Vec<Ident> {
 
 impl AttributeOption for Option<String> {
     fn parse(values: Values) -> Result<Self> {
-        validate(&values, &[ValueKind::Name, ValueKind::SingleList])?;
+        validate(&values, &[ValueKind::Name, ValueKind::Equals, ValueKind::SingleList])?;
 
         Ok(if values.literals.is_empty() {
             Some(String::new())

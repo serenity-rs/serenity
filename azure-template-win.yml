@@ -13,8 +13,9 @@ jobs:
     features: ${{ parameters.features }}
   steps:
   - powershell: |
-      Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
-      &".\rustup-init.exe" --default-toolchain $(toolchain) -y
+      #Invoke-WebRequest -Uri "https://win.rustup.rs" -OutFile "rustup-init.exe"
+      #&".\rustup-init.exe" --default-toolchain $(toolchain) -y
+      rustup show
     displayName: 'Install rust'
   - powershell: |
       If ("$(features)" -eq "all") {

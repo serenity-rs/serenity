@@ -397,6 +397,10 @@ async fn check_command_behaviour<'a>(
 
     if b == HelpBehaviour::Nothing {
        for check in options.checks {
+           if !check.check_in_help {
+               break;
+           }
+
            let mut args = Args::new("", &[]);
 
            if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {

@@ -113,19 +113,22 @@ impl From<IoError> for RustlsError {
 
 #[cfg(feature = "rustls_backend")]
 impl Display for RustlsError {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            RustlsError::WebPKI => f.write_str("Failed to validate X.509 certificate"),
+            RustlsError::HandshakeError => f.write_str("TLS handshake failed when making the websocket connection"),
+            RustlsError::Io(inner) => Display::fmt(&inner, f),
+            RustlsError::__Nonexhaustive => unreachable!(),
+        }
+    }
 }
 
 #[cfg(feature = "rustls_backend")]
 impl StdError for RustlsError {
-    fn description(&self) -> &str {
-        use self::RustlsError::*;
-
-        match *self {
-            WebPKI => "Failed to validate X.509 certificate",
-            HandshakeError => "TLS handshake failed when making the websocket connection",
-            Io(ref inner) => inner.description(),
-            __Nonexhaustive => unreachable!(),
+    fn source(&self) -> Option<&(dyn StdError + 'static)> {
+        match self {
+            RustlsError::Io(inner) => Some(inner),
+            _ => None,
         }
     }
 }

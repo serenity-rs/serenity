@@ -55,27 +55,23 @@ pub enum Error {
 }
 
 impl Display for Error {
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { f.write_str(self.description()) }
-}
-
-impl StdError for Error {
-    fn description(&self) -> &str {
-        use self::Error::*;
-
-        match *self {
-            BuildingUrl => "Error building url",
-            Closed(_) => "Connection closed",
-            ExpectedHello => "Expected a Hello",
-            HeartbeatFailed => "Failed sending a heartbeat",
-            InvalidAuthentication => "Sent invalid authentication",
-            InvalidHandshake => "Expected a valid Handshake",
-            InvalidOpCode => "Invalid OpCode",
-            InvalidShardData => "Sent invalid shard data",
-            NoAuthentication => "Sent no authentication",
-            NoSessionId => "No Session Id present when required",
-            OverloadedShard => "Shard has too many guilds",
-            ReconnectFailure => "Failed to Reconnect",
-            __Nonexhaustive => unreachable!(),
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        match self {
+            Error::BuildingUrl => f.write_str("Error building url"),
+            Error::Closed(_) => f.write_str("Connection closed"),
+            Error::ExpectedHello => f.write_str("Expected a Hello"),
+            Error::HeartbeatFailed => f.write_str("Failed sending a heartbeat"),
+            Error::InvalidAuthentication => f.write_str("Sent invalid authentication"),
+            Error::InvalidHandshake => f.write_str("Expected a valid Handshake"),
+            Error::InvalidOpCode => f.write_str("Invalid OpCode"),
+            Error::InvalidShardData => f.write_str("Sent invalid shard data"),
+            Error::NoAuthentication => f.write_str("Sent no authentication"),
+            Error::NoSessionId => f.write_str("No Session Id present when required"),
+            Error::OverloadedShard => f.write_str("Shard has too many guilds"),
+            Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
+            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
+
+impl StdError for Error {}

@@ -233,7 +233,7 @@ impl Member {
     #[inline]
     pub async fn distinct(&self) -> String {
         format!(
-            "{}#{}",
+            "{}#{:04}",
             self.display_name().await,
             self.user.read().await.discriminator
         )
