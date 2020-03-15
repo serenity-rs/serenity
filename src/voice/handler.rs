@@ -256,7 +256,7 @@ impl Handler {
     pub fn play(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
         let (tx, rx) = mpsc::channel();
         let can_seek = source.is_seekable();
-        let player = Audio::new(source, rx);
+        let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
         self.send(VoiceStatus::AddSender(player));
 
         AudioHandle::new(tx, can_seek)
@@ -280,7 +280,7 @@ impl Handler {
     pub fn play_only(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
         let (tx, rx) = mpsc::channel();
         let can_seek = source.is_seekable();
-        let player = Audio::new(source, rx);
+        let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
         self.send(VoiceStatus::SetSender(Some(player)));
 
         AudioHandle::new(tx, can_seek)

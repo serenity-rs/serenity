@@ -1,3 +1,12 @@
+use audiopus::{
+    packet as opus_packet,
+    Application as CodingMode,
+    Bitrate,
+    Channels,
+    coder::Decoder as OpusDecoder,
+    coder::Encoder as OpusEncoder,
+    softclip::SoftClip,
+};
 use byteorder::{
     BigEndian,
     ByteOrder,
@@ -13,16 +22,6 @@ use crate::internal::{
     Timer
 };
 use crate::model::event::VoiceEvent;
-
-use audiopus::{
-    packet as opus_packet,
-    Application as CodingMode,
-    Bitrate,
-    Channels,
-    coder::Decoder as OpusDecoder,
-    coder::Encoder as OpusEncoder,
-    softclip::SoftClip,
-};
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
@@ -49,7 +48,7 @@ use std::{
 
 use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
-use super::{payload, VoiceError, CRYPTO_MODE};
+use super::{payload, EventContext, VoiceError, CRYPTO_MODE};
 use url::Url;
 use log::{debug, info, warn};
 
@@ -461,6 +460,10 @@ impl Connection {
     pub fn audio_commands_events(&mut self, mut sources: &mut Vec<Audio>) {
         for audio in sources.iter_mut() {
             audio.process_commands();
+            let state = audio.get_state();
+            // FIXME: ideally, hand over direct audio object access, rather than handler...
+            let handle = audio.handle.clone();
+            audio.events.process_timed(audio.position, EventContext::Track(&state, &handle));
         }
     }
 

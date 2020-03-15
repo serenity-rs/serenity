@@ -1,5 +1,5 @@
-use parking_lot::Mutex;
 use audiopus::{Bitrate, SampleRate};
+use parking_lot::Mutex;
 use std::{
     sync::{
         mpsc::{
@@ -17,6 +17,7 @@ use super::events::{
     Event,
     EventContext,
     EventData,
+    EventStore,
 };
 
 pub const HEADER_LEN: usize = 12;
@@ -130,7 +131,7 @@ pub struct Audio {
     ///
     /// Currently, events are visited by linear scan for eligibility.
     /// This can likely be accelerated.
-    pub events: Vec<EventData>,
+    pub events: EventStore,
 
     /// Channel from which commands are received.
     ///
@@ -138,10 +139,12 @@ pub struct Audio {
     /// occurs in a thread-safe manner, without allowing any external
     /// code to lock access to audio objects and block packet generation.
     pub commands: Receiver<AudioCommand>,
+
+    pub handle: AudioHandle,
 }
 
 impl Audio {
-    pub fn new(source: Box<dyn AudioSource>, commands: Receiver<AudioCommand>) -> Self {
+    pub fn new(source: Box<dyn AudioSource>, commands: Receiver<AudioCommand>, handle: AudioHandle) -> Self {
         Self {
             playing: true,
             volume: 1.0,
@@ -149,8 +152,9 @@ impl Audio {
             source,
             position: Duration::new(0, 0),
             position_modified: false,
-            events: vec![],
+            events: EventStore::new(),
             commands,
+            handle,
         }
     }
 
@@ -205,7 +209,7 @@ impl Audio {
         self.position_modified = false;
     }
 
-    pub fn process_commands(&mut self) {
+    pub(crate) fn process_commands(&mut self) {
         // Note: disconnection and an empty channel are both valid,
         // and should allow the audio object to keep running as intended.
         //
@@ -221,14 +225,9 @@ impl Audio {
                         Stop => {self.stop();},
                         Volume(vol) => {self.volume(vol);},
                         Seek(time) => unimplemented!(),
-                        AddEvent(evt) => self.events.push(evt),
+                        AddEvent(evt) => self.events.add_event(evt, self.position),
                         Do(action) => action(self),
-                        Request(tx) => {tx.send(Box::new(AudioState {
-                            playing: self.playing,
-                            volume: self.volume,
-                            finished: self.finished,
-                            position: self.position,
-                        }));},
+                        Request(tx) => {let _ = tx.send(Box::new(self.get_state()));},
                     }
                 },
                 Err(TryRecvError::Disconnected) => {
@@ -244,6 +243,14 @@ impl Audio {
         }
     }
 
+    pub fn get_state(&self) -> AudioState {
+        AudioState {
+            playing: self.playing,
+            volume: self.volume,
+            finished: self.finished,
+            position: self.position,
+        }
+    }
 }
 
 #[derive(Debug)]
@@ -265,7 +272,7 @@ pub type AudioQueryResult = Result<Receiver<Box<AudioState>>, SendError<AudioCom
 pub type BlockingAudioQueryResult = Result<Box<AudioState>, SendError<AudioCommand>>;
 pub type AudioFn = fn(&mut Audio) -> ();
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct AudioHandle {
     command_channel: Sender<AudioCommand>,
     seekable: bool,

@@ -6,7 +6,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["cache", "framework", "standard_framework", "voice"]
 //! ```
-use std::{env, sync::Arc};
+use std::{env, time::Duration, sync::Arc};
 
 // Import the client's bridge to the voice manager. Since voice is a standalone
 // feature, it's not as ergonomic to work with as it could be. The client
@@ -273,19 +273,22 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
         // This shows how t0 periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
         song.add_event(
-            Event::Periodic(ChronoDuration::seconds(2), None),
+            Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
+            // Event::Delayed(Duration::from_secs(2)),
             |evt_ctx| {
-                if let EventContext::Track(aud) = evt_ctx {
-                    aud.volume /= 2.0;
+                if let EventContext::Track(state, aud) = evt_ctx {
+                    aud.action(|true_aud| true_aud.volume /= 2.0);
 
-                    if aud.volume < 1e-2 {
+                    if state.volume < 1e-2 {
                         aud.stop();
 
                         // check_msg(msg.channel_id.say(&ctx.http, "Song stopped"));
+                        println!("Stopping song...");
 
                         Some(Event::Cancel)
                     } else {
                         // check_msg(msg.channel_id.say(&ctx.http, "Volume reduced"));
+                        println!("Volume reduced.");
 
                         None
                     }
