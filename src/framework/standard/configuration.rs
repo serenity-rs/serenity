@@ -2,8 +2,9 @@ use super::Delimiter;
 use crate::client::Context;
 use crate::model::{channel::Message, id::{UserId, GuildId, ChannelId}};
 use std::collections::HashSet;
+use futures::future::BoxFuture;
 
-type DynamicPrefixHook = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
+type DynamicPrefixHook = for<'fut> fn(&'fut mut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
 
 /// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.
@@ -326,23 +327,17 @@ impl Configuration {
     ///         }.to_string())
     ///     })));
     /// ```
-    pub fn dynamic_prefix<F>(&mut self, dynamic_prefix: F) -> &mut Self
-    where
-        F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static,
-    {
+    pub fn dynamic_prefix(&mut self, dynamic_prefix: DynamicPrefixHook) -> &mut Self {
         self.dynamic_prefixes = vec![Box::new(dynamic_prefix)];
 
         self
     }
 
     #[inline]
-    pub fn dynamic_prefixes<F, I: IntoIterator<Item = F>>(&mut self, iter: I) -> &mut Self
-    where
-        F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static,
-    {
+    pub fn dynamic_prefixes<I: IntoIterator<Item = DynamicPrefixHook>>(&mut self, iter: I) -> &mut Self {
         self.dynamic_prefixes = iter
             .into_iter()
-            .map(|f| Box::new(f) as Box<DynamicPrefixHook>)
+            .map(Box::new)
             .collect();
 
         self

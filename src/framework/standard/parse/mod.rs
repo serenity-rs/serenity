@@ -54,7 +54,7 @@ pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'
     }
 }
 
-fn find_prefix<'a>(
+async fn find_prefix<'a>(
     ctx: &mut Context,
     msg: &Message,
     config: &Configuration,
@@ -72,7 +72,7 @@ fn find_prefix<'a>(
     };
 
     for f in &config.dynamic_prefixes {
-        if let Some(p) = f(ctx, msg) {
+        if let Some(p) = f(ctx, msg).await {
             if let Some(p) = try_match(&p) {
                 return Some(p);
             }
@@ -94,7 +94,7 @@ fn find_prefix<'a>(
 ///
 /// [`Configuration::dynamic_prefix`]: ../struct.Configuration.html#method.dynamic_prefix
 /// [`Configuration::prefix`]: ../struct.Configuration.html#method.prefix
-pub fn prefix<'a>(
+pub async fn prefix<'a>(
     ctx: &mut Context,
     msg: &Message,
     stream: &mut Stream<'a>,
@@ -106,7 +106,7 @@ pub fn prefix<'a>(
         return Some(Cow::Borrowed(id));
     }
 
-    let prefix = find_prefix(ctx, msg, config, stream);
+    let prefix = find_prefix(ctx, msg, config, stream).await;
 
     if let Some(prefix) = &prefix {
         stream.increment(prefix.len());
