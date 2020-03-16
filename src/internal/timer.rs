@@ -20,7 +20,7 @@ impl Timer {
         }
     }
 
-    pub fn r#await(&mut self) {
+    pub async fn hold(&mut self) {
         let due_time = (self.due.timestamp() * 1000) + i64::from(self.due.timestamp_subsec_millis());
         let now_time = {
             let now = Utc::now();
@@ -32,7 +32,7 @@ impl Timer {
             let sleep_time = due_time - now_time;
 
             if sleep_time > 0 {
-                thread::sleep(StdDuration::from_millis(sleep_time as u64));
+                delay_for(StdDuration::from_millis(sleep_time as u64));
             }
         }
 

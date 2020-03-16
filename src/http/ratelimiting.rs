@@ -52,7 +52,6 @@ use std::{
         self,
         FromStr,
     },
-    thread,
     i64,
     u64,
 };
@@ -162,7 +161,7 @@ impl Ratelimiter {
                 .entry(route)
                 .or_default());
 
-            bucket.lock().await.pre_hook(&route);
+            bucket.lock().await.pre_hook(&route).await;
 
             let request = req.build(&self.client, &self.token)?.build()?;
             let response = self.client.execute(request).await?;
@@ -195,9 +194,9 @@ impl Ratelimiter {
                         } else {
                             false
                         },
-                    )     
+                    )
                 } else {
-                    bucket.lock().await.post_hook(&response, &route)
+                    bucket.lock().await.post_hook(&response, &route).await
                 };
 
                 if !redo.unwrap_or(true) {
@@ -245,7 +244,7 @@ impl Ratelimit {
         self.reset_after
     }
 
-    pub fn pre_hook(&mut self, route: &Route) {
+    pub async fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
         }
@@ -268,7 +267,7 @@ impl Ratelimit {
                 delay,
             );
 
-            thread::sleep(Duration::from_millis(delay));
+            delay_for(Duration::from_millis(delay)).await;
 
             return;
         }
@@ -276,7 +275,7 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
-    pub fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
+    pub async fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
         }
@@ -297,7 +296,7 @@ impl Ratelimit {
             false
         } else if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            thread::sleep(Duration::from_millis(retry_after));
+            delay_for(Duration::from_millis(retry_after)).await;
 
             true
         } else {
