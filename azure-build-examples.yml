@@ -98,3 +98,9 @@ jobs:
       CARGO_TARGET_DIR='..' cd examples/12_timing_and_events
       cargo build
     displayName: 'Build example 12'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/13_voice_events
+      cargo build
+    displayName: 'Build example 13'
