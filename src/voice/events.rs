@@ -8,27 +8,72 @@ use std::{
 };
 use super::{Audio, AudioHandle, AudioState};
 
-pub type EventFn = dyn FnMut(&mut EventContext<'_>) -> Option<Event> + Send + 'static;
-
+/// Information about which tracks, if any, fired an event.
+///
+/// Local events ([`Audio`]-specific) are guaranteed to have
+/// an attached track, while global timing events will not.
 pub enum EventContext<'a> {
 	Track(&'a AudioState, &'a AudioHandle),
 	Global(Option<&'a mut Audio>),
 }
 
 #[derive(Debug, Eq, Hash, PartialEq)]
+/// Classes of event which may occur, triggering a handler
+/// at the local (track-specific) or global level.
+///
+/// Local time-based events rely upon the current playback
+/// time of a track, and so will not fire if a track becomes paused
+/// or stops. In case this is required, global events are a better
+/// fit.
+///
+/// Event handlers themselves are described in [`EventData::action`].
+///
+/// [`EventData::action`]: struct.EventData.html#method.action
 pub enum Event {
+	/// Periodic events rely upon two parameters: a *period*
+	/// and an optional *phase*.
+	///
+	/// If the *phase* is `None`, then the event will first fire
+	/// in one *period*. Periodic events repeat automatically
+	/// so long as the `action` in [`EventData`] returns `None`.
+	///
+	/// [`EventData`]: struct.EventData.html
 	Periodic(Duration, Option<Duration>),
+
+	/// Delayed events rely upon a *delay* parameter, and
+	/// fire one *delay* after the audio context processes them.
+	///
+	/// Delayed events are automatically removed once fired,
+	/// so long as the `action` in [`EventData`] returns `None`.
+	///
+	/// [`EventData`]: struct.EventData.html
 	Delayed(Duration),
+
+	/// Track events correspond to certain actions or changes
+	/// of state, such as a track finishing, looping, or being
+	/// manually stopped.
+	///
+	/// Track events persist while the `action` in [`EventData`]
+	/// returns `None`.
+	///
+	/// [`EventData`]: struct.EventData.html
 	Track(TrackEvent),
+
+	/// Cancels the event, if it was intended to persist.
 	Cancel,
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+/// Events corresponding to important state changes in an audio track.
 pub enum TrackEvent {
+	/// The attached track has ended. (// TODO: separate actual end with deliberate)
 	End,
+
+	/// The attached track has looped.
 	Loop,
 }
 
+/// Internal representation of an event, as handled by the audio context.
 pub struct EventData {
 	event: Event,
 	fire_time: Option<Duration>,
@@ -36,6 +81,18 @@ pub struct EventData {
 }
 
 impl EventData {
+	/// Create a representation of an event and its associated handler.
+	///
+	/// An event handler, `action`, receives an [`EventContext`] and optionally
+	/// produces a new [`Event`] type for itself. Returning `None` will
+	/// maintain the same event type, while removing any [`Delayed`] entries.
+	/// Event handlers will be re-added with their new trigger condition,
+	/// or removed if [`Cancel`]led
+	///
+	/// [`EventContext`]: struct.EventContext.html
+	/// [`Event`]: enum.Event.html
+	/// [`Delayed`]: enum.Event.html#variant.Delayed
+	/// [`Cancel`]: enum.Event.html#variant.Cancel
 	pub fn new<F>(event: Event, action: F) -> Self
 		where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
 	{
@@ -46,10 +103,11 @@ impl EventData {
 		}
 	}
 
+	/// Computes the next firing time for a timer event.
 	pub fn compute_activation(&mut self, now: Duration) {
 		match self.event {
-			Event::Periodic(period, offset) => {
-				self.fire_time = Some(now + offset.unwrap_or(period));
+			Event::Periodic(period, phase) => {
+				self.fire_time = Some(now + phase.unwrap_or(period));
 			},
 			Event::Delayed(offset) => {
 				self.fire_time = Some(now + offset);
@@ -94,6 +152,12 @@ impl PartialEq for EventData {
 impl Eq for EventData {}
 
 #[derive(Default)]
+/// Storage for [`EventData`], designed to be used for both local and global contexts.
+///
+/// Timed events are stored in a binary heap for fast selection, and have custom `Eq`,
+/// `Ord`, etc. implementations to support (only) this.
+///
+/// [`EventData`]: struct.EventData.html
 pub struct EventStore {
 	timed: BinaryHeap<EventData>,
 	track: HashMap<TrackEvent, Vec<EventData>>,
@@ -104,6 +168,11 @@ impl EventStore {
 		Default::default()
 	}
 
+	/// Add an event to this store.
+	///
+	/// Updates `evt` according to [`EventData::compute_activation`].
+	///
+	/// [`EventData::compute_activation`]: struct.EventData.html#method.compute_activation
 	pub fn add_event(&mut self, mut evt: EventData, now: Duration) {
 		evt.compute_activation(now);
 
@@ -123,7 +192,8 @@ impl EventStore {
 		}
 	}
 
-	pub fn process_timed(&mut self, now: Duration, mut ctx: EventContext<'_>) {
+	/// Processes all events due up to and including `now`.
+	pub(crate) fn process_timed(&mut self, now: Duration, mut ctx: EventContext<'_>) {
 		while let Some(evt) = self.timed.peek() {
 			if evt.fire_time.as_ref().expect("Timed event must have a fire_time.") > &now {
 				break;
@@ -141,13 +211,13 @@ impl EventStore {
 		}
 	}
 
-	pub fn process_track(&mut self, now: Duration, track_event: TrackEvent, mut ctx: EventContext<'_>) {
+	/// Processes all events attached to the given track event.
+	pub(crate) fn process_track(&mut self, now: Duration, track_event: TrackEvent, mut ctx: EventContext<'_>) {
 		// move a Vec in and out: not too expensive, but could be better.
 		// Although it's obvious that moving an event out of one vec and into
 		// another necessitates that they be different event types, thus entries,
 		// convincing the compiler of this is non-trivial without making them dedicated
 		// fields.
-		// FIXME: not working...
 		let events = self.track.remove(&track_event);
 		if let Some(mut events) = events {
 			// FIXME: Possibly use tombstones to prevent realloc/memcpys?

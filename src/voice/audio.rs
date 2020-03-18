@@ -668,7 +668,7 @@ impl TrackQueue {
 
     /// Skip to the next track in the queue, if it exists.
     pub fn skip(&self) -> AudioResult {
-        let mut inner = self.inner.lock();
+        let inner = self.inner.lock();
 
         let out = if let Some(handle) = inner.tracks.front() {
             handle.stop()

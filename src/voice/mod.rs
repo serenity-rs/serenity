@@ -29,7 +29,7 @@ pub use self::{
     },
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
-    events::{Event, EventContext, EventData, EventFn, TrackEvent},
+    events::{Event, EventContext, EventData, EventStore, TrackEvent},
     handler::Handler,
     manager::Manager,
     streamer::{
