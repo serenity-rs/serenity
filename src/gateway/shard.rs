@@ -27,7 +27,7 @@ use async_tungstenite::tungstenite::{
 use url::Url;
 use log::{error, debug, info, trace, warn};
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
 
 #[cfg(feature = "native_tls_backend")]
@@ -831,7 +831,7 @@ impl Shard {
     }
 }
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
 

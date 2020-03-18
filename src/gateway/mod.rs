@@ -74,7 +74,7 @@ use tokio::net::TcpStream;
 #[cfg(feature = "native_tls_backend")]
 use tokio_tls::TlsStream;
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use async_tls::client::TlsStream;
 
 pub type MaybeTlsStream<S> = Stream<S, TokioAdapter<TlsStream<TokioAdapter<S>>>>;
@@ -83,7 +83,7 @@ pub type MaybeTlsStream<S> = Stream<S, TokioAdapter<TlsStream<TokioAdapter<S>>>>
 pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
     TokioAdapter<TlsStream<TokioAdapter<TokioAdapter<TcpStream>>>>>>;
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
     TlsStream<TokioAdapter<TcpStream>>>>;
 

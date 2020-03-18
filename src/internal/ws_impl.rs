@@ -8,7 +8,7 @@ use log::warn;
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use std::{
     error::Error as StdError,
     fmt::{
@@ -106,7 +106,7 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
 
 /// An error that occured while connecting over rustls
 #[derive(Debug)]
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 pub enum RustlsError {
     /// WebPKI X.509 Certificate Validation Error.
     WebPKI,
@@ -118,14 +118,14 @@ pub enum RustlsError {
     __Nonexhaustive,
 }
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl From<IoError> for RustlsError {
     fn from(e: IoError) -> Self {
         RustlsError::Io(e)
     }
 }
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
@@ -137,7 +137,7 @@ impl Display for RustlsError {
     }
 }
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl StdError for RustlsError {
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
@@ -148,7 +148,7 @@ impl StdError for RustlsError {
 }
 
 // Create a tungstenite client with a rustls stream.
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),

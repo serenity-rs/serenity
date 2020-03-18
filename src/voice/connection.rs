@@ -61,7 +61,7 @@ use super::{payload, VoiceError, CRYPTO_MODE};
 use url::Url;
 use log::{debug, info, warn};
 
-#[cfg(feature = "rustls_backend")]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
 
 #[cfg(feature = "native_tls_backend")]
@@ -107,7 +107,7 @@ impl Connection {
     pub async fn new(mut info: ConnectionInfo) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
-        #[cfg(feature = "rustls_backend")]
+        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
         let mut stream = create_rustls_client(url).await?;
 
         #[cfg(feature = "native_tls_backend")]
@@ -245,7 +245,7 @@ impl Connection {
         info!("[VOICE] Sending signal to close WebSocket Stream.");
         let _ = self.task_items.ws_close_sender.unbounded_send(0);
 
-        #[cfg(feature = "rustls_backend")]
+        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
         let mut stream = create_rustls_client(url).await?;
 
         #[cfg(feature = "native_tls_backend")]
