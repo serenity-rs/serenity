@@ -24,7 +24,7 @@ use crate::client::ClientError;
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
-#[cfg(all(feature = "gateway", feature = "rustls_backend"))]
+#[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
 use crate::voice::VoiceError;
