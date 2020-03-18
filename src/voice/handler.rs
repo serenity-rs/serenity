@@ -8,13 +8,9 @@ use crate::model::{
     },
     voice::VoiceState
 };
-use parking_lot::Mutex;
-use std::sync::{
-    mpsc::{self, Sender as MpscSender},
-    Arc
-};
+use std::sync::mpsc::{self, Sender as MpscSender};
 use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioHandle, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
+use super::{Audio, AudioHandle, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading};
 use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting

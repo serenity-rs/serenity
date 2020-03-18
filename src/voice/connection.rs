@@ -46,7 +46,7 @@ use std::{
     time::Duration
 };
 
-use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
+use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE};
 use super::connection_info::ConnectionInfo;
 use super::{payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
 use url::Url;

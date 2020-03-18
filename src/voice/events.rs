@@ -1,8 +1,5 @@
 use std::{
-	cmp::{
-		Ordering,
-		Reverse,
-	},
+	cmp::Ordering,
 	collections::{
 		BinaryHeap,
 		HashMap,
@@ -96,6 +93,7 @@ impl PartialEq for EventData {
 
 impl Eq for EventData {}
 
+#[derive(Default)]
 pub struct EventStore {
 	timed: BinaryHeap<EventData>,
 	track: HashMap<TrackEvent, Vec<EventData>>,
@@ -103,10 +101,7 @@ pub struct EventStore {
 
 impl EventStore {
 	pub fn new() -> Self {
-		Self {
-			timed: BinaryHeap::new(),
-			track: HashMap::new(),
-		}
+		Default::default()
 	}
 
 	pub fn add_event(&mut self, mut evt: EventData, now: Duration) {
@@ -116,7 +111,7 @@ impl EventStore {
 		match evt.event {
 			Track(t) => {
 				self.track.entry(t)
-					.or_insert(vec![])
+					.or_insert_with(|| vec![])
 					.push(evt);
 			}
 			Delayed(_) | Periodic(_, _) => {

@@ -36,7 +36,6 @@ use serenity::{
         self,
         Event,
         EventContext,
-        EventData,
         TrackEvent,
         TrackQueue,
     },
@@ -282,7 +281,7 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
 
         // This shows how t0 periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
-        song.add_event(
+        let _ = song.add_event(
             Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
             // Event::Delayed(Duration::from_secs(2)),
             move |evt_ctx| {
@@ -307,9 +306,9 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
         
         // This shows how to fire an event once an audio track completes,
         // either due to hitting the end of the bytestream or stopped by user code.
-        song.add_event(
+        let _ = song.add_event(
             Event::Track(TrackEvent::End),
-            move |evt_ctx| {
+            move |_evt_ctx| {
                 check_msg(chan_id.say(&send_http, "Song faded out completely!"));
 
                 None
@@ -393,17 +392,11 @@ fn stop(ctx: &mut Context, msg: &Message, _args: Args) -> CommandResult {
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let queues_lock = ctx.data.read().get::<VoiceQueueManager>().cloned().expect("Expected VoiceQueueManager in ShareMap.");
-    let mut manager = manager_lock.lock();
     let mut track_queues = queues_lock.lock();
 
-    if let Some(handler) = manager.get_mut(guild_id) {
-        // We need to ensure that this guild has a TrackQueue created for it.
-        let queue = track_queues.entry(guild_id)
-            .or_default();
-
-        queue.stop();
+    if let Some(queue) = track_queues.get_mut(&guild_id) {
+        let _ = queue.stop();
 
         check_msg(msg.channel_id.say(&ctx.http, "Queue cleared."));
     } else {

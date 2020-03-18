@@ -229,7 +229,7 @@ impl Audio {
                         Pause => {self.pause();},
                         Stop => {self.stop();},
                         Volume(vol) => {self.volume(vol);},
-                        Seek(time) => unimplemented!(),
+                        Seek(_time) => unimplemented!(),
                         AddEvent(evt) => self.events.add_event(evt, self.position),
                         Do(action) => action(self),
                         Request(tx) => {let _ = tx.send(Box::new(self.get_state()));},
@@ -273,12 +273,6 @@ pub struct AudioState {
     pub finished: bool,
     pub position: Duration,
 }
-
-/// Threadsafe form of an instance of the [`Audio`] struct, locked behind a
-/// Mutex.
-///
-/// [`Audio`]: struct.Audio.html
-pub type LockedAudio = Arc<Mutex<Audio>>;
 
 pub type AudioResult = Result<(), SendError<AudioCommand>>;
 pub type AudioQueryResult = Result<Receiver<Box<AudioState>>, SendError<AudioCommand>>;
@@ -373,7 +367,7 @@ impl std::fmt::Debug for AudioCommand {
             Volume(vol) => format!("Volume({})", vol),
             Seek(d) => format!("Seek({:?})", d),
             AddEvent(evt) => format!("AddEvent({:?})", evt),
-            Do(f) => "Do([function])".to_string(),
+            Do(_f) => "Do([function])".to_string(),
             Request(tx) => format!("Request({:?})", tx),
         })
     }
@@ -411,7 +405,7 @@ impl TrackQueue {
         let remote_lock = self.inner.clone();
         let mut inner = self.inner.lock();
 
-        if inner.tracks.len() != 0 {
+        if !inner.tracks.is_empty() {
             audio.pause();
         }
 
@@ -422,9 +416,18 @@ impl TrackQueue {
                     let mut inner = remote_lock.lock();
                     let _old = inner.tracks.pop_front();
 
-                    // If any audio files die unexpectedly, then push forward.
-                    if let Some(new) = inner.tracks.front() {
-                        let err = new.play();
+                    // If any audio files die unexpectedly, then keep going until we
+                    // find one which works, or we run out.
+                    let mut keep_looking = true;
+                    while keep_looking && !inner.tracks.is_empty() {
+                        if let Some(new) = inner.tracks.front() {
+                            keep_looking = new.play().is_err();
+
+                            // Discard files which cannot be used for whatever reason.
+                            if keep_looking {
+                                let _ = inner.tracks.pop_front();
+                            }
+                        }
                     }
 
                     None
@@ -442,30 +445,42 @@ impl TrackQueue {
         inner.tracks.len()
     }
 
-    pub fn pause(&self) {
+    pub fn is_empty(&self) -> bool {
+        let inner = self.inner.lock();
+
+        inner.tracks.is_empty()
+    }
+
+    pub fn pause(&self) -> AudioResult {
         let inner = self.inner.lock();
 
         if let Some(handle) = inner.tracks.front() {
-            handle.pause();
+            handle.pause()
+        } else {
+            Ok(())
         }
     }
 
-    pub fn resume(&self) {
+    pub fn resume(&self) -> AudioResult {
         let inner = self.inner.lock();
 
         if let Some(handle) = inner.tracks.front() {
-            handle.play();
+            handle.play()
+        } else {
+            Ok(())
         }
     }
 
-    pub fn stop(&self) {
+    pub fn stop(&self) -> AudioResult {
         let mut inner = self.inner.lock();
 
-        if let Some(handle) = inner.tracks.front() {
-            handle.stop();
-        }
+        let out = if let Some(handle) = inner.tracks.front() {
+            handle.stop()
+        } else { Ok(()) };
 
         inner.tracks.clear();
+
+        out
     }
 }
 

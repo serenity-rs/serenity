@@ -21,7 +21,6 @@ pub use self::{
         AudioSource,
         AudioState,
         AudioType,
-        LockedAudio,
         TrackQueue,
     },
     dca::DcaMetadata,
