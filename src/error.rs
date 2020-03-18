@@ -95,7 +95,7 @@ pub enum Error {
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
     /// An error occuring in rustls
-    #[cfg(all(feature = "gateway", feature = "rustls_backend"))]
+    #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
@@ -191,7 +191,7 @@ impl Display for Error {
             Error::Http(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "voice")]
             Error::Opus(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
+            #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
@@ -218,7 +218,7 @@ impl StdError for Error {
             Error::Http(inner) => Some(inner),
             #[cfg(feature = "voice")]
             Error::Opus(inner) => Some(inner),
-            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
+            #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => Some(inner),
