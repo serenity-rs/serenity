@@ -7,3 +7,6 @@ edition = "2018"
 [dependencies.serenity]
 features = ["cache", "framework", "standard_framework", "voice", "http", "rustls_backend"]
 path = "../../"
+
+[dependencies]
+env_logger = "0.7"

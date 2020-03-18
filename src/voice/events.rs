@@ -89,7 +89,7 @@ impl EventData {
 	/// Event handlers will be re-added with their new trigger condition,
 	/// or removed if [`Cancel`]led
 	///
-	/// [`EventContext`]: struct.EventContext.html
+	/// [`EventContext`]: enum.EventContext.html
 	/// [`Event`]: enum.Event.html
 	/// [`Delayed`]: enum.Event.html#variant.Delayed
 	/// [`Cancel`]: enum.Event.html#variant.Cancel

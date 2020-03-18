@@ -159,7 +159,13 @@ native_tls_backend = ["reqwest/native-tls", "tungstenite/tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide"]
+voice = [
+    "audiopus",
+    "byteorder",
+    "gateway",
+    "rand",
+    "sodiumoxide",
+]
 
 [package.metadata.docs.rs]
 all-features = true

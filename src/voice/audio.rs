@@ -659,7 +659,7 @@ impl TrackQueue {
     pub fn stop(&self) -> AudioResult {
         let mut inner = self.inner.lock();
 
-        let out = self.skip();
+        let out = inner.stop_current();
 
         inner.tracks.clear();
 
@@ -668,12 +668,21 @@ impl TrackQueue {
 
     /// Skip to the next track in the queue, if it exists.
     pub fn skip(&self) -> AudioResult {
-        let inner = self.inner.lock();
+        let mut inner = self.inner.lock();
 
-        let out = if let Some(handle) = inner.tracks.front() {
-            handle.stop()
-        } else { Ok(()) };
+        let out = inner.stop_current();
+
+        let _ = inner.tracks.pop_front();
 
         out
+    }
+}
+
+impl TrackQueueCore {
+    /// Skip to the next track in the queue, if it exists.
+    fn stop_current(&self) -> AudioResult {
+        if let Some(handle) = self.tracks.front() {
+            handle.stop()
+        } else { Ok(()) }
     }
 }
