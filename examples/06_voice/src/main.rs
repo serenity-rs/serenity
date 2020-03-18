@@ -22,6 +22,7 @@ use serenity::client::bridge::voice::ClientVoiceManager;
 use serenity::{client::Context, prelude::Mutex};
 
 use serenity::{
+    async_trait,
     client::{Client, EventHandler},
     framework::{
         StandardFramework,
@@ -46,8 +47,9 @@ impl TypeMapKey for VoiceManager {
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
@@ -56,197 +58,205 @@ impl EventHandler for Handler {
 #[commands(deafen, join, leave, mute, play, ping, undeafen, unmute)]
 struct General;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+
+    let framework = StandardFramework::new()
+        .configure(|c| c
+            .prefix("~"))
+        .group(&GENERAL_GROUP);
+
+    let mut client = Client::new_with_framework(&token, Handler, framework)
+        .await
+        .expect("Err creating client");
 
     // Obtain a lock to the data owned by the client, and insert the client's
     // voice manager into it. This allows the voice manager to be accessible by
     // event handlers and framework commands.
     {
-        let mut data = client.data.write();
+        let mut data = client.data.write().await;
         data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
     }
 
-    client.with_framework(StandardFramework::new()
-        .configure(|c| c
-            .prefix("~"))
-        .group(&GENERAL_GROUP));
-
-    let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
+    let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
 }
 
 #[command]
-fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+async fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().unwrap();
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await.get::<VoiceManager>().cloned().unwrap();
+    let mut manager = manager_lock.lock().await;
 
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel"));
+            check_msg(msg.reply(&ctx, "Not in a voice channel").await);
 
             return Ok(());
         },
     };
 
     if handler.self_deaf {
-        check_msg(msg.channel_id.say(&ctx.http, "Already deafened"));
+        check_msg(msg.channel_id.say(&ctx.http, "Already deafened").await);
     } else {
         handler.deafen(true);
 
-        check_msg(msg.channel_id.say(&ctx.http, "Deafened"));
+        check_msg(msg.channel_id.say(&ctx.http, "Deafened").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let guild = match msg.guild(&ctx.cache) {
+async fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let guild = match msg.guild(&ctx.cache).await {
         Some(guild) => guild,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
 
             return Ok(());
         }
     };
 
-    let guild_id = guild.read().id;
+    let guild_id = guild.read().await.id;
 
     let channel_id = guild
         .read()
+        .await
         .voice_states.get(&msg.author.id)
         .and_then(|voice_state| voice_state.channel_id);
-
 
     let connect_to = match channel_id {
         Some(channel) => channel,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel"));
+            check_msg(msg.reply(&ctx, "Not in a voice channel").await);
 
             return Ok(());
         }
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await.
+        get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager = manager_lock.lock().await;
 
     if manager.join(guild_id, connect_to).is_some() {
-        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
+        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention().await)).await);
     } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
+        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+async fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
         manager.remove(guild_id);
 
-        check_msg(msg.channel_id.say(&ctx.http, "Left voice channel"));
+        check_msg(msg.channel_id.say(&ctx.http, "Left voice channel").await);
     } else {
-        check_msg(msg.reply(&ctx, "Not in a voice channel"));
+        check_msg(msg.reply(&ctx, "Not in a voice channel").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+async fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager = manager_lock.lock().await;
 
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel"));
+            check_msg(msg.reply(&ctx, "Not in a voice channel").await);
 
             return Ok(());
         },
     };
 
     if handler.self_mute {
-        check_msg(msg.channel_id.say(&ctx.http, "Already muted"));
+        check_msg(msg.channel_id.say(&ctx.http, "Already muted").await);
     } else {
         handler.mute(true);
 
-        check_msg(msg.channel_id.say(&ctx.http, "Now muted"));
+        check_msg(msg.channel_id.say(&ctx.http, "Now muted").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn ping(context: &mut Context, msg: &Message) -> CommandResult {
-    check_msg(msg.channel_id.say(&context.http, "Pong!"));
+async fn ping(context: &mut Context, msg: &Message) -> CommandResult {
+    check_msg(msg.channel_id.say(&context.http, "Pong!").await);
 
     Ok(())
 }
 
 #[command]
-fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let url = match args.single::<String>() {
+async fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+    let url = match args.single::<String>().await {
         Ok(url) => url,
         Err(_) => {
-            check_msg(msg.channel_id.say(&ctx.http, "Must provide a URL to a video or audio"));
+            check_msg(msg.channel_id.say(&ctx.http, "Must provide a URL to a video or audio").await);
 
             return Ok(());
         },
     };
 
     if !url.starts_with("http") {
-        check_msg(msg.channel_id.say(&ctx.http, "Must provide a valid URL"));
+        check_msg(msg.channel_id.say(&ctx.http, "Must provide a valid URL").await);
 
         return Ok(());
     }
 
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+    let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
         let source = match voice::ytdl(&url) {
@@ -254,7 +264,7 @@ fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             Err(why) => {
                 println!("Err starting source: {:?}", why);
 
-                check_msg(msg.channel_id.say(&ctx.http, "Error sourcing ffmpeg"));
+                check_msg(msg.channel_id.say(&ctx.http, "Error sourcing ffmpeg").await);
 
                 return Ok(());
             },
@@ -262,58 +272,60 @@ fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 
         handler.play(source);
 
-        check_msg(msg.channel_id.say(&ctx.http, "Playing song"));
+        check_msg(msg.channel_id.say(&ctx.http, "Playing song").await);
     } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn undeafen(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+async fn undeafen(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
         handler.deafen(false);
 
-        check_msg(msg.channel_id.say(&ctx.http, "Undeafened"));
+        check_msg(msg.channel_id.say(&ctx.http, "Undeafened").await);
     } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to undeafen in").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn unmute(ctx: &mut Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+async fn unmute(ctx: &mut Context, msg: &Message) -> CommandResult {
+    let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
 
             return Ok(());
         },
     };
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
         handler.mute(false);
 
-        check_msg(msg.channel_id.say(&ctx.http, "Unmuted"));
+        check_msg(msg.channel_id.say(&ctx.http, "Unmuted").await);
     } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to unmute in"));
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to unmute in").await);
     }
 
     Ok(())
