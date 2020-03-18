@@ -2,6 +2,7 @@
 use crate::http::CacheHttp;
 use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
+#[cfg(feature = "cache")]
 use futures::stream::StreamExt;
 
 #[cfg(all(feature = "cache", feature = "model"))]

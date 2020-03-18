@@ -2,7 +2,7 @@
 use crate::http::CacheHttp;
 use crate::{internal::RwLockExt, model::prelude::*};
 
-#[cfg(feature = "model")]
+#[cfg(all(feature = "model", feature = "cache"))]
 use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;

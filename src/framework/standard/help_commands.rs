@@ -82,6 +82,7 @@ use std::{
 };
 #[cfg(all(feature = "cache", feature = "http"))]
 use log::warn;
+#[cfg(all(feature = "cache", feature = "http"))]
 use futures::future::{BoxFuture, FutureExt};
 
 /// Macro to format a command according to a `HelpBehaviour` or
@@ -412,6 +413,7 @@ async fn check_command_behaviour<'a>(
     b
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 async fn _nested_group_command_search<'rec, 'a: 'rec>(
     ctx: &'rec mut Context,
     msg: &'rec Message,
@@ -570,6 +572,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
     Err(())
 }
 
+#[cfg(all(feature = "cache", feature = "http"))]
 fn nested_group_command_search<'rec, 'a: 'rec>(
     ctx: &'rec mut Context,
     msg: &'rec Message,

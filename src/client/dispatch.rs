@@ -16,6 +16,7 @@ use super::{
     Context
 };
 use typemap::ShareMap;
+#[cfg(feature = "cache")]
 use tokio::time::timeout;
 
 use crate::http::Http;
@@ -52,7 +53,7 @@ async fn update<E: CacheUpdate + fmt::Debug>(cache_and_http: &Arc<CacheAndHttp>,
 
 #[inline]
 #[cfg(not(feature = "cache"))]
-fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
+async fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> {
     None
 }
 

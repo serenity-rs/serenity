@@ -585,6 +585,9 @@ impl User {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
+        #[cfg(not(feature = "cache"))]
+        let private_channel_id = None;
+        #[cfg(feature = "cache")]
         let mut private_channel_id = None;
 
         #[cfg(feature = "cache")]
@@ -701,6 +704,9 @@ impl User {
                     self._has_role(cache_http, GuildContainer::Id(partial_guild.id), role).await
                 },
                 GuildContainer::Id(guild_id) => {
+                    #[cfg(not(feature = "cache"))]
+                    let has_role = None;
+                    #[cfg(feature = "cache")]
                     let mut has_role = None;
 
                     #[cfg(feature = "cache")]

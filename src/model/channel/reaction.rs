@@ -81,7 +81,9 @@ impl Reaction {
     /// [permissions]: ../permissions/index.html
     #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-
+        #[cfg(not(feature = "cache"))]
+        let user_id = Some(self.user_id.0);
+        #[cfg(feature = "cache")]
         let mut user_id = Some(self.user_id.0);
 
         #[cfg(feature = "cache")]

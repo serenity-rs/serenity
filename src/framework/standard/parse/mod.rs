@@ -8,7 +8,9 @@ pub mod map;
 use map::{CommandMap, GroupMap, ParseMap};
 
 use std::borrow::Cow;
-use futures::future::{BoxFuture, FutureExt};
+#[cfg(feature = "cache")]
+use futures::future::BoxFuture;
+use futures::future::FutureExt;
 
 #[inline]
 fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
@@ -121,7 +123,7 @@ pub async fn prefix<'a>(
 
 /// Checked per valid group or command in the message.
 async fn check_discrepancy(
-    ctx: &Context,
+    _ctx: &Context,
     msg: &Message,
     config: &Configuration,
     options: &impl CommonOptions,
@@ -141,7 +143,7 @@ async fn check_discrepancy(
     #[cfg(feature = "cache")]
     {
         if let Some(guild_id) = msg.guild_id {
-            let guild = match guild_id.to_guild_cached(&ctx).await {
+            let guild = match guild_id.to_guild_cached(&_ctx).await {
                 Some(g) => g,
                 None => return Ok(()),
             };

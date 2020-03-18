@@ -22,7 +22,7 @@ use crate::internal::RwLockExt;
 use std::collections::hash_map::Entry;
 #[cfg(feature = "cache")]
 use std::mem;
-
+#[cfg(feature = "cache")]
 use async_trait::async_trait;
 
 /// Event data for the channel creation event.
