@@ -286,9 +286,8 @@ impl Handler {
     /// Plays audio from an [`Audio`] object.
     ///
     /// This will be one half of the return value of [`voice::create_player`].
-    /// As in [`play_only_source`], this stops all other sources attached
-    /// to the channel.
-    /// As in ['play'], however, this allows for direct manipulation of the
+    /// As in [`play_only_source`], this stops all other sources attached to the
+    /// channel. Like [`play`], however, this allows for direct manipulation of the
     /// [`Audio`] object before it is passed over to the voice and mixing contexts.
     ///
     /// [`voice::create_player`]: fn.create_player.html
@@ -310,7 +309,7 @@ impl Handler {
         self.send(VoiceStatus::SetBitrate(bitrate))
     }
 
-    /// Stops playing audio from a source, if one is set.
+    /// Stops playing audio from all sources, if any are set.
     pub fn stop(&mut self) { self.send(VoiceStatus::SetSender(None)) }
 
     /// Switches the current connected voice channel to the given `channel_id`.
