@@ -247,43 +247,60 @@ impl Handler {
         }
     }
 
-    /// Plays audio from a source, returning a handle for futehr control.
+    /// Plays audio from a source, returning a handle for further control.
     ///
     /// This can be a source created via [`voice::ffmpeg`] or [`voice::ytdl`].
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
-        let (tx, rx) = mpsc::channel();
-        let can_seek = source.is_seekable();
-        let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
+    pub fn play_source(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
+        let (player, handle) = super::create_player(source);
         self.send(VoiceStatus::AddSender(player));
 
-        AudioHandle::new(tx, can_seek)
+        handle
     }
 
-    // /// Plays audio from a source, returning the locked audio source.
-    // pub fn play_returning(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
-    //     let player = Arc::new(Mutex::new(Audio::new(source)));
-    //     self.send(VoiceStatus::AddSender(player.clone()));
-
-    //     player
-    // }
-
-    /// Plays audio from a source.
+    /// Plays audio from a source, returning a handle for further control.
     ///
-    /// Unlike [`play`] or [`play_returning`], this stops all other sources attached
+    /// Unlike [`play_only_source`], this stops all other sources attached
     /// to the channel.
     ///
-    /// [`play`]: #method.play
-    /// [`play_returning`]: #method.play_returning
-    pub fn play_only(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
-        let (tx, rx) = mpsc::channel();
-        let can_seek = source.is_seekable();
-        let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
+    /// [`play_only_source`]: #method.play_only_source
+    pub fn play_only_source(&mut self, source: Box<dyn AudioSource>) -> AudioHandle {
+        let (player, handle) = super::create_player(source);
         self.send(VoiceStatus::SetSender(Some(player)));
 
-        AudioHandle::new(tx, can_seek)
+        handle
+    }
+
+    /// Plays audio from an [`Audio`] object.
+    ///
+    /// This will be one half of the return value of [`voice::create_player`].
+    /// The main difference between this function and [`Handle::play_source`] is
+    /// that this allows for direct manipulation of the [`Audio`] object
+    /// before it is passed over to the voice and mixing contexts.
+    ///
+    /// [`voice::create_player`]: fn.create_player.html
+    /// [`Audio`]: struct.Audio.html
+    /// [`Handle::play_source`]: #method.play
+    pub fn play(&mut self, audio: Audio) {
+        self.send(VoiceStatus::AddSender(audio));
+    }
+
+    /// Plays audio from an [`Audio`] object.
+    ///
+    /// This will be one half of the return value of [`voice::create_player`].
+    /// As in [`play_only_source`], this stops all other sources attached
+    /// to the channel.
+    /// As in ['play'], however, this allows for direct manipulation of the
+    /// [`Audio`] object before it is passed over to the voice and mixing contexts.
+    ///
+    /// [`voice::create_player`]: fn.create_player.html
+    /// [`Audio`]: struct.Audio.html
+    /// [`play_only_source`]: #method.play_only_source
+    /// [`play`]: #method.play
+    pub fn play_only(&mut self, audio: Audio) {
+        self.send(VoiceStatus::SetSender(Some(audio)));
     }
 
     /// Sets the bitrate for encoding Opus packets sent along
@@ -327,7 +344,6 @@ impl Handler {
         match self.channel_id {
             Some(current_id) if current_id == channel_id => {
                 // If already connected to the given channel, do nothing.
-                return;
             },
             _ => {
                 self.channel_id = Some(channel_id);

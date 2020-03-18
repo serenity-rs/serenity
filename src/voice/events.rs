@@ -28,8 +28,8 @@ pub enum Event {
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub enum TrackEvent {
-	TrackEnd,
-	TrackLoop,
+	End,
+	Loop,
 }
 
 pub struct EventData {
@@ -115,14 +115,11 @@ impl EventStore {
 		use Event::*;
 		match evt.event {
 			Track(t) => {
-				println!("Added track event: {:?}", t);
 				self.track.entry(t)
 					.or_insert(vec![])
 					.push(evt);
 			}
 			Delayed(_) | Periodic(_, _) => {
-				println!("Added timed event: {:?}", evt.event);
-
 				self.timed.push(evt);
 			},
 			_ => {
@@ -149,7 +146,31 @@ impl EventStore {
 		}
 	}
 
-	pub fn process_track(&mut self, evt: TrackEvent) {
-		
+	pub fn process_track(&mut self, now: Duration, track_event: TrackEvent, mut ctx: EventContext<'_>) {
+		// move a Vec in and out: not too expensive, but could be better.
+		// Although it's obvious that moving an event out of one vec and into
+		// another necessitates that they be different event types, thus entries,
+		// convincing the compiler of this is non-trivial without making them dedicated
+		// fields.
+		// FIXME: not working...
+		let events = self.track.remove(&track_event);
+		if let Some(mut events) = events {
+			// FIXME: Possibly use tombstones to prevent realloc/memcpys?
+			let mut i = 0;
+			while i < events.len() {
+				let evt = &mut events[i];
+				// Only remove/readd if the event type changes (i.e., Some AND new != old)
+				if let Some(new_evt_type) = (evt.action)(&mut ctx) {
+					if evt.event == new_evt_type {
+
+						let mut evt = events.remove(i);
+
+						evt.event = new_evt_type;
+						self.add_event(evt, now);
+					} else { i += 1; }
+				} else { i += 1; };
+			}
+			self.track.insert(track_event, events);
+		}
 	}
 }

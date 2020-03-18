@@ -13,7 +13,17 @@ mod streamer;
 mod threading;
 
 pub use self::{
-    audio::{Audio, AudioHandle, AudioReceiver, AudioSource, AudioState, AudioType, LockedAudio},
+    audio::{
+        create_player,
+        Audio,
+        AudioHandle,
+        AudioReceiver,
+        AudioSource,
+        AudioState,
+        AudioType,
+        LockedAudio,
+        TrackQueue,
+    },
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
     events::{Event, EventContext, EventData, EventFn, TrackEvent},

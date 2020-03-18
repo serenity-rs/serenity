@@ -48,7 +48,7 @@ use std::{
 
 use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
-use super::{payload, EventContext, VoiceError, CRYPTO_MODE};
+use super::{payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
 use url::Url;
 use log::{debug, info, warn};
 
@@ -379,6 +379,7 @@ impl Connection {
         opus_frame: &[u8],
         buffer: &mut [i16; 1920],
         mut mix_buffer: &mut [f32; 1920],
+        to_cull: &mut Vec<Audio>,
     ) -> Result<usize> {
         let mut len = 0;
         let mut i = 0;
@@ -393,7 +394,8 @@ impl Connection {
 
             if skip {
                 if aud.finished {
-                    sources.remove(i);
+                    // CLEAN UP: DUPED
+                    to_cull.push(sources.remove(i));
                 }
             
                 i += 1;
@@ -449,7 +451,7 @@ impl Connection {
             };
 
             if aud.finished {
-                sources.remove(i);
+                to_cull.push(sources.remove(i));
             }
         };
 
@@ -457,13 +459,19 @@ impl Connection {
     }
 
     #[inline]
-    pub fn audio_commands_events(&mut self, mut sources: &mut Vec<Audio>) {
+    pub fn audio_commands_events(&mut self, sources: &mut Vec<Audio>, culled: &mut Vec<Audio>) {
         for audio in sources.iter_mut() {
             audio.process_commands();
             let state = audio.get_state();
             // FIXME: ideally, hand over direct audio object access, rather than handler...
             let handle = audio.handle.clone();
             audio.events.process_timed(audio.position, EventContext::Track(&state, &handle));
+        }
+
+        for mut audio in culled.drain(0..) {
+            let state = audio.get_state();
+            let handle = audio.handle.clone();
+            audio.events.process_track(audio.position, TrackEvent::End, EventContext::Track(&state, &handle));
         }
     }
 
@@ -491,6 +499,9 @@ impl Connection {
         let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
         let mut nonce = secretbox::Nonce([0; 24]);
+
+        // FIXME: find cleaner/more efficient way
+        let mut to_cull = vec![];
 
         while let Ok(status) = self.thread_items.rx.try_recv() {
             match status {
@@ -546,7 +557,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer,&mut mix_buffer)?;
+        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer, &mut to_cull)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -580,7 +591,7 @@ impl Connection {
         self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
 
-        self.audio_commands_events(&mut sources);
+        self.audio_commands_events(&mut sources, &mut to_cull);
         self.global_events();
 
         Ok(())

@@ -6,7 +6,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["cache", "framework", "standard_framework", "voice"]
 //! ```
-use std::{env, time::Duration, sync::Arc};
+use std::{collections::HashMap, env, time::Duration, sync::Arc};
 
 // Import the client's bridge to the voice manager. Since voice is a standalone
 // feature, it's not as ergonomic to work with as it could be. The client
@@ -30,7 +30,7 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, gateway::Ready, misc::Mentionable},
+    model::{channel::Message, id::GuildId, gateway::Ready, misc::Mentionable},
     Result as SerenityResult,
     voice::{
         self,
@@ -38,6 +38,7 @@ use serenity::{
         EventContext,
         EventData,
         TrackEvent,
+        TrackQueue,
     },
 };
 
@@ -50,6 +51,12 @@ impl TypeMapKey for VoiceManager {
     type Value = Arc<Mutex<ClientVoiceManager>>;
 }
 
+struct VoiceQueueManager;
+
+impl TypeMapKey for VoiceQueueManager {
+    type Value = Arc<Mutex<HashMap<GuildId, TrackQueue>>>;
+}
+
 struct Handler;
 
 impl EventHandler for Handler {
@@ -59,7 +66,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(deafen, join, leave, mute, play_fade, queue, ping, undeafen, unmute)]
+#[commands(deafen, join, leave, mute, play_fade, queue, stop, ping, undeafen, unmute)]
 struct General;
 
 fn main() {
@@ -74,6 +81,7 @@ fn main() {
     {
         let mut data = client.data.write();
         data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
+        data.insert::<VoiceQueueManager>(Arc::new(Mutex::new(HashMap::new())));
     }
 
     client.with_framework(StandardFramework::new()
@@ -268,33 +276,43 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
 
         // This handler object will allow you to, as needed,
         // control the audio track via events and further commands.
-        let song = handler.play(source);
+        let song = handler.play_source(source);
+        let send_http = ctx.http.clone();
+        let chan_id = msg.channel_id;
 
         // This shows how t0 periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
         song.add_event(
             Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
             // Event::Delayed(Duration::from_secs(2)),
-            |evt_ctx| {
+            move |evt_ctx| {
                 if let EventContext::Track(state, aud) = evt_ctx {
-                    aud.action(|true_aud| true_aud.volume /= 2.0);
+                    let _ = aud.action(|true_aud| true_aud.volume /= 2.0);
 
                     if state.volume < 1e-2 {
-                        aud.stop();
-
-                        // check_msg(msg.channel_id.say(&ctx.http, "Song stopped"));
-                        println!("Stopping song...");
-
+                        let _ = aud.stop();
+                        check_msg(chan_id.say(&send_http, "Stopping song..."));
                         Some(Event::Cancel)
                     } else {
-                        // check_msg(msg.channel_id.say(&ctx.http, "Volume reduced"));
-                        println!("Volume reduced.");
-
+                        check_msg(chan_id.say(&send_http, "Volume reduced."));
                         None
                     }
                 } else {
                     None
                 }
+            },
+        );
+
+        let send_http = ctx.http.clone();
+        
+        // This shows how to fire an event once an audio track completes,
+        // either due to hitting the end of the bytestream or stopped by user code.
+        song.add_event(
+            Event::Track(TrackEvent::End),
+            move |evt_ctx| {
+                check_msg(chan_id.say(&send_http, "Song faded out completely!"));
+
+                None
             },
         );
 
@@ -333,7 +351,9 @@ fn queue(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let queues_lock = ctx.data.read().get::<VoiceQueueManager>().cloned().expect("Expected VoiceQueueManager in ShareMap.");
     let mut manager = manager_lock.lock();
+    let mut track_queues = queues_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {
         let source = match voice::ytdl(&url) {
@@ -347,11 +367,45 @@ fn queue(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
             },
         };
 
-        // This handler object will allow you to, as needed,
-        // control the audio track via events and further commands.
-        let song = handler.play(source);
+        // We need to ensure that this guild has a TrackQueue created for it.
+        let queue = track_queues.entry(guild_id)
+            .or_default();
 
-        check_msg(msg.channel_id.say(&ctx.http, "Playing song"));
+        // Queueing a track is this easy!
+        queue.add_source(source, handler);
+
+        check_msg(msg.channel_id.say(&ctx.http, format!("Added song to queue: position {}", queue.len())));
+    } else {
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
+    }
+
+    Ok(())
+}
+
+#[command]
+fn stop(ctx: &mut Context, msg: &Message, _args: Args) -> CommandResult {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
+        None => {
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
+
+            return Ok(());
+        },
+    };
+
+    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let queues_lock = ctx.data.read().get::<VoiceQueueManager>().cloned().expect("Expected VoiceQueueManager in ShareMap.");
+    let mut manager = manager_lock.lock();
+    let mut track_queues = queues_lock.lock();
+
+    if let Some(handler) = manager.get_mut(guild_id) {
+        // We need to ensure that this guild has a TrackQueue created for it.
+        let queue = track_queues.entry(guild_id)
+            .or_default();
+
+        queue.stop();
+
+        check_msg(msg.channel_id.say(&ctx.http, "Queue cleared."));
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
     }

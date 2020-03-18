@@ -1,6 +1,7 @@
 use audiopus::{Bitrate, SampleRate};
 use parking_lot::Mutex;
 use std::{
+    collections::VecDeque,
     sync::{
         mpsc::{
             self,
@@ -13,11 +14,15 @@ use std::{
     },
     time::Duration,
 };
-use super::events::{
-    Event,
-    EventContext,
-    EventData,
-    EventStore,
+use super::{
+    events::{
+        Event,
+        EventContext,
+        EventData,
+        EventStore,
+        TrackEvent,
+    },
+    Handler,
 };
 
 pub const HEADER_LEN: usize = 12;
@@ -253,6 +258,14 @@ impl Audio {
     }
 }
 
+pub fn create_player(source: Box<dyn AudioSource>) -> (Audio, AudioHandle) {
+    let (tx, rx) = mpsc::channel();
+    let can_seek = source.is_seekable();
+    let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
+
+    (player, AudioHandle::new(tx, can_seek))
+}
+
 #[derive(Debug)]
 pub struct AudioState {
     pub playing: bool,
@@ -370,4 +383,94 @@ pub enum PlayMode {
     Play,
     Pause,
     Stop,
+}
+
+pub struct TrackQueue {
+    inner: Arc<Mutex<TrackQueueCore>>,
+}
+
+pub struct TrackQueueCore {
+    tracks: VecDeque<AudioHandle>,
+}
+
+impl TrackQueue {
+    pub fn new() -> Self {
+        Self {
+            inner: Arc::new(Mutex::new(TrackQueueCore {
+                tracks: VecDeque::new(),
+            }))
+        }
+    }
+
+    pub fn add_source(&self, source: Box<dyn AudioSource>, handler: &mut Handler) {
+        let (audio, audio_handle) = create_player(source);
+        self.add_track(audio, audio_handle, handler);
+    }
+
+    pub fn add_track(&self, mut audio: Audio, audio_handle: AudioHandle, handler: &mut Handler) {
+        let remote_lock = self.inner.clone();
+        let mut inner = self.inner.lock();
+
+        if inner.tracks.len() != 0 {
+            audio.pause();
+        }
+
+        audio.events.add_event(
+            EventData::new(
+                Event::Track(TrackEvent::End),
+                move |_ctx| {
+                    let mut inner = remote_lock.lock();
+                    let _old = inner.tracks.pop_front();
+
+                    // If any audio files die unexpectedly, then push forward.
+                    if let Some(new) = inner.tracks.front() {
+                        let err = new.play();
+                    }
+
+                    None
+                }),
+            audio.position,
+        );
+
+        handler.play(audio);
+        inner.tracks.push_back(audio_handle);
+    }
+
+    pub fn len(&self) -> usize {
+        let inner = self.inner.lock();
+
+        inner.tracks.len()
+    }
+
+    pub fn pause(&self) {
+        let inner = self.inner.lock();
+
+        if let Some(handle) = inner.tracks.front() {
+            handle.pause();
+        }
+    }
+
+    pub fn resume(&self) {
+        let inner = self.inner.lock();
+
+        if let Some(handle) = inner.tracks.front() {
+            handle.play();
+        }
+    }
+
+    pub fn stop(&self) {
+        let mut inner = self.inner.lock();
+
+        if let Some(handle) = inner.tracks.front() {
+            handle.stop();
+        }
+
+        inner.tracks.clear();
+    }
+}
+
+impl Default for TrackQueue {
+    fn default() -> Self {
+        Self::new()
+    }
 }
