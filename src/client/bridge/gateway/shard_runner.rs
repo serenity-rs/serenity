@@ -30,6 +30,9 @@ use typemap::ShareMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::ClientVoiceManager;
+#[cfg(feature = "voice")]
+use tokio::sync::Mutex;
+
 use log::{error, debug, warn};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
@@ -114,7 +117,7 @@ impl ShardRunner {
                     self.shard.shard_info(),
                 );
 
-                return self.request_restart();
+                return self.request_restart().await;
             }
 
             let pre = self.shard.stage();
@@ -135,7 +138,7 @@ impl ShardRunner {
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
-                    return self.request_restart();
+                    return self.request_restart().await;
                 },
                 Some(other) => {
                     let _ = self.action(&other).await;
@@ -148,7 +151,7 @@ impl ShardRunner {
             }
 
             if !successful && !self.shard.stage().is_connecting() {
-                return self.request_restart();
+                return self.request_restart().await;
             }
         }
     }
@@ -170,7 +173,7 @@ impl ShardRunner {
     async fn action(&mut self, action: &ShardAction) -> Result<()> {
 
         match *action {
-            ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart(),
+            ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart().await,
             ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
             ShardAction::Reconnect(ReconnectType::__Nonexhaustive) => unreachable!(),
             ShardAction::Heartbeat => self.shard.heartbeat().await,
@@ -336,7 +339,7 @@ impl ShardRunner {
     }
 
     #[cfg(feature = "voice")]
-    fn handle_voice_event(&self, event: &Event) {
+    async fn handle_voice_event(&self, event: &Event) {
         match *event {
             Event::Ready(_) => {
                 self.voice_manager.lock().await.set(
@@ -352,6 +355,7 @@ impl ShardRunner {
                     if let Some(handler) = search {
                         handler.update_server(&event.endpoint, &event.token);
                     }
+
                 }
             },
             Event::VoiceStateUpdate(ref event) => {
@@ -392,7 +396,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
-                    let _ = self.request_restart();
+                    let _ = self.request_restart().await;
 
                     return Ok(false);
                 },
@@ -477,7 +481,7 @@ impl ShardRunner {
         #[cfg(feature = "voice")]
         {
             if let Ok(GatewayEvent::Dispatch(_, ref event)) = event {
-                self.handle_voice_event(&event);
+                self.handle_voice_event(&event).await;
             }
         }
 
@@ -489,7 +493,7 @@ impl ShardRunner {
         (event, action, true)
     }
 
-    fn request_restart(&mut self) -> Result<()> {
+    async fn request_restart(&mut self) -> Result<()> {
         self.update_manager();
 
         debug!(

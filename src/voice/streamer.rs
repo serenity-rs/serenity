@@ -5,7 +5,7 @@ use audiopus::{
     coder::Decoder as OpusDecoder,
     Result as OpusResult,
 };
-use parking_lot::Mutex;
+use tokio::sync::Mutex;
 use serde_json;
 use std::{
     ffi::OsStr,
@@ -18,6 +18,7 @@ use std::{
 use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
 use log::{debug, warn};
 use crate::prelude::SerenityError;
+use async_trait::async_trait;
 
 struct ChildContainer(Child);
 
@@ -42,25 +43,26 @@ struct SendDecoder(OpusDecoder);
 impl SendDecoder {
     fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
         let &mut SendDecoder(ref mut sd) = self;
-        sd.decode_float(input, output, fec)
+        sd.decode_float(Some(input), output, fec)
     }
 }
 
 unsafe impl Send for SendDecoder {}
 
-struct InputSource<R: Read + Send + 'static> {
+struct InputSource<R: Read + Send + Sync + 'static> {
     stereo: bool,
     reader: R,
     kind: AudioType,
     decoder: Option<Arc<Mutex<SendDecoder>>>,
 }
 
-impl<R: Read + Send> AudioSource for InputSource<R> {
-    fn is_stereo(&mut self) -> bool { self.stereo }
+#[async_trait]
+impl<R: Read + Send + Sync> AudioSource for InputSource<R> {
+    async fn is_stereo(&mut self) -> bool { self.stereo }
 
-    fn get_type(&self) -> AudioType { self.kind }
+    async fn get_type(&self) -> AudioType { self.kind }
 
-    fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize> {
+    async fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize> {
         for (i, v) in buffer.iter_mut().enumerate() {
             *v = match self.reader.read_i16::<LittleEndian>() {
                 Ok(v) => v,
@@ -77,7 +79,7 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
         Some(buffer.len())
     }
 
-    fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
+    async fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
         match self.reader.read_i16::<LittleEndian>() {
             Ok(size) => {
                 if size <= 0 {
@@ -105,13 +107,13 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
         }
     }
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
+    async fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
         let decoder_lock = self.decoder.as_mut()?.clone();
-        let frame = self.read_opus_frame()?;
+        let frame = self.read_opus_frame().await?;
         let mut local_buf = [0f32; 960 * 2];
 
         let count = {
-            let mut decoder = decoder_lock.lock();
+            let mut decoder = decoder_lock.lock().await;
 
             decoder.decode_float(frame.as_slice(), &mut local_buf, false).ok()?
         };
@@ -248,7 +250,7 @@ fn _dca(path: &OsStr) -> StdResult<Box<dyn AudioSource>, DcaError> {
 /// If you want to decode a `.opus` file, use [`ffmpeg`]
 ///
 /// [`ffmpeg`]: fn.ffmpeg.html
-pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
+pub fn opus<R: Read + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader,
@@ -263,7 +265,7 @@ pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn Aud
 }
 
 /// Creates a PCM audio source.
-pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
+pub fn pcm<R: Read + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader,

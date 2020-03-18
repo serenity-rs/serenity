@@ -1,8 +1,6 @@
 use chrono::{DateTime, Duration, Utc};
-use std::{
-    time::Duration as StdDuration,
-    thread
-};
+use std::time::Duration as StdDuration;
+use tokio::time::delay_for;
 
 #[derive(Debug)]
 pub struct Timer {
@@ -32,7 +30,7 @@ impl Timer {
             let sleep_time = due_time - now_time;
 
             if sleep_time > 0 {
-                delay_for(StdDuration::from_millis(sleep_time as u64));
+                delay_for(StdDuration::from_millis(sleep_time as u64)).await;
             }
         }
 

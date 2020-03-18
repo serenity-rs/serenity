@@ -755,7 +755,9 @@ impl Client {
         }
 
         {
+
             let mut manager = self.shard_manager.lock().await;
+            
             let init = shard_data[1] - shard_data[0] + 1;
 
             manager.set_shards(shard_data[0], init, shard_data[2]).await;

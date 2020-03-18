@@ -87,7 +87,6 @@ pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
 pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
     TlsStream<TokioAdapter<TcpStream>>>>;
 
-
 /// Indicates the current connection stage of a [`Shard`].
 ///
 /// This can be useful for knowing which shards are currently "down"/"up".

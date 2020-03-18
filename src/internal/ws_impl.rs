@@ -19,6 +19,7 @@ use std::{
     io::Error as IoError,
 };
 use url::Url;
+use futures::stream::SplitSink;
 
 #[async_trait]
 pub trait ReceiverExt {
@@ -50,6 +51,19 @@ impl ReceiverExt for WsStream {
 }
 
 #[async_trait]
+impl SenderExt for SplitSink<WsStream, Message> {
+    async fn send_json(&mut self, value: &Value) -> Result<()> {
+        Ok(serde_json::to_string(value)
+            .map(Message::Text)
+            .map_err(Error::from)
+            .and_then(|m| {
+                Ok(self.send(m))
+            })?
+            .await?)
+    }
+}
+
+#[async_trait]
 impl SenderExt for WsStream {
     async fn send_json(&mut self, value: &Value) -> Result<()> {
         Ok(serde_json::to_string(value)
@@ -63,7 +77,7 @@ impl SenderExt for WsStream {
 }
 
 #[inline]
-fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
+pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
     Ok(match message {
         Some(Message::Binary(bytes)) => {
             serde_json::from_reader(ZlibDecoder::new(&bytes[..]))

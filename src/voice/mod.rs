@@ -9,7 +9,7 @@ mod manager;
 mod handler;
 mod payload;
 mod streamer;
-mod threading;
+mod tasks;
 
 pub use self::{
     audio::{Audio, AudioReceiver, AudioSource, AudioType, LockedAudio},
@@ -29,6 +29,7 @@ pub use self::{
 };
 pub use audiopus::Bitrate;
 
+use std::sync::Arc;
 use self::connection_info::ConnectionInfo;
 
 const CRYPTO_MODE: &str = "xsalsa20_poly1305";
@@ -36,7 +37,7 @@ const CRYPTO_MODE: &str = "xsalsa20_poly1305";
 pub(crate) enum Status {
     Connect(ConnectionInfo),
     Disconnect,
-    SetReceiver(Option<Box<dyn AudioReceiver>>),
+    SetReceiver(Option<Arc<dyn AudioReceiver>>),
     SetSender(Option<LockedAudio>),
     AddSender(LockedAudio),
     SetBitrate(Bitrate),
