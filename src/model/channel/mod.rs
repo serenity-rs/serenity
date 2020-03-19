@@ -336,19 +336,19 @@ pub enum ChannelType {
     /// An indicator that the channel is the channel of a [`ChannelCategory`].
     ///
     /// [`ChannelCategory`]: struct.ChannelCategory.html
-    Category = 3,
+    Category = 4,
     /// An indicator that the channel is a `NewsChannel`.
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    News = 4,
+    News = 5,
     /// An indicator that the channel is a `StoreChannel`
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    Store = 5,
+    Store = 6,
     #[doc(hidden)]
     __Nonexhaustive,
 }

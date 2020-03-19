@@ -352,32 +352,6 @@ fn handle_event(
                 event_handler.channel_pins_update(context, event);
             });
         },
-        DispatchEvent::Model(Event::ChannelRecipientAdd(mut event)) => {
-            update(&cache_and_http, &mut event);
-
-            let event_handler = Arc::clone(event_handler);
-
-            threadpool.execute(move || {
-                event_handler.channel_recipient_addition(
-                    context,
-                    event.channel_id,
-                    event.user,
-                );
-            });
-        },
-        DispatchEvent::Model(Event::ChannelRecipientRemove(mut event)) => {
-            update(&cache_and_http, &mut event);
-
-            let event_handler = Arc::clone(event_handler);
-
-            threadpool.execute(move || {
-                event_handler.channel_recipient_removal(
-                    context,
-                    event.channel_id,
-                    event.user,
-                );
-            });
-        },
         DispatchEvent::Model(Event::ChannelUpdate(mut event)) => {
             let event_handler = Arc::clone(event_handler);
 

@@ -164,7 +164,6 @@ pub struct Cache {
     /// Users are added to - and updated from - this map via the following
     /// received events:
     ///
-    /// - [`ChannelRecipientAdd`][`ChannelRecipientAddEvent`]
     /// - [`GuildMemberAdd`][`GuildMemberAddEvent`]
     /// - [`GuildMemberRemove`][`GuildMemberRemoveEvent`]
     /// - [`GuildMembersChunk`][`GuildMembersChunkEvent`]
@@ -175,7 +174,6 @@ pub struct Cache {
     /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
     /// structs such as members or recipients may still exist.
     ///
-    /// [`ChannelRecipientAddEvent`]: ../model/event/struct.ChannelRecipientAddEvent.html
     /// [`GuildMemberAddEvent`]: ../model/event/struct.GuildMemberAddEvent.html
     /// [`GuildMemberRemoveEvent`]: ../model/event/struct.GuildMemberRemoveEvent.html
     /// [`GuildMemberUpdateEvent`]: ../model/event/struct.GuildMemberUpdateEvent.html

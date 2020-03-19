@@ -199,44 +199,6 @@ impl CacheUpdate for ChannelPinsUpdateEvent {
 }
 
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ChannelRecipientAddEvent {
-    pub channel_id: ChannelId,
-    pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[cfg(feature = "cache")]
-impl CacheUpdate for ChannelRecipientAddEvent {
-    type Output = ();
-
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.update_user_entry(&self.user);
-        let user = Arc::clone(&cache.users[&self.user.id]);
-
-        None
-    }
-}
-
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ChannelRecipientRemoveEvent {
-    pub channel_id: ChannelId,
-    pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[cfg(feature = "cache")]
-impl CacheUpdate for ChannelRecipientRemoveEvent {
-    type Output = ();
-
-    fn update(&mut self, _cache: &mut Cache) -> Option<()> {
-        None
-    }
-}
-
 #[derive(Clone, Debug)]
 pub struct ChannelUpdateEvent {
     pub channel: Channel,
@@ -1418,20 +1380,6 @@ pub enum Event {
     /// [`EventHandler::channel_pins_update`]:
     /// ../../client/trait.EventHandler.html#method.channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
-    /// A [`User`] has been added to a [`Group`].
-    ///
-    /// Fires the [`EventHandler::channel_recipient_addition`] event.
-    ///
-    /// [`EventHandler::channel_recipient_addition`]: ../../client/trait.EventHandler.html#method.channel_recipient_addition
-    /// [`User`]: ../struct.User.html
-    ChannelRecipientAdd(ChannelRecipientAddEvent),
-    /// A [`User`] has been removed from a [`Group`].
-    ///
-    /// Fires the [`EventHandler::channel_recipient_removal`] event.
-    ///
-    /// [`EventHandler::channel_recipient_removal`]: ../../client/trait.EventHandler.html#method.channel_recipient_removal
-    /// [`User`]: ../struct.User.html
-    ChannelRecipientRemove(ChannelRecipientRemoveEvent),
     /// A [`Channel`] has been updated.
     ///
     /// Fires the [`EventHandler::channel_update`] event.
@@ -1534,12 +1482,6 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::ChannelDelete => Event::ChannelDelete(serde_json::from_value(v)?),
         EventType::ChannelPinsUpdate => {
             Event::ChannelPinsUpdate(serde_json::from_value(v)?)
-        },
-        EventType::ChannelRecipientAdd => {
-            Event::ChannelRecipientAdd(serde_json::from_value(v)?)
-        },
-        EventType::ChannelRecipientRemove => {
-            Event::ChannelRecipientRemove(serde_json::from_value(v)?)
         },
         EventType::ChannelUpdate => Event::ChannelUpdate(serde_json::from_value(v)?),
         EventType::GuildBanAdd => Event::GuildBanAdd(serde_json::from_value(v)?),
@@ -1667,18 +1609,6 @@ pub enum EventType {
     ///
     /// [`ChannelPinsUpdateEvent`]: struct.ChannelPinsUpdateEvent.html
     ChannelPinsUpdate,
-    /// Indicator that a channel recipient addition payload was received.
-    ///
-    /// This maps to [`ChannelRecipientAddEvent`].
-    ///
-    /// [`ChannelRecipientAddEvent`]: struct.ChannelRecipientAddEvent.html
-    ChannelRecipientAdd,
-    /// Indicator that a channel recipient removal payload was received.
-    ///
-    /// This maps to [`ChannelRecipientRemoveEvent`].
-    ///
-    /// [`ChannelRecipientRemoveEvent`]: struct.ChannelRecipientRemoveEvent.html
-    ChannelRecipientRemove,
     /// Indicator that a channel update payload was received.
     ///
     /// This maps to [`ChannelUpdateEvent`].
@@ -1898,8 +1828,6 @@ impl<'de> Deserialize<'de> for EventType {
                     "CHANNEL_CREATE" => EventType::ChannelCreate,
                     "CHANNEL_DELETE" => EventType::ChannelDelete,
                     "CHANNEL_PINS_UPDATE" => EventType::ChannelPinsUpdate,
-                    "CHANNEL_RECIPIENT_ADD" => EventType::ChannelRecipientAdd,
-                    "CHANNEL_RECIPIENT_REMOVE" => EventType::ChannelRecipientRemove,
                     "CHANNEL_UPDATE" => EventType::ChannelUpdate,
                     "GUILD_BAN_ADD" => EventType::GuildBanAdd,
                     "GUILD_BAN_REMOVE" => EventType::GuildBanRemove,
