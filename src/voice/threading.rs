@@ -1,6 +1,7 @@
 use crate::internal::Timer;
 use crate::model::id::GuildId;
 use std::{
+    collections::HashMap,
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
     thread::Builder as ThreadBuilder
 };
@@ -8,6 +9,7 @@ use super::{
     connection::Connection,
     Status,
     audio,
+    events::GlobalEvents,
 };
 use log::{error, warn};
 
@@ -26,6 +28,8 @@ fn runner(rx: &MpscReceiver<Status>) {
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = audio::DEFAULT_BITRATE;
+    let mut events = GlobalEvents::default();
+    let mut fired_track_evts = HashMap::new();
 
     'runner: loop {
         loop {
@@ -59,6 +63,9 @@ fn runner(rx: &MpscReceiver<Status>) {
                 Ok(Status::SetBitrate(b)) => {
                     bitrate = b;
                 },
+                Ok(Status::AddEvent(evt)) => {
+                    events.store.add_event(evt, events.time);
+                }
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
                     break;
@@ -79,7 +86,9 @@ fn runner(rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut senders, &mut receiver, &mut timer, bitrate);
+                let cycle = connection.cycle(&mut senders, &mut receiver, &mut fired_track_evts, &mut timer, bitrate);
+
+                events.march_and_process(&mut senders, &mut fired_track_evts);
 
                 match cycle {
                     Ok(()) => false,

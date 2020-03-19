@@ -379,7 +379,7 @@ impl Connection {
         opus_frame: &[u8],
         buffer: &mut [i16; 1920],
         mut mix_buffer: &mut [f32; 1920],
-        to_cull: &mut Vec<Audio>,
+        fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
     ) -> Result<usize> {
         let mut len = 0;
         let mut i = 0;
@@ -395,7 +395,9 @@ impl Connection {
             if skip {
                 if aud.finished {
                     // CLEAN UP: DUPED
-                    to_cull.push(sources.remove(i));
+                    fired_track_evts.entry(TrackEvent::End)
+                        .or_default()
+                        .push(i);
                 }
             
                 i += 1;
@@ -440,26 +442,26 @@ impl Connection {
             combine_audio(*buffer, &mut mix_buffer, source_stereo, vol);
 
             len = len.max(temp_len);
-            i += if temp_len > 0 {
-                aud.step_frame();
-
-                1
+            if temp_len > 0 {
+                aud.step_frame()
             } else {
                 aud.finished = true;
-                
-                0
-            };
+            }
 
             if aud.finished {
-                to_cull.push(sources.remove(i));
+                fired_track_evts.entry(TrackEvent::End)
+                    .or_default()
+                    .push(i);
             }
+
+            i += 1;
         };
 
         Ok(len)
     }
 
     #[inline]
-    pub fn audio_commands_events(&mut self, sources: &mut Vec<Audio>, culled: &mut Vec<Audio>) {
+    pub fn audio_commands_events(&mut self, sources: &mut Vec<Audio>) {
         for audio in sources.iter_mut() {
             audio.process_commands();
             let state = audio.get_state();
@@ -467,23 +469,13 @@ impl Connection {
             let handle = audio.handle.clone();
             audio.events.process_timed(audio.position, EventContext::Track(&state, &handle));
         }
-
-        for mut audio in culled.drain(0..) {
-            let state = audio.get_state();
-            let handle = audio.handle.clone();
-            audio.events.process_track(audio.position, TrackEvent::End, EventContext::Track(&state, &handle));
-        }
-    }
-
-    #[inline]
-    pub fn global_events(&mut self) {
-        // TODO
     }
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
                 mut sources: &mut Vec<Audio>,
                 mut receiver: &mut Option<Box<dyn AudioReceiver>>,
+                fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate)
                  -> Result<()> {
@@ -499,9 +491,6 @@ impl Connection {
         let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
         let mut nonce = secretbox::Nonce([0; 24]);
-
-        // FIXME: find cleaner/more efficient way
-        let mut to_cull = vec![];
 
         while let Ok(status) = self.thread_items.rx.try_recv() {
             match status {
@@ -557,7 +546,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer, &mut to_cull)?;
+        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer, fired_track_evts)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -591,8 +580,7 @@ impl Connection {
         self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
 
-        self.audio_commands_events(&mut sources, &mut to_cull);
-        self.global_events();
+        self.audio_commands_events(&mut sources);
 
         Ok(())
     }

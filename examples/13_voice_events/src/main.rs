@@ -158,8 +158,38 @@ fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
     let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
     let mut manager = manager_lock.lock();
 
-    if manager.join(guild_id, connect_to).is_some() {
+    if let Some(handle) = manager.join(guild_id, connect_to) {
         check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
+
+        let chan_id = msg.channel_id;
+
+        let send_http = ctx.http.clone();
+
+        handle.add_global_event(
+            Event::Track(TrackEvent::End),
+            move |ctx| {
+                if let EventContext::Global(Some(track_list)) = ctx {
+                    check_msg(chan_id.say(&send_http, &format!("Tracks ended: {}.", track_list.len())));
+                }
+
+                None
+            },
+        );
+
+        let send_http = ctx.http.clone();
+        let mut i = 0;
+
+        handle.add_global_event(
+            Event::Periodic(Duration::from_secs(60), None),
+            move |ctx| {
+                if let EventContext::Global(_) = ctx {
+                    i += 1;
+                    check_msg(chan_id.say(&send_http, &format!("I've been in this channel for {} minutes!", i)));
+                }
+
+                None
+            }
+        );
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
     }
@@ -288,7 +318,7 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
             // Event::Delayed(Duration::from_secs(2)),
             move |evt_ctx| {
                 if let EventContext::Track(state, aud) = evt_ctx {
-                    let _ = aud.action(|true_aud| true_aud.volume /= 2.0);
+                    let _ = aud.set_volume(state.volume / 2.0);
 
                     if state.volume < 1e-2 {
                         let _ = aud.stop();

@@ -12,9 +12,21 @@ use super::{Audio, AudioHandle, AudioState};
 ///
 /// Local events ([`Audio`]-specific) are guaranteed to have
 /// an attached track, while global timing events will not.
+///
+/// [`Audio`]: struct.Audio.html
+/// [`Handler::add_global_event`]: struct.Handler.html#method.add_global_event
 pub enum EventContext<'a> {
+	/// Local event context, passed to events created via [`AudioHandle::add_event`]
+	/// or [`EventStore::add_event`].
+	///
+	/// [`EventStore::add_event`]: struct.EventStore.html#method.add_event
+	/// [`AudioHandle::add_event`]: struct.AudioHandle.html#method.add_event
 	Track(&'a AudioState, &'a AudioHandle),
-	Global(Option<&'a mut Audio>),
+
+	/// Global event context, passed to events created via [`Handler::add_global_event`].
+	///
+	/// [`Handler::add_global_event`]: struct.Handler.html#method.add_global_event
+	Global(Option<Vec<&'a mut Audio>>),
 }
 
 #[derive(Debug, Eq, Hash, PartialEq)]
@@ -151,7 +163,7 @@ impl PartialEq for EventData {
 
 impl Eq for EventData {}
 
-#[derive(Default)]
+#[derive(Debug, Default)]
 /// Storage for [`EventData`], designed to be used for both local and global contexts.
 ///
 /// Timed events are stored in a binary heap for fast selection, and have custom `Eq`,
@@ -236,6 +248,60 @@ impl EventStore {
 				} else { i += 1; };
 			}
 			self.track.insert(track_event, events);
+		}
+	}
+}
+
+#[derive(Debug, Default)]
+pub(crate) struct GlobalEvents {
+	pub(crate) store: EventStore,
+	pub(crate) time: Duration,
+}
+
+impl GlobalEvents {
+	pub(crate) fn march_and_process(&mut self, sources: &mut Vec<Audio>, events: &mut HashMap<TrackEvent, Vec<usize>>) {
+		self.time += Duration::from_millis(20);
+		self.store.process_timed(self.time, EventContext::Global(None));
+
+		for (evt, indices) in events.iter() {
+			// Peek to see if there are any listeners and events at all...
+			let should_work = if let Some(handlers) = self.store.track.get(evt) {
+				!handlers.is_empty() && !indices.is_empty()
+			} else { false };
+
+			if should_work {
+				let mut local_sources = &mut sources[..];
+				let mut auds = Vec::with_capacity(local_sources.len());
+
+				// filter_map etc. on the indices wouldn't work here...
+				// So far as I can tell, this was the only way to convince the compiler
+				// that the references would survive.
+				let mut removed = 0;
+				for i in indices {
+					let (_, edge) = local_sources.split_at_mut(i - removed);
+					let (val, rest) = edge.split_at_mut(1);
+					local_sources = rest;
+					auds.push(&mut val[0]);
+					removed += i;
+				}
+
+				self.store.process_track(self.time, *evt, EventContext::Global(Some(auds)));
+			}
+		}
+
+		// remove audios, too.
+		let to_cull = events.entry(TrackEvent::End).or_default();
+		for (count, index) in to_cull.iter().enumerate() {
+			let mut audio = sources.remove(index - count);
+
+			let state = audio.get_state();
+            let handle = audio.handle.clone();
+            audio.events.process_track(audio.position, TrackEvent::End, EventContext::Track(&state, &handle));
+		}
+
+		// Now drain vecs.
+		for (_evt, indices) in events.iter_mut() {
+			indices.clear();
 		}
 	}
 }

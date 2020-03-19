@@ -55,4 +55,5 @@ pub(crate) enum Status {
     SetSender(Option<Audio>),
     AddSender(Audio),
     SetBitrate(Bitrate),
+    AddEvent(EventData),
 }

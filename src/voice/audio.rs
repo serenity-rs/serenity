@@ -303,7 +303,7 @@ pub fn create_player(source: Box<dyn AudioSource>) -> (Audio, AudioHandle) {
 /// [`Audio`]: struct.Audio.html
 /// [`AudioHandle::get_info`]: struct.AudioHandle.html#method.get_info
 /// [`AudioHandle::get_info_blocking`]: struct.AudioHandle.html#method.get_info_blocking
-#[derive(Debug)]
+#[derive(Debug, Default)]
 pub struct AudioState {
     pub playing: bool,
     pub volume: f32,
@@ -415,13 +415,14 @@ impl AudioHandle {
         }
     }
 
-    /// Attach an event handler to an audio track.
+    /// Attach an event handler to an audio track. These will receive [`EventContext::Track`].
     ///
     /// Users **must** ensure that no costly work or blocking occurs
     /// within the supplied function or closure. *Taking excess time could prevent
     /// timely sending of packets, causing audio glitches and delays*.
     ///
     /// [`Audio`]: struct.Audio.html
+    /// [`EventContext::Track`]: enum.EventContext.html#variant.Track
     pub fn add_event<F>(&self, event: Event, action: F) -> AudioResult 
         where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
     {

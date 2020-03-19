@@ -1,17 +1,30 @@
-use crate::constants::VoiceOpCode;
-use crate::gateway::InterMessage;
-use crate::model::{
-    id::{
-        ChannelId,
-        GuildId,
-        UserId
+use crate::{
+    constants::VoiceOpCode,
+    gateway::InterMessage,
+    model::{
+        id::{
+            ChannelId,
+            GuildId,
+            UserId
+        },
+        voice::VoiceState,
     },
-    voice::VoiceState
 };
-use std::sync::mpsc::{self, Sender as MpscSender};
-use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioHandle, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading};
 use serde_json::json;
+use std::sync::mpsc::{self, Sender as MpscSender};
+use super::{
+    Audio,
+    AudioHandle,
+    AudioReceiver,
+    AudioSource,
+    Bitrate,
+    Event,
+    EventContext,
+    EventData,
+    Status as VoiceStatus,
+    connection_info::ConnectionInfo,
+    threading,
+};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -272,13 +285,13 @@ impl Handler {
     /// Plays audio from an [`Audio`] object.
     ///
     /// This will be one half of the return value of [`voice::create_player`].
-    /// The main difference between this function and [`Handle::play_source`] is
+    /// The main difference between this function and [`play_source`] is
     /// that this allows for direct manipulation of the [`Audio`] object
     /// before it is passed over to the voice and mixing contexts.
     ///
     /// [`voice::create_player`]: fn.create_player.html
     /// [`Audio`]: struct.Audio.html
-    /// [`Handle::play_source`]: #method.play
+    /// [`play_source`]: #method.play_source
     pub fn play(&mut self, audio: Audio) {
         self.send(VoiceStatus::AddSender(audio));
     }
@@ -311,6 +324,25 @@ impl Handler {
 
     /// Stops playing audio from all sources, if any are set.
     pub fn stop(&mut self) { self.send(VoiceStatus::SetSender(None)) }
+
+    /// Attach a global event handler to an audio context. Global events will receive
+    /// [`EventContext::Global`].
+    ///
+    /// Global timing events will tick regardless of whether audio is playing,
+    /// so long as the bot is connected to a voice channel, and have `None` tracks.
+    /// TrackEvents will respond to all tracks, giving `Some(...)` audio elements.
+    ///
+    /// Users **must** ensure that no costly work or blocking occurs
+    /// within the supplied function or closure. *Taking excess time could prevent
+    /// timely sending of packets, causing audio glitches and delays*.
+    ///
+    /// [`Audio`]: struct.Audio.html
+    /// [`EventContext::Global`]: enum.EventContext.html#variant.Global
+    pub fn add_global_event<F>(&mut self, event: Event, action: F) 
+        where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
+    {
+        self.send(VoiceStatus::AddEvent(EventData::new(event, action)));
+    }
 
     /// Switches the current connected voice channel to the given `channel_id`.
     ///
