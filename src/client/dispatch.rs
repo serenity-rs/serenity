@@ -118,9 +118,13 @@ pub(crate) fn dispatch<'rec>(
                             h,
                         ).await;
 
-                        if let Some(ref framework) = **framework {
-                            framework.dispatch(context, event.message).await;
-                        }
+                        let framework = Arc::clone(&framework);
+
+                        tokio::spawn(async move {
+                            if let Some(ref framework) = *framework {
+                                framework.dispatch(context, event.message).await;
+                            }
+                        });
                     },
                     other => {
                         handle_event(
