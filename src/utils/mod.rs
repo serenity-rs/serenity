@@ -935,6 +935,7 @@ mod test {
         let role = Role {
             id: RoleId(333333333333333333),
             colour: Colour::ORANGE,
+            guild_id: guild.id,
             hoist: true,
             managed: false,
             mentionable: true,
