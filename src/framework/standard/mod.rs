@@ -102,7 +102,7 @@ pub struct StandardFramework {
     before: Option<BeforeHook>,
     after: Option<AfterHook>,
     dispatch: Option<DispatchHook>,
-    unrecognised_command: Option<UnrecognisedHook>,
+    unrecognised_command: Option<Arc<UnrecognisedHook>>,
     normal_message: Option<Arc<NormalMessageHook>>,
     prefix_only: Option<PrefixOnlyHook>,
     config: Configuration,
@@ -567,7 +567,7 @@ impl StandardFramework {
     ///     }));
     /// ```
     pub fn unrecognised_command(mut self, f: UnrecognisedHook) -> Self {
-        self.unrecognised_command = Some(f);
+        self.unrecognised_command = Some(Arc::new(f));
 
         self
     }
@@ -622,7 +622,7 @@ impl Framework for StandardFramework {
         if prefix.is_some() && stream.rest().is_empty() {
 
             if let Some(prefix_only) = &self.prefix_only {
-                prefix_only(&mut ctx, &msg);
+                prefix_only(&mut ctx, &msg).await;
             }
 
             return;
@@ -635,7 +635,7 @@ impl Framework for StandardFramework {
 
                 tokio::spawn(async move {
                     normal(&mut ctx, &msg).await;
-                }).await.unwrap();
+                });
             }
 
             return;
@@ -643,9 +643,9 @@ impl Framework for StandardFramework {
 
         if let Some(error) = self.should_fail_common(&msg) {
 
-            if let Some(dispatche) = &self.dispatch {
+            if let Some(dispatch_hook) = &self.dispatch {
 
-                (dispatche)(&mut ctx, &msg, error).await;
+                dispatch_hook(&mut ctx, &msg, error).await;
             }
 
             return;
@@ -664,24 +664,21 @@ impl Framework for StandardFramework {
             Ok(i) => i,
             Err(ParseError::UnrecognisedCommand(unreg)) => {
                 if let Some(unreg) = unreg {
+
                     if let Some(unrecognised_command) = &self.unrecognised_command {
-                        unrecognised_command(&mut ctx, &msg, &unreg);
+                        unrecognised_command(&mut ctx, &msg, &unreg).await;
                     }
                 }
 
                 if let Some(normal) = &self.normal_message {
-                    let normal = Arc::clone(&normal);
-
-                    tokio::spawn(async move {
-                        normal(&mut ctx, &msg).await;
-                    }).await.unwrap();
+                    normal(&mut ctx, &msg).await;
                 }
 
                 return;
             }
             Err(ParseError::Dispatch(error)) => {
                 if let Some(dispatch) = &self.dispatch {
-                    dispatch(&mut ctx, &msg, error);
+                     dispatch(&mut ctx, &msg, error).await;
                 }
 
                 return;
@@ -714,7 +711,7 @@ impl Framework for StandardFramework {
                     (&mut ctx, &msg, args, help.options, &groups, owners).await;
 
                 if let Some(after) = after {
-                    after(&mut ctx, &msg, &name, res);
+                    after(&mut ctx, &msg, &name, res).await;
                 }
             }
             Invoke::Command { command, group } => {
@@ -765,13 +762,11 @@ impl Framework for StandardFramework {
                     }
                 }
 
-                tokio::spawn(async move {
-                    let res = (command.fun)(&mut ctx, &msg, args).await;
+                let res = (command.fun)(&mut ctx, &msg, args).await;
 
-                    if let Some(after) = after {
-                        after(&mut ctx, &msg, &name, res).await;
-                    }
-                });
+                if let Some(after) = after {
+                    after(&mut ctx, &msg, &name, res).await;
+                }
             }
         }
     }
