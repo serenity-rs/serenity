@@ -19,7 +19,7 @@ mod execute_webhook;
 mod get_messages;
 
 pub use self::{
-    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter},
+    create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_channel::CreateChannel,
     create_invite::CreateInvite,
     create_message::CreateMessage,
