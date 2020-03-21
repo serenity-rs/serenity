@@ -1,10 +1,8 @@
 use uwl::Stream;
 
-use std::sync::Arc;
 use std::error::Error as StdError;
 use std::marker::PhantomData;
 use std::{fmt, str::FromStr};
-use tokio::sync::RwLock;
 
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]
@@ -35,15 +33,7 @@ impl<E: fmt::Display> fmt::Display for Error<E> {
     }
 }
 
-impl<E: fmt::Debug + fmt::Display> StdError for Error<E> {
-    fn description(&self) -> &str {
-        match self {
-            Error::Eos => "end-of-string",
-            Error::Parse(_) => "parse-failure",
-            Error::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
+impl<E: fmt::Debug + fmt::Display> StdError for Error<E> {}
 
 type Result<T, E> = ::std::result::Result<T, Error<E>>;
 
@@ -283,7 +273,7 @@ pub struct Args {
     message: String,
     args: Vec<Token>,
     offset: usize,
-    state: Arc<RwLock<State>>,
+    state: State,
 }
 
 impl Args {
@@ -351,7 +341,7 @@ impl Args {
             args,
             message: message.to_string(),
             offset: 0,
-            state: Arc::new(RwLock::new(State::None)),
+            state: State::None,
         }
     }
 
@@ -402,7 +392,7 @@ impl Args {
         self.offset = 0;
     }
 
-    async fn apply<'a>(&self, s: &'a str) -> &'a str {
+    fn apply<'a>(&self, s: &'a str) -> &'a str {
         fn trim(s: &str) -> &str {
             let trimmed = s.trim();
 
@@ -415,28 +405,22 @@ impl Args {
 
         let mut s = s;
 
-        {
-            let mut state = self.state.write().await;
-
-            match *state {
-                State::None => {}
-                State::Quoted => {
-                    s = remove_quotes(s);
-                }
-                State::Trimmed => {
-                    s = trim(s);
-                }
-                State::QuotedTrimmed => {
-                    s = remove_quotes(s);
-                    s = trim(s);
-                }
-                State::TrimmedQuoted => {
-                    s = trim(s);
-                    s = remove_quotes(s);
-                }
+        match self.state {
+            State::None => {}
+            State::Quoted => {
+                s = remove_quotes(s);
             }
-
-            *state = State::None;
+            State::Trimmed => {
+                s = trim(s);
+            }
+            State::QuotedTrimmed => {
+                s = remove_quotes(s);
+                s = trim(s);
+            }
+            State::TrimmedQuoted => {
+                s = trim(s);
+                s = remove_quotes(s);
+            }
         }
 
         s
@@ -467,18 +451,18 @@ impl Args {
     /// [`trimmed`]: #method.trimmed
     /// [`quoted`]: #method.quoted
     #[inline]
-    pub async fn current(&self) -> Option<&str> {
+    pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
             return None;
         }
 
         let mut s = self.slice();
-        s = self.apply(s).await;
+        s = self.apply(s);
 
         Some(s)
     }
 
-    /// Apply trimming the next time the current argument is accessed.
+    /// Apply trimming of whitespace to all arguments.
     ///
     /// # Examples
     ///
@@ -487,30 +471,41 @@ impl Args {
     ///
     /// let mut args = Args::new("     42     ", &[]);
     ///
-    /// assert_eq!(args.trimmed().current(), Some("42"));
-    /// // `trimmed`'s effect on argument retrieval diminishes after a call to `current`
+    /// // trimmed lasts for the whole lifetime of `Args`
+    /// args.trimmed();
+    /// assert_eq!(args.current(), Some("42"));
+    /// args.untrimmed(); // or until we decide ourselves
     /// assert_eq!(args.current(), Some("     42     "));
     /// assert_eq!(args.message(), "     42     ");
     /// ```
-    pub async fn trimmed(&mut self) -> &mut Self {
-        if self.is_empty() {
-            return self;
-        }
-
-        {
-            let mut state = self.state.write().await;
-
-            match *state {
-                State::None => *state = State::Trimmed,
-                State::Quoted => *state = State::QuotedTrimmed,
-                _ => {}
-            }
+    pub fn trimmed(&mut self) -> &mut Self {
+        match self.state {
+            State::None => self.state = State::Trimmed,
+            State::Quoted => self.state = State::QuotedTrimmed,
+            _ => {}
         }
 
         self
     }
 
-    /// Remove quotations surrounding the current argument the next time it is accessed.
+    /// Halt trimming of whitespace to all arguments.
+    ///
+    /// # Examples
+    ///
+    /// Refer to [`trimmed`]'s examples.
+    ///
+    /// [`trimmed`]: #method.trimmed
+    pub fn untrimmed(&mut self) -> &mut Self {
+        match self.state {
+            State::Trimmed => self.state = State::None,
+            State::QuotedTrimmed | State::TrimmedQuoted => self.state = State::Quoted,
+            _ => {}
+        }
+
+        self
+    }
+
+    /// Remove quotations surrounding of all arguments.
     ///
     /// Note that only the quotes of the argument are taken into account.
     /// The quotes in the message are preserved.
@@ -522,11 +517,14 @@ impl Args {
     ///
     /// let mut args = Args::new("\"42\"", &[]);
     ///
-    /// assert_eq!(args.quoted().current(), Some("42"));
+    /// // `quoted` lasts the whole lifetime of `Args`
+    /// args.quoted();
+    /// assert_eq!(args.current(), Some("42"));
+    /// args.unquoted(); // or until we decide
     /// assert_eq!(args.current(), Some("\"42\""));
     /// assert_eq!(args.message(), "\"42\"");
     /// ```
-    pub async fn quoted(&mut self) -> &mut Self {
+    pub fn quoted(&mut self) -> &mut Self {
         if self.is_empty() {
             return self;
         }
@@ -534,13 +532,28 @@ impl Args {
         let is_quoted = self.args[self.offset].kind == TokenKind::QuotedArgument;
 
         if is_quoted {
-            let mut state = self.state.write().await;
-
-            match *state {
-                State::None => *state = State::Quoted,
-                State::Trimmed => *state = State::TrimmedQuoted,
+            match self.state {
+                State::None => self.state = State::Quoted,
+                State::Trimmed => self.state = State::TrimmedQuoted,
                 _ => {}
             }
+        }
+
+        self
+    }
+
+    /// Stop removing quotations of all arguments.
+    ///
+    /// # Examples
+    ///
+    /// Refer to [`quoted`]'s examples.
+    ///
+    /// [`quoted`]: #method.quoted
+    pub fn unquoted(&mut self) -> &mut Self {
+        match self.state {
+            State::Quoted => self.state = State::None,
+            State::QuotedTrimmed | State::TrimmedQuoted => self.state = State::Trimmed,
+            _ => {}
         }
 
         self
@@ -564,8 +577,8 @@ impl Args {
     /// [`trimmed`]: #method.trimmed
     /// [`quoted`]: #method.quoted
     #[inline]
-    pub async fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
-        T::from_str(self.current().await.ok_or(Error::Eos)?).map_err(Error::Parse)
+    pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
+        T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
     }
 
     /// Parse the current argument and advance.
@@ -590,8 +603,8 @@ impl Args {
     /// [`parse`]: #method.parse
     /// [`next`]: #method.next
     #[inline]
-    pub async fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
-        let p = self.parse::<T>().await?;
+    pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
+        let p = self.parse::<T>()?;
         self.advance();
         Ok(p)
     }
@@ -613,8 +626,8 @@ impl Args {
     /// ```
     ///
     #[inline]
-    pub async fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
-        let p = self.quoted().await.parse::<T>().await?;
+    pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
+        let p = self.quoted().parse::<T>()?;
         self.advance();
         Ok(p)
     }
@@ -717,7 +730,7 @@ impl Args {
     /// assert_eq!(args.single::<String>().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
-    pub async fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
+    pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
         }
@@ -734,7 +747,7 @@ impl Args {
         };
 
         self.offset = pos;
-        let parsed = self.single_quoted::<T>().await?;
+        let parsed = self.single_quoted::<T>()?;
 
         self.args.remove(pos);
         self.offset = before;
@@ -759,7 +772,7 @@ impl Args {
     /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
-    pub async fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
+    pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
         }
@@ -776,7 +789,7 @@ impl Args {
         };
 
         self.offset = pos;
-        let parsed = self.quoted().await.parse::<T>().await?;
+        let parsed = self.quoted().parse::<T>()?;
 
         self.offset = before;
 
@@ -847,15 +860,15 @@ pub struct Iter<'a, T: FromStr> {
 
 impl<'a, T: FromStr> Iter<'a, T> {
     /// Retrieve the current argument.
-    pub async fn current(&self) -> Option<&str> {
-        *self.args.state.write().await = self.state;
-        self.args.current().await
+    pub fn current(&mut self) -> Option<&str> {
+        self.args.state = self.state;
+        self.args.current()
     }
 
     /// Parse the current argument independently.
-    pub async fn parse(&self) -> Result<T, T::Err> {
-        *self.args.state.write().await = self.state;
-        self.args.parse::<T>().await
+    pub fn parse(&mut self) -> Result<T, T::Err> {
+        self.args.state = self.state;
+        self.args.parse::<T>()
     }
 
     /// Remove surrounding quotation marks from all of the arguments.
@@ -890,7 +903,7 @@ impl<'a, T: FromStr> Iterator for Iter<'a, T> {
         if self.args.is_empty() {
             None
         } else {
-            let arg = futures::executor::block_on(self.parse());
+            let arg = self.parse();
             self.args.advance();
             Some(arg)
         }
