@@ -408,8 +408,8 @@ async fn about_role(ctx: &mut Context, msg: &Message, args: Args) -> CommandResu
 // Lets us also call `~math *` instead of just `~math multiply`.
 #[aliases("*")]
 async fn multiply(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let first = args.single::<f64>().await?;
-    let second = args.single::<f64>().await?;
+    let first = args.single::<f64>()?;
+    let second = args.single::<f64>()?;
 
     let res = first * second;
 
@@ -546,7 +546,7 @@ async fn am_i_admin(ctx: &mut Context, msg: &Message, _args: Args) -> CommandRes
 
 #[command]
 async fn slow_mode(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>().await {
+    let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
         if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)).await {
             println!("Error setting channel's slow mode rate: {:?}", why);
 
