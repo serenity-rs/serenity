@@ -7,12 +7,12 @@ use serenity::framework::standard::{
 
 #[command]
 pub async fn multiply(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let one = args.single::<f64>().await.unwrap();
-    let two = args.single::<f64>().await.unwrap();
+    let one = args.single::<f64>()?;
+    let two = args.single::<f64>()?;
 
     let product = one * two;
 
-    let _ = msg.channel_id.say(&ctx.http, product);
+    msg.channel_id.say(&ctx.http, product).await?;
 
     Ok(())
 }

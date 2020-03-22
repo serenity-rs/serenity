@@ -230,7 +230,7 @@ async fn ping(context: &mut Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let url = match args.single::<String>().await {
+    let url = match args.single::<String>() {
         Ok(url) => url,
         Err(_) => {
             check_msg(msg.channel_id.say(&ctx.http, "Must provide a URL to a video or audio").await);
