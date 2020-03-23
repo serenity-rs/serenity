@@ -180,87 +180,83 @@ pub(crate) fn dispatch<'rec>(
 }
 
 #[cfg(not(feature = "framework"))]
-pub(crate) fn dispatch(
+pub(crate) fn dispatch<'rec>(
     event: DispatchEvent,
-    data: &Arc<RwLock<ShareMap>>,
-    event_handler: &Option<Arc<dyn EventHandler>>,
-    raw_event_handler: &Option<Arc<dyn RawEventHandler>>,
-    runner_tx: &Sender<InterMessage>,
+    data: &'rec Arc<RwLock<ShareMap>>,
+    event_handler: &'rec Option<Arc<dyn EventHandler>>,
+    raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
+    runner_tx: &'rec Sender<InterMessage>,
     shard_id: u64,
     cache_and_http: Arc<CacheAndHttp>,
-) {
-    match (event_handler, raw_event_handler) {
-        (None, None) => {}, // Do nothing
-        (Some(ref h), None) => {
-            match event {
-                DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                    update(&cache_and_http, &mut event).await;
+) -> BoxFuture<'rec, ()> {
+    async move {
+        match (event_handler, raw_event_handler) {
+            (None, None) => {}, // Do nothing
+            (Some(ref h), None) => {
+                match event {
+                    DispatchEvent::Model(Event::MessageCreate(mut event)) => {
+                        update(&cache_and_http, &mut event).await;
 
-                    #[cfg(not(feature = "cache"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(feature = "cache")]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+                        #[cfg(not(feature = "cache"))]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                        #[cfg(feature = "cache")]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
 
-                    dispatch_message(
-                        context.clone(),
-                        event.message.clone(),
-                        h,
-                        threadpool,
-                    );
-                },
-                other => {
-                    handle_event(
-                        other,
-                        data,
-                        h,
-                        runner_tx,
-                        threadpool,
-                        shard_id,
-                        cache_and_http,
-                    ).await;
+                        dispatch_message(
+                            context.clone(),
+                            event.message.clone(),
+                            h,
+                        ).await;
+                    },
+                    other => {
+                        handle_event(
+                            other,
+                            data,
+                            h,
+                            runner_tx,
+                            shard_id,
+                            cache_and_http,
+                        ).await;
+                    }
                 }
-            }
-        },
-        (None, Some(ref rh)) => {
-            match event {
-                DispatchEvent::Model(e) => {
-                    #[cfg(not(feature = "cache"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(feature = "cache")]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+            },
+            (None, Some(ref rh)) => {
+                match event {
+                    DispatchEvent::Model(e) => {
+                        #[cfg(not(feature = "cache"))]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                        #[cfg(feature = "cache")]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
 
-                    let event_handler = Arc::clone(rh);
+                        let event_handler = Arc::clone(rh);
 
-                    tokio::spawn(async move {
-                        event_handler.raw_event(context, e).await;
-                    });
-                },
-                _ => {}
+                        tokio::spawn(async move {
+                            event_handler.raw_event(context, e).await;
+                        });
+                    },
+                    _ => {}
+                }
+            },
+            (Some(ref h), Some(ref rh)) => {
+                if let DispatchEvent::Model(ref e) = event {
+                        dispatch(DispatchEvent::Model(e.clone()),
+                                 data,
+                                 &None,
+                                 raw_event_handler,
+                                 runner_tx,
+                                 shard_id,
+                                 Arc::clone(&cache_and_http)).await;
+                }
+                dispatch(event,
+                         data,
+                         event_handler,
+                         &None,
+                         runner_tx,
+                         shard_id,
+                         cache_and_http).await;
             }
-        },
-        (Some(ref h), Some(ref rh)) => {
-            match event {
-                DispatchEvent::Model(ref e) =>
-                    dispatch(DispatchEvent::Model(e.clone()),
-                             data,
-                             &None,
-                             raw_event_handler,
-                             runner_tx,
-                             threadpool,
-                             shard_id,
-                             Arc::clone(&cache_and_http)),
-                _ => {}
-            }
-            dispatch(event,
-                     data,
-                     event_handler,
-                     &None,
-                     runner_tx,
-                     threadpool,
-                     shard_id,
-                     cache_and_http);
-        }
-    };
+        };
+    }.boxed()
 }
 
 async fn dispatch_message(
