@@ -168,11 +168,11 @@ pub(crate) fn dispatch<'rec>(
                 dispatch(event,
                     framework,
                     data,
+                    event_handler,
                     &None,
-                    raw_event_handler,
                     runner_tx,
                     shard_id,
-                    Arc::clone(&cache_and_http))
+                    cache_and_http)
                 .await;
             }
         };
