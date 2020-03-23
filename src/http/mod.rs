@@ -172,6 +172,11 @@ impl CacheHttp for Arc<Http> {
     fn http(&self) -> &Http { &*self }
 }
 
+#[cfg(feature = "http")]
+impl CacheHttp for &Arc<Http> {
+    fn http(&self) -> &Http { &*self }
+}
+
 #[cfg(all(feature = "cache", feature = "http"))]
 impl AsRef<CacheRwLock> for (&CacheRwLock, &Http) {
     fn as_ref(&self) -> &CacheRwLock {
