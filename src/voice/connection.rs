@@ -424,6 +424,7 @@ impl Connection {
                 self.encoder_stereo = is_stereo;
             }
 
+            let now = Instant::now();
             let temp_len = match stream.get_type() {
                 AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
                         opus_frame.len()
@@ -431,47 +432,31 @@ impl Connection {
                         0
                     },
                 AudioType::Pcm => {
-                    let now = Instant::now();
-                    let t_v = match stream.add_pcm_frame(&mut mix_buffer, source_stereo, vol) {
+                    match stream.add_pcm_frame(&mut mix_buffer, source_stereo, vol) {
                         Some(len) => len,
                         None => 0,
-                    };
-                    let later = Instant::now();
-
-                    *time_in_call += later - now;
-                    *entry_points += 1;
-
-                    if *entry_points % 1000 == 0 {
-                        println!("Average cost {:?}ms", time_in_call.as_nanos()/(*entry_points as u128));
-
-                        *time_in_call = Duration::default();
-                        *entry_points = 0;
                     }
-
-                    t_v
                 },
                 AudioType::FloatPcm => {
-                    let now = Instant::now();
-                    let t_v = match stream.add_float_pcm_frame(&mut mix_buffer, source_stereo, vol) {
+                    match stream.add_float_pcm_frame(&mut mix_buffer, source_stereo, vol) {
                         Some(len) => len,
                         None => 0,
-                    };
-                    let later = Instant::now();
-
-                    *time_in_call += later - now;
-                    *entry_points += 1;
-
-                    if *entry_points % 1000 == 0 {
-                        println!("Average cost {:?}ms", time_in_call.as_nanos()/(*entry_points as u128));
-
-                        *time_in_call = Duration::default();
-                        *entry_points = 0;
                     }
-
-                    t_v
                 },
                 AudioType::__Nonexhaustive => unreachable!(),
             };
+
+            let later = Instant::now();
+
+            *time_in_call += later - now;
+            *entry_points += 1;
+
+            if *entry_points % 1000 == 0 {
+                println!("Average cost {:?}ms", time_in_call.as_nanos()/(*entry_points as u128));
+
+                *time_in_call = Duration::default();
+                *entry_points = 0;
+            }
 
             len = len.max(temp_len);
             if temp_len > 0 {
