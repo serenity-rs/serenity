@@ -60,21 +60,89 @@ impl<R: Read + Send> AudioSource for InputSource<R> {
 
     fn get_type(&self) -> AudioType { self.kind }
 
-    fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize> {
-        for (i, v) in buffer.iter_mut().enumerate() {
-            *v = match self.reader.read_i16::<LittleEndian>() {
-                Ok(v) => v,
-                Err(ref e) => {
-                    return if e.kind() == IoErrorKind::UnexpectedEof {
-                        Some(i)
-                    } else {
-                        None
-                    }
-                },
+    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; 1920], true_stereo: bool, volume: f32) -> Option<usize> {
+        // Duplicate this to avoid repeating the stereo check.
+        // This should let us unconditionally duplicate samples in the main loop body.
+        if true_stereo {
+            for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
+                let raw = match self.reader.read_i16::<LittleEndian>() {
+                    Ok(v) => v,
+                    Err(ref e) => {
+                        return if e.kind() == IoErrorKind::UnexpectedEof {
+                            Some(i)
+                        } else {
+                            None
+                        }
+                    },
+                };
+                let sample = f32::from(raw) / 32768.0;
+
+                *float_buffer_element += sample * volume;
+            }
+        } else {
+            let mut float_index = 0;
+            for i in 0..float_buffer.len() / 2 {
+                let raw = match self.reader.read_i16::<LittleEndian>() {
+                    Ok(v) => v,
+                    Err(ref e) => {
+                        return if e.kind() == IoErrorKind::UnexpectedEof {
+                            Some(i)
+                        } else {
+                            None
+                        }
+                    },
+                };
+                let sample = volume * f32::from(raw) / 32768.0;
+
+                float_buffer[float_index] += sample;
+                float_buffer[float_index+1] += sample;
+
+                float_index += 2;
             }
         }
 
-        Some(buffer.len())
+        Some(float_buffer.len())
+    }
+
+    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; 1920], true_stereo: bool, volume: f32) -> Option<usize> {
+        if true_stereo {
+            for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
+                let sample = match self.reader.read_f32::<LittleEndian>() {
+                    Ok(v) => v,
+                    Err(ref e) => {
+                        return if e.kind() == IoErrorKind::UnexpectedEof {
+                            Some(i)
+                        } else {
+                            None
+                        }
+                    },
+                };
+
+                *float_buffer_element += sample * volume;
+            }
+        } else {
+            let mut float_index = 0;
+            for i in 0..float_buffer.len() / 2 {
+                let raw = match self.reader.read_f32::<LittleEndian>() {
+                    Ok(v) => v,
+                    Err(ref e) => {
+                        return if e.kind() == IoErrorKind::UnexpectedEof {
+                            Some(i)
+                        } else {
+                            None
+                        }
+                    },
+                };
+                let sample = volume * raw;
+
+                float_buffer[float_index] += sample;
+                float_buffer[float_index+1] += sample;
+
+                float_index += 2;
+            }
+        }
+
+        Some(float_buffer.len())
     }
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
@@ -146,7 +214,7 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
         "-ar",
         "48000",
         "-acodec",
-        "pcm_s16le",
+        "pcm_f32le",
         "-",
     ], Some(is_stereo))
 }
@@ -198,7 +266,7 @@ fn _ffmpeg_optioned(path: &OsStr, args: &[&str], is_stereo_known: Option<bool>) 
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(pcm(is_stereo, ChildContainer(command)))
+    Ok(float_pcm(is_stereo, ChildContainer(command)))
 }
 
 /// Creates a streamed audio source from a DCA file.
@@ -276,6 +344,16 @@ pub fn pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn Audi
     })
 }
 
+/// Creates a PCM audio source.
+pub fn float_pcm<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
+    Box::new(InputSource {
+        stereo: is_stereo,
+        reader,
+        kind: AudioType::FloatPcm,
+        decoder: None,
+    })
+}
+
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
     let ytdl_args = [
@@ -298,7 +376,7 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
         "-ar",
         "48000",
         "-acodec",
-        "pcm_s16le",
+        "pcm_f32le",
         "-",
     ];
 
@@ -319,7 +397,7 @@ pub fn ytdl(uri: &str) -> Result<Box<dyn AudioSource>> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(pcm(true, ChildContainer(ffmpeg)))
+    Ok(float_pcm(true, BufReader::with_capacity(1920 * 2 * std::mem::size_of::<i16>() * 50, ChildContainer(ffmpeg))))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
@@ -345,7 +423,7 @@ pub fn ytdl_search(name: &str) -> Result<Box<dyn AudioSource>> {
         "-ar",
         "48000",
         "-acodec",
-        "pcm_s16le",
+        "pcm_f32le",
         "-",
     ];
 
@@ -366,7 +444,7 @@ pub fn ytdl_search(name: &str) -> Result<Box<dyn AudioSource>> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(pcm(true, ChildContainer(ffmpeg)))
+    Ok(float_pcm(true, BufReader::with_capacity(1920 * 2 * std::mem::size_of::<i16>() * 50, ChildContainer(ffmpeg))))
 }
 
 fn is_stereo(path: &OsStr) -> Result<bool> {

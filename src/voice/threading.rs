@@ -3,7 +3,9 @@ use crate::model::id::GuildId;
 use std::{
     collections::HashMap,
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
-    thread::Builder as ThreadBuilder
+    thread::Builder as ThreadBuilder,
+    time::Duration,
+    time::Instant,
 };
 use super::{
     connection::Connection,
@@ -30,6 +32,8 @@ fn runner(rx: &MpscReceiver<Status>) {
     let mut bitrate = audio::DEFAULT_BITRATE;
     let mut events = GlobalEvents::default();
     let mut fired_track_evts = HashMap::new();
+    let mut time_in_call = Duration::default();
+    let mut entry_points = 0u64;
 
     'runner: loop {
         loop {
@@ -86,7 +90,7 @@ fn runner(rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut senders, &mut receiver, &mut fired_track_evts, &mut timer, bitrate);
+                let cycle = connection.cycle(&mut senders, &mut receiver, &mut fired_track_evts, &mut timer, bitrate, &mut time_in_call, &mut entry_points);
 
                 events.march_and_process(&mut senders, &mut fired_track_evts);
 

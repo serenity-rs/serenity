@@ -35,7 +35,9 @@ pub trait AudioSource: Send {
 
     fn get_type(&self) -> AudioType;
 
-    fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
+    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; 1920], true_stereo: bool, volume: f32) -> Option<usize>;
+
+    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; 1920], true_stereo: bool, volume: f32) -> Option<usize>;
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 
@@ -66,6 +68,7 @@ pub trait AudioReceiver: Send {
 pub enum AudioType {
     Opus,
     Pcm,
+    FloatPcm,
     #[doc(hidden)]
     __Nonexhaustive,
 }

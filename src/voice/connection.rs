@@ -43,7 +43,8 @@ use std::{
         Builder as ThreadBuilder,
         JoinHandle
     },
-    time::Duration
+    time::Duration,
+    time::Instant,
 };
 
 use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE};
@@ -380,6 +381,8 @@ impl Connection {
         buffer: &mut [i16; 1920],
         mut mix_buffer: &mut [f32; 1920],
         fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
+        time_in_call: &mut Duration,
+        entry_points: &mut u64,
     ) -> Result<usize> {
         let mut len = 0;
         let mut i = 0;
@@ -428,18 +431,47 @@ impl Connection {
                         0
                     },
                 AudioType::Pcm => {
-                    let buffer_len = if source_stereo { 960 * 2 } else { 960 };
-
-                    match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                    let now = Instant::now();
+                    let t_v = match stream.add_pcm_frame(&mut mix_buffer, source_stereo, vol) {
                         Some(len) => len,
                         None => 0,
+                    };
+                    let later = Instant::now();
+
+                    *time_in_call += later - now;
+                    *entry_points += 1;
+
+                    if *entry_points % 1000 == 0 {
+                        println!("Average cost {:?}ms", time_in_call.as_nanos()/(*entry_points as u128));
+
+                        *time_in_call = Duration::default();
+                        *entry_points = 0;
                     }
+
+                    t_v
+                },
+                AudioType::FloatPcm => {
+                    let now = Instant::now();
+                    let t_v = match stream.add_float_pcm_frame(&mut mix_buffer, source_stereo, vol) {
+                        Some(len) => len,
+                        None => 0,
+                    };
+                    let later = Instant::now();
+
+                    *time_in_call += later - now;
+                    *entry_points += 1;
+
+                    if *entry_points % 1000 == 0 {
+                        println!("Average cost {:?}ms", time_in_call.as_nanos()/(*entry_points as u128));
+
+                        *time_in_call = Duration::default();
+                        *entry_points = 0;
+                    }
+
+                    t_v
                 },
                 AudioType::__Nonexhaustive => unreachable!(),
             };
-
-            // May need to force interleave/copy.
-            combine_audio(*buffer, &mut mix_buffer, source_stereo, vol);
 
             len = len.max(temp_len);
             if temp_len > 0 {
@@ -477,7 +509,9 @@ impl Connection {
                 mut receiver: &mut Option<Box<dyn AudioReceiver>>,
                 fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
                 audio_timer: &mut Timer,
-                bitrate: Bitrate)
+                bitrate: Bitrate,
+                mut time_in_call: &mut Duration,
+                mut entry_points: &mut u64)
                  -> Result<()> {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
@@ -546,7 +580,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer, fired_track_evts)?;
+        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -648,21 +682,6 @@ impl Drop for Connection {
         let _ = self.thread_items.ws_close_sender.send(0);
 
         info!("[Voice] Disconnected");
-    }
-}
-
-#[inline]
-fn combine_audio(
-    raw_buffer: [i16; 1920],
-    float_buffer: &mut [f32; 1920],
-    true_stereo: bool,
-    volume: f32,
-) {
-    for (i, float_buffer_element) in float_buffer.iter_mut().enumerate().take(1920) {
-        let sample_index = if true_stereo { i } else { i / 2 };
-        let sample = f32::from(raw_buffer[sample_index]) / 32768.0;
-
-        *float_buffer_element += sample * volume;
     }
 }
 
