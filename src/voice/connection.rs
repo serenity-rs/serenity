@@ -49,7 +49,7 @@ use std::{
 
 use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE};
 use super::connection_info::ConnectionInfo;
-use super::{payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
+use super::{constants::*, payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
 use url::Url;
 use log::{debug, info, warn};
 
@@ -379,7 +379,7 @@ impl Connection {
         sources: &mut Vec<Audio>,
         opus_frame: &[u8],
         buffer: &mut [i16; 1920],
-        mut mix_buffer: &mut [f32; 1920],
+        mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
         fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
         time_in_call: &mut Duration,
         entry_points: &mut u64,

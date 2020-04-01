@@ -3,6 +3,7 @@
 mod audio;
 mod connection;
 mod connection_info;
+mod constants;
 mod dca;
 mod error;
 mod events;
@@ -14,7 +15,6 @@ mod threading;
 
 pub use self::{
     audio::{
-        create_player,
         Audio,
         AudioFn,
         AudioHandle,
@@ -25,7 +25,9 @@ pub use self::{
         AudioState,
         AudioType,
         BlockingAudioQueryResult,
+        RawAudioSource,
         TrackQueue,
+        create_player,
     },
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
@@ -33,13 +35,16 @@ pub use self::{
     handler::Handler,
     manager::Manager,
     streamer::{
+        CompressedSource,
+        MemorySource,
+        RestartableSource,
         dca,
         ffmpeg,
         ffmpeg_optioned,
         opus,
         pcm,
         ytdl,
-        ytdl_search
+        ytdl_search,
     }
 };
 pub use audiopus::Bitrate;

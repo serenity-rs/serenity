@@ -15,6 +15,7 @@ use std::{
     time::Duration,
 };
 use super::{
+    constants::*,
     events::{
         Event,
         EventContext,
@@ -35,15 +36,20 @@ pub trait AudioSource: Send {
 
     fn get_type(&self) -> AudioType;
 
-    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; 1920], true_stereo: bool, volume: f32) -> Option<usize>;
+    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
 
-    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; 1920], true_stereo: bool, volume: f32) -> Option<usize>;
+    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
 
     fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
+    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> Option<usize>;
 
     fn is_seekable(&self) -> bool;
+
+    // FIXME: make into Result
+    fn seek(&mut self, time: Duration) -> Option<Duration>;
+
+    fn consume(&mut self, amt: usize) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.
@@ -63,6 +69,13 @@ pub trait AudioReceiver: Send {
 
     fn client_disconnect(&mut self, _user_id: u64) { }
 }
+
+/// Marker trait used to prevent incorrect chaining of buffered [`AudioSource`]s.
+/// Ideally, only raw handles should be wrapped by mechanisms like [`MemorySource`].
+///
+/// [`AudioSource`]: trait.AudioSource.html
+/// [`MemorySource`]: struct.MemorySource.html
+pub trait RawAudioSource {}
 
 #[derive(Clone, Copy)]
 pub enum AudioType {
@@ -247,7 +260,7 @@ impl Audio {
                         Pause => {self.pause();},
                         Stop => {self.stop();},
                         Volume(vol) => {self.volume(vol);},
-                        Seek(_time) => unimplemented!(),
+                        Seek(time) => {self.source.seek(time);},
                         AddEvent(evt) => self.events.add_event(evt, self.position),
                         Do(action) => action(self),
                         Request(tx) => {let _ = tx.send(Box::new(self.get_state()));},
