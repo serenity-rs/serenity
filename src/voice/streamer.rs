@@ -266,7 +266,7 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource + Send>> {
 ///
 /// let stereo_val = "2";
 ///
-/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[
+/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[], &[
 ///     "-f",
 ///     "s16le",
 ///     "-ac",
@@ -277,6 +277,7 @@ fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource + Send>> {
 ///     "pcm_s16le",
 ///     "-",
 /// ]);
+///```
 pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,
     pre_input_args: &[&str],

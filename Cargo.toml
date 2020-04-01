@@ -35,6 +35,11 @@ path = "./command_attr"
 version = "0.1.7"
 optional = true
 
+[dependencies.discortp]
+optional = true
+version = "1.0"
+repository = "https://github.com/FelixMcFelix/discortp"
+
 [dependencies.serde]
 version = "1"
 features = ["derive"]
@@ -162,6 +167,7 @@ utils = ["base64"]
 voice = [
     "audiopus",
     "byteorder",
+    "discortp",
     "gateway",
     "rand",
     "sodiumoxide",
