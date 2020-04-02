@@ -325,6 +325,37 @@ impl Member {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     pub fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
+        self.kick_with_reason(cache_http, "")
+    }
+
+    /// Kicks the member from the guild, with a reason.
+    ///
+    /// **Note**: Requires the [Kick Members] permission.
+    ///
+    /// # Examples
+    ///
+    /// Kicks a member from it's guild, with an optional reason:
+    ///
+    /// ```rust,ignore
+    /// match member.kick(&ctx.http, "A Reason") {
+    ///     Ok(()) => println!("Successfully kicked member"),
+    ///     Err(Error::Model(ModelError::GuildNotFound)) => {
+    ///         println!("Couldn't determine guild of member");
+    ///     },
+    ///     Err(Error::Model(ModelError::InvalidPermissions(missing_perms))) => {
+    ///         println!("Didn't have permissions; missing: {:?}", missing_perms);
+    ///     },
+    ///     _ => {},
+    /// }
+    /// ```
+    ///
+    /// # Errors
+    ///
+    /// Same as [`kick`]
+    ///
+    /// [`kick`]: #method.kick
+    #[cfg(feature = "http")]
+    pub fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -343,8 +374,9 @@ impl Member {
             }
         }
 
-        self.guild_id.kick(cache_http.http(), self.user.read().id)
+        self.guild_id.kick_with_reason(cache_http.http(), self.user.read().id, reason)
     }
+
 
     /// Returns the guild-level permissions for the member.
     ///

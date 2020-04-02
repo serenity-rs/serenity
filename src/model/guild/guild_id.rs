@@ -482,6 +482,12 @@ impl GuildId {
         http.as_ref().kick_member(self.0, user_id.into().0)
     }
 
+    #[cfg(feature = "http")]
+    #[inline]
+    pub fn kick_with_reason<U: Into<UserId>>(self, http: impl AsRef<Http>, user_id: U, reason: &str) -> Result<()> {
+        http.as_ref().kick_member_with_reason(self.0, user_id.into().0, reason)
+    }
+
     /// Leaves the guild.
     #[cfg(feature = "http")]
     #[inline]
