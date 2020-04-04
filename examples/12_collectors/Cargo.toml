@@ -11,3 +11,4 @@ path = "../../"
 [dependencies]
 hey_listen = "0.4.0"
 white_rabbit = "0.1.1"
+tokio = { version = "0.2", features = ["macros"] }
