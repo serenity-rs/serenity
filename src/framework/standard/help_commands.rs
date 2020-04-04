@@ -600,7 +600,7 @@ async fn fetch_single_command<'a>(
     ctx: &mut Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
-    name: &str,
+    name: &'a str,
     help_options: &'a HelpOptions,
     owners: &HashSet<UserId>,
 ) -> Result<CustomisedHelpData<'a>, Vec<SuggestedCommandName>> {
