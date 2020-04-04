@@ -362,10 +362,6 @@ impl Route {
         api!("/gateway/bot")
     }
 
-    pub fn group_recipient(group_id: u64, user_id: u64) -> String {
-        format!(api!("/channels/{}/recipients/{}"), group_id, user_id)
-    }
-
     pub fn guild(guild_id: u64) -> String {
         format!(api!("/guilds/{}"), guild_id)
     }
@@ -621,10 +617,6 @@ impl Route {
 
 #[derive(Clone, Debug)]
 pub enum RouteInfo<'a> {
-    AddGroupRecipient {
-        group_id: u64,
-        user_id: u64,
-    },
     AddMemberRole {
         guild_id: u64,
         role_id: u64,
@@ -882,10 +874,6 @@ pub enum RouteInfo<'a> {
     },
     LeaveGuild {
         guild_id: u64,
-    },
-    RemoveGroupRecipient {
-        group_id: u64,
-        user_id: u64,
     },
     PinMessage {
         channel_id: u64,
