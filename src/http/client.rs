@@ -1359,15 +1359,6 @@ impl Http {
         })
     }
 
-    /// Deletes a user from group DM.
-    pub fn remove_group_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::RemoveGroupRecipient { group_id, user_id },
-        })
-    }
-
     /// Sends file(s) to a channel.
     ///
     /// # Errors

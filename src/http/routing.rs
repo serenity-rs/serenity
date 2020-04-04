@@ -910,11 +910,6 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
-            RouteInfo::AddGroupRecipient { group_id, user_id } => (
-                LightMethod::Put,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
-            ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
                 LightMethod::Put,
                 Route::GuildsIdMembersIdRolesId(guild_id),
@@ -1374,11 +1369,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::UsersMeGuildsId,
                 Cow::from(Route::user_guild("@me", guild_id)),
-            ),
-            RouteInfo::RemoveGroupRecipient { group_id, user_id } => (
-                LightMethod::Delete,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
             ),
             RouteInfo::PinMessage { channel_id, message_id } => (
                 LightMethod::Put,
