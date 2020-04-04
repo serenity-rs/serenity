@@ -159,6 +159,7 @@ default_native_tls = [
 ]
 builder = ["utils"]
 cache = []
+collector = ["gateway", "model"]
 client = [
     "gateway",
     "http",

@@ -81,6 +81,8 @@ pub mod http;
 pub mod utils;
 #[cfg(feature = "voice")]
 pub mod voice;
+#[cfg(feature = "collector")]
+pub mod collector;
 
 mod error;
 

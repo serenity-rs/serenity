@@ -3,6 +3,8 @@ use crate::model::{
     id::GuildId,
     user::OnlineStatus,
 };
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
 use async_tungstenite::tungstenite::Message;
 
 /// A message to send from a shard over a WebSocket.
@@ -47,4 +49,10 @@ pub enum ShardRunnerMessage {
     SetPresence(OnlineStatus, Option<Activity>),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
+    /// Sends a new filter for messages to the shard.
+    #[cfg(feature = "collector")]
+    SetMessageFilter(MessageFilter),
+    /// Sends a new filter for reactions to the shard.
+    #[cfg(feature = "collector")]
+    SetReactionFilter(ReactionFilter),
 }

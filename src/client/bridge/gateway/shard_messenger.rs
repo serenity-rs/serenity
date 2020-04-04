@@ -3,7 +3,8 @@ use crate::model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
 use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
 use async_tungstenite::tungstenite::Message;
-
+#[cfg(feature = "collector")]
+use crate::collector::{ReactionFilter, MessageFilter};
 /// A lightweight wrapper around an mpsc sender.
 ///
 /// This is used to cleanly communicate with a shard's respective
@@ -257,5 +258,19 @@ impl ShardMessenger {
     fn send(&self, msg: ShardRunnerMessage)
         -> Result<(), TrySendError<InterMessage>> {
         self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+    }
+
+    /// Sets a new filter for a message collector.
+    #[inline]
+    #[cfg(feature = "collector")]
+    pub fn set_message_filter(&self, collector: MessageFilter) {
+        let _ = self.send(ShardRunnerMessage::SetMessageFilter(collector));
+    }
+
+    /// Sets a new filter for a message collector.
+    #[inline]
+    #[cfg(feature = "collector")]
+    pub fn set_reaction_filter(&self, collector: ReactionFilter) {
+        let _ = self.send(ShardRunnerMessage::SetReactionFilter(collector));
     }
 }

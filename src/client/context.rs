@@ -339,6 +339,22 @@ impl Context {
     pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
         self.shard.lock().await.set_presence(activity, status);
     }
+
+    /// Sets a new `filter` for the shard to check if a message event shall be
+    /// sent back to `filter`'s paired receiver.
+    #[inline]
+    #[cfg(features = "collector")]
+    pub async fn set_message_filter(&self, filter: MessageFilter) {
+        self.shard.lock().await.set_message_filter(filter);
+    }
+
+    /// Sets a new `filter` for the shard to check if a reaction event shall be
+    /// sent back to `filter`'s paired receiver.
+    #[inline]
+    #[cfg(features = "collector")]
+    pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
+        self.shard.lock().await.set_reaction_filter(filter);
+    }
 }
 
 impl AsRef<Http> for Context {
@@ -360,5 +376,12 @@ impl AsRef<CacheRwLock> for Context {
 impl AsRef<CacheRwLock> for Arc<Context> {
     fn as_ref(&self) -> &CacheRwLock {
         &self.cache
+    }
+}
+
+#[cfg(feature = "gateway")]
+impl AsRef<Arc<Mutex<ShardMessenger>>> for Context {
+    fn as_ref(&self) -> &Arc<Mutex<ShardMessenger>> {
+        &self.shard
     }
 }

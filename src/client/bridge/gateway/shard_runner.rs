@@ -32,9 +32,10 @@ use crate::framework::Framework;
 use super::super::voice::ClientVoiceManager;
 #[cfg(feature = "voice")]
 use tokio::sync::Mutex;
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 
 use log::{error, debug, warn};
-
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
 /// [`Shard`]: ../../../gateway/struct.Shard.html
@@ -53,6 +54,10 @@ pub struct ShardRunner {
     #[cfg(feature = "voice")]
     voice_manager: Arc<Mutex<ClientVoiceManager>>,
     cache_and_http: Arc<CacheAndHttp>,
+    #[cfg(feature = "collector")]
+    message_filters: Vec<MessageFilter>,
+    #[cfg(feature = "collector")]
+    reaction_filters: Vec<ReactionFilter>,
 }
 
 impl ShardRunner {
@@ -73,6 +78,10 @@ impl ShardRunner {
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             cache_and_http: opt.cache_and_http,
+            #[cfg(feature = "collector")]
+            message_filters: Vec::new(),
+            #[cfg(feature = "collector")]
+            reaction_filters: Vec::new(),
         }
     }
 
@@ -147,6 +156,11 @@ impl ShardRunner {
             }
 
             if let Some(event) = event {
+                #[cfg(feature = "collector")]
+                {
+                    self.handle_filters(&event);
+                }
+
                 self.dispatch(DispatchEvent::Model(event)).await;
             }
 
@@ -159,6 +173,59 @@ impl ShardRunner {
     /// Clones the internal copy of the Sender to the shard runner.
     pub(super) fn runner_tx(&self) -> Sender<InterMessage> {
         self.runner_tx.clone()
+    }
+
+    /// Lets filters check the `event` to send them to collectors if the `event`
+    /// is accepted by them.
+    #[cfg(feature = "collector")]
+    fn handle_filters(&mut self, event: &Event) {
+        /// Unlike `Vec`'s `retain`, allows mutable references in `f`.
+        fn retain<T, F>(vec: &mut Vec<T>, mut f: F)
+        where
+            F: FnMut(&mut T) -> bool,
+        {
+            let len = vec.len();
+            let mut del = 0;
+            {
+                let v = &mut **vec;
+
+                for i in 0..len {
+
+                    if !f(&mut v[i]) {
+                        del += 1;
+                    } else if del > 0 {
+                        v.swap(i - del, i);
+                    }
+                }
+            }
+
+            if del > 0 {
+                vec.truncate(len - del);
+            }
+        }
+
+        // Avoid the clone if there is no message filter.
+        if !self.message_filters.is_empty() {
+
+            if let Event::MessageCreate(ref msg_event) = &event {
+                let msg = Arc::new(msg_event.message.clone());
+
+                retain(&mut self.message_filters, |f| f.send_message(&msg));
+            }
+        }
+
+        // Avoid the clone if there is no reacton filter.
+        if !self.reaction_filters.is_empty() {
+            let reaction = Arc::new(match &event {
+                Event::ReactionAdd(ref reaction_event) =>
+                    ReactionAction::Added(Arc::new(reaction_event.reaction.clone())),
+                Event::ReactionRemove(ref reaction_event) =>
+                    ReactionAction::Removed(Arc::new(reaction_event.reaction.clone())),
+                _ => return,
+            });
+
+            retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
+        }
     }
 
     /// Takes an action that a [`Shard`] has determined should happen and then
@@ -328,6 +395,16 @@ impl ShardRunner {
                     self.shard.set_status(status);
 
                     self.shard.update_presence().await.is_ok()
+                },
+                ShardClientMessage::Runner(ShardRunnerMessage::SetMessageFilter(collector)) => {
+                    self.message_filters.push(collector);
+
+                    true
+                },
+                ShardClientMessage::Runner(ShardRunnerMessage::SetReactionFilter(collector)) => {
+                    self.reaction_filters.push(collector);
+
+                    true
                 },
             },
             InterMessage::Json(value) => {

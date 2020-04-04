@@ -25,6 +25,13 @@ use crate::utils;
 use crate::http::Http;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
+#[cfg(feature = "collector")]
+use crate::client::bridge::gateway::MutexMessenger;
+#[cfg(feature = "collector")]
+use crate::collector::{
+    CollectAllReactions, CollectNReactions, CollectOneReaction,
+    CollectAllReplies, CollectNReplies, CollectOneReply,
+};
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -710,6 +717,46 @@ impl ChannelId {
     #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_channel_webhooks(self.0).await
+    }
+
+    /// Await a single reply sent in this channel.
+    #[cfg(feature = "collector")]
+    pub fn await_reply<'a>(self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectOneReply<'a> {
+        CollectOneReply::new(shard_messenger).channel_id(self.0)
+    }
+
+    /// Await `number` of replies in this channel.
+    #[cfg(feature = "collector")]
+    pub fn await_n_replies<'a>(self, shard_messenger: &'a impl AsRef<MutexMessenger>, number: u32) -> CollectNReplies<'a> {
+        CollectNReplies::new(shard_messenger).channel_id(self.0).collect_limit(number)
+    }
+
+    /// Await all replies by this user. This won't stop unless a set limit is
+    /// reached, there are no limits set by default.
+    /// For example, a limit can be set by calling `timeout` or `collect_limit`.
+    #[cfg(feature = "collector")]
+    pub fn await_all_replies<'a>(self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectAllReplies<'a> {
+        CollectAllReplies::new(shard_messenger).channel_id(self.0)
+    }
+
+    /// Await a single reaction sent in this channel.
+    #[cfg(feature = "collector")]
+    pub fn await_reaction<'a>(self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectOneReaction<'a> {
+        CollectOneReaction::new(shard_messenger).channel_id(self.0)
+    }
+
+    /// Await `number` of reactions in this channel.
+    #[cfg(feature = "collector")]
+    pub fn await_n_reactions<'a>(self, shard_messenger: &'a impl AsRef<MutexMessenger>, number: u32) -> CollectNReactions<'a> {
+        CollectNReactions::new(shard_messenger).channel_id(self.0).collect_limit(number)
+    }
+
+    /// Await all reactions sent in this channel. This won't stop unless
+    /// a set limit is reached, there are no limits set by default.
+    /// For example, a limit can be set by calling `timeout` or `collect_limit`.
+    #[cfg(feature = "collector")]
+    pub fn await_all_reactions<'a>(self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectAllReactions<'a> {
+        CollectAllReactions::new(shard_messenger).channel_id(self.0)
     }
 }
 

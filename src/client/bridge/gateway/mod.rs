@@ -70,10 +70,14 @@ use std::{
         Formatter,
         Result as FmtResult
     },
-    time::Duration as StdDuration
+    time::Duration as StdDuration,
+    sync::Arc,
 };
+use tokio::sync::Mutex;
 use futures::channel::mpsc::UnboundedSender as Sender;
 use crate::gateway::{ConnectionStage, InterMessage};
+
+pub type MutexMessenger = Arc<Mutex<ShardMessenger>>;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///

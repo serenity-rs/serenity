@@ -44,6 +44,12 @@ use crate::{
 };
 #[cfg(feature = "http")]
 use crate::http::Http;
+#[cfg(feature = "collector")]
+use crate::collector::{
+    CollectAllReactions, CollectNReactions, CollectOneReaction,
+};
+#[cfg(feature = "collector")]
+use crate::client::bridge::gateway::MutexMessenger;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -657,6 +663,26 @@ impl Message {
 
             Err(Error::Model(ModelError::EmbedTooLarge(overflow)))
         }
+    }
+
+    /// Await a single reactions on this message.
+    #[cfg(feature = "collector")]
+    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectOneReaction<'a> {
+        CollectOneReaction::new(shard_messenger).message_id(self.id.0)
+    }
+
+    /// Await `number` of reactions on this message.
+    #[cfg(feature = "collector")]
+    pub fn await_n_reactions<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>, number: u32) -> CollectNReactions<'a> {
+        CollectNReactions::new(shard_messenger).message_id(self.id.0).collect_limit(number)
+    }
+
+    /// Await all reactions sent on this message. This won't stop unless
+    /// a set limit is reached, there are no limits set by default.
+    /// For example, a limit can be set by calling `timeout` or `collect_limit`.
+    #[cfg(feature = "collector")]
+    pub fn await_all_reactions<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectAllReactions<'a> {
+        CollectAllReactions::new(shard_messenger).message_id(self.id.0)
     }
 }
 
