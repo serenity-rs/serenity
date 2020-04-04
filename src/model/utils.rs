@@ -109,7 +109,6 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Group(ref group) => group.read().channel_id,
             Channel::Private(ref channel) => channel.read().id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
@@ -300,7 +299,7 @@ pub fn user_has_perms(
 
             match channel {
                 Channel::Guild(channel) => channel.read().guild_id,
-                Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
+                Channel::Private(_) | Channel::Category(_) => {
                     // Both users in DMs, all users in groups, and maybe all channels in categories
                     // will have the same permissions.
                     //

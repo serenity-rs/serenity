@@ -53,21 +53,6 @@ impl Http {
         Self::new(Arc::new(built), token)
     }
 
-    /// Adds a [`User`] as a recipient to a [`Group`].
-    ///
-    /// **Note**: Groups have a limit of 10 recipients, including the current user.
-    ///
-    /// [`Group`]: ../../model/channel/struct.Group.html
-    /// [`Group::add_recipient`]: ../../model/channel/struct.Group.html#method.add_recipient
-    /// [`User`]: ../../model/user/struct.User.html
-    pub fn add_group_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::AddGroupRecipient { group_id, user_id },
-        })
-    }
-
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     ///
     /// **Note**: Requires the [Manage Roles] permission and respect of role
@@ -1376,30 +1361,12 @@ impl Http {
         })
     }
 
-    /// Leaves a group DM.
-    pub fn leave_group(&self, group_id: u64) -> Result<Group> {
-        self.fire(Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::LeaveGroup { group_id },
-        })
-    }
-
     /// Leaves a guild.
     pub fn leave_guild(&self, guild_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::LeaveGuild { guild_id },
-        })
-    }
-
-    /// Deletes a user from group DM.
-    pub fn remove_group_recipient(&self, group_id: u64, user_id: u64) -> Result<()> {
-        self.wind(204, Request {
-            body: None,
-            headers: None,
-            route: RouteInfo::RemoveGroupRecipient { group_id, user_id },
         })
     }
 

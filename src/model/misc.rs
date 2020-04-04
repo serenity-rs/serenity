@@ -30,7 +30,6 @@ impl Mentionable for Channel {
         match *self {
             Channel::Guild(ref x) => x.with(Mentionable::mention),
             Channel::Private(ref x) => x.with(Mentionable::mention),
-            Channel::Group(ref x) => x.with(Mentionable::mention),
             Channel::Category(ref x) => x.with(Mentionable::mention),
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -51,12 +50,6 @@ impl Mentionable for CurrentUser {
 
 impl Mentionable for Emoji {
     fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
-}
-
-impl Mentionable for Group {
-    fn mention(&self) -> String {
-        format!("<#{}>", self.channel_id.0)
-    }
 }
 
 impl Mentionable for Member {

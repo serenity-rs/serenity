@@ -362,10 +362,6 @@ impl Route {
         api!("/gateway/bot")
     }
 
-    pub fn group_recipient(group_id: u64, user_id: u64) -> String {
-        format!(api!("/channels/{}/recipients/{}"), group_id, user_id)
-    }
-
     pub fn guild(guild_id: u64) -> String {
         format!(api!("/guilds/{}"), guild_id)
     }
@@ -634,10 +630,6 @@ impl Route {
 
 #[derive(Clone, Debug)]
 pub enum RouteInfo<'a> {
-    AddGroupRecipient {
-        group_id: u64,
-        user_id: u64,
-    },
     AddMemberRole {
         guild_id: u64,
         role_id: u64,
@@ -897,10 +889,6 @@ pub enum RouteInfo<'a> {
     LeaveGuild {
         guild_id: u64,
     },
-    RemoveGroupRecipient {
-        group_id: u64,
-        user_id: u64,
-    },
     PinMessage {
         channel_id: u64,
         message_id: u64,
@@ -936,11 +924,6 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
-            RouteInfo::AddGroupRecipient { group_id, user_id } => (
-                LightMethod::Put,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
-            ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
                 LightMethod::Put,
                 Route::GuildsIdMembersIdRolesId(guild_id),
@@ -1404,11 +1387,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::UsersMeGuildsId,
                 Cow::from(Route::user_guild("@me", guild_id)),
-            ),
-            RouteInfo::RemoveGroupRecipient { group_id, user_id } => (
-                LightMethod::Delete,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
             ),
             RouteInfo::PinMessage { channel_id, message_id } => (
                 LightMethod::Put,
