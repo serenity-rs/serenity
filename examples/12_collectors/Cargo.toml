@@ -5,7 +5,7 @@ authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies.serenity]
-features = ["framework", "standard_framework", "rustls_backend"]
+features = ["framework", "standard_framework", "rustls_backend", "collector"]
 path = "../../"
 
 [dependencies]
