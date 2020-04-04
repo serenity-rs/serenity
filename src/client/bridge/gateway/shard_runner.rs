@@ -396,11 +396,13 @@ impl ShardRunner {
 
                     self.shard.update_presence().await.is_ok()
                 },
+                #[cfg(feature = "collector")]
                 ShardClientMessage::Runner(ShardRunnerMessage::SetMessageFilter(collector)) => {
                     self.message_filters.push(collector);
 
                     true
                 },
+                #[cfg(feature = "collector")]
                 ShardClientMessage::Runner(ShardRunnerMessage::SetReactionFilter(collector)) => {
                     self.reaction_filters.push(collector);
 
