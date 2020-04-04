@@ -11,7 +11,7 @@ mod benches {
     fn single_with_one_delimiter(b: &mut Bencher) {
         b.iter(|| {
             let mut args = Args::new("1,2", &[Delimiter::Single(',')]);
-            futures::executor::block_on(args.single::<String>()).unwrap();
+            args.single::<String>().unwrap();
         })
     }
 
@@ -22,7 +22,7 @@ mod benches {
                 "1,2,3,4,5,6,7,8,9,10,11,12,13,14,15,16,17,18,19,20,21,22,23,24,25",
                 &[Delimiter::Single(',')],
             );
-            futures::executor::block_on(args.single::<String>()).unwrap();
+            args.single::<String>().unwrap();
         })
     }
 
@@ -37,7 +37,7 @@ mod benches {
                     Delimiter::Single('@'),
                 ],
             );
-            futures::executor::block_on(args.single::<String>()).unwrap();
+            args.single::<String>().unwrap();
         })
     }
 
@@ -52,7 +52,7 @@ mod benches {
                     Delimiter::Single('@'),
                 ],
             );
-            futures::executor::block_on(args.single::<String>()).unwrap();
+            args.single::<String>().unwrap();
         })
     }
 
@@ -60,7 +60,7 @@ mod benches {
     fn single_quoted_with_one_delimiter(b: &mut Bencher) {
         b.iter(|| {
             let mut args = Args::new(r#""1","2""#, &[Delimiter::Single(',')]);
-            futures::executor::block_on(args.single_quoted::<String>()).unwrap();
+            args.single_quoted::<String>().unwrap();
         })
     }
 
