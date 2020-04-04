@@ -1735,6 +1735,15 @@ impl<'de> Deserialize<'de> for Guild {
                     }
                 }
             }
+
+            if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
+                for value in array {
+                    if let Some(role) = value.as_object_mut() {
+                        role
+                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    }
+                }
+            }
         }
 
         let afk_channel_id = match map.remove("afk_channel_id") {
