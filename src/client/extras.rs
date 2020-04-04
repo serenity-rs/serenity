@@ -77,6 +77,7 @@ impl Default for Extras {
         Extras {
             event_handler: None,
             raw_event_handler: None,
+            #[cfg(feature = "framework")]
             framework: Arc::new(None),
             #[cfg(feature = "cache")]
             timeout: None,

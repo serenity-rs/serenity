@@ -122,7 +122,7 @@ async fn main() {
 
 #[command]
 async fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
-    let connect_to = match args.single::<u64>().await {
+    let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
             check_msg(msg.reply(&ctx, "Requires a valid voice channel ID be given").await);
