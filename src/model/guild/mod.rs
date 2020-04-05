@@ -1356,7 +1356,8 @@ impl Guild {
                     | Permissions::MUTE_MEMBERS
                     | Permissions::DEAFEN_MEMBERS
                     | Permissions::MOVE_MEMBERS
-                    | Permissions::USE_VAD);
+                    | Permissions::USE_VAD
+                    | Permissions::STREAM);
             }
 
             // Apply the permission overwrites for the channel for each of the
