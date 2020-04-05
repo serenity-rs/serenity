@@ -21,33 +21,28 @@ impl EditProfile {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "client", feature = "cache"))]
-    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
     /// # struct Handler;
-    ///
+    /// #
+    /// # #[serenity::async_trait]
     /// # impl EventHandler for Handler {
-    ///    # fn message(&self, context: Context, _: Message) {
-    ///         use serenity::utils;
+    /// #     async fn message(&self, context: Context, _: Message) {
+    /// use serenity::utils;
     ///
-    ///         // assuming a `context` has been bound
+    /// // assuming a `context` has been bound
     ///
-    ///         let base64 = utils::read_image("./my_image.jpg")
-    ///         .expect("Failed to read image");
+    /// let base64 = utils::read_image("./my_image.jpg")
+    ///     .expect("Failed to read image");
     ///
-    ///         let _ = context.cache.write().await.user.edit(&context, |p|
-    ///             p.avatar(Some(&base64)));
-    ///    # }
+    /// let mut data = context.cache.write().await;
+    /// let _ = data.user.edit(&context, |p| {
+    ///     p.avatar(Some(&base64))
+    /// })
+    /// .await;
+    /// #     }
     /// # }
-    /// #
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
-    /// # client.start().unwrap();
-    /// # }
-    /// #
-    /// # #[cfg(any(not(feature = "client"), not(feature = "cache")))]
-    /// # fn main() {}
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html

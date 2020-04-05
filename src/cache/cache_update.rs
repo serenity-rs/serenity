@@ -11,9 +11,6 @@ use async_trait::async_trait;
 /// Creating a custom struct implementation to update the cache with:
 ///
 /// ```rust
-/// extern crate serde_json;
-/// extern crate serenity;
-///
 /// use serde_json::json;
 /// use serenity::{
 ///     cache::{Cache, CacheUpdate},
@@ -38,11 +35,12 @@ use async_trait::async_trait;
 ///     user_name: String,
 /// }
 ///
+/// #[serenity::async_trait]
 /// impl CacheUpdate for DatabaseUserUpdate {
 ///     // A copy of the old user's data, if it existed in the cache.
 ///     type Output = User;
 ///
-///     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+///     async fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
 ///         // If an entry for the user already exists, update its fields.
 ///         match cache.users.entry(self.user_id) {
 ///             Entry::Occupied(entry) => {
@@ -85,7 +83,7 @@ use async_trait::async_trait;
 ///     }
 /// }
 ///
-/// # fn main() {
+/// # async fn run() {
 /// // Create an instance of the cache.
 /// let mut cache = Cache::new();
 ///
@@ -100,7 +98,7 @@ use async_trait::async_trait;
 /// };
 ///
 /// // Update the cache with the message.
-/// cache.update(&mut update_message);
+/// cache.update(&mut update_message).await;
 /// # }
 /// ```
 ///

@@ -20,13 +20,10 @@ use std::{
 /// value:
 ///
 /// ```rust,no_run
-/// # extern crate serde_json;
-/// # extern crate serenity;
-/// #
 /// # use serde_json::json;
 /// # use serenity::model::prelude::*;
 /// #
-/// # fn main() {
+/// # async fn run() {
 /// # let user = UserId(1);
 /// # let emoji = serde_json::from_value::<Emoji>(json!({
 /// #     "animated": false,
@@ -44,8 +41,10 @@ use std::{
 /// let content = MessageBuilder::new()
 ///     .push("You sent a message, ")
 ///     .mention(&user)
+///     .await
 ///     .push("! ")
 ///     .mention(&emoji)
+///     .await
 ///     .build();
 /// # }
 /// ```
@@ -84,14 +83,17 @@ impl MessageBuilder {
     /// use serenity::model::id::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
+    /// # async fn run() {
     /// let channel_id = ChannelId(81384788765712384);
     ///
     /// let content = MessageBuilder::new()
     ///     .channel(channel_id)
+    ///     .await
     ///     .push("!")
     ///     .build();
     ///
     /// assert_eq!(content, "<#81384788765712384>!");
+    /// # }
     /// ```
     ///
     /// This is equivalent to simply retrieving the tuple struct's first value:
@@ -122,14 +124,17 @@ impl MessageBuilder {
     /// use serenity::model::id::ChannelId;
     /// use serenity::utils::MessageBuilder;
     ///
+    /// # async fn run() {
     /// let channel_id = ChannelId(81384788765712384);
     ///
     /// let content = MessageBuilder::new()
     ///     .push("The channel is: ")
     ///     .channel(channel_id)
+    ///     .await
     ///     .build();
     ///
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
+    /// # }
     /// ```
     ///
     /// [`Channel`]: ../model/channel/enum.Channel.html
@@ -157,9 +162,6 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::model::guild::Role;
     /// #
@@ -237,7 +239,7 @@ impl MessageBuilder {
     ///
     /// Pushing a Rust codeblock:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// use serenity::utils::MessageBuilder;
     ///
     /// let code = r#"

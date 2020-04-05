@@ -46,24 +46,24 @@ impl Attachment {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
-    /// use std::env;
     /// use std::fs::File;
     /// use std::io::Write;
     /// use std::path::Path;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, mut message: Message) {
+    ///     async fn message(&self, context: Context, mut message: Message) {
     ///         for attachment in message.attachments {
-    ///             let content = match attachment.download() {
+    ///             let content = match attachment.download().await {
     ///                 Ok(content) => content,
     ///                 Err(why) => {
     ///                     println!("Error downloading attachment: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context.http, "Error downloading attachment");
+    ///                     let _ = message.channel_id.say(&context, "Error downloading attachment").await;
     ///
     ///                     return;
     ///                 },
@@ -73,7 +73,7 @@ impl Attachment {
     ///                 Ok(file) => file,
     ///                 Err(why) => {
     ///                     println!("Error creating file: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context.http, "Error creating file");
+    ///                     let _ = message.channel_id.say(&context, "Error creating file").await;
     ///
     ///                     return;
     ///                 },
@@ -85,22 +85,20 @@ impl Attachment {
     ///                 return;
     ///             }
     ///
-    ///             let _ = message.channel_id.say(&context.http, &format!("Saved {:?}", attachment.filename));
+    ///             let _ = message.channel_id.say(&context, &format!("Saved {:?}", attachment.filename)).await;
     ///         }
     ///     }
     ///
-    ///     fn ready(&self, _: Context, ready: Ready) {
+    ///     async fn ready(&self, _: Context, ready: Ready) {
     ///         println!("{} is connected!", ready.user.name);
     ///     }
     /// }
-    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() {}
     /// ```
     ///
     /// # Errors

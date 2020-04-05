@@ -79,8 +79,14 @@ impl ChannelCategory {
     ///
     /// Change a voice channels name and bitrate:
     ///
-    /// ```rust,ignore
-    /// category.edit(&context, |c| c.name("test").bitrate(86400));
+    /// ```rust,no_run
+    /// # async fn run() {
+    /// #     use serenity::http::Http;
+    /// #     use serenity::model::id::ChannelId;
+    /// #     let http = Http::default();
+    /// #     let category = ChannelId(1234);
+    /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
+    /// # }
     /// ```
     #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>

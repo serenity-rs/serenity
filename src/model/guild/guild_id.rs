@@ -41,11 +41,18 @@ impl GuildId {
     ///
     /// Ban a member and remove all messages they've sent in the last 4 days:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
+    /// use serenity::model::id::UserId;
     /// use serenity::model::id::GuildId;
     ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # use serenity::http::Http;
+    /// # let http = Http::default();
+    /// # let user = UserId(1);
     /// // assuming a `user` has already been bound
-    /// let _ = GuildId(81384788765712384).ban(user, 4);
+    /// let _ = GuildId(81384788765712384).ban(&http, user, &4).await;
+    /// #    Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors
@@ -138,11 +145,15 @@ impl GuildId {
     ///
     /// Create a voice channel in a guild with the name `test`:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// use serenity::model::id::GuildId;
     /// use serenity::model::channel::ChannelType;
     ///
-    /// let _channel = GuildId(7).create_channel(|c| c.name("test").kind(ChannelType::Voice));
+    /// # async fn run() {
+    /// # use serenity::http::Http;
+    /// # let http = Http::default();
+    /// let _channel = GuildId(7).create_channel(&http, |c| c.name("test").kind(ChannelType::Voice)).await;
+    /// # }
     /// ```
     ///
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
@@ -575,18 +586,26 @@ impl GuildId {
     /// ```rust,no_run
     /// # use serenity::model::id::GuildId;
     /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() {
     /// # let guild_id = GuildId::default();
     /// # let ctx = Http::default();
-    /// for member_result in guild_id.members_iter(&ctx) {
+    /// use serenity::model::guild::MembersIter;
+    /// use serenity::futures::StreamExt;
+    ///
+    /// let mut members = MembersIter::<Http>::stream(&ctx, guild_id).boxed();
+    /// while let Some(member_result) = members.next().await {
     ///     match member_result {
     ///         Ok(member) => println!(
     ///             "{} is {}",
     ///             member,
-    ///             member.display_name()
+    ///             member.display_name().await,
     ///         ),
     ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
     ///     }
     /// }
+    /// # }
+    /// ```
     #[cfg(all(feature = "http", feature = "cache"))]
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
         MembersIter::new(self, http)

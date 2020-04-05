@@ -773,6 +773,7 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
 /// # use serenity::client::{Cache, CacheRwLock};
 /// # use tokio::sync::RwLock;
 /// #
+/// # async fn run() {
 /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
 /// use serenity::utils::{
 ///     content_safe,
@@ -780,9 +781,10 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
 /// };
 ///
 /// let with_mention = "@everyone";
-/// let without_mention = content_safe(&cache, &with_mention, &ContentSafeOptions::default());
+/// let without_mention = content_safe(&cache, &with_mention, &ContentSafeOptions::default()).await;
 ///
 /// assert_eq!("@\u{200B}everyone".to_string(), without_mention);
+/// # }
 /// ```
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html

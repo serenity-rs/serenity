@@ -257,7 +257,7 @@ impl Guild {
     ///
     /// ```rust,ignore
     /// // assumes a `user` and `guild` have already been bound
-    /// let _ = guild.ban(user, 4);
+    /// let _ = guild.ban(&http, user, &4).await;
     /// ```
     ///
     /// # Errors
@@ -364,7 +364,7 @@ impl Guild {
     /// ```rust,ignore
     /// use serenity::model::{Guild, Region};
     ///
-    /// let _guild = Guild::create_guild("test", Region::UsWest, None);
+    /// let _guild = Guild::create_guild(&http, "test", Region::UsWest, None).await;
     /// ```
     ///
     /// [`Guild`]: struct.Guild.html
@@ -394,7 +394,9 @@ impl Guild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let _ = guild.create_channel(|c| c.name("my-test-channel").kind(ChannelType::Text));
+    /// let _ = guild
+    ///     .create_channel(&http, |c| c.name("my-test-channel").kind(ChannelType::Text))
+    ///     .await;
     /// ```
     ///
     /// # Errors
@@ -582,7 +584,7 @@ impl Guild {
     /// let base64_icon = utils::read_image("./icon.png")
     ///     .expect("Failed to read image");
     ///
-    /// guild.edit(|g| g.icon(base64_icon));
+    /// guild.edit(&http, |g| g.icon(base64_icon)).await;
     /// ```
     ///
     /// # Errors
@@ -655,7 +657,7 @@ impl Guild {
     /// Mute a member and set their roles to just one role with a predefined Id:
     ///
     /// ```rust,ignore
-    /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
+    /// guild.edit_member(&http, user_id, |m| m.mute(true).roles(&vec![role_id])).await;
     /// ```
     #[cfg(feature = "http")]
     #[inline]
@@ -703,7 +705,7 @@ impl Guild {
     /// Make a role hoisted:
     ///
     /// ```rust,ignore
-    /// guild.edit_role(&context, RoleId(7), |r| r.hoist(true));
+    /// guild.edit_role(&context, RoleId(7), |r| r.hoist(true)).await;
     /// ```
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
@@ -723,7 +725,7 @@ impl Guild {
     ///
     /// ```rust,ignore
     /// use serenity::model::id::RoleId;
-    /// guild.edit_role_position(&context, RoleId(8), 2);
+    /// guild.edit_role_position(&context, RoleId(8), 2).await;
     /// ```
     ///
     /// [`Role`]: struct.Role.html
@@ -1700,29 +1702,30 @@ impl Guild {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "cache", feature = "client"))]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached(&ctx.cache) {
-    ///             if let Some(role) = arc.read().await.role_by_name("role_name") {
-    ///                 println!("{:?}", role);
+    ///     async fn message(&self, ctx: Context, msg: Message) {
+    ///         if let Some(guild_id) = msg.guild_id {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx).await {
+    ///                 if let Some(role) = guild.read().await.role_by_name("role_name") {
+    ///                     println!("{:?}", role);
+    ///                 }
     ///             }
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #    Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "cache", feature = "client")))]
-    /// # fn main() {}
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html

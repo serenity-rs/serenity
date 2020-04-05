@@ -143,7 +143,7 @@ impl GuildChannel {
     /// Create an invite that can only be used 5 times:
     ///
     /// ```rust,ignore
-    /// let invite = channel.create_invite(&context, |i| i.max_uses(5));
+    /// let invite = channel.create_invite(&context, |i| i.max_uses(5)).await;
     /// ```
     #[cfg(all(feature = "utils", feature = "client"))]
     pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
@@ -183,10 +183,8 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use std::error::Error;
-    /// #
     /// # #[cfg(feature = "cache")]
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
@@ -213,12 +211,9 @@ impl GuildChannel {
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().await.create_permission(&http, &overwrite)?;
-    /// # Ok(())
+    /// channel.read().await.create_permission(&http, &overwrite).await?;
+    /// #   Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() -> Result<(), Box<Error>> { Ok(()) }
     /// ```
     ///
     /// Creating a permission overwrite for a role by specifying the
@@ -227,10 +222,8 @@ impl GuildChannel {
     /// permissions:
     ///
     /// ```rust,no_run
-    /// # use std::error::Error;
-    /// #
     /// # #[cfg(feature = "cache")]
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
@@ -258,12 +251,9 @@ impl GuildChannel {
     ///     .guild_channel(channel_id)
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().await.create_permission(&http, &overwrite)?;
+    /// channel.read().await.create_permission(&http, &overwrite).await?;
     /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() -> Result<(), Box<Error>> { Ok(()) }
     /// ```
     ///
     /// [`Channel`]: enum.Channel.html
@@ -367,7 +357,7 @@ impl GuildChannel {
     /// Change a voice channels name and bitrate:
     ///
     /// ```rust,ignore
-    /// channel.edit(&context, |c| c.name("test").bitrate(86400));
+    /// channel.edit(&context, |c| c.name("test").bitrate(86400)).await;
     /// ```
     #[cfg(all(feature = "utils", feature = "client", feature = "builder"))]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
@@ -534,21 +524,27 @@ impl GuildChannel {
     /// use serenity::model::prelude::*;
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
+    ///     async fn message(&self, context: Context, msg: Message) {
     ///         let channel = match context.cache.read().await.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let permissions = channel.read().await.permissions_for(&context.cache, &msg.author).unwrap();
-    ///
-    ///         println!("The user's permissions: {:?}", permissions);
+    ///         let channel = channel.read().await;
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author).await {
+    ///             println!("The user's permissions: {:?}", permissions);
+    ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
     ///
-    /// client.start().unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// Check if the current user has the [Attach Files] and [Send Messages]
@@ -563,16 +559,17 @@ impl GuildChannel {
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, mut msg: Message) {
+    ///     async fn message(&self, context: Context, mut msg: Message) {
     ///         let channel = match context.cache.read().await.guild_channel(msg.channel_id) {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
     ///         let current_user_id = context.cache.read().await.user.id;
-    ///         let permissions =
-    ///             channel.read().await.permissions_for(&context.cache, current_user_id).unwrap();
+    ///         let channel = channel.read().await;
+    ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id).await {
     ///
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
     ///                 return;
@@ -587,17 +584,21 @@ impl GuildChannel {
     ///                 },
     ///             };
     ///
-    ///         let _ = msg.channel_id.send_files(&context.http, vec![(&file, "cat.png")], |mut m| {
-    ///             m.content("here's a cat");
-    ///
-    ///             m
-    ///         });
+    ///             let _ = msg.channel_id.send_files(&context.http, vec![(&file, "cat.png")], |mut m| {
+    ///                 m.content("here's a cat");
+    ///                 m
+    ///             })
+    ///             .await;
+    ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors

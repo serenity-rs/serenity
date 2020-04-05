@@ -246,15 +246,16 @@ impl Cache {
     /// # use serenity::prelude::*;
     /// #
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use std::thread;
     /// use std::time::Duration;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
-    ///          // Wait some time for guilds to be received.
+    ///     async fn ready(&self, ctx: Context, _: Ready) {
+    ///         // Wait some time for guilds to be received.
     ///         //
     ///         // You should keep track of this in a better fashion by tracking how
     ///         // many guilds each `ready` has, and incrementing a counter on
@@ -263,19 +264,17 @@ impl Cache {
     ///         //
     ///         // For demonstrative purposes we're just sleeping the thread for 5
     ///         // seconds.
-    ///         thread::sleep(Duration::from_secs(5));
+    ///         tokio::time::delay_for(Duration::from_secs(5)).await;
     ///
-    ///         println!("{} unknown members", ctx.cache.read().await.unknown_members());
+    ///         println!("{} unknown members", ctx.cache.read().await.unknown_members().await);
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() { }
     /// ```
     ///
     /// [`Member`]: ../model/guild/struct.Member.html
@@ -312,10 +311,12 @@ impl Cache {
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
+    /// # async fn run() {
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// let amount = cache.read().await.all_private_channels().len();
     ///
     /// println!("There are {} private channels", amount);
+    /// # }
     /// ```
     ///
     /// [`Group`]: ../model/channel/struct.Group.html
@@ -338,24 +339,19 @@ impl Cache {
     /// Print all of the Ids of guilds in the Cache:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # fn main() {
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, context: Context, _: Ready) {
+    ///     async fn ready(&self, context: Context, _: Ready) {
     ///         let guilds = context.cache.read().await.guilds.len();
     ///
     ///         println!("Guilds in the Cache: {}", guilds);
     ///     }
     /// }
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() { }
     /// ```
     ///
     /// [`Context`]: ../client/struct.Context.html
@@ -422,11 +418,11 @@ impl Cache {
     /// Retrieve a guild from the cache and print its name:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::{Cache, CacheRwLock}};
+    /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use tokio::sync::RwLock;
-    /// # use std::{error::Error, sync::Arc};
+    /// # use std::sync::Arc;
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// // assuming the cache is in scope, e.g. via `Context`
     /// if let Some(guild) = cache.read().await.guild(7) {
@@ -456,22 +452,21 @@ impl Cache {
     /// [`Client::on_message`] event dispatch:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # fn main() {
     /// # use serenity::model::prelude::*;
     /// # use serenity::prelude::*;
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, message: Message) {
+    ///     async fn message(&self, context: Context, message: Message) {
     ///         let cache = context.cache.read().await;
     ///
     ///         let channel = match cache.guild_channel(message.channel_id) {
     ///             Some(channel) => channel,
     ///             None => {
-    /// if let Err(why) = message.channel_id.say(&context.http, "Could not find guild's
-    /// channel data") {
+    ///                 let result = message.channel_id.say(&context, "Could not find guild's channel data").await;
+    ///                 if let Err(why) = result {
     ///                     println!("Error sending message: {:?}", why);
     ///                 }
     ///
@@ -481,13 +476,13 @@ impl Cache {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # #[cfg(feature = "client")]
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() { }
     /// ```
     ///
     /// [`ChannelId`]: ../model/id/struct.ChannelId.html
@@ -519,9 +514,9 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use tokio::sync::RwLock;
-    /// # use std::{error::Error, sync::Arc};
+    /// # use std::sync::Arc;
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// if let Some(group) = cache.read().await.group(7) {
     ///     println!("Owner Id: {}", group.read().await.owner_id);
@@ -549,11 +544,16 @@ impl Cache {
     /// Retrieving the member object of the user that posted a message, in a
     /// [`Client::on_message`] context:
     ///
-    /// ```rust,ignore
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
+    /// ```rust,no_run
+    /// # use serenity::cache::{Cache, CacheRwLock};
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::{ChannelId, MessageId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
+    /// # let message = ChannelId(0).message(&http, MessageId(1)).await.unwrap();
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// let cache = cache.read().await;
     ///
@@ -561,27 +561,31 @@ impl Cache {
     ///     let channel = match cache.guild_channel(message.channel_id) {
     ///         Some(channel) => channel,
     ///         None => {
-    ///             if let Err(why) = message.channel_id.say("Error finding channel data") {
+    ///             if let Err(why) = message.channel_id.say(http, "Error finding channel data").await {
     ///                 println!("Error sending message: {:?}", why);
     ///             }
+    ///             return;
     ///         },
     ///     };
     ///
-    ///     match cache.member(channel.guild_id, message.author.id) {
+    ///     let channel = channel.read().await;
+    ///     match cache.member(channel.guild_id, message.author.id).await {
     ///         Some(member) => member,
     ///         None => {
-    ///             if let Err(why) = message.channel_id.say("Error finding member data") {
+    ///             if let Err(why) = message.channel_id.say(&http, "Error finding member data").await {
     ///                 println!("Error sending message: {:?}", why);
     ///             }
+    ///             return;
     ///         },
     ///     }
     /// };
     ///
     /// let msg = format!("You have {} roles", member.roles.len());
     ///
-    /// if let Err(why) = message.channel_id.say(&msg) {
+    /// if let Err(why) = message.channel_id.say(&http, &msg).await {
     ///     println!("Error sending message: {:?}", why);
     /// }
+    /// # }
     /// ```
     ///
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
@@ -618,12 +622,15 @@ impl Cache {
     /// [`EventHandler::message`] context:
     ///
     /// ```rust,no_run
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, MessageId}};
+    /// # use serenity::cache::{Cache, CacheRwLock};
+    /// # use serenity::http::Http;
+    /// # use serenity::model::id::{ChannelId, MessageId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::new_with_token("DISCORD_TOKEN"));
-    /// # let message = ChannelId(0).message(&http, MessageId(1)).unwrap();
+    /// # let message = ChannelId(0).message(&http, MessageId(1)).await?;
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #
     /// let cache = cache.read().await;
@@ -637,6 +644,8 @@ impl Cache {
     ///         println!("No message found in cache.");
     ///     },
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`EventHandler::message`]: ../client/trait.EventHandler.html#method.message
@@ -665,13 +674,11 @@ impl Cache {
     /// name:
     ///
     /// ```rust,no_run
-    /// # use std::error::Error;
-    /// #
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
+    /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #   let cache = cache.read().await;
     /// // assuming the cache has been unlocked
@@ -683,10 +690,6 @@ impl Cache {
     ///     println!("The recipient is {}", user_reader.name);
     /// }
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -717,12 +720,12 @@ impl Cache {
     /// ```rust,no_run
     /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use tokio::sync::RwLock;
-    /// # use std::{error::Error, sync::Arc};
+    /// # use std::sync::Arc;
     /// #
-    /// # fn main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// // assuming the cache is in scope, e.g. via `Context`
-    /// if let Some(role) = cache.read().await.role(7, 77) {
+    /// if let Some(role) = cache.read().await.role(7, 77).await {
     ///     println!("Role with Id 77 is called {}", role.name);
     /// }
     /// #     Ok(())
@@ -790,14 +793,12 @@ impl Cache {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// #
     /// # #[command]
-    /// # fn test(context: &mut Context) -> CommandResult {
+    /// # async fn test(context: &mut Context) -> CommandResult {
     /// if let Some(user) = context.cache.read().await.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.read().await.name);
     /// }
-    /// # Ok(())
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn user<U: Into<UserId>>(&self, user_id: U) -> Option<Arc<RwLock<User>>> {

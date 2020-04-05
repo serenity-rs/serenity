@@ -113,25 +113,20 @@ impl Shard {
     /// ```rust,no_run
     /// use serenity::gateway::Shard;
     /// use tokio::sync::Mutex;
-    /// use std::{env, sync::Arc};
+    /// use std::sync::Arc;
     /// #
     /// # use serenity::http::Http;
-    /// # use std::{error::Error};
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::default());
-    /// let token = env::var("DISCORD_BOT_TOKEN")?;
+    /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = Arc::new(Mutex::new(http.get_gateway()?.url));
-    /// let shard = Shard::new(gateway, &token, [0, 1], true)?;
+    /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
+    /// let shard = Shard::new(gateway, &token, [0, 1], true).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     pub async fn new(
@@ -174,6 +169,7 @@ impl Shard {
     pub fn current_presence(&self) -> &CurrentPresence {
         &self.current_presence
     }
+
     /// Whether the shard has permanently shutdown.
     ///
     /// This should normally happen due to manual calling of [`shutdown`] or
@@ -267,21 +263,18 @@ impl Shard {
 
     /// ```rust,no_run
     /// # #[cfg(feature = "model")]
-    /// # fn main() {
+    /// # async fn run() {
     /// # use serenity::{gateway::Shard, prelude::Mutex};
     /// # use std::sync::Arc;
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await.unwrap();
     /// #
     /// use serenity::model::gateway::Activity;
     ///
     /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "model"))]
-    /// # fn main() { }
     /// ```
     #[inline]
     pub fn set_activity(&mut self, activity: Option<Activity>) {
@@ -317,20 +310,17 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "model")]
-    /// # fn main() {
+    /// # async fn run() {
     /// # use serenity::gateway::Shard;
     /// # use serenity::prelude::Mutex;
     /// # use std::sync::Arc;
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await.unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "model"))]
-    /// # fn main() {}
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
 
@@ -682,24 +672,19 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None);
+    /// shard.chunk_guilds(guild_ids, Some(2000), None).await?;
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -712,21 +697,17 @@ impl Shard {
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"));
+    /// shard.chunk_guilds(guild_ids, Some(20), Some("do")).await?;
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///

@@ -536,30 +536,30 @@ impl PartialGuild {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
-    ///         let guild = msg.guild_id.unwrap().to_partial_guild(&context.http).unwrap();
-    ///         let possible_role = guild.role_by_name("role_name");
-    ///
-    ///         if let Some(role) = possible_role {
-    ///             println!("Obtained role's reference: {:?}", role);
+    ///     async fn message(&self, context: Context, msg: Message) {
+    ///         if let Some(guild_id) = msg.guild_id {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&context).await {
+    ///                 if let Some(role) = guild.read().await.role_by_name("role_name") {
+    ///                     println!("Obtained role's reference: {:?}", role);
+    ///                 }
+    ///             }
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #    Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() {}
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html

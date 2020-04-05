@@ -71,8 +71,8 @@ impl CurrentUser {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
+    /// # async fn run() {
+    /// # use serenity::cache::{Cache, CacheRwLock};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
@@ -86,9 +86,6 @@ impl CurrentUser {
     ///     None => println!("{} does not have an avatar set.", user.name)
     /// }
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
@@ -109,16 +106,18 @@ impl CurrentUser {
     ///
     /// Change the avatar:
     ///
-    /// ```rust,ignore
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
-    ///
-    /// context.cache.write().await.user.edit(|p| p.avatar(Some(&avatar)));
-    /// # }
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// #     let mut user = CurrentUser::default();
+    /// let avatar = serenity::utils::read_image("./avatar.png")?;
+    ///
+    /// user.edit(&http, |p| p.avatar(Some(&avatar))).await;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
@@ -166,27 +165,20 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read().await;
-    /// # let http = Arc::new(Http::default());
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
+    /// // assuming the user has been bound
     ///
-    /// if let Ok(guilds) = user.guilds(&http) {
+    /// if let Ok(guilds) = user.guilds(&http).await {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
     ///         println!("{}: {}", index, guild.name);
     ///     }
     /// }
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[cfg(feature = "http")]
     pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
@@ -204,20 +196,16 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let mut cache = cache.write().await;
-    /// # let http = Arc::new(Http::default());
-    ///
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
     /// use serenity::model::Permissions;
     ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(&http, Permissions::empty()) {
+    /// // assuming the user has been bound
+    /// let url = match user.invite_url(&http, Permissions::empty()).await {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -229,27 +217,22 @@ impl CurrentUser {
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
     ///                  client_id=249608697955745802&scope=bot");
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let mut cache = cache.write().await;
-    /// # let http = Arc::new(Http::default());
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
     /// use serenity::model::Permissions;
     ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(&http, Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
+    /// // assuming the user has been bound
+    /// let permissions = Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
+    /// let url = match user.invite_url(&http, permissions).await {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -262,9 +245,6 @@ impl CurrentUser {
     /// "https://discordapp.
     /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     ///
     /// # Errors
@@ -307,25 +287,17 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read().await;
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// # fn run() {
+    /// #     let user = CurrentUser::default();
+    /// // assuming the user has been bound
     ///
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
     ///     None => println!("Could not get static avatar for {}.", user.name)
     /// }
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn static_avatar_url(&self) -> Option<String> {
@@ -339,20 +311,14 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read().await;
-    /// // assuming the cache has been unlocked
-    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// # fn run() {
+    /// #     let user = CurrentUser::default();
+    /// // assuming the user has been bound
+    ///
+    /// println!("The current user's distinct identifier is {}", user.tag());
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
@@ -522,11 +488,13 @@ impl User {
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     /// #   #[cfg(feature = "cache")]
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match ctx.cache.read().await.user.invite_url(&ctx, Permissions::empty()) {
+    ///             let cache = ctx.cache.read().await;
+    ///             let url = match cache.user.invite_url(&ctx, Permissions::empty()).await {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -542,23 +510,27 @@ impl User {
     ///
     ///             let dm = msg.author.direct_message(&ctx, |m| {
     ///                 m.content(&help)
-    ///             });
+    ///             })
+    ///             .await;
     ///
     ///             match dm {
     ///                 Ok(_) => {
-    ///                     let _ = msg.react(&ctx, '👌');
+    ///                     let _ = msg.react(&ctx, '👌').await;
     ///                 },
     ///                 Err(why) => {
     ///                     println!("Err sending help: {:?}", why);
     ///
-    ///                     let _ = msg.reply(&ctx, "There was an error DMing you help.");
+    ///                     let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
     ///                 },
     ///             };
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler);
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
+    /// #     Ok(())
+    /// # }
     /// # }
     /// ```
     ///
@@ -783,7 +755,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -792,25 +764,24 @@ impl User {
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
+    ///     async fn message(&self, context: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")
     ///                 .push(Bold + msg.author.tag())
     ///                 .build();
     ///
-    ///             let _ = msg.channel_id.say(&context.http, &content);
+    ///             let _ = msg.channel_id.say(&context.http, &content).await;
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }

@@ -48,10 +48,14 @@ impl ChannelId {
     ///
     /// # Examples
     ///
-    /// ```rust,ignore
-    /// use serenity::model::ChannelId;
+    /// ```rust,no_run
+    /// use serenity::model::id::ChannelId;
     ///
-    /// let _successful = ChannelId(7).broadcast_typing();
+    /// # async fn run() {
+    /// #     use serenity::http::Http;
+    /// #     let http = Http::default();
+    /// let _successful = ChannelId(7).broadcast_typing(&http).await;
+    /// # }
     /// ```
     ///
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
@@ -260,10 +264,16 @@ impl ChannelId {
     ///
     /// Change a voice channel's name and bitrate:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// // assuming a `channel_id` has been bound
     ///
-    /// channel_id.edit(&context, |c| c.name("test").bitrate(64000));
+    /// # async fn run() {
+    /// #     use serenity::http::Http;
+    /// #     use serenity::model::id::ChannelId;
+    /// #     let http = Http::default();
+    /// #     let channel_id = ChannelId(1234);
+    /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
+    /// # }
     /// ```
     ///
     /// [`Channel`]: ../channel/enum.Channel.html
@@ -562,6 +572,7 @@ impl ChannelId {
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
+    /// # async fn run() {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::id::ChannelId;
     ///
@@ -571,7 +582,9 @@ impl ChannelId {
     ///
     /// let _ = channel_id.send_files(&http, paths, |m| {
     ///     m.content("a file")
-    /// });
+    /// })
+    /// .await;
+    /// # }
     /// ```
     ///
     /// Send files using `File`:
@@ -580,20 +593,24 @@ impl ChannelId {
     /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::id::ChannelId;
     /// use std::fs::File;
     ///
     /// let channel_id = ChannelId(7);
     ///
-    /// let f1 = File::open("my_file.jpg").unwrap();
-    /// let f2 = File::open("my_file2.jpg").unwrap();
+    /// let f1 = File::open("my_file.jpg")?;
+    /// let f2 = File::open("my_file2.jpg")?;
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///
     /// let _ = channel_id.send_files(&http, files, |m| {
     ///     m.content("a file")
-    /// });
+    /// })
+    /// .await;
+    /// #    Ok(())
+    /// # }
     /// ```
     ///
     /// # Errors

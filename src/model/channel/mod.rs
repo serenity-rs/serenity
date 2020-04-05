@@ -83,13 +83,13 @@ impl Channel {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # fn main() {
+    /// # async fn run() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// #     let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// #     let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.group() {
     ///     Some(group_lock) => {
@@ -103,9 +103,6 @@ impl Channel {
     /// }
     /// #
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
-    /// fn main() {}
     /// ```
     pub fn group(self) -> Option<Arc<RwLock<Group>>> {
         match self {
@@ -126,13 +123,13 @@ impl Channel {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # fn main() {
+    /// # async fn run() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.guild() {
     ///     Some(guild_lock) => {
@@ -140,11 +137,7 @@ impl Channel {
     ///     },
     ///     None => { println!("It's not a guild!"); },
     /// }
-    /// #
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
-    /// fn main() {}
     /// ```
     pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
         match self {
@@ -165,13 +158,13 @@ impl Channel {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # fn main() {
+    /// # async fn run() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.private() {
     ///     Some(private_lock) => {
@@ -182,11 +175,7 @@ impl Channel {
     ///     },
     ///     None => { println!("It's not a private channel!"); },
     /// }
-    /// #
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
-    /// fn main() {}
     /// ```
     pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
         match self {
@@ -207,13 +196,13 @@ impl Channel {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # fn main() {
+    /// # async fn run() {
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// #   let channel = ChannelId(0).to_channel_cached(&cache).unwrap();
+    /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.category() {
     ///     Some(category_lock) => {
@@ -223,9 +212,6 @@ impl Channel {
     /// }
     /// #
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "model", feature = "cache")))]
-    /// fn main() {}
     /// ```
     pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {
         match self {

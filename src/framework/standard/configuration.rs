@@ -78,15 +78,17 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// impl EventHandler for Handler {}
 ///
 /// use serenity::Client;
-/// use std::env;
 /// use serenity::framework::StandardFramework;
 /// use serenity::model::id::UserId;
 ///
-/// let token = env::var("DISCORD_BOT_TOKEN").unwrap();
-/// let mut client = Client::new(&token, Handler).unwrap();
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let token = std::env::var("DISCORD_BOT_TOKEN")?;
+/// let framework = StandardFramework::new()
+///     .configure(|c| c.on_mention(Some(UserId(5))).prefix("~"));
 ///
-/// client.with_framework(StandardFramework::new()
-///     .configure(|c| c.on_mention(Some(UserId(5))).prefix("~")));
+/// let mut client = Client::new_with_framework(&token, Handler, framework).await?;
+/// #     Ok(())
+/// # }
 /// ```
 ///
 /// [`Client`]: ../../client/struct.Client.html
@@ -185,15 +187,11 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::id::ChannelId;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect())));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .allowed_channels(vec![ChannelId(7), ChannelId(77)].into_iter().collect()));
     /// ```
     pub fn allowed_channels(&mut self, channels: HashSet<ChannelId>) -> &mut Self {
         self.allowed_channels = channels;
@@ -211,15 +209,11 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::id::GuildId;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect())));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .blocked_guilds(vec![GuildId(7), GuildId(77)].into_iter().collect()));
     /// ```
     pub fn blocked_guilds(&mut self, guilds: HashSet<GuildId>) -> &mut Self {
         self.blocked_guilds = guilds;
@@ -239,15 +233,11 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::id::UserId;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect())));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .blocked_users(vec![UserId(7), UserId(77)].into_iter().collect()));
     /// ```
     pub fn blocked_users(&mut self, users: HashSet<UserId>) -> &mut Self {
         self.blocked_users = users;
@@ -267,11 +257,12 @@ impl Configuration {
     /// use serenity::framework::StandardFramework;
     /// use serenity::client::Context;
     /// use serenity::model::channel::Message;
-    /// use serenity::framework::standard::{CommandResult, macros::{group, command}};
+    /// use serenity::framework::standard::CommandResult;
+    /// use serenity::framework::standard::macros::{group, command};
     ///
     /// #[command]
-    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "Pong!")?;
+    /// async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "Pong!").await?;
     ///     Ok(())
     /// }
     ///
@@ -279,18 +270,11 @@ impl Configuration {
     /// #[commands(ping)]
     /// struct Peng;
     ///
-    /// # fn main() {
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// let disabled = vec!["ping"].into_iter().map(|x| x.to_string()).collect();
     ///
-    /// client.with_framework(StandardFramework::new()
+    /// let framework = StandardFramework::new()
     ///     .group(&PENG_GROUP)
-    ///     .configure(|c| c.disabled_commands(disabled)));
-    /// # }
+    ///     .configure(|c| c.disabled_commands(disabled));
     /// ```
     pub fn disabled_commands(&mut self, commands: HashSet<String>) -> &mut Self {
         self.disabled_commands = commands;
@@ -312,14 +296,10 @@ impl Configuration {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .configure(|c| c.dynamic_prefix(|_, msg| {
+    /// let framework = StandardFramework::new()
+    ///     .configure(|c| c.dynamic_prefix(|_, msg| Box::pin(async move {
     ///         Some(if msg.channel_id.0 % 5 == 0 {
     ///             "!"
     ///         } else {
@@ -401,26 +381,16 @@ impl Configuration {
     /// Create a HashSet in-place:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::id::UserId;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .owners(vec![UserId(7), UserId(77)].into_iter().collect())));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .owners(vec![UserId(7), UserId(77)].into_iter().collect()));
     /// ```
     ///
     /// Create a HashSet beforehand:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
     /// use serenity::model::id::UserId;
     /// use std::collections::HashSet;
     /// use serenity::framework::StandardFramework;
@@ -429,7 +399,7 @@ impl Configuration {
     /// set.insert(UserId(7));
     /// set.insert(UserId(77));
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c.owners(set)));
+    /// let framework = StandardFramework::new().configure(|c| c.owners(set));
     /// ```
     #[allow(clippy::implicit_hasher)]
     pub fn owners(&mut self, user_ids: HashSet<UserId>) -> &mut Self {
@@ -448,16 +418,10 @@ impl Configuration {
     /// Assign a basic prefix:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .prefix("!")));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .prefix("!"));
     /// ```
     pub fn prefix(&mut self, prefix: &str) -> &mut Self {
         self.prefixes = vec![prefix.to_string()];
@@ -475,16 +439,10 @@ impl Configuration {
     /// Assign a set of prefixes the bot can respond to:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .prefixes(vec!["!", ">", "+"])));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .prefixes(vec!["!", ">", "+"]));
     /// ```
     ///
     /// [`prefix`]: #method.prefix
@@ -521,16 +479,10 @@ impl Configuration {
     /// Have the args be separated by a comma and a space:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .delimiter(", ")));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .delimiter(", "));
     /// ```
     pub fn delimiter<I: Into<Delimiter>>(&mut self, delimiter: I) -> &mut Self {
         self.delimiters.clear();
@@ -549,16 +501,10 @@ impl Configuration {
     /// Have the args be separated by a comma and a space; and a regular space:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new().configure(|c| c
-    ///     .delimiters(vec![", ", " "])));
+    /// let framework = StandardFramework::new().configure(|c| c
+    ///     .delimiters(vec![", ", " "]));
     /// ```
     ///
     /// [`delimiter`]: #method.delimiter

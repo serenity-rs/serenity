@@ -58,7 +58,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # use serenity::cache::Cache;
 /// #
 /// # #[cfg(feature = "framework")]
-/// # fn try_main() -> Result<(), Box<Error>> {
+/// # async fn run() -> Result<(), Box<dyn Error>> {
 /// #
 /// use tokio::sync::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
@@ -80,10 +80,10 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
-/// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
+/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(ShareMap::custom()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
-/// let framework = Arc::new(Mutex::new(None));
+/// let framework = Arc::new(None);
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
 ///
 /// ShardManager::new(ShardManagerOptions {
@@ -105,15 +105,6 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     guild_subscriptions: true,
 /// });
 /// #     Ok(())
-/// # }
-/// #
-/// # #[cfg(not(feature = "framework"))]
-/// # fn try_main() -> Result<(), Box<Error>> {
-/// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     try_main().unwrap();
 /// # }
 /// ```
 ///
@@ -251,11 +242,14 @@ impl ShardManager {
     ///
     /// impl EventHandler for Handler { }
     ///
-    /// let token = env::var("DISCORD_TOKEN").unwrap();
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token, Handler).await?;
     ///
     /// // restart shard ID 7
-    /// client.shard_manager.lock().await.restart(ShardId(7));
+    /// client.shard_manager.lock().await.restart(ShardId(7)).await;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`ShardQueuer`]: struct.ShardQueuer.html

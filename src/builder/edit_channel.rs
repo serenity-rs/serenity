@@ -10,11 +10,18 @@ use std::collections::HashMap;
 ///
 /// Edit a channel, providing a new name and topic:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// # use serenity::{http::Http, model::id::ChannelId};
+/// #
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// #     let http = Http::default();
+/// #     let mut channel = ChannelId(0);
 /// // assuming a channel has already been bound
-/// if let Err(why) = channel::edit(|c| c.name("new name").topic("a test topic")) {
+/// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
 ///     // properly handle the error
 /// }
+/// #     Ok(())
+/// # }
 /// ```
 ///
 /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html

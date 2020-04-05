@@ -1,6 +1,6 @@
 //! The framework is a customizable method of separating commands.
 //!
-//! This is used in combination with [`Client::with_framework`].
+//! This is used in combination with [`Client::new_with_framework`].
 //!
 //! The framework has a number of configurations, and can have any number of
 //! commands bound to it. The primary purpose of it is to offer the utility of
@@ -36,18 +36,17 @@
 //! use serenity::model::channel::Message;
 //! use serenity::framework::standard::macros::{command, group};
 //! use serenity::framework::standard::{StandardFramework, CommandResult};
-//! use std::env;
 //!
 //! #[command]
-//! fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
-//!     msg.channel_id.say(&ctx.http, "A simple test bot")?;
+//! async fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
+//!     msg.channel_id.say(&ctx.http, "A simple test bot").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[command]
-//! fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-//!     msg.channel_id.say(&ctx.http, "pong!")?;
+//! async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+//!     msg.channel_id.say(&ctx.http, "pong!").await?;
 //!
 //!     Ok(())
 //! }
@@ -60,20 +59,23 @@
 //!
 //! impl EventHandler for Handler {}
 //!
-//! # fn main() {
-//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler).unwrap();
+//! # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+//! let token = std::env::var("DISCORD_TOKEN")?;
 //!
-//! client.with_framework(StandardFramework::new()
+//! let framework = StandardFramework::new()
 //!     .configure(|c| c.prefix("~"))
 //!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances
 //!     // containing any options you gave it. For instance, the group `name` and its `commands`.
 //!     // Their identifiers, names you can use to refer to these instances in code, are an
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
-//!     .group(&GENERAL_GROUP));
+//!     .group(&GENERAL_GROUP);
+//!
+//! let mut client = Client::new_with_framework(&token, Handler, framework).await?;
+//! #     Ok(())
 //! # }
 //! ```
 //!
-//! [`Client::with_framework`]: ../client/struct.Client.html#method.with_framework
+//! [`Client::new_with_framework`]: ../client/struct.Client.html#method.new_with_framework
 
 #[cfg(feature = "standard_framework")]
 pub mod standard;

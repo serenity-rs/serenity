@@ -92,17 +92,21 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!online" {
-    ///             ctx.online();
+    ///             ctx.online().await;
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
@@ -124,16 +128,21 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!idle" {
-    ///             ctx.idle();
+    ///             ctx.idle().await;
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
     ///
-    /// client.start().unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
@@ -155,16 +164,21 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "!dnd" {
-    ///             ctx.dnd();
+    ///             ctx.dnd().await;
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
     ///
-    /// client.start().unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
@@ -187,15 +201,19 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
-    ///         ctx.invisible();
+    ///     async fn ready(&self, ctx: Context, _: Ready) {
+    ///         ctx.invisible().await;
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
@@ -220,15 +238,19 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn resume(&self, ctx: Context, _: ResumedEvent) {
-    ///         ctx.reset_presence();
+    ///     async fn resume(&self, ctx: Context, _: ResumedEvent) {
+    ///         ctx.reset_presence().await;
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
@@ -247,8 +269,6 @@ impl Context {
     /// playing:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
     /// # use serenity::prelude::*;
     /// # use serenity::model::channel::Message;
     /// #
@@ -256,25 +276,23 @@ impl Context {
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
-    ///         let args = msg.content.splitn(2, ' ').collect::<Vec<&str>>();
+    ///     async fn message(&self, ctx: Context, msg: Message) {
+    ///         let mut args = msg.content.splitn(2, ' ');
     ///
-    ///         if args.len() < 2 || *unsafe { args.get_unchecked(0) } != "~setgame" {
-    ///             return;
+    ///         if let (Some("~setgame"), Some(game)) = (args.next(), args.next()) {
+    ///             ctx.set_activity(Activity::playing(game)).await;
     ///         }
-    ///
-    ///         ctx.set_activity(Activity::playing(*unsafe { args.get_unchecked(1) }));
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    ///
-    /// # #[cfg(not(feature = "model"))]
-    /// # fn main() {}
     /// ```
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
@@ -295,29 +313,35 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, ctx: Context, _: Ready) {
+    ///     async fn ready(&self, ctx: Context, _: Ready) {
     ///         use serenity::model::user::OnlineStatus;
     ///
     ///         ctx.set_presence(None, OnlineStatus::Idle);
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
     ///
-    /// client.start().unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
+    ///
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// Setting the current user as playing `"Heroes of the Storm"`, while being
     /// [`DoNotDisturb`]:
     ///
-    /// ```rust,ignore
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn ready(&self, context: Context, _: Ready) {
+    ///     async fn ready(&self, context: Context, _: Ready) {
     ///         use serenity::model::gateway::Activity;
     ///         use serenity::model::user::OnlineStatus;
     ///
@@ -328,9 +352,12 @@ impl Context {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token", Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb

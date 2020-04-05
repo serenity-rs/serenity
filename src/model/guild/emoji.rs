@@ -66,16 +66,13 @@ impl Emoji {
     /// Delete a given emoji:
     ///
     /// ```rust,no_run
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// # use serenity::client::Context;
     /// # use serenity::model::prelude::{EmojiId, Emoji, Role};
     /// #
     /// # #[command]
-    /// # fn example(ctx: &mut Context) -> CommandResult {
+    /// # async fn example(ctx: &mut Context) -> CommandResult {
     /// #     let mut emoji = serde_json::from_value::<Emoji>(json!({
     /// #         "animated": false,
     /// #         "id": EmojiId(7),
@@ -83,17 +80,15 @@ impl Emoji {
     /// #         "managed": false,
     /// #         "require_colons": false,
     /// #         "roles": Vec::<Role>::new(),
-    /// #     })).unwrap();
+    /// #     }))?;
     /// #
     /// // assuming emoji has been set already
-    /// match emoji.delete(&ctx) {
+    /// match emoji.delete(&ctx).await {
     ///     Ok(()) => println!("Emoji deleted."),
     ///     Err(_) => println!("Could not delete emoji.")
     /// }
     /// #    Ok(())
     /// # }
-    /// #
-    /// # fn main() { }
     /// ```
     #[cfg(all(feature = "cache", feature = "http"))]
     pub async fn delete<T>(&self, cache_and_http: T) -> Result<()>
@@ -144,15 +139,12 @@ impl Emoji {
     /// Print the guild id that owns this emoji:
     ///
     /// ```rust,no_run
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::{cache::{Cache, CacheRwLock}, model::{guild::{Emoji, Role}, id::EmojiId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # fn main() {
+    /// # async fn run() {
     /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
     /// #
     /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
@@ -165,7 +157,7 @@ impl Emoji {
     /// # })).unwrap();
     /// #
     /// // assuming emoji has been set already
-    /// if let Some(guild_id) = emoji.find_guild_id(&cache) {
+    /// if let Some(guild_id) = emoji.find_guild_id(&cache).await {
     ///     println!("{} is owned by {}", emoji.name, guild_id);
     /// }
     /// # }

@@ -145,14 +145,17 @@ impl StandardFramework {
     /// # impl EventHandler for Handler {}
     /// use serenity::Client;
     /// use serenity::framework::StandardFramework;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN").unwrap();
-    /// let mut client = Client::new(&token, Handler).unwrap();
-    /// client.with_framework(StandardFramework::new()
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let framework = StandardFramework::new()
     ///     .configure(|c| c
     ///         .with_whitespace(true)
-    ///         .prefix("~")));
+    ///         .prefix("~"));
+    ///
+    /// let mut client = Client::new_with_framework(&token, Handler, framework).await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Client`]: ../../client/struct.Client.html
@@ -177,24 +180,21 @@ impl StandardFramework {
     /// a 2 second delay inbetween invocations:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::framework::standard::macros::command;
     /// use serenity::framework::standard::{StandardFramework, CommandResult};
     ///
     /// #[command]
     /// // Registers the bucket `basic` to this command.
     /// #[bucket = "basic"]
-    /// fn nothing() -> CommandResult {
+    /// async fn nothing() -> CommandResult {
     ///     Ok(())
     /// }
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .bucket("basic", |b| b.delay(2).time_span(10).limit(3)));
+    /// # async fn run() {
+    /// let framework = StandardFramework::new()
+    ///     .bucket("basic", |b| b.delay(2).time_span(10).limit(3))
+    ///     .await;
+    /// # }
     /// ```
     #[inline]
     pub async fn bucket<F>(self, name: &str, f: F) -> Self
@@ -352,15 +352,15 @@ impl StandardFramework {
     ///
     /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
     /// #[command]
-    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "pong!")?;
+    /// async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "pong!").await?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[command]
-    /// fn pong(ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "ping!")?;
+    /// async fn pong(ctx: &mut Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "ping!").await?;
     ///
     ///     Ok(())
     /// }
@@ -369,13 +369,9 @@ impl StandardFramework {
     /// #[commands(ping, pong)]
     /// struct BingBong;
     ///
-    /// # fn main() -> Result<(), Box<dyn StdError>> {
-    /// #   let mut client = Client::new("token", Handler)?;
-    /// client.with_framework(StandardFramework::new()
+    /// let framework = StandardFramework::new()
     ///     // Groups' names are changed to all uppercase, plus appended with `_GROUP`.
-    ///     .group(&BINGBONG_GROUP));
-    /// #   Ok(())
-    /// # }
+    ///     .group(&BINGBONG_GROUP);
     /// ```
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
         self.group_add(group);
@@ -423,30 +419,30 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// use serenity::framework::standard::DispatchError::{NotEnoughArguments,
-    /// TooManyArguments};
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::standard::DispatchError;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .on_dispatch_error(|context, msg, error| {
-    ///         match error {
-    ///             NotEnoughArguments { min, given } => {
-    ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
+    /// #[hook]
+    /// async fn dispatch_error_hook(context: &mut Context, msg: &Message, error: DispatchError) {
+    ///     match error {
+    ///         DispatchError::NotEnoughArguments { min, given } => {
+    ///             let s = format!("Need {} arguments, but only got {}.", min, given);
     ///
-    ///                 let _ = msg.channel_id.say(&context.http, &s);
-    ///             },
-    ///             TooManyArguments { max, given } => {
-    ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
+    ///             let _ = msg.channel_id.say(&context, &s).await;
+    ///         },
+    ///         DispatchError::TooManyArguments { max, given } => {
+    ///             let s = format!("Max arguments allowed is {}, but got {}.", max, given);
     ///
-    ///                 let _ = msg.channel_id.say(&context.http, &s);
-    ///             },
-    ///             _ => println!("Unhandled dispatch error."),
-    ///         }
-    ///     }));
+    ///             let _ = msg.channel_id.say(&context, &s).await;
+    ///         },
+    ///         _ => println!("Unhandled dispatch error."),
+    ///     }
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .on_dispatch_error(dispatch_error_hook);
     /// ```
     pub fn on_dispatch_error(mut self, f: DispatchHook) -> Self {
         self.dispatch = Some(f);
@@ -470,44 +466,43 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .before(|ctx, msg, cmd_name| {
-    ///         println!("Running command {}", cmd_name);
-    ///         true
-    ///     }));
+    /// #[hook]
+    /// async fn before_hook(_: &mut Context, _: &Message, cmd_name: &str) -> bool {
+    ///     println!("Running command {}", cmd_name);
+    ///     true
+    /// }
+    /// let framework = StandardFramework::new()
+    ///     .before(before_hook);
     /// ```
     ///
     /// Using before to prevent command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .before(|ctx, msg, cmd_name| {
-    ///         if let Ok(channel) = msg.channel_id.to_channel(ctx) {
-    ///             //  Don't run unless in nsfw channel
-    ///             if !channel.is_nsfw() {
-    ///                 return false;
-    ///             }
+    /// #[hook]
+    /// async fn before_hook(ctx: &mut Context, msg: &Message, cmd_name: &str) -> bool {
+    ///     if let Ok(channel) = msg.channel_id.to_channel(ctx).await {
+    ///         //  Don't run unless in nsfw channel
+    ///         if !channel.is_nsfw().await {
+    ///             return false;
     ///         }
+    ///     }
     ///
-    ///         println!("Running command {}", cmd_name);
+    ///     println!("Running command {}", cmd_name);
     ///
-    ///         true
-    ///     }));
+    ///     true
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .before(before_hook);
     /// ```
     ///
     pub fn before(mut self, f: BeforeHook) -> Self {
@@ -525,20 +520,21 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::standard::CommandError;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .after(|ctx, msg, cmd_name, error| {
-    ///         //  Print out an error if it happened
-    ///         if let Err(why) = error {
-    ///             println!("Error in {}: {:?}", cmd_name, why);
-    ///         }
-    ///     }));
+    /// #[hook]
+    /// async fn after_hook(_: &mut Context, _: &Message, cmd_name: &str, error: Result<(), CommandError>) {
+    ///     //  Print out an error if it happened
+    ///     if let Err(why) = error {
+    ///         println!("Error in {}: {:?}", cmd_name, why);
+    ///     }
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .after(after_hook);
     /// ```
     pub fn after(mut self, f: AfterHook) -> Self {
         self.after = Some(f);
@@ -554,17 +550,19 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .unrecognised_command(|_ctx, msg, unrecognised_command_name| {
-    ///        println!("A user named {:?} tried to executute an unknown command: {}", msg.author.name, unrecognised_command_name);
-    ///     }));
+    /// #[hook]
+    /// async fn unrecognised_command_hook(_: &mut Context, msg: &Message, unrecognised_command_name: &str) {
+    ///     println!("A user named {:?} tried to executute an unknown command: {}",
+    ///         msg.author.name, unrecognised_command_name
+    ///     );
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .unrecognised_command(unrecognised_command_hook);
     /// ```
     pub fn unrecognised_command(mut self, f: UnrecognisedHook) -> Self {
         self.unrecognised_command = Some(Arc::new(f));
@@ -580,17 +578,17 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .normal_message(|ctx, msg| {
-    ///         println!("Received a generic message: {:?}", msg.content);
-    ///     }));
+    /// #[hook]
+    /// async fn normal_message_hook(_: &mut Context, msg: &Message) {
+    ///     println!("Received a generic message: {:?}", msg.content);
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .normal_message(normal_message_hook);
     /// ```
     pub fn normal_message(mut self, f: NormalMessageHook) -> Self {
         self.normal_message = Some(Arc::new(f));

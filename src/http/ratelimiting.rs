@@ -113,15 +113,19 @@ impl Ratelimiter {
     /// View the `reset` time of the route for `ChannelsId(7)`:
     ///
     /// ```rust,no_run
-    /// use serenity::http::{ratelimiting::{Route}};
+    /// use serenity::http::ratelimiting::Route;
     /// # use serenity::http::Http;
-    /// # let http = Http::default();
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
     /// let routes = http.ratelimiter.routes();
     /// let reader = routes.read().await;
     ///
     /// if let Some(route) = reader.get(&Route::ChannelsId(7)) {
     ///     println!("Reset time at: {}", route.lock().await.reset());
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Ratelimit`]: struct.Ratelimit.html
