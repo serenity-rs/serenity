@@ -1,7 +1,6 @@
 use byteorder::{
     BigEndian,
     ByteOrder,
-    LittleEndian,
     ReadBytesExt,
     WriteBytesExt
 };
@@ -174,7 +173,7 @@ impl Connection {
             let pos = 4 + index;
             let addr = String::from_utf8_lossy(&bytes[4..pos]);
             let port_pos = len - 2;
-            let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
+            let port = (&bytes[port_pos..]).read_u16::<BigEndian>()?;
 
             client
                 .send_json(&payload::build_select_protocol(addr, port))?;
