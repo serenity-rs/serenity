@@ -36,6 +36,7 @@ use serenity::{
         self,
         Event,
         EventContext,
+        RestartableSource,
         TrackEvent,
         TrackQueue,
     },
@@ -294,7 +295,18 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match voice::ytdl(&url) {
+        // let source = match voice::ytdl(&url) {
+        //     Ok(source) => source,
+        //     Err(why) => {
+        //         println!("Err starting source: {:?}", why);
+
+        //         check_msg(msg.channel_id.say(&ctx.http, "Error sourcing ffmpeg"));
+
+        //         return Ok(());
+        //     },
+        // };
+
+        let source = match RestartableSource::ffmpeg("test.mp3") {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
@@ -307,30 +319,41 @@ fn play_fade(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult 
 
         // This handler object will allow you to, as needed,
         // control the audio track via events and further commands.
-        let song = handler.play_source(source);
+        let song = handler.play_source(source.into_input());
         let send_http = ctx.http.clone();
         let chan_id = msg.channel_id;
 
         // This shows how t0 periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
+        // let _ = song.add_event(
+        //     Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
+        //     // Event::Delayed(Duration::from_secs(2)),
+        //     move |evt_ctx| {
+        //         if let EventContext::Track(state, aud) = evt_ctx {
+        //             let _ = aud.set_volume(state.volume / 2.0);
+
+        //             if state.volume < 1e-2 {
+        //                 let _ = aud.stop();
+        //                 check_msg(chan_id.say(&send_http, "Stopping song..."));
+        //                 Some(Event::Cancel)
+        //             } else {
+        //                 check_msg(chan_id.say(&send_http, "Volume reduced."));
+        //                 None
+        //             }
+        //         } else {
+        //             None
+        //         }
+        //     },
+        // );
+
         let _ = song.add_event(
-            Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
+            Event::Periodic(Duration::from_secs(10), None),
             // Event::Delayed(Duration::from_secs(2)),
             move |evt_ctx| {
                 if let EventContext::Track(state, aud) = evt_ctx {
-                    let _ = aud.set_volume(state.volume / 2.0);
-
-                    if state.volume < 1e-2 {
-                        let _ = aud.stop();
-                        check_msg(chan_id.say(&send_http, "Stopping song..."));
-                        Some(Event::Cancel)
-                    } else {
-                        check_msg(chan_id.say(&send_http, "Volume reduced."));
-                        None
-                    }
-                } else {
-                    None
+                    let _ = aud.seek(Duration::from_secs(0));
                 }
+                None
             },
         );
 

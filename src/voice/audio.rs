@@ -1,7 +1,17 @@
-use audiopus::{Bitrate, SampleRate};
+use audiopus::{
+    coder::Decoder as OpusDecoder,
+    Bitrate,
+    SampleRate,
+};
 use parking_lot::Mutex;
 use std::{
     collections::VecDeque,
+    io::{
+        Read,
+        Result as IoResult,
+        Seek,
+        SeekFrom,
+    },
     sync::{
         mpsc::{
             self,
@@ -24,32 +34,39 @@ use super::{
         TrackEvent,
     },
     Handler,
+    InputSource,
 };
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
 pub const DEFAULT_BITRATE: Bitrate = Bitrate::BitsPerSecond(128_000);
 
-/// A readable audio source.
-pub trait AudioSource: Send {
-    fn is_stereo(&mut self) -> bool;
+pub trait ReadSeek {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize>;
 
-    fn get_type(&self) -> AudioType;
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64>;
+}
 
-    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
+impl Read for dyn ReadSeek {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
+        ReadSeek::read(self, buf)
+    }
+}
 
-    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
+impl Seek for dyn ReadSeek {
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
+        ReadSeek::seek(self, pos)
+    }
+}
 
-    fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
+impl<R: Read + Seek> ReadSeek for R {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize>{
+        Read::read(self, buf)
+    }
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> Option<usize>;
-
-    fn is_seekable(&self) -> bool;
-
-    // FIXME: make into Result
-    fn seek(&mut self, time: Duration) -> Option<Duration>;
-
-    fn consume(&mut self, amt: usize) -> Option<usize>;
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64>{
+        Seek::seek(self, pos)
+    }
 }
 
 /// A receiver for incoming audio.
@@ -70,20 +87,31 @@ pub trait AudioReceiver: Send {
     fn client_disconnect(&mut self, _user_id: u64) { }
 }
 
-/// Marker trait used to prevent incorrect chaining of buffered [`AudioSource`]s.
-/// Ideally, only raw handles should be wrapped by mechanisms like [`MemorySource`].
-///
-/// [`AudioSource`]: trait.AudioSource.html
-/// [`MemorySource`]: struct.MemorySource.html
-pub trait RawAudioSource {}
-
-#[derive(Clone, Copy)]
+#[non_exhaustive]
+#[derive(Copy, Clone)]
 pub enum AudioType {
     Opus,
     Pcm,
     FloatPcm,
-    #[doc(hidden)]
-    __Nonexhaustive,
+}
+
+#[non_exhaustive]
+pub enum AudioTypeData {
+    Opus(OpusDecoder),
+    Pcm,
+    FloatPcm,
+}
+
+#[non_exhaustive]
+pub enum AudioContainer {
+    Raw,
+    Dca1,
+}
+
+#[non_exhaustive]
+pub enum AudioContainerData {
+    Raw,
+    Dca1(),
 }
 
 /// Control object for audio playback.
@@ -140,7 +168,7 @@ pub struct Audio {
     /// Underlying data access object.
     ///
     /// *Calling code is not expected to use this.*
-    pub source: Box<dyn AudioSource>,
+    pub source: InputSource,
 
     /// The current position for playback.
     ///
@@ -170,7 +198,7 @@ pub struct Audio {
 }
 
 impl Audio {
-    pub fn new(source: Box<dyn AudioSource>, commands: Receiver<AudioCommand>, handle: AudioHandle) -> Self {
+    pub fn new(source: InputSource, commands: Receiver<AudioCommand>, handle: AudioHandle) -> Self {
         Self {
             playing: true,
             volume: 1.0,
@@ -260,7 +288,7 @@ impl Audio {
                         Pause => {self.pause();},
                         Stop => {self.stop();},
                         Volume(vol) => {self.volume(vol);},
-                        Seek(time) => {self.source.seek(time);},
+                        Seek(time) => {self.source.seek_time(time);},
                         AddEvent(evt) => self.events.add_event(evt, self.position),
                         Do(action) => action(self),
                         Request(tx) => {let _ = tx.send(Box::new(self.get_state()));},
@@ -304,7 +332,7 @@ impl Audio {
 ///
 /// [`Audio`]: struct.Audio.html
 /// [`AudioHandle`]: struct.AudioHandle.html
-pub fn create_player(source: Box<dyn AudioSource>) -> (Audio, AudioHandle) {
+pub fn create_player(source: InputSource) -> (Audio, AudioHandle) {
     let (tx, rx) = mpsc::channel();
     let can_seek = source.is_seekable();
     let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
@@ -586,7 +614,7 @@ impl TrackQueue {
     }
 
     /// Adds an audio source to the queue, to be played in the channel managed by `handler`.
-    pub fn add_source(&self, source: Box<dyn AudioSource>, handler: &mut Handler) {
+    pub fn add_source(&self, source: InputSource, handler: &mut Handler) {
         let (audio, audio_handle) = create_player(source);
         self.add(audio, audio_handle, handler);
     }

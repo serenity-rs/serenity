@@ -425,27 +425,7 @@ impl Connection {
             }
 
             let now = Instant::now();
-            let temp_len = match stream.get_type() {
-                AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
-                        opus_frame.len()
-                    } else {
-                        0
-                    },
-                AudioType::Pcm => {
-                    match stream.add_pcm_frame(&mut mix_buffer, source_stereo, vol) {
-                        Some(len) => len,
-                        None => 0,
-                    }
-                },
-                AudioType::FloatPcm => {
-                    match stream.add_float_pcm_frame(&mut mix_buffer, source_stereo, vol) {
-                        Some(len) => len,
-                        None => 0,
-                    }
-                },
-                AudioType::__Nonexhaustive => unreachable!(),
-            };
-
+            let temp_len = stream.mix(&mut mix_buffer, source_stereo, vol);
             let later = Instant::now();
 
             *time_in_call += later - now;
