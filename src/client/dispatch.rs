@@ -87,10 +87,10 @@ pub(crate) enum DispatchEvent {
     __Nonexhaustive,
 }
 
-#[cfg(feature = "framework")]
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<'rec>(
     event: DispatchEvent,
+    #[cfg(feature = "framework")]
     framework: &'rec Arc<Option<Box<dyn Framework + Send + Sync >>>,
     data: &'rec Arc<RwLock<ShareMap>>,
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
@@ -118,13 +118,16 @@ pub(crate) fn dispatch<'rec>(
                             h,
                         ).await;
 
-                        let framework = Arc::clone(&framework);
+                        #[cfg(feature = "framework")]
+                        {
+                            let framework = Arc::clone(&framework);
 
-                        tokio::spawn(async move {
-                            if let Some(ref framework) = *framework {
-                                framework.dispatch(context, event.message).await;
-                            }
-                        });
+                            tokio::spawn(async move {
+                                if let Some(ref framework) = *framework {
+                                    framework.dispatch(context, event.message).await;
+                                }
+                            });
+                        }
                     },
                     other => {
                         handle_event(
@@ -155,6 +158,7 @@ pub(crate) fn dispatch<'rec>(
             (Some(_), Some(_)) => {
                 if let DispatchEvent::Model(ref e) = event {
                         dispatch(DispatchEvent::Model(e.clone()),
+                                #[cfg(feature = "framework")]
                                 framework,
                                 data,
                                 &None,
@@ -166,6 +170,7 @@ pub(crate) fn dispatch<'rec>(
                 }
 
                 dispatch(event,
+                    #[cfg(feature = "framework")]
                     framework,
                     data,
                     event_handler,
@@ -174,86 +179,6 @@ pub(crate) fn dispatch<'rec>(
                     shard_id,
                     cache_and_http)
                 .await;
-            }
-        };
-    }.boxed()
-}
-
-#[cfg(not(feature = "framework"))]
-pub(crate) fn dispatch<'rec>(
-    event: DispatchEvent,
-    data: &'rec Arc<RwLock<ShareMap>>,
-    event_handler: &'rec Option<Arc<dyn EventHandler>>,
-    raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
-    runner_tx: &'rec Sender<InterMessage>,
-    shard_id: u64,
-    cache_and_http: Arc<CacheAndHttp>,
-) -> BoxFuture<'rec, ()> {
-    async move {
-        match (event_handler, raw_event_handler) {
-            (None, None) => {}, // Do nothing
-            (Some(ref h), None) => {
-                match event {
-                    DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                        update(&cache_and_http, &mut event).await;
-
-                        #[cfg(not(feature = "cache"))]
-                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                        #[cfg(feature = "cache")]
-                        let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
-
-                        dispatch_message(
-                            context.clone(),
-                            event.message.clone(),
-                            h,
-                        ).await;
-                    },
-                    other => {
-                        handle_event(
-                            other,
-                            data,
-                            h,
-                            runner_tx,
-                            shard_id,
-                            cache_and_http,
-                        ).await;
-                    }
-                }
-            },
-            (None, Some(ref rh)) => {
-                match event {
-                    DispatchEvent::Model(e) => {
-                        #[cfg(not(feature = "cache"))]
-                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                        #[cfg(feature = "cache")]
-                        let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
-
-                        let event_handler = Arc::clone(rh);
-
-                        tokio::spawn(async move {
-                            event_handler.raw_event(context, e).await;
-                        });
-                    },
-                    _ => {}
-                }
-            },
-            (Some(ref h), Some(ref rh)) => {
-                if let DispatchEvent::Model(ref e) = event {
-                        dispatch(DispatchEvent::Model(e.clone()),
-                                 data,
-                                 &None,
-                                 raw_event_handler,
-                                 runner_tx,
-                                 shard_id,
-                                 Arc::clone(&cache_and_http)).await;
-                }
-                dispatch(event,
-                         data,
-                         event_handler,
-                         &None,
-                         runner_tx,
-                         shard_id,
-                         cache_and_http).await;
             }
         };
     }.boxed()
