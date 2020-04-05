@@ -34,7 +34,6 @@ impl Mentionable for Channel {
         match *self {
             Channel::Guild(ref x) => x.read().await.mention().await,
             Channel::Private(ref x) => x.read().await.mention().await,
-            Channel::Group(ref x) => x.read().await.mention().await,
             Channel::Category(ref x) => x.read().await.mention().await,
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -59,13 +58,6 @@ impl Mentionable for CurrentUser {
 impl Mentionable for Emoji {
     async fn mention(&self) -> String {
         format!("<:{}:{}>", self.name, self.id.0)
-    }
-}
-
-#[async_trait]
-impl Mentionable for Group {
-  async fn mention(&self) -> String {
-        format!("<#{}>", self.channel_id.0)
     }
 }
 
@@ -351,6 +343,7 @@ mod test {
             };
             let role = Role {
                 id: RoleId(2),
+                guild_id: GuildId(1),
                 colour: Colour::ROSEWATER,
                 hoist: false,
                 managed: false,

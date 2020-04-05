@@ -109,7 +109,6 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Group(ref group) => futures::executor::block_on(group.read()).channel_id,
             Channel::Private(ref channel) => futures::executor::block_on(channel.read()).id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
@@ -197,43 +196,12 @@ pub fn serialize_sync_user<S: Serializer>(
     User::serialize(&*futures::executor::block_on(user.read()), serializer)
 }
 
-pub fn deserialize_users<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, Arc<RwLock<User>>>, D::Error> {
-    let vec: Vec<User> = Deserialize::deserialize(deserializer)?;
-    let mut users = HashMap::new();
-
-    for user in vec {
-        users.insert(user.id, Arc::new(RwLock::new(user)));
-    }
-
-    Ok(users)
-}
-
-pub fn serialize_users<S: Serializer>(
-    users: &HashMap<UserId, Arc<RwLock<User>>>,
-    serializer: S
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(users.len()))?;
-
-    for user in users.values() {
-        seq.serialize_element(&*futures::executor::block_on(user.read()))?;
-    }
-
-    seq.end()
-}
-
 pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
     deserializer.deserialize_any(U16Visitor)
 }
 
 pub fn deserialize_u64<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
     deserializer.deserialize_any(U64Visitor)
-}
-
-/// Deserializes an u64, returning 0 if the deserialization failed.
-pub fn deserialize_u64_or_zero<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u64, D::Error> {
-    deserialize_u64(deserializer).or(Ok(0))
 }
 
 #[allow(clippy::trivially_copy_pass_by_ref)]
@@ -300,7 +268,7 @@ pub async fn user_has_perms(
 
             match channel {
                 Channel::Guild(channel) => channel.read().await.guild_id,
-                Channel::Group(_) | Channel::Private(_) | Channel::Category(_) => {
+                Channel::Private(_) | Channel::Category(_) => {
                     // Both users in DMs, all users in groups, and maybe all channels in categories
                     // will have the same permissions.
                     //

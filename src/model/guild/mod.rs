@@ -881,6 +881,18 @@ impl Guild {
         self.id.kick(&http, user_id).await
     }
 
+    /// Kicks a [`Member`] from the guild and specifies the reason.
+    ///
+    /// Requires the [Kick Members] permission.
+    ///
+    /// [`Member`]: struct.Member.html
+    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    #[cfg(feature = "http")]
+    #[inline]
+    pub async fn kick_with_reason<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U, reason: &str) -> Result<()> {
+        self.id.kick_with_reason(&http, user_id, reason).await
+    }
+
     /// Leaves the guild.
     #[inline]
     pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
@@ -1374,7 +1386,8 @@ impl Guild {
                     | Permissions::MUTE_MEMBERS
                     | Permissions::DEAFEN_MEMBERS
                     | Permissions::MOVE_MEMBERS
-                    | Permissions::USE_VAD);
+                    | Permissions::USE_VAD
+                    | Permissions::STREAM);
             }
 
             // Apply the permission overwrites for the channel for each of the
@@ -1756,6 +1769,15 @@ impl<'de> Deserialize<'de> for Guild {
                 for value in array {
                     if let Some(member) = value.as_object_mut() {
                         member
+                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    }
+                }
+            }
+
+            if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
+                for value in array {
+                    if let Some(role) = value.as_object_mut() {
+                        role
                             .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
                     }
                 }

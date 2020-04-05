@@ -236,7 +236,6 @@ async fn handle_event(
                         event_handler.private_channel_create(context, channel).await;
                     });
                 },
-                Channel::Group(_) => {},
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
@@ -258,7 +257,7 @@ async fn handle_event(
             update(&cache_and_http, &mut event).await;
 
             match event.channel {
-                Channel::Private(_) | Channel::Group(_) => {},
+                Channel::Private(_) => {},
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
@@ -282,32 +281,6 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 event_handler.channel_pins_update(context, event).await;
-            });
-        },
-        DispatchEvent::Model(Event::ChannelRecipientAdd(mut event)) => {
-            update(&cache_and_http, &mut event).await;
-
-            let event_handler = Arc::clone(event_handler);
-
-            tokio::spawn(async move {
-                event_handler.channel_recipient_addition(
-                    context,
-                    event.channel_id,
-                    event.user,
-                ).await;
-            });
-        },
-        DispatchEvent::Model(Event::ChannelRecipientRemove(mut event)) => {
-            update(&cache_and_http, &mut event).await;
-
-            let event_handler = Arc::clone(event_handler);
-
-            tokio::spawn(async move {
-                event_handler.channel_recipient_removal(
-                    context,
-                    event.channel_id,
-                    event.user,
-                ).await;
             });
         },
         DispatchEvent::Model(Event::ChannelUpdate(mut event)) => {

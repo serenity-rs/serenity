@@ -2,8 +2,6 @@
 use crate::http::CacheHttp;
 use crate::{internal::RwLockExt, model::prelude::*};
 
-#[cfg(all(feature = "model", feature = "cache"))]
-use std::borrow::Cow;
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
@@ -453,10 +451,6 @@ impl ChannelId {
 
         Some(match channel {
             Channel::Guild(channel) => channel.read().await.name().to_string(),
-            Channel::Group(channel) => match channel.read().await.name().await {
-                Cow::Borrowed(name) => name.to_string(),
-                Cow::Owned(name) => name,
-            },
             Channel::Category(category) => category.read().await.name.to_string(),
             Channel::Private(channel) => channel.read().await.name().await,
             Channel::__Nonexhaustive => unreachable!(),
@@ -781,7 +775,6 @@ impl From<Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: Channel) -> ChannelId {
         match channel {
-            Channel::Group(group) => futures::executor::block_on(group.with(|g| g.channel_id)),
             Channel::Guild(ch) => futures::executor::block_on(ch.with(|c| c.id)),
             Channel::Private(ch) => futures::executor::block_on(ch.with(|c| c.id)),
             Channel::Category(ch) => futures::executor::block_on(ch.with(|c| c.id)),
@@ -794,7 +787,6 @@ impl<'a> From<&'a Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: &Channel) -> ChannelId {
         futures::executor::block_on(match *channel {
-            Channel::Group(ref group) => group.with(|g| g.channel_id),
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
             Channel::Category(ref ch) => ch.with(|c| c.id),

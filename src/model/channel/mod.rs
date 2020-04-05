@@ -3,7 +3,6 @@
 mod attachment;
 mod channel_id;
 mod embed;
-mod group;
 mod guild_channel;
 mod message;
 mod private_channel;
@@ -15,7 +14,6 @@ use crate::http::CacheHttp;
 pub use self::attachment::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
-pub use self::group::*;
 pub use self::guild_channel::*;
 pub use self::message::*;
 pub use self::private_channel::*;
@@ -49,8 +47,6 @@ use async_trait::async_trait;
 /// A container for any channel.
 #[derive(Clone, Debug)]
 pub enum Channel {
-    /// A group. A group comprises of only one channel.
-    Group(Arc<RwLock<Group>>),
     /// A [text] or [voice] channel within a [`Guild`].
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
@@ -71,50 +67,10 @@ pub enum Channel {
 }
 
 impl Channel {
-    /// Converts from `Channel` to `Option<Arc<RwLock<Group>>>`.
-    ///
-    /// Converts `self` into an `Option<Arc<RwLock<Group>>>`, consuming `self`,
-    /// and discarding a `GuildChannel`, `PrivateChannel`, or `ChannelCategory`,
-    /// if any.
-    ///
-    /// # Examples
-    ///
-    /// Basic usage:
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(all(feature = "model", feature = "cache"))]
-    /// # async fn run() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
-    /// # use tokio::sync::RwLock;
-    /// # use std::sync::Arc;
-    /// #
-    /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// #     let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
-    /// #
-    /// match channel.group() {
-    ///     Some(group_lock) => {
-    ///         if let Some(ref name) = group_lock.read().await.name {
-    ///             println!("It's a group named {}!", name);
-    ///         } else {
-    ///              println!("It's an unnamed group!");
-    ///         }
-    ///     },
-    ///     None => { println!("It's not a group!"); },
-    /// }
-    /// #
-    /// # }
-    /// ```
-    pub fn group(self) -> Option<Arc<RwLock<Group>>> {
-        match self {
-            Channel::Group(lock) => Some(lock),
-            _ => None,
-        }
-    }
-
     /// Converts from `Channel` to `Option<Arc<RwLock<GuildChannel>>>`.
     ///
     /// Converts `self` into an `Option<Arc<RwLock<GuildChannel>>>`, consuming
-    /// `self`, and discarding a `Group`, `PrivateChannel`, or
+    /// `self`, and discarding a `PrivateChannel`, or
     /// `ChannelCategory`, if any.
     ///
     /// # Examples
@@ -149,7 +105,7 @@ impl Channel {
     /// Converts from `Channel` to `Option<Arc<RwLock<PrivateChannel>>>`.
     ///
     /// Converts `self` into an `Option<Arc<RwLock<PrivateChannel>>>`, consuming
-    /// `self`, and discarding a `Group`, `GuildChannel`, or `ChannelCategory`,
+    /// `self`, and discarding a `GuildChannel`, or `ChannelCategory`,
     /// if any.
     ///
     /// # Examples
@@ -187,7 +143,7 @@ impl Channel {
     /// Converts from `Channel` to `Option<Arc<RwLock<ChannelCategory>>>`.
     ///
     /// Converts `self` into an `Option<Arc<RwLock<ChannelCategory>>>`,
-    /// consuming `self`, and discarding a `Group`, `GuildChannel`, or
+    /// consuming `self`, and discarding a `GuildChannel`, or
     /// `PrivateChannel`, if any.
     ///
     /// # Examples
@@ -224,17 +180,9 @@ impl Channel {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
-    ///
-    /// **Note**: There is no real function as _deleting_ a [`Group`]. The
-    /// closest functionality is leaving it.
-    ///
-    /// [`Group`]: struct.Group.html
     #[cfg(all(feature = "model", feature = "http"))]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match *self {
-            Channel::Group(ref group) => {
-                let _ = group.read().await.leave(cache_http.http()).await?;
-            },
             Channel::Guild(ref public_channel) => {
                 let _ = public_channel.read().await.delete(cache_http).await?;
             },
@@ -257,20 +205,18 @@ impl Channel {
         match *self {
             Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()).await,
             Channel::Category(ref category) => category.with(|c| c.is_nsfw()).await,
-            Channel::Group(_) | Channel::Private(_) => false,
+            Channel::Private(_) => false,
             Channel::__Nonexhaustive => unreachable!(),
         }
     }
 
-    /// Retrieves the Id of the inner [`Group`], [`GuildChannel`], or
+    /// Retrieves the Id of the inner [`GuildChannel`], or
     /// [`PrivateChannel`].
     ///
-    /// [`Group`]: struct.Group.html
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     pub async fn id(&self) -> ChannelId {
         match *self {
-            Channel::Group(ref group) => group.with(|g| g.channel_id),
             Channel::Guild(ref ch) => ch.with(|c| c.id),
             Channel::Private(ref ch) => ch.with(|c| c.id),
             Channel::Category(ref category) => category.with(|c| c.id),
@@ -310,10 +256,7 @@ impl<'de> Deserialize<'de> for Channel {
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
                 .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
                 .map_err(DeError::custom),
-            3 => serde_json::from_value::<Group>(Value::Object(v))
-                .map(|x| Channel::Group(Arc::new(RwLock::new(x))))
-                .map_err(DeError::custom),
-            4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
+            3 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
                 .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
@@ -327,9 +270,6 @@ impl Serialize for Channel {
         match *self {
             Channel::Category(ref c) => {
                 ChannelCategory::serialize(&*futures::executor::block_on(c.read()), serializer)
-            },
-            Channel::Group(ref c) => {
-                Group::serialize(&*futures::executor::block_on(c.read()), serializer)
             },
             Channel::Guild(ref c) => {
                 GuildChannel::serialize(&*futures::executor::block_on(c.read()), serializer)
@@ -348,19 +288,14 @@ impl Display for Channel {
     ///
     /// This will return a different format for each type of channel:
     ///
-    /// - [`Group`]s: the generated name retrievable via [`Group::name`];
     /// - [`PrivateChannel`]s: the recipient's name;
     /// - [`GuildChannel`]s: a string mentioning the channel that users who can
     /// see the channel can click on.
     ///
-    /// [`Group`]: struct.Group.html
-    /// [`Group::name`]: struct.Group.html#method.name
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
-            Channel::Group(ref group) =>
-                Display::fmt(&futures::executor::block_on(futures::executor::block_on(group.read()).name()), f),
             Channel::Guild(ref ch) =>
                 Display::fmt(&futures::executor::block_on(futures::executor::block_on(ch.read()).id.mention()), f),
             Channel::Private(ref ch) => {
@@ -391,10 +326,6 @@ pub enum ChannelType {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     Voice = 2,
-    /// An indicator that the channel is the channel of a [`Group`].
-    ///
-    /// [`Group`]: struct.Group.html
-    Group = 3,
     /// An indicator that the channel is the channel of a [`ChannelCategory`].
     ///
     /// [`ChannelCategory`]: struct.ChannelCategory.html
@@ -420,7 +351,6 @@ enum_number!(
         Text,
         Private,
         Voice,
-        Group,
         Category,
         News,
         Store,
@@ -430,7 +360,6 @@ enum_number!(
 impl ChannelType {
     pub fn name(&self) -> &str {
         match *self {
-            ChannelType::Group => "group",
             ChannelType::Private => "private",
             ChannelType::Text => "text",
             ChannelType::Voice => "voice",
@@ -446,7 +375,6 @@ impl ChannelType {
             ChannelType::Text => 0,
             ChannelType::Private => 1,
             ChannelType::Voice => 2,
-            ChannelType::Group => 3,
             ChannelType::Category => 4,
             ChannelType::News => 5,
             ChannelType::Store => 6,
@@ -533,19 +461,6 @@ mod test {
         use std::collections::HashMap;
         use std::sync::Arc;
 
-        fn group() -> Group {
-            Group {
-                channel_id: ChannelId(1),
-                icon: None,
-                last_message_id: None,
-                last_pin_timestamp: None,
-                name: None,
-                owner_id: UserId(2),
-                recipients: HashMap::new(),
-                _nonexhaustive: (),
-            }
-        }
-
         fn guild_channel() -> GuildChannel {
             GuildChannel {
                 id: ChannelId(1),
@@ -609,9 +524,6 @@ mod test {
 
             let channel = Channel::Guild(Arc::new(RwLock::new(channel)));
             assert!(!channel.is_nsfw().await);
-
-            let group = group();
-            assert!(!group.is_nsfw());
 
             let private_channel = private_channel();
             assert!(!private_channel.is_nsfw());

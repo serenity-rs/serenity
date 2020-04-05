@@ -20,24 +20,30 @@ pub trait ParseMap {
 
 #[derive(Debug, Default)]
 pub struct CommandMap {
-    cmds: HashMap<&'static str, (&'static Command, Arc<CommandMap>)>,
+    cmds: HashMap<String, (&'static Command, Arc<CommandMap>)>,
     min_length: usize,
     max_length: usize,
 }
 
 impl CommandMap {
-    pub fn new(cmds: &[&'static Command]) -> Self {
+    pub fn new(cmds: &[&'static Command], conf: &Configuration) -> Self {
         let mut map = Self::default();
 
         for cmd in cmds {
-            let sub_map = Arc::new(Self::new(&cmd.options.sub_commands));
+            let sub_map = Arc::new(Self::new(&cmd.options.sub_commands, conf));
 
             for name in cmd.options.names {
                 let len = name.chars().count();
                 map.min_length = std::cmp::min(len, map.min_length);
                 map.max_length = std::cmp::max(len, map.max_length);
 
-                map.cmds.insert(*name, (*cmd, sub_map.clone()));
+                let name = if conf.case_insensitive {
+                    name.to_lowercase()
+                } else {
+                    name.to_string()
+                };
+
+                map.cmds.insert(name, (*cmd, sub_map.clone()));
             }
         }
 
@@ -60,7 +66,7 @@ impl ParseMap for CommandMap {
 
     #[inline]
     fn get(&self, name: &str) -> Option<Self::Storage> {
-        self.cmds.get(&name).cloned()
+        self.cmds.get(name).cloned()
     }
 
     #[inline]
@@ -77,12 +83,12 @@ pub struct GroupMap {
 }
 
 impl GroupMap {
-    pub fn new(groups: &[&'static CommandGroup]) -> Self {
+    pub fn new(groups: &[&'static CommandGroup], conf: &Configuration) -> Self {
         let mut map = Self::default();
 
         for group in groups {
-            let subgroups_map = Arc::new(Self::new(&group.options.sub_groups));
-            let commands_map = Arc::new(CommandMap::new(&group.options.commands));
+            let subgroups_map = Arc::new(Self::new(&group.options.sub_groups, conf));
+            let commands_map = Arc::new(CommandMap::new(&group.options.commands, conf));
 
             for prefix in group.options.prefixes {
                 let len = prefix.chars().count();
