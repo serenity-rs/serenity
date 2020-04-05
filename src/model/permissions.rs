@@ -204,6 +204,8 @@ __impl_bitflags! {
         VIEW_AUDIT_LOG = 0b0000_0000_0000_0000_0000_0000_1000_0000;
         /// Allows the use of priority speaking in voice channels.
         PRIORITY_SPEAKER = 0b0000_0000_0000_0000_0000_0001_0000_0000;
+        // Allows the user to go live
+        STREAM = 0b0000_0000_0000_0000_0000_0010_0000_0000;
         /// Allows reading messages in a guild channel. If a user does not have
         /// this permission, then they will not be able to see the channel.
         READ_MESSAGES = 0b0000_0000_0000_0000_0000_0100_0000_0000;
@@ -317,6 +319,12 @@ impl Permissions {
     ///
     /// [Priority Speaker]: #associatedconstant.PRIORITY_SPEAKER
     pub fn priority_speaker(self) -> bool { self.contains(Self::PRIORITY_SPEAKER) }
+
+    /// Shorthand for checking that the set of permission contains the
+    /// [Stream] permission.
+    ///
+    /// [Stream]: #associatedconstant.STREAM
+    pub fn stream(self) -> bool { self.contains(Self::STREAM) }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Create Invite] permission.
