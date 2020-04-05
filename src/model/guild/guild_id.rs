@@ -576,7 +576,7 @@ impl GuildId {
         http.as_ref().get_guild_members(self.0, limit, after.map(|x| x.0)).await
     }
 
-    /// Iterates over all the members in a guild.
+    /// Streams over all the members in a guild.
     ///
     /// This is accomplished and equivilent to repeated calls to [`members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
@@ -593,7 +593,7 @@ impl GuildId {
     /// use serenity::model::guild::MembersIter;
     /// use serenity::futures::StreamExt;
     ///
-    /// let mut members = MembersIter::<Http>::stream(&ctx, guild_id).boxed();
+    /// let mut members = guild_id.members_iter(&ctx).boxed();
     /// while let Some(member_result) = members.next().await {
     ///     match member_result {
     ///         Ok(member) => println!(
@@ -607,8 +607,8 @@ impl GuildId {
     /// # }
     /// ```
     #[cfg(all(feature = "http", feature = "cache"))]
-    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> MembersIter<H> {
-        MembersIter::new(self, http)
+    pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item=Result<Member>> {
+        MembersIter::<H>::stream(http, self)
     }
 
     /// Moves a member to a specific voice channel.
@@ -932,6 +932,37 @@ impl<H: AsRef<Http>> MembersIter<H> {
         Ok(())
     }
 
+    /// Streams over all the members in a guild.
+    ///
+    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// A buffer of at most 1,000 members is used to reduce the number of calls
+    /// necessary.
+    ///
+    /// # Examples
+    ///
+    /// ```rust,no_run
+    /// # use serenity::model::id::GuildId;
+    /// # use serenity::http::Http;
+    /// #
+    /// # async fn run() {
+    /// # let guild_id = GuildId::default();
+    /// # let ctx = Http::default();
+    /// use serenity::model::guild::MembersIter;
+    /// use serenity::futures::StreamExt;
+    ///
+    /// let mut members = MembersIter::<Http>::stream(&ctx, guild_id).boxed();
+    /// while let Some(member_result) = members.next().await {
+    ///     match member_result {
+    ///         Ok(member) => println!(
+    ///             "{} is {}",
+    ///             member,
+    ///             member.display_name().await,
+    ///         ),
+    ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
+    ///     }
+    /// }
+    /// # }
+    /// ```
     pub fn stream(http: impl AsRef<Http>, guild_id: GuildId) -> impl Stream<Item=Result<Member>> {
         let init_state = MembersIter::new(guild_id, http);
 
