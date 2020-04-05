@@ -120,7 +120,7 @@ version = "0.19"
 [dependencies.tokio]
 version = "0.2"
 default-features = false
-features = ["fs", "macros", "rt-core", "sync", "time", "udp"]
+features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process"]
 
 [dependencies.futures]
 version = "0.3"
@@ -181,7 +181,7 @@ native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-tls", "toki
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide"]
+voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide", "tokio/process"]
 
 [package.metadata.docs.rs]
 all-features = true

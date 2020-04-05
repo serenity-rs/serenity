@@ -259,7 +259,7 @@ async fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match voice::ytdl(&url) {
+        let source = match voice::ytdl(&url).await {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
