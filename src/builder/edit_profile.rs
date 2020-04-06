@@ -20,7 +20,8 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "cache"))]
+    /// # #[cfg(all(feature = "client", feature = "cache", feature = "gateway"))]
+    /// # {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -42,6 +43,7 @@ impl EditProfile {
     /// })
     /// .await;
     /// #     }
+    /// # }
     /// # }
     /// ```
     ///
