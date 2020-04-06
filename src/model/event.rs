@@ -229,7 +229,7 @@ impl CacheUpdate for ChannelUpdateEvent {
 
                 if let Some(guild) = cache.guilds.get_mut(&guild_id) {
                     guild
-                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)));
+                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel))).await;
                 }
             },
             Channel::Private(ref channel) => {
@@ -429,7 +429,7 @@ impl CacheUpdate for GuildMemberAddEvent {
             guild.with_mut(|guild| {
                 guild.member_count += 1;
                 guild.members.insert(user_id, self.member.clone());
-            });
+            }).await;
         }
 
         None
