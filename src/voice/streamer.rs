@@ -178,9 +178,10 @@ async fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
 /// ```rust,no_run
 /// use serenity::voice;
 ///
+/// # async fn test() {
 /// let stereo_val = "2";
 ///
-/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[
+/// let options = &[
 ///     "-f",
 ///     "s16le",
 ///     "-ac",
@@ -190,7 +191,11 @@ async fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
 ///     "-acodec",
 ///     "pcm_s16le",
 ///     "-",
-/// ]);
+/// ];
+///
+/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", options).await;
+///
+/// # }
 pub async fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,
     args: &[&str],
