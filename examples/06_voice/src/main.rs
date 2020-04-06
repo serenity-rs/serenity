@@ -89,7 +89,7 @@ async fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
         Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported")).await;
 
             return Ok(());
         },
@@ -123,7 +123,7 @@ async fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild = match msg.guild(&ctx.cache).await {
         Some(guild) => guild,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported")).await;
 
             return Ok(());
         }
@@ -164,7 +164,7 @@ async fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
         Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported")).await;
 
             return Ok(());
         },
@@ -191,7 +191,7 @@ async fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
         Some(channel) => channel.read().await.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported")).await;
 
             return Ok(());
         },
