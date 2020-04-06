@@ -158,7 +158,14 @@ pub struct Client {
     ///     async fn message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
     ///         reg(ctx, "MessageDeleteBulk").await
     ///     }
+    ///
+    ///     #[cfg(feature = "cache")]
     ///     async fn message_update(&self, ctx: Context, _old: Option<Message>, _new: Option<Message>, _: MessageUpdateEvent) {
+    ///         reg(ctx, "MessageUpdate").await
+    ///     }
+    ///
+    ///     #[cfg(not(feature = "cache"))]
+    ///     async fn message_update(&self, ctx: Context, _new_data: MessageUpdateEvent) {
     ///         reg(ctx, "MessageUpdate").await
     ///     }
     /// }
@@ -701,7 +708,7 @@ impl Client {
         {
 
             let mut manager = self.shard_manager.lock().await;
-            
+
             let init = shard_data[1] - shard_data[0] + 1;
 
             manager.set_shards(shard_data[0], init, shard_data[2]).await;
