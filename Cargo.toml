@@ -37,8 +37,8 @@ optional = true
 
 [dependencies.discortp]
 optional = true
-version = "1.0"
-repository = "https://github.com/FelixMcFelix/discortp"
+# version = "1.0"
+git = "https://github.com/FelixMcFelix/discortp"
 
 [dependencies.serde]
 version = "1"
