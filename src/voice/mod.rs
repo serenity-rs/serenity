@@ -43,7 +43,6 @@ pub use self::{
         ffmpeg,
         ffmpeg_optioned,
         // opus,
-        pcm,
         ytdl,
         ytdl_search,
     }

@@ -42,6 +42,15 @@ use log::{debug, warn};
 
 pub struct ChildContainer(Child);
 
+pub fn child_to_reader<T>(child: Child) -> Reader {
+    Reader::Pipe(
+        BufReader::with_capacity(
+            STEREO_FRAME_SIZE * std::mem::size_of::<T>() * CHILD_BUFFER_LEN,
+            ChildContainer(child),
+        )
+    )
+}
+
 impl Read for ChildContainer {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
         self.0.stdout.as_mut().unwrap().read(buffer)
@@ -110,13 +119,31 @@ impl Seek for Reader {
 }
 
 pub struct InputSource {
-    stereo: bool,
-    reader: Reader,
-    kind: AudioType,
-    decoder: Option<Arc<Mutex<OpusDecoder>>>,
+    pub stereo: bool,
+    pub reader: Reader,
+    pub kind: AudioType,
+    pub decoder: Option<Arc<Mutex<OpusDecoder>>>,
 }
 
 impl InputSource {
+    pub fn float_pcm(is_stereo: bool, reader: Reader) -> InputSource {
+    InputSource {
+        stereo: is_stereo,
+        reader,
+        kind: AudioType::FloatPcm,
+        decoder: None,
+    }
+}
+
+    pub fn new(stereo: bool, reader: Reader, kind: AudioType, decoder: Option<Arc<Mutex<OpusDecoder>>>) -> Self {
+        InputSource {
+            stereo,
+            reader,
+            kind,
+            decoder,
+        }
+    }
+
     pub fn is_seekable(&self) -> bool {
         self.reader.is_seekable()
     }
@@ -156,19 +183,7 @@ impl InputSource {
 
     // fixme: make this relative.
     pub fn seek_time(&mut self, time: Duration) -> Option<Duration> {
-        // let current_ts = byte_count_to_timestamp(self.position, self.stereo);
-
         let future_pos = timestamp_to_byte_count(time, self.stereo);
-        // if time < current_ts {
-        //     // FIXME: don't unwrap
-        //     self.source = (self.recreator)(Some(time)).unwrap();
-        //     self.position = future_pos;
-        // } else {
-        //     if let Some(p) = self.source.consume(future_pos - self.position) {
-        //         self.position += p;
-        //     };
-        // }
-
         Seek::seek(&mut self.reader, SeekFrom::Start(future_pos as u64))
             .ok()
             .map(|a| byte_count_to_timestamp(a as usize, self.stereo))
@@ -526,7 +541,7 @@ fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(float_pcm(true, Reader::Pipe(BufReader::with_capacity(STEREO_FRAME_SIZE * std::mem::size_of::<f32>() * AUDIO_FRAME_RATE / 2, ChildContainer(command)))))
+    Ok(InputSource::new(true, child_to_reader::<f32>(command), AudioType::FloatPcm, None))
 }
 
 // /// Creates a streamed audio source from a DCA file.
@@ -594,26 +609,6 @@ fn _ffmpeg_optioned(
 //     })
 // }
 
-/// Creates a PCM audio source.
-pub fn pcm(is_stereo: bool, reader: Reader) -> InputSource {
-    InputSource {
-        stereo: is_stereo,
-        reader,
-        kind: AudioType::Pcm,
-        decoder: None,
-    }
-}
-
-/// Creates a PCM audio source.
-pub fn float_pcm(is_stereo: bool, reader: Reader) -> InputSource {
-    InputSource {
-        stereo: is_stereo,
-        reader,
-        kind: AudioType::FloatPcm,
-        decoder: None,
-    }
-}
-
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub fn ytdl(uri: &str) -> Result<InputSource> {
     let ytdl_args = [
@@ -656,7 +651,7 @@ pub fn ytdl(uri: &str) -> Result<InputSource> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(float_pcm(true, Reader::Pipe(BufReader::with_capacity(STEREO_FRAME_SIZE * std::mem::size_of::<f32>() * AUDIO_FRAME_RATE / 2, ChildContainer(ffmpeg)))))
+    Ok(InputSource::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
@@ -702,7 +697,7 @@ pub fn ytdl_search(name: &str) -> Result<InputSource> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(float_pcm(true, Reader::Pipe(BufReader::with_capacity(STEREO_FRAME_SIZE * std::mem::size_of::<f32>() * AUDIO_FRAME_RATE / 2, ChildContainer(ffmpeg)))))
+    Ok(InputSource::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
 }
 
 fn is_stereo(path: &OsStr) -> Result<bool> {

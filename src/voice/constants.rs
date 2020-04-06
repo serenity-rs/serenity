@@ -11,3 +11,6 @@ pub const STEREO_FRAME_SIZE: usize = 2 * MONO_FRAME_SIZE;
 
 /// Length (in milliseconds) of any audio frame.
 pub const FRAME_LEN_MS: usize = 1000 / AUDIO_FRAME_RATE;
+
+/// Maximum number of audio frames/packets to be sent per second to be buffered.
+pub const CHILD_BUFFER_LEN: usize = AUDIO_FRAME_RATE / 2;
