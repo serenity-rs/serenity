@@ -458,7 +458,6 @@ mod test {
     mod model_utils {
         use crate::model::prelude::*;
         use tokio::sync::RwLock;
-        use std::collections::HashMap;
         use std::sync::Arc;
 
         fn guild_channel() -> GuildChannel {
@@ -524,7 +523,7 @@ mod test {
 
             let channel = Channel::Guild(Arc::new(RwLock::new(channel)));
             assert!(!channel.is_nsfw().await);
-          
+
             let private_channel = private_channel();
             assert!(!private_channel.is_nsfw());
         }
