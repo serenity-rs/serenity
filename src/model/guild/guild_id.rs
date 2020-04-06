@@ -717,9 +717,9 @@ impl GuildId {
     /// use serenity::model::id::GuildId;
     /// use serenity::utils;
     ///
+    /// # async fn test() {
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// # async fn test() {
     /// assert_eq!(guild_id.shard_id(17).await, 7);
     /// # }
     /// ```
