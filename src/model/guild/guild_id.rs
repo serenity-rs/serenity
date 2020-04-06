@@ -719,7 +719,9 @@ impl GuildId {
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// assert_eq!(guild_id.shard_id(17), 7);
+    /// # async fn test() {
+    /// assert_eq!(guild_id.shard_id(17).await, 7);
+    /// # }
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
