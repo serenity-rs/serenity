@@ -64,7 +64,7 @@ impl Http {
 
         Self::new(Arc::new(built), &token)
     }
-  
+
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
     ///
     /// **Note**: Requires the [Manage Roles] permission and respect of role
