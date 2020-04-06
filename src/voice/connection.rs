@@ -297,7 +297,7 @@ impl Connection {
     }
 
     #[inline]
-    fn handle_received_udp(
+    async fn handle_received_udp(
         &mut self,
         receiver: &mut Option<Arc<dyn AudioReceiver>>,
         buffer: &mut [i16; 1920],
@@ -352,7 +352,7 @@ impl Connection {
                 let b = if is_stereo { len * 2 } else { len };
 
                 receiver
-                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
+                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len()).await;
             }
         }
 
@@ -494,7 +494,7 @@ impl Connection {
         while let Ok(Some(status)) = self.task_items.rx.try_next() {
             match status {
                 ReceiverStatus::Udp(packet) => {
-                    self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce)?;
+                    self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce).await?;
                 },
                 ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                     if let Some(receiver) = receiver {
