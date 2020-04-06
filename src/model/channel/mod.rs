@@ -524,7 +524,7 @@ mod test {
 
             let channel = Channel::Guild(Arc::new(RwLock::new(channel)));
             assert!(!channel.is_nsfw().await);
-
+          
             let private_channel = private_channel();
             assert!(!private_channel.is_nsfw());
         }

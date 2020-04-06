@@ -91,10 +91,11 @@ impl<'a> Request<'a> {
         // but don't give a body.
         if self.body.is_some() {
             headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
-            headers.insert(CONTENT_LENGTH,
-                HeaderValue::from_str(&body.unwrap_or(&Vec::new()).len().to_string()).map_err(HttpError::InvalidHeader)?);
         }
-
+      
+        headers.insert(CONTENT_LENGTH,
+                HeaderValue::from_str(&body.unwrap_or(&Vec::new()).len().to_string()).map_err(HttpError::InvalidHeader)?);
+        headers.insert(CONTENT_LENGTH, HeaderValue::from_static(&"0"));
         headers.insert("X-Ratelimit-Precision", HeaderValue::from_static("millisecond"));
 
         if let Some(ref request_headers) = request_headers {
