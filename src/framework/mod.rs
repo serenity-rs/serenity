@@ -102,6 +102,6 @@ pub trait Framework {
 impl<'a, F: Framework + ?Sized + Send + Sync> Framework for &'a mut F {
     #[inline]
     async fn dispatch(&self, ctx: Context, msg: Message) {
-        (**self).dispatch(ctx, msg);
+        (**self).dispatch(ctx, msg).await;
     }
 }
