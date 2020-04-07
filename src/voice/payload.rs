@@ -51,12 +51,14 @@ pub fn build_select_protocol(address: ::std::borrow::Cow<'_, str>, port: u16) ->
 }
 
 #[inline]
-pub fn build_speaking(speaking: bool) -> Value {
+pub fn build_speaking(speaking: bool, ssrc: u32) -> Value {
     json!({
         "op": VoiceOpCode::Speaking.num(),
         "d": {
             "delay": 0,
-            "speaking": speaking,
+            // FIXME: use bitflags.
+            "speaking": speaking as u8,
+            "ssrc": ssrc,
         }
     })
 }

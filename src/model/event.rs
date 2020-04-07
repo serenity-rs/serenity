@@ -2026,7 +2026,6 @@ impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceReady {
-    pub heartbeat_interval: u64,
     pub modes: Vec<String>,
     pub ip: String, 
     pub port: u16,
@@ -2037,7 +2036,7 @@ pub struct VoiceReady {
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct VoiceHello {
-    pub heartbeat_interval: u64,
+    pub heartbeat_interval: f64,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -2052,7 +2051,8 @@ pub struct VoiceSessionDescription {
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceSpeaking {
-    pub speaking: bool,
+    // FIXME: this is a bitmask now!
+    pub speaking: u8,
     pub ssrc: u32,
     pub user_id: UserId,
     #[serde(skip)]

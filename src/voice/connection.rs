@@ -10,7 +10,6 @@ use audiopus::{
 use byteorder::{
     BigEndian,
     ByteOrder,
-    LittleEndian,
     ReadBytesExt,
     WriteBytesExt
 };
@@ -174,7 +173,7 @@ impl Connection {
             let pos = 4 + index;
             let addr = String::from_utf8_lossy(&bytes[4..pos]);
             let port_pos = len - 2;
-            let port = (&bytes[port_pos..]).read_u16::<LittleEndian>()?;
+            let port = (&bytes[port_pos..]).read_u16::<BigEndian>()?;
 
             client
                 .send_json(&payload::build_select_protocol(addr, port))?;
@@ -271,7 +270,7 @@ impl Connection {
 
         let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
 
-        self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
+        self.keepalive_timer = Timer::new(hello.heartbeat_interval as u64);
 
         unset_blocking(&mut client)?;
         let mutexed_client = Arc::new(Mutex::new(client));
@@ -498,7 +497,8 @@ impl Connection {
                 },
                 ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
-                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                        // FIXME: check for bitflags, rather than doing this...
+                        receiver.speaking_update(ev.ssrc, ev.user_id.0, (ev.speaking & 1) == 1);
                     }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
@@ -635,7 +635,7 @@ impl Connection {
         self.speaking = speaking;
 
         info!("[Voice] Speaking update: {}", speaking);
-        let o = self.client.lock().send_json(&payload::build_speaking(speaking));
+        let o = self.client.lock().send_json(&payload::build_speaking(speaking, self.ssrc));
         info!("[Voice] Speaking update confirmed.");
         o
     }
