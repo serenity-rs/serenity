@@ -27,8 +27,8 @@ use tungstenite::{
     error::Error as TungsteniteError,
     protocol::frame::CloseFrame,
 };
-use typemap::ShareMap;
 
+use crate::utils::ShareMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]

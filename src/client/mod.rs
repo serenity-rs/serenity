@@ -47,7 +47,6 @@ use parking_lot::RwLock;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 use log::{error, debug, info};
 
 #[cfg(feature = "framework")]
@@ -57,6 +56,7 @@ use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
 use crate::http::Http;
+use crate::utils::ShareMap;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -124,7 +124,6 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```rust,ignore
-    /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
     /// use serenity::model::*;
     /// use std::collections::HashMap;
@@ -132,7 +131,7 @@ pub struct Client {
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl TypeMapKey for MessageEventCounter {
+    /// impl ShareMapKey for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
@@ -407,7 +406,7 @@ impl Client {
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
-        let data = Arc::new(RwLock::new(ShareMap::custom()));
+        let data = Arc::new(RwLock::new(ShareMap::new()));
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));

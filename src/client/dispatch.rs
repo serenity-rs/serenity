@@ -12,10 +12,10 @@ use super::{
     Context
 };
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 
 use crate::http::Http;
 use crate::CacheAndHttp;
+use crate::utils::ShareMap;
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;

@@ -25,10 +25,10 @@ use super::{
     ShardRunnerOptions,
 };
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
 use log::{info, warn};
 
+use crate::utils::ShareMap;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]

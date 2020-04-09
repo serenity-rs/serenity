@@ -83,10 +83,6 @@ default-features = false
 optional = true
 version = "0.9"
 
-[dependencies.typemap]
-optional = true
-version = "0.3"
-
 [dependencies.url]
 optional = true
 version = "^2.1"
@@ -137,7 +133,6 @@ client = [
     "gateway",
     "http",
     "threadpool",
-    "typemap",
 ]
 extras = []
 framework = ["client", "model", "utils"]

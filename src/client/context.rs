@@ -6,9 +6,9 @@ use std::sync::{
     Arc,
     mpsc::Sender,
 };
-use typemap::ShareMap;
 
 use crate::http::Http;
+use crate::utils::ShareMap;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::{Cache, CacheRwLock};

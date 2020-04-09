@@ -35,12 +35,11 @@ use serenity::{
     voice,
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
 use serenity::prelude::*;
 
 struct VoiceManager;
 
-impl TypeMapKey for VoiceManager {
+impl ShareMapKey for VoiceManager {
     type Value = Arc<Mutex<ClientVoiceManager>>;
 }
 

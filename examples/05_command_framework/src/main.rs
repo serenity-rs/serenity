@@ -20,7 +20,6 @@ use serenity::{
     utils::{content_safe, ContentSafeOptions},
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
 use serenity::prelude::*;
 
 // A container type is created for inserting into the Client's `data`, which
@@ -28,13 +27,13 @@ use serenity::prelude::*;
 // anywhere else that has a copy of the `data` Arc.
 struct ShardManagerContainer;
 
-impl TypeMapKey for ShardManagerContainer {
+impl ShareMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 
 struct CommandCounter;
 
-impl TypeMapKey for CommandCounter {
+impl ShareMapKey for CommandCounter {
     type Value = HashMap<String, u64>;
 }
 
