@@ -2,6 +2,12 @@
 
 use std::any::{Any, TypeId};
 use std::collections::HashMap;
+use std::collections::hash_map::{
+    Entry as HashMapEntry,
+    OccupiedEntry as HashMapOccupiedEntry,
+    VacantEntry as HashMapVacantEntry,
+};
+use std::marker::PhantomData;
 
 /// ShareMapKey is used to declare key types that are eligible for use
 /// with [`ShareMap`].
@@ -52,6 +58,26 @@ impl ShareMap {
         T: ShareMapKey
     {
         self.0.insert(TypeId::of::<T>(), Box::new(value));
+    }
+
+    /// Retrieve the entry based on its [`ShareMapKey`]
+    ///
+    /// [`ShareMapKey`]: trait.ShareMapKey.html
+    #[inline]
+    pub fn entry<T>(&mut self) -> Entry<'_, T>
+    where
+        T: ShareMapKey
+    {
+        match self.0.entry(TypeId::of::<T>()) {
+            HashMapEntry::Occupied(entry) => Entry::Occupied(OccupiedEntry {
+                entry,
+                _marker: PhantomData,
+            }),
+            HashMapEntry::Vacant(entry) => Entry::Vacant(VacantEntry {
+                entry,
+                _marker: PhantomData,
+            })
+        }
     }
 
     /// Retrieve a reference to a value based on its [`ShareMapKey`].
@@ -115,6 +141,128 @@ impl ShareMap {
     }
 }
 
+/// A view into a single entry in the [`ShareMap`],
+/// which may either be vacant or occupied.
+///
+/// This heavily mirrors the official [`Entry`] API in the standard library,
+/// but not all of it is provided due to implementation restrictions. Please
+/// refer to its documentations.
+///
+/// [`ShareMap`]: struct.ShareMap.html
+/// [`Entry`]: std::collections::hash_map::Entry
+pub enum Entry<'a, K>
+where
+    K: ShareMapKey,
+{
+    Occupied(OccupiedEntry<'a, K>),
+    Vacant(VacantEntry<'a, K>),
+}
+
+impl<'a, K> Entry<'a, K>
+where
+    K: ShareMapKey,
+{
+    #[inline]
+    pub fn or_insert(self, value: K::Value) -> &'a mut K::Value {
+        match self {
+            Entry::Occupied(entry) => entry.into_mut(),
+            Entry::Vacant(entry) => entry.insert(value),
+        }
+    }
+
+    #[inline]
+    pub fn or_insert_with<F>(self, f: F) -> &'a mut K::Value
+    where
+        F: FnOnce() -> K::Value
+    {
+        match self {
+            Entry::Occupied(entry) => entry.into_mut(),
+            Entry::Vacant(entry) => entry.insert(f()),
+        }
+    }
+
+    #[inline]
+    pub fn and_modify<F>(self, f: F) -> Self
+    where
+        F: FnOnce(&mut K::Value)
+    {
+        match self {
+            Entry::Occupied(mut entry) => {
+                f(entry.get_mut());
+                Entry::Occupied(entry)
+            },
+            Entry::Vacant(entry) => Entry::Vacant(entry),
+        }
+    }
+}
+
+impl<'a, K> Entry<'a, K>
+where
+    K: ShareMapKey,
+    K::Value: Default
+{
+    #[inline]
+    pub fn or_default(self) -> &'a mut K::Value {
+        self.or_insert_with(<K::Value as Default>::default)
+    }
+}
+
+pub struct OccupiedEntry<'a, K>
+where
+    K: ShareMapKey,
+{
+    entry: HashMapOccupiedEntry<'a, TypeId, Box<(dyn Any + Send + Sync)>>,
+    _marker: PhantomData<&'a K::Value>,
+}
+
+impl<'a, K> OccupiedEntry<'a, K>
+where
+    K: ShareMapKey,
+{
+    #[inline]
+    pub fn get(&self) -> &K::Value {
+        self.entry.get().downcast_ref().unwrap()
+    }
+
+    #[inline]
+    pub fn get_mut(&mut self) -> &mut K::Value {
+        self.entry.get_mut().downcast_mut().unwrap()
+    }
+
+    #[inline]
+    pub fn into_mut(self) -> &'a mut K::Value {
+        self.entry.into_mut().downcast_mut().unwrap()
+    }
+
+    #[inline]
+    pub fn insert(&mut self, value: K::Value) {
+        self.entry.insert(Box::new(value));
+    }
+
+    #[inline]
+    pub fn remove(self) {
+        self.entry.remove();
+    }
+}
+
+pub struct VacantEntry<'a, K>
+where
+    K: ShareMapKey,
+{
+    entry: HashMapVacantEntry<'a, TypeId, Box<(dyn Any + Send + Sync)>>,
+    _marker: PhantomData<&'a K::Value>,
+}
+
+impl<'a, K> VacantEntry<'a, K>
+where
+    K: ShareMapKey,
+{
+    #[inline]
+    pub fn insert(self, value: K::Value) -> &'a mut K::Value {
+        self.entry.insert(Box::new(value)).downcast_mut().unwrap()
+    }
+}
+
 #[cfg(test)]
 mod test {
     use super::*;
@@ -138,5 +286,14 @@ mod test {
         }
 
         assert_eq!(*map.get::<Counter>().unwrap(), 100);
+    }
+
+    #[test]
+    fn sharemap_entry() {
+        let mut map = ShareMap::new();
+
+        assert_eq!(map.get::<Counter>(), None);
+        *map.entry::<Counter>().or_insert(0) += 42;
+        assert_eq!(*map.get::<Counter>().unwrap(), 42);
     }
 }
