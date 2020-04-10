@@ -31,9 +31,10 @@ use commands::{
     meta::*,
     owner::*,
 };
+
 struct ShardManagerContainer;
 
-impl TypeMapKey for ShardManagerContainer {
+impl ShareMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 

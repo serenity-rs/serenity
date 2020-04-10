@@ -25,7 +25,7 @@ use serenity::{
 
 struct VoiceManager;
 
-impl TypeMapKey for VoiceManager {
+impl ShareMapKey for VoiceManager {
     type Value = Arc<Mutex<ClientVoiceManager>>;
 }
 
