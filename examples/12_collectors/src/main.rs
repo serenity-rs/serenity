@@ -1,5 +1,5 @@
 //! This example will showcase the beauty of collectors.
-//! The allow to await messages or reactions from a user in the middle
+//! They allow to await messages or reactions from a user in the middle
 //! of a control flow, one being a command.
 use std::{
     collections::HashSet, env,
@@ -8,6 +8,9 @@ use std::{
 use serenity::{
     async_trait,
     collector::MessageCollectorBuilder,
+    // Collectors are streams, that means we can use `StreamExt` and
+    // `TryStreamExt`.
+    futures::stream::StreamExt,
     framework::standard::{
         Args, CommandResult, CommandGroup,
         HelpOptions, help_commands, StandardFramework,
@@ -83,6 +86,9 @@ async fn challenge(ctx: &mut Context, msg: &Message, _: Args) -> CommandResult {
     let _ =  msg.reply(&ctx, "How was that crusty crab called again? 10 seconds time!").await;
 
     // There are methods implemented for some models to conveniently collect replies.
+    // This one returns a future that will await a single message only.
+    // The other method for messages is called `await_replies` and returns a future
+    // which builds a stream to easily handle them.
     if let Some(answer) = &msg.author.await_reply(&ctx).timeout(Duration::from_secs(10)).await {
 
         if answer.content.to_lowercase() == "ferris" {
@@ -95,7 +101,7 @@ async fn challenge(ctx: &mut Context, msg: &Message, _: Args) -> CommandResult {
         let _ =  msg.reply(&ctx, "No answer within 10 seconds.").await;
     };
 
-    let react_msg = msg.reply(&ctx, "React with the reaction representing 1. 10 seconds time!").await.unwrap();
+    let react_msg = msg.reply(&ctx, "React with the reaction representing 1, you got 10 seconds!").await.unwrap();
 
     // The message model has a way to collect reactions on it.
     // Other methods are `await_n_reactions` and `await_all_reactions`.
@@ -116,43 +122,37 @@ async fn challenge(ctx: &mut Context, msg: &Message, _: Args) -> CommandResult {
         let _ = msg.reply(&ctx, "No reaction within 10 seconds.").await;
     };
 
-    let _ = msg.reply(&ctx, "Write five messages!").await;
+    let _ = msg.reply(&ctx, "Write 5 messages in 10 seconds").await;
 
     // We can create a collector from scratch too using this builder future.
-    let mut collector = MessageCollectorBuilder::new(&ctx)
+    let collector = MessageCollectorBuilder::new(&ctx)
         // Only collect messages by this user.
         .author_id(msg.author.id)
-        // At maximum collect 5 messages.
+        .channel_id(msg.channel_id)
         .collect_limit(5u32)
-        // Very important, collectors don't timeout by default.
-        // You should always set a timeout.
-        .timeout(Duration::from_secs(5))
+        .timeout(Duration::from_secs(10))
         // Build the collector.
         .await;
 
-    let mut counter = 0;
+    // Let's acquire borrow HTTP to send a message inside the `async move`.
+    let http = &ctx.http;
 
-    // A collector can be used step by step.
-    // However, while not receiving, events will still be evaluated.
-    // If you want to expect only one message and then stop accepting
-    // new events, you will need to create a new collector.
-    loop {
-        // Receive a single message.
-        if let Some(message) = collector.receive_one().await {
-            counter += 1;
-            let _ = message.reply(&ctx, &format!("I repeat: {}", message.content)).await;
-        // When five messages have been received or one reply took longer than five seconds,
-        // we won't receive a message.
-        } else {
-            break;
-        }
-    }
+    // We want to process each message and get the length.
+    // There are a couple of ways to do this. Folding the stream with `fold`
+    // is one way.
+    // Using `then` to first reply and then create a new stream with all
+    // messages is another way to do it, which can be nice if you want
+    // to further process the messages.
+    // If you don't want to collect the stream, `for_each` may be sufficient.
+    let collected: Vec<_> = collector.then(|msg| async move {
+        let _ = msg.reply(http, format!("I repeat: {}", msg.content)).await;
 
-    if counter == 5 {
+        msg
+    }).collect().await;
+
+    if collected.len() >= 5 {
         score += 1;
     }
-
-    collector.stop();
 
     let _ = msg.reply(&ctx, &format!("You completed {} out of 3 tasks correctly!", score)).await;
 

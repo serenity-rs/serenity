@@ -1,27 +1,31 @@
 use std::{
+    boxed::Box,
+    future::Future,
     sync::Arc,
     time::Duration,
-};
-use tokio::sync::mpsc::{
-    unbounded_channel,
-    UnboundedReceiver as Receiver,
-    UnboundedSender as Sender,
-};
-use tokio::{
-    sync::Mutex,
-    time::timeout,
-};
-use std::{
-    future::Future,
     pin::Pin,
     task::{Context as FutContext, Poll},
 };
+use tokio::{
+    sync::{
+        mpsc::{
+            unbounded_channel,
+            UnboundedReceiver as Receiver,
+            UnboundedSender as Sender,
+        },
+        Mutex,
+    },
+    time::{Delay, delay_for},
+};
+use futures::{
+    future::BoxFuture,
+    stream::{Stream, StreamExt},
+};
+use crate::{
+    client::bridge::gateway::ShardMessenger,
+    model::channel::Reaction,
+};
 
-use futures::future::BoxFuture;
-use crate::client::bridge::gateway::ShardMessenger;
-use crate::model::channel::Reaction;
-
-type ForeachFunction = for<'fut> fn(&'fut Arc<ReactionAction>) -> BoxFuture<'fut, bool>;
 type Shard = Arc<Mutex<ShardMessenger>>;
 
 macro_rules! impl_reaction_collector {
@@ -59,15 +63,6 @@ macro_rules! impl_reaction_collector {
                     self
                 }
 
-                /// Sets a duration the collector shall await reactions.
-                /// Once the timeout is reached, the collector will *close* and be unable
-                /// to receive any new reactions, already received reactions will be yielded.
-                pub fn timeout(mut self, timeout: Duration) -> Self {
-                    self.collector.as_mut().unwrap().timeout = Some(timeout);
-
-                    self
-                }
-
                 /// Sets the required author ID of a reaction.
                 /// If a reaction is not issued by a user with this ID, it won't be received.
                 pub fn author_id(mut self, author_id: impl Into<u64>) -> Self {
@@ -100,15 +95,6 @@ macro_rules! impl_reaction_collector {
                     self
                 }
 
-                /// Performs a function whenever a reaction is received,
-                /// if the function returns true, it will continue receiving
-                /// more reactions, if it returns false, it will stop receiving.
-                pub fn for_each_received(mut self, function: ForeachFunction) -> Self {
-                    self.collector.as_mut().unwrap().for_each = Some(Arc::new(function));
-
-                    self
-                }
-
                 /// If set to `true`, added reactions will be collected.
                 ///
                 /// Set to `true` by default.
@@ -123,6 +109,14 @@ macro_rules! impl_reaction_collector {
                 /// Set to `false` by default.
                 pub fn removed(mut self, is_accepted: bool) -> Self {
                     self.filter.as_mut().unwrap().accept_removed = is_accepted;
+
+                    self
+                }
+
+                /// Sets a `duration` for how long the collector shall receive
+                /// reactions.
+                pub fn timeout(mut self, duration: Duration) -> Self {
+                    self.timeout = Some(delay_for(duration));
 
                     self
                 }
@@ -237,12 +231,6 @@ impl ReactionFilter {
     }
 }
 
-#[derive(Default)]
-struct CollectorOptions {
-    for_each: Option<Arc<ForeachFunction>>,
-    timeout: Option<Duration>,
-}
-
 #[derive(Clone)]
 struct FilterOptions {
     filter_limit: Option<u32>,
@@ -276,16 +264,14 @@ impl Default for FilterOptions {
 // This avoids using a trait that the user would need to import in
 // order to use any of these methods.
 impl_reaction_collector! {
-    CollectOneReaction;
-    CollectNReactions;
-    CollectAllReactions;
+    CollectReaction;
     ReactionCollectorBuilder;
 }
 
 pub struct ReactionCollectorBuilder<'a> {
     filter: Option<FilterOptions>,
-    collector: Option<CollectorOptions>,
     shard: Option<Shard>,
+    timeout: Option<Delay>,
     fut: Option<BoxFuture<'a, ReactionCollector>>,
 }
 
@@ -293,8 +279,8 @@ impl<'a> ReactionCollectorBuilder<'a> {
     pub fn new(shard_messenger: impl AsRef<Shard>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
-            collector: Some(CollectorOptions::default()),
             shard: Some(Arc::clone(shard_messenger.as_ref())),
+            timeout: None,
             fut: None,
         }
     }
@@ -306,17 +292,15 @@ impl<'a> Future for ReactionCollectorBuilder<'a> {
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let timeout = self.collector.as_ref().unwrap().timeout;
-            let for_each = self.collector.as_mut().unwrap().for_each.take();
             let (filter, receiver) = ReactionFilter::new(self.filter.take().unwrap());
+            let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
                 shard_messenger.lock().await.set_reaction_filter(filter);
 
                 ReactionCollector {
-                    receiver,
-                    timeout,
-                    for_each,
+                    receiver: Box::pin(receiver),
+                    timeout: timeout.map(Box::pin),
                 }
             }))
         }
@@ -325,130 +309,40 @@ impl<'a> Future for ReactionCollectorBuilder<'a> {
     }
 }
 
-pub struct CollectOneReaction<'a> {
+pub struct CollectReaction<'a> {
     filter: Option<FilterOptions>,
-    collector: Option<CollectorOptions>,
     shard: Option<Shard>,
+    timeout: Option<Delay>,
     fut: Option<BoxFuture<'a, Option<Arc<ReactionAction>>>>,
 }
 
-impl<'a> CollectOneReaction<'a> {
+impl<'a> CollectReaction<'a> {
     pub fn new(shard_messenger: impl AsRef<Shard>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
-            collector: Some(CollectorOptions::default()),
             shard: Some(Arc::clone(shard_messenger.as_ref())),
+            timeout: None,
             fut: None,
         }
     }
 }
 
-impl<'a> Future for CollectOneReaction<'a> {
+impl<'a> Future for CollectReaction<'a> {
     type Output = Option<Arc<ReactionAction>>;
 
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let timeout = self.collector.as_ref().unwrap().timeout;
-            let for_each = self.collector.as_mut().unwrap().for_each.take();
             let (filter, receiver) = ReactionFilter::new(self.filter.take().unwrap());
+            let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
                 shard_messenger.lock().await.set_reaction_filter(filter);
 
                 ReactionCollector {
-                    receiver,
-                    timeout,
-                    for_each,
-                }.receive_one().await
-            }))
-        }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
-    }
-}
-
-pub struct CollectNReactions<'a> {
-    filter: Option<FilterOptions>,
-    collector: Option<CollectorOptions>,
-    shard: Option<Shard>,
-    fut: Option<BoxFuture<'a, Vec<Arc<ReactionAction>>>>,
-}
-
-impl<'a> CollectNReactions<'a> {
-    pub fn new(shard_messenger: impl AsRef<Shard>) -> Self {
-        Self {
-            filter: Some(FilterOptions::default()),
-            collector: Some(CollectorOptions::default()),
-            shard: Some(Arc::clone(shard_messenger.as_ref())),
-            fut: None,
-        }
-    }
-}
-
-impl<'a> Future for CollectNReactions<'a> {
-    type Output = Vec<Arc<ReactionAction>>;
-
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let timeout = self.collector.as_ref().unwrap().timeout;
-            let for_each = self.collector.as_mut().unwrap().for_each.take();
-            let number = self.filter.as_ref().unwrap().collect_limit.unwrap_or(1);
-            let (filter, receiver) = ReactionFilter::new(self.filter.take().unwrap());
-
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.lock().await.set_reaction_filter(filter);
-
-                ReactionCollector {
-                    receiver,
-                    timeout,
-                    for_each,
-                }.receive_n(number).await
-            }))
-        }
-
-        self.fut.as_mut().unwrap().as_mut().poll(ctx)
-    }
-}
-
-/// Future to collect all reactions.
-pub struct CollectAllReactions<'a> {
-    filter: Option<FilterOptions>,
-    collector: Option<CollectorOptions>,
-    shard: Option<Shard>,
-    fut: Option<BoxFuture<'a, Vec<Arc<ReactionAction>>>>,
-}
-
-impl<'a> CollectAllReactions<'a> {
-    pub fn new(shard_messenger: impl AsRef<Shard>) -> Self {
-        Self {
-            filter: Some(FilterOptions::default()),
-            collector: Some(CollectorOptions::default()),
-            shard: Some(Arc::clone(shard_messenger.as_ref())),
-            fut: None,
-        }
-    }
-}
-
-impl<'a> Future for CollectAllReactions<'a> {
-    type Output = Vec<Arc<ReactionAction>>;
-
-    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
-        if self.fut.is_none() {
-            let shard_messenger = self.shard.take().unwrap();
-            let timeout = self.collector.as_ref().unwrap().timeout;
-            let for_each = self.collector.as_mut().unwrap().for_each.take();
-            let (filter, receiver) = ReactionFilter::new(self.filter.take().unwrap());
-
-            self.fut = Some(Box::pin(async move {
-                shard_messenger.lock().await.set_reaction_filter(filter);
-
-                ReactionCollector {
-                    receiver,
-                    timeout,
-                    for_each,
-                }.receive_all().await
+                    receiver: Box::pin(receiver),
+                    timeout: timeout.map(Box::pin),
+                }.next().await
             }))
         }
 
@@ -471,88 +365,34 @@ impl std::fmt::Debug for FilterOptions {
 /// A reaction collector receives reactions matching a the given filter for a
 /// set duration.
 pub struct ReactionCollector {
-    timeout: Option<Duration>,
-    receiver: Receiver<Arc<ReactionAction>>,
-    for_each: Option<Arc<ForeachFunction>>,
+    receiver: Pin<Box<Receiver<Arc<ReactionAction>>>>,
+    timeout: Option<Pin<Box<Delay>>>,
 }
 
 impl ReactionCollector {
-    /// Internal method to receive reactions until limitations are reached.
-    /// The method fills `reactions` while it is awaited, you cancel awaiting.
-    async fn receive(&mut self, reactions: &mut Vec<Arc<ReactionAction>>, max_reactions: Option<u32>) {
-        let mut received_reactions = 0;
-
-        while let Some(reaction) = self.receiver.recv().await {
-            if max_reactions.map_or(false, |max| received_reactions >= max) {
-                break;
-            }
-
-            received_reactions += 1;
-
-            if let Some(for_each) = &self.for_each {
-
-                if !for_each(&reaction).await {
-                    break;
-                }
-            }
-
-            reactions.push(reaction);
-        }
-    }
-
-    /// Receives all reactions until set limitations are reached and
-    /// returns the reactions.
-    ///
-    /// This will consume the collector and end the collection.
-    pub async fn receive_all(mut self) -> Vec<Arc<ReactionAction>> {
-        let mut reactions = Vec::new();
-
-        if let Some(time) = self.timeout {
-            let _ = timeout(time, self.receive(&mut reactions, None)).await;
-        } else {
-            self.receive(&mut reactions, None).await;
-        }
-
-        self.receiver.close();
-
-        reactions
-    }
-
-    /// Receives `number` amount of reactions until set limitations are reached
-    /// and returns the reactions.
-    ///
-    /// This will consume the collector and end the collection.
-    pub async fn receive_n(mut self, number: u32) -> Vec<Arc<ReactionAction>> {
-        let mut reactions = Vec::new();
-
-        if let Some(time) = self.timeout {
-            let _ = timeout(time, self.receive(&mut reactions, Some(number))).await;
-        } else {
-            self.receive(&mut reactions, Some(number)).await;
-        }
-
-        self.receiver.close();
-
-        reactions
-    }
-
-   /// Receives a single reaction and returns it.
-   /// The timer is applied each time called, the internal reaction collected
-   /// counter carries over.
-    pub async fn receive_one(&mut self) -> Option<Arc<ReactionAction>> {
-        if let Some(time) = self.timeout {
-            timeout(time, self.receiver.recv()).await.ok().flatten()
-        } else {
-            self.receiver.recv().await
-        }
-    }
-
     /// Stops collecting, this will implicitly be done once the
     /// collector drops.
     /// In case the drop does not appear until later, it is preferred to
     /// stop the collector early.
     pub fn stop(mut self) {
         self.receiver.close();
+    }
+}
+
+impl Stream for ReactionCollector {
+    type Item = Arc<ReactionAction>;
+    fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
+        if let Some(ref mut timeout) = self.timeout {
+
+            match timeout.as_mut().poll(ctx) {
+                Poll::Ready(_) => {
+                    return Poll::Ready(None);
+                },
+                Poll::Pending => (),
+            }
+        }
+
+        self.receiver.as_mut().poll_next(ctx)
     }
 }
 
