@@ -29,7 +29,6 @@ use std::{
     sync::Arc,
     borrow::Cow,
 };
-use std::io::Read;
 use tokio::{
     io::AsyncReadExt,
     fs::File,
