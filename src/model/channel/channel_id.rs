@@ -590,7 +590,7 @@ impl ChannelId {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let http = Arc::new(Http::default());
     /// use serenity::model::id::ChannelId;
-    /// use std::fs::File;
+    /// use tokio::fs::File;
     ///
     /// let channel_id = ChannelId(7);
     ///

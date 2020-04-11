@@ -49,7 +49,7 @@ impl Attachment {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
-    /// use std::fs::File;
+    /// use tokio::fs::File;
     /// use std::io::Write;
     /// use std::path::Path;
     ///

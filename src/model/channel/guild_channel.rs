@@ -554,7 +554,7 @@ impl GuildChannel {
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
     /// use serenity::model::channel::Channel;
-    /// use std::fs::File;
+    /// use tokio::fs::File;
     ///
     /// struct Handler;
     ///

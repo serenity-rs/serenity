@@ -527,7 +527,7 @@ impl Connection {
                     if let Some(nonce) = self.last_heartbeat_nonce {
 
                         if ev.nonce == nonce {
-                            info!("[Voice] Heartbeat ACK received.");
+                            // TODO info!("[Voice] Heartbeat ACK received.");
                         } else {
                             warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
                         }
