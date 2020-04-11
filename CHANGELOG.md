@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.2] - 2020-04-11
+
+This is a release for a critical bugfix.
+
+In an attempt to fix one thing, other things broke. Any time Serenity made a request to a POST or PUT endpoint (such as creating reactions or banning users), Discord would return HTTP 400. This release corrects that.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [http] Always send the `Content-Length` header ([@Lakelezz]) [c:f5dd8bf]
+
 ## [0.8.1] - 2020-04-02
 
 This is the last release for the 0.8.x series. 0.9.x will contain async/await support!
@@ -3500,6 +3514,8 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:f5dd8bf]: https://github.com/serenity-rs/serenity/commit/f5dd8bf42a7a952c1093925ecd60b46b8f716f60
 
 [c:e005ef1]: https://github.com/serenity-rs/serenity/commit/e005ef19b695fb444f921e84741b97fb2a9d0687
 [c:f27c7c1]: https://github.com/serenity-rs/serenity/commit/f27c7c148b14239b7170b3acd6a17137c6986737
