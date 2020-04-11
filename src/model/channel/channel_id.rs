@@ -594,8 +594,8 @@ impl ChannelId {
     ///
     /// let channel_id = ChannelId(7);
     ///
-    /// let f1 = File::open("my_file.jpg")?;
-    /// let f2 = File::open("my_file2.jpg")?;
+    /// let f1 = File::open("my_file.jpg").await?;
+    /// let f2 = File::open("my_file2.jpg").await?;
     ///
     /// let files = vec![(&f1, "my_file.jpg"), (&f2, "my_file2.jpg")];
     ///

@@ -50,6 +50,7 @@ impl Attachment {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     /// use tokio::fs::File;
+    /// use tokio::io::AsyncWriteExt;
     /// use std::io::Write;
     /// use std::path::Path;
     ///
@@ -69,7 +70,7 @@ impl Attachment {
     ///                 },
     ///             };
     ///
-    ///             let mut file = match File::create(&attachment.filename) {
+    ///             let mut file = match File::create(&attachment.filename).await {
     ///                 Ok(file) => file,
     ///                 Err(why) => {
     ///                     println!("Error creating file: {:?}", why);
@@ -79,7 +80,7 @@ impl Attachment {
     ///                 },
     ///             };
     ///
-    ///             if let Err(why) = file.write(&content) {
+    ///             if let Err(why) = file.write(&content).await {
     ///                 println!("Error writing to file: {:?}", why);
     ///
     ///                 return;

@@ -1421,7 +1421,7 @@ impl Http {
                 },
                 AttachmentType::File{ file, filename } => {
                     let mut buf = Vec::new();
-                    file.try_clone()?.read_to_end(&mut buf)?;
+                    file.try_clone().await?.read_to_end(&mut buf).await?;
 
                     multipart = multipart
                         .part(file_num.to_string(),

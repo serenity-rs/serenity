@@ -574,7 +574,7 @@ impl GuildChannel {
     ///                 return;
     ///             }
     ///
-    ///             let file = match File::open("./cat.png") {
+    ///             let file = match File::open("./cat.png").await {
     ///                 Ok(file) => file,
     ///                 Err(why) => {
     ///                     println!("Err opening file: {:?}", why);

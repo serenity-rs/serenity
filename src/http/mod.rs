@@ -38,9 +38,9 @@ use crate::model::prelude::*;
 use self::request::Request;
 use std::{
     borrow::Cow,
-    fs::File,
     path::{Path, PathBuf},
 };
+use tokio::fs::File;
 
 #[cfg(any(feature = "client", feature = "http"))]
 use std::sync::Arc;
