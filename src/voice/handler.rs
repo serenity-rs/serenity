@@ -16,7 +16,7 @@ use super::{
     Audio,
     AudioHandle,
     AudioReceiver,
-    InputSource,
+    Input,
     Bitrate,
     Event,
     EventContext,
@@ -262,7 +262,7 @@ impl Handler {
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play_source(&mut self, source: InputSource) -> AudioHandle {
+    pub fn play_source(&mut self, source: Input) -> AudioHandle {
         let (player, handle) = super::create_player(source);
         self.send(VoiceStatus::AddSender(player));
 
@@ -275,7 +275,7 @@ impl Handler {
     /// to the channel.
     ///
     /// [`play_only_source`]: #method.play_only_source
-    pub fn play_only_source(&mut self, source: InputSource) -> AudioHandle {
+    pub fn play_only_source(&mut self, source: Input) -> AudioHandle {
         let (player, handle) = super::create_player(source);
         self.send(VoiceStatus::SetSender(Some(player)));
 

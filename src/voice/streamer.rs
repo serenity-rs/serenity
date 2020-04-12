@@ -3,7 +3,7 @@ use audiopus::{
     coder::Decoder as OpusDecoder,
     Result as OpusResult,
 };
-use byteorder::{LittleEndian, ReadBytesExt};
+use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::{
     internal::prelude::*,
     prelude::SerenityError,
@@ -11,6 +11,8 @@ use crate::{
 use parking_lot::Mutex;
 use serde_json;
 use std::{
+    cell::UnsafeCell,
+    collections::LinkedList,
     ffi::OsStr,
     fs::File,
     io::{
@@ -24,6 +26,8 @@ use std::{
         Seek,
         SeekFrom,
     },
+    marker::PhantomData,
+    mem::ManuallyDrop,
     process::{Child, Command, Stdio},
     result::Result as StdResult,
     sync::Arc,
@@ -92,7 +96,7 @@ impl Read for Reader {
         use Reader::*;
         match self {
             Pipe(a) => Read::read(a, buffer),
-            InMemory(_) => unimplemented!(),
+            InMemory(a) => Read::read(a, buffer),
             Compressed(_) => unimplemented!(),
             Restartable(a) => Read::read(a, buffer),
             Extension(a) => a.read(buffer),
@@ -109,7 +113,7 @@ impl Seek for Reader {
             Pipe(_) | Extension(_) => Err(IoError::new(
                 IoErrorKind::InvalidInput,
                 "Seeking not supported on Reader of this type.")),
-            InMemory(_) => unimplemented!(),
+            InMemory(a) => Seek::seek(a, pos),
             Compressed(_) => unimplemented!(),
             Restartable(a) => Seek::seek(a, pos),
             ExtensionSeek(a) => a.seek(pos),
@@ -118,16 +122,16 @@ impl Seek for Reader {
     }
 }
 
-pub struct InputSource {
+pub struct Input {
     pub stereo: bool,
     pub reader: Reader,
     pub kind: AudioType,
     pub decoder: Option<Arc<Mutex<OpusDecoder>>>,
 }
 
-impl InputSource {
-    pub fn float_pcm(is_stereo: bool, reader: Reader) -> InputSource {
-    InputSource {
+impl Input {
+    pub fn float_pcm(is_stereo: bool, reader: Reader) -> Input {
+    Input {
         stereo: is_stereo,
         reader,
         kind: AudioType::FloatPcm,
@@ -136,7 +140,7 @@ impl InputSource {
 }
 
     pub fn new(stereo: bool, reader: Reader, kind: AudioType, decoder: Option<Arc<Mutex<OpusDecoder>>>) -> Self {
-        InputSource {
+        Input {
             stereo,
             reader,
             kind,
@@ -190,9 +194,33 @@ impl InputSource {
     }
 }
 
-impl Read for InputSource {
+impl Read for Input {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
-        Read::read(&mut self.reader, buffer)
+        // This implementation of Read converts the input stream
+        // to floating point output.
+        let float_space = buffer.len() / std::mem::size_of::<f32>();
+        let mut written_floats = 0;
+        // Read::read(&mut self.reader, buffer)
+        match self.kind {
+            AudioType::Opus => unimplemented!(),
+            AudioType::Pcm => {
+                //FIXME: probably stifiling an error.
+                let mut buffer = &mut buffer[..];
+                while written_floats < float_space {
+                    if let Ok(signal) = self.reader.read_i16::<LittleEndian>() {
+                        buffer.write_f32::<LittleEndian>(f32::from(signal) / 32768.0);
+                        written_floats += 1;
+                    } else {
+                        break;
+                    }
+                }
+                Ok(written_floats)
+            },
+            AudioType::FloatPcm => {
+                Read::read(&mut self.reader, buffer)
+            },
+            _ => unreachable!(),
+        }
     }
 }
 
@@ -295,96 +323,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
     }
 }
 
-// impl AudioSource for InputSource {
-//     fn is_stereo(&mut self) -> bool { self.stereo }
-
-//     fn get_type(&self) -> AudioType { self.kind }
-
-//     fn add_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize> {
-//         // Duplicate this to avoid repeating the stereo check.
-//         // This should let us unconditionally duplicate samples in the main loop body.
-//         if true_stereo {
-//             for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
-//                 let raw = match self.reader.read_i16::<LittleEndian>() {
-//                     Ok(v) => v,
-//                     Err(ref e) => {
-//                         return if e.kind() == IoErrorKind::UnexpectedEof {
-//                             Some(i)
-//                         } else {
-//                             None
-//                         }
-//                     },
-//                 };
-//                 let sample = f32::from(raw) / 32768.0;
-
-//                 *float_buffer_element += sample * volume;
-//             }
-//         } else {
-//             let mut float_index = 0;
-//             for i in 0..float_buffer.len() / 2 {
-//                 let raw = match self.reader.read_i16::<LittleEndian>() {
-//                     Ok(v) => v,
-//                     Err(ref e) => {
-//                         return if e.kind() == IoErrorKind::UnexpectedEof {
-//                             Some(i)
-//                         } else {
-//                             None
-//                         }
-//                     },
-//                 };
-//                 let sample = volume * f32::from(raw) / 32768.0;
-
-//                 float_buffer[float_index] += sample;
-//                 float_buffer[float_index+1] += sample;
-
-//                 float_index += 2;
-//             }
-//         }
-
-//         Some(float_buffer.len())
-//     }
-
-//     fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize> {
-//         if true_stereo {
-//             for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
-//                 let sample = match self.reader.read_f32::<LittleEndian>() {
-//                     Ok(v) => v,
-//                     Err(ref e) => {
-//                         return if e.kind() == IoErrorKind::UnexpectedEof {
-//                             Some(i)
-//                         } else {
-//                             None
-//                         }
-//                     },
-//                 };
-
-//                 *float_buffer_element += sample * volume;
-//             }
-//         } else {
-//             let mut float_index = 0;
-//             for i in 0..float_buffer.len() / 2 {
-//                 let raw = match self.reader.read_f32::<LittleEndian>() {
-//                     Ok(v) => v,
-//                     Err(ref e) => {
-//                         return if e.kind() == IoErrorKind::UnexpectedEof {
-//                             Some(i)
-//                         } else {
-//                             None
-//                         }
-//                     },
-//                 };
-//                 let sample = volume * raw;
-
-//                 float_buffer[float_index] += sample;
-//                 float_buffer[float_index+1] += sample;
-
-//                 float_index += 2;
-//             }
-//         }
-
-//         Some(float_buffer.len())
-//     }
-
+// impl AudioSource for Input {
 //     // FIXME: COMPLETELY BROKEN
 //     // this assumes DCA exculsively.
 //     // DOES NOT WORK FOR OPUS IN THE GENERAL CASE.
@@ -433,42 +372,15 @@ impl<R: Read + Sized> ReadAudioExt for R {
 
 //         Some(count)
 //     }
-
-//     fn is_seekable(&self) -> bool {
-//         false
-//     }
-
-//     fn seek(&mut self, time: Duration) -> Option<Duration> {
-//         None
-//     }
-
-//     fn consume(&mut self, amt: usize) -> Option<usize> {
-//         io::copy(&mut self.by_ref().take(amt as u64), &mut io::sink()).ok().map(|a| a as usize)
-//     }
 // }
 
-// impl<R: Read + Send> Read for InputSource<R> {
-//     fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
-//         self.reader.read(buf)
-//     }
-// }
-
-// impl<R: BufRead + Send> BufRead for InputSource<R> {
-//     fn fill_buf(&mut self) -> IoResult<&[u8]> {
-//         self.reader.fill_buf()
-//     }
-
-//     fn consume(&mut self, amt: usize) {
-//         self.reader.consume(amt)
-//     }
-// }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.
-pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<InputSource> {
+pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
     _ffmpeg(path.as_ref())
 }
 
-fn _ffmpeg(path: &OsStr) -> Result<InputSource> {
+fn _ffmpeg(path: &OsStr) -> Result<Input> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
     let is_stereo = is_stereo(path).unwrap_or(false);
     let stereo_val = if is_stereo { "2" } else { "1" };
@@ -517,7 +429,7 @@ pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,
     pre_input_args: &[&str],
     args: &[&str],
-) -> Result<InputSource> {
+) -> Result<Input> {
     _ffmpeg_optioned(path.as_ref(), pre_input_args, args, None)
 }
 
@@ -526,7 +438,7 @@ fn _ffmpeg_optioned(
     pre_input_args: &[&str],
     args: &[&str],
     is_stereo_known: Option<bool>,
-) -> Result<InputSource> {
+) -> Result<Input> {
     let is_stereo = is_stereo_known
         .or_else(|| is_stereo(path).ok())
         .unwrap_or(false);
@@ -541,7 +453,7 @@ fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(InputSource::new(true, child_to_reader::<f32>(command), AudioType::FloatPcm, None))
+    Ok(Input::new(true, child_to_reader::<f32>(command), AudioType::FloatPcm, None))
 }
 
 // /// Creates a streamed audio source from a DCA file.
@@ -596,7 +508,7 @@ fn _ffmpeg_optioned(
 // ///
 // /// [`ffmpeg`]: fn.ffmpeg.html
 // pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource + Send> {
-//     Box::new(InputSource {
+//     Box::new(Input {
 //         stereo: is_stereo,
 //         reader,
 //         kind: AudioType::Opus,
@@ -610,7 +522,7 @@ fn _ffmpeg_optioned(
 // }
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
-pub fn ytdl(uri: &str) -> Result<InputSource> {
+pub fn ytdl(uri: &str) -> Result<Input> {
     let ytdl_args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
@@ -651,12 +563,12 @@ pub fn ytdl(uri: &str) -> Result<InputSource> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(InputSource::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
+    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
 /// Takes the first video listed from the YouTube search.
-pub fn ytdl_search(name: &str) -> Result<InputSource> {
+pub fn ytdl_search(name: &str) -> Result<Input> {
     let ytdl_args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
@@ -697,7 +609,7 @@ pub fn ytdl_search(name: &str) -> Result<InputSource> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(InputSource::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
+    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
 }
 
 fn is_stereo(path: &OsStr) -> Result<bool> {
@@ -728,11 +640,229 @@ fn is_stereo(path: &OsStr) -> Result<bool> {
     Ok(check)
 }
 
+// type AudioCacheCore = Arc<UnsafeCell<RawAudioCacheCore>>;
+
+struct AudioCacheCore {
+    core: Arc<SharedCore>,
+    pos: usize,
+    loc: CacheReadLocation,
+}
+
+impl AudioCacheCore {
+    fn upgrade_to_backing(&mut self) {
+        self.loc = CacheReadLocation::Backed;
+        self.core.remove_chain();
+    }
+}
+
+// Read and Seek on the audio operate on byte positions
+// of the output FloatPcm stream.
+impl Read for AudioCacheCore {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
+        let (bytes_read, should_upgrade) = self.core.read_from_pos(self.pos, (&self.loc).into(), buf);
+
+        if should_upgrade {
+            self.upgrade_to_backing();
+        }
+
+        if let Ok(size) = bytes_read {
+            self.pos += size;
+        }
+
+        bytes_read
+    }
+}
+
+struct SharedCore {
+    raw: UnsafeCell<RawCore>,
+}
+
+impl SharedCore {
+    // The main reason for employing `unsafe` here is *shared mutability*:
+    // due to the granularity of the locks we need, (i.e., a moving critical
+    // section otherwise lock-free), we need to assert that these operations
+    // are safe.
+    //
+    // Note that only our code can use this, so that we can ensure correctness
+    // and concurrent safety.
+    fn get_mut_ref(&self) -> &mut RawCore {
+        unsafe { &mut *self.raw.get() }
+    }
+
+    fn remove_chain(&self) {
+        self.get_mut_ref()
+            .remove_chain()
+    }
+
+    fn read_from_pos(&self, pos: usize, loc: CacheReadLocationType, buffer: &mut [u8]) -> (IoResult<usize>, bool) {
+        self.get_mut_ref()
+            .read_from_pos(pos, loc, buffer)
+    }
+}
 
 // Shared basis for the below cache-based seekables.
-struct AudioCacheCore<T> {
-    backing_store: Vec<T>,
-    chain: Option<()>,
+struct RawCore {
+    len: usize,
+    finalised: bool,
+
+    inner_type: AudioType,
+
+    source: Box<Input>,
+
+    chunk_size: usize,
+    backing_store: Option<Vec<u8>>,
+    chain: Option<LinkedList<BufferChunk>>,
+    chain_users: Arc<()>,
+    lock: Mutex<()>,
+}
+
+impl RawCore {
+    fn finalise(&mut self) {
+        // Move the chain/rope of bytes into the backing store.BufferChunk
+        if let Some(rope) = &mut self.chain {
+            if rope.len() > 1 {
+                // Allocate one big store, then start moving entries over
+                // chunk-by-chunk.
+                let mut back = Vec::with_capacity(self.len);
+
+                for el in rope.iter() {
+                    back[el.start_pos..].copy_from_slice(&el.data[..]);
+                }
+
+                // Insert the new backing store, but DO NOT purge the old.
+                // This is left to the last Arc<> holder of the chain.
+                self.backing_store = Some(back);
+            } else {
+                // Least work, but unsafe.
+                // We move the first chunk's buffer to become the backing store,
+                // temporarily aliasing it until the list is destroyed.
+                // In this case, when the list is destroyed, the first element
+                // MUST be leaked to keep the backing store memory valid.
+                //
+                // (see remove_chain for this leakage)
+                //
+                // The alternative (write first chunk into always-present
+                // backing store) mandates a lock for the final expansion, because
+                // the backing store is IN USE. Thus, we can't employ it.
+                if let Some(el) = rope.front_mut() {
+                    // We can be certain that this pointer is not invalidated because:
+                    // * All writes to the rope/chain are finished. Thus, no
+                    //   reallocations/moves.
+                    // * The Vec will live exactly as long as the RawCore, pointer never escapes.
+                    // Likewise, we knoe that it is safe to build the new vector as:
+                    // * The stored type and pointer do not change, so alignment is preserved.
+                    // * The data pointer is created by an existing Vec<T>.
+                    self.backing_store = Some(unsafe {
+                        let data = el.data.as_mut_ptr();
+                        Vec::from_raw_parts(data, el.data.len(), el.data.capacity())
+                    })
+                }
+            }
+        }
+
+        // It's crucial that we do this *last*, as this is the signal
+        // for other threads to migrate from rope to backing store.
+        self.finalised = true;
+    }
+
+    fn remove_chain(&mut self) {
+        // We can only remove the chain if the core holds the last reference.
+        if Arc::strong_count(&self.chain_users) == 1 {
+            // FIXME: make this use an atomic int with fetch_subtract
+
+            // In worst case, several upgrades might pile up.
+            // Only one holder should concern itself with drop logic,
+            // the rest should carry on and start using the backing store.
+            let maybe_lock = self.lock.try_lock();
+            if maybe_lock.is_none() {
+                return;
+            }
+
+            if let Some(rope) = &mut self.chain {
+                // Prevent the backing store from being wiped out
+                // if the first link in the chain sufficed.
+                // This ensures safety as we undo the aliasing
+                // in the above special case.
+                if rope.len() == 1 {
+                    let el = rope.pop_front().expect("Length of rope was established as >= 1.");
+                    ManuallyDrop::new(el.data);
+                }
+            }
+
+            // Drop everything else.
+            self.chain = None;
+        }
+    }
+
+    fn read_from_pos(&mut self, pos: usize, loc: CacheReadLocationType, buffer: &mut [u8]) -> (IoResult<usize>, bool) {
+        unimplemented!();
+
+        let should_upgrade = matches!(loc, CacheReadLocationType::Chained) && self.finalised;
+
+        // ROUGH IDEA
+        // Use pos, buffer size to determine whether we need to lock
+        //  (i.e., likely to need to pull bytes from underlying source.)
+        // if no overlap...
+        // match on inner_type
+        //   floatpcm?
+        //     copy bytes into target buffer (maintain frame alignment if possible)
+        //   opus?
+        //     calculate number of frames needed
+        //     loop: read frame_len, decode into target buffer, march cursor...
+        //
+        // if overlap...
+        // TAKE THE LOCK
+        // are the needed bytes now in memory?
+        // if so... RELEASE (and read from rope) until we hit overlap
+        // if not... HOLD and do the following
+        // Read n frames of audio
+        // Allocate another chunk if needed.
+        // match on inner_type:
+        //   floatpcm?
+        //     do a straight read into the rope, then copy from our buffers to the reader
+        //   opus?
+        //     read some aligned amount of bytes (i.e., 1920 * f32, stereo?)
+        //     encode packet into large scratch
+        //     write encoded_pkt_len into rope, then packet (keep in same chunk?)
+        //     write f32 bytes out to buf
+        // Add equiv f32 bytes to len.
+        // RELEASE
+        // 
+        // Did we hit EOF? If so, finalise.
+
+        (Ok(0), should_upgrade)
+    }
+}
+
+// We need to declare these as thread-safe, since we don't have a mutex around
+// several raw fields. However, the way that they are used should remain
+// consistent.
+unsafe impl Sync for SharedCore {}
+unsafe impl Send for SharedCore {}
+
+struct BufferChunk {
+    start_pos: usize,
+    data: Vec<u8>,
+}
+
+enum CacheReadLocation {
+    Chained(Arc<()>),
+    Backed,
+}
+
+#[derive(Clone, Copy, Debug)]
+enum CacheReadLocationType {
+    Chained,
+    Backed,
+}
+
+impl From<&CacheReadLocation> for CacheReadLocationType {
+    fn from(a: &CacheReadLocation) -> Self {
+        match a {
+            CacheReadLocation::Chained(_) => CacheReadLocationType::Chained,
+            CacheReadLocation::Backed => CacheReadLocationType::Backed,
+        }
+    }
 }
 
 /// A wrapper around an existing [`AudioSource`] which caches
@@ -754,24 +884,71 @@ struct AudioCacheCore<T> {
 /// [`CompressedSource`]: struct.CompressedSource.html
 /// [`RestartableSource`]: struct.RestartableSource.html
 pub struct MemorySource {
-    source: Box<InputSource>,
+    cache: AudioCacheCore,
+    stereo: bool,
 }
 
 impl MemorySource {
-    pub fn new(source: InputSource, length_hint: Option<Duration>) -> Self {
+    pub fn new(source: Input, length_hint: Option<Duration>) -> Self {
+        let stereo = source.stereo;
+
         let store = if let Some(length) = length_hint {
             Vec::with_capacity(std::mem::size_of::<f32>() * STEREO_FRAME_SIZE * (length.as_millis() as usize) / FRAME_LEN_MS)
         } else {
             vec![]
         };
-        let a = AudioCacheCore::<f32> {
-            backing_store: store,
-            chain: None,
+
+        let mut list = LinkedList::new();
+        list.push_back(BufferChunk {
+            start_pos: 0,
+            data: store,
+        });
+
+        // NOTE: put backing store as first element in chain...
+        let a = RawCore {
+            len: 0,
+            finalised: false,
+            source: Box::new(source),
+            inner_type: AudioType::FloatPcm,
+            chunk_size: 2, // ???
+            backing_store: None,
+            chain: Some(list),//(store),
+            chain_users: Arc::new(()),
+            lock: Mutex::new(()),
         };
 
+        let loc = CacheReadLocation::Chained(a.chain_users.clone());
+
         Self {
-            source: Box::new(source),
+            cache: AudioCacheCore {
+                core: Arc::new(SharedCore{ raw: UnsafeCell::new(a) }),
+                pos: 0,
+                loc,
+            },
+            stereo,
         }
+    }
+
+    pub fn into_input(self) -> Input {
+        Input {
+            stereo: self.stereo,
+            kind: AudioType::FloatPcm,
+            decoder: None,
+
+            reader: Reader::InMemory(self),
+        }
+    }
+}
+
+impl Read for MemorySource {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
+        self.cache.read(buf)
+    }
+}
+
+impl Seek for MemorySource {
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
+        unimplemented!()
     }
 }
 
@@ -793,11 +970,11 @@ impl MemorySource {
 /// [`MemorySource`]: struct.MemorySource.html
 /// [`RestartableSource`]: struct.RestartableSource.html
 pub struct CompressedSource {
-    source: Box<InputSource>,
+    source: Box<Input>,
 }
 
 impl CompressedSource {
-    pub fn new(source: Box<InputSource>, length_hint: Option<Duration>) -> Self {
+    pub fn new(source: Box<Input>, length_hint: Option<Duration>) -> Self {
         Self {
             source,
         }
@@ -823,12 +1000,12 @@ impl CompressedSource {
 /// [`CompressedSource`]: struct.CompressedSource.html
 pub struct RestartableSource {
     position: usize,
-    recreator: Box<dyn Fn(Option<Duration>) -> Result<InputSource> + Send + 'static>,
-    source: Box<InputSource>,
+    recreator: Box<dyn Fn(Option<Duration>) -> Result<Input> + Send + 'static>,
+    source: Box<Input>,
 }
 
 impl RestartableSource {
-    pub fn new(recreator: impl Fn(Option<Duration>) -> Result<InputSource> + Send + 'static) -> Result<Self> {
+    pub fn new(recreator: impl Fn(Option<Duration>) -> Result<Input> + Send + 'static) -> Result<Self> {
         recreator(None)
             .map(move |source| {
                 Self {
@@ -870,8 +1047,8 @@ impl RestartableSource {
     }
 
     // FIXME: figure out how to do this better / how I want to do this.
-    pub fn into_input(self) -> InputSource {
-        InputSource {
+    pub fn into_input(self) -> Input {
+        Input {
             stereo: self.source.stereo,
             kind: self.source.kind,
             decoder: None,

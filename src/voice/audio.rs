@@ -34,7 +34,7 @@ use super::{
         TrackEvent,
     },
     Handler,
-    InputSource,
+    Input,
 };
 
 pub const HEADER_LEN: usize = 12;
@@ -168,7 +168,7 @@ pub struct Audio {
     /// Underlying data access object.
     ///
     /// *Calling code is not expected to use this.*
-    pub source: InputSource,
+    pub source: Input,
 
     /// The current position for playback.
     ///
@@ -198,7 +198,7 @@ pub struct Audio {
 }
 
 impl Audio {
-    pub fn new(source: InputSource, commands: Receiver<AudioCommand>, handle: AudioHandle) -> Self {
+    pub fn new(source: Input, commands: Receiver<AudioCommand>, handle: AudioHandle) -> Self {
         Self {
             playing: true,
             volume: 1.0,
@@ -332,7 +332,7 @@ impl Audio {
 ///
 /// [`Audio`]: struct.Audio.html
 /// [`AudioHandle`]: struct.AudioHandle.html
-pub fn create_player(source: InputSource) -> (Audio, AudioHandle) {
+pub fn create_player(source: Input) -> (Audio, AudioHandle) {
     let (tx, rx) = mpsc::channel();
     let can_seek = source.is_seekable();
     let player = Audio::new(source, rx, AudioHandle::new(tx.clone(), can_seek));
@@ -614,7 +614,7 @@ impl TrackQueue {
     }
 
     /// Adds an audio source to the queue, to be played in the channel managed by `handler`.
-    pub fn add_source(&self, source: InputSource, handler: &mut Handler) {
+    pub fn add_source(&self, source: Input, handler: &mut Handler) {
         let (audio, audio_handle) = create_player(source);
         self.add(audio, audio_handle, handler);
     }
