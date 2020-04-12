@@ -117,7 +117,6 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
     }
 
     let start = stream.offset();
-
     if stream.current()? == b'"' {
         stream.next();
 
@@ -127,6 +126,11 @@ fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
         stream.next();
 
         let end = stream.offset();
+
+        // Remove possible delimiters after the quoted argument.
+        for delim in delims {
+            stream.eat(delim);
+        }
 
         return Some(if is_quote {
             Token::new(TokenKind::QuotedArgument, start, end)
