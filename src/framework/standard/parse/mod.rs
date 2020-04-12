@@ -72,6 +72,7 @@ fn find_prefix<'a>(
 
     for f in &config.dynamic_prefixes {
         if let Some(p) = f(ctx, msg) {
+            let p = to_lowercase(config, &p);
             if let Some(p) = try_match(&p) {
                 return Some(p);
             }
