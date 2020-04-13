@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.3] - 2020-04-13
+
+Another bugfix release. This time it fixes a panic that would occur when using a string delimiter and messages contained a unicode character after the delimiter.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Fixed
+
+- [framework] Fix a panic when parsing unicode characters after a string delimiter ([@acdenisSK]) [c:7f04ecf] [c:9ebd779]
+
 ## [0.8.2] - 2020-04-11
 
 This is a release for a critical bugfix.
@@ -3514,6 +3526,9 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:7f04ecf]: https://github.com/serenity-rs/serenity/commit/7f04ecf967b3de4a8e83a2441fa9cb99e7f5913d
+[c:9ebd779]: https://github.com/serenity-rs/serenity/commit/9ebd7791b5b266d2877ece8cad19f333bcacc606
 
 [c:f5dd8bf]: https://github.com/serenity-rs/serenity/commit/f5dd8bf42a7a952c1093925ecd60b46b8f716f60
 
