@@ -538,7 +538,7 @@ impl Message {
         cache_http.http().send_message(self.channel_id.0, &map)
     }
 
-    ///Hide all embeds in this message
+    ///Delete all embeds in this message
     ///**Note**: The logged in user must either be the author of the message or
     /// have the [Manage Messages] permission.
     ///
