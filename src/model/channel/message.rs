@@ -287,8 +287,8 @@ impl Message {
         }
     }
 
-    ///Delete all embeds in this message
-    ///**Note**: The logged in user must either be the author of the message or
+    /// Delete all embeds in this message
+    /// **Note**: The logged in user must either be the author of the message or
     /// have the [Manage Messages] permission.
     ///
     /// # Errors
