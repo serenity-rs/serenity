@@ -526,6 +526,49 @@ impl Message {
         cache_http.http().send_message(self.channel_id.0, &map)
     }
 
+    /// Delete all embeds in this message
+    /// **Note**: The logged in user must either be the author of the message or
+    /// have the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` feature is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    #[cfg(feature = "client")]
+    pub fn suppress_embeds(&mut self, cache_http: impl CacheHttp) -> Result<()> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_MESSAGES;
+                let is_author = self.author.id == cache.read().user.id;
+                let has_perms = utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)?;
+
+                if !is_author && !has_perms {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        let mut suppress = EditMessage::default();
+        suppress.suppress_embeds(true);
+
+        let map = serenity_utils::hashmap_to_json_map(suppress.0);
+
+        match cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
+        {
+            Ok(edited) => {
+                mem::replace(self, edited);
+                Ok(())
+            }
+            Err(why) => Err(why),
+        }
+    }
+
     /// Checks whether the message mentions passed [`UserId`].
     ///
     /// [`UserId`]: ../id/struct.UserId.html
