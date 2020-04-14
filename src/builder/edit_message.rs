@@ -54,6 +54,7 @@ impl EditMessage {
         } else {
             self.0.remove("flags");
         }
+
         self
     }
 
