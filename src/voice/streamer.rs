@@ -35,6 +35,7 @@ use std::{
 };
 use super::{
     AudioType,
+    Bitrate,
     DcaError,
     DcaMetadata,
     ReadSeek,
@@ -131,13 +132,13 @@ pub struct Input {
 
 impl Input {
     pub fn float_pcm(is_stereo: bool, reader: Reader) -> Input {
-    Input {
-        stereo: is_stereo,
-        reader,
-        kind: AudioType::FloatPcm,
-        decoder: None,
+        Input {
+            stereo: is_stereo,
+            reader,
+            kind: AudioType::FloatPcm,
+            decoder: None,
+        }
     }
-}
 
     pub fn new(stereo: bool, reader: Reader, kind: AudioType, decoder: Option<Arc<Mutex<OpusDecoder>>>) -> Self {
         Input {
@@ -187,10 +188,11 @@ impl Input {
 
     // fixme: make this relative.
     pub fn seek_time(&mut self, time: Duration) -> Option<Duration> {
-        let future_pos = timestamp_to_byte_count(time, self.stereo);
+        let sample_len = std::mem::size_of::<f32>();
+        let future_pos = timestamp_to_sample_count(time, self.stereo) * sample_len;
         Seek::seek(&mut self.reader, SeekFrom::Start(future_pos as u64))
             .ok()
-            .map(|a| byte_count_to_timestamp(a as usize, self.stereo))
+            .map(|a| sample_count_to_timestamp((a as usize)/sample_len, self.stereo))
     }
 }
 
@@ -640,39 +642,6 @@ fn is_stereo(path: &OsStr) -> Result<bool> {
     Ok(check)
 }
 
-// type AudioCacheCore = Arc<UnsafeCell<RawAudioCacheCore>>;
-
-struct AudioCacheCore {
-    core: Arc<SharedCore>,
-    pos: usize,
-    loc: CacheReadLocation,
-}
-
-impl AudioCacheCore {
-    fn upgrade_to_backing(&mut self) {
-        self.loc = CacheReadLocation::Backed;
-        self.core.remove_chain();
-    }
-}
-
-// Read and Seek on the audio operate on byte positions
-// of the output FloatPcm stream.
-impl Read for AudioCacheCore {
-    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
-        let (bytes_read, should_upgrade) = self.core.read_from_pos(self.pos, (&self.loc).into(), buf);
-
-        if should_upgrade {
-            self.upgrade_to_backing();
-        }
-
-        if let Ok(size) = bytes_read {
-            self.pos += size;
-        }
-
-        bytes_read
-    }
-}
-
 struct SharedCore {
     raw: UnsafeCell<RawCore>,
 }
@@ -698,6 +667,21 @@ impl SharedCore {
         self.get_mut_ref()
             .read_from_pos(pos, loc, buffer)
     }
+
+    fn len(&self) -> usize {
+        self.get_mut_ref()
+            .len
+    }
+
+    fn is_stereo(&self) -> bool {
+        self.get_mut_ref()
+            .stereo
+    }
+
+    fn is_finalised(&self) -> bool {
+        self.get_mut_ref()
+            .finalised
+    }
 }
 
 // Shared basis for the below cache-based seekables.
@@ -707,7 +691,8 @@ struct RawCore {
 
     inner_type: AudioType,
 
-    source: Box<Input>,
+    source: Option<Box<Input>>,
+    stereo: bool,
 
     chunk_size: usize,
     backing_store: Option<Vec<u8>>,
@@ -717,16 +702,43 @@ struct RawCore {
 }
 
 impl RawCore {
+    fn new(source: Input, inner_type: AudioType, chunk_size: usize, start_size: usize) -> Self {
+        let stereo = source.stereo;
+
+        let mut list = LinkedList::new();
+        list.push_back(BufferChunk::new(0, start_size));
+
+        Self {
+            len: 0,
+            finalised: false,
+            source: Some(Box::new(source)),
+            stereo: stereo,
+            inner_type: AudioType::FloatPcm,
+            chunk_size,
+            backing_store: None,
+            chain: Some(list),
+            chain_users: Arc::new(()),
+            lock: Mutex::new(()),
+        }
+    }
+
     fn finalise(&mut self) {
         // Move the chain/rope of bytes into the backing store.BufferChunk
+        let rope = self.chain.as_mut()
+            .expect("Writes should only occur while the rope exists.");
+
+        let t_E = rope.back().unwrap();
+        assert!(self.len == t_E.start_pos + t_E.data.len());
+
         if let Some(rope) = &mut self.chain {
             if rope.len() > 1 {
                 // Allocate one big store, then start moving entries over
                 // chunk-by-chunk.
-                let mut back = Vec::with_capacity(self.len);
+                let mut back = vec![0u8; self.len];
 
                 for el in rope.iter() {
-                    back[el.start_pos..].copy_from_slice(&el.data[..]);
+                    let end_pos = el.start_pos + el.data.len();
+                    back[el.start_pos..end_pos].copy_from_slice(&el.data[..]);
                 }
 
                 // Insert the new backing store, but DO NOT purge the old.
@@ -759,6 +771,9 @@ impl RawCore {
                 }
             }
         }
+
+        // Drop the old input.
+        self.source = None;
 
         // It's crucial that we do this *last*, as this is the signal
         // for other threads to migrate from rope to backing store.
@@ -794,10 +809,14 @@ impl RawCore {
         }
     }
 
-    fn read_from_pos(&mut self, pos: usize, loc: CacheReadLocationType, buffer: &mut [u8]) -> (IoResult<usize>, bool) {
-        unimplemented!();
+    fn read_from_pos(&mut self, pos: usize, mut loc: CacheReadLocationType, buf: &mut [u8]) -> (IoResult<usize>, bool) {
+        use AudioType::*;
 
-        let should_upgrade = matches!(loc, CacheReadLocationType::Chained) && self.finalised;
+        // If should upgrade, then we take from backing.
+        let mut should_upgrade = matches!(loc, CacheReadLocationType::Chained) && self.finalised;
+        if should_upgrade {
+            loc = CacheReadLocationType::Backed;
+        }
 
         // ROUGH IDEA
         // Use pos, buffer size to determine whether we need to lock
@@ -811,6 +830,7 @@ impl RawCore {
         //     loop: read frame_len, decode into target buffer, march cursor...
         //
         // if overlap...
+        // read up to the limit.
         // TAKE THE LOCK
         // are the needed bytes now in memory?
         // if so... RELEASE (and read from rope) until we hit overlap
@@ -830,7 +850,218 @@ impl RawCore {
         // 
         // Did we hit EOF? If so, finalise.
 
-        (Ok(0), should_upgrade)
+        let target_len = pos + buf.len();
+
+        let out = if target_len <= self.len || self.finalised {
+            // If finalised, there is zero risk of triggering more writes.
+            Ok(self.read_from_local(pos, loc, buf))
+        } else {
+            let mut read = 0;
+            let mut base_result = None;
+
+            loop {
+                let mut remaining_in_store = self.len - pos - read;
+
+                if remaining_in_store == 0 {
+                    // Need to do this to trigger the lock
+                    // while holding mutability to the other members.
+                    let lock: *mut Mutex<()> = &mut self.lock;
+                    let guard = unsafe {
+                        let lock = & *lock;
+                        lock.lock()
+                    };
+
+                    // If length changed between our check and
+                    // acquiring the lock, then drop it -- we don't need new bytes *yet*
+                    // and might not!
+                    remaining_in_store = self.len - pos - read;
+                    if remaining_in_store == 0 {
+                        let read_count = self.fill_from_source(buf.len() - read);
+                        if let Ok(read_count) = read_count {
+                            remaining_in_store += read_count;
+                        }
+                        base_result = Some(read_count);
+
+                        should_upgrade |= self.finalised;
+                    }
+
+                    // Unlocked here.
+                }
+
+                if remaining_in_store > 0 {
+                    read += self.read_from_local(pos, loc, &mut buf[read..]);
+                }
+
+                // break out if:
+                // * no space in reader's buffer
+                // * hit an error
+                // * or nothing remaining, AND finalised
+                if matches!(base_result, Some(Err(_)))
+                    || read == buf.len()
+                    || (self.finalised && self.len == pos + read) {
+                    break;
+                }
+            }
+
+            base_result
+                .unwrap_or(Ok(0))
+                .map(|_| read)
+        };
+
+        (out, should_upgrade)
+    }
+
+    // ONLY SAFE TO CALL WITH LOCK.
+    // The critical section concerns:
+    // * adding new elements to the rope
+    // * drawing bytes from the source
+    // * modifying len
+    fn fill_from_source(&mut self, mut bytes_needed: usize) -> IoResult<usize> {
+        // Round up to the next full audio frame.
+        // FIXME: cache this.
+        let frame_len = timestamp_to_sample_count(Duration::from_millis(20), self.stereo);
+
+        let a = bytes_needed;
+
+        let overspill = bytes_needed % frame_len;
+        if overspill != 0 {
+            bytes_needed += frame_len - overspill;
+        }
+
+        let mut remaining_bytes = bytes_needed;
+
+        use AudioType::*;
+        match self.inner_type {
+            FloatPcm => {
+                let mut recorded_error = None;
+
+                loop {
+                    let rope = self.chain.as_mut()
+                        .expect("Writes should only occur while the rope exists.");
+
+                    let rope_el = rope.back_mut()
+                        .expect("There will always be at least one element in rope.");
+
+                    let start = rope_el.start_pos;
+                    let old_len = rope_el.data.len();
+                    let cap = rope_el.data.capacity();
+                    let space = cap - old_len;
+
+                    let new_len = old_len + space.min(remaining_bytes);
+                    rope_el.data.resize(new_len, 0);
+
+                    // read until we hit bytes_needed
+                    match self.source.as_mut().expect("Source MUST exists while not finalised.").read(&mut rope_el.data[old_len..]) {
+                        Ok(0) => {
+                            rope_el.data.truncate(self.len - start);
+                            self.finalise();
+                        },
+                        Ok(len) => {
+                            if len == space {
+                                // Make a new chunk!
+                                rope.push_back(BufferChunk::new(
+                                    start + new_len,
+                                    self.chunk_size,
+                                ));
+                            } else {
+                                rope_el.data.truncate(old_len + len);
+                            }
+
+                            remaining_bytes -= len;
+                            self.len += len;
+                        },
+                        Err(e) if e.kind() == IoErrorKind::Interrupted => {
+                            // DO nothing, so try again.
+                        },
+                        Err(e) => {
+                            recorded_error = Some(Err(e));
+                        }
+                    }
+
+                    let rope = self.chain.as_mut()
+                        .expect("Writes should only occur while the rope exists.");
+
+                    let rope_el = rope.back_mut()
+                        .expect("There will always be at least one element in rope.");
+
+                    if self.finalised || remaining_bytes == 0 || recorded_error.is_some() {
+                        break;
+                    }
+                }
+
+                recorded_error.unwrap_or(Ok(bytes_needed - remaining_bytes))
+            },
+            Opus => {
+                unimplemented!()
+            },
+            _ => unreachable!(),
+        }
+    }
+
+    fn read_from_local(&self, pos: usize, loc: CacheReadLocationType, buf: &mut [u8]) -> usize {
+        use AudioType::*;
+        match self.inner_type {
+            FloatPcm => self.copy_into_buf_from_pos(pos, loc, buf),
+            Opus => {
+                unimplemented!()
+            },
+            _ => unreachable!(),
+        }
+    }
+
+    #[inline]
+    fn copy_into_buf_from_pos(&self, mut pos: usize, loc: CacheReadLocationType, buf: &mut [u8]) -> usize {
+        use CacheReadLocationType::*;
+        match loc {
+            Backed => {
+                let store = self.backing_store
+                    .as_ref()
+                    .expect("Reader should not attempt to use a backing store before it exists");
+
+                if pos < self.len {
+                    let available = self.len - pos;
+                    let to_write = buf.len().min(available);
+                    buf[..to_write].copy_from_slice(&store[pos..pos + to_write]);
+
+                    to_write
+                } else {
+                    0
+                }
+            },
+            Chained => {
+                let rope = self.chain
+                    .as_ref()
+                    .expect("Rope should still exist while any handles hold a ::Chained(_) \
+                             (and thus an Arc)");
+
+                let mut written = 0;
+
+                for (i, link) in rope.iter().enumerate() {
+                    let end_pos = link.start_pos + link.data.len();
+
+                    if pos >= link.start_pos && pos < end_pos {
+                        let local_available = end_pos - pos;
+                        let to_write = (buf.len() - written).min(local_available);
+
+                        let first_el = pos - link.start_pos;
+                        let last_el = first_el + to_write;
+
+                        let next_len = written + to_write;
+
+                        buf[written..next_len].copy_from_slice(&link.data[first_el..last_el]);
+
+                        written = next_len;
+                        pos += to_write;
+                    }
+
+                    if written >= buf.len() {
+                        break;
+                    }
+                }
+
+                written
+            }
+        }
     }
 }
 
@@ -845,6 +1076,16 @@ struct BufferChunk {
     data: Vec<u8>,
 }
 
+impl BufferChunk {
+    fn new(start_pos: usize, chunk_len: usize) -> Self {
+        BufferChunk {
+            start_pos,
+            data: Vec::with_capacity(chunk_len),
+        }
+    }
+}
+
+#[derive(Clone, Debug)]
 enum CacheReadLocation {
     Chained(Arc<()>),
     Backed,
@@ -862,6 +1103,71 @@ impl From<&CacheReadLocation> for CacheReadLocationType {
             CacheReadLocation::Chained(_) => CacheReadLocationType::Chained,
             CacheReadLocation::Backed => CacheReadLocationType::Backed,
         }
+    }
+}
+
+struct AudioCacheCore {
+    core: Arc<SharedCore>,
+    pos: usize,
+    loc: CacheReadLocation,
+}
+
+impl AudioCacheCore {
+    fn new(core: RawCore) -> Self {
+        let loc = CacheReadLocation::Chained(core.chain_users.clone());
+        AudioCacheCore {
+            core: Arc::new(SharedCore{ raw: UnsafeCell::new(core) }),
+            pos: 0,
+            loc,
+        }
+    }
+
+    fn upgrade_to_backing(&mut self) {
+        self.loc = CacheReadLocation::Backed;
+        self.core.remove_chain();
+    }
+
+    fn new_handle(&self) -> Self {
+        Self {
+            core: self.core.clone(),
+            pos: 0,
+            loc: self.loc.clone(),
+        }
+    }
+
+    fn load_file(&mut self) {
+        let pos = self.pos;
+        while self.consume(1920 * std::mem::size_of::<f32>()) > 0 && !self.is_finalised() {}
+        self.pos = pos;
+    }
+
+    fn spawn_loader(&self) -> std::thread::JoinHandle<()> {
+        let mut handle = self.new_handle();
+        std::thread::spawn(move || {
+            handle.load_file();
+        })
+    }
+
+    fn is_finalised(&self) -> bool {
+        self.core.is_finalised()
+    }
+}
+
+// Read and Seek on the audio operate on byte positions
+// of the output FloatPcm stream.
+impl Read for AudioCacheCore {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
+        let (bytes_read, should_upgrade) = self.core.read_from_pos(self.pos, (&self.loc).into(), buf);
+
+        if should_upgrade {
+            self.upgrade_to_backing();
+        }
+
+        if let Ok(size) = bytes_read {
+            self.pos += size;
+        }
+
+        bytes_read
     }
 }
 
@@ -885,57 +1191,51 @@ impl From<&CacheReadLocation> for CacheReadLocationType {
 /// [`RestartableSource`]: struct.RestartableSource.html
 pub struct MemorySource {
     cache: AudioCacheCore,
-    stereo: bool,
 }
 
 impl MemorySource {
     pub fn new(source: Input, length_hint: Option<Duration>) -> Self {
         let stereo = source.stereo;
+        let chunk_size =
+            std::mem::size_of::<f32>()
+            * timestamp_to_sample_count(Duration::from_secs(5), stereo);
 
-        let store = if let Some(length) = length_hint {
-            Vec::with_capacity(std::mem::size_of::<f32>() * STEREO_FRAME_SIZE * (length.as_millis() as usize) / FRAME_LEN_MS)
+        let start_size = if let Some(length) = length_hint {
+            std::mem::size_of::<f32>() * timestamp_to_sample_count(length, stereo)
         } else {
-            vec![]
+            chunk_size
         };
 
-        let mut list = LinkedList::new();
-        list.push_back(BufferChunk {
-            start_pos: 0,
-            data: store,
-        });
-
-        // NOTE: put backing store as first element in chain...
-        let a = RawCore {
-            len: 0,
-            finalised: false,
-            source: Box::new(source),
-            inner_type: AudioType::FloatPcm,
-            chunk_size: 2, // ???
-            backing_store: None,
-            chain: Some(list),//(store),
-            chain_users: Arc::new(()),
-            lock: Mutex::new(()),
-        };
-
-        let loc = CacheReadLocation::Chained(a.chain_users.clone());
+        let core_raw = RawCore::new(source, AudioType::FloatPcm, chunk_size, start_size);
 
         Self {
-            cache: AudioCacheCore {
-                core: Arc::new(SharedCore{ raw: UnsafeCell::new(a) }),
-                pos: 0,
-                loc,
-            },
-            stereo,
+            cache: AudioCacheCore::new(core_raw),
         }
     }
 
-    pub fn into_input(self) -> Input {
-        Input {
-            stereo: self.stereo,
+    pub fn new_handle(&self) -> Self {
+        Self {
+            cache: self.cache.new_handle(),
+        }
+    }
+
+    pub fn load_file(&mut self) {
+        self.cache.load_file();
+    }
+
+    pub fn spawn_loader(&self) -> std::thread::JoinHandle<()> {
+        self.cache.spawn_loader()
+    }
+}
+
+impl From<MemorySource> for Input {
+    fn from(src: MemorySource) -> Self {
+        Self {
+            stereo: src.cache.core.is_stereo(),
             kind: AudioType::FloatPcm,
             decoder: None,
 
-            reader: Reader::InMemory(self),
+            reader: Reader::InMemory(src),
         }
     }
 }
@@ -948,7 +1248,40 @@ impl Read for MemorySource {
 
 impl Seek for MemorySource {
     fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
-        unimplemented!()
+        let old_pos = self.cache.pos as u64;
+        let mut len = self.cache.core.len();
+
+        let (valid, new_pos) = match pos {
+            SeekFrom::Current(adj) => {
+                // overflow expected in many cases.
+                let new_pos = old_pos.wrapping_add(adj as u64);
+                (adj >= 0 || (adj.abs() as u64) <= old_pos, new_pos)
+            }
+            SeekFrom::End(adj) => {
+                // FIXME: make this check for metadata as the basis?
+                self.load_file();
+
+                len = self.cache.core.len();
+                let new_pos = (len as u64).wrapping_add(adj as u64);
+                (adj >= 0 || (adj.abs() as u64) <= len as u64, new_pos)
+            }
+            SeekFrom::Start(new_pos) => {
+                (true, new_pos)
+            }
+        };
+
+        if valid {
+            if new_pos > old_pos {
+                let a = self.cache.consume((new_pos - old_pos) as usize);
+            }
+
+            len = self.cache.core.len();
+
+            self.cache.pos = new_pos.min(len as u64) as usize;
+            Ok(self.cache.pos as u64)
+        } else {
+            Err(IoError::new(IoErrorKind::InvalidInput, "Tried to seek before start of stream."))
+        }
     }
 }
 
@@ -970,14 +1303,72 @@ impl Seek for MemorySource {
 /// [`MemorySource`]: struct.MemorySource.html
 /// [`RestartableSource`]: struct.RestartableSource.html
 pub struct CompressedSource {
-    source: Box<Input>,
+    cache: AudioCacheCore,
 }
 
 impl CompressedSource {
-    pub fn new(source: Box<Input>, length_hint: Option<Duration>) -> Self {
+    pub fn new(source: Input, bitrate: Bitrate, length_hint: Option<Duration>) -> Self {
+        let framing_cost_per_sec = AUDIO_FRAME_RATE * std::mem::size_of::<u16>();
+        let bitrate = match bitrate {
+            Bitrate::BitsPerSecond(i) => i,
+            Bitrate::Auto => 64_000,
+            Bitrate::Max => 510_000,
+        } as usize;
+
+        let est_cost_per_sec = (bitrate / 8) + framing_cost_per_sec;
+
+        let chunk_size = est_cost_per_sec * 5;
+
+        let start_size = if let Some(length) = length_hint {
+            let sec_count = length.as_secs() + if length.subsec_nanos() != 0 { 1 } else { 0 };
+            est_cost_per_sec * sec_count as usize
+        } else {
+            chunk_size
+        };
+
+        let core_raw = RawCore::new(source, AudioType::Opus, chunk_size, start_size);
+
         Self {
-            source,
+            cache: AudioCacheCore::new(core_raw),
         }
+    }
+
+    pub fn new_handle(&self) -> Self {
+        Self {
+            cache: self.cache.new_handle(),
+        }
+    }
+
+    pub fn load_file(&mut self) {
+        self.cache.load_file();
+    }
+
+    pub fn spawn_loader(&self) -> std::thread::JoinHandle<()> {
+        self.cache.spawn_loader()
+    }
+}
+
+impl From<CompressedSource> for Input {
+    fn from(src: CompressedSource) -> Self {
+        Input {
+            stereo: src.cache.core.is_stereo(),
+            kind: AudioType::FloatPcm,
+            decoder: None,
+
+            reader: Reader::Compressed(src),
+        }
+    }
+}
+
+impl Read for CompressedSource {
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
+        unimplemented!()
+    }
+}
+
+impl Seek for CompressedSource {
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
+        unimplemented!()
     }
 }
 
@@ -1045,15 +1436,16 @@ impl RestartableSource {
             }
         })
     }
+}
 
-    // FIXME: figure out how to do this better / how I want to do this.
-    pub fn into_input(self) -> Input {
-        Input {
-            stereo: self.source.stereo,
-            kind: self.source.kind,
+impl From<RestartableSource> for Input {
+    fn from(src: RestartableSource) -> Self {
+        Self {
+            stereo: src.source.stereo,
+            kind: src.source.kind,
             decoder: None,
 
-            reader: Reader::Restartable(self),
+            reader: Reader::Restartable(src),   
         }
     }
 }
@@ -1073,12 +1465,16 @@ impl Seek for RestartableSource {
         match pos {
             Start(offset) => {
                 let stereo = self.source.stereo;
-                let current_ts = byte_count_to_timestamp(self.position, stereo);
+                let current_ts = sample_count_to_timestamp(self.position, stereo) * std::mem::size_of::<f32>();
                 let offset = offset as usize;
 
                 if offset < self.position {
                     // FIXME: don't unwrap
-                    self.source = Box::new((self.recreator)(Some(byte_count_to_timestamp(offset, stereo))).unwrap());
+                    self.source = Box::new(
+                        (self.recreator)(
+                            Some(sample_count_to_timestamp(offset, stereo)) * std::mem::size_of::<f32>()
+                        ).unwrap()
+                    );
                     self.position = offset;
                 } else {
                     self.position += self.source.consume(offset - self.position);
@@ -1094,10 +1490,10 @@ impl Seek for RestartableSource {
     }
 }
 
-fn timestamp_to_byte_count(timestamp: Duration, stereo: bool) -> usize {
+fn timestamp_to_sample_count(timestamp: Duration, stereo: bool) -> usize {
     ((timestamp.as_millis() as usize) * (MONO_FRAME_SIZE / FRAME_LEN_MS)) << stereo as usize
 }
 
-fn byte_count_to_timestamp(amt: usize, stereo: bool) -> Duration {
+fn sample_count_to_timestamp(amt: usize, stereo: bool) -> Duration {
     Duration::from_millis((((amt * FRAME_LEN_MS) / MONO_FRAME_SIZE) as u64) >> stereo as u64)
 }
