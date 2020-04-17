@@ -27,7 +27,7 @@ use super::{
 use threadpool::ThreadPool;
 use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
-use log::{info, warn};
+use log::{debug, info, warn};
 
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
@@ -209,6 +209,7 @@ impl<H: EventHandler + Send + Sync + 'static,
 
         thread::spawn(move || {
             let _ = runner.run();
+            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
         self.runners.lock().insert(ShardId(shard_id), runner_info);
