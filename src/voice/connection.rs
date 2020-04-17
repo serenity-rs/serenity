@@ -325,9 +325,8 @@ impl Connection {
                         offset += 1 + (0b1111 & (byte >> 4)) as usize;
                     }
 
-                    while decrypted[offset] == 0 {
-                        offset += 1;
-                    }
+                    // Skip over undocumented Discord byte
+                    offset += 1;
 
                     decrypted = decrypted.split_off(offset);
                 }
