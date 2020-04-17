@@ -25,7 +25,7 @@ use super::{
 };
 use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
-use log::{info, warn};
+use log::{debug, info, warn};
 
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
@@ -196,6 +196,7 @@ impl ShardQueuer {
 
         tokio::spawn(async move {
             let _ = runner.run().await;
+            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
         self.runners.lock().await.insert(ShardId(shard_id), runner_info);

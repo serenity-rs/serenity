@@ -47,10 +47,11 @@ impl ShardManagerMonitor {
         debug!("Starting shard manager worker");
 
         while let Some(value) = self.rx.next().await {
-            
+
             match value {
                 ShardManagerMessage::Restart(shard_id) => {
                     self.manager.lock().await.restart(shard_id).await;
+                    let _  = self.shutdown.unbounded_send(shard_id);
                 },
                 ShardManagerMessage::ShardUpdate { id, latency, stage } => {
                     let manager = self.manager.lock().await;
@@ -61,8 +62,9 @@ impl ShardManagerMonitor {
                         runner.stage = stage;
                     }
                 }
-                ShardManagerMessage::Shutdown(shard_id) => {
-                    self.manager.lock().await.shutdown(shard_id).await;
+                ShardManagerMessage::Shutdown(shard_id, code) => {
+                    self.manager.lock().await.shutdown(shard_id, code).await;
+                    let _ = self.shutdown.unbounded_send(shard_id);
                 },
                 ShardManagerMessage::ShutdownAll => {
                     self.manager.lock().await.shutdown_all().await;

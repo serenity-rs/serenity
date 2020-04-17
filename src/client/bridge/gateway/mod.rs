@@ -116,7 +116,7 @@ pub enum ShardManagerMessage {
     /// without bringing it back up.
     ///
     /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
-    Shutdown(ShardId),
+    Shutdown(ShardId, u16),
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards
     /// and end its monitoring process for the [`ShardManager`].
     ///

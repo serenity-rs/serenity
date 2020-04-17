@@ -50,7 +50,7 @@ pub struct ShardRunner {
     runner_rx: Receiver<InterMessage>,
     // channel to send messages to the shard runner from the shard manager
     runner_tx: Sender<InterMessage>,
-    shard: Shard,
+    pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
     voice_manager: Arc<Mutex<ClientVoiceManager>>,
     cache_and_http: Arc<CacheAndHttp>,
@@ -147,7 +147,8 @@ impl ShardRunner {
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
-                    return self.request_restart().await;
+                    let _ = self.request_restart().await;
+                    continue;
                 },
                 Some(other) => {
                     let _ = self.action(&other).await;
@@ -256,7 +257,7 @@ impl ShardRunner {
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
-    async fn checked_shutdown(&mut self, id: ShardId) -> bool {
+    async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
         // First verify the ID so we know for certain this runner is
         // to shutdown.
         if id.0 != self.shard.shard_info()[0] {
@@ -267,7 +268,7 @@ impl ShardRunner {
 
         // Send a Close Frame to Discord, which allows a bot to "log off"
         let _ = self.shard.client.close(Some(CloseFrame {
-            code: 1000.into(),
+            code: close_code.into(),
             reason: Cow::from(""),
         }));
 
@@ -322,9 +323,11 @@ impl ShardRunner {
     async fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
             InterMessage::Client(value) => match *value {
-                    ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) |
-                    ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id)) => {
-                        self.checked_shutdown(id).await
+                    ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) => {
+                        self.checked_shutdown(id, 4000).await
+                    },
+                    ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id, code)) => {
+                        self.checked_shutdown(id, code).await
                     },
                     ShardClientMessage::Manager(ShardManagerMessage::ShutdownAll) => {
                         // This variant should never be received.
