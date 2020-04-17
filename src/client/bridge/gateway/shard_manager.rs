@@ -260,7 +260,7 @@ impl ShardManager {
     /// [`initialize`]: #method.initialize
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
-        self.shutdown(shard_id);
+        self.shutdown(shard_id, 4000);
 
         let shard_total = self.shard_total;
 
@@ -286,11 +286,11 @@ impl ShardManager {
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
-    pub fn shutdown(&mut self, shard_id: ShardId) -> bool {
+    pub fn shutdown(&mut self, shard_id: ShardId, code: u16) -> bool {
         info!("Shutting down shard {}", shard_id);
 
         if let Some(runner) = self.runners.lock().get(&shard_id) {
-            let shutdown = ShardManagerMessage::Shutdown(shard_id);
+            let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
             let client_msg = ShardClientMessage::Manager(shutdown);
             let msg = InterMessage::Client(Box::new(client_msg));
 
@@ -341,7 +341,7 @@ impl ShardManager {
         info!("Shutting down all shards");
 
         for shard_id in keys {
-            self.shutdown(shard_id);
+            self.shutdown(shard_id, 1000);
         }
 
         let _ = self.shard_queuer.send(ShardQueuerMessage::Shutdown);
