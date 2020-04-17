@@ -34,7 +34,7 @@ use commands::{
 
 struct ShardManagerContainer;
 
-impl ShareMapKey for ShardManagerContainer {
+impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
 }
 

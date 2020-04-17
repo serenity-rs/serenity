@@ -28,7 +28,7 @@ use tungstenite::{
     protocol::frame::CloseFrame,
 };
 
-use crate::utils::ShareMap;
+use crate::utils::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
@@ -39,7 +39,7 @@ use log::{error, debug, warn};
 ///
 /// [`Shard`]: ../../../gateway/struct.Shard.html
 pub struct ShardRunner {
-    data: Arc<RwLock<ShareMap>>,
+    data: Arc<RwLock<TypeMap>>,
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
@@ -529,7 +529,7 @@ impl ShardRunner {
 ///
 /// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
 pub struct ShardRunnerOptions {
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     pub event_handler: Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]

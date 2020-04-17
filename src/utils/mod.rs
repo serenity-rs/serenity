@@ -4,7 +4,7 @@
 mod colour;
 mod message_builder;
 mod custom_message;
-mod sharemap;
+mod typemap;
 
 pub use self::{
     colour::Colour,
@@ -15,7 +15,7 @@ pub use self::{
         MessageBuilder,
     },
 	custom_message::CustomMessage,
-    sharemap::{ShareMap, ShareMapKey},
+    typemap::{TypeMap, TypeMapKey},
 };
 pub type Color = Colour;
 

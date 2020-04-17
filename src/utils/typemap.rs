@@ -9,64 +9,64 @@ use std::collections::hash_map::{
 };
 use std::marker::PhantomData;
 
-/// ShareMapKey is used to declare key types that are eligible for use
-/// with [`ShareMap`].
+/// TypeMapKey is used to declare key types that are eligible for use
+/// with [`TypeMap`].
 ///
-/// [`ShareMap`]: struct.ShareMap.html
-pub trait ShareMapKey: Any {
-    /// Defines the value type that corresponds to this `ShareMapKey`.
+/// [`TypeMap`]: struct.TypeMap.html
+pub trait TypeMapKey: Any {
+    /// Defines the value type that corresponds to this `TypeMapKey`.
     type Value: Send + Sync;
 }
 
-/// ShareMap is a simple abstraction around the standard library's [`HashMap`]
+/// TypeMap is a simple abstraction around the standard library's [`HashMap`]
 /// type, where types are its keys. This allows for statically-checked value
 /// retrieval.
 ///
 /// [`HashMap`]: std::collections::HashMap
-pub struct ShareMap(HashMap<TypeId, Box<(dyn Any + Send + Sync)>>);
+pub struct TypeMap(HashMap<TypeId, Box<(dyn Any + Send + Sync)>>);
 
-impl ShareMap {
-    /// Creates a new instance of `ShareMap`.
+impl TypeMap {
+    /// Creates a new instance of `TypeMap`.
     #[inline]
     pub fn new() -> Self {
         Self(HashMap::new())
     }
 
-    /// Inserts a new value based on its [`ShareMapKey`].
+    /// Inserts a new value based on its [`TypeMapKey`].
     /// If the value has been already inserted, it will be overwritten
     /// with the new value.
     ///
     /// ```rust
-    /// use serenity::utils::{ShareMap, ShareMapKey};
+    /// use serenity::utils::{TypeMap, TypeMapKey};
     ///
     /// struct Number;
     ///
-    /// impl ShareMapKey for Number {
+    /// impl TypeMapKey for Number {
     ///     type Value = i32;
     /// }
     ///
-    /// let mut map = ShareMap::new();
+    /// let mut map = TypeMap::new();
     /// map.insert::<Number>(42);
     /// // Overwrite the value of `Number` with -42.
     /// map.insert::<Number>(-42);
     /// ```
     ///
-    /// [`ShareMapKey`]: trait.ShareMapKey.html
+    /// [`TypeMapKey`]: trait.TypeMapKey.html
     #[inline]
     pub fn insert<T>(&mut self, value: T::Value)
     where
-        T: ShareMapKey
+        T: TypeMapKey
     {
         self.0.insert(TypeId::of::<T>(), Box::new(value));
     }
 
-    /// Retrieve the entry based on its [`ShareMapKey`]
+    /// Retrieve the entry based on its [`TypeMapKey`]
     ///
-    /// [`ShareMapKey`]: trait.ShareMapKey.html
+    /// [`TypeMapKey`]: trait.TypeMapKey.html
     #[inline]
     pub fn entry<T>(&mut self) -> Entry<'_, T>
     where
-        T: ShareMapKey
+        T: TypeMapKey
     {
         match self.0.entry(TypeId::of::<T>()) {
             HashMapEntry::Occupied(entry) => Entry::Occupied(OccupiedEntry {
@@ -80,48 +80,48 @@ impl ShareMap {
         }
     }
 
-    /// Retrieve a reference to a value based on its [`ShareMapKey`].
+    /// Retrieve a reference to a value based on its [`TypeMapKey`].
     /// Returns `None` if it couldn't be found.
     ///
     /// ```rust
-    /// use serenity::utils::{ShareMap, ShareMapKey};
+    /// use serenity::utils::{TypeMap, TypeMapKey};
     ///
     /// struct Number;
     ///
-    /// impl ShareMapKey for Number {
+    /// impl TypeMapKey for Number {
     ///     type Value = i32;
     /// }
     ///
-    /// let mut map = ShareMap::new();
+    /// let mut map = TypeMap::new();
     /// map.insert::<Number>(42);
     ///
     /// assert_eq!(*map.get::<Number>().unwrap(), 42);
     /// ```
     ///
-    /// [`ShareMapKey`]: trait.ShareMapKey.html
+    /// [`TypeMapKey`]: trait.TypeMapKey.html
     #[inline]
     pub fn get<T>(&self) -> Option<&T::Value>
     where
-        T: ShareMapKey
+        T: TypeMapKey
     {
         self.0
             .get(&TypeId::of::<T>())
             .and_then(|b| b.downcast_ref::<T::Value>())
     }
 
-    /// Retrieve a mutable reference to a value based on its [`ShareMapKey`].
+    /// Retrieve a mutable reference to a value based on its [`TypeMapKey`].
     /// Returns `None` if it couldn't be found.
     ///
     /// ```rust
-    /// use serenity::utils::{ShareMap, ShareMapKey};
+    /// use serenity::utils::{TypeMap, TypeMapKey};
     ///
     /// struct Number;
     ///
-    /// impl ShareMapKey for Number {
+    /// impl TypeMapKey for Number {
     ///     type Value = i32;
     /// }
     ///
-    /// let mut map = ShareMap::new();
+    /// let mut map = TypeMap::new();
     /// map.insert::<Number>(42);
     ///
     /// assert_eq!(*map.get::<Number>().unwrap(), 42);
@@ -129,11 +129,11 @@ impl ShareMap {
     /// assert_eq!(*map.get::<Number>().unwrap(), 0);
     /// ```
     ///
-    /// [`ShareMapKey`]: trait.ShareMapKey.html
+    /// [`TypeMapKey`]: trait.TypeMapKey.html
     #[inline]
     pub fn get_mut<T>(&mut self) -> Option<&mut T::Value>
     where
-        T: ShareMapKey
+        T: TypeMapKey
     {
         self.0
             .get_mut(&TypeId::of::<T>())
@@ -141,18 +141,18 @@ impl ShareMap {
     }
 }
 
-/// A view into a single entry in the [`ShareMap`],
+/// A view into a single entry in the [`TypeMap`],
 /// which may either be vacant or occupied.
 ///
 /// This heavily mirrors the official [`Entry`] API in the standard library,
 /// but not all of it is provided due to implementation restrictions. Please
 /// refer to its documentations.
 ///
-/// [`ShareMap`]: struct.ShareMap.html
+/// [`TypeMap`]: struct.TypeMap.html
 /// [`Entry`]: std::collections::hash_map::Entry
 pub enum Entry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
 {
     Occupied(OccupiedEntry<'a, K>),
     Vacant(VacantEntry<'a, K>),
@@ -160,7 +160,7 @@ where
 
 impl<'a, K> Entry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
 {
     #[inline]
     pub fn or_insert(self, value: K::Value) -> &'a mut K::Value {
@@ -198,7 +198,7 @@ where
 
 impl<'a, K> Entry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
     K::Value: Default
 {
     #[inline]
@@ -209,7 +209,7 @@ where
 
 pub struct OccupiedEntry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
 {
     entry: HashMapOccupiedEntry<'a, TypeId, Box<(dyn Any + Send + Sync)>>,
     _marker: PhantomData<&'a K::Value>,
@@ -217,7 +217,7 @@ where
 
 impl<'a, K> OccupiedEntry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
 {
     #[inline]
     pub fn get(&self) -> &K::Value {
@@ -247,7 +247,7 @@ where
 
 pub struct VacantEntry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
 {
     entry: HashMapVacantEntry<'a, TypeId, Box<(dyn Any + Send + Sync)>>,
     _marker: PhantomData<&'a K::Value>,
@@ -255,7 +255,7 @@ where
 
 impl<'a, K> VacantEntry<'a, K>
 where
-    K: ShareMapKey,
+    K: TypeMapKey,
 {
     #[inline]
     pub fn insert(self, value: K::Value) -> &'a mut K::Value {
@@ -269,13 +269,13 @@ mod test {
 
     struct Counter;
 
-    impl ShareMapKey for Counter {
+    impl TypeMapKey for Counter {
         type Value = u64;
     }
 
     #[test]
-    fn sharemap_counter() {
-        let mut map = ShareMap::new();
+    fn typemap_counter() {
+        let mut map = TypeMap::new();
 
         map.insert::<Counter>(0);
 
@@ -289,8 +289,8 @@ mod test {
     }
 
     #[test]
-    fn sharemap_entry() {
-        let mut map = ShareMap::new();
+    fn typemap_entry() {
+        let mut map = TypeMap::new();
 
         assert_eq!(map.get::<Counter>(), None);
         *map.entry::<Counter>().or_insert(0) += 42;

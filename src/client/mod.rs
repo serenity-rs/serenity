@@ -56,7 +56,7 @@ use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
 use crate::http::Http;
-use crate::utils::ShareMap;
+use crate::utils::TypeMap;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -102,7 +102,7 @@ use crate::utils::ShareMap;
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: ../index.html#sharding
 pub struct Client {
-    /// A ShareMap which requires types to be Send + Sync. This is a map that
+    /// A TypeMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
     /// The purpose of the data field is to be accessible and persistent across
@@ -131,7 +131,7 @@ pub struct Client {
     ///
     /// struct MessageEventCounter;
     ///
-    /// impl ShareMapKey for MessageEventCounter {
+    /// impl TypeMapKey for MessageEventCounter {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
@@ -180,7 +180,7 @@ pub struct Client {
     /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     /// A vector of all active shards that have received their [`Event::Ready`]
     /// payload, and have dispatched to [`on_ready`] if an event handler was
     /// configured.
@@ -406,7 +406,7 @@ impl Client {
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway()?.url));
-        let data = Arc::new(RwLock::new(ShareMap::new()));
+        let data = Arc::new(RwLock::new(TypeMap::new()));
 
         #[cfg(feature = "framework")]
         let framework = Arc::new(Mutex::new(None));

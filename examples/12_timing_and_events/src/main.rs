@@ -67,12 +67,12 @@ impl Hash for DispatchEvent {
 }
 
 struct DispatcherKey;
-impl ShareMapKey for DispatcherKey {
+impl TypeMapKey for DispatcherKey {
     type Value = Arc<RwLock<Dispatcher<DispatchEvent>>>;
 }
 
 struct SchedulerKey;
-impl ShareMapKey for SchedulerKey {
+impl TypeMapKey for SchedulerKey {
     type Value = Arc<RwLock<Scheduler>>;
 }
 

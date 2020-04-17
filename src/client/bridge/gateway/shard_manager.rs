@@ -25,7 +25,7 @@ use super::{
 use threadpool::ThreadPool;
 use log::{info, warn};
 
-use crate::utils::ShareMap;
+use crate::utils::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
@@ -73,7 +73,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
-/// let data = Arc::new(RwLock::new(ShareMap::new()));
+/// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
@@ -371,7 +371,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions<'a> {
-    pub data: &'a Arc<RwLock<ShareMap>>,
+    pub data: &'a Arc<RwLock<TypeMap>>,
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]

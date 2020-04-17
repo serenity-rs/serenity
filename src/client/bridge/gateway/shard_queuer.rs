@@ -28,7 +28,7 @@ use threadpool::ThreadPool;
 use crate::gateway::ConnectionStage;
 use log::{info, warn};
 
-use crate::utils::ShareMap;
+use crate::utils::TypeMap;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]
@@ -47,7 +47,7 @@ pub struct ShardQueuer {
     /// dispatching.
     ///
     /// [`Client::data`]: ../../struct.Client.html#structfield.data
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     /// A reference to an `EventHandler`, such as the one given to the
     /// [`Client`].
     ///
