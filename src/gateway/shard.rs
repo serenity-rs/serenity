@@ -124,7 +124,7 @@ impl Shard {
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
-    /// let shard = Shard::new(gateway, &token, [0, 1], true, None).await?;
+    /// let shard = Shard::new(gateway, &token, [0u64, 1u64], true, None).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -273,7 +273,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await.unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true).await.unwrap();
     /// #
     /// use serenity::model::gateway::Activity;
     ///
@@ -321,7 +321,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await.unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await.unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
@@ -681,7 +681,7 @@ impl Shard {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -704,7 +704,7 @@ impl Shard {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
