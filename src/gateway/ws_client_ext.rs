@@ -1,6 +1,7 @@
 use chrono::Utc;
 use crate::constants::{self, OpCode};
 use crate::gateway::{CurrentPresence, WsStream};
+use crate::client::bridge::gateway::GatewayIntents;
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::model::id::GuildId;
@@ -22,7 +23,7 @@ pub trait WebSocketGatewayClientExt {
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()>;
 
     async fn send_presence_update(
@@ -71,7 +72,7 @@ impl WebSocketGatewayClientExt for WsStream {
         })).await.map_err(From::from)
     }
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -83,6 +84,7 @@ impl WebSocketGatewayClientExt for WsStream {
                 "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,
                 "token": token,
+                "intents": intents,
                 "v": constants::GATEWAY_VERSION,
                 "properties": {
                     "$browser": "serenity",

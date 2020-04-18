@@ -44,7 +44,6 @@ use tokio::sync::RwLock;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 use log::{error, debug, info};
 
 #[cfg(feature = "framework")]
@@ -55,6 +54,7 @@ use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
 use crate::http::Http;
+use crate::utils::TypeMap;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -104,7 +104,7 @@ use crate::http::Http;
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: ../index.html#sharding
 pub struct Client {
-    /// A ShareMap which requires types to be Send + Sync. This is a map that
+    /// A TypeMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
     /// The purpose of the data field is to be accessible and persistent across
@@ -125,8 +125,7 @@ pub struct Client {
     /// - [`Event::MessageDeleteBulk`]
     /// - [`Event::MessageUpdate`]
     ///
-    /// ```rust,no_run
-    /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
+    /// ```rust,ignore
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
     /// use std::collections::HashMap;
@@ -191,7 +190,7 @@ pub struct Client {
     /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
     /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -357,6 +356,7 @@ impl Client {
             #[cfg(feature = "cache")]
             timeout,
             guild_subscriptions,
+            intents,
         } = extras;
 
         let http = Http::new_with_token(&token);
@@ -364,7 +364,7 @@ impl Client {
         let name = "serenity client".to_owned();
         let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
-        let data = Arc::new(RwLock::new(ShareMap::custom()));
+        let data = Arc::new(RwLock::new(TypeMap::new()));
 
         #[cfg(feature = "voice")]
         let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
@@ -400,6 +400,7 @@ impl Client {
                 ws_url: &url,
                 cache_and_http: &cache_and_http,
                 guild_subscriptions,
+                intents,
             }).await
         };
 

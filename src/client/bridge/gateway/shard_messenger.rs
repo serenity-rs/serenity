@@ -58,7 +58,7 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -80,7 +80,7 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -125,7 +125,7 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
     /// use serenity::model::gateway::Activity;
     ///
     /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
@@ -154,7 +154,7 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
     /// #
     /// use serenity::model::gateway::Activity;
     /// use serenity::model::user::OnlineStatus;
@@ -191,7 +191,7 @@ impl ShardMessenger {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).await?;
     /// #
     /// use serenity::model::user::OnlineStatus;
     ///

@@ -141,7 +141,7 @@ async fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
     };
 
     let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
@@ -166,7 +166,7 @@ async fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().await.get::<VoiceManager>().cloned()
-        .expect("Expected VoiceManager in ShareMap.");
+        .expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 

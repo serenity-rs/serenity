@@ -19,6 +19,7 @@ use futures::{
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
+    GatewayIntents,
     ShardClientMessage,
     ShardId,
     ShardManagerMessage,
@@ -28,9 +29,9 @@ use super::{
     ShardRunnerInfo,
 };
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 use log::{info, warn};
 
+use crate::utils::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
@@ -63,11 +64,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use tokio::sync::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
-/// // Of note, this imports `typemap`'s `ShareMap` type.
-/// use serenity::prelude::*;
 /// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
-/// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
 /// use std::sync::Arc;
 /// use std::env;
@@ -80,8 +78,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
-/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
-/// let data = Arc::new(RwLock::new(ShareMap::custom()));
+/// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
+/// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(None);
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
@@ -103,6 +101,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
 ///     guild_subscriptions: true,
+///     intents: None,
 /// });
 /// #     Ok(())
 /// # }
@@ -153,6 +152,7 @@ impl ShardManager {
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
             guild_subscriptions: opt.guild_subscriptions,
+            intents: opt.intents,
         };
 
         tokio::spawn(async move {
@@ -375,7 +375,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions<'a> {
-    pub data: &'a Arc<RwLock<ShareMap>>,
+    pub data: &'a Arc<RwLock<TypeMap>>,
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
@@ -389,4 +389,5 @@ pub struct ShardManagerOptions<'a> {
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
+    pub intents: Option<GatewayIntents>,
 }

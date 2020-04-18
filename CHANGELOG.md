@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.4] - 2020-04-18
+
+This release fixes Serenity's handling of Discord's new rebalances. You should no longer encounter many Ready events.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [gateway] Fix handling rebalances. ([@Lakelezz]) [c:003c8e1]
+
+## [0.8.3] - 2020-04-13
+
+Another bugfix release. This time it fixes a panic that would occur when using a string delimiter and messages contained a unicode character after the delimiter.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Fixed
+
+- [framework] Fix a panic when parsing unicode characters after a string delimiter ([@acdenisSK]) [c:7f04ecf] [c:9ebd779]
+
+## [0.8.2] - 2020-04-11
+
+This is a release for a critical bugfix.
+
+In an attempt to fix one thing, other things broke. Any time Serenity made a request to a POST or PUT endpoint (such as creating reactions or banning users), Discord would return HTTP 400. This release corrects that.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [http] Always send the `Content-Length` header ([@Lakelezz]) [c:f5dd8bf]
+
 ## [0.8.1] - 2020-04-02
 
 This is the last release for the 0.8.x series. 0.9.x will contain async/await support!
@@ -147,6 +185,18 @@ Thanks to the following for their contributions:
 - [framework] Get rid of the `Arc` implementation for `Framework` ([@acdenisSK]) [c:05044b6]
 - [client] Turn the function-like group macro to an attribute macro ([@acdenisSK]) [c:5b01290]
 - [http] Remove april fools functions ([@TheUnitedStatesOfAmerica]) [c:caeeda1]
+
+## [0.7.6] - 2019-04-18
+
+This release fixes Serenity's handling of Discord's new rebalances. You should no longer encounter many Ready events.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [gateway] Fix handling rebalances. ([@Lakelezz]) [c:f708bec]
 
 ## [0.7.5] - 2020-01-13
 
@@ -3354,7 +3404,12 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
-[0.8.0]: https://github.com/serenity-rs/serenity/compare/v0.7.5...v0.8.0
+[0.8.4]: https://github.com/serenity-rs/serenity/compare/v0.8.3...v0.8.4
+[0.8.3]: https://github.com/serenity-rs/serenity/compare/v0.8.2...v0.8.3
+[0.8.2]: https://github.com/serenity-rs/serenity/compare/v0.8.1...v0.8.2
+[0.8.1]: https://github.com/serenity-rs/serenity/compare/v0.8.0...v0.8.1
+[0.8.0]: https://github.com/serenity-rs/serenity/compare/v0.7.6...v0.8.0
+[0.7.6]: https://github.com/serenity-rs/serenity/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/serenity-rs/serenity/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/serenity-rs/serenity/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/serenity-rs/serenity/compare/v0.7.2...v0.7.3
@@ -3500,6 +3555,16 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+
+[c:003c8e1]: https://github.com/serenity-rs/serenity/commit/003c8e1d2519610601a6f800be6bc8faddac8b1b
+
+[c:f708bec]: https://github.com/serenity-rs/serenity/commit/f708bec4932a7bec2b53e4b4450d9567b44a4138
+
+[c:7f04ecf]: https://github.com/serenity-rs/serenity/commit/7f04ecf967b3de4a8e83a2441fa9cb99e7f5913d
+[c:9ebd779]: https://github.com/serenity-rs/serenity/commit/9ebd7791b5b266d2877ece8cad19f333bcacc606
+
+[c:f5dd8bf]: https://github.com/serenity-rs/serenity/commit/f5dd8bf42a7a952c1093925ecd60b46b8f716f60
 
 [c:e005ef1]: https://github.com/serenity-rs/serenity/commit/e005ef19b695fb444f921e84741b97fb2a9d0687
 [c:f27c7c1]: https://github.com/serenity-rs/serenity/commit/f27c7c148b14239b7170b3acd6a17137c6986737

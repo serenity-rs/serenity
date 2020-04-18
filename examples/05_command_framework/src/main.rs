@@ -25,7 +25,6 @@ use serenity::{
     utils::{content_safe, ContentSafeOptions},
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
 use serenity::prelude::*;
 use tokio::sync::Mutex;
 
@@ -139,7 +138,7 @@ async fn before(ctx: &mut Context, msg: &Message, command_name: &str) -> bool {
     // the command's name does not exist in the counter, add a default
     // value of 0.
     let mut data = ctx.data.write().await;
-    let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in ShareMap.");
+    let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
     let entry = counter.entry(command_name.to_string()).or_insert(0);
     *entry += 1;
 
@@ -273,15 +272,6 @@ async fn main() {
         data.insert::<CommandCounter>(HashMap::default());
         data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
     }
-
-    // Commands are equivalent to:
-    // "~about"
-    // "~emoji cat"
-    // "~emoji dog"
-    // "~multiply"
-    // "~ping"
-    // "~some long command"
-
 
     if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);

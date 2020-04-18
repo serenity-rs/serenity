@@ -3,6 +3,7 @@ use uwl::Stream;
 use std::error::Error as StdError;
 use std::marker::PhantomData;
 use std::{fmt, str::FromStr};
+use std::borrow::Cow;
 
 /// Defines how an operation on an `Args` method failed.
 #[derive(Debug)]
@@ -44,6 +45,16 @@ pub enum Delimiter {
     Multiple(String),
 }
 
+impl Delimiter {
+    #[inline]
+    fn to_str(&self) -> Cow<'_, str> {
+        match self {
+            Delimiter::Single(c) => Cow::Owned(c.to_string()),
+            Delimiter::Multiple(s) => Cow::Borrowed(s),
+        }
+    }
+}
+
 impl From<char> for Delimiter {
     #[inline]
     fn from(c: char) -> Delimiter {
@@ -74,7 +85,6 @@ impl<'a> From<&'a str> for Delimiter {
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 enum TokenKind {
-    Delimiter,
     Argument,
     QuotedArgument,
 }
@@ -92,75 +102,51 @@ impl Token {
     }
 }
 
-fn lex(stream: &mut Stream<'_>, delims: &[&Delimiter]) -> Option<Token> {
-    if stream.at_end() {
+fn lex(stream: &mut Stream<'_>, delims: &[Cow<'_, str>]) -> Option<Token> {
+    if stream.is_empty() {
         return None;
     }
 
-    for delim in delims {
-        match delim {
-            Delimiter::Single(c) => {
-                if stream.current()? == *c {
-                    let start = stream.offset();
-                    stream.next();
-                    return Some(Token::new(TokenKind::Delimiter, start, c.len_utf8()));
-                }
-            }
-            Delimiter::Multiple(s) => {
-                if *s == stream.peek_for(s.chars().count()) {
-                    let start = stream.offset();
-                    let end = start + s.len();
-
-                    // Move the offset pointer by `s.len()` bytes.
-                    stream.set(end);
-
-                    return Some(Token::new(TokenKind::Delimiter, start, end));
-                }
-            }
-        }
-    }
-
-    if stream.current()? == '"' {
-        let start = stream.offset();
+    let start = stream.offset();
+    if stream.current()? == b'"' {
         stream.next();
 
-        stream.take_until(|s| s == '"');
+        stream.take_until(|b| b == b'"');
 
-        let is_quote = stream.current().map_or(false, |s| s == '"');
+        let is_quote = stream.current().map_or(false, |b| b == b'"');
         stream.next();
 
         let end = stream.offset();
+
+        // Remove possible delimiters after the quoted argument.
+        for delim in delims {
+            stream.eat(delim);
+        }
 
         return Some(if is_quote {
             Token::new(TokenKind::QuotedArgument, start, end)
         } else {
             // We're missing an end quote. View this as a normal argument.
-            Token::new(TokenKind::Argument, start, stream.source().len())
+            Token::new(TokenKind::Argument, start, stream.len())
         });
     }
 
-    let start = stream.offset();
+    let mut end = start;
 
-    'outer: while !stream.at_end() {
+    'outer: while !stream.is_empty() {
         for delim in delims {
-            match delim {
-                Delimiter::Single(c) => {
-                    if stream.current()? == *c {
-                        break 'outer;
-                    }
-                }
-                Delimiter::Multiple(s) => {
-                    if *s == stream.peek_for(s.chars().count()) {
-                        break 'outer;
-                    }
-                }
+            end = stream.offset();
+
+            if stream.eat(&delim) {
+                break 'outer;
             }
         }
 
-        stream.next();
+        stream.next_char();
+        end = stream.offset();
     }
 
-    Some(Token::new(TokenKind::Argument, start, stream.offset()))
+    Some(Token::new(TokenKind::Argument, start, end))
 }
 
 fn remove_quotes(s: &str) -> &str {
@@ -311,6 +297,7 @@ impl Args {
                 Delimiter::Single(c) => message.contains(*c),
                 Delimiter::Multiple(s) => message.contains(s),
             })
+            .map(|delim| delim.to_str())
             .collect::<Vec<_>>();
 
         let args = if delims.is_empty() && !message.is_empty() {
@@ -327,10 +314,6 @@ impl Args {
             let mut stream = Stream::new(message);
 
             while let Some(token) = lex(&mut stream, &delims) {
-                if token.kind == TokenKind::Delimiter {
-                    continue;
-                }
-
                 args.push(token);
             }
 

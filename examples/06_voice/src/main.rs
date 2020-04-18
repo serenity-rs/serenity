@@ -36,7 +36,6 @@ use serenity::{
     voice,
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
 use serenity::prelude::*;
 
 struct VoiceManager;
@@ -147,7 +146,7 @@ async fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().await.
-        get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
 
     if manager.join(guild_id, connect_to).is_some() {
@@ -171,7 +170,7 @@ async fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 
@@ -198,7 +197,7 @@ async fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
 
     let handler = match manager.get_mut(guild_id) {
@@ -255,7 +254,7 @@ async fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
     };
 
     let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
@@ -292,7 +291,7 @@ async fn undeafen(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
@@ -317,7 +316,7 @@ async fn unmute(ctx: &mut Context, msg: &Message) -> CommandResult {
         },
     };
     let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {

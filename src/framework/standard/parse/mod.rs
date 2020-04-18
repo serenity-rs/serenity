@@ -38,7 +38,7 @@ pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'
     // Optional.
     stream.eat("!");
 
-    let id = stream.take_while(|s| s.is_numeric());
+    let id = stream.take_while(|b| b.is_ascii_digit());
 
     if !stream.eat(">") {
         // Backtrack to where we were.
@@ -63,7 +63,7 @@ async fn find_prefix<'a>(
     stream: &Stream<'a>,
 ) -> Option<Cow<'a, str>> {
     let try_match = |prefix: &str| {
-        let peeked = stream.peek_for(prefix.chars().count());
+        let peeked = stream.peek_for_char(prefix.chars().count());
         let peeked = to_lowercase(config, peeked);
 
         if prefix == &peeked {
@@ -75,6 +75,7 @@ async fn find_prefix<'a>(
 
     for f in &config.dynamic_prefixes {
         if let Some(p) = f(ctx, msg).await {
+            let p = to_lowercase(config, &p);
             if let Some(p) = try_match(&p) {
                 return Some(p);
             }
@@ -103,7 +104,7 @@ pub async fn prefix<'a>(
     config: &Configuration,
 ) -> Option<Cow<'a, str>> {
     if let Some(id) = mention(stream, config) {
-        stream.take_while(|s| s.is_whitespace());
+        stream.take_while_char(|c| c.is_whitespace());
 
         return Some(Cow::Borrowed(id));
     }
@@ -115,7 +116,7 @@ pub async fn prefix<'a>(
     }
 
     if config.with_whitespace.prefixes {
-        stream.take_while(|s| s.is_whitespace());
+        stream.take_while_char(|c| c.is_whitespace());
     }
 
     prefix
@@ -178,13 +179,13 @@ fn try_parse<M: ParseMap>(
     f: impl Fn(&str) -> String,
 ) -> (String, Option<M::Storage>) {
     if by_space {
-        let n = f(stream.peek_until(|s| s.is_whitespace()));
+        let n = f(stream.peek_until_char(|c| c.is_whitespace()));
 
         let o = map.get(&n);
 
         (n, o)
     } else {
-        let mut n = f(stream.peek_for(map.max_length()));
+        let mut n = f(stream.peek_for_char(map.max_length()));
         let mut o = None;
 
         for _ in 0..(map.max_length() - map.min_length()) {
@@ -222,7 +223,7 @@ fn parse_cmd<'a>(
             stream.increment(n.len());
 
             if config.with_whitespace.commands {
-                stream.take_while(|s| s.is_whitespace());
+                stream.take_while_char(|s| s.is_whitespace());
             }
 
             check_discrepancy(ctx, msg, config, &cmd.options).await?;
@@ -257,7 +258,7 @@ fn parse_group<'a>(
             stream.increment(n.len());
 
             if config.with_whitespace.groups {
-                stream.take_while(|s| s.is_whitespace());
+                stream.take_while_char(|c| c.is_whitespace());
             }
 
             check_discrepancy(ctx, msg, config, &group.options).await?;
@@ -341,12 +342,12 @@ pub async fn command(
     // Precedence is taken over commands named as one of the help names.
     if let Some(names) = help_was_set {
         for name in names {
-            let n = to_lowercase(config, stream.peek_for(name.chars().count()));
+            let n = to_lowercase(config, stream.peek_for_char(name.chars().count()));
 
             if name == &n {
                 stream.increment(n.len());
 
-                stream.take_while(|s| s.is_whitespace());
+                stream.take_while_char(|c| c.is_whitespace());
 
                 return Ok(Invoke::Help(name));
             }

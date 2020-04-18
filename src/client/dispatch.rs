@@ -15,12 +15,12 @@ use super::{
     event_handler::{EventHandler, RawEventHandler},
     Context
 };
-use typemap::ShareMap;
 #[cfg(feature = "cache")]
 use tokio::time::timeout;
 
 use crate::http::Http;
 use crate::CacheAndHttp;
+use crate::utils::TypeMap;
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -59,7 +59,7 @@ async fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Optio
 
 #[cfg(feature = "cache")]
 fn context(
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     http: &Arc<Http>,
@@ -70,7 +70,7 @@ fn context(
 
 #[cfg(not(feature = "cache"))]
 fn context(
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     http: &Arc<Http>,
@@ -92,7 +92,7 @@ pub(crate) fn dispatch<'rec>(
     event: DispatchEvent,
     #[cfg(feature = "framework")]
     framework: &'rec Arc<Option<Box<dyn Framework + Send + Sync >>>,
-    data: &'rec Arc<RwLock<ShareMap>>,
+    data: &'rec Arc<RwLock<TypeMap>>,
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
     runner_tx: &'rec Sender<InterMessage>,
@@ -204,7 +204,7 @@ async fn dispatch_message(
 #[allow(clippy::too_many_arguments)]
 async fn handle_event(
     event: DispatchEvent,
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     event_handler: &Arc<dyn EventHandler>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
