@@ -2,7 +2,7 @@ use crate::constants::{self, close_codes};
 use crate::internal::prelude::*;
 use crate::model::{
     event::{Event, GatewayEvent},
-    gateway::{Activity},
+    gateway::Activity,
     id::GuildId,
     user::OnlineStatus
 };
