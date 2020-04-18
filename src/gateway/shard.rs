@@ -99,7 +99,7 @@ pub struct Shard {
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
-    intents: Option<GatewayIntents>,
+    pub intents: Option<GatewayIntents>,
 }
 
 impl Shard {
