@@ -12,10 +12,10 @@ use super::{
     Context
 };
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 
 use crate::http::Http;
 use crate::CacheAndHttp;
+use crate::utils::TypeMap;
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -53,7 +53,7 @@ fn update<E>(_cache_and_http: &Arc<CacheAndHttp>, _event: &mut E) -> Option<()> 
 
 #[cfg(feature = "cache")]
 fn context(
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     http: &Arc<Http>,
@@ -64,7 +64,7 @@ fn context(
 
 #[cfg(not(feature = "cache"))]
 fn context(
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     http: &Arc<Http>,
@@ -86,7 +86,7 @@ pub(crate) enum DispatchEvent {
 pub(crate) fn dispatch(
     event: DispatchEvent,
     framework: &Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     event_handler: &Option<Arc<dyn EventHandler>>,
     raw_event_handler: &Option<Arc<dyn RawEventHandler>>,
     runner_tx: &Sender<InterMessage>,
@@ -170,7 +170,7 @@ pub(crate) fn dispatch(
 #[cfg(not(feature = "framework"))]
 pub(crate) fn dispatch(
     event: DispatchEvent,
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     event_handler: &Option<Arc<dyn EventHandler>>,
     raw_event_handler: &Option<Arc<dyn RawEventHandler>>,
     runner_tx: &Sender<InterMessage>,
@@ -272,7 +272,7 @@ fn dispatch_message(
 #[allow(clippy::too_many_arguments)]
 fn handle_event(
     event: DispatchEvent,
-    data: &Arc<RwLock<ShareMap>>,
+    data: &Arc<RwLock<TypeMap>>,
     event_handler: &Arc<dyn EventHandler>,
     runner_tx: &Sender<InterMessage>,
     threadpool: &ThreadPool,
