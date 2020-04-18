@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.6] - 2019-04-18
+
+This release fixes Serenity's handling of Discord's new rebalances. You should no longer encounter many Ready events.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [gateway] Fix handling rebalances. ([@Lakelezz]) [c:f708bec]
+
 ## [0.7.5] - 2019-01-13
 
 An emergency release to fix build breakage due to violation of SemVer for the `command_attr` crate.
@@ -3209,6 +3221,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.6]: https://github.com/serenity-rs/serenity/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/serenity-rs/serenity/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/serenity-rs/serenity/compare/v0.7.3...v0.7.4
 [0.7.3]: https://github.com/serenity-rs/serenity/compare/v0.7.2...v0.7.3
@@ -3343,6 +3356,8 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:f708bec]: https://github.com/serenity-rs/serenity/commit/f708bec4932a7bec2b53e4b4450d9567b44a4138
 
 [c:e6ed1b5]: https://github.com/serenity-rs/serenity/commit/e6ed1b5987814174fcf66dff084be45386a68136
 [c:42937e9]: https://github.com/serenity-rs/serenity/commit/42937e9b7414455a9baefeb0c902ba81ff242de4
