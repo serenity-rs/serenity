@@ -28,7 +28,6 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
-use threadpool::ThreadPool;
 use log::{info, warn};
 
 use crate::utils::TypeMap;
@@ -380,7 +379,6 @@ pub struct ShardManagerOptions<'a> {
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
-    pub threadpool: ThreadPool,
     #[cfg(feature = "voice")]
     pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
     pub ws_url: &'a Arc<Mutex<String>>,

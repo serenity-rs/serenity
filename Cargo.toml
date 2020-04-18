@@ -82,10 +82,6 @@ features = ["std"]
 optional = true
 version = "0.2"
 
-[dependencies.threadpool]
-optional = true
-version = "1"
-
 [dependencies.async-tungstenite]
 default-features = false
 features = ["tokio-runtime"]
@@ -154,7 +150,6 @@ collector = ["gateway", "model", "tokio/stream"]
 client = [
     "gateway",
     "http",
-    "threadpool",
 ]
 extras = []
 framework = ["client", "model", "utils"]

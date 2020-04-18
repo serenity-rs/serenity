@@ -43,7 +43,6 @@ use tokio::sync::Mutex;
 use tokio::sync::RwLock;
 use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::sync::Arc;
-use threadpool::ThreadPool;
 use log::{error, debug, info};
 
 #[cfg(feature = "framework")]
@@ -271,11 +270,6 @@ pub struct Client {
     /// [`Client::start_shards`]: #method.start_shards
     pub shard_manager: Arc<Mutex<ShardManager>>,
     shard_manager_worker: ShardManagerMonitor,
-    /// The threadpool shared by all shards.
-    ///
-    /// Defaults to 5 threads, which should suffice small bots. Consider
-    /// increasing this number as your bot grows.
-    pub threadpool: ThreadPool,
     /// The voice manager for the client.
     ///
     /// This is an ergonomic structure for interfacing over shards' voice
@@ -361,8 +355,6 @@ impl Client {
 
         let http = Http::new_with_token(&token);
 
-        let name = "serenity client".to_owned();
-        let threadpool = ThreadPool::with_name(name, 5);
         let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
         let data = Arc::new(RwLock::new(TypeMap::new()));
 
@@ -394,7 +386,6 @@ impl Client {
                 shard_index: 0,
                 shard_init: 0,
                 shard_total: 0,
-                threadpool: threadpool.clone(),
                 #[cfg(feature = "voice")]
                 voice_manager: &voice_manager,
                 ws_url: &url,
@@ -409,7 +400,6 @@ impl Client {
             data,
             shard_manager,
             shard_manager_worker,
-            threadpool,
             #[cfg(feature = "voice")]
             voice_manager,
             cache_and_http,

@@ -88,11 +88,6 @@ use crate::model::channel::Message;
 use async_trait::async_trait;
 
 /// A trait for defining your own framework for serenity to use.
-///
-/// Should you implement this trait, or define a `message` handler, depends on you.
-/// However, using this will benefit you by abstracting the `EventHandler` away,
-/// and providing a reference to serenity's threadpool,
-/// so that you may run your commands in separate threads.
 #[async_trait]
 pub trait Framework {
     async fn dispatch(&self, _: Context, _: Message);

@@ -12,9 +12,6 @@ struct Handler;
 impl EventHandler for Handler {
     // Set a handler for the `message` event - so that whenever a new message
     // is received - the closure (or function) passed will be called.
-    //
-    // Event handlers are dispatched through a threadpool, and so multiple
-    // events can be dispatched simultaneously.
     async fn message(&self, ctx: Context, msg: Message) {
         if msg.content == "!ping" {
             // Sending a message can fail, due to a network error, an
