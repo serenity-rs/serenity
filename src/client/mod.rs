@@ -399,6 +399,7 @@ impl Client {
             #[cfg(feature = "cache")]
             timeout,
             guild_subscriptions,
+            intents,
         } = extras;
 
         let http = Http::new_with_token(&token);
@@ -441,6 +442,7 @@ impl Client {
                 ws_url: &url,
                 cache_and_http: &cache_and_http,
                 guild_subscriptions,
+                intents,
             })
         };
 
