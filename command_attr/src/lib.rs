@@ -3,6 +3,7 @@
 // Currently exists for backwards compatibility to previous Rust versions.
 #![recursion_limit = "128"]
 
+#[allow(rust_2018_idioms)]
 extern crate proc_macro;
 
 use proc_macro::TokenStream;
