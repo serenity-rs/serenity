@@ -2,10 +2,11 @@ use crate::constants::{self, close_codes};
 use crate::internal::prelude::*;
 use crate::model::{
     event::{Event, GatewayEvent},
-    gateway::Activity,
+    gateway::{Activity},
     id::GuildId,
     user::OnlineStatus
 };
+use crate::client::bridge::gateway::GatewayIntents;
 use parking_lot::Mutex;
 use std::{
     sync::Arc,
@@ -98,6 +99,7 @@ pub struct Shard {
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
+    intents: Option<GatewayIntents>,
 }
 
 impl Shard {
@@ -139,6 +141,7 @@ impl Shard {
         token: &str,
         shard_info: [u64; 2],
         guild_subscriptions: bool,
+        intents: Option<GatewayIntents>,
     ) -> Result<Shard> {
         let mut client = connect(&*ws_url.lock())?;
 
@@ -170,6 +173,7 @@ impl Shard {
             shard_info,
             guild_subscriptions,
             ws_url,
+            intents,
         })
     }
 
@@ -756,7 +760,7 @@ impl Shard {
     // - the time that the last heartbeat sent as being now
     // - the `stage` to `Identifying`
     pub fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions)?;
+        self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions, self.intents)?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;

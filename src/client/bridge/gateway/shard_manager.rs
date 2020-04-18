@@ -14,6 +14,7 @@ use std::{
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
+    GatewayIntents,
     ShardClientMessage,
     ShardId,
     ShardManagerMessage,
@@ -158,6 +159,7 @@ impl ShardManager {
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
             guild_subscriptions: opt.guild_subscriptions,
+            intents: opt.intents,
         };
 
         thread::spawn(move || {
@@ -388,4 +390,5 @@ pub struct ShardManagerOptions<'a> {
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
+    pub intents: Option<GatewayIntents>,
 }

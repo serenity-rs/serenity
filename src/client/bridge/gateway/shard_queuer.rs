@@ -17,6 +17,7 @@ use std::{
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
+    GatewayIntents,
     ShardId,
     ShardManagerMessage,
     ShardQueuerMessage,
@@ -93,6 +94,7 @@ pub struct ShardQueuer {
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
+    pub intents: Option<GatewayIntents>
 }
 
 impl ShardQueuer {
@@ -185,6 +187,7 @@ impl ShardQueuer {
             &self.cache_and_http.http.token,
             shard_info,
             self.guild_subscriptions,
+            self.intents,
         )?;
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {

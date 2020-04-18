@@ -1,4 +1,5 @@
 use super::{EventHandler, RawEventHandler};
+use crate::client::bridge::gateway::GatewayIntents;
 
 use std::fmt;
 use std::sync::Arc;
@@ -16,6 +17,7 @@ pub struct Extras {
     #[cfg(feature = "cache")]
     pub(crate) timeout: Option<Duration>,
     pub(crate) guild_subscriptions: bool,
+    pub(crate) intents: Option<GatewayIntents>,
 }
 
 impl Extras {
@@ -57,6 +59,14 @@ impl Extras {
         self.guild_subscriptions = guild_subscriptions;
         self
     }
+
+    /// Set what Discord gateway events shall be received.
+    ///
+    /// By default, no intents are being used and all events are received.
+    pub fn intents(&mut self, intents: GatewayIntents) -> &mut Self {
+        self.intents = Some(intents);
+        self
+    }
 }
 
 impl Default for Extras {
@@ -67,6 +77,7 @@ impl Default for Extras {
             #[cfg(feature = "cache")]
             timeout: None,
             guild_subscriptions: true,
+            intents: None,
         }
     }
 }
@@ -85,6 +96,7 @@ impl fmt::Debug for Extras {
         ds.field("raw_event_handler", &RawEventHandler);
         #[cfg(feature = "cache")]
         ds.field("cache_update_timeout", &self.timeout);
+        ds.field("intents", &self.intents);
 
         ds.finish()
     }
