@@ -69,7 +69,6 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use serenity::prelude::*;
 /// use std::sync::Arc;
 /// use std::env;
-/// use threadpool::ThreadPool;
 ///
 /// struct Handler;
 ///
@@ -78,11 +77,10 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
-/// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
+/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(None);
-/// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
@@ -95,7 +93,6 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     shard_init: 3,
 ///     // the total number of shards in use
 ///     shard_total: 5,
-///     threadpool,
 ///     # #[cfg(feature = "voice")]
 ///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
