@@ -256,7 +256,7 @@ impl<'de> Deserialize<'de> for Channel {
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
                 .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
                 .map_err(DeError::custom),
-            3 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
+            4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
                 .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),

@@ -419,6 +419,25 @@ pub struct User {
     pub(crate) _nonexhaustive: (),
 }
 
+impl Default for User {
+    /// Initializes a `User` with default values. Setting the following:
+    /// - **id** to `UserId(210)`
+    /// - **avatar** to `Some("abc")`
+    /// - **bot** to `true`.
+    /// - **discriminator** to `1432`.
+    /// - **name** to `"test"`.
+    fn default() -> Self {
+        User {
+            id: UserId(210),
+            avatar: Some("abc".to_string()),
+            bot: true,
+            discriminator: 1432,
+            name: "test".to_string(),
+            _nonexhaustive: (),
+        }
+    }
+}
+
 use std::hash::{Hash, Hasher};
 #[cfg(feature = "model")]
 use chrono::{DateTime, FixedOffset};
@@ -993,23 +1012,11 @@ fn tag(name: &str, discriminator: u16) -> String {
 mod test {
     #[cfg(feature = "model")]
     mod model {
-        use crate::model::id::UserId;
         use crate::model::user::User;
-
-        fn gen() -> User {
-            User {
-                id: UserId(210),
-                avatar: Some("abc".to_string()),
-                bot: true,
-                discriminator: 1432,
-                name: "test".to_string(),
-                _nonexhaustive: (),
-            }
-        }
 
         #[test]
         fn test_core() {
-            let mut user = gen();
+            let mut user = User::default();
 
             assert!(
                 user.avatar_url()
@@ -1042,7 +1049,7 @@ mod test {
 
         #[test]
         fn default_avatars() {
-            let mut user = gen();
+            let mut user = User::default();
 
             user.discriminator = 0;
             assert!(user.default_avatar_url().ends_with("0.png"));

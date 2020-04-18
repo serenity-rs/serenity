@@ -913,7 +913,7 @@ pub struct ChannelMention {
     /// ID of the guild containing the channel.
     pub guild_id: GuildId,
     /// The kind of channel
-    #[serde(rename = "kind")]
+    #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The name of the channel
     pub name: String,
