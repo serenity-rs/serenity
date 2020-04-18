@@ -273,7 +273,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true).await.unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await.unwrap();
     /// #
     /// use serenity::model::gateway::Activity;
     ///
