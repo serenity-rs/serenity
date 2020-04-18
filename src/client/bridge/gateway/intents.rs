@@ -4,11 +4,11 @@ use serde::{
     ser::{Serialize, Serializer},
 };
 
-#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 /// [Gateway Intents] will limit the events your bot will receive via the gateway.
 /// By default, no intents are specified by Serenity.
 ///
 /// [Gateway Intents]: https://discordapp.com/developers/docs/topics/gateway#gateway-intents
+#[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct GatewayIntents {
     /// The flags composing gateway intents.
     ///
