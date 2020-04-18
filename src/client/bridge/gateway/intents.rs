@@ -117,6 +117,10 @@ __impl_bitflags! {
     }
 }
 
+impl Default for GatewayIntents {
+    fn default() -> Self { Self::empty() }
+}
+
 impl<'de> Deserialize<'de> for GatewayIntents {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         Ok(Self::from_bits_truncate(u64::deserialize(deserializer)?))
@@ -129,5 +133,120 @@ impl Serialize for GatewayIntents {
         S: Serializer,
     {
         serializer.serialize_u64(self.bits())
+    }
+}
+
+#[cfg(feature = "model")]
+impl GatewayIntents {
+     /// Shorthand for checking that the set of intents contains the
+    /// [GUILDS] intent.
+    ///
+    /// [GUILDS]: #associatedconstant.GUILDS
+    pub fn guilds(self) -> bool {
+        self.contains(Self::GUILDS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MEMBERS] intent.
+    ///
+    /// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS
+    pub fn guild_members(self) -> bool {
+        self.contains(Self::GUILD_MEMBERS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_BANS] intent.
+    ///
+    /// [GUILD_BANS]: #associatedconstant.GUILD_BANS
+    pub fn guild_bans(self) -> bool {
+        self.contains(Self::GUILD_BANS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_EMOJIS] intent.
+    ///
+    /// [GUILD_EMOJIS]: #associatedconstant.GUILD_EMOJIS
+    pub fn guild_emojis(self) -> bool {
+        self.contains(Self::GUILD_EMOJIS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_INTEGRATIONS] intent.
+    ///
+    /// [GUILD_INTEGRATIONS]: #associatedconstant.GUILD_INTEGRATIONS
+    pub fn guild_integrations(self) -> bool {
+        self.contains(Self::GUILD_INTEGRATIONS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_WEBHOOKS] intent.
+    ///
+    /// [GUILD_WEBHOOKS]: #associatedconstant.GUILD_WEBHOOKS
+    pub fn guild_webhooks(self) -> bool {
+        self.contains(Self::GUILD_WEBHOOKS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_INVITES] intent.
+    ///
+    /// [GUILD_INVITES]: #associatedconstant.GUILD_INVITES
+    pub fn guild_invites(self) -> bool {
+        self.contains(Self::GUILD_INVITES)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_VOICE_STATES] intent.
+    ///
+    /// [GUILD_VOICE_STATES]: #associatedconstant.GUILD_VOICE_STATES
+    pub fn guild_voice_states(self) -> bool {
+        self.contains(Self::GUILD_VOICE_STATES)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_PRESENCES] intent.
+    ///
+    /// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES
+    pub fn guild_presences(self) -> bool {
+        self.contains(Self::GUILD_PRESENCES)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MESSAGE_REACTIONS] intent.
+    ///
+    /// [GUILD_MESSAGE_REACTIONS]: #associatedconstant.GUILD_MESSAGE_REACTIONS
+    pub fn guild_message_reactions(self) -> bool {
+        self.contains(Self::GUILD_MESSAGE_REACTIONS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [GUILD_MESSAGE_TYPING] intent.
+    ///
+    /// [GUILD_MESSAGE_TYPING]: #associatedconstant.GUILD_MESSAGE_TYPING
+    pub fn guild_message_typing(self) -> bool {
+        self.contains(Self::GUILD_MESSAGE_TYPING)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [DIRECT_MESSAGES] intent.
+    ///
+    /// [DIRECT_MESSAGES]: #associatedconstant.DIRECT_MESSAGES
+    pub fn direct_messages(self) -> bool {
+        self.contains(Self::DIRECT_MESSAGES)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [DIRECT_MESSAGE_REACTIONS] intent.
+    ///
+    /// [DIRECT_MESSAGE_REACTIONS]: #associatedconstant.DIRECT_MESSAGE_REACTIONS
+    pub fn direct_message_reactions(self) -> bool {
+        self.contains(Self::DIRECT_MESSAGE_REACTIONS)
+    }
+
+    /// Shorthand for checking that the set of intents contains the
+    /// [DIRECT_MESSAGE_TYPING] intent.
+    ///
+    /// [DIRECT_MESSAGE_TYPING]: #associatedconstant.DIRECT_MESSAGE_TYPING
+    pub fn direct_message_typing(self) -> bool {
+        self.contains(Self::DIRECT_MESSAGE_TYPING)
     }
 }

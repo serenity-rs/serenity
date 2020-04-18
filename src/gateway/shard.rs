@@ -125,7 +125,7 @@ impl Shard {
     /// let token = env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway()?.url));
-    /// let shard = Shard::new(gateway, &token, [0, 1], true)?;
+    /// let shard = Shard::new(gateway, &token, [0, 1], true, None)?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -281,7 +281,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).unwrap();
     /// #
     /// use serenity::model::gateway::Activity;
     ///
@@ -332,7 +332,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
@@ -694,7 +694,7 @@ impl Shard {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -721,7 +721,7 @@ impl Shard {
     /// # fn try_main() -> Result<(), Box<Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
     /// #
     /// use serenity::model::id::GuildId;
     ///

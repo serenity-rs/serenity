@@ -99,6 +99,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
 ///     guild_subscriptions: true,
+///     intents: None,
 /// });
 /// #     Ok(())
 /// # }
