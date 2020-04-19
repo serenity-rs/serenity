@@ -474,7 +474,9 @@ impl<'a> TryFrom<&'a str> for ReactionType {
         if !emoji_str.ends_with('>') {
             return Err(ReactionConversionError);
         }
-let emoji_str = emoji_str.trim_matches(&['<', '>'] as &[char]);
+
+    let emoji_str = emoji_str.trim_matches(&['<', '>'] as &[char]);
+
         let mut split_iter = emoji_str.split(':');
 
         let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
