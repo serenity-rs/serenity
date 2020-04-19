@@ -450,7 +450,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// use serenity::model::id::EmojiId;
     ///
     /// let emoji_string = "<:customemoji:600404340292059257>";
-    /// let reaction = ReactionType::from(emoji_string);
+    /// let reaction = ReactionType::try_from(emoji_string).unwrap();
     /// let reaction2 = ReactionType::Custom {
     ///     animated: false,
     ///     id: EmojiId(600404340292059257),
