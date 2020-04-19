@@ -3,16 +3,12 @@ use crate::http::CacheHttp;
 use crate::{model::prelude::*};
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
-use std::{
-    error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-        Write as FmtWrite
-    },
-    str::FromStr
-};
+use std::{error::Error as StdError, fmt::{
+    Display,
+    Formatter,
+    Result as FmtResult,
+    Write as FmtWrite
+}, fmt};
 
 use crate::internal::prelude::*;
 
@@ -20,6 +16,7 @@ use crate::internal::prelude::*;
 use crate::http::Http;
 #[cfg(all(feature = "http", feature = "model"))]
 use log::warn;
+use std::convert::TryFrom;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -397,11 +394,33 @@ impl From<EmojiIdentifier> for ReactionType {
     }
 }
 
-impl From<String> for ReactionType {
-    fn from(unicode: String) -> ReactionType { ReactionType::Unicode(unicode) }
+#[derive(Debug)]
+pub struct ReactionConversionError;
+
+impl Display for ReactionConversionError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "Failed to convert String to Reaction")
+    }
 }
 
-impl<'a> From<&'a str> for ReactionType {
+impl std::error::Error for ReactionConversionError {}
+
+impl TryFrom<String> for ReactionType {
+    type Error = ReactionConversionError;
+
+    fn try_from(emoji_string: String) -> std::result::Result<Self, Self::Error> {
+        if emoji_string.is_empty() {
+            return Err(ReactionConversionError)
+        }
+
+        if !emoji_string.starts_with('<') {
+            return Ok(ReactionType::Unicode(emoji_string))
+        }
+        ReactionType::try_from(&emoji_string[..])
+    }
+}
+
+impl<'a> TryFrom<&'a str> for ReactionType {
     /// Creates a `ReactionType` from a string slice.
     ///
     /// # Examples
@@ -418,7 +437,68 @@ impl<'a> From<&'a str> for ReactionType {
     ///
     /// foo("🍎");
     /// ```
-    fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_string()) }
+    ///
+    /// Creating a `ReactionType` from a custom emoji argument in the following format:
+    ///
+    /// ```rust
+    /// use serenity::model::channel::ReactionType;
+    /// use serenity::model::id::EmojiId;
+    ///
+    /// let emoji_string = "<:customemoji:600404340292059257>";
+    /// let reaction = ReactionType::from(emoji_string);
+    /// let reaction2 = ReactionType::Custom {
+    ///     animated: false,
+    ///     id: EmojiId(600404340292059257),
+    ///     name: Some("customemoji".to_string()),
+    /// };
+    ///
+    /// assert_eq!(reaction, reaction2);
+    /// ```
+
+    type Error = ReactionConversionError;
+
+    fn try_from(emoji_str: &str) -> std::result::Result<Self, Self::Error> {
+        if emoji_str.is_empty() {
+            return Err(ReactionConversionError)
+        }
+
+        if !emoji_str.starts_with('<') {
+            return Ok(ReactionType::Unicode(emoji_str.to_string()))
+        }
+
+        if !emoji_str.ends_with('>') {
+            return Err(ReactionConversionError);
+        }
+
+        let mut split_iter = emoji_str.split(':');
+
+        let animated = split_iter
+            .next()
+            .ok_or(ReactionConversionError)?
+            .chars()
+            .nth(1)
+            .unwrap_or('b') == 'a';
+
+        let name = split_iter
+            .next()
+            .ok_or(ReactionConversionError)?
+            .to_string()
+            .into();
+
+        let id = split_iter
+            .next()
+            .ok_or(ReactionConversionError)?
+            .trim_end_matches('>')
+            .parse::<u64>()
+            .map_err(|_| ReactionConversionError)?
+            .into();
+
+        Ok(ReactionType::Custom {
+            animated,
+            id,
+            name,
+        })
+    }
 }
 
 // TODO: Change this to `!` once it becomes stable.
@@ -434,14 +514,6 @@ impl Display for NeverFails {
 impl StdError for NeverFails {
     fn description(&self) -> &str {
         "never fails"
-    }
-}
-
-impl FromStr for ReactionType {
-    type Err = NeverFails;
-
-    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
-        Ok(ReactionType::from(s))
     }
 }
 
