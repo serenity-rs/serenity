@@ -404,7 +404,7 @@ pub struct ReactionConversionError;
 
 impl Display for ReactionConversionError {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
-        write!(f, "Failed to convert String to Reaction")
+        write!(f, "failed to convert from a string to ReactionType")
     }
 }
 
