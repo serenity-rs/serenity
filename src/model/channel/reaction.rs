@@ -436,8 +436,8 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// ```rust
     /// use serenity::model::channel::ReactionType;
     ///
-    /// fn foo<R: Into<ReactionType>>(bar: R) {
-    ///     println!("{:?}", bar.into());
+    /// fn foo<R: TryInto<ReactionType>>(bar: R) {
+    ///     println!("{:?}", bar.try_into().unwrap());
     /// }
     ///
     /// foo("🍎");
