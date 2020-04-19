@@ -3,12 +3,16 @@ use crate::http::CacheHttp;
 use crate::{model::prelude::*};
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
-use std::{error::Error as StdError, fmt::{
-    Display,
-    Formatter,
-    Result as FmtResult,
-    Write as FmtWrite
-}, fmt};
+use std::{
+    error::Error as StdError, 
+    fmt::{
+        self,
+        Display,
+        Formatter,
+        Result as FmtResult,
+        Write as FmtWrite
+    },
+};
 
 use crate::internal::prelude::*;
 
