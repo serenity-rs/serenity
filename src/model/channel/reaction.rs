@@ -17,6 +17,7 @@ use crate::http::Http;
 #[cfg(all(feature = "http", feature = "model"))]
 use log::warn;
 use std::convert::TryFrom;
+use std::str::FromStr;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -514,6 +515,14 @@ impl Display for NeverFails {
 impl StdError for NeverFails {
     fn description(&self) -> &str {
         "never fails"
+    }
+}
+
+impl FromStr for ReactionType {
+    type Err = ReactionConversionError;
+
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        ReactionType::try_from(s)
     }
 }
 

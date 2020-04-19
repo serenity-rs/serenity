@@ -1,6 +1,7 @@
 use serenity::model::channel::ReactionType;
 use serenity::model::id::EmojiId;
 use std::convert::TryFrom;
+use std::str::FromStr;
 
 #[test]
 fn str_to_reaction_type() {
@@ -72,4 +73,10 @@ fn str_to_reaction_type_mangled_3() {
 fn str_to_reaction_type_mangled_4() {
     let emoji_str = "<:somestuff:1234";
     ReactionType::try_from(emoji_str).unwrap_err();
+}
+
+#[test]
+fn str_fromstr() {
+    let emoji_str = "<:somestuff:1234";
+    ReactionType::from_str(emoji_str).unwrap_err();
 }
