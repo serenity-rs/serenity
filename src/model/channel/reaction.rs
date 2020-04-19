@@ -436,8 +436,11 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// ```rust
     /// use serenity::model::channel::ReactionType;
     /// use std::convert::TryInto;
+    /// use std::fmt::Debug;
     ///
-    /// fn foo<R: TryInto<ReactionType>>(bar: R) {
+    /// fn foo<R: TryInto<ReactionType>>(bar: R)
+    ///     where R::Error: Debug
+    /// {
     ///     println!("{:?}", bar.try_into().unwrap());
     /// }
     ///
