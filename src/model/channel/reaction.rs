@@ -435,6 +435,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     ///
     /// ```rust
     /// use serenity::model::channel::ReactionType;
+    /// use std::convert::TryInto;
     ///
     /// fn foo<R: TryInto<ReactionType>>(bar: R) {
     ///     println!("{:?}", bar.try_into().unwrap());
@@ -448,6 +449,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
     /// ```rust
     /// use serenity::model::channel::ReactionType;
     /// use serenity::model::id::EmojiId;
+    /// use std::convert::TryFrom;
     ///
     /// let emoji_string = "<:customemoji:600404340292059257>";
     /// let reaction = ReactionType::try_from(emoji_string).unwrap();
