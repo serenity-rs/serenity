@@ -487,10 +487,8 @@ let emoji_str = emoji_str.trim_matches(&['<', '>'] as &[char]);
 
         let id = split_iter
             .next()
+            .and_then(|s| s.parse::<u64>().ok())
             .ok_or(ReactionConversionError)?
-            .trim_end_matches('>')
-            .parse::<u64>()
-            .map_err(|_| ReactionConversionError)?
             .into();
 
         Ok(ReactionType::Custom {
