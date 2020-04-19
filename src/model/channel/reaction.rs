@@ -477,12 +477,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
 let emoji_str = emoji_str.trim_matches(&['<', '>'] as &[char]);
         let mut split_iter = emoji_str.split(':');
 
-        let animated = split_iter
-            .next()
-            .ok_or(ReactionConversionError)?
-            .chars()
-            .nth(1)
-            .unwrap_or('b') == 'a';
+        let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
 
         let name = split_iter
             .next()
