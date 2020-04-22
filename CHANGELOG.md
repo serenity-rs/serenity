@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.7.7] - 2019-04-22
+
+The last bugfix release was ironically broken because of a slight oversight. This release fixes that.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [gateway] Resume on Reconnect events. ([@Lakelezz]) [c:f543b57]
+
 ## [0.7.6] - 2019-04-18
 
 This release fixes Serenity's handling of Discord's new rebalances. You should no longer encounter many Ready events.
@@ -3221,6 +3233,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.7.7]: https://github.com/serenity-rs/serenity/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/serenity-rs/serenity/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/serenity-rs/serenity/compare/v0.7.4...v0.7.5
 [0.7.4]: https://github.com/serenity-rs/serenity/compare/v0.7.3...v0.7.4
@@ -3356,6 +3369,8 @@ Initial commit.
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
 [@zeyla]: https://github.com/zeyla
+
+[c:f543b57]: https://github.com/serenity-rs/serenity/commit/f543b579ca10d4fc439f1a899361a2edff5f04f3
 
 [c:f708bec]: https://github.com/serenity-rs/serenity/commit/f708bec4932a7bec2b53e4b4450d9567b44a4138
 
