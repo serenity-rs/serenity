@@ -550,7 +550,7 @@ impl Shard {
                 }))
             },
             Ok(GatewayEvent::Reconnect) => {
-                Ok(Some(ShardAction::Reconnect(ReconnectType::Reidentify)))
+                Ok(Some(ShardAction::Reconnect(ReconnectType::Resume)))
             },
             Err(Error::Gateway(GatewayError::Closed(ref data))) => self.handle_gateway_closed(&data),
             Err(Error::Tungstenite(ref why)) => {
