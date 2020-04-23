@@ -781,7 +781,7 @@ impl Shard {
     }
 
     pub async fn resume(&mut self) -> Result<()> {
-        debug!("Shard {:?}] Attempting to resume", self.shard_info);
+        debug!("[Shard {:?}] Attempting to resume", self.shard_info);
 
         self.client = self.initialize().await?;
         self.stage = ConnectionStage::Resuming;

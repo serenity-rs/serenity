@@ -289,7 +289,7 @@ impl ShardManager {
 
             if let Err(why) = runner.runner_tx.unbounded_send(msg) {
                 warn!(
-                    "Failed to cleanly shutdown shard {}: {:?}",
+                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
                     shard_id,
                     why,
                 );
@@ -307,7 +307,7 @@ impl ShardManager {
                     },
                 Ok(None) => (),
                 Err(why) => warn!(
-                    "Failed to cleanly shutdown shard {}: {:?}",
+                    "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
                     shard_id,
                     why,
                 ),
