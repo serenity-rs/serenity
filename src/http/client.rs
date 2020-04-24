@@ -411,7 +411,7 @@ impl Http {
     }
 
     ///Deletes all the reactions for a given emoji on a message.
-    pub fn delete_message_reactions_emoji(&self,
+    pub fn delete_message_reaction_emoji(&self,
                                         channel_id: u64,
                                         message_id: u64,
                                         reaction_type: &ReactionType)

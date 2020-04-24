@@ -218,7 +218,7 @@ impl Message {
             }
         }
 
-        cache_http.http().as_ref().delete_message_reactions_emoji(self.channel_id.0, self.id.0, &reaction_type.into())
+        cache_http.http().as_ref().delete_message_reaction_emoji(self.channel_id.0, self.id.0, &reaction_type.into())
     }
 
     /// Edits this message, replacing the original content with new content.
