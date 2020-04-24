@@ -107,6 +107,34 @@ impl Reaction {
         cache_http.http().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
     }
 
+    /// Deletes all reactions from the message with this emoji.
+    ///
+    /// Requires the [Manage Messages] permission
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required [permissions].
+    ///
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [permissions]: ../permissions/index.html
+    #[cfg(feature = "http")]
+    pub fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_MESSAGES;
+
+                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+        cache_http.http().as_ref().delete_message_reaction_emoji(self.channel_id.0, self.message_id.0, &self.emoji)
+    }
+
     /// Retrieves the [`Message`] associated with this reaction.
     ///
     /// Requires the [Read Message History] permission.
