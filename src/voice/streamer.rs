@@ -79,6 +79,13 @@ impl Drop for ChildContainer {
     }
 }
 
+/// Usable data/byte sources for an audio stream.
+///
+/// Users may define their own data sources using [`Extension`]
+/// and [`ExtensionSeek`].
+///
+/// [`Extension`]: #variant.Extension
+/// [`ExtensionSeek`]: #variant.ExtensionSeek
 pub enum Reader {
     Pipe(BufReader<ChildContainer>),
     InMemory(MemorySource),
@@ -130,6 +137,7 @@ impl Seek for Reader {
     }
 }
 
+/// Data and metadata needed to correctly parse a [`Reader`]'s audio bytestream.
 pub struct Input {
     pub stereo: bool,
     pub reader: Reader,
@@ -1380,6 +1388,12 @@ pub struct MemorySource {
 }
 
 impl MemorySource {
+    /// Wrap an existing [`Input`] with an in-memory store of raw 32-bit floating point audio.
+    ///
+    /// `length_hint` may be used to control the size of the initial chunk, preventing
+    /// needless allocations and copies.
+    ///
+    /// [`Input`]: struct.Input.html
     pub fn new(source: Input, length_hint: Option<Duration>) -> Self {
         let stereo = source.stereo;
         let chunk_size = timestamp_to_byte_count(Duration::from_secs(5), stereo);
@@ -1397,16 +1411,22 @@ impl MemorySource {
         }
     }
 
+    /// Acquire a new handle to this object, to begin a new
+    /// source from the exsting cached data.
     pub fn new_handle(&self) -> Self {
         Self {
             cache: self.cache.new_handle(),
         }
     }
 
+    /// Block the current thread to read all bytes from the underlying stream
+    /// into the backing store.
     pub fn load_file(&mut self) {
         self.cache.load_file();
     }
 
+    /// Spawn a new thread to read all bytes from the underlying stream
+    /// into the backing store.
     pub fn spawn_loader(&self) -> std::thread::JoinHandle<()> {
         self.cache.spawn_loader()
     }
@@ -1421,6 +1441,12 @@ impl From<MemorySource> for Input {
 
             reader: Reader::InMemory(src),
         }
+    }
+}
+
+impl Clone for MemorySource {
+    fn clone(&self) -> Self {
+        self.new_handle()
     }
 }
 
@@ -1496,6 +1522,12 @@ pub struct CompressedSource {
 }
 
 impl CompressedSource {
+    /// Wrap an existing `Input` with an in-memory store, compressed using Opus.
+    ///
+    /// `length_hint` may be used to control the size of the initial chunk, preventing
+    /// needless allocations and copies.
+    ///
+    /// [`Input`]: struct.Input.html
     pub fn new(source: Input, bitrate: Bitrate, length_hint: Option<Duration>) -> Self {
         let channels = if source.stereo { Channels::Stereo } else { Channels::Mono };
         let mut encoder = OpusEncoder::new(SampleRate::Hz48000, channels, Application::Audio)
@@ -1507,6 +1539,13 @@ impl CompressedSource {
         Self::with_encoder(source, encoder, length_hint)
     }
 
+    /// Wrap an existing [`Input`] with an in-memory store, compressed using a user-defined
+    /// Opus encoder.
+    ///
+    /// `length_hint` functions as in [`new`].
+    ///
+    /// [`Input`]: struct.Input.html
+    /// [`new`]: #method.new
     pub fn with_encoder(source: Input, encoder: OpusEncoder, length_hint: Option<Duration>) -> Self {
         let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();
         let bitrate = encoder.bitrate()
@@ -1551,6 +1590,8 @@ impl CompressedSource {
         }
     }
 
+    /// Acquire a new handle to this object, to begin a new
+    /// source from the exsting cached data.
     pub fn new_handle(&self) -> Self {
         Self {
             cache: self.cache.new_handle(),
@@ -1563,20 +1604,27 @@ impl CompressedSource {
         }
     }
 
+    /// Drop all decoder/position state to allow this handle
+    /// to be sent across thread boundaries.
     pub fn into_sendable(self) -> CompressedSourceBase {
         CompressedSourceBase {
             cache: self.cache,
         }
     }
 
+    /// Block the current thread to read all bytes from the underlying stream
+    /// into the backing store.
     pub fn load_file(&mut self) {
         self.cache.load_file();
     }
 
+    /// Spawn a new thread to read all bytes from the underlying stream
+    /// into the backing store.
     pub fn spawn_loader(&self) -> std::thread::JoinHandle<()> {
         self.cache.spawn_loader()
     }
 
+    /// Completely resets decoder state and reading position.
     pub fn reset(&mut self) {
         self.remaining_lookahead = None;
         self.cache.pos = 0;
@@ -1603,6 +1651,12 @@ impl From<CompressedSource> for Input {
 
             reader: Reader::Compressed(src),
         }   
+    }
+}
+
+impl Clone for CompressedSource {
+    fn clone(&self) -> Self {
+        self.new_handle()
     }
 }
 
@@ -1724,11 +1778,20 @@ impl Seek for CompressedSource {
     }
 }
 
+/// Handle to a [`CompressedSource`] which is safe to pass between threads.
+///
+/// This strips all instance-specific state, including position and decoder information.
+///
+/// [`CompressedSource`]: struct.CompressedSource.html
 pub struct CompressedSourceBase {
     cache: AudioCacheCore,
 }
 
 impl CompressedSourceBase {
+    /// Create a new handle, suitable for conversion to an [`Input`] or [`Audio`].
+    ///
+    /// [`Input`]: struct.Input.html
+    /// [`Audio`]: struct.Audio.html
     pub fn new_handle(&self) -> CompressedSource {
         CompressedSource {
             cache: self.cache.new_handle(),
@@ -1766,6 +1829,7 @@ pub struct RestartableSource {
 }
 
 impl RestartableSource {
+    /// Create a new source, which can be restarted using a `recreator` function.
     pub fn new(recreator: impl Fn(Option<Duration>) -> Result<Input> + Send + 'static) -> Result<Self> {
         recreator(None)
             .map(move |source| {
@@ -1777,6 +1841,7 @@ impl RestartableSource {
             })
     }
 
+    /// Create a new restartable ffmpeg source for a local file.
     pub fn ffmpeg<P: AsRef<OsStr> + Send + Clone + Copy + 'static>(path: P) -> Result<Self> {
         Self::new(move |time: Option<Duration>| {
             if let Some(time) = time {
