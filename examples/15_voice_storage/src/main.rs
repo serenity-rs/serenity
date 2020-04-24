@@ -40,8 +40,10 @@ use serenity::{
         Bitrate,
         CompressedSource,
         CompressedSourceBase,
+        Event,
         Input,
         MemorySource,
+        TrackEvent,
     },
 };
 
@@ -116,8 +118,14 @@ fn main() {
             voice::ffmpeg("ting.wav").expect("File should be in root folder."),
             None);
         let _ = ting_src.spawn_loader();
-
         audio_map.insert("ting".into(), CachedSound::Uncompressed(ting_src));
+
+        // Another short sting, to show where each loop occurs.
+        let loop_src = MemorySource::new(
+            voice::ffmpeg("loop.wav").expect("File should be in root folder."),
+            None);
+        let _ = loop_src.spawn_loader();
+        audio_map.insert("loop".into(), CachedSound::Uncompressed(loop_src));
 
         // Creation of a compressed source.
         //
@@ -130,7 +138,6 @@ fn main() {
                 None,
             );
         let _ = song_src.spawn_loader();
-
         // CompressedSource cannot be sent between threads, so we need to discard some state using
         // `into_sendable`.
         audio_map.insert("song".into(), CachedSound::Compressed(song_src.into_sendable()));
@@ -209,17 +216,39 @@ fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
     };
 
     let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in ShareMap.");
+    let manager_lock_for_evt = manager_lock.clone();
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
         check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
 
         let sources_lock = ctx.data.read().get::<SoundStore>().cloned().expect("Sound cache was installed at startup.");
+        let sources_lock_for_evt = sources_lock.clone();
         let sources = sources_lock.lock();
         let source = sources.get("song").expect("Handle placed into cache at startup.");
 
         let song = handler.play_source(source.into());
         let _ = song.set_volume(0.5);
+        let _ = song.enable_loop();
+
+        // Play a guitar chord whenever the main backing track loops.
+        let _ = song.add_event(
+            Event::Track(TrackEvent::Loop),
+            move |_evt_ctx| {
+                let src = {
+                    let sources = sources_lock_for_evt.lock();
+                    sources.get("loop").expect("Handle placed into cache at startup.").into()
+                };
+
+                let mut manager = manager_lock_for_evt.lock();
+                if let Some(handler) = manager.get_mut(guild_id) {
+                    let sound = handler.play_source(src);
+                    let _ = sound.set_volume(0.5);
+                }
+
+                None
+            },
+        );
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
     }
@@ -306,7 +335,7 @@ fn ting(ctx: &mut Context, msg: &Message, _args: Args) -> CommandResult {
         let sources = sources_lock.lock();
         let source = sources.get("ting").expect("Handle placed into cache at startup.");
 
-        let _song = handler.play_source(source.into());
+        let _sound = handler.play_source(source.into());
 
         check_msg(msg.channel_id.say(&ctx.http, "Ting!"));
     } else {

@@ -194,6 +194,9 @@ pub struct Audio {
     /// Typically, this is used by internal code to supply context information
     /// to event handlers, though more may be cloned from this handle.
     pub handle: AudioHandle,
+
+    /// Count of remaining loops.
+    pub loops: LoopState,
 }
 
 impl Audio {
@@ -208,6 +211,7 @@ impl Audio {
             events: EventStore::new(),
             commands,
             handle,
+            loops: LoopState::Finite(0),
         }
     }
 
@@ -259,6 +263,25 @@ impl Audio {
         self
     }
 
+    /// Sets [`loops`] in a manner that allows method chaining.
+    ///
+    /// [`loops`]: #structfield.loops
+    pub fn loops(&mut self, loops: LoopState) -> &mut Self {
+        self.loops = loops;
+        self   
+    }
+
+    pub(crate) fn do_loop(&mut self) -> bool {
+        match self.loops {
+            LoopState::Infinite => true,
+            LoopState::Finite(0) => false,
+            LoopState::Finite(ref mut n) => {
+                *n -= 1;
+                true
+            },
+        }
+    }
+
     /// Steps playback location forward by one frame.
     ///
     /// *Used internally*, although in future this might affect seek position.
@@ -287,10 +310,11 @@ impl Audio {
                         Pause => {self.pause();},
                         Stop => {self.stop();},
                         Volume(vol) => {self.volume(vol);},
-                        Seek(time) => {self.source.seek_time(time);},
+                        Seek(time) => {self.seek_time(time);},
                         AddEvent(evt) => self.events.add_event(evt, self.position),
                         Do(action) => action(self),
                         Request(tx) => {let _ = tx.send(Box::new(self.get_state()));},
+                        Loop(loops) => {self.loops(loops);},
                     }
                 },
                 Err(TryRecvError::Disconnected) => {
@@ -318,7 +342,21 @@ impl Audio {
             volume: self.volume,
             finished: self.finished,
             position: self.position,
+            loops: self.loops,
         }
+    }
+
+    /// Seek to a specific point in the track.
+    ///
+    /// Returns `None` if unsupported.
+    pub fn seek_time(&mut self, pos: Duration) -> Option<Duration> {
+        let out = self.source.seek_time(pos);
+
+        if let Some(t) = out {
+            self.position = t;
+        }
+
+        out
     }
 }
 
@@ -352,6 +390,7 @@ pub struct AudioState {
     pub volume: f32,
     pub finished: bool,
     pub position: Duration,
+    pub loops: LoopState,
 }
 
 /// Alias for most result-free calls to an [`AudioHandle`].
@@ -504,12 +543,51 @@ impl AudioHandle {
             .map(|c| c.recv().unwrap())
     }
 
+    // Set an audio track to loop indefinitely.
+    pub fn enable_loop(&self) -> AudioResult {
+        if self.seekable {
+            self.send(AudioCommand::Loop(LoopState::Infinite))
+        } else {
+            Err(SendError(AudioCommand::Loop(LoopState::Infinite)))
+        }
+    }
+
+    // Set an audio track to no longer loop.
+    pub fn disable_loop(&self) -> AudioResult {
+        if self.seekable {
+            self.send(AudioCommand::Loop(LoopState::Finite(0)))
+        } else {
+            Err(SendError(AudioCommand::Loop(LoopState::Finite(0))))
+        }
+    }
+
+    // Set an audio track to loop a set number of times.
+    pub fn loop_for(&self, count: usize) -> AudioResult {
+        if self.seekable {
+            self.send(AudioCommand::Loop(LoopState::Finite(count)))
+        } else {
+            Err(SendError(AudioCommand::Loop(LoopState::Finite(count))))
+        }
+    }
+
     #[inline]
     /// Send a raw command to the [`Audio`] object.
     ///
     /// [`Audio`]: struct.Audio.html
     pub fn send(&self, cmd: AudioCommand) -> AudioResult {
         self.command_channel.send(cmd)
+    }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub enum LoopState {
+    Infinite,
+    Finite(usize),
+}
+
+impl Default for LoopState {
+    fn default() -> Self {
+        Self::Finite(0)
     }
 }
 
@@ -527,6 +605,7 @@ pub enum AudioCommand {
     AddEvent(EventData),
     Do(AudioFn),
     Request(Sender<Box<AudioState>>),
+    Loop(LoopState),
 }
 
 impl std::fmt::Debug for AudioCommand {
@@ -541,10 +620,12 @@ impl std::fmt::Debug for AudioCommand {
             AddEvent(evt) => format!("AddEvent({:?})", evt),
             Do(_f) => "Do([function])".to_string(),
             Request(tx) => format!("Request({:?})", tx),
+            Loop(loops) => format!("Loop({:?})", loops),
         })
     }
 }
 
+#[derive(Clone, Copy, Debug)]
 pub enum PlayMode {
     Play,
     Pause,

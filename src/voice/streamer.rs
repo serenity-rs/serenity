@@ -537,6 +537,10 @@ fn _ffmpeg_optioned(
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub fn ytdl(uri: &str) -> Result<Input> {
+    _ytdl(uri, &[])
+}
+
+fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
     let ytdl_args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
@@ -569,6 +573,7 @@ pub fn ytdl(uri: &str) -> Result<Input> {
         .spawn()?;
 
     let ffmpeg = Command::new("ffmpeg")
+        .args(pre_args)
         .arg("-i")
         .arg("-")
         .args(&ffmpeg_args)
@@ -1870,6 +1875,33 @@ impl RestartableSource {
                 ffmpeg(path)
             }
         })
+    }
+
+    /// Create a new restartable ytdl source.
+    ///
+    /// The cost of restarting and seeking will probably be *very* high:
+    /// expect a pause if you seek backwards.
+    pub fn ytdl<P: AsRef<str> + Send + Clone + 'static>(uri: P) -> Result<Self> {
+        Self::new(move |time: Option<Duration>| {
+            if let Some(time) = time {
+                let is_stereo = true;
+                let stereo_val = if is_stereo { "2" } else { "1" };
+
+                let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
+
+                _ytdl(uri.as_ref(), &["-ss",&ts,])
+            } else {
+                ytdl(uri.as_ref())
+            }
+        })
+    }
+
+    /// Create a new restartable ytdl source, using the first result of a youtube search.
+    ///
+    /// The cost of restarting and seeking will probably be *very* high:
+    /// expect a pause if you seek backwards.
+    pub fn ytdl_search(name: &str) -> Result<Self> {
+       Self::ytdl(format!("ytsearch1:{}",name))
     }
 }
 

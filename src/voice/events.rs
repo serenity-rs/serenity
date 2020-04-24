@@ -265,9 +265,7 @@ impl GlobalEvents {
 
 		for (evt, indices) in events.iter() {
 			// Peek to see if there are any listeners and events at all...
-			let should_work = if let Some(handlers) = self.store.track.get(evt) {
-				!handlers.is_empty() && !indices.is_empty()
-			} else { false };
+			let should_work = !indices.is_empty();
 
 			if should_work {
 				let mut local_sources = &mut sources[..];
@@ -285,6 +283,12 @@ impl GlobalEvents {
 					removed += i;
 				}
 
+				for audio in &mut auds {
+					let state = audio.get_state();
+		            let handle = audio.handle.clone();
+		            audio.events.process_track(audio.position, *evt, EventContext::Track(&state, &handle));
+				}
+
 				self.store.process_track(self.time, *evt, EventContext::Global(Some(auds)));
 			}
 		}
@@ -293,10 +297,6 @@ impl GlobalEvents {
 		let to_cull = events.entry(TrackEvent::End).or_default();
 		for (count, index) in to_cull.iter().enumerate() {
 			let mut audio = sources.remove(index - count);
-
-			let state = audio.get_state();
-            let handle = audio.handle.clone();
-            audio.events.process_track(audio.position, TrackEvent::End, EventContext::Track(&state, &handle));
 		}
 
 		// Now drain vecs.

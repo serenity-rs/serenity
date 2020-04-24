@@ -16,6 +16,7 @@ mod threading;
 pub use self::{
     audio::{
         Audio,
+        AudioCommand,
         AudioFn,
         AudioHandle,
         AudioQueryResult,
@@ -24,6 +25,8 @@ pub use self::{
         AudioState,
         AudioType,
         BlockingAudioQueryResult,
+        LoopState,
+        PlayMode,
         ReadSeek,
         TrackQueue,
         create_player,
@@ -34,12 +37,14 @@ pub use self::{
     handler::Handler,
     manager::Manager,
     streamer::{
+        ChildContainer,
         CompressedSource,
         CompressedSourceBase,
         Input,
         MemorySource,
         Reader,
         RestartableSource,
+        child_to_reader,
         // dca,
         ffmpeg,
         ffmpeg_optioned,

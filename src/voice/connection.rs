@@ -437,7 +437,13 @@ impl Connection {
 
             len = len.max(temp_len);
             if temp_len > 0 {
-                aud.step_frame()
+                aud.step_frame();
+            } else if aud.do_loop() {
+                if let Some(_) = aud.seek_time(Default::default()) {
+                    fired_track_evts.entry(TrackEvent::Loop)
+                        .or_default()
+                        .push(i);
+                }
             } else {
                 aud.finished = true;
             }
