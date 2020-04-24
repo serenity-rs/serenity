@@ -384,9 +384,12 @@ impl StandardFramework {
     /// [`group`]: #method.group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
-            Map::Prefixless(GroupMap::new(&group.options.sub_groups), CommandMap::new(&group.options.commands))
+            Map::Prefixless(
+                GroupMap::new(&group.options.sub_groups, &self.config),
+                CommandMap::new(&group.options.commands, &self.config),
+            )
         } else {
-            Map::WithPrefixes(GroupMap::new(&[group]))
+            Map::WithPrefixes(GroupMap::new(&[group], &self.config))
         };
 
         self.groups.push((group, map));
@@ -622,7 +625,7 @@ impl Framework for StandardFramework {
     fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
         let mut stream = Stream::new(&msg.content);
 
-        stream.take_while(|s| s.is_whitespace());
+        stream.take_while_char(|c| c.is_whitespace());
 
         let prefix = parse::prefix(&mut ctx, &msg, &mut stream, &self.config);
 

@@ -17,6 +17,7 @@ use std::{
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
+    GatewayIntents,
     ShardId,
     ShardManagerMessage,
     ShardQueuerMessage,
@@ -25,10 +26,10 @@ use super::{
     ShardRunnerOptions,
 };
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 use crate::gateway::ConnectionStage;
-use log::{info, warn};
+use log::{debug, info, warn};
 
+use crate::utils::TypeMap;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]
@@ -47,7 +48,7 @@ pub struct ShardQueuer {
     /// dispatching.
     ///
     /// [`Client::data`]: ../../struct.Client.html#structfield.data
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     /// A reference to an `EventHandler`, such as the one given to the
     /// [`Client`].
     ///
@@ -93,6 +94,7 @@ pub struct ShardQueuer {
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
+    pub intents: Option<GatewayIntents>
 }
 
 impl ShardQueuer {
@@ -185,6 +187,7 @@ impl ShardQueuer {
             &self.cache_and_http.http.token,
             shard_info,
             self.guild_subscriptions,
+            self.intents,
         )?;
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
@@ -209,6 +212,7 @@ impl ShardQueuer {
 
         thread::spawn(move || {
             let _ = runner.run();
+            debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
         self.runners.lock().insert(ShardId(shard_id), runner_info);

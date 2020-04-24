@@ -131,7 +131,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id, the user's data, and the user's member data if available.
     #[cfg(feature = "cache")]
-    fn guild_member_removal(&self, _ctx: Context, _guild: GuildId, _user: User, _member_data_if_available: Option<Member>) {}
+    fn guild_member_removal(&self, _ctx: Context, _guild_id: GuildId, _user: User, _member_data_if_available: Option<Member>) {}
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///

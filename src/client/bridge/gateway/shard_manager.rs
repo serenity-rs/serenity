@@ -14,6 +14,7 @@ use std::{
 };
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
+    GatewayIntents,
     ShardClientMessage,
     ShardId,
     ShardManagerMessage,
@@ -23,9 +24,9 @@ use super::{
     ShardRunnerInfo,
 };
 use threadpool::ThreadPool;
-use typemap::ShareMap;
 use log::{info, warn};
 
+use crate::utils::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
@@ -58,11 +59,8 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// use parking_lot::{Mutex, RwLock};
 /// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
 /// use serenity::client::{EventHandler, RawEventHandler};
-/// // Of note, this imports `typemap`'s `ShareMap` type.
-/// use serenity::prelude::*;
 /// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
-/// // Of note, this imports `typemap`'s `ShareMap` type.
 /// use serenity::prelude::*;
 /// use std::sync::Arc;
 /// use std::env;
@@ -76,7 +74,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway()?.url));
-/// let data = Arc::new(RwLock::new(ShareMap::custom()));
+/// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework = Arc::new(Mutex::new(None));
 /// let threadpool = ThreadPool::with_name("my threadpool".to_owned(), 5);
@@ -98,12 +96,13 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
 ///     guild_subscriptions: true,
+///     intents: None,
 /// });
 /// #     Ok(())
 /// # }
 /// #
 /// # #[cfg(not(feature = "framework"))]
-/// # fn try_main() -> Result<(), Box<Error>> {
+/// # fn try_main() -> Result<(), Box<dyn Error>> {
 /// #     Ok(())
 /// # }
 /// #
@@ -158,6 +157,7 @@ impl ShardManager {
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
             guild_subscriptions: opt.guild_subscriptions,
+            intents: opt.intents,
         };
 
         thread::spawn(move || {
@@ -260,7 +260,7 @@ impl ShardManager {
     /// [`initialize`]: #method.initialize
     pub fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
-        self.shutdown(shard_id);
+        self.shutdown(shard_id, 4000);
 
         let shard_total = self.shard_total;
 
@@ -286,11 +286,11 @@ impl ShardManager {
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
-    pub fn shutdown(&mut self, shard_id: ShardId) -> bool {
+    pub fn shutdown(&mut self, shard_id: ShardId, code: u16) -> bool {
         info!("Shutting down shard {}", shard_id);
 
         if let Some(runner) = self.runners.lock().get(&shard_id) {
-            let shutdown = ShardManagerMessage::Shutdown(shard_id);
+            let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
             let client_msg = ShardClientMessage::Manager(shutdown);
             let msg = InterMessage::Client(Box::new(client_msg));
 
@@ -341,7 +341,7 @@ impl ShardManager {
         info!("Shutting down all shards");
 
         for shard_id in keys {
-            self.shutdown(shard_id);
+            self.shutdown(shard_id, 1000);
         }
 
         let _ = self.shard_queuer.send(ShardQueuerMessage::Shutdown);
@@ -374,7 +374,7 @@ impl Drop for ShardManager {
 }
 
 pub struct ShardManagerOptions<'a> {
-    pub data: &'a Arc<RwLock<ShareMap>>,
+    pub data: &'a Arc<RwLock<TypeMap>>,
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
@@ -388,4 +388,5 @@ pub struct ShardManagerOptions<'a> {
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
+    pub intents: Option<GatewayIntents>,
 }

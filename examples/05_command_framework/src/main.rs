@@ -20,7 +20,6 @@ use serenity::{
     utils::{content_safe, ContentSafeOptions},
 };
 
-// This imports `typemap`'s `Key` as `TypeMapKey`.
 use serenity::prelude::*;
 
 // A container type is created for inserting into the Client's `data`, which
@@ -197,7 +196,7 @@ fn main() {
             // the command's name does not exist in the counter, add a default
             // value of 0.
             let mut data = ctx.data.write();
-            let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in ShareMap.");
+            let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
             let entry = counter.entry(command_name.to_string()).or_insert(0);
             *entry += 1;
 
@@ -256,7 +255,7 @@ fn commands(ctx: &mut Context, msg: &Message) -> CommandResult {
     let mut contents = "Commands used:\n".to_string();
 
     let data = ctx.data.read();
-    let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in ShareMap.");
+    let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
 
     for (k, v) in counter {
         let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);

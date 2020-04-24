@@ -4,6 +4,7 @@
 mod colour;
 mod message_builder;
 mod custom_message;
+mod typemap;
 
 pub use self::{
     colour::Colour,
@@ -14,6 +15,7 @@ pub use self::{
         MessageBuilder,
     },
 	custom_message::CustomMessage,
+    typemap::{TypeMap, TypeMapKey},
 };
 pub type Color = Colour;
 
@@ -936,6 +938,7 @@ mod test {
         let role = Role {
             id: RoleId(333333333333333333),
             colour: Colour::ORANGE,
+            guild_id: guild.id,
             hoist: true,
             managed: false,
             mentionable: true,

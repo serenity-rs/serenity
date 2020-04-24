@@ -61,7 +61,6 @@ pub struct Handler {
     /// **Note**: This _must not_ be manually mutated. Call [`switch_to`] to
     /// mutate this value.
     ///
-    /// [`Group`]: ../../model/channel/struct.Group.html
     /// [`guild`]: #structfield.guild
     /// [`switch_to`]: #method.switch_to
     pub channel_id: Option<ChannelId>,

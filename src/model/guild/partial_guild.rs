@@ -1,7 +1,9 @@
+use serde::de::Error as DeError;
+
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
 use crate::{model::prelude::*};
-use super::super::utils::{deserialize_emojis, deserialize_roles, deserialize_u64_or_zero};
+use super::super::utils::{deserialize_emojis, deserialize_roles};
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
@@ -14,7 +16,7 @@ use crate::cache::CacheRwLock;
 /// like member data.
 ///
 /// [`Guild`]: struct.Guild.html
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
 pub struct PartialGuild {
     pub id: GuildId,
     pub afk_channel_id: Option<ChannelId>,
@@ -333,7 +335,15 @@ impl PartialGuild {
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn kick<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> { self.id.kick(&http, user_id) }
+    pub fn kick<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
+        self.id.kick(&http, user_id)
+    }
+
+    #[cfg(feature = "http")]
+    #[inline]
+    pub fn kick_with_reason<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U, reason: &str) -> Result<()> {
+        self.id.kick_with_reason(&http, user_id, reason)
+    }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
@@ -534,5 +544,139 @@ impl PartialGuild {
     /// [`Role`]: ../guild/struct.Role.html
     pub fn role_by_name(&self, role_name: &str) -> Option<&Role> {
         self.roles.values().find(|role| role_name == role.name)
+    }
+}
+
+impl<'de> Deserialize<'de> for PartialGuild {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let id = map.get("id")
+            .and_then(|x| x.as_str())
+            .and_then(|x| x.parse::<u64>().ok());
+
+        if let Some(guild_id) = id {
+            if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
+                for value in array {
+                    if let Some(role) = value.as_object_mut() {
+                        role
+                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                    }
+                }
+            }
+        }
+
+        let afk_channel_id = match map.remove("afk_channel_id") {
+            Some(v) => serde_json::from_value::<Option<ChannelId>>(v)
+                .map_err(DeError::custom)?,
+            None => None,
+        };
+        let afk_timeout = map.remove("afk_timeout")
+            .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
+            .and_then(u64::deserialize)
+            .map_err(DeError::custom)?;
+        let default_message_notifications = map.remove("default_message_notifications")
+            .ok_or_else(|| {
+                DeError::custom("expected guild default_message_notifications")
+            })
+            .and_then(DefaultMessageNotificationLevel::deserialize)
+            .map_err(DeError::custom)?;
+        let embed_channel_id = match map.remove("embed_channel_id") {
+            Some(e) => Option::<ChannelId>::deserialize(e).map_err(DeError::custom)?,
+            None => None,
+        };
+        let embed_enabled = map.remove("embed_enabled")
+            .ok_or_else(|| DeError::custom("expected guild embed_enabled"))
+            .and_then(bool::deserialize)
+            .map_err(DeError::custom)?;
+        let emojis = map.remove("emojis")
+            .ok_or_else(|| DeError::custom("expected guild emojis"))
+            .and_then(deserialize_emojis)
+            .map_err(DeError::custom)?;
+        let features = map.remove("features")
+            .ok_or_else(|| DeError::custom("expected guild features"))
+            .and_then(serde_json::from_value::<Vec<String>>)
+            .map_err(DeError::custom)?;
+        let icon = match map.remove("icon") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let id = map.remove("id")
+            .ok_or_else(|| DeError::custom("expected guild id"))
+            .and_then(GuildId::deserialize)
+            .map_err(DeError::custom)?;
+        let mfa_level = map.remove("mfa_level")
+            .ok_or_else(|| DeError::custom("expected guild mfa_level"))
+            .and_then(MfaLevel::deserialize)
+            .map_err(DeError::custom)?;
+        let name = map.remove("name")
+            .ok_or_else(|| DeError::custom("expected guild name"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+        let owner_id = map.remove("owner_id")
+            .ok_or_else(|| DeError::custom("expected guild owner_id"))
+            .and_then(UserId::deserialize)
+            .map_err(DeError::custom)?;
+        let region = map.remove("region")
+            .ok_or_else(|| DeError::custom("expected guild region"))
+            .and_then(String::deserialize)
+            .map_err(DeError::custom)?;
+        let roles = map.remove("roles")
+            .ok_or_else(|| DeError::custom("expected guild roles"))
+            .and_then(deserialize_roles)
+            .map_err(DeError::custom)?;
+        let splash = match map.remove("splash") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let verification_level = map.remove("verification_level")
+            .ok_or_else(|| DeError::custom("expected guild verification_level"))
+            .and_then(VerificationLevel::deserialize)
+            .map_err(DeError::custom)?;
+        let description = match map.remove("description") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let premium_tier = match map.remove("premium_tier") {
+            Some(v) => PremiumTier::deserialize(v).map_err(DeError::custom)?,
+            None => PremiumTier::default(),
+        };
+        let premium_subscription_count = match map.remove("premium_subscription_count") {
+            Some(Value::Null) | None => 0,
+            Some(v) => u64::deserialize(v).map_err(DeError::custom)?,
+        };
+        let banner = match map.remove("banner") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+        let vanity_url_code = match map.remove("vanity_url_code") {
+            Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        Ok(Self {
+            afk_channel_id,
+            afk_timeout,
+            default_message_notifications,
+            embed_channel_id,
+            embed_enabled,
+            emojis,
+            features,
+            icon,
+            id,
+            mfa_level,
+            name,
+            owner_id,
+            region,
+            roles,
+            splash,
+            verification_level,
+            description,
+            premium_tier,
+            premium_subscription_count,
+            banner,
+            vanity_url_code,
+            _nonexhaustive: (),
+        })
     }
 }

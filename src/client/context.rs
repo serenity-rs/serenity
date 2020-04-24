@@ -6,9 +6,9 @@ use std::sync::{
     Arc,
     mpsc::Sender,
 };
-use typemap::ShareMap;
 
 use crate::http::Http;
+use crate::utils::TypeMap;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::{Cache, CacheRwLock};
@@ -34,7 +34,7 @@ pub struct Context {
     /// information.
     ///
     /// [`Client::data`]: struct.Client.html#structfield.data
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
@@ -48,7 +48,7 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     #[cfg(feature = "cache")]
     pub(crate) fn new(
-        data: Arc<RwLock<ShareMap>>,
+        data: Arc<RwLock<TypeMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         http: Arc<Http>,
@@ -66,7 +66,7 @@ impl Context {
     /// Create a new Context to be passed to an event handler.
     #[cfg(not(feature = "cache"))]
     pub(crate) fn new(
-        data: Arc<RwLock<ShareMap>>,
+        data: Arc<RwLock<TypeMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         http: Arc<Http>,

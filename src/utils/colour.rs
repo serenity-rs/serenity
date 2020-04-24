@@ -32,6 +32,7 @@ macro_rules! colour {
 /// # use serde_json::json;
 /// # use serenity::model::guild::Role;
 /// # use serenity::model::id::RoleId;
+/// # use serenity::model::id::GuildId;
 /// # use serenity::model::permissions;
 /// #
 /// # fn main() {
@@ -39,6 +40,7 @@ macro_rules! colour {
 /// #     "color": Colour::BLURPLE,
 /// #     "hoist": false,
 /// #     "id": RoleId(1),
+/// #     "guild_id": GuildId(2),
 /// #     "managed": false,
 /// #     "mentionable": false,
 /// #     "name": "test",

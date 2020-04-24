@@ -362,10 +362,6 @@ impl Route {
         api!("/gateway/bot")
     }
 
-    pub fn group_recipient(group_id: u64, user_id: u64) -> String {
-        format!(api!("/channels/{}/recipients/{}"), group_id, user_id)
-    }
-
     pub fn guild(guild_id: u64) -> String {
         format!(api!("/guilds/{}"), guild_id)
     }
@@ -416,6 +412,19 @@ impl Route {
             guild_id,
             user_id,
             delete_message_days,
+            reason,
+        )
+    }
+
+    pub fn guild_kick_optioned(
+        guild_id: u64,
+        user_id: u64,
+        reason: &str,
+    ) -> String {
+        format!(
+            api!("/guilds/{}/members/{}?reason={}"),
+            guild_id,
+            user_id,
             reason,
         )
     }
@@ -621,10 +630,6 @@ impl Route {
 
 #[derive(Clone, Debug)]
 pub enum RouteInfo<'a> {
-    AddGroupRecipient {
-        group_id: u64,
-        user_id: u64,
-    },
     AddMemberRole {
         guild_id: u64,
         role_id: u64,
@@ -876,16 +881,13 @@ pub enum RouteInfo<'a> {
     KickMember {
         guild_id: u64,
         user_id: u64,
+        reason: &'a str
     },
     LeaveGroup {
         group_id: u64,
     },
     LeaveGuild {
         guild_id: u64,
-    },
-    RemoveGroupRecipient {
-        group_id: u64,
-        user_id: u64,
     },
     PinMessage {
         channel_id: u64,
@@ -922,11 +924,6 @@ pub enum RouteInfo<'a> {
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
-            RouteInfo::AddGroupRecipient { group_id, user_id } => (
-                LightMethod::Put,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
-            ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
                 LightMethod::Put,
                 Route::GuildsIdMembersIdRolesId(guild_id),
@@ -1372,10 +1369,14 @@ impl<'a> RouteInfo<'a> {
                 Route::WebhooksId(webhook_id),
                 Cow::from(Route::webhook_with_token(webhook_id, token)),
             ),
-            RouteInfo::KickMember { guild_id, user_id } => (
+            RouteInfo::KickMember { guild_id, user_id, reason } => (
                 LightMethod::Delete,
                 Route::GuildsIdMembersId(guild_id),
-                Cow::from(Route::guild_member(guild_id, user_id)),
+                Cow::from(Route::guild_kick_optioned(
+                        guild_id,
+                        user_id,
+                        reason,
+                    )),
             ),
             RouteInfo::LeaveGroup { group_id } => (
                 LightMethod::Delete,
@@ -1386,11 +1387,6 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Delete,
                 Route::UsersMeGuildsId,
                 Cow::from(Route::user_guild("@me", guild_id)),
-            ),
-            RouteInfo::RemoveGroupRecipient { group_id, user_id } => (
-                LightMethod::Delete,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
             ),
             RouteInfo::PinMessage { channel_id, message_id } => (
                 LightMethod::Put,

@@ -8,7 +8,7 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.8.0"
+version = "0.8.5"
 edition = "2018"
 
 [dependencies]
@@ -27,12 +27,7 @@ version = "0.2"
 
 [dependencies.command_attr]
 path = "./command_attr"
-# FIXME: A terrible mistake was done. The version of command_attr
-# should've incremented from 0.1.6 to 0.2.0 as 0.1.7 is incompatible
-# with serenity 0.7.x, therefore violating the SemVer specification.
-# Upon a new release of `command_attr`, please increment to 0.2.0
-# and yank 0.1.7 from crates.io.
-version = "0.1.7"
+version = "0.2.0"
 optional = true
 
 [dependencies.discortp]
@@ -46,7 +41,7 @@ features = ["derive"]
 
 [dependencies.uwl]
 optional = true
-version = "0.5"
+version = "0.6.0"
 
 [dependencies.base64]
 optional = true
@@ -92,10 +87,6 @@ version = "1"
 default-features = false
 optional = true
 version = "0.9"
-
-[dependencies.typemap]
-optional = true
-version = "0.3"
 
 [dependencies.url]
 optional = true
@@ -147,7 +138,6 @@ client = [
     "gateway",
     "http",
     "threadpool",
-    "typemap",
 ]
 extras = []
 framework = ["client", "model", "utils"]
