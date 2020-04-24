@@ -106,6 +106,12 @@ jobs:
 
   - bash: |
       source $HOME/.cargo/env
-      CARGO_TARGET_DIR='..' cd examples/14_voice_events
+      CARGO_TARGET_DIR='..' cd examples/14_voice_events_queue
       cargo build
     displayName: 'Build example 14'
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/15_voice_storage
+      cargo build
+    displayName: 'Build example 15'

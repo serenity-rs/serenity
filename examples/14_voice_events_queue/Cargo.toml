@@ -1,0 +1,12 @@
+[package]
+name = "14_voice_events_queue"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies.serenity]
+features = ["cache", "framework", "standard_framework", "voice", "http", "rustls_backend"]
+path = "../../"
+
+[dependencies]
+env_logger = "0.7"
