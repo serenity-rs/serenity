@@ -35,6 +35,7 @@ pub use self::{
     manager::Manager,
     streamer::{
         CompressedSource,
+        CompressedSourceBase,
         Input,
         MemorySource,
         Reader,

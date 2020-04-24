@@ -25,7 +25,6 @@ use std::{
     time::Duration,
 };
 use super::{
-    constants::*,
     events::{
         Event,
         EventContext,

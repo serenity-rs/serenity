@@ -9,6 +9,10 @@ pub const MONO_FRAME_SIZE: usize = SAMPLING_RATE / AUDIO_FRAME_RATE;
 
 pub const STEREO_FRAME_SIZE: usize = 2 * MONO_FRAME_SIZE;
 
+pub const MONO_FRAME_BYTE_SIZE: usize = MONO_FRAME_SIZE * std::mem::size_of::<f32>();
+
+pub const STEREO_FRAME_BYTE_SIZE: usize = STEREO_FRAME_SIZE * std::mem::size_of::<f32>();
+
 /// Length (in milliseconds) of any audio frame.
 pub const FRAME_LEN_MS: usize = 1000 / AUDIO_FRAME_RATE;
 

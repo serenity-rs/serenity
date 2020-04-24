@@ -46,7 +46,7 @@ use std::{
     time::Instant,
 };
 
-use super::audio::{Audio, AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE};
+use super::audio::{Audio, AudioReceiver, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE};
 use super::connection_info::ConnectionInfo;
 use super::{constants::*, payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
 use url::Url;
@@ -377,7 +377,6 @@ impl Connection {
         &mut self,
         sources: &mut Vec<Audio>,
         opus_frame: &[u8],
-        buffer: &mut [i16; 1920],
         mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
         fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
         time_in_call: &mut Duration,
@@ -424,14 +423,14 @@ impl Connection {
             }
 
             let now = Instant::now();
-            let temp_len = stream.mix(&mut mix_buffer, source_stereo, vol);
+            let temp_len = stream.mix(&mut mix_buffer, vol);
             let later = Instant::now();
 
             *time_in_call += later - now;
             *entry_points += 1;
 
             if *entry_points % 1000 == 0 {
-                println!("Average cost {:?}ms", time_in_call.as_nanos()/(*entry_points as u128));
+                println!("Average cost {:?}ns", time_in_call.as_nanos()/(*entry_points as u128));
 
                 *time_in_call = Duration::default();
                 *entry_points = 0;
@@ -545,7 +544,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points)?;
+        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
