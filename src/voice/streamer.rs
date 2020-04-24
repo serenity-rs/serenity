@@ -575,47 +575,7 @@ pub fn ytdl(uri: &str) -> Result<Input> {
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
 /// Takes the first video listed from the YouTube search.
 pub fn ytdl_search(name: &str) -> Result<Input> {
-    let ytdl_args = [
-        "-f",
-        "webm[abr>0]/bestaudio/best",
-        "-R",
-        "infinite",
-        "--no-playlist",
-        "--ignore-config",
-        &format!("ytsearch1:{}",name),
-        "-o",
-        "-"
-    ];
-
-    let ffmpeg_args = [
-        "-f",
-        "s16le",
-        "-ac",
-        "2",
-        "-ar",
-        "48000",
-        "-acodec",
-        "pcm_f32le",
-        "-",
-    ];
-
-    let youtube_dl = Command::new("youtube-dl")
-        .args(&ytdl_args)
-        .stdin(Stdio::null())
-        .stderr(Stdio::null())
-        .stdout(Stdio::piped())
-        .spawn()?;
-
-    let ffmpeg = Command::new("ffmpeg")
-        .arg("-i")
-        .arg("-")
-        .args(&ffmpeg_args)
-        .stdin(youtube_dl.stdout.ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?)
-        .stderr(Stdio::null())
-        .stdout(Stdio::piped())
-        .spawn()?;
-
-    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
+    ytdl(&format!("ytsearch1:{}",name))
 }
 
 fn is_stereo(path: &OsStr) -> Result<bool> {
