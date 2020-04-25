@@ -197,7 +197,7 @@ impl Channel {
     /// Determines if the channel is NSFW.
     #[cfg(feature = "model")]
     #[inline]
-    pub async fn is_nsfw(&self) -> bool {
+    pub fn is_nsfw(&self) -> bool {
         match *self {
             Channel::Guild(ref channel) => channel.is_nsfw(),
             Channel::Category(ref category) => category.is_nsfw(),
@@ -515,7 +515,7 @@ mod test {
             assert!(!channel.is_nsfw());
 
             let channel = Channel::Guild(channel);
-            assert!(!channel.is_nsfw().await);
+            assert!(!channel.is_nsfw());
 
             let private_channel = private_channel();
             assert!(!private_channel.is_nsfw());

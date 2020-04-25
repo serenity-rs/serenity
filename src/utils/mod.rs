@@ -714,7 +714,7 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
                             if show_discriminator {
                                 format!("@{}", member.distinct().await)
                             } else {
-                                format!("@{}", member.display_name().await)
+                                format!("@{}", member.display_name())
                             }
                         } else {
                             "@invalid-user".to_string()

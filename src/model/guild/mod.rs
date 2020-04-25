@@ -2384,18 +2384,17 @@ mod test {
                 .member_named("test#1432")
                 .await
                 .unwrap()
-                .display_name()
-                .await;
+                .display_name();
 
-            assert_eq!(lhs, gen_member().display_name().await);
+            assert_eq!(lhs, gen_member().display_name());
         }
 
         #[tokio::test]
         async fn member_named_nickname() {
             let guild = gen();
-            let lhs = guild.member_named("aaaa").await.unwrap().display_name().await;
+            let lhs = guild.member_named("aaaa").await.unwrap().display_name();
 
-            assert_eq!(lhs, gen_member().display_name().await);
+            assert_eq!(lhs, gen_member().display_name());
         }
     }
 }

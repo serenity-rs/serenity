@@ -219,7 +219,7 @@ impl Member {
     ///
     /// The nickname takes priority over the member's username if it exists.
     #[inline]
-    pub async fn display_name(&self) -> Cow<'_, String> {
+    pub fn display_name(&self) -> Cow<'_, String> {
         match self.nick.as_ref().map(Cow::Borrowed) {
             Some(nick) => nick,
             None => Cow::Owned(self.user.name.clone())
@@ -231,7 +231,7 @@ impl Member {
     pub async fn distinct(&self) -> String {
         format!(
             "{}#{:04}",
-            self.display_name().await,
+            self.display_name(),
             self.user.discriminator
         )
     }

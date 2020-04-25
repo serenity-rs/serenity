@@ -611,7 +611,7 @@ impl GuildId {
     ///         Ok(member) => println!(
     ///             "{} is {}",
     ///             member,
-    ///             member.display_name().await,
+    ///             member.display_name(),
     ///         ),
     ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
     ///     }
@@ -954,7 +954,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
     ///         Ok(member) => println!(
     ///             "{} is {}",
     ///             member,
-    ///             member.display_name().await,
+    ///             member.display_name(),
     ///         ),
     ///         Err(error) => eprintln!("Uh oh!  Error: {}", error),
     ///     }

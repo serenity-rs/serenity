@@ -494,7 +494,7 @@ impl StandardFramework {
     /// async fn before_hook(ctx: &mut Context, msg: &Message, cmd_name: &str) -> bool {
     ///     if let Ok(channel) = msg.channel_id.to_channel(ctx).await {
     ///         //  Don't run unless in nsfw channel
-    ///         if !channel.is_nsfw().await {
+    ///         if !channel.is_nsfw() {
     ///             return false;
     ///         }
     ///     }
