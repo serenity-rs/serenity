@@ -191,7 +191,7 @@ async fn dispatch_message(
 ) {
     #[cfg(feature = "model")]
     {
-        message.transform_content().await;
+        message.transform_content();
     }
 
     let event_handler = Arc::clone(event_handler);
@@ -233,21 +233,21 @@ async fn handle_event(
                     let event_handler = Arc::clone(event_handler);
 
                     tokio::spawn(async move {
-                        event_handler.private_channel_create(context, channel).await;
+                        event_handler.private_channel_create(context, &channel).await;
                     });
                 },
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
                     tokio::spawn(async move {
-                        event_handler.channel_create(context, channel).await;
+                        event_handler.channel_create(context, &channel).await;
                     });
                 },
                 Channel::Category(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
                     tokio::spawn(async move {
-                        event_handler.category_create(context, channel).await;
+                        event_handler.category_create(context, &channel).await;
                     });
                 },
                 Channel::__Nonexhaustive => unreachable!(),
@@ -262,14 +262,14 @@ async fn handle_event(
                     let event_handler = Arc::clone(event_handler);
 
                     tokio::spawn(async move {
-                        event_handler.channel_delete(context, channel).await;
+                        event_handler.channel_delete(context, &channel).await;
                     });
                 },
                 Channel::Category(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
                     tokio::spawn(async move {
-                        event_handler.category_delete(context, channel).await;
+                        event_handler.category_delete(context, &channel).await;
                     });
                 },
                 Channel::__Nonexhaustive => unreachable!(),
@@ -288,10 +288,10 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 feature_cache! {{
-                    let before = cache_and_http.cache.as_ref().read().await.channel(event.channel.id().await);
+                    let old_channel = cache_and_http.cache.as_ref().read().await.channel(event.channel.id()).await;
                     update(&cache_and_http, &mut event).await;
 
-                    event_handler.channel_update(context, before, event.channel).await;
+                    event_handler.channel_update(context, old_channel, event.channel).await;
                 } else {
                     update(&cache_and_http, &mut event).await;
 

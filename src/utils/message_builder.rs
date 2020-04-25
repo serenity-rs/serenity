@@ -41,10 +41,8 @@ use std::{
 /// let content = MessageBuilder::new()
 ///     .push("You sent a message, ")
 ///     .mention(&user)
-///     .await
 ///     .push("! ")
 ///     .mention(&emoji)
-///     .await
 ///     .build();
 /// # }
 /// ```
@@ -88,7 +86,6 @@ impl MessageBuilder {
     ///
     /// let content = MessageBuilder::new()
     ///     .channel(channel_id)
-    ///     .await
     ///     .push("!")
     ///     .build();
     ///
@@ -130,7 +127,6 @@ impl MessageBuilder {
     /// let content = MessageBuilder::new()
     ///     .push("The channel is: ")
     ///     .channel(channel_id)
-    ///     .await
     ///     .build();
     ///
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
@@ -142,12 +138,12 @@ impl MessageBuilder {
     /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
     /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
     #[inline]
-    pub async fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
-        self._channel(channel.into()).await
+    pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
+        self._channel(channel.into())
     }
 
-    async fn _channel(&mut self, channel: ChannelId) -> &mut Self {
-        let _ = write!(self.0, "{}", channel.mention().await);
+    fn _channel(&mut self, channel: ChannelId) -> &mut Self {
+        let _ = write!(self.0, "{}", channel.mention());
 
         self
     }
@@ -200,8 +196,8 @@ impl MessageBuilder {
     /// Mentions something that implements the [`Mentionable`] trait.
     ///
     /// [`Mentionable`]: ../model/misc/trait.Mentionable.html
-    pub async fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
-        let _ = write!(self.0, "{}", item.mention().await);
+    pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
+        let _ = write!(self.0, "{}", item.mention());
 
         self
     }
@@ -875,8 +871,8 @@ impl MessageBuilder {
     /// [`Role`]: ../model/guild/struct.Role.html
     /// [`RoleId`]: ../model/id/struct.RoleId.html
     /// [Display implementation]: ../model/id/struct.RoleId.html#method.fmt-1
-    pub async fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
-        let _ = write!(self.0, "{}", role.into().mention().await);
+    pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
+        let _ = write!(self.0, "{}", role.into().mention());
 
         self
     }
@@ -892,8 +888,8 @@ impl MessageBuilder {
     /// [`User`]: ../model/user/struct.User.html
     /// [`UserId`]: ../model/id/struct.UserId.html
     /// [Display implementation]: ../model/id/struct.UserId.html#method.fmt-1
-    pub async fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
-        let _ = write!(self.0, "{}", user.into().mention().await);
+    pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
+        let _ = write!(self.0, "{}", user.into().mention());
 
         self
     }
@@ -1328,8 +1324,8 @@ mod test {
         assert_ne!(content, "**test**test**");
     }
 
-    #[tokio::test]
-    async fn mentions() {
+    #[test]
+    fn mentions() {
         let content_emoji = MessageBuilder::new()
             .emoji(&Emoji {
                 animated: false,
@@ -1343,13 +1339,9 @@ mod test {
             .build();
         let content_mentions = MessageBuilder::new()
             .channel(1)
-            .await
             .mention(&UserId(2))
-            .await
             .role(3)
-            .await
             .user(4)
-            .await
             .build();
         assert_eq!(content_mentions, "<#1><@2><@&3><@4>");
         assert_eq!(content_emoji, "<:Rohrkatze:32>");

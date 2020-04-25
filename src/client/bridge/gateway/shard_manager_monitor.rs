@@ -12,10 +12,10 @@ use futures::{
     StreamExt,
 };
 
-/// The shard manager monitor does what it says on the tin -- it monitors the
+/// The shard manager monitor monitors the
 /// shard manager and performs actions on it as received.
 ///
-/// The monitor is essentially responsible for running in its own thread and
+/// The monitor is essentially responsible for running in its own task and
 /// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
 /// shutdown everything entirely.
 ///
@@ -83,6 +83,5 @@ impl ShardManagerMonitor {
                 }
             }
         }
-        warn!("deads");
     }
 }

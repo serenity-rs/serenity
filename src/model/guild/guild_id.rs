@@ -19,6 +19,10 @@ use crate::builder::CreateChannel;
 #[cfg(feature = "model")]
 use serde_json::json;
 #[cfg(feature = "cache")]
+use tokio::sync::RwLock;
+#[cfg(feature = "cache")]
+use std::sync::Arc;
+#[cfg(feature = "cache")]
 use futures::stream::Stream;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::MutexMessenger;
@@ -538,7 +542,9 @@ impl GuildId {
     /// Gets a user's [`Member`] for the guild by Id.
     ///
     /// If the cache feature is enabled the cache will be checked
-    /// first. If not found it will resort to an http request.
+    /// first, if found, the [`Member`] will be cloned out.
+    ///
+    /// If not found it will resort to an http request.
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: ../guild/struct.Member.html
@@ -912,7 +918,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
         // Get the last member. If shorter than 1000, there are no more results anyway
         self.after = match self.buffer.get(grab_size as usize - 1) {
-            Some(member) => Some(member.user_id().await),
+            Some(member) => Some(member.user.id),
             None => None,
         };
 

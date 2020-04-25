@@ -1,11 +1,10 @@
-use tokio::sync::RwLock;
+
 use serde::de::Error as DeError;
 use serde::de::MapAccess;
 use serde::ser::{SerializeSeq, Serialize, Serializer};
 use std::{
     collections::HashMap,
-    hash::Hash,
-    sync::Arc
+    hash::Hash
 };
 use super::prelude::*;
 
@@ -48,12 +47,12 @@ pub fn serialize_emojis<S: Serializer>(
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<ChannelId, Arc<RwLock<GuildChannel>>>, D::Error> {
+    -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
     for channel in vec {
-        map.insert(channel.id, Arc::new(RwLock::new(channel)));
+        map.insert(channel.id, channel);
     }
 
     Ok(map)
@@ -67,7 +66,7 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
     let mut members = HashMap::new();
 
     for member in vec {
-        let user_id = futures::executor::block_on(member.user.read()).id;
+        let user_id = member.user.id;
 
         members.insert(user_id, member);
     }
@@ -109,7 +108,7 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
     for private_channel in vec {
         let id = match private_channel {
-            Channel::Private(ref channel) => futures::executor::block_on(channel.read()).id,
+            Channel::Private(ref channel) => channel.id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
             Channel::__Nonexhaustive => unreachable!(),
@@ -162,7 +161,7 @@ pub fn serialize_roles<S: Serializer>(
 
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<Arc<RwLock<User>>, D::Error> {
+    -> StdResult<User, D::Error> {
     let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
     let user = if users.is_empty() {
         return Err(DeError::custom("Expected a single recipient"));
@@ -170,30 +169,18 @@ pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
         users.remove(0)
     };
 
-    Ok(Arc::new(RwLock::new(user)))
+    Ok(user)
 }
 
 pub fn serialize_single_recipient<S: Serializer>(
-    user: &Arc<RwLock<User>>,
+    user: &User,
     serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(1))?;
 
-    seq.serialize_element(&*futures::executor::block_on(user.read()))?;
+    seq.serialize_element(&user)?;
 
     seq.end()
-}
-
-pub fn deserialize_sync_user<'de, D>(deserializer: D)
-    -> StdResult<Arc<RwLock<User>>, D::Error> where D: Deserializer<'de> {
-    Ok(Arc::new(RwLock::new(User::deserialize(deserializer)?)))
-}
-
-pub fn serialize_sync_user<S: Serializer>(
-    user: &Arc<RwLock<User>>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    User::serialize(&*futures::executor::block_on(user.read()), serializer)
 }
 
 pub fn deserialize_u16<'de, D: Deserializer<'de>>(deserializer: D) -> StdResult<u16, D::Error> {
@@ -235,19 +222,6 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
     seq.end()
 }
 
-pub fn serialize_gen_locked_map<K: Eq + Hash, S: Serializer, V: Serialize>(
-    map: &HashMap<K, Arc<RwLock<V>>>,
-    serializer: S,
-) -> StdResult<S::Ok, S::Error> {
-    let mut seq = serializer.serialize_seq(Some(map.len()))?;
-
-    for value in map.values() {
-        seq.serialize_element(&*(futures::executor::block_on(value.read())))?;
-    }
-
-    seq.end()
-}
-
 #[cfg(all(feature = "cache", feature = "model"))]
 pub async fn user_has_perms(
     cache: impl AsRef<CacheRwLock>,
@@ -261,13 +235,13 @@ pub async fn user_has_perms(
     let guild_id = match guild_id {
         Some(id) => id,
         None => {
-            let channel = match cache.channel(channel_id) {
+            let channel = match cache.channel(channel_id).await {
                 Some(channel) => channel,
                 None => return Err(Error::Model(ModelError::ItemMissing)),
             };
 
             match channel {
-                Channel::Guild(channel) => channel.read().await.guild_id,
+                Channel::Guild(channel) => channel.guild_id,
                 Channel::Private(_) | Channel::Category(_) => {
                     // Both users in DMs, all users in groups, and maybe all channels in categories
                     // will have the same permissions.
@@ -290,11 +264,7 @@ pub async fn user_has_perms(
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild
-        .read()
-        .await
-        .user_permissions_in(channel_id, current_user.id)
-        .await;
+    let perms = guild.read().await.user_permissions_in(channel_id, current_user.id).await;
 
     permissions.remove(perms);
 

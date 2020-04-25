@@ -29,11 +29,11 @@ use futures::stream::StreamExt;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(all(feature = "cache", feature = "model"))]
-use tokio::sync::RwLock;
+
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
+
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
@@ -66,8 +66,8 @@ pub struct Guild {
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
-    #[serde(serialize_with = "serialize_gen_locked_map")]
-    pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub channels: HashMap<ChannelId, GuildChannel>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
@@ -188,11 +188,11 @@ impl Guild {
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
     #[cfg(feature = "http")]
-    pub async fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub async fn default_channel<'a>(&'a self, uid: UserId) -> Option<&'a GuildChannel> {
         for (cid, channel) in &self.channels {
 
             if self.user_permissions_in(*cid, uid).await.read_messages() {
-                return Some(Arc::clone(channel));
+                return Some(channel);
             }
         }
 
@@ -204,13 +204,13 @@ impl Guild {
     /// returns `None`)
     /// Note however that this is very costy if used in a server with lots of channels,
     /// members, or both.
-    pub async fn default_channel_guaranteed(&self) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub async fn default_channel_guaranteed<'a>(&'a self) -> Option<&'a GuildChannel> {
         for (cid, channel) in &self.channels {
 
             for memid in self.members.keys() {
 
                 if self.user_permissions_in(*cid, *memid).await.read_messages() {
-                    return Some(Arc::clone(channel));
+                    return Some(channel);
                 }
             }
         }
@@ -232,11 +232,11 @@ impl Guild {
     pub async fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
         let name = name.as_ref();
         let cache = cache.as_ref().read().await;
-        let guild = cache.guilds.get(&self.id)?.read().await;
+        let guild = cache.guilds.get(&self.id)?;
 
-        for (id, channel) in guild.channels.iter() {
+        for (id, channel) in guild.read().await.channels.iter() {
 
-            if channel.read().await.name == name {
+            if channel.name == name {
                 return Some(*id)
             }
         }
@@ -977,10 +977,10 @@ impl Guild {
         };
 
         for member in self.members.values() {
-            let name_matches = member.user.read().await.name == name;
+            let name_matches = member.user.name == name;
 
             let discrim_matches = match discrim {
-                Some(discrim) => member.user.read().await.discriminator == discrim,
+                Some(discrim) => member.user.discriminator == discrim,
                 None => true,
             };
 
@@ -1021,7 +1021,7 @@ impl Guild {
 
         let mut members = futures::stream::iter(self.members.values())
             .filter_map(|member| async move {
-                let username = &member.user.read().await.name;
+                let username = &member.user.name;
 
                 if starts_with(prefix, case_sensitive, username) {
                     Some((member, username.to_string()))
@@ -1091,7 +1091,7 @@ impl Guild {
         let mut members = futures::stream::iter(self.members
             .values())
             .filter_map(|member| async move {
-                let username = &member.user.read().await.name;
+                let username = &member.user.name;
 
                 if contains(substring, case_sensitive, username) {
                     Some((member, username.to_string()))
@@ -1152,7 +1152,7 @@ impl Guild {
             .values())
             .filter_map(|member| async move {
                 if case_sensitive {
-                    let name = &member.user.read().await.name;
+                    let name = &member.user.name;
 
                     if name.contains(substring) {
                         Some((member, name.to_string()))
@@ -1160,7 +1160,7 @@ impl Guild {
                         None
                     }
                 } else {
-                    let name = &member.user.read().await.name;
+                    let name = &member.user.name;
 
                     if contains_case_insensitive(name, substring) {
                         Some((member, name.to_string()))
@@ -1217,7 +1217,7 @@ impl Guild {
             .filter_map(|member| async move {
                 let nick = match member.nick {
                     Some(ref nick) => nick.to_string(),
-                    None => member.user.read().await.name.to_string(),
+                    None => member.user.name.to_string(),
                 };
 
                 if case_sensitive && nick.contains(substring)
@@ -1285,7 +1285,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().await.id,
+                    member.user.id,
                     self.id,
                     role,
                 );
@@ -1364,7 +1364,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().await.id,
+                    member.user.id,
                     self.id,
                     role
                 );
@@ -1377,7 +1377,6 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
-            let channel = channel.read().await;
 
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
@@ -1469,7 +1468,6 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
-            let channel = channel.read().await;
 
             for overwrite in &channel.permission_overwrites {
 
@@ -2292,7 +2290,7 @@ mod test {
         use chrono::prelude::*;
         use crate::model::prelude::*;
         use std::collections::*;
-        use std::sync::Arc;
+
 
         fn gen_user() -> User {
             User {
@@ -2310,7 +2308,7 @@ mod test {
                 .ymd(2016, 11, 08)
                 .and_hms(0, 0, 0);
             let vec1 = Vec::new();
-            let u = Arc::new(RwLock::new(gen_user()));
+            let u = gen_user();
 
             Member {
                 deaf: false,

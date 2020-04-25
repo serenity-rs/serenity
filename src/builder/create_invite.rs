@@ -33,7 +33,6 @@ use serde_json::Value;
 ///             };
 ///
 ///             let channel = channel.read().await;
-///
 ///             let creation = channel.create_invite(&context, |i| {
 ///                 i.max_age(3600).max_uses(10)
 ///             })

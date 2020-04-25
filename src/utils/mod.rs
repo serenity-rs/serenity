@@ -662,7 +662,7 @@ async fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
                 let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
 
                 *s = if let Some(Channel::Guild(channel)) = id._to_channel_cached(&cache).await {
-                    let replacement = format!("#{}", &channel.read().await.name);
+                    let replacement = format!("#{}", &channel.name);
                     s.replace(&to_replace, &replacement)
                 } else {
                     s.replace(&to_replace, &"#deleted-channel")
@@ -933,7 +933,7 @@ mod test {
             mute: false,
             nick: Some("Ferris".to_string()),
             roles: Vec::new(),
-            user: Arc::new(RwLock::new(user.clone())),
+            user: user.clone(),
             _nonexhaustive: (),
         };
 

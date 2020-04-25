@@ -4,13 +4,13 @@ use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
+#[cfg(feature = "cache")]
+use std::sync::Arc;
+#[cfg(feature = "cache")]
+use tokio::sync::RwLock;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
-use tokio::sync::RwLock;
-#[cfg(feature = "cache")]
-use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInvite,
@@ -825,7 +825,8 @@ impl GuildChannel {
                     .filter_map(|e| async move {
                         if self.permissions_for_user(&cache, e.0)
                         .await
-                        .map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false) {
+                            .map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false)
+                        {
                             Some(e.1.clone())
                         } else {
                             None
@@ -865,6 +866,6 @@ impl GuildChannel {
 impl Display for GuildChannel {
     /// Formats the channel, creating a mention of it.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        Display::fmt(&futures::executor::block_on(self.id.mention()), f)
+        Display::fmt(&self.id.mention(), f)
     }
 }

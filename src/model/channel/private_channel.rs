@@ -5,7 +5,6 @@ use std::fmt::{
     Formatter,
     Result as FmtResult
 };
-use super::{deserialize_single_recipient, serialize_single_recipient};
 
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -16,7 +15,7 @@ use crate::builder::{
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
 #[cfg(feature = "model")]
-use crate::internal::RwLockExt;
+
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -44,7 +43,7 @@ pub struct PrivateChannel {
     #[serde(deserialize_with = "deserialize_single_recipient",
             serialize_with = "serialize_single_recipient",
             rename = "recipients")]
-    pub recipient: Arc<RwLock<User>>,
+    pub recipient: User,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -198,7 +197,7 @@ impl PrivateChannel {
     }
 
     /// Returns "DM with $username#discriminator".
-    pub async fn name(&self) -> String { format!("DM with {}", self.recipient.with(|r| r.tag()).await) }
+    pub fn name(&self) -> String { format!("DM with {}", self.recipient.tag()) }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
@@ -322,6 +321,6 @@ impl PrivateChannel {
 impl Display for PrivateChannel {
     /// Formats the private channel, displaying the recipient's username.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        f.write_str(&futures::executor::block_on(self.recipient.read()).name)
+        f.write_str(&self.recipient.name)
     }
 }

@@ -1,6 +1,6 @@
 #[cfg(feature = "http")]
 use crate::http::CacheHttp;
-use crate::{internal::RwLockExt, model::prelude::*};
+use crate::{model::prelude::*};
 
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
@@ -344,7 +344,7 @@ impl ChannelId {
     #[cfg(feature = "cache")]
     #[inline]
     pub(crate) async fn _to_channel_cached(self, cache: &RwLock<Cache>) -> Option<Channel> {
-        cache.read().await.channel(self)
+        cache.read().await.channel(self).await
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache,
@@ -361,8 +361,8 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(channel) = cache.read().await.channel(self) {
-                    return Ok(channel);
+                if let Some(channel) = cache.read().await.channel(self).await {
+                    return Ok(channel.clone());
                 }
             }
         }
@@ -396,7 +396,7 @@ impl ChannelId {
     async fn _message(self, http: impl AsRef<Http>, message_id: MessageId) -> Result<Message> {
         match http.as_ref().get_message(self.0, message_id.0).await {
             Ok(mut message) => {
-                message.transform_content().await;
+                message.transform_content();
 
                 Ok(message)
             },
@@ -431,7 +431,7 @@ impl ChannelId {
         match http.as_ref().get_messages(self.0, &query).await {
             Ok(mut messages) => {
                 for message in &mut messages {
-                    message.transform_content().await;
+                    message.transform_content();
                 }
 
                 Ok(messages)
@@ -450,9 +450,9 @@ impl ChannelId {
         };
 
         Some(match channel {
-            Channel::Guild(channel) => channel.read().await.name().to_string(),
-            Channel::Category(category) => category.read().await.name.to_string(),
-            Channel::Private(channel) => channel.read().await.name().await,
+            Channel::Guild(channel) => channel.name().to_string(),
+            Channel::Category(category) => category.name().to_string(),
+            Channel::Private(channel) => channel.name(),
             Channel::__Nonexhaustive => unreachable!(),
         })
     }
@@ -758,24 +758,14 @@ impl ChannelId {
 impl From<Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: Channel) -> ChannelId {
-        match channel {
-            Channel::Guild(ch) => futures::executor::block_on(ch.with(|c| c.id)),
-            Channel::Private(ch) => futures::executor::block_on(ch.with(|c| c.id)),
-            Channel::Category(ch) => futures::executor::block_on(ch.with(|c| c.id)),
-            Channel::__Nonexhaustive => unreachable!(),
-        }
+        channel.id()
     }
 }
 
 impl<'a> From<&'a Channel> for ChannelId {
     /// Gets the Id of a `Channel`.
     fn from(channel: &Channel) -> ChannelId {
-        futures::executor::block_on(match *channel {
-            Channel::Guild(ref ch) => ch.with(|c| c.id),
-            Channel::Private(ref ch) => ch.with(|c| c.id),
-            Channel::Category(ref ch) => ch.with(|c| c.id),
-            Channel::__Nonexhaustive => unreachable!(),
-        })
+        channel.id()
     }
 }
 

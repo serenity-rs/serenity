@@ -20,7 +20,7 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
-use crate::{internal::RwLockExt, model::prelude::*};
+use crate::{model::prelude::*};
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
@@ -37,10 +37,6 @@ use crate::model::misc::ChannelParseError;
 use crate::utils::parse_channel;
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
-use std::sync::Arc;
-#[cfg(feature = "cache")]
-use tokio::sync::RwLock;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use async_trait::async_trait;
 
@@ -52,16 +48,16 @@ pub enum Channel {
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [text]: enum.ChannelType.html#variant.Text
     /// [voice]: enum.ChannelType.html#variant.Voice
-    Guild(Arc<RwLock<GuildChannel>>),
+    Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
     ///
     /// [`User`]: ../user/struct.User.html
-    Private(Arc<RwLock<PrivateChannel>>),
+    Private(PrivateChannel),
     /// A category of [`GuildChannel`]s
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
-    Category(Arc<RwLock<ChannelCategory>>),
+    Category(ChannelCategory),
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -88,17 +84,18 @@ impl Channel {
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.guild() {
-    ///     Some(guild_lock) => {
-    ///         println!("It's a guild named {}!", guild_lock.read().await.name);
+    ///     Some(guild) => {
+    ///         println!("It's a guild named {}!", guild.name);
     ///     },
     ///     None => { println!("It's not a guild!"); },
     /// }
     /// # }
     /// ```
-    pub fn guild(self) -> Option<Arc<RwLock<GuildChannel>>> {
-        match self {
-            Channel::Guild(lock) => Some(lock),
-            _ => None,
+    pub fn guild(self) -> Option<GuildChannel> {
+        if let Channel::Guild(channel) = self {
+            Some(channel)
+        } else {
+            None
         }
     }
 
@@ -123,20 +120,18 @@ impl Channel {
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.private() {
-    ///     Some(private_lock) => {
-    ///         let private = private_lock.read().await;
-    ///         let recipient_lock = &private.recipient;
-    ///         let recipient = recipient_lock.read().await;
-    ///         println!("It's a private channel with {}!", recipient.name);
+    ///     Some(private) => {
+    ///         println!("It's a private channel with {}!", &private.recipient);
     ///     },
     ///     None => { println!("It's not a private channel!"); },
     /// }
     /// # }
     /// ```
-    pub fn private(self) -> Option<Arc<RwLock<PrivateChannel>>> {
-        match self {
-            Channel::Private(lock) => Some(lock),
-            _ => None,
+    pub fn private(self) -> Option<PrivateChannel> {
+        if let Channel::Private(channel) = self {
+            Some(channel)
+        } else {
+            None
         }
     }
 
@@ -161,18 +156,19 @@ impl Channel {
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.category() {
-    ///     Some(category_lock) => {
-    ///         println!("It's a category named {}!", category_lock.read().await.name);
+    ///     Some(category) => {
+    ///         println!("It's a category named {}!", category.name);
     ///     },
     ///     None => { println!("It's not a category!"); },
     /// }
     /// #
     /// # }
     /// ```
-    pub fn category(self) -> Option<Arc<RwLock<ChannelCategory>>> {
-        match self {
-            Channel::Category(lock) => Some(lock),
-            _ => None,
+    pub fn category(self) -> Option<ChannelCategory> {
+        if let Channel::Category(channel) = self {
+            Some(channel)
+        } else {
+            None
         }
     }
 
@@ -184,13 +180,13 @@ impl Channel {
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match *self {
             Channel::Guild(ref public_channel) => {
-                let _ = public_channel.read().await.delete(cache_http).await?;
+                let _ = public_channel.delete(cache_http).await?;
             },
             Channel::Private(ref private_channel) => {
-                let _ = private_channel.read().await.delete(cache_http.http()).await?;
+                let _ = private_channel.delete(cache_http.http()).await?;
             },
             Channel::Category(ref category) => {
-                category.read().await.delete(cache_http).await?;
+                category.delete(cache_http).await?;
             },
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -203,8 +199,8 @@ impl Channel {
     #[inline]
     pub async fn is_nsfw(&self) -> bool {
         match *self {
-            Channel::Guild(ref channel) => channel.with(|c| c.is_nsfw()).await,
-            Channel::Category(ref category) => category.with(|c| c.is_nsfw()).await,
+            Channel::Guild(ref channel) => channel.is_nsfw(),
+            Channel::Category(ref category) => category.is_nsfw(),
             Channel::Private(_) => false,
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -215,13 +211,13 @@ impl Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
-    pub async fn id(&self) -> ChannelId {
+    pub fn id(&self) -> ChannelId {
         match *self {
-            Channel::Guild(ref ch) => ch.with(|c| c.id),
-            Channel::Private(ref ch) => ch.with(|c| c.id),
-            Channel::Category(ref category) => category.with(|c| c.id),
+            Channel::Guild(ref ch) => ch.id,
+            Channel::Private(ref ch) => ch.id,
+            Channel::Category(ref ch) => ch.id,
             Channel::__Nonexhaustive => unreachable!(),
-        }.await
+        }
     }
 
     /// Retrieves the position of the inner [`GuildChannel`] or
@@ -231,10 +227,10 @@ impl Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`CategoryChannel`]: struct.ChannelCategory.html
-    pub async fn position(&self) -> Option<i64> {
+    pub fn position(&self) -> Option<i64> {
         match *self {
-            Channel::Guild(ref channel) => Some(channel.with(|c| c.position).await),
-            Channel::Category(ref catagory) => Some(catagory.with(|c| c.position).await),
+            Channel::Guild(ref channel) => Some(channel.position),
+            Channel::Category(ref catagory) => Some(catagory.position),
             _ => None
         }
     }
@@ -251,13 +247,13 @@ impl<'de> Deserialize<'de> for Channel {
 
         match kind {
             0 | 2 | 5 | 6 => serde_json::from_value::<GuildChannel>(Value::Object(v))
-                .map(|x| Channel::Guild(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Guild(x))
                 .map_err(DeError::custom),
             1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
-                .map(|x| Channel::Private(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Private(x))
                 .map_err(DeError::custom),
             4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
-                .map(|x| Channel::Category(Arc::new(RwLock::new(x))))
+                .map(|x| Channel::Category(x))
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
         }
@@ -269,13 +265,13 @@ impl Serialize for Channel {
         where S: Serializer {
         match *self {
             Channel::Category(ref c) => {
-                ChannelCategory::serialize(&*futures::executor::block_on(c.read()), serializer)
+                ChannelCategory::serialize(&c, serializer)
             },
             Channel::Guild(ref c) => {
-                GuildChannel::serialize(&*futures::executor::block_on(c.read()), serializer)
+                GuildChannel::serialize(&c, serializer)
             },
             Channel::Private(ref c) => {
-                PrivateChannel::serialize(&*futures::executor::block_on(c.read()), serializer)
+                PrivateChannel::serialize(&c, serializer)
             },
             Channel::__Nonexhaustive => unreachable!(),
         }
@@ -296,16 +292,13 @@ impl Display for Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
-            Channel::Guild(ref ch) =>
-                Display::fmt(&futures::executor::block_on(futures::executor::block_on(ch.read()).id.mention()), f),
-            Channel::Private(ref ch) => {
-                let channel = futures::executor::block_on(ch.read());
-                let recipient = futures::executor::block_on(channel.recipient.read());
-
-                Display::fmt(&recipient.name, f)
+            Channel::Guild(ref channel) =>
+                Display::fmt(&channel.id.mention(), f),
+            Channel::Private(ref channel) => {
+                Display::fmt(&channel.recipient.name, f)
             },
-            Channel::Category(ref category) =>
-                Display::fmt(&futures::executor::block_on(category.read()).name, f),
+            Channel::Category(ref channel) =>
+                Display::fmt(&channel.name, f),
             Channel::__Nonexhaustive => unreachable!(),
         }
     }
@@ -457,8 +450,8 @@ mod test {
     #[cfg(all(feature = "model", feature = "utils"))]
     mod model_utils {
         use crate::model::prelude::*;
-        use tokio::sync::RwLock;
-        use std::sync::Arc;
+
+
 
         fn guild_channel() -> GuildChannel {
             GuildChannel {
@@ -486,14 +479,14 @@ mod test {
                 last_message_id: None,
                 last_pin_timestamp: None,
                 kind: ChannelType::Private,
-                recipient: Arc::new(RwLock::new(User {
+                recipient: User {
                     id: UserId(2),
                     avatar: None,
                     bot: false,
                     discriminator: 1,
                     name: "ab".to_string(),
                     _nonexhaustive: (),
-                })),
+                },
                 _nonexhaustive: (),
             }
         }
@@ -521,7 +514,7 @@ mod test {
             channel.nsfw = false;
             assert!(!channel.is_nsfw());
 
-            let channel = Channel::Guild(Arc::new(RwLock::new(channel)));
+            let channel = Channel::Guild(channel);
             assert!(!channel.is_nsfw().await);
 
             let private_channel = private_channel();
@@ -538,7 +531,7 @@ impl FromStrAndCache for Channel {
     async fn from_str<CRL: AsRef<CacheRwLock> + Send + Sync>(cache: CRL, s: &str) -> StdResult<Self, Self::Err> {
         match parse_channel(s) {
             Some(x) => match ChannelId(x).to_channel_cached(&cache).await {
-                Some(channel) => Ok(channel),
+                Some(channel) => Ok(channel.clone()),
                 _ => Err(ChannelParseError::NotPresentInCache),
             },
             _ => Err(ChannelParseError::InvalidChannel),

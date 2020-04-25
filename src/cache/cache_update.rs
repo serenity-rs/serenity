@@ -45,23 +45,23 @@ use async_trait::async_trait;
 ///         match cache.users.entry(self.user_id) {
 ///             Entry::Occupied(entry) => {
 ///                 let user = entry.get();
-///                 let mut writer = user.write().await;
-///                 let old = writer.clone();
+///                 let mut user = user.write().await;
+///                 let old_user = user.clone();
 ///
-///                 writer.bot = self.user_is_bot;
-///                 writer.discriminator = self.user_discriminator;
-///                 writer.id = self.user_id;
+///                 user.bot = self.user_is_bot;
+///                 user.discriminator = self.user_discriminator;
+///                 user.id = self.user_id;
 ///
-///                 if writer.avatar != self.user_avatar {
-///                     writer.avatar = self.user_avatar.clone();
+///                 if user.avatar != self.user_avatar {
+///                     user.avatar = self.user_avatar.clone();
 ///                 }
 ///
-///                 if writer.name != self.user_name {
-///                     writer.name = self.user_name.clone();
+///                 if user.name != self.user_name {
+///                     user.name = self.user_name.clone();
 ///                 }
 ///
 ///                 // Return the old copy for the user's sake.
-///                 Some(old)
+///                 Some(old_user)
 ///             },
 ///             Entry::Vacant(entry) => {
 ///                 // We can convert a `serde_json::Value` to a User for test

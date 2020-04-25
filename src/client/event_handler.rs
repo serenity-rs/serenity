@@ -1,10 +1,11 @@
 use crate::model::prelude::*;
-use tokio::sync::RwLock;
+
 use serde_json::Value;
 use std::{
     collections::HashMap,
-    sync::Arc
+    sync::Arc,
 };
+use tokio::sync::RwLock;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use async_trait::async_trait;
@@ -27,27 +28,27 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a channel is created.
     ///
     /// Provides said channel's data.
-    async fn channel_create(&self, _ctx: Context, _channel: Arc<RwLock<GuildChannel>>) {}
+    async fn channel_create(&self, _ctx: Context, _channel: &GuildChannel) {}
 
     /// Dispatched when a category is created.
     ///
     /// Provides said category's data.
-    async fn category_create(&self, _ctx: Context, _category: Arc<RwLock<ChannelCategory>>) {}
+    async fn category_create(&self, _ctx: Context, _category: &ChannelCategory) {}
 
     /// Dispatched when a category is deleted.
     ///
     /// Provides said category's data.
-    async fn category_delete(&self, _ctx: Context, _category: Arc<RwLock<ChannelCategory>>) {}
+    async fn category_delete(&self, _ctx: Context, _category: &ChannelCategory) {}
 
     /// Dispatched when a private channel is created.
     ///
     /// Provides said channel's data.
-    async fn private_channel_create(&self, _ctx: Context, _channel: Arc<RwLock<PrivateChannel>>) {}
+    async fn private_channel_create(&self, _ctx: Context, _channel: &PrivateChannel) {}
 
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
-    async fn channel_delete(&self, _ctx: Context, _channel: Arc<RwLock<GuildChannel>>) {}
+    async fn channel_delete(&self, _ctx: Context, _channel: &GuildChannel) {}
 
     /// Dispatched when a pin is added, deleted.
     ///

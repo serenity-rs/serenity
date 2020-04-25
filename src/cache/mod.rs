@@ -276,7 +276,6 @@ impl Cache {
 
         for guild in self.guilds.values() {
             let guild = guild.read().await;
-
             let members = guild.members.len() as u64;
 
             if guild.member_count > members {
@@ -369,17 +368,19 @@ impl Cache {
     /// [`groups`]: #structfield.groups
     /// [`private_channels`]: #structfield.private_channels
     #[inline]
-    pub fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
-        self._channel(id.into())
+    pub async fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
+        self._channel(id.into()).await
     }
 
-    fn _channel(&self, id: ChannelId) -> Option<Channel> {
+    async fn _channel(&self, id: ChannelId) -> Option<Channel> {
         if let Some(channel) = self.channels.get(&id) {
-            return Some(Channel::Guild(Arc::clone(channel)));
+            let channel = channel.read().await.clone();
+            return Some(Channel::Guild(channel));
         }
 
         if let Some(private_channel) = self.private_channels.get(&id) {
-            return Some(Channel::Private(Arc::clone(private_channel)));
+            let channel = private_channel.read().await.clone();
+            return Some(Channel::Private(channel));
         }
 
         None
@@ -629,9 +630,8 @@ impl Cache {
     ///
     /// if let Some(channel) = cache.private_channel(7) {
     ///     let channel_reader = channel.read().await;
-    ///     let user_reader = channel_reader.recipient.read().await;
     ///
-    ///     println!("The recipient is {}", user_reader.name);
+    ///     println!("The recipient is {}", channel_reader.recipient);
     /// }
     /// #     Ok(())
     /// # }
@@ -818,12 +818,10 @@ mod test {
     use serde_json::{Number, Value};
     use std::{
         collections::HashMap,
-        sync::Arc,
     };
     use crate::{
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,
-        prelude::RwLock,
     };
     use crate::model::guild::PremiumTier::Tier2;
 
@@ -922,17 +920,17 @@ mod test {
         // Add a channel delete event to the cache, the cached messages for that
         // channel should now be gone.
         let mut delete = ChannelDeleteEvent {
-            channel: Channel::Guild(Arc::new(RwLock::new(guild_channel.clone()))),
+            channel: Channel::Guild(guild_channel.clone()),
             _nonexhaustive: (),
         };
         assert!(cache.update(&mut delete).await.is_none());
-        assert!(!cache.messages.contains_key(&delete.channel.id().await));
+        assert!(!cache.messages.contains_key(&delete.channel.id()));
 
         // Test deletion of a guild channel's message cache when a GuildDeleteEvent
         // is received.
         let mut guild_create = {
             let mut channels = HashMap::new();
-            channels.insert(ChannelId(2), Arc::new(RwLock::new(guild_channel.clone())));
+            channels.insert(ChannelId(2), guild_channel.clone());
 
             GuildCreateEvent {
                 guild: Guild {

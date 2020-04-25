@@ -1,10 +1,8 @@
 //! Models pertaining to the gateway.
 
-use tokio::sync::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
-use std::sync::Arc;
 use super::utils::*;
 use super::prelude::*;
 use bitflags::bitflags;
@@ -433,7 +431,7 @@ pub struct Presence {
     /// date.
     pub user_id: UserId,
     /// The associated user instance.
-    pub user: Option<Arc<RwLock<User>>>,
+    pub user: Option<User>,
     pub(crate) _nonexhaustive: (),
 }
 
@@ -449,7 +447,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user = User::deserialize(Value::Object(user_map))
                 .map_err(DeError::custom)?;
 
-            (user.id, Some(Arc::new(RwLock::new(user))))
+            (user.id, Some(user))
         } else {
             let user_id = user_map
                 .remove("id")
@@ -472,7 +470,7 @@ impl<'de> Deserialize<'de> for Presence {
             }
             None => None,
         };
-        
+
         let last_modified = match map.remove("last_modified") {
             Some(v) => serde_json::from_value::<Option<u64>>(v)
                 .map_err(DeError::custom)?,
@@ -520,13 +518,12 @@ impl Serialize for Presence {
         state.serialize_field("status", &self.status)?;
 
         if let Some(ref user) = self.user {
-            let user = futures::executor::block_on(user.read());
             state.serialize_field("user", &*user)?;
         } else {
             state.serialize_field(
                 "user",
                 &UserId {
-                    id: *self.user_id.as_u64(),
+                    id: self.user_id.0,
                 },
             )?;
         }

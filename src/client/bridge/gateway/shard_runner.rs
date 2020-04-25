@@ -494,9 +494,7 @@ impl ShardRunner {
     async fn recv_event(&mut self) -> (Option<Event>, Option<ShardAction>, bool) {
         let gw_event = match self.shard.client.recv_json().await {
             Ok(Some(value)) => {
-                tokio::task::spawn_blocking(move || {
-                    GatewayEvent::deserialize(value).map(Some).map_err(From::from)
-                }).await.unwrap_or(Err(Error::Other("Failed to perform `spawn_blocking`.")))
+                GatewayEvent::deserialize(value).map(Some).map_err(From::from)
             },
             Ok(None) => Ok(None),
             Err(Error::Tungstenite(TungsteniteError::Io(_))) => {

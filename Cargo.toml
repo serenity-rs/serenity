@@ -107,7 +107,7 @@ version = "0.19"
 [dependencies.tokio]
 version = "0.2"
 default-features = false
-features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process"]
+features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process", "blocking", "rt-threaded"]
 
 [dependencies.futures]
 version = "0.3"

@@ -595,7 +595,7 @@ impl User {
                 for channel in cache.read().await.private_channels.values() {
                     let channel = channel.read().await;
 
-                    if channel.recipient.read().await.id == self.id {
+                    if channel.recipient.id == self.id {
                         private_channel_id = Some(channel.id);
                         break;
                     }
@@ -712,8 +712,9 @@ impl User {
                         if let Some(cache) = cache_http.cache() {
 
                             if let Some(guild) = cache.read().await.guilds.get(&guild_id) {
+                                let guild = guild.read().await;
 
-                                if let Some(member) = guild.read().await.members.get(&self.id) {
+                                if let Some(member) = guild.members.get(&self.id) {
                                     has_role = Some(member.roles.contains(&role));
                                 }
                             }
@@ -864,7 +865,7 @@ impl fmt::Display for User {
     /// Formats a string which will mention the user.
     // This is in the format of: `<@USER_ID>`
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        fmt::Display::fmt(&futures::executor::block_on(self.id.mention()), f)
+        fmt::Display::fmt(&self.id.mention(), f)
     }
 }
 
@@ -954,12 +955,12 @@ impl<'a> From<&'a CurrentUser> for UserId {
 
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: Member) -> UserId { futures::executor::block_on(member.user.read()).id }
+    fn from(member: Member) -> UserId { member.user.id }
 }
 
 impl<'a> From<&'a Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: &Member) -> UserId { futures::executor::block_on(member.user.read()).id }
+    fn from(member: &Member) -> UserId { member.user.id }
 }
 
 impl From<User> for UserId {

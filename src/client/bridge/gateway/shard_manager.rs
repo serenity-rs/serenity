@@ -362,11 +362,13 @@ impl Drop for ShardManager {
     /// [`ShardQueuer`]: struct.ShardQueuer.html
     /// [`ShardRunner`]: struct.ShardRunner.html
     fn drop(&mut self) {
-        futures::executor::block_on(self.shutdown_all());
+        tokio::task::block_in_place(move || {
+            futures::executor::block_on(self.shutdown_all());
 
-        if let Err(why) = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown) {
-            warn!("Failed to send shutdown to shard queuer: {:?}", why);
-        }
+            if let Err(why) = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown) {
+                warn!("Failed to send shutdown to shard queuer: {:?}", why);
+            }
+        });
     }
 }
 
