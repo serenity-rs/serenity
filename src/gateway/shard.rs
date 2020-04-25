@@ -616,7 +616,7 @@ impl Shard {
 
             false
         } else {
-            trace!("[Shard {:?}] Heartbeated", self.shard_info);
+            trace!("[Shard {:?}] Heartbeat", self.shard_info);
 
             true
         }
@@ -799,7 +799,7 @@ impl Shard {
     }
 
     pub fn resume(&mut self) -> Result<()> {
-        debug!("Shard {:?}] Attempting to resume", self.shard_info);
+        debug!("[Shard {:?}] Attempting to resume", self.shard_info);
 
         self.client = self.initialize()?;
         self.stage = ConnectionStage::Resuming;
