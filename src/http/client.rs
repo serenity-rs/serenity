@@ -420,9 +420,9 @@ impl Http {
             body: None,
             headers: None,
             route: RouteInfo::DeleteMessageReactionEmoji {
-            reaction: &reaction_type.as_data(),
-            channel_id,
-            message_id,
+                reaction: &reaction_type.as_data(),
+                channel_id,
+                message_id,
             },
         })
     }
