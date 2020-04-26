@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.6] - 2020-04-26
+
+This release prevents a loop when requesting a restart of a Shard, resulting in the Shard hanging forever.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [gateway] Return instantly when requesting restart. ([@Lakelezz]) [c:b8e2a7d]
+
 ## [0.8.5] - 2020-04-22
 
 The last bugfix release was ironically broken because of a slight oversight. This release fixes that.
@@ -197,6 +209,18 @@ Thanks to the following for their contributions:
 - [framework] Get rid of the `Arc` implementation for `Framework` ([@acdenisSK]) [c:05044b6]
 - [client] Turn the function-like group macro to an attribute macro ([@acdenisSK]) [c:5b01290]
 - [http] Remove april fools functions ([@TheUnitedStatesOfAmerica]) [c:caeeda1]
+
+## [0.7.8] - 2020-04-26
+
+This release prevents a loop when requesting a restart of a Shard, resulting in the Shard hanging forever.
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+
+### Fixed
+
+- [gateway] Return instantly when requesting restart. ([@Lakelezz]) [c:0959f15]
 
 ## [0.7.7] - 2020-04-22
 
@@ -3428,12 +3452,14 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.8.6]: https://github.com/serenity-rs/serenity/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/serenity-rs/serenity/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/serenity-rs/serenity/compare/v0.8.3...v0.8.4
 [0.8.3]: https://github.com/serenity-rs/serenity/compare/v0.8.2...v0.8.3
 [0.8.2]: https://github.com/serenity-rs/serenity/compare/v0.8.1...v0.8.2
 [0.8.1]: https://github.com/serenity-rs/serenity/compare/v0.8.0...v0.8.1
-[0.8.0]: https://github.com/serenity-rs/serenity/compare/v0.7.7...v0.8.0
+[0.8.0]: https://github.com/serenity-rs/serenity/compare/v0.7.8...v0.8.0
+[0.7.8]: https://github.com/serenity-rs/serenity/compare/v0.7.7...v0.7.8
 [0.7.7]: https://github.com/serenity-rs/serenity/compare/v0.7.6...v0.7.7
 [0.7.6]: https://github.com/serenity-rs/serenity/compare/v0.7.5...v0.7.6
 [0.7.5]: https://github.com/serenity-rs/serenity/compare/v0.7.4...v0.7.5
@@ -3583,9 +3609,13 @@ Initial commit.
 [@zeyla]: https://github.com/zeyla
 
 
+[c:b8e2a7d]: https://github.com/serenity-rs/serenity/commit/b8e2a7d14bd3abca3fb8ae0dcf5e1889180ff037
+
 [c:13d5481]: https://github.com/serenity-rs/serenity/commit/13d54818d4bc7cc9cd999d0e56ef713c159ce848
 
 [c:003c8e1]: https://github.com/serenity-rs/serenity/commit/003c8e1d2519610601a6f800be6bc8faddac8b1b
+
+[c:0959f15]: https://github.com/serenity-rs/serenity/commit/0959f15e3605a2fea1e945bd4d8ef0e8052e6d65
 
 [c:f543b57]: https://github.com/serenity-rs/serenity/commit/f543b579ca10d4fc439f1a899361a2edff5f04f3
 
