@@ -139,8 +139,7 @@ impl ShardRunner {
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
-                    let _ = self.request_restart();
-                    continue;
+                    return self.request_restart();
                 },
                 Some(other) => {
                     let _ = self.action(&other);
