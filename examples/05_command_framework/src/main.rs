@@ -411,7 +411,7 @@ fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
         None => {
-            let _ = msg.reply(&ctx, "There was a problem getting the shard manager");
+            let _ = msg.reply(ctx, "There was a problem getting the shard manager");
 
             return Ok(());
         },
@@ -426,13 +426,13 @@ fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
-            let _ = msg.reply(&ctx,  "No shard found");
+            let _ = msg.reply(ctx,  "No shard found");
 
             return Ok(());
         },
     };
 
-    let _ = msg.reply(&ctx, &format!("The shard latency is {:?}", runner.latency));
+    let _ = msg.reply(ctx, &format!("The shard latency is {:?}", runner.latency));
 
     Ok(())
 }
