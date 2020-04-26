@@ -1352,6 +1352,16 @@ impl AudioCacheCore {
     }
 }
 
+impl Drop for AudioCacheCore {
+    fn drop(&mut self) {
+        // This is necesary to prevent unsoundness.
+        // I.e., 1-chunk case after finalisation if
+        // one handle is left in Rope, then dropped last
+        // would cause a double free due to aliased chunk.
+        self.upgrade_to_backing();
+    }
+}
+
 // Read and Seek on the audio operate on byte positions
 // of the output FloatPcm stream.
 impl Read for AudioCacheCore {
