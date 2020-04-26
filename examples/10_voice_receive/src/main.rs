@@ -118,7 +118,7 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
-            check_msg(msg.reply(&ctx, "Requires a valid voice channel ID be given"));
+            check_msg(msg.reply(ctx, "Requires a valid voice channel ID be given"));
 
             return Ok(());
         },
