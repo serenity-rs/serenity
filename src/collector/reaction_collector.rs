@@ -104,7 +104,7 @@ macro_rules! impl_reaction_collector {
                     self
                 }
 
-                /// If set to `false`, removed reactions will be collected.
+                /// If set to `true`, removed reactions will be collected.
                 ///
                 /// Set to `false` by default.
                 pub fn removed(mut self, is_accepted: bool) -> Self {
