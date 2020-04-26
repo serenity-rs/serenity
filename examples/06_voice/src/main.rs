@@ -78,7 +78,7 @@ fn main() {
 }
 
 #[command]
-fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -94,7 +94,7 @@ fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel"));
+            check_msg(msg.reply(ctx, "Not in a voice channel"));
 
             return Ok(());
         },
@@ -112,7 +112,7 @@ fn deafen(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn join(ctx: &Context, msg: &Message) -> CommandResult {
     let guild = match msg.guild(&ctx.cache) {
         Some(guild) => guild,
         None => {
@@ -133,7 +133,7 @@ fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
     let connect_to = match channel_id {
         Some(channel) => channel,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel"));
+            check_msg(msg.reply(ctx, "Not in a voice channel"));
 
             return Ok(());
         }
@@ -152,7 +152,7 @@ fn join(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -171,14 +171,14 @@ fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
 
         check_msg(msg.channel_id.say(&ctx.http, "Left voice channel"));
     } else {
-        check_msg(msg.reply(&ctx, "Not in a voice channel"));
+        check_msg(msg.reply(ctx, "Not in a voice channel"));
     }
 
     Ok(())
 }
 
 #[command]
-fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn mute(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -194,7 +194,7 @@ fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel"));
+            check_msg(msg.reply(ctx, "Not in a voice channel"));
 
             return Ok(());
         },
@@ -212,14 +212,14 @@ fn mute(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn ping(context: &mut Context, msg: &Message) -> CommandResult {
+fn ping(context: &Context, msg: &Message) -> CommandResult {
     check_msg(msg.channel_id.say(&context.http, "Pong!"));
 
     Ok(())
 }
 
 #[command]
-fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let url = match args.single::<String>() {
         Ok(url) => url,
         Err(_) => {
@@ -270,7 +270,7 @@ fn play(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
-fn undeafen(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -295,7 +295,7 @@ fn undeafen(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn unmute(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
