@@ -166,7 +166,7 @@ fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 
         check_msg(msg.channel_id.say(&ctx.http,"Left voice channel"));
     } else {
-        check_msg(msg.reply(&ctx, "Not in a voice channel"));
+        check_msg(msg.reply(ctx, "Not in a voice channel"));
     }
 
     Ok(())
