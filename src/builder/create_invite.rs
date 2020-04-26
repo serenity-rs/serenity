@@ -89,7 +89,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
+    /// # fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
@@ -126,7 +126,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
+    /// # fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
@@ -161,7 +161,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
+    /// # fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #
@@ -195,7 +195,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
+    /// # fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read();
     /// #

@@ -3,7 +3,7 @@ use crate::client::Context;
 use crate::model::id::{ChannelId, GuildId, UserId};
 use std::collections::HashMap;
 
-type Check = dyn Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
+type Check = dyn Fn(&Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static;
 
 pub(crate) struct Ratelimit {
     pub delay: i64,
@@ -98,7 +98,7 @@ impl BucketBuilder {
     #[inline]
     pub fn check<F>(&mut self, f: F) -> &mut Self
     where
-        F: Fn(&mut Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static
+        F: Fn(&Context, Option<GuildId>, ChannelId, UserId) -> bool + Send + Sync + 'static
     {
         self.check = Some(Box::new(f));
 

@@ -39,14 +39,14 @@
 //! use std::env;
 //!
 //! #[command]
-//! fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
+//! fn about(ctx: &Context, msg: &Message) -> CommandResult {
 //!     msg.channel_id.say(&ctx.http, "A simple test bot")?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[command]
-//! fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+//! fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 //!     msg.channel_id.say(&ctx.http, "pong!")?;
 //!
 //!     Ok(())

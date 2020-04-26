@@ -8,7 +8,7 @@ use serenity::framework::standard::{
 
 #[command]
 #[owners_only]
-fn quit(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn quit(ctx: &Context, msg: &Message) -> CommandResult {
     let data = ctx.data.read();
 
     if let Some(manager) = data.get::<ShardManagerContainer>() {

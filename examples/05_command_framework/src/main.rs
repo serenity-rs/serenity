@@ -114,7 +114,7 @@ If you want more information about a specific command, just pass the command as 
 // If the `String` is not empty, your given `String` will be used instead.
 // If you pass in a `None`, no hint will be displayed at all.
 fn my_help(
-    context: &mut Context,
+    context: &Context,
     msg: &Message,
     args: Args,
     help_options: &'static HelpOptions,
@@ -251,7 +251,7 @@ fn main() {
 // Options are passed via subsequent attributes.
 // Make this command use the "complicated" bucket.
 #[bucket = "complicated"]
-fn commands(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn commands(ctx: &Context, msg: &Message) -> CommandResult {
     let mut contents = "Commands used:\n".to_string();
 
     let data = ctx.data.read();
@@ -272,7 +272,7 @@ fn commands(ctx: &mut Context, msg: &Message) -> CommandResult {
 // mentions are replaced with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
 #[command]
-fn say(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let settings = if let Some(guild_id) = msg.guild_id {
        // By default roles, users, and channel mentions are cleaned.
        ContentSafeOptions::default()
@@ -304,7 +304,7 @@ fn say(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 // not called.
 #[check]
 #[name = "Owner"]
-fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
     // Replace 7 with your ID to make this check pass.
     //
     // `true` will convert into `CheckResult::Success`,
@@ -332,7 +332,7 @@ fn owner_check(_: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions)
 #[check_in_help(true)]
 // Whether the check shall be displayed in the help-system.
 #[display_in_help(true)]
-fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+fn admin_check(ctx: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
     if let Some(member) = msg.member(&ctx.cache) {
 
         if let Ok(permissions) = member.permissions(&ctx.cache) {
@@ -344,7 +344,7 @@ fn admin_check(ctx: &mut Context, msg: &Message, _: &mut Args, _: &CommandOption
 }
 
 #[command]
-fn some_long_command(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())) {
         println!("Error sending message: {:?}", why);
     }
@@ -355,7 +355,7 @@ fn some_long_command(ctx: &mut Context, msg: &Message, args: Args) -> CommandRes
 #[command]
 // Limits the usage of this command to roles named:
 #[allowed_roles("mods", "ultimate neko")]
-fn about_role(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let potential_role_name = args.rest();
 
     if let Some(guild) = msg.guild(&ctx.cache) {
@@ -380,7 +380,7 @@ fn about_role(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 // Lets us also call `~math *` instead of just `~math multiply`.
 #[aliases("*")]
-fn multiply(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let first = args.single::<f64>()?;
     let second = args.single::<f64>()?;
 
@@ -394,7 +394,7 @@ fn multiply(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
-fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn about(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )") {
         println!("Error sending message: {:?}", why);
     }
@@ -403,7 +403,7 @@ fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn latency(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     // The shard manager is an interface for mutating, stopping, restarting, and
     // retrieving information about shards.
     let data = ctx.data.read();
@@ -441,7 +441,7 @@ fn latency(ctx: &mut Context, msg: &Message) -> CommandResult {
 // Limit command usage to guilds.
 #[only_in(guilds)]
 #[checks(Owner)]
-fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )") {
         println!("Error sending message: {:?}", why);
     }
@@ -456,7 +456,7 @@ fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
 #[bucket = "emoji"]
 // Allow only administrators to call this:
 #[required_permissions("ADMINISTRATOR")]
-fn cat(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn cat(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, ":cat:") {
         println!("Error sending message: {:?}", why);
     }
@@ -467,7 +467,7 @@ fn cat(ctx: &mut Context, msg: &Message) -> CommandResult {
 #[command]
 #[description = "Sends an emoji with a dog."]
 #[bucket = "emoji"]
-fn dog(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn dog(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:") {
         println!("Error sending message: {:?}", why);
     }
@@ -476,7 +476,7 @@ fn dog(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn bird(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
+fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let say_content = if args.is_empty() {
         ":bird: can find animals for you.".to_string()
     } else {
@@ -491,7 +491,7 @@ fn bird(ctx: &mut Context, msg: &Message, args: Args) -> CommandResult {
 }
 
 #[command]
-fn am_i_admin(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn am_i_admin(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Yes you are.") {
         println!("Error sending message: {:?}", why);
     }
@@ -500,7 +500,7 @@ fn am_i_admin(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn slow_mode(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
         if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)) {
             println!("Error setting channel's slow mode rate: {:?}", why);

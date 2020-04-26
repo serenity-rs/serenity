@@ -114,7 +114,7 @@ fn main() {
 }
 
 #[command]
-fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
@@ -147,7 +147,7 @@ fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
-fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -173,7 +173,7 @@ fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     check_msg(msg.channel_id.say(&ctx.http,"Pong!"));
 
     Ok(())
