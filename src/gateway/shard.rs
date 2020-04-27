@@ -338,7 +338,7 @@ impl Shard {
             warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
         }
 
-        match *event {
+        match &event {
             Event::Ready(ref ready) => {
                 debug!("[Shard {:?}] Received Ready", self.shard_info);
 
@@ -409,12 +409,11 @@ impl Shard {
                 return Err(Error::Gateway(GatewayError::NoAuthentication));
             },
             Some(close_codes::AUTHENTICATION_FAILED) => {
-                warn!("Sent invalid authentication");
-
-                return Err(Error::Gateway(GatewayError::InvalidAuthentication));
+                panic!("[Shard {:?}] Sent invalid authentication, please check the token.",
+                    self.shard_info);
             },
             Some(close_codes::ALREADY_AUTHENTICATED) => {
-                warn!("[Shard {:?}] Already authenticated",
+                warn!("[Shard {:?}] Already authenticated.",
                         self.shard_info);
             },
             Some(close_codes::INVALID_SEQUENCE) => {
@@ -425,25 +424,31 @@ impl Shard {
                 self.seq = 0;
             },
             Some(close_codes::RATE_LIMITED) => {
-                warn!("[Shard {:?}] Gateway ratelimited",
+                warn!("[Shard {:?}] Gateway ratelimited.",
                         self.shard_info);
             },
             Some(close_codes::INVALID_SHARD) => {
-                warn!("[Shard {:?}] Sent invalid shard data",
+                warn!("[Shard {:?}] Sent invalid shard data.",
                         self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::InvalidShardData));
             },
             Some(close_codes::SHARDING_REQUIRED) => {
-                error!("[Shard {:?}] Shard has too many guilds",
+                error!("[Shard {:?}] Shard has too many guilds.",
                         self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::OverloadedShard));
             },
             Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
-                info!("[Shard {:?}] Invalid session", self.shard_info);
+                info!("[Shard {:?}] Invalid session.", self.shard_info);
 
                 self.session_id = None;
+            },
+            Some(close_codes::INVALID_GATEWAY_INTENTS) => {
+                panic!("[Shard {:?}] Invalid gateway intents have been provided.", self.shard_info);
+            },
+           Some(close_codes::DISALLOWED_GATEWAY_INTENTS) => {
+                panic!("[Shard {:?}] Disallowed gateway intents have been provided.", self.shard_info);
             },
             Some(other) if !clean => {
                 warn!(

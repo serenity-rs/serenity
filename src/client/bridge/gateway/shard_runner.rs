@@ -7,9 +7,7 @@ use tokio::sync::RwLock;
 use serde::Deserialize;
 use std::{
     borrow::Cow,
-    sync::{
-        Arc,
-    },
+    sync::Arc,
 };
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};

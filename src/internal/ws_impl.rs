@@ -1,5 +1,5 @@
 use flate2::read::ZlibDecoder;
-use crate::gateway::WsStream;
+use crate::gateway::{GatewayError, WsStream};
 use crate::internal::prelude::*;
 use serde_json;
 use async_tungstenite::tungstenite::Message;
@@ -98,6 +98,9 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
 
                 why
             })?
+        },
+        Some(Message::Close(Some(frame))) => {
+            return Err(Error::Gateway(GatewayError::Closed(Some(frame))));
         },
         // Ping/Pong message behaviour is internally handled by tungstenite.
         _ => None,
