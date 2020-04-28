@@ -79,7 +79,7 @@ impl<T: fmt::Display> From<T> for CommandError {
 
 pub type CommandResult = ::std::result::Result<(), CommandError>;
 
-pub type CommandFn = fn(&mut Context, &Message, Args) -> CommandResult;
+pub type CommandFn = fn(&Context, &Message, Args) -> CommandResult;
 
 pub struct Command {
     pub fun: CommandFn,
@@ -102,7 +102,7 @@ impl PartialEq for Command {
 }
 
 pub type HelpCommandFn = fn(
-    &mut Context,
+    &Context,
     &Message,
     Args,
     &'static HelpOptions,

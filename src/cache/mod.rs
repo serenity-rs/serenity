@@ -720,7 +720,7 @@ impl Cache {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// #
     /// # #[command]
-    /// # fn test(context: &mut Context) -> CommandResult {
+    /// # fn test(context: &Context) -> CommandResult {
     /// if let Some(user) = context.cache.read().user(7) {
     ///     println!("User with Id 7 is currently named {}", user.read().name);
     /// }

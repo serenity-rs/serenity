@@ -111,7 +111,7 @@ impl From<Reason> for CheckResult {
     }
 }
 
-pub type CheckFunction = fn(&mut Context, &Message, &mut Args, &CommandOptions) -> CheckResult;
+pub type CheckFunction = fn(&Context, &Message, &mut Args, &CommandOptions) -> CheckResult;
 
 /// A check can be part of a command or group and will be executed to
 /// determine whether a user is permitted to use related item.

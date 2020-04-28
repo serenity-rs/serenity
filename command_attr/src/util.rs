@@ -188,7 +188,7 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
         ));
     }
 
-    let context: Type = parse_quote!(&mut serenity::client::Context);
+    let context: Type = parse_quote!(&serenity::client::Context);
     let message: Type = parse_quote!(&serenity::model::channel::Message);
     let args: Type = parse_quote!(serenity::framework::standard::Args);
     let args2: Type = parse_quote!(&mut serenity::framework::standard::Args);

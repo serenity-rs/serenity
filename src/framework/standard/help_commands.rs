@@ -26,7 +26,7 @@
 //!
 //! #[help]
 //! fn my_help(
-//!    context: &mut Context,
+//!    context: &Context,
 //!    msg: &Message,
 //!    args: Args,
 //!    help_options: &'static HelpOptions,
@@ -386,7 +386,7 @@ fn check_common_behaviour(
 
 #[cfg(all(feature = "cache", feature = "http"))]
 fn check_command_behaviour(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     options: &CommandOptions,
     owners: &HashSet<UserId>,
@@ -414,7 +414,7 @@ fn check_command_behaviour(
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::too_many_arguments)]
 fn nested_group_command_search<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
     name: &mut String,
@@ -576,7 +576,7 @@ fn nested_group_command_search<'a>(
 /// returns similar commands.
 #[cfg(feature = "cache")]
 fn fetch_single_command<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
     name: &str,
@@ -603,7 +603,7 @@ fn fetch_single_command<'a>(
 #[cfg(feature = "cache")]
 #[allow(clippy::too_many_arguments)]
 fn fill_eligible_commands<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     commands: &[&'static InternalCommand],
     owners: &HashSet<UserId>,
@@ -667,7 +667,7 @@ fn fill_eligible_commands<'a>(
 #[cfg(feature = "cache")]
 #[allow(clippy::too_many_arguments)]
 fn fetch_all_eligible_commands_in_group<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     commands: &[&'static InternalCommand],
     owners: &HashSet<UserId>,
@@ -716,7 +716,7 @@ fn fetch_all_eligible_commands_in_group<'a>(
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
 fn create_command_group_commands_pair_from_groups<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
     owners: &HashSet<UserId>,
@@ -740,7 +740,7 @@ fn create_command_group_commands_pair_from_groups<'a>(
 /// Fetches a single group with its commands.
 #[cfg(feature = "cache")]
 fn create_single_group(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     group: &CommandGroup,
     owners: &HashSet<UserId>,
@@ -782,7 +782,7 @@ fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool 
 #[cfg(feature = "cache")]
 #[allow(clippy::implicit_hasher)]
 pub fn searched_lowercase<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     args: &'a Args,
     group: &CommandGroup,
@@ -852,7 +852,7 @@ pub fn searched_lowercase<'a>(
 #[cfg(feature = "cache")]
 #[allow(clippy::implicit_hasher)]
 pub fn create_customised_help_data<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     args: &'a Args,
     groups: &[&'static CommandGroup],
@@ -1209,7 +1209,7 @@ fn send_error_embed(
 ///
 /// #[help]
 /// fn my_help(
-///     context: &mut Context,
+///     context: &Context,
 ///     msg: &Message,
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
@@ -1225,7 +1225,7 @@ fn send_error_embed(
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub fn with_embeds(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
@@ -1406,7 +1406,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///
 /// #[help]
 /// fn my_help(
-///     context: &mut Context,
+///     context: &Context,
 ///     msg: &Message,
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
@@ -1422,7 +1422,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub fn plain(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
