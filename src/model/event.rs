@@ -1,5 +1,5 @@
 //! All the events this library handles.
-
+use bitflags::bitflags;
 use chrono::{DateTime, FixedOffset};
 use serde::de::Error as DeError;
 use serde::ser::{
@@ -1974,10 +1974,38 @@ pub struct VoiceSessionDescription {
     pub(crate) _nonexhaustive: (),
 }
 
+bitflags!{
+    /// Flag set describing how a speaker is sending audio.
+    pub struct VoiceSpeakingState: u8 {
+        /// Normal transmission of voice audio.
+        const MICROPHONE = 0b001;
+
+        /// Transmission of context audio for video, no speaking indicator.
+        const SOUNDSHARE = 0b010;
+
+        /// Priority speaker, lowering audio of other speakers.
+        const PRIORITY   = 0b100;
+    }
+}
+
+impl<'de> Deserialize<'de> for VoiceSpeakingState {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self::from_bits_truncate(u8::deserialize(deserializer)?))
+    }
+}
+
+impl Serialize for VoiceSpeakingState {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+    where
+        S: Serializer,
+    {
+        serializer.serialize_u8(self.bits())
+    }
+}
+
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct VoiceSpeaking {
-    // FIXME: this is a bitmask now!
-    pub speaking: u8,
+    pub speaking: VoiceSpeakingState,
     pub ssrc: u32,
     pub user_id: UserId,
     #[serde(skip)]

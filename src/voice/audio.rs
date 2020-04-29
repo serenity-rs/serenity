@@ -3,6 +3,7 @@ use audiopus::{
     Bitrate,
     SampleRate,
 };
+use crate::model::event::VoiceSpeakingState;
 use parking_lot::Mutex;
 use std::{
     collections::VecDeque,
@@ -70,7 +71,7 @@ impl<R: Read + Seek> ReadSeek for R {
 
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) { }
+    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: VoiceSpeakingState) { }
 
     #[allow(clippy::too_many_arguments)]
     fn voice_packet(&mut self,

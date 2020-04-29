@@ -17,7 +17,7 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
+    model::{channel::Message, event::VoiceSpeakingState, gateway::Ready, id::ChannelId, misc::Mentionable},
     prelude::*,
     voice::AudioReceiver,
     Result as SerenityResult,
@@ -48,7 +48,7 @@ impl Receiver {
 }
 
 impl AudioReceiver for Receiver {
-    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) {
+    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: VoiceSpeakingState) {
         // You can implement logic here so that you can differentiate users'
         // SSRCs and map the SSRC to the User ID and maintain a state in
         // `Receiver`. Using this map, you can map the `ssrc` in `voice_packet`

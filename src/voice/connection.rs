@@ -20,7 +20,7 @@ use crate::internal::{
     ws_impl::{ReceiverExt, SenderExt},
     Timer
 };
-use crate::model::event::VoiceEvent;
+use crate::model::event::{VoiceEvent, VoiceSpeakingState};
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
@@ -84,7 +84,7 @@ pub struct Connection {
     sequence: u16,
     silence_frames: u8,
     soft_clip: SoftClip,
-    speaking: bool,
+    speaking: VoiceSpeakingState,
     ssrc: u32,
     thread_items: ThreadItems,
     timestamp: u32,
@@ -216,7 +216,7 @@ impl Connection {
             sequence: 0,
             silence_frames: 0,
             soft_clip,
-            speaking: false,
+            speaking: VoiceSpeakingState::empty(),
             ssrc: ready.ssrc,
             thread_items,
             timestamp: 0,
@@ -501,8 +501,7 @@ impl Connection {
                 },
                 ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
-                        // FIXME: check for bitflags, rather than doing this...
-                        receiver.speaking_update(ev.ssrc, ev.user_id.0, (ev.speaking & 1) == 1);
+                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
                     }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
@@ -632,14 +631,14 @@ impl Connection {
     }
 
     fn set_speaking(&mut self, speaking: bool) -> Result<()> {
-        if self.speaking == speaking {
+        if self.speaking.contains(VoiceSpeakingState::MICROPHONE) == speaking {
             return Ok(());
         }
 
-        self.speaking = speaking;
+        self.speaking.set(VoiceSpeakingState::MICROPHONE, speaking);
 
         info!("[Voice] Speaking update: {}", speaking);
-        let o = self.client.lock().send_json(&payload::build_speaking(speaking, self.ssrc));
+        let o = self.client.lock().send_json(&payload::build_speaking(self.speaking, self.ssrc));
         info!("[Voice] Speaking update confirmed.");
         o
     }

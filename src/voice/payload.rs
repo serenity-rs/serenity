@@ -1,4 +1,7 @@
-use crate::constants::VoiceOpCode;
+use crate::{
+    constants::VoiceOpCode,
+    model::event::VoiceSpeakingState,
+};
 use serde_json::{json, Value};
 use super::connection_info::ConnectionInfo;
 
@@ -51,13 +54,12 @@ pub fn build_select_protocol(address: ::std::borrow::Cow<'_, str>, port: u16) ->
 }
 
 #[inline]
-pub fn build_speaking(speaking: bool, ssrc: u32) -> Value {
+pub fn build_speaking(speaking: VoiceSpeakingState, ssrc: u32) -> Value {
     json!({
         "op": VoiceOpCode::Speaking.num(),
         "d": {
             "delay": 0,
-            // FIXME: use bitflags.
-            "speaking": speaking as u8,
+            "speaking": speaking.bits(),
             "ssrc": ssrc,
         }
     })
