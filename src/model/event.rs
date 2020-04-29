@@ -1978,13 +1978,27 @@ bitflags!{
     /// Flag set describing how a speaker is sending audio.
     pub struct VoiceSpeakingState: u8 {
         /// Normal transmission of voice audio.
-        const MICROPHONE = 0b001;
+        const MICROPHONE = 1;
 
         /// Transmission of context audio for video, no speaking indicator.
-        const SOUNDSHARE = 0b010;
+        const SOUNDSHARE = 1 << 1;
 
         /// Priority speaker, lowering audio of other speakers.
-        const PRIORITY   = 0b100;
+        const PRIORITY = 1 << 2;
+    }
+}
+
+impl VoiceSpeakingState {
+    pub fn microphone(self) -> bool {
+        self.contains(Self::MICROPHONE)
+    }
+
+    pub fn soundshare(self) -> bool {
+        self.contains(Self::SOUNDSHARE)
+    }
+
+    pub fn priority(self) -> bool {
+        self.contains(Self::PRIORITY)   
     }
 }
 
