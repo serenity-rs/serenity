@@ -639,12 +639,17 @@ impl SharedStore {
         unsafe { &mut *self.raw.get() }
     }
 
+    fn add_rope(&self) {
+        self.get_mut_ref()
+            .add_rope()
+    }
+
     fn remove_rope(&self) {
         self.get_mut_ref()
             .remove_rope()
     }
 
-    fn read_from_pos(&self, pos: usize, loc: CacheReadLocationType, buffer: &mut [u8]) -> (IoResult<usize>, bool, bool) {
+    fn read_from_pos(&self, pos: usize, loc: CacheReadLocation, buffer: &mut [u8]) -> (IoResult<usize>, bool, bool) {
         self.get_mut_ref()
             .read_from_pos(pos, loc, buffer)
     }
@@ -676,7 +681,7 @@ impl SharedStore {
             .lookahead()
     }
 
-    fn audio_to_backing_pos(&self, audio_byte_pos: usize, loc: CacheReadLocationType) -> Option<ChunkPosition> {
+    fn audio_to_backing_pos(&self, audio_byte_pos: usize, loc: CacheReadLocation) -> Option<ChunkPosition> {
         self.get_mut_ref()
             .audio_to_backing_pos(audio_byte_pos, loc)
     }
@@ -873,7 +878,7 @@ struct RawStore {
 
     backing_store: Option<Vec<u8>>,
     rope: Option<LinkedList<BufferChunk>>,
-    rope_users: Arc<()>,
+    rope_users: AtomicUsize,
     lock: Mutex<()>,
 }
 
@@ -899,7 +904,7 @@ impl RawStore {
 
             backing_store: None,
             rope: Some(list),
-            rope_users: Arc::new(()),
+            rope_users: AtomicUsize::new(1),
             lock: Mutex::new(()),
         }
     }
@@ -1004,10 +1009,16 @@ impl RawStore {
         self.finalised.store(FinaliseState::Finalised.into(), Ordering::Release);
     }
 
+    fn add_rope(&mut self) {
+        self.rope_users.fetch_add(1, Ordering::AcqRel);
+    }
+
     fn remove_rope(&mut self) {
         // We can only remove the rope if the core holds the last reference.
-        if Arc::strong_count(&self.rope_users) == 1 {
-            // FIXME: make this use an atomic int with fetch_subtract
+        // Given that the number of active handles
+        let a = self.rope_users.fetch_sub(1, Ordering::AcqRel);
+        println!("Discarded handle, there were {} rope usesrs [{:?}]", a, self.inner_type);
+        if a == 1 {
 
             // In worst case, several upgrades might pile up.
             // Only one holder should concern itself with drop logic,
@@ -1030,20 +1041,23 @@ impl RawStore {
 
             // Drop everything else.
             self.rope = None;
+            self.rope_users.store(0, Ordering::Release);
+
+            println!("Rope dropped!")
         }
     }
 
     /// Returns read count, should_upgrade, should_finalise_external
-    fn read_from_pos(&mut self, pos: usize, mut loc: CacheReadLocationType, buf: &mut [u8]) -> (IoResult<usize>, bool, bool) {
+    fn read_from_pos(&mut self, pos: usize, mut loc: CacheReadLocation, buf: &mut [u8]) -> (IoResult<usize>, bool, bool) {
         // Place read of finalised first to be certain that if we see finalised,
         // then backing_len *must* be the true length.
         let mut finalised = self.finalised();
         let mut backing_len = self.len();
 
         // If should upgrade, then we take from backing.
-        let mut should_upgrade = matches!(loc, CacheReadLocationType::Roped) && finalised.is_backing_ready();
+        let mut should_upgrade = matches!(loc, CacheReadLocation::Roped) && finalised.is_backing_ready();
         if should_upgrade {
-            loc = CacheReadLocationType::Backed;
+            loc = CacheReadLocation::Backed;
         }
 
         let mut should_finalise_external = false;
@@ -1203,8 +1217,8 @@ impl RawStore {
     }
 
     #[inline]
-    fn read_from_local(&self, mut pos: usize, loc: CacheReadLocationType, buf: &mut [u8], count: usize) -> usize {
-        use CacheReadLocationType::*;
+    fn read_from_local(&self, mut pos: usize, loc: CacheReadLocation, buf: &mut [u8], count: usize) -> usize {
+        use CacheReadLocation::*;
         match loc {
             Backed => {
                 let store = self.backing_store
@@ -1257,7 +1271,7 @@ impl RawStore {
         }
     }
 
-    fn audio_to_backing_pos(&self, audio_byte_pos: usize, loc: CacheReadLocationType) -> Option<ChunkPosition> {
+    fn audio_to_backing_pos(&self, audio_byte_pos: usize, loc: CacheReadLocation) -> Option<ChunkPosition> {
         if audio_byte_pos > self.audio_len() {
             if self.finalised().is_source_finished() {
                 Some(ChunkPosition::new(self.len(), self.audio_len()))
@@ -1272,7 +1286,7 @@ impl RawStore {
                 },
                 EncodingData::Opus{..} => {
                     match loc {
-                        CacheReadLocationType::Backed => {
+                        CacheReadLocation::Backed => {
                             let back = self.backing_store.as_ref()
                                 .expect("Can't access this code path unless nacking store exists.");
 
@@ -1292,7 +1306,7 @@ impl RawStore {
 
                             Some(pos)
                         },
-                        CacheReadLocationType::Roped => {
+                        CacheReadLocation::Roped => {
                             let rope = self.rope
                                 .as_ref()
                                 .expect("Rope should still exist while any handles hold a ::Roped(_) \
@@ -1409,25 +1423,10 @@ impl SubAssign for ChunkPosition {
     }
 }
 
-#[derive(Clone, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq,)]
 enum CacheReadLocation {
-    Roped(Arc<()>),
-    Backed,
-}
-
-#[derive(Clone, Copy, Debug)]
-enum CacheReadLocationType {
     Roped,
     Backed,
-}
-
-impl From<&CacheReadLocation> for CacheReadLocationType {
-    fn from(a: &CacheReadLocation) -> Self {
-        match a {
-            CacheReadLocation::Roped(_) => CacheReadLocationType::Roped,
-            CacheReadLocation::Backed => CacheReadLocationType::Backed,
-        }
-    }
 }
 
 struct AudioCache {
@@ -1438,24 +1437,29 @@ struct AudioCache {
 
 impl AudioCache {
     fn new(core: RawStore) -> Self {
-        let loc = CacheReadLocation::Roped(core.rope_users.clone());
         AudioCache {
             core: Arc::new(SharedStore{ raw: UnsafeCell::new(core) }),
             pos: 0,
-            loc,
+            loc: CacheReadLocation::Roped,
         }
     }
 
     fn upgrade_to_backing(&mut self) {
+        if self.loc == CacheReadLocation::Roped {
+            self.core.remove_rope();
+        }
         self.loc = CacheReadLocation::Backed;
-        self.core.remove_rope();
     }
 
     fn new_handle(&self) -> Self {
+        if matches!(self.loc, CacheReadLocation::Roped) {
+            self.core.add_rope();
+        }
+
         Self {
             core: self.core.clone(),
             pos: 0,
-            loc: self.loc.clone(),
+            loc: self.loc,
         }
     }
 
@@ -1477,7 +1481,7 @@ impl AudioCache {
     }
 
     fn audio_to_backing_pos(&self, audio_byte_pos: usize) -> Option<ChunkPosition> {
-        self.core.audio_to_backing_pos(audio_byte_pos, (&self.loc).into())
+        self.core.audio_to_backing_pos(audio_byte_pos, self.loc)
     }
 }
 
@@ -1495,7 +1499,7 @@ impl Drop for AudioCache {
 // of the output FloatPcm stream.
 impl Read for AudioCache {
     fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
-        let (bytes_read, should_upgrade, should_finalise_here) = self.core.read_from_pos(self.pos, (&self.loc).into(), buf);
+        let (bytes_read, should_upgrade, should_finalise_here) = self.core.read_from_pos(self.pos, self.loc, buf);
 
         if should_finalise_here {
             let handle = self.core.clone();
