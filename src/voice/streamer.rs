@@ -39,7 +39,10 @@ use std::{
     },
     ops::{Add, AddAssign, Sub, SubAssign},
     process::{Child, Command, Stdio},
-    sync::Arc,
+    sync::{
+        atomic::{AtomicU8, AtomicUsize, Ordering},
+        Arc,
+    },
     time::Duration,
 };
 use super::{
@@ -619,11 +622,11 @@ fn is_stereo(path: &OsStr) -> Result<bool> {
     Ok(check)
 }
 
-struct SharedCore {
-    raw: UnsafeCell<RawCore>,
+struct SharedStore {
+    raw: UnsafeCell<RawStore>,
 }
 
-impl SharedCore {
+impl SharedStore {
     // The main reason for employing `unsafe` here is *shared mutability*:
     // due to the granularity of the locks we need, (i.e., a moving critical
     // section otherwise lock-free), we need to assert that these operations
@@ -632,30 +635,28 @@ impl SharedCore {
     // Note that only our code can use this, so that we can ensure correctness
     // and concurrent safety.
     #[allow(clippy::mut_from_ref)]
-    fn get_mut_ref(&self) -> &mut RawCore {
+    fn get_mut_ref(&self) -> &mut RawStore {
         unsafe { &mut *self.raw.get() }
     }
 
-    fn remove_chain(&self) {
+    fn remove_rope(&self) {
         self.get_mut_ref()
-            .remove_chain()
+            .remove_rope()
     }
 
-    fn read_from_pos(&self, pos: usize, loc: CacheReadLocationType, buffer: &mut [u8]) -> (IoResult<usize>, bool) {
+    fn read_from_pos(&self, pos: usize, loc: CacheReadLocationType, buffer: &mut [u8]) -> (IoResult<usize>, bool, bool) {
         self.get_mut_ref()
             .read_from_pos(pos, loc, buffer)
     }
 
     fn len(&self) -> usize {
         self.get_mut_ref()
-            .len
-            .audio_pos
+            .audio_len()
     }
 
     fn store_len(&self) -> usize {
         self.get_mut_ref()
-            .len
-            .audio_pos
+            .len()
     }
 
     fn is_stereo(&self) -> bool {
@@ -665,7 +666,8 @@ impl SharedCore {
 
     fn is_finalised(&self) -> bool {
         self.get_mut_ref()
-            .finalised
+            .finalised()
+            .is_source_finished()
     }
 
     fn lookahead(&self) -> IoResult<usize> {
@@ -678,8 +680,14 @@ impl SharedCore {
         self.get_mut_ref()
             .audio_to_backing_pos(audio_byte_pos, loc)
     }
+
+    fn do_finalise(&self) {
+        self.get_mut_ref()
+            .do_finalise()
+    }
 }
 
+#[derive(Debug)]
 enum EncodingData {
     FloatPcm,
     Opus{encoder: OpusEncoder, last_frame: Vec<u8>, frame_pos: usize}
@@ -805,10 +813,55 @@ impl From<&EncodingData> for AudioType {
     }
 }
 
+#[derive(Clone, Copy, Debug)]
+enum FinaliseState {
+    Live,
+    Finalising,
+    Finalised,
+}
+
+impl From<u8> for FinaliseState {
+    fn from(val: u8) -> Self {
+        use FinaliseState::*;
+        match val {
+            0 => Live,
+            1 => Finalising,
+            2 => Finalised,
+            _ => unreachable!(),
+        }
+    }
+}
+
+impl From<FinaliseState> for u8 {
+    fn from(val: FinaliseState) -> Self {
+        use FinaliseState::*;
+        match val {
+            Live => 0,
+            Finalising => 1,
+            Finalised => 2,
+        }
+    }
+}
+
+impl FinaliseState {
+    fn is_source_live(self) -> bool {
+        matches!(self, FinaliseState::Live)
+    }
+
+    fn is_source_finished(self) -> bool {
+        !self.is_source_live()
+    }
+
+    fn is_backing_ready(self) -> bool {
+        matches!(self, FinaliseState::Finalised)
+    }
+}
+
 // Shared basis for the below cache-based seekables.
-struct RawCore {
-    len: ChunkPosition,
-    finalised: bool,
+struct RawStore {
+    len: AtomicUsize,
+    audio_len: AtomicUsize,
+    finalised: AtomicU8,
 
     inner_type: EncodingData,
 
@@ -816,13 +869,15 @@ struct RawCore {
     stereo: bool,
 
     chunk_size: usize,
+    spawn_finaliser: bool,
+
     backing_store: Option<Vec<u8>>,
-    chain: Option<LinkedList<BufferChunk>>,
-    chain_users: Arc<()>,
+    rope: Option<LinkedList<BufferChunk>>,
+    rope_users: Arc<()>,
     lock: Mutex<()>,
 }
 
-impl RawCore {
+impl RawStore {
     fn new(source: Input, inner_type: EncodingData, chunk_size: usize, start_size: usize) -> Self {
         let stereo = source.stereo;
 
@@ -831,27 +886,78 @@ impl RawCore {
 
         Self {
             len: Default::default(),
-            finalised: false,
+            audio_len: Default::default(),
+            finalised: AtomicU8::new(FinaliseState::Live.into()),
+
+            inner_type,
+
             source: Some(Box::new(source)),
             stereo,
-            inner_type,
+
             chunk_size,
+            spawn_finaliser: true,
+
             backing_store: None,
-            chain: Some(list),
-            chain_users: Arc::new(()),
+            rope: Some(list),
+            rope_users: Arc::new(()),
             lock: Mutex::new(()),
         }
     }
 
-    fn finalise(&mut self) {
-        // Move the chain/rope of bytes into the backing store.BufferChunk
-        let rope = self.chain.as_mut()
+    fn len(&self) -> usize {
+        self.len.load(Ordering::Acquire)
+    }
+
+    fn set_len(&mut self, value: usize) {
+        self.len.store(value, Ordering::Release)
+    }
+
+    fn audio_len(&self) -> usize {
+        self.audio_len.load(Ordering::Acquire)
+    }
+
+    fn set_audio_len(&mut self, value: usize) {
+        self.audio_len.store(value, Ordering::Release)
+    }
+
+    fn finalised(&self) -> FinaliseState {
+        self.finalised.load(Ordering::Acquire).into()
+    }
+
+    /// Marks stream as finished.
+    ///
+    /// Returns `true` if a new handle must be spawned by the parent
+    /// to finalise in another thread.
+    fn finalise(&mut self) -> bool {
+        let state_on_call: FinaliseState = self.finalised.compare_and_swap(
+            FinaliseState::Live.into(),
+            FinaliseState::Finalising.into(),
+            Ordering::AcqRel
+        ).into();
+        
+        if state_on_call.is_source_live() {
+            if self.spawn_finaliser {
+                true
+            } else {
+                self.do_finalise();
+                false
+            }
+        } else {
+            false
+        }
+    }
+
+    fn do_finalise(&mut self) {
+        let backing_len = self.len();
+
+        // Move the rope of bytes into the backing store.
+        let rope = self.rope.as_mut()
             .expect("Writes should only occur while the rope exists.");
 
         if rope.len() > 1 {
             // Allocate one big store, then start moving entries over
             // chunk-by-chunk.
-            let mut back = vec![0u8; self.len.backing_pos];
+            let mut back = vec![0u8; backing_len];
 
             for el in rope.iter() {
                 let start = el.start_pos.backing_pos;
@@ -861,7 +967,7 @@ impl RawCore {
             }
 
             // Insert the new backing store, but DO NOT purge the old.
-            // This is left to the last Arc<> holder of the chain.
+            // This is left to the last Arc<> holder of the rope.
             self.backing_store = Some(back);
         } else {
             // Least work, but unsafe.
@@ -870,16 +976,16 @@ impl RawCore {
             // In this case, when the list is destroyed, the first element
             // MUST be leaked to keep the backing store memory valid.
             //
-            // (see remove_chain for this leakage)
+            // (see remove_rope for this leakage)
             //
             // The alternative (write first chunk into always-present
             // backing store) mandates a lock for the final expansion, because
             // the backing store is IN USE. Thus, we can't employ it.
             if let Some(el) = rope.front_mut() {
                 // We can be certain that this pointer is not invalidated because:
-                // * All writes to the rope/chain are finished. Thus, no
+                // * All writes to the rope/rope are finished. Thus, no
                 //   reallocations/moves.
-                // * The Vec will live exactly as long as the RawCore, pointer never escapes.
+                // * The Vec will live exactly as long as the RawStore, pointer never escapes.
                 // Likewise, we knoe that it is safe to build the new vector as:
                 // * The stored type and pointer do not change, so alignment is preserved.
                 // * The data pointer is created by an existing Vec<T>.
@@ -895,12 +1001,12 @@ impl RawCore {
 
         // It's crucial that we do this *last*, as this is the signal
         // for other threads to migrate from rope to backing store.
-        self.finalised = true;
+        self.finalised.store(FinaliseState::Finalised.into(), Ordering::Release);
     }
 
-    fn remove_chain(&mut self) {
-        // We can only remove the chain if the core holds the last reference.
-        if Arc::strong_count(&self.chain_users) == 1 {
+    fn remove_rope(&mut self) {
+        // We can only remove the rope if the core holds the last reference.
+        if Arc::strong_count(&self.rope_users) == 1 {
             // FIXME: make this use an atomic int with fetch_subtract
 
             // In worst case, several upgrades might pile up.
@@ -911,9 +1017,9 @@ impl RawCore {
                 return;
             }
 
-            if let Some(rope) = &mut self.chain {
+            if let Some(rope) = &mut self.rope {
                 // Prevent the backing store from being wiped out
-                // if the first link in the chain sufficed.
+                // if the first link in the rope sufficed.
                 // This ensures safety as we undo the aliasing
                 // in the above special case.
                 if rope.len() == 1 {
@@ -923,28 +1029,40 @@ impl RawCore {
             }
 
             // Drop everything else.
-            self.chain = None;
+            self.rope = None;
         }
     }
 
-    fn read_from_pos(&mut self, pos: usize, mut loc: CacheReadLocationType, buf: &mut [u8]) -> (IoResult<usize>, bool) {
+    /// Returns read count, should_upgrade, should_finalise_external
+    fn read_from_pos(&mut self, pos: usize, mut loc: CacheReadLocationType, buf: &mut [u8]) -> (IoResult<usize>, bool, bool) {
+        // Place read of finalised first to be certain that if we see finalised,
+        // then backing_len *must* be the true length.
+        let mut finalised = self.finalised();
+        let mut backing_len = self.len();
+
         // If should upgrade, then we take from backing.
-        let mut should_upgrade = matches!(loc, CacheReadLocationType::Chained) && self.finalised;
+        let mut should_upgrade = matches!(loc, CacheReadLocationType::Roped) && finalised.is_backing_ready();
         if should_upgrade {
             loc = CacheReadLocationType::Backed;
         }
 
+        let mut should_finalise_external = false;
+
         let target_len = pos + buf.len();
 
-        let out = if target_len <= self.len.backing_pos || self.finalised {
+        let out = if finalised.is_backing_ready() || target_len <= backing_len {
+            // FIXME: may need to re-fetch backing_len to compute count.
             // If finalised, there is zero risk of triggering more writes.
-            Ok(self.read_from_local(pos, loc, buf))
+            let read_amt = buf.len().min(backing_len - pos);
+            Ok(self.read_from_local(pos, loc, buf, read_amt))
         } else {
             let mut read = 0;
             let mut base_result = None;
 
             loop {
-                let mut remaining_in_store = self.len.backing_pos - pos - read;
+                finalised = self.finalised();
+                backing_len = self.len();
+                let mut remaining_in_store = backing_len - pos - read;
 
                 if remaining_in_store == 0 {
                     // Need to do this to trigger the lock
@@ -955,18 +1073,23 @@ impl RawCore {
                         lock.lock()
                     };
 
+                    finalised = self.finalised();
+                    backing_len = self.len();
+
                     // If length changed between our check and
                     // acquiring the lock, then drop it -- we don't need new bytes *yet*
                     // and might not!
-                    remaining_in_store = self.len.backing_pos - pos - read;
-                    if remaining_in_store == 0 {
+                    remaining_in_store = backing_len - pos - read;
+                    if remaining_in_store == 0 && finalised.is_source_live() {
                         let read_count = self.fill_from_source(buf.len() - read);
-                        if let Ok(read_count) = read_count {
+                        if let Ok((read_count, finalise_elsewhere)) = read_count {
                             remaining_in_store += read_count;
+                            should_finalise_external |= finalise_elsewhere;
                         }
-                        base_result = Some(read_count);
+                        base_result = Some(read_count.map(|a| a.0));
 
-                        should_upgrade |= self.finalised;
+                        finalised = self.finalised();
+                        should_upgrade |= finalised.is_backing_ready();
                     }
 
                     // Unlocked here.
@@ -974,7 +1097,8 @@ impl RawCore {
                 }
 
                 if remaining_in_store > 0 {
-                    read += self.read_from_local(pos, loc, &mut buf[read..]);
+                    let count = remaining_in_store.min(buf.len() - read);
+                    read += self.read_from_local(pos, loc, &mut buf[read..], count);
                 }
 
                 // break out if:
@@ -983,7 +1107,7 @@ impl RawCore {
                 // * or nothing remaining, AND finalised
                 if matches!(base_result, Some(Err(_)))
                     || read == buf.len()
-                    || (self.finalised && self.len.backing_pos == pos + read) {
+                    || (finalised.is_source_finished() && backing_len == pos + read) {
                     break;
                 }
             }
@@ -993,7 +1117,7 @@ impl RawCore {
                 .map(|_| read)
         };
 
-        (out, should_upgrade)
+        (out, should_upgrade, should_finalise_external)
     }
 
     // ONLY SAFE TO CALL WITH LOCK.
@@ -1002,7 +1126,7 @@ impl RawCore {
     // * drawing bytes from the source
     // * modifying len
     // * modifying encoder state
-    fn fill_from_source(&mut self, mut bytes_needed: usize) -> IoResult<usize> {
+    fn fill_from_source(&mut self, mut bytes_needed: usize) -> IoResult<(usize, bool)> {
         let minimum_to_write = self.inner_type.min_bytes_required();
         // Round up to the next full audio frame.
         // FIXME: cache this.
@@ -1016,8 +1140,10 @@ impl RawCore {
         let mut remaining_bytes = bytes_needed;
         let mut recorded_error = None;
 
+        let mut spawn_new_finaliser = false;
+
         loop {
-            let rope = self.chain.as_mut()
+            let rope = self.rope.as_mut()
                 .expect("Writes should only occur while the rope exists.");
 
             let rope_el = rope.back_mut()
@@ -1052,7 +1178,8 @@ impl RawCore {
                         rope_el.data.truncate(old_len + store_len);
 
                         remaining_bytes -= store_len;
-                        self.len += len;
+                        self.audio_len.fetch_add(len.audio_pos, Ordering::Release);
+                        self.len.fetch_add(len.backing_pos, Ordering::Release);
                     },
                     Err(e) if e.kind() == IoErrorKind::Interrupted => {
                         // DO nothing, so try again.
@@ -1063,20 +1190,20 @@ impl RawCore {
                 }
 
                 if eofd {
-                    self.finalise();
+                    spawn_new_finaliser = self.finalise();
                 }
 
-                if self.finalised || remaining_bytes < minimum_to_write || recorded_error.is_some() {
+                if self.finalised().is_source_finished() || remaining_bytes < minimum_to_write || recorded_error.is_some() {
                     break;
                 }
             }
             }
 
-        recorded_error.unwrap_or(Ok(bytes_needed - remaining_bytes))
+        recorded_error.unwrap_or(Ok((bytes_needed - remaining_bytes, spawn_new_finaliser)))
     }
 
     #[inline]
-    fn read_from_local(&self, mut pos: usize, loc: CacheReadLocationType, buf: &mut [u8]) -> usize {
+    fn read_from_local(&self, mut pos: usize, loc: CacheReadLocationType, buf: &mut [u8], count: usize) -> usize {
         use CacheReadLocationType::*;
         match loc {
             Backed => {
@@ -1084,35 +1211,37 @@ impl RawCore {
                     .as_ref()
                     .expect("Reader should not attempt to use a backing store before it exists");
 
-                if pos < self.len.backing_pos {
-                    let available = self.len.backing_pos - pos;
-                    let to_write = buf.len().min(available);
-                    buf[..to_write].copy_from_slice(&store[pos..pos + to_write]);
+                if pos < self.audio_len() {
+                    buf[..count].copy_from_slice(&store[pos..pos + count]);
 
-                    to_write
+                    count
                 } else {
                     0
                 }
             },
-            Chained => {
-                let rope = self.chain
+            Roped => {
+                let rope = self.rope
                     .as_ref()
-                    .expect("Rope should still exist while any handles hold a ::Chained(_) \
+                    .expect("Rope should still exist while any handles hold a ::Roped(_) \
                              (and thus an Arc)");
 
                 let mut written = 0;
 
                 for link in rope.iter() {
+                    // Although this isn't atomic, Release on store to .len ensures that
+                    // all writes made before setting len STAY before len.
+                    // backing_pos might be larger than len, and fluctuates
+                    // due to resizes, BUT we're gated by the atomically written len,
+                    // via count, which gives us a safe bound on accessible bytes this call.
                     if pos >= link.start_pos.backing_pos && pos < link.end_pos.backing_pos {
                         let local_available = link.end_pos.backing_pos - pos;
-                        let to_write = (buf.len() - written).min(local_available);
+                        let to_write = (count - written).min(local_available);
 
                         let first_el = pos - link.start_pos.backing_pos;
-                        let last_el = first_el + to_write;
 
                         let next_len = written + to_write;
 
-                        buf[written..next_len].copy_from_slice(&link.data[first_el..last_el]);
+                        buf[written..next_len].copy_from_slice(&link.data[first_el..first_el + to_write]);
 
                         written = next_len;
                         pos += to_write;
@@ -1123,15 +1252,15 @@ impl RawCore {
                     }
                 }
 
-                written
+                count
             }
         }
     }
 
     fn audio_to_backing_pos(&self, audio_byte_pos: usize, loc: CacheReadLocationType) -> Option<ChunkPosition> {
-        if audio_byte_pos > self.len.audio_pos {
-            if self.finalised {
-                Some(self.len)
+        if audio_byte_pos > self.audio_len() {
+            if self.finalised().is_source_finished() {
+                Some(ChunkPosition::new(self.len(), self.audio_len()))
             } else {
                 None
             }
@@ -1163,10 +1292,10 @@ impl RawCore {
 
                             Some(pos)
                         },
-                        CacheReadLocationType::Chained => {
-                            let rope = self.chain
+                        CacheReadLocationType::Roped => {
+                            let rope = self.rope
                                 .as_ref()
-                                .expect("Rope should still exist while any handles hold a ::Chained(_) \
+                                .expect("Rope should still exist while any handles hold a ::Roped(_) \
                                          (and thus an Arc)");
 
                             let mut out = None;
@@ -1201,8 +1330,8 @@ impl RawCore {
 // We need to declare these as thread-safe, since we don't have a mutex around
 // several raw fields. However, the way that they are used should remain
 // consistent.
-unsafe impl Sync for SharedCore {}
-unsafe impl Send for SharedCore {}
+unsafe impl Sync for SharedStore {}
+unsafe impl Send for SharedStore {}
 
 struct BufferChunk {
     data: Vec<u8>,
@@ -1282,36 +1411,36 @@ impl SubAssign for ChunkPosition {
 
 #[derive(Clone, Debug)]
 enum CacheReadLocation {
-    Chained(Arc<()>),
+    Roped(Arc<()>),
     Backed,
 }
 
 #[derive(Clone, Copy, Debug)]
 enum CacheReadLocationType {
-    Chained,
+    Roped,
     Backed,
 }
 
 impl From<&CacheReadLocation> for CacheReadLocationType {
     fn from(a: &CacheReadLocation) -> Self {
         match a {
-            CacheReadLocation::Chained(_) => CacheReadLocationType::Chained,
+            CacheReadLocation::Roped(_) => CacheReadLocationType::Roped,
             CacheReadLocation::Backed => CacheReadLocationType::Backed,
         }
     }
 }
 
-struct AudioCacheCore {
-    core: Arc<SharedCore>,
+struct AudioCache {
+    core: Arc<SharedStore>,
     pos: usize,
     loc: CacheReadLocation,
 }
 
-impl AudioCacheCore {
-    fn new(core: RawCore) -> Self {
-        let loc = CacheReadLocation::Chained(core.chain_users.clone());
-        AudioCacheCore {
-            core: Arc::new(SharedCore{ raw: UnsafeCell::new(core) }),
+impl AudioCache {
+    fn new(core: RawStore) -> Self {
+        let loc = CacheReadLocation::Roped(core.rope_users.clone());
+        AudioCache {
+            core: Arc::new(SharedStore{ raw: UnsafeCell::new(core) }),
             pos: 0,
             loc,
         }
@@ -1319,7 +1448,7 @@ impl AudioCacheCore {
 
     fn upgrade_to_backing(&mut self) {
         self.loc = CacheReadLocation::Backed;
-        self.core.remove_chain();
+        self.core.remove_rope();
     }
 
     fn new_handle(&self) -> Self {
@@ -1352,7 +1481,7 @@ impl AudioCacheCore {
     }
 }
 
-impl Drop for AudioCacheCore {
+impl Drop for AudioCache {
     fn drop(&mut self) {
         // This is necesary to prevent unsoundness.
         // I.e., 1-chunk case after finalisation if
@@ -1364,9 +1493,14 @@ impl Drop for AudioCacheCore {
 
 // Read and Seek on the audio operate on byte positions
 // of the output FloatPcm stream.
-impl Read for AudioCacheCore {
+impl Read for AudioCache {
     fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
-        let (bytes_read, should_upgrade) = self.core.read_from_pos(self.pos, (&self.loc).into(), buf);
+        let (bytes_read, should_upgrade, should_finalise_here) = self.core.read_from_pos(self.pos, (&self.loc).into(), buf);
+
+        if should_finalise_here {
+            let handle = self.core.clone();
+            std::thread::spawn(move || handle.do_finalise());
+        }
 
         if should_upgrade {
             self.upgrade_to_backing();
@@ -1399,7 +1533,7 @@ impl Read for AudioCacheCore {
 /// [`CompressedSource`]: struct.CompressedSource.html
 /// [`RestartableSource`]: struct.RestartableSource.html
 pub struct MemorySource {
-    cache: AudioCacheCore,
+    cache: AudioCache,
 }
 
 impl MemorySource {
@@ -1419,10 +1553,10 @@ impl MemorySource {
             chunk_size
         };
 
-        let core_raw = RawCore::new(source, EncodingData::FloatPcm, chunk_size, start_size);
+        let core_raw = RawStore::new(source, EncodingData::FloatPcm, chunk_size, start_size);
 
         Self {
-            cache: AudioCacheCore::new(core_raw),
+            cache: AudioCache::new(core_raw),
         }
     }
 
@@ -1527,7 +1661,7 @@ impl Seek for MemorySource {
 /// [`MemorySource`]: struct.MemorySource.html
 /// [`RestartableSource`]: struct.RestartableSource.html
 pub struct CompressedSource {
-    cache: AudioCacheCore,
+    cache: AudioCache,
     decoder: OpusDecoder,
     current_frame: Vec<f32>,
     frame_pos: usize,
@@ -1591,11 +1725,11 @@ impl CompressedSource {
 
         let stereo = source.stereo;
 
-        let core_raw = RawCore::new(source, encoder_data, chunk_size, start_size);
+        let core_raw = RawStore::new(source, encoder_data, chunk_size, start_size);
 
         // FIXME: does not take into account actual encoder params.
         Self {
-            cache: AudioCacheCore::new(core_raw),
+            cache: AudioCache::new(core_raw),
             decoder: decoder(stereo).expect("FIXME: shouldn't unwrap."),
             current_frame: Vec::with_capacity(STEREO_FRAME_SIZE),
             frame_pos: 0,
@@ -1799,7 +1933,7 @@ impl Seek for CompressedSource {
 ///
 /// [`CompressedSource`]: struct.CompressedSource.html
 pub struct CompressedSourceBase {
-    cache: AudioCacheCore,
+    cache: AudioCache,
 }
 
 impl CompressedSourceBase {

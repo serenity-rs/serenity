@@ -17,31 +17,9 @@ log = "0.4"
 parking_lot = "0.9"
 serde_json = "1"
 
-[dependencies.static_assertions]
-optional = true
-version = "1.1"
-
 [dependencies.audiopus]
 optional = true
 version = "0.2"
-
-[dependencies.command_attr]
-path = "./command_attr"
-version = "0.2.0"
-optional = true
-
-[dependencies.discortp]
-optional = true
-# version = "1.0"
-git = "https://github.com/FelixMcFelix/discortp"
-
-[dependencies.serde]
-version = "1"
-features = ["derive"]
-
-[dependencies.uwl]
-optional = true
-version = "0.6.0"
 
 [dependencies.base64]
 optional = true
@@ -51,9 +29,19 @@ version = "0.11"
 optional = true
 version = "1"
 
+[dependencies.command_attr]
+path = "./command_attr"
+version = "0.2.0"
+optional = true
+
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"
+
+[dependencies.discortp]
+optional = true
+# version = "1.0"
+git = "https://github.com/FelixMcFelix/discortp"
 
 [dependencies.flate2]
 optional = true
@@ -73,11 +61,19 @@ version = "0.7"
 optional = true
 version = "0.16"
 
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
 [dependencies.sodiumoxide]
 default-features = false
 features = ["std"]
 optional = true
 version = "0.2"
+
+[dependencies.static_assertions]
+optional = true
+version = "1.1"
 
 [dependencies.threadpool]
 optional = true
@@ -91,6 +87,10 @@ version = "0.9"
 [dependencies.url]
 optional = true
 version = "^2.1"
+
+[dependencies.uwl]
+optional = true
+version = "0.6.0"
 
 [dependencies.webpki]
 optional = true
