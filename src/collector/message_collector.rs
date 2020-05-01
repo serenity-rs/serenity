@@ -149,8 +149,6 @@ impl MessageFilter {
         self.options.filter_limit.as_ref().map_or(true, |limit| { self.filtered < *limit })
         && self.options.collect_limit.as_ref().map_or(true, |limit| { self.collected < *limit })
     }
-
-
 }
 
 
