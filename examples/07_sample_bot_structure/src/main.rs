@@ -92,7 +92,9 @@ async fn main() {
             .prefix("~"))
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::new_with_framework(&token, Handler, framework)
+    let mut client = Client::new(&token)
+        .framework(framework)
+        .event_handler(Handler)
         .await
         .expect("Err creating client");
 

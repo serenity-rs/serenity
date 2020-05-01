@@ -263,7 +263,9 @@ async fn main() {
     .group(&MATH_GROUP)
     .group(&OWNER_GROUP);
 
-    let mut client = Client::new_with_framework(&token, Handler, framework)
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .framework(framework)
         .await
         .expect("Err creating client");
 
@@ -545,7 +547,7 @@ async fn slow_mode(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandR
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
     } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await {
-        format!("Current slow mode rate is `{}` seconds.", channel.read().await.slow_mode_rate.unwrap_or(0))
+        format!("Current slow mode rate is `{}` seconds.", channel.slow_mode_rate.unwrap_or(0))
     } else {
         "Failed to find channel in cache.".to_string()
     };

@@ -42,7 +42,7 @@ pub struct ShardRunner {
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    framework: Arc<Option<Box<dyn Framework + Send + Sync>>>,
+    framework: Arc<Box<dyn Framework + Send + Sync>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<InterMessage>,
@@ -611,7 +611,7 @@ pub struct ShardRunnerOptions {
     pub event_handler: Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Arc<Option<Box<dyn Framework + Send + Sync>>>,
+    pub framework: Arc<Box<dyn Framework + Send + Sync>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     #[cfg(feature = "voice")]

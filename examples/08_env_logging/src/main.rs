@@ -39,7 +39,10 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    let mut client = Client::new(&token, Handler).await.expect("Err creating client");
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
     if let Err(why) = client.start().await {
         error!("Client error: {:?}", why);

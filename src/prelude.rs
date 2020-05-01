@@ -19,7 +19,7 @@ pub use crate::model::misc::Mentionable;
 pub use tokio::sync::{Mutex, RwLock};
 
 #[cfg(feature = "client")]
-pub use crate::client::{Client, ClientError, Context, EventHandler, RawEventHandler};
+pub use crate::client::{Client, ClientBuilder, ClientError, Context, EventHandler, RawEventHandler};
 #[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
 #[cfg(feature = "http")]

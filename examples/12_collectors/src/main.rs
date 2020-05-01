@@ -72,7 +72,10 @@ async fn main() {
         .help(&MY_HELP)
         .group(&COLLECTOR_GROUP);
 
-    let mut client = Client::new_with_framework(&token, Handler, framework).await
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .framework(framework)
+        .await
         .expect("Err creating client");
 
     if let Err(why) = client.start().await {

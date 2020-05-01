@@ -39,10 +39,16 @@ pub use crate::CacheAndHttp;
 pub use crate::cache::{Cache, CacheRwLock};
 
 use crate::internal::prelude::*;
-use tokio::sync::Mutex;
-use tokio::sync::RwLock;
-use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
-use std::sync::Arc;
+use tokio::sync::{Mutex, RwLock};
+use self::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerMonitor, ShardManagerOptions};
+use std::{
+    boxed::Box,
+    sync::Arc,
+    future::Future,
+    pin::Pin,
+    task::{Context as FutContext, Poll},
+    time::Duration,
+};
 use log::{error, debug, info};
 
 #[cfg(feature = "framework")]
@@ -53,7 +59,273 @@ use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
 use crate::http::Http;
-use crate::utils::TypeMap;
+use crate::utils::{TypeMap, TypeMapKey};
+use futures::future::BoxFuture;
+
+/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
+///
+/// [`Client`]: #struct.Client.html
+/// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html
+pub struct ClientBuilder<'a> {
+    data: Option<TypeMap>,
+    http: Option<Http>,
+    fut: Option<BoxFuture<'a, Result<Client>>>,
+    guild_subscriptions: bool,
+    intents: Option<GatewayIntents>,
+    #[cfg(feature = "cache")]
+    timeout: Option<Duration>,
+    #[cfg(feature = "framework")]
+    framework: Option<Arc<Box<dyn Framework + Send + Sync + 'static>>>,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+}
+
+impl<'a> ClientBuilder<'a> {
+    /// Construct a new builder to call methods on for the client construction.
+    /// The `token` will automatically be prefixed "Bot " if not already.
+    ///
+    /// **Panic**:
+    /// If you enabled the `framework`-feature (on by default), you must specify
+    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// otherwise awaiting the builder will cause a panic.
+    ///
+    /// [`framework`]: #method.framework
+    /// [`framework_arc`]: #method.framework_arc
+    pub fn new(token: impl AsRef<str>) -> Self {
+        Self {
+            data: Some(TypeMap::new()),
+            http: None,
+            fut: None,
+            guild_subscriptions: true,
+            intents: None,
+            #[cfg(feature = "cache")]
+            timeout: None,
+            #[cfg(feature = "framework")]
+            framework: None,
+            event_handler: None,
+            raw_event_handler: None,
+        }.token(token)
+    }
+
+    /// Sets a token for the bot. If the token is not prefixed "Bot ",
+    /// this method will automatically do so.
+    pub fn token(mut self, token: impl AsRef<str>) -> Self {
+        let token = token.as_ref().trim();
+
+        let token = if token.starts_with("Bot ") {
+            token.to_string()
+        } else {
+            format!("Bot {}", token)
+        };
+
+        self.http = Some(Http::new_with_token(&token));
+
+        self
+    }
+
+    /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
+    /// A `TypeMap` must not be constructed manually: [`type_map_insert`]
+    /// can be used to insert one type at a time.
+    ///
+    /// [`TypeMap`]: ../utils/struct.TypeMap.html
+    pub fn type_map(mut self, type_map: TypeMap) -> Self {
+        self.data = Some(type_map);
+
+        self
+    }
+
+    /// Insert a single `value` into the internal [`TypeMap`] that will
+    /// be available in [`Context::data`].
+    /// This method can be called multiple times in order to populate the
+    /// [`TypeMap`] with `value`s.
+    ///
+    /// [`Context::data`]: #struct.Context
+    /// [`TypeMap`]: ../utils/struct.TypeMap.html
+    pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
+        if let Some(ref mut data) = self.data {
+            data.insert::<T>(value);
+        } else {
+            let mut type_map = TypeMap::new();
+            type_map.insert::<T>(value);
+
+            self.data = Some(type_map);
+        }
+
+        self
+    }
+
+    /// Sets how long - if wanted to begin with - a cache update shall
+    /// be attempted for. After the `timeout` ran out, the update will be
+    /// skipped.
+    ///
+    /// By default, a cache update will never timeout and potentially
+    /// cause a deadlock.
+    /// A timeout however, will invalidate the cache.
+    #[cfg(feature = "cache")]
+    pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = Some(timeout);
+
+        self
+    }
+
+    /// Whether presence or typing events shall be received over the gateway.
+    ///
+    /// **Info**:
+    /// Prefer to use `intents`, as this may be replaced by them in the future.**
+    pub fn guild_subscriptions(mut self, is_enabled: bool) -> Self {
+        self.guild_subscriptions = is_enabled;
+
+        self
+    }
+
+    /// Sets the command framework to be used. It will receive messages sent
+    /// over the gateway and then consider - based on its settings - whether to
+    /// dispatch a command.
+    ///
+    /// *Info*:
+    /// If a reference to the framework is required for manual dispatch,
+    /// use the [`framework_arc`]-method instead.
+    ///
+    /// [`framework_arc`]: #method.framework_arc
+    #[cfg(feature = "framework")]
+    pub fn framework<F>(mut self, framework: F) -> Self
+    where F: Framework + Send + Sync + 'static,
+    {
+        self.framework = Some(Arc::new(Box::new(framework)));
+
+        self
+    }
+
+    /// This method allows to pass an `Arc`'ed `framework` - this step is
+    /// done for you in the [`framework`]-method, if you don't need the
+    /// extra control.
+    /// You can provide a clone and keep the original to manually dispatch.
+    ///
+    /// [`framework`]: #method.framework
+    #[cfg(feature = "framework")]
+    pub fn framework_arc(mut self, framework: Arc<Box<dyn Framework + Send + Sync + 'static>>) -> Self {
+        self.framework = Some(framework);
+
+        self
+    }
+
+    /// Sets all intents directly, replacing already set intents.
+    ///
+    /// *See also*:
+    /// If visually preferred, you can use [`add_intent`] and chain it
+    /// in order to add intent after intent.
+    ///
+    /// *Info*:
+    /// Intents are a bitflag, you can combine them by performing the
+    /// `|`-operator.
+    ///
+    /// [`add_intent`]: #method.add_intent
+    pub fn intents(mut self, intents: GatewayIntents) -> Self {
+        self.intents = Some(intents);
+
+        self
+    }
+
+    /// Adds a single `intent`, this method can be called
+    /// repetitively to add multiple intents.
+    ///
+    /// *See also*:
+    /// If visually preferred, you can use [`intents`] and specify all
+    /// intents at once. In theory you could also achieve the same result
+    /// by passing the combined `intents`-bitflag to this method.
+    ///
+    /// [`intents`]: #method.intents
+    pub fn add_intent(mut self, intent: GatewayIntents) -> Self {
+        if let Some(ref mut intents) = self.intents {
+            intents.insert(intent);
+        } else {
+            self.intents = Some(intent);
+        }
+
+        self
+    }
+
+    /// Sets an event handler with multiple methods for each possible event.
+    pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
+        self.event_handler = Some(Arc::new(event_handler));
+
+        self
+    }
+
+    /// Sets an event handler with a single method where all received gateway
+    /// events will be dispatched.
+    pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
+        self.raw_event_handler = Some(Arc::new(raw_event_handler));
+
+        self
+    }
+}
+
+impl<'a> Future for ClientBuilder<'a> {
+    type Output = Result<Client>;
+
+    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
+        if self.fut.is_none() {
+            let data = Arc::new(RwLock::new(self.data.take().unwrap()));
+            #[cfg(feature = "framework")]
+            let framework = self.framework.take().expect("No framework set");
+            let event_handler = self.event_handler.take();
+            let raw_event_handler = self.raw_event_handler.take();
+            let guild_subscriptions = self.guild_subscriptions;
+            let intents = self.intents;
+            let http = Arc::new(self.http.take().unwrap());
+            #[cfg(feature = "voice")]
+            let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
+                0,
+                UserId(0),
+            )));
+
+            let cache_and_http = Arc::new(CacheAndHttp {
+                #[cfg(feature = "cache")]
+                cache: CacheRwLock::default(),
+                #[cfg(feature = "cache")]
+                update_cache_timeout: self.timeout.take(),
+                http: Arc::clone(&http),
+                __nonexhaustive: (),
+            });
+
+            self.fut = Some(Box::pin(async move {
+                let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+
+                let (shard_manager, shard_manager_worker) = {
+                    ShardManager::new(ShardManagerOptions {
+                        data: &data,
+                        event_handler: &event_handler,
+                        raw_event_handler: &raw_event_handler,
+                        #[cfg(feature = "framework")]
+                        framework: &framework,
+                        shard_index: 0,
+                        shard_init: 0,
+                        shard_total: 0,
+                        #[cfg(feature = "voice")]
+                        voice_manager: &voice_manager,
+                        ws_url: &url,
+                        cache_and_http: &cache_and_http,
+                        guild_subscriptions,
+                        intents,
+                    }).await
+                };
+
+                Ok(Client {
+                    ws_uri: url,
+                    data,
+                    shard_manager,
+                    shard_manager_worker,
+                    #[cfg(feature = "voice")]
+                    voice_manager,
+                    cache_and_http,
+                })
+            }))
+        }
+
+        self.fut.as_mut().unwrap().as_mut().poll(ctx)
+    }
+}
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -284,126 +556,19 @@ pub struct Client {
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
     pub ws_uri: Arc<Mutex<String>>,
+    /// A container for an optional cache and HTTP client.
+    /// It also contains the cache update timeout.
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 
 impl Client {
-    /// Creates a Client for a bot user.
+    /// Returns a builder implementing [`Future`]. You can chain the builder methods and then await
+    /// in order to finish the [`Client`].
     ///
-    /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
-    /// this function will automatically do for you if not already included.
-    ///
-    #[cfg(feature = "framework")]
-    pub async fn new_with_framework<H: EventHandler + 'static, F: Framework + Send + Sync + 'static>(token: impl AsRef<str>, handler: H, framework: F) -> Result<Self> {
-        Self::new_with_extras(token, |e|
-            e.event_handler(handler).framework(framework)
-        ).await
-    }
-
-    /// Creates a Client for a bot user but without framework.
-    ///
-    /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
-    /// this function will automatically do for you if not already included.
-    ///
-    /// # Examples
-    ///
-    /// Create a Client, using a token from an environment variable:
-    ///
-    /// ```rust,no_run
-    /// # use std::error::Error;
-    /// # use serenity::prelude::EventHandler;
-    /// use serenity::Client;
-    ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// # async fn run() -> Result<(), Box<dyn Error>> {
-    /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let client = Client::new(&token, Handler).await?;
-    /// #     Ok(())
-    /// # }
-    /// ```
-    pub async fn new<H: EventHandler + 'static>(token: impl AsRef<str>, handler: H) -> Result<Self> {
-        Self::new_with_extras(token, |e| e.event_handler(handler)).await
-    }
-
-    /// Creates a client with extra configuration.
-    pub async fn new_with_extras(token: impl AsRef<str>, f: impl FnOnce(&mut Extras) -> &mut Extras) -> Result<Self> {
-        let token = token.as_ref().trim();
-
-        let token = if token.starts_with("Bot ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
-
-        let mut extras = Extras::default();
-
-        f(&mut extras);
-
-        let Extras {
-            event_handler,
-            raw_event_handler,
-            #[cfg(feature = "framework")]
-            framework,
-            #[cfg(feature = "cache")]
-            timeout,
-            guild_subscriptions,
-            intents,
-        } = extras;
-
-        let http = Http::new_with_token(&token);
-
-        let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
-        let data = Arc::new(RwLock::new(TypeMap::new()));
-
-        #[cfg(feature = "voice")]
-        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
-            0,
-            UserId(0),
-        )));
-
-        let cache_and_http = Arc::new(CacheAndHttp {
-            #[cfg(feature = "cache")]
-            cache: CacheRwLock::default(),
-            #[cfg(feature = "cache")]
-            update_cache_timeout: timeout,
-            http: Arc::new(http),
-            __nonexhaustive: (),
-        });
-
-        #[cfg(feature = "framework")]
-        let framework: Arc<Option<Box<dyn Framework + Send + Sync>>> = framework;
-
-        let (shard_manager, shard_manager_worker) = {
-            ShardManager::new(ShardManagerOptions {
-                data: &data,
-                event_handler: &event_handler,
-                raw_event_handler: &raw_event_handler,
-                #[cfg(feature = "framework")]
-                framework: &framework,
-                shard_index: 0,
-                shard_init: 0,
-                shard_total: 0,
-                #[cfg(feature = "voice")]
-                voice_manager: &voice_manager,
-                ws_url: &url,
-                cache_and_http: &cache_and_http,
-                guild_subscriptions,
-                intents,
-            }).await
-        };
-
-        Ok(Client {
-            ws_uri: url,
-            data,
-            shard_manager,
-            shard_manager_worker,
-            #[cfg(feature = "voice")]
-            voice_manager,
-            cache_and_http,
-        })
+    /// [`Client`]: #struct.Client.html
+    /// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html
+    pub fn new<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
+        ClientBuilder::new(token)
     }
 
     /// Establish the connection and start listening for events.

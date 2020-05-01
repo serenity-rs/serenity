@@ -35,22 +35,16 @@ async fn main() {
     // Create a client with extras and then specify the intents you want to
     // use.
     // By default, Serenity sets no intents.
-    let mut client = Client::new_with_extras(&token, |extras| {
-        extras
-            .intents(
-                GatewayIntents::GUILDS
-                | GatewayIntents::GUILD_MESSAGES
-            )
-            .event_handler(Handler)
-    })
-    .await
-    .expect("Err creating client");
-
-    // Finally, start a single shard, and start listening to events.
-    //
-    // Shards will automatically attempt to reconnect, and will perform
-    // exponential backoff until it reconnects.
-    if let Err(why) = client.start().await {
+    if let Err(why) = Client::new(token)
+        .event_handler(Handler)
+        .add_intent(GatewayIntents::GUILDS)
+        .add_intent(GatewayIntents::GUILD_MESSAGES)
+        // Build our client.
+        .await
+        .expect("Error creating client")
+        // Finally, start a single shard, and start listening to events.
+        .start()
+        .await {
         println!("Client error: {:?}", why);
     }
 }

@@ -87,11 +87,83 @@ pub(crate) enum DispatchEvent {
     __Nonexhaustive,
 }
 
+impl DispatchEvent {
+    async fn update(&mut self, cache_and_http: &Arc<CacheAndHttp>) {
+        match self {
+            Self::Model(Event::ChannelCreate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::ChannelDelete(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::ChannelUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildCreate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildDelete(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildEmojisUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildMemberAdd(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildMemberRemove(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildMemberUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildMembersChunk(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildRoleCreate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildRoleDelete(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildRoleUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::GuildUnavailable(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            // Already handled by the framework check macro
+            Self::Model(Event::MessageCreate(_)) => {},
+            Self::Model(Event::MessageUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::PresencesReplace(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::PresenceUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::Ready(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::UserUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::VoiceStateUpdate(ref mut event)) => {
+                update(cache_and_http, event).await;
+            },
+            Self::Model(Event::__Nonexhaustive) => unreachable!(),
+            Self::__Nonexhaustive => unreachable!(),
+            _ => (),
+        }
+    }
+}
+
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<'rec>(
-    event: DispatchEvent,
+    mut event: DispatchEvent,
     #[cfg(feature = "framework")]
-    framework: &'rec Arc<Option<Box<dyn Framework + Send + Sync >>>,
+    framework: &'rec Arc<Box<dyn Framework + Send + Sync>>,
     data: &'rec Arc<RwLock<TypeMap>>,
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
@@ -101,7 +173,25 @@ pub(crate) fn dispatch<'rec>(
 ) -> BoxFuture<'rec, ()> {
     async move {
         match (event_handler, raw_event_handler) {
-            (None, None) => {}, // Do nothing
+            (None, None) => {
+                event.update(&cache_and_http).await;
+
+                if let DispatchEvent::Model(Event::MessageCreate(event)) = event {
+                    #[cfg(feature = "framework")]
+                    {
+                        #[cfg(not(feature = "cache"))]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                        #[cfg(feature = "cache")]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+
+                        let framework = Arc::clone(&framework);
+
+                        tokio::spawn(async move {
+                            framework.dispatch(context, event.message).await;
+                        });
+                    }
+                }
+            },
             (Some(ref h), None) => {
                 match event {
                     DispatchEvent::Model(Event::MessageCreate(mut event)) => {
@@ -123,9 +213,7 @@ pub(crate) fn dispatch<'rec>(
                             let framework = Arc::clone(&framework);
 
                             tokio::spawn(async move {
-                                if let Some(ref framework) = *framework {
-                                    framework.dispatch(context, event.message).await;
-                                }
+                                framework.dispatch(context, event.message).await;
                             });
                         }
                     },
@@ -142,31 +230,80 @@ pub(crate) fn dispatch<'rec>(
                 }
             },
             (None, Some(ref rh)) => {
-                if let DispatchEvent::Model(e) = event {
-                    #[cfg(not(feature = "cache"))]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                    #[cfg(feature = "cache")]
-                    let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+                event.update(&cache_and_http).await;
 
+                if let DispatchEvent::Model(event) = event {
                     let event_handler = Arc::clone(rh);
 
-                    tokio::spawn(async move {
-                        event_handler.raw_event(context, e).await;
-                    });
+                    #[cfg(not(feature = "framework"))]
+                    {
+                        #[cfg(not(feature = "cache"))]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                        #[cfg(feature = "cache")]
+                        let context = context(data, runner_tx, shard_id,
+                            &cache_and_http.http,
+                            &cache_and_http.cache
+                        );
+
+                        event_handler.raw_event(context, event).await;
+                    }
+
+                    #[cfg(feature = "framework")]
+                    {
+                        #[cfg(not(feature = "cache"))]
+                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                        #[cfg(feature = "cache")]
+                        let context = context(data, runner_tx, shard_id,
+                            &cache_and_http.http,
+                            &cache_and_http.cache
+                        );
+
+                        if let Event::MessageCreate(ref msg_event) = event {
+                            let framework = Arc::clone(&framework);
+                            let message = msg_event.message.clone();
+
+                            let context2 = context.clone();
+                            tokio::spawn(async move {
+                                event_handler.raw_event(context2, event).await;
+                            });
+
+                            tokio::spawn(async move {
+                                framework.dispatch(context, message).await;
+                            });
+                        }
+                    }
                 }
             },
             (Some(_), Some(_)) => {
-                if let DispatchEvent::Model(ref e) = event {
-                        dispatch(DispatchEvent::Model(e.clone()),
+                #[cfg(not(feature = "cache"))]
+                let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                #[cfg(feature = "cache")]
+                let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+
+                if let DispatchEvent::Model(ref event) = event {
+                    let framework = Arc::clone(&framework);
+                        dispatch(DispatchEvent::Model(event.clone()),
                                 #[cfg(feature = "framework")]
-                                framework,
+                                &framework,
                                 data,
                                 &None,
                                 raw_event_handler,
                                 runner_tx,
                                 shard_id,
                                 Arc::clone(&cache_and_http))
-                        .await
+                        .await;
+
+                    #[cfg(feature = "framework")]
+                    {
+                        if let Event::MessageCreate(ref msg_event) = event {
+                            let framework = Arc::clone(&framework);
+
+                            let message = msg_event.message.clone();
+                            tokio::spawn(async move {
+                                framework.dispatch(context, message).await;
+                            });
+                        }
+                    }
                 }
 
                 dispatch(event,
@@ -590,7 +727,7 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 feature_cache! {{
-                    event_handler.user_update(context, _before.expect("BRR"), event.current_user).await;
+                    event_handler.user_update(context, _before.expect("Missing old user"), event.current_user).await;
                 } else {
                     event_handler.user_update(context, event.current_user).await;
                 }}
