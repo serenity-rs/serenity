@@ -52,6 +52,15 @@ impl EventHandler for Handler {
     }
 }
 
+struct RawHandler;
+
+#[async_trait]
+impl serenity::client::RawEventHandler for RawHandler {
+    async fn raw_event(&self, _: Context, event: serenity::model::event::Event) {
+        println!("Event: {:?}", event);
+    }
+}
+
 #[group]
 #[commands(about, am_i_admin, say, commands, ping, some_long_command)]
 struct General;
@@ -131,7 +140,7 @@ async fn my_help(
 }
 
 #[hook]
-async fn before(ctx: &mut Context, msg: &Message, command_name: &str) -> bool {
+async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
     println!("Got command '{}' by user '{}'", command_name, msg.author.name);
 
     // Increment the number of times this command has been run once. If
@@ -146,7 +155,7 @@ async fn before(ctx: &mut Context, msg: &Message, command_name: &str) -> bool {
 }
 
 #[hook]
-async fn after(_ctx: &mut Context, _msg: &Message, command_name: &str, command_result: CommandResult) {
+async fn after(_ctx: &Context, _msg: &Message, command_name: &str, command_result: CommandResult) {
     match command_result {
         Ok(()) => println!("Processed command '{}'", command_name),
         Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
@@ -154,18 +163,18 @@ async fn after(_ctx: &mut Context, _msg: &Message, command_name: &str, command_r
 }
 
 #[hook]
-async fn unknown_command(_ctx: &mut Context, _msg: &Message, unknown_command_name: &str) {
+async fn unknown_command(_ctx: &Context, _msg: &Message, unknown_command_name: &str) {
     println!("Could not find command named '{}'", unknown_command_name);
 }
 
 #[hook]
-async fn normal_message(_ctx: &mut Context, msg: &Message) {
+async fn normal_message(_ctx: &Context, msg: &Message) {
     println!("Message is not a command '{}'", msg.content);
 }
 
 
 #[hook]
-async fn dispatch_error(ctx: &mut Context, msg: &Message, error: DispatchError) -> () {
+async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) -> () {
     if let DispatchError::Ratelimited(seconds) = error {
         let _ = msg
             .channel_id
@@ -265,6 +274,7 @@ async fn main() {
 
     let mut client = Client::new(&token)
         .event_handler(Handler)
+        .raw_event_handler(RawHandler)
         .framework(framework)
         .await
         .expect("Err creating client");

@@ -27,7 +27,7 @@ struct Collector;
 
 #[help]
 async fn my_help(
-    context: &mut Context,
+    context: &Context,
     msg: &Message,
     args: Args,
     help_options: &'static HelpOptions,
@@ -84,7 +84,7 @@ async fn main() {
 }
 
 #[command]
-async fn challenge(ctx: &mut Context, msg: &Message, _: Args) -> CommandResult {
+async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let mut score = 0u32;
     let _ =  msg.reply(&ctx, "How was that crusty crab called again? 10 seconds time!").await;
 
@@ -95,16 +95,16 @@ async fn challenge(ctx: &mut Context, msg: &Message, _: Args) -> CommandResult {
     if let Some(answer) = &msg.author.await_reply(&ctx).timeout(Duration::from_secs(10)).await {
 
         if answer.content.to_lowercase() == "ferris" {
-            let _ = answer.reply(&ctx, "That's correct!").await;
+            let _ = answer.reply(ctx, "That's correct!").await;
             score += 1;
         } else {
-            let _ = answer.reply(&ctx, "Wrong, it's Ferris!").await;
+            let _ = answer.reply(ctx, "Wrong, it's Ferris!").await;
         }
     } else {
-        let _ =  msg.reply(&ctx, "No answer within 10 seconds.").await;
+        let _ =  msg.reply(ctx, "No answer within 10 seconds.").await;
     };
 
-    let react_msg = msg.reply(&ctx, "React with the reaction representing 1, you got 10 seconds!").await.unwrap();
+    let react_msg = msg.reply(ctx, "React with the reaction representing 1, you got 10 seconds!").await.unwrap();
 
     // The message model has a way to collect reactions on it.
     // Other methods are `await_n_reactions` and `await_all_reactions`.

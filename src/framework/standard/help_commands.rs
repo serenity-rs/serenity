@@ -1466,7 +1466,7 @@ pub async fn plain(
         CustomisedHelpData::__Nonexhaustive => unreachable!(),
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx, result).await {
+    if let Err(why) = msg.channel_id.say(ctx, result).await {
         warn_about_failed_send!(&formatted_help, why);
     };
 

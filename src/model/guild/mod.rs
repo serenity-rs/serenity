@@ -1732,7 +1732,7 @@ impl Guild {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).await?;
+    /// let mut client = Client::new("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #    Ok(())
