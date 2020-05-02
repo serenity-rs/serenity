@@ -52,15 +52,6 @@ impl EventHandler for Handler {
     }
 }
 
-struct RawHandler;
-
-#[async_trait]
-impl serenity::client::RawEventHandler for RawHandler {
-    async fn raw_event(&self, _: Context, event: serenity::model::event::Event) {
-        println!("Event: {:?}", event);
-    }
-}
-
 #[group]
 #[commands(about, am_i_admin, say, commands, ping, some_long_command)]
 struct General;
@@ -274,7 +265,6 @@ async fn main() {
 
     let mut client = Client::new(&token)
         .event_handler(Handler)
-        .raw_event_handler(RawHandler)
         .framework(framework)
         .await
         .expect("Err creating client");
