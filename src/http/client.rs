@@ -27,7 +27,6 @@ use log::{debug, trace};
 use std::{
     collections::BTreeMap,
     sync::Arc,
-    borrow::Cow,
 };
 use tokio::{
     io::AsyncReadExt,
@@ -1464,11 +1463,12 @@ impl Http {
                     let filename = url.path_segments()
                       .and_then(|segments| segments.last().map(ToString::to_string))
                       .ok_or_else(|| Error::Url(url.to_string()))?;
-                    let mut picture: Vec<u8> = vec![];
-                    let mut req_bytes = self.client.get(url).send().await?.bytes().await?;
-                    req_bytes.copy_to_slice(&mut picture);
+                    let response = self.client.get(url).send().await?;
+                    let mut bytes = response.bytes().await?;
+                    let mut picture: Vec<u8> = vec![0; bytes.len()];
+                    bytes.copy_to_slice(&mut picture[..]);
                     multipart = multipart
-                        .part(file_num.to_string(), Part::bytes(Cow::Borrowed(&picture[..]).into_owned())
+                        .part(file_num.to_string(), Part::bytes(picture)
                             .file_name(filename.to_string()));
                 },
                 AttachmentType::__Nonexhaustive => unreachable!(),
