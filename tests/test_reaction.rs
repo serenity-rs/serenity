@@ -1,6 +1,6 @@
 use serenity::model::channel::ReactionType;
 use serenity::model::id::EmojiId;
-use std::convert::{TryFrom, TryInto};
+use std::convert::TryFrom;
 use std::str::FromStr;
 
 #[test]
