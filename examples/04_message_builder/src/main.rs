@@ -31,7 +31,6 @@ impl EventHandler for Handler {
                 .push_bold_safe(&msg.author.name)
                 .push(" used the 'ping' command in the ")
                 .mention(&channel)
-                .await
                 .push(" channel")
                 .build();
 

@@ -16,7 +16,7 @@ use crate::utils;
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::builder::CreateChannel;
-#[cfg(feature = "model")]
+#[cfg(any(feature = "model", feature = "http"))]
 use serde_json::json;
 #[cfg(feature = "cache")]
 use tokio::sync::RwLock;

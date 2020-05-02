@@ -28,12 +28,8 @@ use futures::stream::StreamExt;
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(all(feature = "cache", feature = "model"))]
-
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
