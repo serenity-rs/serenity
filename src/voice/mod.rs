@@ -38,23 +38,11 @@ pub use self::{
     error::{DcaError, VoiceError},
     events::{Event, EventContext, EventData, EventStore, TrackEvent},
     handler::Handler,
+    input::{
+        ffmpeg,
+        ytdl,
+    },
     manager::Manager,
-    // streamer::{
-    //     ChildContainer,
-    //     CompressedSource,
-    //     CompressedSourceBase,
-    //     Input,
-    //     MemorySource,
-    //     Reader,
-    //     RestartableSource,
-    //     child_to_reader,
-    //     // dca,
-    //     ffmpeg,
-    //     ffmpeg_optioned,
-    //     // opus,
-    //     ytdl,
-    //     ytdl_search,
-    // }
 };
 pub use audiopus as opus;
 

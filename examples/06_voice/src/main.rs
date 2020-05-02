@@ -32,7 +32,7 @@ use serenity::{
     },
     model::{channel::Message, gateway::Ready, misc::Mentionable},
     Result as SerenityResult,
-    voice,
+    voice::input,
 };
 
 use serenity::prelude::*;
@@ -248,7 +248,7 @@ fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match voice::ytdl(&url) {
+        let source = match input::ytdl(&url) {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
