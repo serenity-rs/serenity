@@ -1,3 +1,4 @@
+use audiopus::Bitrate;
 use crate::{
     constants::VoiceOpCode,
     gateway::InterMessage,
@@ -16,8 +17,7 @@ use super::{
     Audio,
     AudioHandle,
     AudioReceiver,
-    Input,
-    Bitrate,
+    input::Input,
     Event,
     EventContext,
     EventData,

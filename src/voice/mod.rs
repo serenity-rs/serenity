@@ -7,11 +7,13 @@ mod constants;
 mod dca;
 mod error;
 mod events;
-mod manager;
 mod handler;
+pub mod input;
+mod manager;
 mod payload;
-mod streamer;
 mod threading;
+
+use audiopus::Bitrate;
 
 pub use self::{
     audio::{
@@ -27,7 +29,7 @@ pub use self::{
         BlockingAudioQueryResult,
         LoopState,
         PlayMode,
-        ReadSeek,
+        // ReadSeek,
         TrackQueue,
         create_player,
     },
@@ -36,24 +38,24 @@ pub use self::{
     events::{Event, EventContext, EventData, EventStore, TrackEvent},
     handler::Handler,
     manager::Manager,
-    streamer::{
-        ChildContainer,
-        CompressedSource,
-        CompressedSourceBase,
-        Input,
-        MemorySource,
-        Reader,
-        RestartableSource,
-        child_to_reader,
-        // dca,
-        ffmpeg,
-        ffmpeg_optioned,
-        // opus,
-        ytdl,
-        ytdl_search,
-    }
+    // streamer::{
+    //     ChildContainer,
+    //     CompressedSource,
+    //     CompressedSourceBase,
+    //     Input,
+    //     MemorySource,
+    //     Reader,
+    //     RestartableSource,
+    //     child_to_reader,
+    //     // dca,
+    //     ffmpeg,
+    //     ffmpeg_optioned,
+    //     // opus,
+    //     ytdl,
+    //     ytdl_search,
+    // }
 };
-pub use audiopus::Bitrate;
+pub use audiopus as opus;
 
 use self::connection_info::ConnectionInfo;
 

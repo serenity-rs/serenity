@@ -34,40 +34,12 @@ use super::{
         TrackEvent,
     },
     Handler,
-    Input,
+    input::Input,
 };
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
 pub const DEFAULT_BITRATE: Bitrate = Bitrate::BitsPerSecond(128_000);
-
-pub trait ReadSeek {
-    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize>;
-
-    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64>;
-}
-
-impl Read for dyn ReadSeek {
-    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
-        ReadSeek::read(self, buf)
-    }
-}
-
-impl Seek for dyn ReadSeek {
-    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
-        ReadSeek::seek(self, pos)
-    }
-}
-
-impl<R: Read + Seek> ReadSeek for R {
-    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize>{
-        Read::read(self, buf)
-    }
-
-    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64>{
-        Seek::seek(self, pos)
-    }
-}
 
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
@@ -88,7 +60,7 @@ pub trait AudioReceiver: Send {
 }
 
 #[non_exhaustive]
-#[derive(Copy, Clone)]
+#[derive(Copy, Clone, Debug)]
 pub enum AudioType {
     Opus,
     Pcm,
