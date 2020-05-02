@@ -429,6 +429,23 @@ impl Http {
         }).await
     }
 
+    ///Deletes all the reactions for a given emoji on a message.
+    pub async fn delete_message_reaction_emoji(&self,
+        channel_id: u64,
+        message_id: u64,
+        reaction_type: &ReactionType)
+        -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteMessageReactionEmoji {
+                reaction: &reaction_type.as_data(),
+                channel_id,
+                message_id,
+            },
+        }).await
+    }
+
     /// Deletes a permission override from a role or a member in a channel.
     pub async fn delete_permission(&self, channel_id: u64, target_id: u64) -> Result<()> {
         self.wind(204, Request {

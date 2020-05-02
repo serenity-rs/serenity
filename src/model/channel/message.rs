@@ -201,6 +201,40 @@ impl Message {
         cache_http.http().as_ref().delete_message_reactions(self.channel_id.0, self.id.0).await
     }
 
+    /// Deletes all of the [`Reaction`]s of a given emoji associated with the message.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` feature is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`Reaction`]: struct.Reaction.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    #[cfg(feature = "http")]
+    pub async fn delete_reaction_emoji<R: Into<ReactionType>>(&self, cache_http: impl CacheHttp, reaction_type: R) -> Result<()> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_MESSAGES;
+
+                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        cache_http.http().as_ref()
+            .delete_message_reaction_emoji(
+                self.channel_id.0,
+                self.id.0,
+                &reaction_type.into()
+        ).await
+    }
+
     /// Edits this message, replacing the original content with new content.
     ///
     /// Message editing preserves all unchanged message data.

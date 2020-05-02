@@ -123,11 +123,11 @@ async fn main() {
 }
 
 #[command]
-async fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
-            check_msg(msg.reply(&ctx, "Requires a valid voice channel ID be given").await);
+            check_msg(msg.reply(ctx, "Requires a valid voice channel ID be given").await);
 
             return Ok(());
         },
@@ -157,7 +157,7 @@ async fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult
 }
 
 #[command]
-async fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
+async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().await.guild_channel(msg.channel_id) {
         Some(channel) => channel.read().await.guild_id,
         None => {
@@ -177,14 +177,14 @@ async fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
 
         check_msg(msg.channel_id.say(&ctx.http,"Left voice channel").await);
     } else {
-        check_msg(msg.reply(&ctx, "Not in a voice channel").await);
+        check_msg(msg.reply(ctx, "Not in a voice channel").await);
     }
 
     Ok(())
 }
 
 #[command]
-async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     check_msg(msg.channel_id.say(&ctx.http,"Pong!").await);
 
     Ok(())

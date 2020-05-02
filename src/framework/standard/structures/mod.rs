@@ -79,7 +79,7 @@ impl<T: fmt::Display> From<T> for CommandError {
 }
 
 pub type CommandResult = std::result::Result<(), CommandError>;
-pub type CommandFn = for<'fut> fn(&'fut mut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
+pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
     pub fun: CommandFn,
@@ -102,7 +102,7 @@ impl PartialEq for Command {
 }
 
 pub type HelpCommandFn = for<'fut> fn(
-    &'fut mut Context,
+    &'fut Context,
     &'fut Message,
     Args,
     &'fut HelpOptions,

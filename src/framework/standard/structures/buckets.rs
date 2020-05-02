@@ -6,7 +6,7 @@ use std::{
 };
 use futures::future::BoxFuture;
 
-type Check = for<'fut> fn(&'fut mut Context, Option<GuildId>, ChannelId, UserId)
+type Check = for<'fut> fn(&'fut Context, Option<GuildId>, ChannelId, UserId)
     -> BoxFuture<'fut, bool>;
 
 pub(crate) struct Ratelimit {

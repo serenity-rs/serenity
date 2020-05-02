@@ -19,7 +19,7 @@ use std::collections::HashMap;
 /// #
 /// # #[cfg(all(feature = "http", feature = "framework"))]
 /// # #[command]
-/// # async fn example(ctx: &mut Context) -> CommandResult {
+/// # async fn example(ctx: &Context) -> CommandResult {
 /// # let mut message = ChannelId(7).message(&ctx, MessageId(8)).await?;
 /// message.edit(ctx, |m| {
 ///     m.content("hello")

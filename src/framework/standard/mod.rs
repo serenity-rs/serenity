@@ -83,12 +83,12 @@ pub enum DispatchError {
     __Nonexhaustive,
 }
 
-type DispatchHook = for<'fut> fn(&'fut mut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;
-type BeforeHook = for<'fut> fn(&'fut mut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool>;
-type AfterHook = for<'fut> fn(&'fut mut Context, &'fut Message, &'fut str, Result<(), CommandError>) -> BoxFuture<'fut, ()>;
-type UnrecognisedHook = for<'fut> fn(&'fut mut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, ()>;
-type NormalMessageHook = for<'fut> fn(&'fut mut Context, &'fut Message) -> BoxFuture<'fut, ()>;
-type PrefixOnlyHook = for<'fut> fn(&'fut mut Context, &'fut Message) -> BoxFuture<'fut, ()>;
+type DispatchHook = for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;
+type BeforeHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool>;
+type AfterHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str, Result<(), CommandError>) -> BoxFuture<'fut, ()>;
+type UnrecognisedHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, ()>;
+type NormalMessageHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
+type PrefixOnlyHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -241,7 +241,7 @@ impl StandardFramework {
 
     async fn should_fail<'a>(
         &'a self,
-        ctx: &'a mut Context,
+        ctx: &'a Context,
         msg: &'a Message,
         args: &'a mut Args,
         command: &'static CommandOptions,
@@ -352,14 +352,14 @@ impl StandardFramework {
     ///
     /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
     /// #[command]
-    /// async fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    /// async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "pong!").await?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[command]
-    /// async fn pong(ctx: &mut Context, msg: &Message) -> CommandResult {
+    /// async fn pong(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "ping!").await?;
     ///
     ///     Ok(())

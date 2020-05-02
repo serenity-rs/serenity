@@ -737,7 +737,7 @@ impl Cache {
     /// # use serenity::framework::standard::{CommandResult, macros::command};
     /// #
     /// # #[command]
-    /// # async fn test(context: &mut Context) -> CommandResult {
+    /// # async fn test(context: &Context) -> CommandResult {
     /// if let Some(user) = context.cache.read().await.user(7) {
     ///     println!("User with Id 7 is currently named {}", user.read().await.name);
     /// }

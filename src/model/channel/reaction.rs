@@ -6,12 +6,12 @@ use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::{
     error::Error as StdError,
     fmt::{
+        self,
         Display,
         Formatter,
         Result as FmtResult,
         Write as FmtWrite
     },
-    str::FromStr
 };
 
 use crate::internal::prelude::*;
@@ -20,6 +20,8 @@ use crate::internal::prelude::*;
 use crate::http::Http;
 #[cfg(all(feature = "http", feature = "model"))]
 use log::warn;
+use std::convert::TryFrom;
+use std::str::FromStr;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -108,6 +110,40 @@ impl Reaction {
             .http()
             .delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
             .await
+    }
+
+    /// Deletes all reactions from the message with this emoji.
+    ///
+    /// Requires the [Manage Messages] permission
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, then returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required [permissions].
+    ///
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [permissions]: ../permissions/index.html
+    #[cfg(feature = "http")]
+    pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                let req = Permissions::MANAGE_MESSAGES;
+
+                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
+                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                }
+            }
+        }
+
+        cache_http.http().as_ref()
+            .delete_message_reaction_emoji(
+                self.channel_id.0,
+                self.message_id.0,
+                &self.emoji
+        ).await
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -360,7 +396,7 @@ impl From<char> for ReactionType {
     /// #
     /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # async fn example(ctx: &mut Context) -> CommandResult {
+    /// # async fn example(ctx: &Context) -> CommandResult {
     /// #   let message = ChannelId(0).message(&ctx.http, 0).await?;
     /// #
     /// message.react(ctx, '🍎').await?;
@@ -402,11 +438,33 @@ impl From<EmojiIdentifier> for ReactionType {
     }
 }
 
-impl From<String> for ReactionType {
-    fn from(unicode: String) -> ReactionType { ReactionType::Unicode(unicode) }
+#[derive(Debug)]
+pub struct ReactionConversionError;
+
+impl Display for ReactionConversionError {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        write!(f, "failed to convert from a string to ReactionType")
+    }
 }
 
-impl<'a> From<&'a str> for ReactionType {
+impl std::error::Error for ReactionConversionError {}
+
+impl TryFrom<String> for ReactionType {
+    type Error = ReactionConversionError;
+
+    fn try_from(emoji_string: String) -> std::result::Result<Self, Self::Error> {
+        if emoji_string.is_empty() {
+            return Err(ReactionConversionError)
+        }
+
+        if !emoji_string.starts_with('<') {
+            return Ok(ReactionType::Unicode(emoji_string))
+        }
+        ReactionType::try_from(&emoji_string[..])
+    }
+}
+
+impl<'a> TryFrom<&'a str> for ReactionType {
     /// Creates a `ReactionType` from a string slice.
     ///
     /// # Examples
@@ -416,14 +474,75 @@ impl<'a> From<&'a str> for ReactionType {
     ///
     /// ```rust
     /// use serenity::model::channel::ReactionType;
+    /// use std::convert::TryInto;
+    /// use std::fmt::Debug;
     ///
-    /// fn foo<R: Into<ReactionType>>(bar: R) {
-    ///     println!("{:?}", bar.into());
+    /// fn foo<R: TryInto<ReactionType>>(bar: R)
+    ///     where R::Error: Debug
+    /// {
+    ///     println!("{:?}", bar.try_into().unwrap());
     /// }
     ///
     /// foo("🍎");
     /// ```
-    fn from(unicode: &str) -> ReactionType { ReactionType::Unicode(unicode.to_string()) }
+    ///
+    /// Creating a `ReactionType` from a custom emoji argument in the following format:
+    ///
+    /// ```rust
+    /// use serenity::model::channel::ReactionType;
+    /// use serenity::model::id::EmojiId;
+    /// use std::convert::TryFrom;
+    ///
+    /// let emoji_string = "<:customemoji:600404340292059257>";
+    /// let reaction = ReactionType::try_from(emoji_string).unwrap();
+    /// let reaction2 = ReactionType::Custom {
+    ///     animated: false,
+    ///     id: EmojiId(600404340292059257),
+    ///     name: Some("customemoji".to_string()),
+    /// };
+    ///
+    /// assert_eq!(reaction, reaction2);
+    /// ```
+
+    type Error = ReactionConversionError;
+
+    fn try_from(emoji_str: &str) -> std::result::Result<Self, Self::Error> {
+        if emoji_str.is_empty() {
+            return Err(ReactionConversionError)
+        }
+
+        if !emoji_str.starts_with('<') {
+            return Ok(ReactionType::Unicode(emoji_str.to_string()))
+        }
+
+        if !emoji_str.ends_with('>') {
+            return Err(ReactionConversionError);
+        }
+
+        let emoji_str = emoji_str.trim_matches(&['<', '>'] as &[char]);
+
+        let mut split_iter = emoji_str.split(':');
+
+        let animated = split_iter.next().ok_or(ReactionConversionError)? == "a";
+
+        let name = split_iter
+            .next()
+            .ok_or(ReactionConversionError)?
+            .to_string()
+            .into();
+
+        let id = split_iter
+            .next()
+            .and_then(|s| s.parse::<u64>().ok())
+            .ok_or(ReactionConversionError)?
+            .into();
+
+        Ok(ReactionType::Custom {
+            animated,
+            id,
+            name,
+        })
+    }
 }
 
 // TODO: Change this to `!` once it becomes stable.
@@ -443,10 +562,10 @@ impl StdError for NeverFails {
 }
 
 impl FromStr for ReactionType {
-    type Err = NeverFails;
+    type Err = ReactionConversionError;
 
-    fn from_str(s: &str) -> ::std::result::Result<Self, Self::Err> {
-        Ok(ReactionType::from(s))
+    fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
+        ReactionType::try_from(s)
     }
 }
 

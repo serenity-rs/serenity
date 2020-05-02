@@ -113,7 +113,7 @@ impl From<Reason> for CheckResult {
 }
 
 pub type CheckFunction = for<'fut> fn(
-    &'fut mut Context,
+    &'fut Context,
     &'fut Message,
     &'fut mut Args,
     &'fut CommandOptions,

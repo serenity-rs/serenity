@@ -293,6 +293,19 @@ impl Route {
         )
     }
 
+    pub fn channel_message_reaction_emoji<T>(
+        channel_id: u64,
+        message_id: u64,
+        reaction_type: T
+    ) -> String where T: Display {
+        format!(
+            api!("/channels/{}/messages/{}/reactions/{}"),
+            channel_id,
+            message_id,
+            reaction_type,
+        )
+    }
+
     pub fn channel_message_reactions(
         channel_id: u64,
         message_id: u64,
@@ -705,6 +718,11 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
+    DeleteMessageReactionEmoji {
+        channel_id: u64,
+        message_id: u64,
+        reaction: &'a str,
+    },
     DeletePermission {
         channel_id: u64,
         target_id: u64,
@@ -1041,6 +1059,15 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::channel_message_reactions(
                     channel_id,
                     message_id,
+                )),
+            ),
+            RouteInfo::DeleteMessageReactionEmoji { channel_id, message_id,  reaction} => (
+                LightMethod::Delete,
+                Route::ChannelsIdMessagesIdReactions(channel_id),
+                Cow::from(Route::channel_message_reaction_emoji(
+                    channel_id,
+                    message_id,
+                    reaction,
                 )),
             ),
             RouteInfo::DeleteMessage { channel_id, message_id } => (

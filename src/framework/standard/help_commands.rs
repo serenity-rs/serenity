@@ -26,7 +26,7 @@
 //!
 //! #[help]
 //! async fn my_help(
-//!    context: &mut Context,
+//!    context: &Context,
 //!    msg: &Message,
 //!    args: Args,
 //!    help_options: &'static HelpOptions,
@@ -386,7 +386,7 @@ async fn check_common_behaviour<'a>(
 
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn check_command_behaviour<'a>(
-    ctx: &'a mut Context,
+    ctx: &'a Context,
     msg: &'a Message,
     options: &'a CommandOptions,
     owners: &'a HashSet<UserId>,
@@ -413,7 +413,7 @@ async fn check_command_behaviour<'a>(
 
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn _nested_group_command_search<'rec, 'a: 'rec>(
-    ctx: &'rec mut Context,
+    ctx: &'rec Context,
     msg: &'rec Message,
     groups: &'rec [&'static CommandGroup],
     name: &'rec mut String,
@@ -572,7 +572,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
 
 #[cfg(all(feature = "cache", feature = "http"))]
 fn nested_group_command_search<'rec, 'a: 'rec>(
-    ctx: &'rec mut Context,
+    ctx: &'rec Context,
     msg: &'rec Message,
     groups: &'rec [&'static CommandGroup],
     name: &'rec mut String,
@@ -595,7 +595,7 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
 /// returns similar commands.
 #[cfg(feature = "cache")]
 async fn fetch_single_command<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
     name: &'a str,
@@ -622,7 +622,7 @@ async fn fetch_single_command<'a>(
 #[cfg(feature = "cache")]
 #[allow(clippy::too_many_arguments)]
 async fn fill_eligible_commands<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     commands: &[&'static InternalCommand],
     owners: &HashSet<UserId>,
@@ -686,7 +686,7 @@ async fn fill_eligible_commands<'a>(
 #[cfg(feature = "cache")]
 #[allow(clippy::too_many_arguments)]
 fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
-    ctx: &'rec mut Context,
+    ctx: &'rec Context,
     msg: &'rec Message,
     commands: &'rec [&'static InternalCommand],
     owners: &'rec HashSet<UserId>,
@@ -737,7 +737,7 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
 async fn create_command_group_commands_pair_from_groups<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     groups: &[&'static CommandGroup],
     owners: &HashSet<UserId>,
@@ -767,7 +767,7 @@ async fn create_command_group_commands_pair_from_groups<'a>(
 /// Fetches a single group with its commands.
 #[cfg(feature = "cache")]
 async fn create_single_group(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     group: &CommandGroup,
     owners: &HashSet<UserId>,
@@ -809,7 +809,7 @@ fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool 
 #[cfg(feature = "cache")]
 #[allow(clippy::implicit_hasher)]
 pub fn searched_lowercase<'rec, 'a: 'rec>(
-    ctx: &'rec mut Context,
+    ctx: &'rec Context,
     msg: &'rec Message,
     group: &'rec CommandGroup,
     owners: &'rec HashSet<UserId>,
@@ -879,7 +879,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
 #[cfg(feature = "cache")]
 #[allow(clippy::implicit_hasher)]
 pub async fn create_customised_help_data<'a>(
-    mut ctx: Context,
+    ctx: Context,
     msg: &Message,
     args: &'a Args,
     groups: &[&'static CommandGroup],
@@ -889,7 +889,7 @@ pub async fn create_customised_help_data<'a>(
     if !args.is_empty() {
         let name = args.message();
 
-        return match fetch_single_command(&mut ctx, msg, &groups, &name, &help_options, owners).await {
+        return match fetch_single_command(&ctx, msg, &groups, &name, &help_options, owners).await {
             Ok(single_command) => single_command,
             Err(suggestions) => {
                 let mut searched_named_lowercase = name.to_lowercase();
@@ -897,7 +897,7 @@ pub async fn create_customised_help_data<'a>(
                 for group in groups {
 
                     if let Some(found_command) = searched_lowercase(
-                        &mut ctx,
+                        &ctx,
                         msg,
                         group,
                         owners,
@@ -938,7 +938,7 @@ pub async fn create_customised_help_data<'a>(
     };
 
     let listed_groups = create_command_group_commands_pair_from_groups(
-        &mut ctx,
+        &ctx,
         msg,
         &groups,
         owners,
@@ -1230,7 +1230,7 @@ async fn send_error_embed(
 ///
 /// #[help]
 /// async fn my_help(
-///     context: &mut Context,
+///     context: &Context,
 ///     msg: &Message,
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
@@ -1246,7 +1246,7 @@ async fn send_error_embed(
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn with_embeds(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,
@@ -1422,7 +1422,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///
 /// #[help]
 /// async fn my_help(
-///     context: &mut Context,
+///     context: &Context,
 ///     msg: &Message,
 ///     args: Args,
 ///     help_options: &'static HelpOptions,
@@ -1438,7 +1438,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 #[cfg(all(feature = "cache", feature = "http"))]
 #[allow(clippy::implicit_hasher)]
 pub async fn plain(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     args: Args,
     help_options: &HelpOptions,

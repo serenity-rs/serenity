@@ -91,7 +91,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # async fn example(context: &mut Context) -> CommandResult {
+    /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().await.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read().await;
     /// #
@@ -127,7 +127,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # async fn example(context: &mut Context) -> CommandResult {
+    /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().await.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read().await;
     /// #
@@ -161,7 +161,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # async fn example(context: &mut Context) -> CommandResult {
+    /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().await.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read().await;
     /// #
@@ -196,7 +196,7 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # async fn example(context: &mut Context) -> CommandResult {
+    /// # async fn example(context: &Context) -> CommandResult {
     /// #     let channel = context.cache.read().await.guild_channel(81384788765712384).unwrap();
     /// #     let channel = channel.read().await;
     /// #

@@ -72,7 +72,7 @@ impl Emoji {
     /// # use serenity::model::prelude::{EmojiId, Emoji, Role};
     /// #
     /// # #[command]
-    /// # async fn example(ctx: &mut Context) -> CommandResult {
+    /// # async fn example(ctx: &Context) -> CommandResult {
     /// #     let mut emoji = serde_json::from_value::<Emoji>(json!({
     /// #         "animated": false,
     /// #         "id": EmojiId(7),

@@ -57,7 +57,7 @@ pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'
 }
 
 async fn find_prefix<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     config: &Configuration,
     stream: &Stream<'a>,
@@ -98,7 +98,7 @@ async fn find_prefix<'a>(
 /// [`Configuration::dynamic_prefix`]: ../struct.Configuration.html#method.dynamic_prefix
 /// [`Configuration::prefix`]: ../struct.Configuration.html#method.prefix
 pub async fn prefix<'a>(
-    ctx: &mut Context,
+    ctx: &Context,
     msg: &Message,
     stream: &mut Stream<'a>,
     config: &Configuration,
