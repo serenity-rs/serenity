@@ -5,6 +5,10 @@
 //! * Share audio data between calls and threads, for commonly reused sound effects or
 //!   interactive experiences.
 //!
+//! Cached sources share the [same underlying design](https://mcfelix.me/blog/shared-buffers/),
+//! where reads which do not exceed the current stored length are lock-free. New data enters a rope
+//! data structure, and is copied to contiguous storage on completion.
+//!
 //! [`Input`]: ../struct.Input.html
 //! [`ffmpeg`]: ../fn.ffmpeg.html
 
@@ -70,6 +74,98 @@ use crate::voice::{
 use super::{utils, Input, ReadAudioExt, Reader};
 use log::{debug, warn};
 
+/// 
+#[derive(Copy, Clone, Debug)]
+pub enum LengthHint {
+    Bytes(usize),
+    Time(Duration),
+}
+
+impl From<usize> for LengthHint {
+    fn from(size: usize) -> Self {
+        LengthHint::Bytes(size)
+    }
+}
+
+impl From<Duration> for LengthHint {
+    fn from(size: Duration) -> Self {
+        LengthHint::Time(size)
+    }
+}
+
+/// Configuration for the internals of cached [`Input`]s, such as
+/// [`MemorySource`].
+///
+/// [`Input`]: ../struct.Input.html
+/// [`MemorySource`]: struct.MemorySource.html
+#[derive(Copy, Clone, Debug)]
+pub struct CacheConfig {
+    chunk_size: usize,
+    spawn_finaliser: bool,
+    use_backing: bool,
+    length_hint: Option<LengthHint>,
+}
+
+impl CacheConfig {
+    pub fn new() -> Self {
+        Self {
+            chunk_size: 0,
+            spawn_finaliser: true,
+            use_backing: true,
+            length_hint: None,
+        }
+    }
+
+    /// The amount of bytes to allocate any time more space is required to
+    /// store the stream.
+    ///
+    /// A larger value is generally preferred for minimising locking and allocations
+    /// but may reserve too much space before the struct is finalised.
+    ///
+    /// If this is smaller than the minimum contiguous bytes needed for a coding type,
+    /// or unspecified, then this will default to an estimated 5 seconds.
+    pub fn chunk_size(&mut self, size: usize) -> &mut Self {
+        self.chunk_size = size;
+        self
+    }
+
+    /// Allocate a contiguous backing store to speed up reads after the stream ends.
+    ///
+    /// Defaults to `true`.
+    pub fn use_backing(&mut self, val: bool) -> &mut Self {
+        self.use_backing = val;
+        self
+    }
+
+    /// Spawn a new thread to move contents of the rope into backing storage once
+    /// a stream completes.
+    ///
+    /// Disabling this may negatively impact audio mixing performance.
+    ///
+    /// Defaults to `true`.
+    pub fn spawn_finaliser(&mut self, val: bool) -> &mut Self {
+        self.spawn_finaliser = val;
+        self
+    }
+
+    /// Estimate for the amount of data required to store the completed stream.
+    ///
+    /// On `None`, this will default to `Bytes(chunk_size)`, or use the track time supplied
+    /// by metadata if available.
+    ///
+    /// Defaults to `None`.
+    pub fn length_hint(&mut self, hint: Option<LengthHint>) -> &mut Self {
+        self.length_hint = hint;
+        self
+    }
+}
+
+impl Default for CacheConfig {
+    fn default() -> Self {
+        Self::new()
+    }
+}
+
 /// A wrapper around an existing [`Input`] which caches
 /// the decoded and converted audio data locally in memory.
 ///
@@ -100,17 +196,9 @@ impl MemorySource {
     /// needless allocations and copies.
     ///
     /// [`Input`]: struct.Input.html
-    pub fn new(source: Input, length_hint: Option<Duration>) -> Self {
-        let stereo = source.stereo;
-        let chunk_size = utils::timestamp_to_byte_count(Duration::from_secs(5), stereo);
-
-        let start_size = if let Some(length) = length_hint {
-            utils::timestamp_to_byte_count(length, stereo)
-        } else {
-            chunk_size
-        };
-
-        let core_raw = RawStore::new(source, EncodingData::FloatPcm, chunk_size, start_size);
+    pub fn new(source: Input, config: Option<CacheConfig>) -> Self {
+        let core_raw = RawStore::new(source, EncodingData::FloatPcm, config)
+            .expect("This should only be fallible for Opus caches.");
 
         Self {
             cache: AudioCache::new(core_raw),
@@ -229,43 +317,24 @@ impl CompressedSource {
     /// needless allocations and copies.
     ///
     /// [`Input`]: struct.Input.html
-    pub fn new(source: Input, bitrate: Bitrate, length_hint: Option<Duration>) -> Result<Self> {
+    pub fn new(source: Input, bitrate: Bitrate, config: Option<CacheConfig>) -> Result<Self> {
         let channels = if source.stereo { Channels::Stereo } else { Channels::Mono };
         let mut encoder = OpusEncoder::new(SampleRate::Hz48000, channels, Application::Audio)?;
 
         encoder.set_bitrate(bitrate)?;
 
-        Self::with_encoder(source, encoder, length_hint)
+        Self::with_encoder(source, encoder, config)
     }
 
     /// Wrap an existing [`Input`] with an in-memory store, compressed using a user-defined
     /// Opus encoder.
     ///
-    /// `length_hint` functions as in [`new`].
+    /// `length_hint` functions as in [`new`]. This function's behaviour is undefined if your encoder
+    /// has a different sample rate than 48kHz.
     ///
     /// [`Input`]: struct.Input.html
     /// [`new`]: #method.new
-    pub fn with_encoder(source: Input, encoder: OpusEncoder, length_hint: Option<Duration>) -> Result<Self> {
-        let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();
-        let bitrate = encoder.bitrate()?;
-
-        let bitrate_raw = match bitrate {
-            Bitrate::BitsPerSecond(i) => i,
-            Bitrate::Auto => 64_000,
-            Bitrate::Max => 510_000,
-        } as usize;
-
-        let est_cost_per_sec = (bitrate_raw / 8) + framing_cost_per_sec;
-
-        let chunk_size = est_cost_per_sec * 5;
-
-        let start_size = if let Some(length) = length_hint {
-            let sec_count = length.as_secs() + if length.subsec_nanos() != 0 { 1 } else { 0 };
-            est_cost_per_sec * sec_count as usize
-        } else {
-            chunk_size
-        };
-
+    pub fn with_encoder(source: Input, encoder: OpusEncoder, config: Option<CacheConfig>) -> Result<Self> {
         let encoder_data = EncodingData::Opus{
             encoder,
             last_frame: Vec::with_capacity(4000),//256 + est_cost_per_sec / AUDIO_FRAME_RATE),
@@ -273,9 +342,7 @@ impl CompressedSource {
         };
 
         let stereo = source.stereo;
-
-        let core_raw = RawStore::new(source, encoder_data, chunk_size, start_size);
-
+        let core_raw = RawStore::new(source, encoder_data, config)?;
         let decoder = utils::decoder(stereo)?;
 
         // FIXME: does not take into account actual encoder params.
@@ -571,6 +638,24 @@ enum EncodingData {
 }
 
 impl EncodingData {
+    fn cost_per_second(&self, stereo: bool) -> Result<usize> {
+        match self {
+            Self::FloatPcm => Ok(utils::timestamp_to_byte_count(Duration::from_secs(1), stereo)),
+            Self::Opus{ encoder, .. } => {
+                let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();
+                let bitrate = encoder.bitrate()?;
+
+                let bitrate_raw = match bitrate {
+                    Bitrate::BitsPerSecond(i) => i,
+                    Bitrate::Auto => 64_000,
+                    Bitrate::Max => 512_000,
+                } as usize;
+
+                Ok((bitrate_raw / 8) + framing_cost_per_sec)
+            },
+        }
+    }
+
     fn lookahead(&self) -> IoResult<usize> {
         match self {
             Self::FloatPcm => Ok(0),
@@ -737,6 +822,8 @@ impl FinaliseState {
 // Shared basis for the below cache-based seekables.
 #[derive(Debug)]
 struct RawStore {
+    config: CacheConfig,
+
     len: AtomicUsize,
     audio_len: AtomicUsize,
     finalised: AtomicU8,
@@ -746,9 +833,6 @@ struct RawStore {
     source: Option<Box<Input>>,
     stereo: bool,
 
-    chunk_size: usize,
-    spawn_finaliser: bool,
-
     backing_store: Option<Vec<u8>>,
     rope: Option<LinkedList<BufferChunk>>,
     rope_users: AtomicUsize,
@@ -756,13 +840,38 @@ struct RawStore {
 }
 
 impl RawStore {
-    fn new(source: Input, inner_type: EncodingData, chunk_size: usize, start_size: usize) -> Self {
+    fn new(source: Input, inner_type: EncodingData, config: Option<CacheConfig>) -> Result<Self> {
+        let mut config = config.unwrap_or_else(Default::default);
         let stereo = source.stereo;
+        let cost_per_sec = inner_type.cost_per_second(stereo)?;
+        let min_bytes = inner_type.min_bytes_required();
+
+        if config.chunk_size < min_bytes {
+            config.chunk_size = cost_per_sec * 5;
+        };
+
+        let mut start_size = if let Some(length) = config.length_hint {
+            match length {
+                LengthHint::Bytes(a) => a,
+                LengthHint::Time(t) => {
+                    let s = t.as_secs() + if t.subsec_millis() > 0 { 1 } else { 0 };
+                    (s as usize) * cost_per_sec
+                }
+            }
+        } else {
+            config.chunk_size
+        };
+
+        if start_size < min_bytes {
+            start_size = cost_per_sec * 5;
+        }
 
         let mut list = LinkedList::new();
         list.push_back(BufferChunk::new(Default::default(), start_size));
 
-        Self {
+        Ok(Self {
+            config,
+
             len: Default::default(),
             audio_len: Default::default(),
             finalised: AtomicU8::new(FinaliseState::Live.into()),
@@ -772,14 +881,11 @@ impl RawStore {
             source: Some(Box::new(source)),
             stereo,
 
-            chunk_size,
-            spawn_finaliser: true,
-
             backing_store: None,
             rope: Some(list),
             rope_users: AtomicUsize::new(1),
             lock: Mutex::new(()),
-        }
+        })
     }
 
     fn len(&self) -> usize {
@@ -814,7 +920,7 @@ impl RawStore {
         ).into();
         
         if state_on_call.is_source_live() {
-            if self.spawn_finaliser {
+            if self.config.spawn_finaliser {
                 true
             } else {
                 self.do_finalise();
@@ -826,6 +932,14 @@ impl RawStore {
     }
 
     fn do_finalise(&mut self) {
+        if !self.config.use_backing {
+            // If we don't want to use backing, then still remove the source.
+            // This state will prevent anyone from trying to use the backing store.
+            self.source = None;
+            self.finalised.store(FinaliseState::Finalising.into(), Ordering::Release);
+            return;
+        }
+
         let backing_len = self.len();
 
         // Move the rope of bytes into the backing store.
@@ -928,7 +1042,9 @@ impl RawStore {
         let mut backing_len = self.len();
 
         // If should upgrade, then we take from backing.
-        let mut should_upgrade = matches!(loc, CacheReadLocation::Roped) && finalised.is_backing_ready();
+        let mut should_upgrade = matches!(loc, CacheReadLocation::Roped)
+            && finalised.is_backing_ready();
+
         if should_upgrade {
             loc = CacheReadLocation::Backed;
         }
@@ -937,7 +1053,7 @@ impl RawStore {
 
         let target_len = pos + buf.len();
 
-        let out = if finalised.is_backing_ready() || target_len <= backing_len {
+        let out = if finalised.is_source_finished() || target_len <= backing_len {
             // If finalised, there is zero risk of triggering more writes.
             let read_amt = buf.len().min(backing_len - pos);
             Ok(self.read_from_local(pos, loc, buf, read_amt))
@@ -1046,7 +1162,7 @@ impl RawStore {
                 // Make a new chunk!
                 rope.push_back(BufferChunk::new(
                     end,
-                    self.chunk_size,
+                    self.config.chunk_size,
                 ));
             } else {
                 rope_el.data.resize(new_len, 0);
