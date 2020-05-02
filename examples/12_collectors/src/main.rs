@@ -86,7 +86,7 @@ async fn main() {
 #[command]
 async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     let mut score = 0u32;
-    let _ =  msg.reply(&ctx, "How was that crusty crab called again? 10 seconds time!").await;
+    let _ =  msg.reply(ctx, "How was that crusty crab called again? 10 seconds time!").await;
 
     // There are methods implemented for some models to conveniently collect replies.
     // This one returns a future that will await a single message only.
@@ -118,14 +118,14 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         let emoji = &reaction.as_inner_ref().emoji;
 
         let _ = match emoji.as_data().as_str() {
-            "1️⃣" => { score += 1; msg.reply(&ctx, "That's correct!").await },
-            _ => msg.reply(&ctx, "Wrong!").await,
+            "1️⃣" => { score += 1; msg.reply(ctx, "That's correct!").await },
+            _ => msg.reply(ctx, "Wrong!").await,
         };
     } else {
-        let _ = msg.reply(&ctx, "No reaction within 10 seconds.").await;
+        let _ = msg.reply(ctx, "No reaction within 10 seconds.").await;
     };
 
-    let _ = msg.reply(&ctx, "Write 5 messages in 10 seconds").await;
+    let _ = msg.reply(ctx, "Write 5 messages in 10 seconds").await;
 
     // We can create a collector from scratch too using this builder future.
     let collector = MessageCollectorBuilder::new(&ctx)
@@ -157,7 +157,7 @@ async fn challenge(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
         score += 1;
     }
 
-    let _ = msg.reply(&ctx, &format!("You completed {} out of 3 tasks correctly!", score)).await;
+    let _ = msg.reply(ctx, &format!("You completed {} out of 3 tasks correctly!", score)).await;
 
     Ok(())
 }

@@ -102,7 +102,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
     let handler = match manager.get_mut(guild_id) {
         Some(handler) => handler,
         None => {
-            check_msg(msg.reply(&ctx, "Not in a voice channel").await);
+            check_msg(msg.reply(ctx, "Not in a voice channel").await);
 
             return Ok(());
         },
