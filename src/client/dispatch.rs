@@ -234,90 +234,81 @@ pub(crate) fn dispatch<'rec>(
 
                 if let DispatchEvent::Model(event) = event {
                     let event_handler = Arc::clone(rh);
+                    #[cfg(not(feature = "cache"))]
+                    let context = context(data, runner_tx, shard_id, &cache_and_http.http);
+                    #[cfg(feature = "cache")]
+                    let context = context(data, runner_tx, shard_id,
+                        &cache_and_http.http,
+                        &cache_and_http.cache
+                    );
 
                     #[cfg(not(feature = "framework"))]
-                    {
-                        #[cfg(not(feature = "cache"))]
-                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                        #[cfg(feature = "cache")]
-                        let context = context(data, runner_tx, shard_id,
-                            &cache_and_http.http,
-                            &cache_and_http.cache
-                        );
-
-                        event_handler.raw_event(context, event).await;
-                    }
+                    // No clone needed, as there will be no framework disaptch.
+                    event_handler.raw_event(context, event).await;
 
                     #[cfg(feature = "framework")]
                     {
-                        #[cfg(not(feature = "cache"))]
-                        let context = context(data, runner_tx, shard_id, &cache_and_http.http);
-                        #[cfg(feature = "cache")]
-                        let context = context(data, runner_tx, shard_id,
-                            &cache_and_http.http,
-                            &cache_and_http.cache
-                        );
-
                         if let Event::MessageCreate(ref msg_event) = event {
-                            let framework = Arc::clone(&framework);
+                            // Must clone in order to dispatch the framework too.
                             let message = msg_event.message.clone();
+                            event_handler.raw_event(context.clone(), event).await;
 
-                            let context2 = context.clone();
-                            tokio::spawn(async move {
-                                event_handler.raw_event(context2, event).await;
-                            });
+                            let framework = Arc::clone(&framework);
 
                             tokio::spawn(async move {
                                 framework.dispatch(context, message).await;
                             });
+                        } else {
+                            // Avoid cloning, if there is no framework-dispatch.
+                            event_handler.raw_event(context, event).await;
                         }
                     }
                 }
             },
-            (Some(_), Some(_)) => {
+            // We call this function again, passing `None` for each event handler
+            // and passing no framework, as we dispatch once we are done right here.
+            (Some(ref handler), Some(ref raw_handler)) => {
                 #[cfg(not(feature = "cache"))]
                 let context = context(data, runner_tx, shard_id, &cache_and_http.http);
                 #[cfg(feature = "cache")]
-                let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
+                let context = context(data, runner_tx, shard_id,
+                    &cache_and_http.http,
+                    &cache_and_http.cache
+                );
 
                 if let DispatchEvent::Model(ref event) = event {
-                    let framework = Arc::clone(&framework);
-                        dispatch(DispatchEvent::Model(event.clone()),
-                                #[cfg(feature = "framework")]
-                                &framework,
-                                data,
-                                &None,
-                                raw_event_handler,
-                                runner_tx,
-                                shard_id,
-                                Arc::clone(&cache_and_http))
-                        .await;
+                    raw_handler.raw_event(context.clone(), event.clone()).await;
+                }
 
-                    #[cfg(feature = "framework")]
-                    {
-                        if let Event::MessageCreate(ref msg_event) = event {
+                match event {
+                    DispatchEvent::Model(Event::MessageCreate(event)) => {
+                        dispatch_message(
+                            context.clone(),
+                            event.message.clone(),
+                            handler,
+                        ).await;
+
+                        #[cfg(feature = "framework")]
+                        {
                             let framework = Arc::clone(&framework);
-
-                            let message = msg_event.message.clone();
+                            let message =  event.message;
                             tokio::spawn(async move {
                                 framework.dispatch(context, message).await;
                             });
                         }
-                    }
+                    },
+                    other =>
+                        handle_event(
+                            other,
+                            data,
+                            handler,
+                            runner_tx,
+                            shard_id,
+                            cache_and_http,
+                        ).await,
                 }
-
-                dispatch(event,
-                    #[cfg(feature = "framework")]
-                    framework,
-                    data,
-                    event_handler,
-                    &None,
-                    runner_tx,
-                    shard_id,
-                    cache_and_http)
-                .await;
-            }
-        };
+            },
+        }
     }.boxed()
 }
 
