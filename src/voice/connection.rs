@@ -375,7 +375,7 @@ impl Connection {
     fn remove_unfinished_files(
         &mut self,
         sources: &mut Vec<Audio>,
-        opus_frame: &[u8],
+        _opus_frame: &[u8],
         mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
         fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
         time_in_call: &mut Duration,
@@ -409,7 +409,6 @@ impl Connection {
             // We'll be fusing streams, so we can either keep
             // as stereo or downmix to mono.
             let is_stereo = true;
-            let source_stereo = stream.is_stereo();
 
             if is_stereo != self.encoder_stereo {
                 let channels = if is_stereo {
@@ -439,7 +438,7 @@ impl Connection {
             if temp_len > 0 {
                 aud.step_frame();
             } else if aud.do_loop() {
-                if let Some(_) = aud.seek_time(Default::default()) {
+                if aud.seek_time(Default::default()).is_some() {
                     fired_track_evts.entry(TrackEvent::Loop)
                         .or_default()
                         .push(i);

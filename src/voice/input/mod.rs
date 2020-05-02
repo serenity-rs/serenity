@@ -3,32 +3,15 @@
 pub mod cached;
 pub mod utils;
 
-use audiopus::{
-    Application,
-    Bitrate,
-    Channels,
-    Error as OpusError,
-    ErrorCode as OpusErrorCode,
-    coder::GenericCtl,
-    coder::Decoder as OpusDecoder,
-    coder::Encoder as OpusEncoder,
-    Result as OpusResult,
-    SampleRate,
-};
+use audiopus::coder::Decoder as OpusDecoder;
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::{CompressedSource, MemorySource};
 use crate::{
     internal::prelude::*,
     prelude::SerenityError,
 };
-use parking_lot::{
-    lock_api::MutexGuard,
-    Mutex,
-};
-use serde_json;
+use parking_lot::Mutex;
 use std::{
-    cell::UnsafeCell,
-    collections::LinkedList,
     ffi::OsStr,
     fmt::{
     	Debug,
@@ -45,27 +28,17 @@ use std::{
         Seek,
         SeekFrom,
     },
-    mem::{
-        self,
-        ManuallyDrop,
-    },
-    ops::{Add, AddAssign, Sub, SubAssign},
+    mem,
     process::{Child, Command, Stdio},
-    sync::{
-        atomic::{AtomicU8, AtomicUsize, Ordering},
-        Arc,
-    },
+    sync::Arc,
     time::Duration,
 };
 use super::{
     AudioType,
-    DcaError,
-    DcaMetadata,
     VoiceError, 
-    audio,
     constants::*,
 };
-use log::{debug, warn};
+use log::debug;
 
 /// Handle for a child process which ensures that any subprocesses are properly closed
 /// on drop.
@@ -167,8 +140,8 @@ impl Debug for Reader {
     		InMemory(a) => format!("{:?}", a),
     		Compressed(a) => format!("{:?}", a),
     		Restartable(a) => format!("{:?}", a),
-    		Extension(_) => format!("Extension"),
-    		ExtensionSeek(_) => format!("ExtensionSeek"),
+    		Extension(_) => "Extension".to_string(),
+    		ExtensionSeek(_) => "ExtensionSeek".to_string(),
     	};
 	    f.debug_tuple("Reader")
 	    	.field(&field)
@@ -294,7 +267,7 @@ impl Read for Input {
                 let mut buffer = &mut buffer[..];
                 while written_floats < float_space {
                     if let Ok(signal) = self.reader.read_i16::<LittleEndian>() {
-                        buffer.write_f32::<LittleEndian>(f32::from(signal) / 32768.0);
+                        buffer.write_f32::<LittleEndian>(f32::from(signal) / 32768.0)?;
                         written_floats += 1;
                     } else {
                         break;
@@ -765,9 +738,6 @@ impl RestartableSource {
     pub fn ytdl<P: AsRef<str> + Send + Clone + 'static>(uri: P) -> Result<Self> {
         Self::new(move |time: Option<Duration>| {
             if let Some(time) = time {
-                let is_stereo = true;
-                let stereo_val = if is_stereo { "2" } else { "1" };
-
                 let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
 
                 _ytdl(uri.as_ref(), &["-ss",&ts,])

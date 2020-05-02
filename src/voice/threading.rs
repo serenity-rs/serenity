@@ -5,7 +5,6 @@ use std::{
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
     thread::Builder as ThreadBuilder,
     time::Duration,
-    time::Instant,
 };
 use super::{
     connection::Connection,

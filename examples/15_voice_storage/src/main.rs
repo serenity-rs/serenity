@@ -38,11 +38,16 @@ use serenity::{
     voice::{
         self,
         Bitrate,
-        CompressedSource,
-        CompressedSourceBase,
         Event,
-        Input,
-        MemorySource,
+        input::{
+            self,
+            cached::{
+                CompressedSource,
+                CompressedSourceBase,
+                MemorySource,
+            },
+            Input,
+        },
         TrackEvent,
     },
 };
@@ -73,7 +78,9 @@ impl From<&CachedSound> for Input {
     fn from(obj: &CachedSound) -> Self {
         use CachedSound::*;
         match obj {
-            Compressed(c) => c.new_handle().into(),
+            Compressed(c) => c.new_handle()
+                .expect("Opus errors on decoder creation are rare if we're copying valid settings.")
+                .into(),
             Uncompressed(u) => u.new_handle().into(),
         }
     }
@@ -115,14 +122,14 @@ fn main() {
         // ahead of time. We do this in both cases to ensure optimal performance for the audio
         // core.
         let ting_src = MemorySource::new(
-            voice::ffmpeg("ting.wav").expect("File should be in root folder."),
+            input::ffmpeg("ting.wav").expect("File should be in root folder."),
             None);
         let _ = ting_src.spawn_loader();
         audio_map.insert("ting".into(), CachedSound::Uncompressed(ting_src));
 
         // Another short sting, to show where each loop occurs.
         let loop_src = MemorySource::new(
-            voice::ffmpeg("loop.wav").expect("File should be in root folder."),
+            input::ffmpeg("loop.wav").expect("File should be in root folder."),
             None);
         let _ = loop_src.spawn_loader();
         audio_map.insert("loop".into(), CachedSound::Uncompressed(loop_src));
@@ -133,10 +140,10 @@ fn main() {
         //
         // Music by Cloudkicker, used under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
         let song_src = CompressedSource::new(
-                voice::ytdl("https://cloudkicker.bandcamp.com/track/7").expect("Link may be dead."),
+                input::ytdl("https://cloudkicker.bandcamp.com/track/7").expect("Link may be dead."),
                 Bitrate::BitsPerSecond(128_000),
                 None,
-            );
+            ).expect("These parameters are well-defined.");
         let _ = song_src.spawn_loader();
         // CompressedSource cannot be sent between threads, so we need to discard some state using
         // `into_sendable`.

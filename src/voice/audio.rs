@@ -7,12 +7,6 @@ use crate::model::event::VoiceSpeakingState;
 use parking_lot::Mutex;
 use std::{
     collections::VecDeque,
-    io::{
-        Read,
-        Result as IoResult,
-        Seek,
-        SeekFrom,
-    },
     sync::{
         mpsc::{
             self,

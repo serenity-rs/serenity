@@ -296,7 +296,7 @@ impl GlobalEvents {
 		// remove audios, too.
 		let to_cull = events.entry(TrackEvent::End).or_default();
 		for (count, index) in to_cull.iter().enumerate() {
-			let mut audio = sources.remove(index - count);
+			let _ = sources.remove(index - count);
 		}
 
 		// Now drain vecs.

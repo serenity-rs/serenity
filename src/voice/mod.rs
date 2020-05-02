@@ -12,8 +12,9 @@ pub mod input;
 mod manager;
 mod payload;
 mod threading;
+pub mod tracks;
 
-use audiopus::Bitrate;
+pub use audiopus::Bitrate;
 
 pub use self::{
     audio::{
@@ -61,6 +62,7 @@ use self::connection_info::ConnectionInfo;
 
 const CRYPTO_MODE: &str = "xsalsa20_poly1305";
 
+#[allow(clippy::large_enum_variant)]
 pub(crate) enum Status {
     Connect(ConnectionInfo),
     Disconnect,

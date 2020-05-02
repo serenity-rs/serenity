@@ -30,20 +30,15 @@ use audiopus::{
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::{
     internal::prelude::*,
-    prelude::SerenityError,
 };
 use parking_lot::{
     lock_api::MutexGuard,
     Mutex,
 };
-use serde_json;
 use std::{
     cell::UnsafeCell,
-    collections::LinkedList,
-    ffi::OsStr,
+    collections::LinkedList,    
     io::{
-        self,
-        BufReader,
         Error as IoError,
         ErrorKind as IoErrorKind,
         Read,
@@ -56,7 +51,6 @@ use std::{
         ManuallyDrop,
     },
     ops::{Add, AddAssign, Sub, SubAssign},
-    process::{Child, Command, Stdio},
     sync::{
         atomic::{AtomicU8, AtomicUsize, Ordering},
         Arc,
@@ -65,14 +59,9 @@ use std::{
 };
 use crate::voice::{
     AudioType,
-    DcaError,
-    DcaMetadata,
-    VoiceError, 
-    audio,
     constants::*,
 };
 use super::{utils, Input, ReadAudioExt, Reader};
-use log::{debug, warn};
 
 /// 
 #[derive(Copy, Clone, Debug)]
@@ -348,7 +337,7 @@ impl CompressedSource {
         // FIXME: does not take into account actual encoder params.
         Ok(Self {
             cache: AudioCache::new(core_raw),
-            decoder: decoder,
+            decoder,
             current_frame: Vec::with_capacity(STEREO_FRAME_SIZE),
             frame_pos: 0,
             audio_pos: 0,
@@ -392,13 +381,13 @@ impl CompressedSource {
     }
 
     /// Completely resets decoder state and reading position.
-    pub fn reset(&mut self) {
+    pub fn reset(&mut self) -> OpusResult<()> {
         self.remaining_lookahead = None;
         self.cache.pos = 0;
         self.audio_pos = 0;
         self.frame_pos = 0;
         self.current_frame.truncate(0);
-        self.decoder.reset_state();
+        self.decoder.reset_state()
     }
 }
 
@@ -513,7 +502,10 @@ impl Seek for CompressedSource {
                 if let Some(new_backing_pos) = self.cache.audio_to_backing_pos(new_pos) {
                     // We now have the start of the frame which includes the desired pos.
                     // NOTE: we hit this branch once finalised, too.
-                    self.reset();
+                    self.reset()
+                        .map_err(|e|
+                            IoError::new(IoErrorKind::Other, e)
+                        )?;
                     self.cache.pos = new_backing_pos.backing_pos;
                     if self.cache.pos != self.cache.core.store_len() {
                         self.frame_pos_override = Some(new_pos - new_backing_pos.audio_pos);
@@ -743,7 +735,9 @@ impl EncodingData {
                 if out.is_none() {
                     // Write from frame we have.
                     let start = if *frame_pos < output_start {
-                        (&mut buf[..output_start]).write_u16::<LittleEndian>(last_frame.len() as u16);
+                        (&mut buf[..output_start]).write_u16::<LittleEndian>(last_frame.len() as u16)
+                            .expect("Minimum bytes requirement for Opus (2) should mean that a u16 \
+                                     may always be written.");
                         *frame_pos += output_start;
 
                         output_start
@@ -892,16 +886,8 @@ impl RawStore {
         self.len.load(Ordering::Acquire)
     }
 
-    fn set_len(&mut self, value: usize) {
-        self.len.store(value, Ordering::Release)
-    }
-
     fn audio_len(&self) -> usize {
         self.audio_len.load(Ordering::Acquire)
-    }
-
-    fn set_audio_len(&mut self, value: usize) {
-        self.audio_len.store(value, Ordering::Release)
     }
 
     fn finalised(&self) -> FinaliseState {
