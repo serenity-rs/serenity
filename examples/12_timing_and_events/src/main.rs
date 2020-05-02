@@ -97,7 +97,7 @@ struct RemindMe;
 
 #[help]
 fn my_help(
-    context: &mut Context,
+    context: &Context,
     msg: &Message,
     args: Args,
     help_options: &'static HelpOptions,
@@ -188,7 +188,7 @@ fn thanks_for_reacting(http: Arc<Http>, channel: ChannelId) ->
 
 #[command]
 #[aliases("add")]
-fn set_reminder(context: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+fn set_reminder(context: &Context, msg: &Message, mut args: Args) -> CommandResult {
     // It might be smart to set a moderately high minimum value for `time`
     // to avoid abuse like tasks that repeat every 100ms, especially since
     // channels have send-message rate limits.

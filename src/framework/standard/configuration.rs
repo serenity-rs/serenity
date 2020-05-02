@@ -3,7 +3,7 @@ use crate::client::Context;
 use crate::model::{channel::Message, id::{UserId, GuildId, ChannelId}};
 use std::collections::HashSet;
 
-type DynamicPrefixHook = dyn Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static;
+type DynamicPrefixHook = dyn Fn(&Context, &Message) -> Option<String> + Send + Sync + 'static;
 
 /// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.
@@ -269,7 +269,7 @@ impl Configuration {
     /// use serenity::framework::standard::{CommandResult, macros::{group, command}};
     ///
     /// #[command]
-    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    /// fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "Pong!")?;
     ///     Ok(())
     /// }
@@ -328,7 +328,7 @@ impl Configuration {
     /// ```
     pub fn dynamic_prefix<F>(&mut self, dynamic_prefix: F) -> &mut Self
     where
-        F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static,
+        F: Fn(&Context, &Message) -> Option<String> + Send + Sync + 'static,
     {
         self.dynamic_prefixes = vec![Box::new(dynamic_prefix)];
 
@@ -338,7 +338,7 @@ impl Configuration {
     #[inline]
     pub fn dynamic_prefixes<F, I: IntoIterator<Item = F>>(&mut self, iter: I) -> &mut Self
     where
-        F: Fn(&mut Context, &Message) -> Option<String> + Send + Sync + 'static,
+        F: Fn(&Context, &Message) -> Option<String> + Send + Sync + 'static,
     {
         self.dynamic_prefixes = iter
             .into_iter()

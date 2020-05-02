@@ -219,7 +219,7 @@ impl ChannelId {
             &reaction_type.into(),
         )
     }
-
+ 
     #[cfg(feature = "http")]
     fn _delete_reaction(
         self,
@@ -235,6 +235,43 @@ impl ChannelId {
             reaction_type,
         )
     }
+
+
+    /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
+    /// 
+    /// **Note**: Requires the [Manage Messages] permission.
+    /// 
+    /// [`Reaction`]: ../channel/struct.Reaction.html
+    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    #[cfg(feature = "http")]
+    #[inline]
+    pub fn delete_reaction_emoji<M, R>(self,
+                                http: impl AsRef<Http>,
+                                message_id: M,
+                                reaction_type: R)
+                                -> Result<()>
+        where M: Into<MessageId>, R: Into<ReactionType> {
+            self._delete_reaction_emoji(
+                &http,
+                message_id.into(),
+                &reaction_type.into()
+            )
+    }
+
+    #[cfg(feature = "http")]
+    fn _delete_reaction_emoji(
+        self,
+        http: impl AsRef<Http>,
+        message_id: MessageId,
+        reaction_type: &ReactionType,
+    ) -> Result<()> {
+        http.as_ref().delete_message_reaction_emoji(
+            self.0,
+            message_id.0,
+            reaction_type
+        )
+    }
+
 
 
     /// Edits the settings of a [`Channel`], optionally setting new values.

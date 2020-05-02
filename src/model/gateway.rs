@@ -86,7 +86,7 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn activity(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
+    /// fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::playing(&name));
     ///
@@ -133,7 +133,7 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn stream(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
+    /// fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     const STREAM_URL: &str = "...";
     ///
     ///     let name = args.message();
@@ -181,7 +181,7 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn listen(ctx: &mut Context, _msg: &Message, args: Args) -> CommandResult {
+    /// fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
     ///     ctx.set_activity(Activity::listening(&name));
     ///

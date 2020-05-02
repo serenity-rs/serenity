@@ -114,11 +114,11 @@ fn main() {
 }
 
 #[command]
-fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
+fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
-            check_msg(msg.reply(&ctx, "Requires a valid voice channel ID be given"));
+            check_msg(msg.reply(ctx, "Requires a valid voice channel ID be given"));
 
             return Ok(());
         },
@@ -147,7 +147,7 @@ fn join(ctx: &mut Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
-fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
         Some(channel) => channel.read().guild_id,
         None => {
@@ -166,14 +166,14 @@ fn leave(ctx: &mut Context, msg: &Message) -> CommandResult {
 
         check_msg(msg.channel_id.say(&ctx.http,"Left voice channel"));
     } else {
-        check_msg(msg.reply(&ctx, "Not in a voice channel"));
+        check_msg(msg.reply(ctx, "Not in a voice channel"));
     }
 
     Ok(())
 }
 
 #[command]
-fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     check_msg(msg.channel_id.say(&ctx.http,"Pong!"));
 
     Ok(())

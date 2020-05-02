@@ -80,12 +80,12 @@ pub enum DispatchError {
     __Nonexhaustive,
 }
 
-pub type DispatchHook = dyn Fn(&mut Context, &Message, DispatchError) + Send + Sync + 'static;
-type BeforeHook = dyn Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static;
-type AfterHook = dyn Fn(&mut Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static;
-type UnrecognisedHook = dyn Fn(&mut Context, &Message, &str) + Send + Sync + 'static;
-type NormalMessageHook = dyn Fn(&mut Context, &Message) + Send + Sync + 'static;
-type PrefixOnlyHook = dyn Fn(&mut Context, &Message) + Send + Sync + 'static;
+pub type DispatchHook = dyn Fn(&Context, &Message, DispatchError) + Send + Sync + 'static;
+type BeforeHook = dyn Fn(&Context, &Message, &str) -> bool + Send + Sync + 'static;
+type AfterHook = dyn Fn(&Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static;
+type UnrecognisedHook = dyn Fn(&Context, &Message, &str) + Send + Sync + 'static;
+type NormalMessageHook = dyn Fn(&Context, &Message) + Send + Sync + 'static;
+type PrefixOnlyHook = dyn Fn(&Context, &Message) + Send + Sync + 'static;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -238,7 +238,7 @@ impl StandardFramework {
 
     fn should_fail(
         &mut self,
-        ctx: &mut Context,
+        ctx: &Context,
         msg: &Message,
         args: &mut Args,
         command: &'static CommandOptions,
@@ -342,14 +342,14 @@ impl StandardFramework {
     ///
     /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
     /// #[command]
-    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
+    /// fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "pong!")?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[command]
-    /// fn pong(ctx: &mut Context, msg: &Message) -> CommandResult {
+    /// fn pong(ctx: &Context, msg: &Message) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "ping!")?;
     ///
     ///     Ok(())
@@ -443,7 +443,7 @@ impl StandardFramework {
     /// ```
     pub fn on_dispatch_error<F>(mut self, f: F) -> Self
     where
-        F: Fn(&mut Context, &Message, DispatchError) + Send + Sync + 'static,
+        F: Fn(&Context, &Message, DispatchError) + Send + Sync + 'static,
     {
         self.dispatch = Some(Arc::new(f));
 
@@ -453,7 +453,7 @@ impl StandardFramework {
     /// Specify the function to be called on messages comprised of only the prefix.
     pub fn prefix_only<F>(mut self, f: F) -> Self
     where
-        F: Fn(&mut Context, &Message) + Send + Sync + 'static
+        F: Fn(&Context, &Message) + Send + Sync + 'static
     {
         self.prefix_only = Some(Arc::new(f));
 
@@ -511,7 +511,7 @@ impl StandardFramework {
     ///
     pub fn before<F>(mut self, f: F) -> Self
     where
-        F: Fn(&mut Context, &Message, &str) -> bool + Send + Sync + 'static,
+        F: Fn(&Context, &Message, &str) -> bool + Send + Sync + 'static,
     {
         self.before = Some(Arc::new(f));
 
@@ -544,7 +544,7 @@ impl StandardFramework {
     /// ```
     pub fn after<F>(mut self, f: F) -> Self
     where
-        F: Fn(&mut Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static,
+        F: Fn(&Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static,
     {
         self.after = Some(Arc::new(f));
 
@@ -573,7 +573,7 @@ impl StandardFramework {
     /// ```
     pub fn unrecognised_command<F>(mut self, f: F) -> Self
     where
-        F: Fn(&mut Context, &Message, &str) + Send + Sync + 'static,
+        F: Fn(&Context, &Message, &str) + Send + Sync + 'static,
     {
         self.unrecognised_command = Some(Arc::new(f));
 
@@ -602,7 +602,7 @@ impl StandardFramework {
     /// ```
     pub fn normal_message<F>(mut self, f: F) -> Self
     where
-        F: Fn(&mut Context, &Message) + Send + Sync + 'static,
+        F: Fn(&Context, &Message) + Send + Sync + 'static,
     {
         self.normal_message = Some(Arc::new(f));
 
