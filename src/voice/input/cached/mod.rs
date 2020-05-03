@@ -319,7 +319,7 @@ impl CompressedSource {
     /// Opus encoder.
     ///
     /// `length_hint` functions as in [`new`]. This function's behaviour is undefined if your encoder
-    /// has a different sample rate than 48kHz.
+    /// has a different sample rate than 48kHz, and if the decoder has a different channel count from the source.
     ///
     /// [`Input`]: struct.Input.html
     /// [`new`]: #method.new
@@ -334,7 +334,6 @@ impl CompressedSource {
         let core_raw = RawStore::new(source, encoder_data, config)?;
         let decoder = utils::decoder(stereo)?;
 
-        // FIXME: does not take into account actual encoder params.
         Ok(Self {
             cache: AudioCache::new(core_raw),
             decoder,

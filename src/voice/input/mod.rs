@@ -86,8 +86,8 @@ pub enum Reader {
     InMemory(MemorySource),
     Compressed(CompressedSource),
     Restartable(RestartableSource),
-    Extension(Box<dyn Read + Send + 'static>),
-    ExtensionSeek(Box<dyn ReadSeek + Send + 'static>),
+    Extension(Box<dyn Read + Send>),
+    ExtensionSeek(Box<dyn ReadSeek + Send>),
 }
 
 impl Reader {
@@ -468,11 +468,11 @@ fn _ffmpeg(path: &OsStr) -> Result<Input> {
 /// Pass options to create a custom ffmpeg streamer:
 ///
 /// ```rust,no_run
-/// use serenity::voice;
+/// use serenity::voice::input;
 ///
 /// let stereo_val = "2";
 ///
-/// let streamer = voice::ffmpeg_optioned("./some_file.mp3", &[], &[
+/// let streamer = input::ffmpeg_optioned("./some_file.mp3", &[], &[
 ///     "-f",
 ///     "s16le",
 ///     "-ac",
