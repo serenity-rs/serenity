@@ -5,6 +5,7 @@ use crate::voice::input::{
 	},
 	AudioType,
 	Input,
+	ReadAudioExt,
 	Reader,
 };
 use std::io::{Cursor, Read};
@@ -25,4 +26,21 @@ fn memory_source_output_matches_input() {
 	}
 
 	assert_eq!(input_bytes, output_bytes);
+
+	let mut test_buf = [0u8; 1];
+	assert!(matches!(src.read(&mut test_buf[..]), Ok(0usize)));
+	assert_eq!(&test_buf, &[0u8]);
+}
+
+#[test]
+fn memory_source_wont_read_past_end() {
+	let input_bytes: Vec<u8> = vec![0, 1, 2, 3, 4];
+	let input = Input::new(false, Reader::Extension(Box::new(Cursor::new(input_bytes.clone()))), AudioType::FloatPcm, None);
+	let mut src = MemorySource::new(input, None);
+
+	let _ = src.consume(input_bytes.len());
+
+	let mut test_buf = [0u8; 1];
+	assert!(matches!(src.read(&mut test_buf[..]), Ok(0usize)));
+	assert_eq!(&test_buf, &[0u8]);
 }

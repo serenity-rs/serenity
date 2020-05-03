@@ -39,6 +39,7 @@ features = ["serde"]
 version = "0.4"
 
 [dependencies.discortp]
+features = ["discord"]
 optional = true
 # version = "1.0"
 git = "https://github.com/FelixMcFelix/discortp"

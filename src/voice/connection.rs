@@ -21,6 +21,15 @@ use crate::internal::{
     Timer
 };
 use crate::model::event::{VoiceEvent, VoiceSpeakingState};
+use discortp::{
+    discord::{
+        IpDiscoveryPacket,
+        IpDiscoveryType,
+        MutableIpDiscoveryPacket,
+
+    },
+    rtp::MutableRtpPacket,
+};
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
@@ -143,40 +152,32 @@ impl Connection {
             .next()
             .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
 
-        // Important to note here: the length of the packet can be of either 4
-        // or 70 bytes. If it is 4 bytes, then we need to send a 70-byte packet
-        // to determine the IP.
-        //
-        // Past the initial 4 bytes, the packet _must_ be completely empty data.
-        //
-        // The returned packet will be a null-terminated string of the IP, and
-        // the port encoded in LE in the last two bytes of the packet.
         let udp = UdpSocket::bind("0.0.0.0:0")?;
 
+        // Follow Discord's IP Discovery procedures, in case NAT tunnelling is needed.
+        let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
         {
-            let mut bytes = [0; 70];
+            let mut view = MutableIpDiscoveryPacket::new(&mut bytes[..])
+                .expect("[Voice] There are enough bytes to encode a discovery packet.");
+            view.set_pkt_type(IpDiscoveryType::Request);
+            view.set_length(70);
+            view.set_ssrc(ready.ssrc);
+        }
 
-            (&mut bytes[..]).write_u32::<BigEndian>(ready.ssrc)?;
-            udp.send_to(&bytes, destination)?;
+        udp.send_to(&bytes, destination)?;
 
-            let mut bytes = [0; 256];
-            let (len, _addr) = udp.recv_from(&mut bytes)?;
+        let (len, _addr) = udp.recv_from(&mut bytes)?;
+        {
+            let view = IpDiscoveryPacket::new(&bytes[..len])
+                .expect("[voice] Should be enough space to view a packet we just fully received.");
 
-            // Find the position in the bytes that contains the first byte of 0,
-            // indicating the "end of the address".
-            let index = bytes
-                .iter()
-                .skip(4)
-                .position(|&x| x == 0)
-                .ok_or(Error::Voice(VoiceError::FindingByte))?;
+            debug_assert!(
+                view.get_pkt_type() == IpDiscoveryType::Response,
+                "[Voice] Server responded with illegal Ip Discovery packet type.",
+            );
 
-            let pos = 4 + index;
-            let addr = String::from_utf8_lossy(&bytes[4..pos]);
-            let port_pos = len - 2;
-            let port = (&bytes[port_pos..]).read_u16::<BigEndian>()?;
-
-            client
-                .send_json(&payload::build_select_protocol(addr, port))?;
+            let addr = String::from_utf8_lossy(&view.get_address_raw());
+            client.send_json(&payload::build_select_protocol(addr, view.get_port()))?;
         }
 
         let key = encryption_key(&mut client)?;
@@ -759,6 +760,7 @@ fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>
         .spawn(move || {
             'outer: loop {
                 while let Ok(Some(value)) = client.lock().try_recv_json() {
+                    debug!("VOX WS {:#?}", value);
                     let msg = match VoiceEvent::deserialize(value) {
                         Ok(msg) => msg,
                         Err(_) => break,
