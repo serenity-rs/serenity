@@ -5,7 +5,7 @@ authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies]
-serenity = { path = "../../", default-features = true }
+serenity = { path = "../../", default-features = false, features = ["client", "rustls_backend", "model"] }
 tokio  = { version = "0.2", features = ["macros"] }
 pretty_env_logger = "0.4"
 log = "0.4"
