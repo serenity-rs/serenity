@@ -9,8 +9,6 @@ use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use crate::model::guild::BanOptions;
-#[cfg(feature = "model")]
 use crate::utils;
 #[cfg(feature = "http")]
 use crate::http::Http;
@@ -21,8 +19,8 @@ use serde_json::json;
 
 #[cfg(feature = "model")]
 impl GuildId {
-    /// Ban a [`User`] from the guild. All messages by the
-    /// user within the last given number of days given will be deleted.
+    /// Ban a [`User`] from the guild, deleting a number of
+    /// days' worth of messages (`dmd`) between the range 0 and 7.
     ///
     /// Refer to the documentation for [`Guild::ban`] for more information.
     ///
@@ -50,15 +48,25 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn ban<U, BO>(self, http: impl AsRef<Http>, user: U, ban_options: &BO) -> Result<()>
-        where U: Into<UserId>, BO: BanOptions {
-        self._ban(&http, user.into(), (ban_options.dmd(), ban_options.reason()))
+    pub fn ban(self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
+        self._ban_with_reason(http, user.into(), dmd, "")
+    }
+
+    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    /// [`ban`]: #method.ban
+    #[cfg(feature = "http")]
+    #[inline]
+    pub fn ban_with_reason(self, http: impl AsRef<Http>,
+                                 user: impl Into<UserId>,
+                                 dmd: u8,
+                                 reason: impl AsRef<str>) -> Result<()> {
+        self._ban_with_reason(http, user.into(), dmd, reason.as_ref())
     }
 
     #[cfg(feature = "http")]
-    fn _ban(self, http: impl AsRef<Http>, user: UserId, ban_options: (u8, &str)) -> Result<()> {
-        let (dmd, reason) = ban_options;
-
+    fn _ban_with_reason(self, http: impl AsRef<Http>, user: UserId, dmd: u8, reason: &str) -> Result<()> {
         if dmd > 7 {
             return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
         }
@@ -77,16 +85,16 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
     #[inline]
-    pub fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {http.as_ref().get_bans(self.0) }
+    pub fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> { http.as_ref().get_bans(self.0) }
 
     /// Gets a list of the guild's audit log entries
     #[cfg(feature = "http")]
     #[inline]
     pub fn audit_logs(self, http: impl AsRef<Http>,
-                             action_type: Option<u8>,
-                             user_id: Option<UserId>,
-                             before: Option<AuditLogEntryId>,
-                             limit: Option<u8>) -> Result<AuditLogs> {
+                            action_type: Option<u8>,
+                            user_id: Option<UserId>,
+                            before: Option<AuditLogEntryId>,
+                            limit: Option<u8>) -> Result<AuditLogs> {
         http.as_ref().get_audit_logs(self.0, action_type, user_id.map(|u| u.0), before.map(|a| a.0), limit)
     }
 

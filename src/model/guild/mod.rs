@@ -242,8 +242,8 @@ impl Guild {
             })
     }
 
-    /// Ban a [`User`] from the guild. All messages by the
-    /// user within the last given number of days given will be deleted.
+    /// Ban a [`User`] from the guild, deleting a number of
+    /// days' worth of messages (`dmd`) between the range 0 and 7.
     ///
     /// Refer to the documentation for [`Guild::ban`] for more information.
     ///
@@ -273,12 +273,25 @@ impl Guild {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "client")]
     #[inline]
-    pub fn ban<U: Into<UserId>, BO: BanOptions>(&self, cache_http: impl CacheHttp, user: U, options: &BO) -> Result<()> {
-        self._ban(cache_http, user.into(), options)
+    pub fn ban(&self, cache_http: impl CacheHttp, user: impl Into<UserId>, dmd: u8) -> Result<()> {
+        self._ban_with_reason(cache_http, user.into(), dmd, "")
+    }
+
+    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    /// [`ban`]: #method.ban
+    #[cfg(feature = "client")]
+    #[inline]
+    pub fn ban_with_reason(&self, cache_http: impl CacheHttp,
+                                  user: impl Into<UserId>,
+                                  dmd: u8,
+                                  reason: impl AsRef<str>) -> Result<()> {
+        self._ban_with_reason(cache_http, user.into(), dmd, reason.as_ref())
     }
 
     #[cfg(feature = "client")]
-    fn _ban<BO: BanOptions>(&self, cache_http: impl CacheHttp, user: UserId, options: &BO) -> Result<()> {
+    fn _ban_with_reason(&self, cache_http: impl CacheHttp, user: UserId, dmd: u8, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -292,7 +305,7 @@ impl Guild {
             }
         }
 
-        self.id.ban(cache_http.http(), user, options)
+        self.id.ban_with_reason(cache_http.http(), user, dmd, reason)
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -1869,7 +1882,7 @@ impl<'de> Deserialize<'de> for Guild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let preferred_locale = map.remove("preferred_locale") 
+        let preferred_locale = map.remove("preferred_locale")
             .ok_or_else(|| DeError::custom("expected preferred locale"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;

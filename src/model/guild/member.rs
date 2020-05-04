@@ -22,40 +22,6 @@ use crate::{cache::CacheRwLock, utils};
 #[cfg(all(feature = "http", feature = "cache"))]
 use crate::http::Http;
 
-/// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
-pub trait BanOptions {
-    fn dmd(&self) -> u8 { 0 }
-    fn reason(&self) -> &str { "" }
-}
-
-impl BanOptions for u8 {
-    fn dmd(&self) -> u8 { *self }
-}
-
-impl BanOptions for str {
-    fn reason(&self) -> &str { self }
-}
-
-impl<'a> BanOptions for &'a str {
-    fn reason(&self) -> &str { self }
-}
-
-impl BanOptions for String {
-    fn reason(&self) -> &str { self }
-}
-
-impl<'a> BanOptions for (u8, &'a str) {
-    fn dmd(&self) -> u8 { self.0 }
-
-    fn reason(&self) -> &str { self.1 }
-}
-
-impl BanOptions for (u8, String) {
-    fn dmd(&self) -> u8 { self.0 }
-
-    fn reason(&self) -> &str { &self.1 }
-}
-
 /// Information about a member of a guild.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Member {
@@ -137,8 +103,8 @@ impl Member {
         }
     }
 
-    /// Ban the member from its guild, deleting the last X number of
-    /// days' worth of messages.
+    /// Ban a [`User`] from the guild, deleting a number of
+    /// days' worth of messages (`dmd`) between the range 0 and 7.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -149,28 +115,19 @@ impl Member {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(all(feature = "cache", feature = "http"))]
+    #[cfg(all(feature = "http", feature = "cache"))]
     #[inline]
-    pub fn ban<BO: BanOptions>(&self, http: impl AsRef<Http>, ban_options: &BO) -> Result<()> {
-        self._ban(&http, ban_options.dmd(), ban_options.reason())
+    pub fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
+        self.ban_with_reason(&http, dmd, "")
     }
 
-    #[cfg(all(feature = "cache", feature = "http"))]
-    fn _ban(&self, http: impl AsRef<Http>, dmd: u8, reason: &str) -> Result<()> {
-        if dmd > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
-        }
-
-        if reason.len() > 512 {
-            return Err(Error::ExceededLimit(reason.to_string(), 512));
-        }
-
-        http.as_ref().ban_user(
-            self.guild_id.0,
-            self.user.read().id.0,
-            dmd,
-            &*reason,
-        )
+    /// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// [`ban`]: #method.ban
+    #[cfg(all(feature = "http", feature = "cache"))]
+    #[inline]
+    pub fn ban_with_reason(&self, http: impl AsRef<Http>, dmd: u8, reason: impl AsRef<str>) -> Result<()> {
+        self.guild_id.ban_with_reason(http, self.user.read().id, dmd, reason)
     }
 
     /// Determines the member's colour.
