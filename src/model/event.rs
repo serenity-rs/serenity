@@ -110,7 +110,7 @@ pub struct ChannelDeleteEvent {
     pub(crate) _nonexhaustive: (),
 }
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 impl CacheUpdate for ChannelDeleteEvent {
     type Output = ();
 

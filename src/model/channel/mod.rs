@@ -9,8 +9,6 @@ mod private_channel;
 mod reaction;
 mod channel_category;
 
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
 pub use self::attachment::*;
 pub use self::channel_id::*;
 pub use self::embed::*;
@@ -20,7 +18,7 @@ pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
 
-use crate::{internal::RwLockExt, model::prelude::*};
+use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
@@ -35,12 +33,16 @@ use crate::cache::FromStrAndCache;
 use crate::model::misc::ChannelParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use parking_lot::RwLock;
+#[cfg(feature = "model")]
+use crate::internal::RwLockExt;
+#[cfg(feature = "model")]
+use crate::http::CacheHttp;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -64,6 +66,7 @@ pub enum Channel {
     __Nonexhaustive,
 }
 
+#[cfg(feature = "model")]
 impl Channel {
     /// Converts from `Channel` to `Option<Arc<RwLock<GuildChannel>>>`.
     ///
@@ -189,7 +192,6 @@ impl Channel {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
-    #[cfg(all(feature = "model", feature = "http"))]
     pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match *self {
             Channel::Guild(ref public_channel) => {
@@ -208,7 +210,6 @@ impl Channel {
     }
 
     /// Determines if the channel is NSFW.
-    #[cfg(feature = "model")]
     #[inline]
     pub fn is_nsfw(&self) -> bool {
         match *self {
@@ -224,6 +225,7 @@ impl Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
+    #[inline]
     pub fn id(&self) -> ChannelId {
         match *self {
             Channel::Guild(ref ch) => ch.with(|c| c.id),
@@ -240,6 +242,7 @@ impl Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`CategoryChannel`]: struct.ChannelCategory.html
+    #[inline]
     pub fn position(&self) -> Option<i64> {
         match *self {
             Channel::Guild(ref channel) => Some(channel.with(|c| c.position)),
@@ -291,7 +294,6 @@ impl Serialize for Channel {
     }
 }
 
-#[cfg(feature = "model")]
 impl Display for Channel {
     /// Formats the channel into a "mentioned" string.
     ///
@@ -365,6 +367,7 @@ enum_number!(
 );
 
 impl ChannelType {
+    #[inline]
     pub fn name(&self) -> &str {
         match *self {
             ChannelType::Private => "private",
@@ -377,6 +380,7 @@ impl ChannelType {
         }
     }
 
+    #[inline]
     pub fn num(self) -> u64 {
         match self {
             ChannelType::Text => 0,

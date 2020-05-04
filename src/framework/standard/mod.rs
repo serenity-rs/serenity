@@ -21,7 +21,7 @@ use parse::map::{CommandMap, GroupMap, Map};
 use super::Framework;
 use crate::client::Context;
 use crate::model::{
-    channel::{Channel, Message},
+    channel::Message,
     permissions::Permissions,
 };
 
@@ -31,6 +31,8 @@ use std::sync::Arc;
 use threadpool::ThreadPool;
 use uwl::Stream;
 
+#[cfg(feature = "cache")]
+use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]

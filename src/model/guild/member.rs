@@ -1,6 +1,4 @@
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{
     Display,
@@ -9,7 +7,7 @@ use std::fmt::{
 };
 use super::deserialize_sync_user;
 
-#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
@@ -18,9 +16,11 @@ use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::{cache::CacheRwLock, utils};
-#[cfg(all(feature = "http", feature = "cache"))]
-use crate::http::Http;
+use crate::cache::CacheRwLock;
+#[cfg(feature = "model")]
+use crate::utils;
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
 
 /// Information about a member of a guild.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -56,13 +56,11 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
     pub fn add_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
         self._add_role(&http, role_id.into())
     }
 
-    #[cfg(all(feature = "cache", feature = "http"))]
     fn _add_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         if self.roles.contains(&role_id) {
             return Ok(());
@@ -85,7 +83,6 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     pub fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
@@ -115,7 +112,6 @@ impl Member {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(all(feature = "http", feature = "cache"))]
     #[inline]
     pub fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
         self.ban_with_reason(&http, dmd, "")
@@ -124,14 +120,13 @@ impl Member {
     /// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.
     ///
     /// [`ban`]: #method.ban
-    #[cfg(all(feature = "http", feature = "cache"))]
     #[inline]
     pub fn ban_with_reason(&self, http: impl AsRef<Http>, dmd: u8, reason: impl AsRef<str>) -> Result<()> {
         self.guild_id.ban_with_reason(http, self.user.read().id, dmd, reason)
     }
 
     /// Determines the member's colour.
-    #[cfg(all(feature = "cache", feature = "utils"))]
+    #[cfg(feature = "cache")]
     pub fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
         let cache = cache.as_ref().read();
         let guild = cache.guilds.get(&self.guild_id)?.read();
@@ -200,7 +195,6 @@ impl Member {
     ///
     /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../../builder/struct.EditMember.html
-    #[cfg(feature = "cache")]
     pub fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(&self, http: impl AsRef<Http>, f: F) -> Result<()> {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
@@ -280,7 +274,7 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    #[cfg(feature = "http")]
+    #[inline]
     pub fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
         self.kick_with_reason(cache_http, "")
     }
@@ -311,7 +305,6 @@ impl Member {
     /// Same as [`kick`]
     ///
     /// [`kick`]: #method.kick
-    #[cfg(feature = "http")]
     pub fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -374,13 +367,11 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
     pub fn remove_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
         self._remove_role(&http, role_id.into())
     }
 
-    #[cfg(all(feature = "cache", feature = "http"))]
     fn _remove_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         if !self.roles.contains(&role_id) {
             return Ok(());
@@ -402,7 +393,6 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     pub fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
@@ -451,7 +441,7 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(all(feature = "cache", feature = "http"))]
+    #[inline]
     pub fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id.0, self.user.read().id.0)
     }
@@ -465,7 +455,7 @@ impl Member {
     ///
     /// This function can deadlock while retrieving a read guard to the user
     /// object if your application infinitely holds a write lock elsewhere.
-    #[cfg(feature = "cache")]
+    #[inline]
     pub fn user_id(&self) -> UserId {
         self.user.read().id
     }
