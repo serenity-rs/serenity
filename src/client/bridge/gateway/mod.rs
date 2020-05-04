@@ -149,6 +149,8 @@ pub enum ShardQueuerMessage {
     Start(ShardId, ShardId),
     /// Message to shutdown the shard queuer.
     Shutdown,
+    /// Message to dequeue/shutdown a shard.
+    ShutdownShard(ShardId, u16),
 }
 
 /// A light tuplestruct wrapper around a u64 to verify type correctness when

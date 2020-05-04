@@ -1,4 +1,4 @@
-use crate::gateway::Shard;
+use crate::gateway::{InterMessage, Shard};
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
 use tokio::sync::Mutex;
@@ -25,6 +25,7 @@ use super::{
     ShardRunnerOptions,
 };
 use crate::gateway::ConnectionStage;
+use super::ShardClientMessage;
 use log::{debug, info, warn};
 
 use crate::utils::TypeMap;
@@ -84,7 +85,8 @@ pub struct ShardQueuer {
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
-    pub intents: Option<GatewayIntents>
+    pub intents: Option<GatewayIntents>,
+    pub shard_shutdown: Receiver<ShardId>,
 }
 
 impl ShardQueuer {
@@ -118,7 +120,14 @@ impl ShardQueuer {
 
         loop {
             match timeout(TIMEOUT, self.rx.next()).await {
-                Ok(Some(ShardQueuerMessage::Shutdown)) => break,
+                Ok(Some(ShardQueuerMessage::Shutdown)) => {
+                    self.shutdown_runners().await;
+
+                    break
+                },
+                Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
+                    self.shutdown(shard, code).await;
+                },
                 Ok(Some(ShardQueuerMessage::Start(id, total))) => {
                     self.checked_start(id.0, total.0).await;
                 },
@@ -205,5 +214,71 @@ impl ShardQueuer {
         self.runners.lock().await.insert(ShardId(shard_id), runner_info);
 
         Ok(())
+    }
+
+    async fn shutdown_runners(&mut self) {
+        let keys = {
+            let runners = self.runners.lock().await;
+
+            if runners.is_empty() {
+                return;
+            }
+
+            runners.keys().cloned().collect::<Vec<_>>()
+        };
+
+        info!("Shutting down all shards");
+
+        for shard_id in keys {
+            self.shutdown(shard_id, 1000).await;
+        }
+    }
+
+    /// Attempts to shut down the shard runner by Id.
+    ///
+    /// Returns a boolean indicating whether a shard runner was present. This is
+    /// _not_ necessary an indicator of whether the shard runner was
+    /// successfully shut down.
+    ///
+    /// **Note**: If the receiving end of an mpsc channel - theoretically owned
+    /// by the shard runner - no longer exists, then the shard runner will not
+    /// know it should shut down. This _should never happen_. It may already be
+    /// stopped.
+    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) -> bool {
+        info!("Shutting down shard {}", shard_id);
+
+        if let Some(runner) = self.runners.lock().await.get(&shard_id) {
+            let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
+            let client_msg = ShardClientMessage::Manager(shutdown);
+            let msg = InterMessage::Client(Box::new(client_msg));
+
+            if let Err(why) = runner.runner_tx.unbounded_send(msg) {
+                warn!(
+                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
+                    shard_id,
+                    why,
+                );
+            }
+
+            const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
+
+            match timeout(TIMEOUT, self.shard_shutdown.next()).await {
+                Ok(Some(shutdown_shard_id)) =>
+                    if shutdown_shard_id != shard_id {
+                        warn!(
+                            "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
+                            shard_id,
+                        );
+                    },
+                Ok(None) => (),
+                Err(why) => warn!(
+                    "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
+                    shard_id,
+                    why,
+                ),
+            }
+        }
+
+        self.runners.lock().await.remove(&shard_id).is_some()
     }
 }

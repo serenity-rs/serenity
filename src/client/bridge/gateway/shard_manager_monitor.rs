@@ -63,7 +63,7 @@ impl ShardManagerMonitor {
                     }
                 }
                 ShardManagerMessage::Shutdown(shard_id, code) => {
-                    self.manager.lock().await.shutdown(shard_id, code).await;
+                    self.manager.lock().await.shutdown(shard_id, code);
                     let _ = self.shutdown.unbounded_send(shard_id);
                 },
                 ShardManagerMessage::ShutdownAll => {
