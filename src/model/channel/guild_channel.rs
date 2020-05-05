@@ -793,13 +793,14 @@ impl GuildChannel {
     #[inline]
     pub async fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
-        let guild = cache.read().await.guild(self.guild_id).unwrap();
+        let guild = cache
+            .read().await
+            .guild(self.guild_id)
+            .ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {
             ChannelType::Voice => {
-                let guild = cache.read().await.guild(self.guild_id).unwrap();
                 let guild = guild.read().await;
-
                 Ok(guild
                 .voice_states
                 .values()
