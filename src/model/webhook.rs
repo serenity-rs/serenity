@@ -141,14 +141,9 @@ impl Webhook {
             map.insert("name".to_string(), Value::String(name.to_string()));
         }
 
-        match http.as_ref().edit_webhook_with_token(self.id.0, &self.token, &map) {
-            Ok(replacement) => {
-                mem::replace(self, replacement);
+        *self = http.as_ref().edit_webhook_with_token(self.id.0, &self.token, &map)?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     /// Executes a webhook with the fields set via the given builder.

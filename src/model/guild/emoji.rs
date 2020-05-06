@@ -11,8 +11,6 @@ use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use std::mem;
-#[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
@@ -119,14 +117,9 @@ impl Emoji {
                     "name": name,
                 });
 
-                match cache_http.http().edit_emoji(guild_id.0, self.id.0, &map) {
-                    Ok(emoji) => {
-                        mem::replace(self, emoji);
+                *self = cache_http.http().edit_emoji(guild_id.0, self.id.0, &map)?;
 
-                        Ok(())
-                    },
-                    Err(why) => Err(why),
-                }
+                Ok(())
             },
             None => Err(Error::Model(ModelError::ItemMissing)),
         }

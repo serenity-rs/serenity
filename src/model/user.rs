@@ -14,8 +14,6 @@ use crate::http::GuildPagination;
 use parking_lot::RwLock;
 #[cfg(feature = "model")]
 use std::fmt::Write;
-#[cfg(feature = "model")]
-use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 #[cfg(feature = "model")]
@@ -118,14 +116,9 @@ impl CurrentUser {
         f(&mut edit_profile);
         let map = utils::hashmap_to_json_map(edit_profile.0);
 
-        match http.as_ref().edit_profile(&map) {
-            Ok(new) => {
-                let _ = mem::replace(self, new);
+        *self = http.as_ref().edit_profile(&map)?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     /// Retrieves the URL to the current user's avatar, falling back to the
@@ -721,11 +714,10 @@ impl User {
     /// Replaces the instance with the data retrieved over the REST API.
     #[inline]
     pub fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
-        self.id.to_user(cache_http).map(|replacement| {
-            mem::replace(self, replacement);
-        })
-    }
+        *self = self.id.to_user(cache_http)?;
 
+        Ok(())
+    }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
