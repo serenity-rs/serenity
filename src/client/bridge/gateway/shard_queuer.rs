@@ -121,14 +121,17 @@ impl ShardQueuer {
         loop {
             match timeout(TIMEOUT, self.rx.next()).await {
                 Ok(Some(ShardQueuerMessage::Shutdown)) => {
+                    debug!("[Shard Queuer] Received to shutdown.");
                     self.shutdown_runners().await;
 
                     break
                 },
                 Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
+                    debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
                     self.shutdown(shard, code).await;
                 },
                 Ok(Some(ShardQueuerMessage::Start(id, total))) => {
+                    debug!("[Shard Queuer] Received to start shard {} of {}.", id.0, total.0);
                     self.checked_start(id.0, total.0).await;
                 },
                 Ok(None) => {
@@ -164,11 +167,12 @@ impl ShardQueuer {
     }
 
     async fn checked_start(&mut self, id: u64, total: u64) {
+        debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
         self.check_last_start().await;
 
         if let Err(why) = self.start(id, total).await {
-            warn!("Err starting shard {}: {:?}", id, why);
-            info!("Re-queueing start of shard {}", id);
+            warn!("[Shard Queuer] Err starting shard {}: {:?}", id, why);
+            info!("[Shard Queuer] Re-queueing start of shard {}", id);
 
             self.queue.push_back((id, total));
         }
