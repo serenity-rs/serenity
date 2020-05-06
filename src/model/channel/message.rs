@@ -27,7 +27,6 @@ use serde::{
 use super::utils::U64Visitor;
 #[cfg(feature = "model")]
 use std::{
-    mem,
     result::Result as StdResult,
 };
 #[cfg(feature = "model")]
@@ -280,14 +279,9 @@ impl Message {
 
         let map = serenity_utils::hashmap_to_json_map(builder.0);
 
-        match cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map)) {
-            Ok(edited) => {
-                mem::replace(self, edited);
+        *self = cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map))?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     pub(crate) fn transform_content(&mut self) {
@@ -580,14 +574,9 @@ impl Message {
 
         let map = serenity_utils::hashmap_to_json_map(suppress.0);
 
-        match cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
-        {
-            Ok(edited) => {
-                mem::replace(self, edited);
-                Ok(())
-            }
-            Err(why) => Err(why),
-        }
+        *self = cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map))?;
+
+        Ok(())
     }
 
     /// Checks whether the message mentions passed [`UserId`].

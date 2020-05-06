@@ -372,14 +372,9 @@ impl GuildChannel {
         f(&mut edit_channel);
         let edited = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        match cache_http.http().edit_channel(self.id.0, &edited) {
-            Ok(channel) => {
-                std::mem::replace(self, channel);
+        *self = cache_http.http().edit_channel(self.id.0, &edited)?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     /// Edits a [`Message`] in the channel given its Id.
