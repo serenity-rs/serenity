@@ -1196,9 +1196,9 @@ impl Http {
     /// Gets information about a specific invite.
     pub fn get_invite(&self, mut code: &str, stats: bool) -> Result<Invite> {
         #[cfg(feature = "utils")]
-            {
-                code = crate::utils::parse_invite(code);
-            }
+        {
+            code = crate::utils::parse_invite(code);
+        }
 
         self.fire(Request {
             body: None,

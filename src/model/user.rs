@@ -1,7 +1,5 @@
 //! User information-related models.
 
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
 use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
@@ -20,20 +18,14 @@ use std::fmt::Write;
 use std::mem;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(all(
-    feature = "model",
-    any(
-        all(feature = "builder", feature = "client"),
-        feature = "http",
-    ),
-))]
+#[cfg(feature = "model")]
 use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::utils;
-#[cfg(feature = "http")]
-use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
@@ -113,7 +105,6 @@ impl CurrentUser {
     /// ```
     ///
     /// [`EditProfile`]: ../../builder/struct.EditProfile.html
-    #[cfg(feature = "http")]
     pub fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
         where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
         let mut map = HashMap::new();
@@ -145,6 +136,7 @@ impl CurrentUser {
     ///
     /// [`avatar_url`]: #method.avatar_url
     /// [`default_avatar_url`]: #method.default_avatar_url
+    #[inline]
     pub fn face(&self) -> String {
         self.avatar_url()
             .unwrap_or_else(|| self.default_avatar_url())
@@ -179,7 +171,7 @@ impl CurrentUser {
     /// # #[cfg(not(feature = "cache"))]
     /// # fn main() {}
     /// ```
-    #[cfg(feature = "http")]
+    #[inline]
     pub fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
         http.as_ref().get_guilds(&GuildPagination::After(GuildId(1)), 100)
     }
@@ -268,7 +260,6 @@ impl CurrentUser {
     ///
     /// [`Error::Format`]: ../../enum.Error.html#variant.Format
     /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
-    #[cfg(feature = "http")]
     pub fn invite_url(&self, http: impl AsRef<Http>, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
         let client_id = http.as_ref().get_current_application_info().map(|v| v.id)?;
@@ -490,7 +481,6 @@ impl User {
     ///
     /// [current user]: struct.CurrentUser.html
     #[inline]
-    #[cfg(feature = "http")]
     pub fn create_dm_channel(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> { self.id.create_dm_channel(&http) }
 
     /// Retrieves the time that this user was created at.
@@ -583,13 +573,14 @@ impl User {
     //
     // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
     #[allow(clippy::let_and_return)]
-    #[cfg(all(feature = "builder", feature = "client"))]
     pub fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
         where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         if self.bot {
             return Err(Error::Model(ModelError::MessagingBot));
         }
 
+        // Silences a warning when compiling without the `cache` feature.
+        #[allow(unused_mut)]
         let mut private_channel_id = None;
 
         #[cfg(feature = "cache")]
@@ -636,7 +627,6 @@ impl User {
     ///
     /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
     /// [direct_message]: #method.direct_message
-    #[cfg(all(feature = "builder", feature = "client"))]
     #[inline]
     pub fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
@@ -677,13 +667,12 @@ impl User {
     /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
     /// [`Role`]: ../guild/struct.Role.html
     /// [`Cache`]: ../../cache/struct.Cache.html
-    #[cfg(feature = "client")]
+    #[inline]
     pub fn has_role<G, R>(&self, cache_http: impl CacheHttp, guild: G, role: R) -> Result<bool>
         where G: Into<GuildContainer>, R: Into<RoleId> {
         self._has_role(cache_http, guild.into(), role.into())
     }
 
-    #[cfg(feature = "client")]
     fn _has_role(
         &self,
         cache_http: impl CacheHttp,
@@ -698,6 +687,8 @@ impl User {
                 )
             },
             GuildContainer::Id(guild_id) => {
+                // Silences a warning when compiling without the `cache` feature.
+                #[allow(unused_mut)]
                 let mut has_role = None;
 
                 #[cfg(feature = "cache")]
@@ -713,19 +704,12 @@ impl User {
                     }
                 }
 
-                #[cfg(feature = "http")]
-                {
-                    if let Some(has_role) = has_role {
-                        Ok(has_role)
-                    } else {
-                        cache_http.http()
-                            .get_member(guild_id.0, self.id.0)
-                            .map(|m| m.roles.contains(&role))
-                    }
-                }
-                #[cfg(not(feature = "http"))]
-                {
-                    Err(Error::Model(ModelError::ItemMissing))
+                if let Some(has_role) = has_role {
+                    Ok(has_role)
+                } else {
+                    cache_http.http()
+                        .get_member(guild_id.0, self.id.0)
+                        .map(|m| m.roles.contains(&role))
                 }
             },
             GuildContainer::__Nonexhaustive => unreachable!(),
@@ -735,7 +719,7 @@ impl User {
     /// Refreshes the information about the user.
     ///
     /// Replaces the instance with the data retrieved over the REST API.
-    #[cfg(feature = "http")]
+    #[inline]
     pub fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
         self.id.to_user(cache_http).map(|replacement| {
             mem::replace(self, replacement);
@@ -797,13 +781,11 @@ impl User {
     ///
     /// If none is used, it returns `None`.
     #[inline]
-    #[cfg(feature = "http")]
     pub fn nick_in<G>(&self, cache_http: impl CacheHttp, guild_id: G) -> Option<String>
     where G: Into<GuildId> {
         self._nick_in(cache_http, guild_id.into())
     }
 
-    #[cfg(feature = "http")]
     fn _nick_in(&self, cache_http: impl CacheHttp, guild_id: GuildId) -> Option<String> {
         #[cfg(feature = "cache")]
         {
@@ -832,7 +814,6 @@ impl UserId {
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: ../user/struct.CurrentUser.html
-    #[cfg(feature = "http")]
     pub fn create_dm_channel(self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
         let map = json!({
             "recipient_id": self.0,
@@ -855,7 +836,6 @@ impl UserId {
     /// REST API will be used only.
     ///
     /// [`User`]: ../user/struct.User.html
-    #[cfg(feature = "http")]
     #[inline]
     pub fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]

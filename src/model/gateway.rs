@@ -478,7 +478,7 @@ impl<'de> Deserialize<'de> for Presence {
             }
             None => None,
         };
-        
+
         let last_modified = match map.remove("last_modified") {
             Some(v) => serde_json::from_value::<Option<u64>>(v)
                 .map_err(DeError::custom)?,
