@@ -52,9 +52,8 @@ pub struct PartialGuild {
 
 #[cfg(feature = "model")]
 impl PartialGuild {
-    /// Ban a [`User`] from the guild. All messages by the
-    /// user within the last given number of days given will be deleted. This
-    /// may be a range between `0` and `7`.
+    /// Ban a [`User`] from the guild, deleting a number of
+    /// days' worth of messages (`dmd`) between the range 0 and 7.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -76,14 +75,22 @@ impl PartialGuild {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[cfg(feature = "http")]
-    pub fn ban<U: Into<UserId>>(&self, http: impl AsRef<Http>, user: U, delete_message_days: u8) -> Result<()> {
-        if delete_message_days > 7 {
-            return Err(Error::Model(
-                ModelError::DeleteMessageDaysAmount(delete_message_days),
-            ));
-        }
+    #[inline]
+    pub fn ban(&self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
+        self.ban_with_reason(&http, user, dmd, "")
+    }
 
-        self.id.ban(&http, user, &delete_message_days)
+    /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// [`User`]: ../user/struct.User.html
+    /// [`ban`]: #method.ban
+    #[cfg(feature = "http")]
+    #[inline]
+    pub fn ban_with_reason(&self, http: impl AsRef<Http>,
+                                  user: impl Into<UserId>,
+                                  dmd: u8,
+                                  reason: impl AsRef<str>) -> Result<()> {
+        self.id.ban_with_reason(&http, user, dmd, reason)
     }
 
     /// Gets a list of the guild's bans.
