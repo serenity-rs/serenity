@@ -130,6 +130,7 @@ pub struct Command<'a> {
     name: &'static str,
     group_name: &'static str,
     group_prefixes: &'a [&'static str],
+    sub_commands: Vec<String>,
     aliases: Vec<&'static str>,
     availability: &'a str,
     description: Option<&'static str>,
@@ -538,6 +539,17 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                 })
                 .collect();
 
+                let sub_command_names: Vec<String> = options
+                .sub_commands
+                .iter()
+                .filter_map(|cmd| {
+                    if (*cmd).options.help_available {
+                        Some((*cmd).options.names[0].to_string())
+                    } else {
+                        None
+                    }
+                }).collect();
+
             return Ok(CustomisedHelpData::SingleCommand {
                 command: Command {
                     name: options.names[0],
@@ -549,6 +561,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     availability: available_text,
                     usage: options.usage,
                     usage_sample: options.examples.to_vec(),
+                    sub_commands: sub_command_names,
                 },
             });
         }
@@ -1163,6 +1176,14 @@ async fn send_single_command_embed(
                 embed.field(
                     &help_options.checks_label,
                     format!("`{}`", command.checks.join("`, `")),
+                    true,
+                );
+            }
+
+            if !command.sub_commands.is_empty() {
+                embed.field(
+                    &help_options.sub_commands_label, 
+                    format!("`{}`", command.sub_commands.join("`, `")),
                     true,
                 );
             }

@@ -257,6 +257,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[usage_sample_label(s)]` </br> `#[usage_sample_label = s]`                                                                                  | Actual sample label.                                                                                                                                                                                                                             | `s` is a string                                                                                            |
 /// | `#[ungrouped_label(s)]` </br> `#[ungrouped_label = s]`                                                                                        | Ungrouped commands label.                                                                                                                                                                                                                        | `s` is a string                                                                                            |
 /// | `#[grouped_label(s)]` </br> `#[grouped_label = s]`                                                                                            | Grouped commands label.                                                                                                                                                                                                                          | `s` is a string                                                                                            |
+/// | `#[sub_commands_label(s)]` </br> `#[sub_commands_label = s]`                                                                                  | Sub commands label.                                                                                                                                                                                                                               | `s` is a string                                                                                            |
 /// | `#[description_label(s)]` </br> `#[description_label = s]`                                                                                    | Label at the start of the description.                                                                                                                                                                                                           | `s` is a string                                                                                            |
 /// | `#[aliases_label(s)]` </br> `#[aliases_label= s]`                                                                                             | Label for a command's aliases.                                                                                                                                                                                                                   | `s` is a string                                                                                            |
 /// | `#[guild_only_text(s)]` </br> `#[guild_only_text = s]`                                                                                        | When a command is specific to guilds only.                                                                                                                                                                                                       | `s` is a string                                                                                            |
@@ -333,6 +334,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             embed_success_colour;
             strikethrough_commands_tip_in_dm;
             strikethrough_commands_tip_in_guild;
+            sub_commands_label;
             max_levenshtein_distance;
             indention_prefix
         ]);
@@ -415,6 +417,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         description_label,
         guild_only_text,
         checks_label,
+        sub_commands_label,
         dm_only_text,
         dm_and_guild_text,
         available_text,
@@ -472,6 +475,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             description_label: #description_label,
             guild_only_text: #guild_only_text,
             checks_label: #checks_label,
+            sub_commands_label: #sub_commands_label,
             dm_only_text: #dm_only_text,
             dm_and_guild_text: #dm_and_guild_text,
             available_text: #available_text,
