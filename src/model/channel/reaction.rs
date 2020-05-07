@@ -349,7 +349,6 @@ impl Serialize for ReactionType {
     }
 }
 
-#[cfg(feature = "model")]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful

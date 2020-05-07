@@ -50,7 +50,7 @@ impl GuildId {
     /// # let http = Http::default();
     /// # let user = UserId(1);
     /// // assuming a `user` has already been bound
-    /// let _ = GuildId(81384788765712384).ban(&http, user, &4).await;
+    /// let _ = GuildId(81384788765712384).ban(&http, user, 4).await;
     /// #    Ok(())
     /// # }
     /// ```
