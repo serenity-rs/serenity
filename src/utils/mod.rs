@@ -26,13 +26,11 @@ use crate::model::{
     id::EmojiId,
 };
 #[cfg(feature = "cache")]
-use crate::model::{
-    id::{
-        ChannelId,
-        GuildId,
-        RoleId,
-        UserId,
-    },
+use crate::model::id::{
+    ChannelId,
+    GuildId,
+    RoleId,
+    UserId,
 };
 use std::{
     collections::HashMap,

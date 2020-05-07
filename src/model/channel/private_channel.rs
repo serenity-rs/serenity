@@ -14,8 +14,6 @@ use crate::builder::{
 };
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
-#[cfg(feature = "model")]
-
 #[cfg(feature = "http")]
 use crate::http::Http;
 
@@ -51,7 +49,7 @@ pub struct PrivateChannel {
 #[cfg(feature = "model")]
 impl PrivateChannel {
     /// Broadcasts that the current user is typing to the recipient.
-    #[cfg(feature = "http")]
+    #[inline]
     pub async fn broadcast_typing(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.broadcast_typing(&http).await
     }
@@ -68,7 +66,7 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     /// [`Message::react`]: struct.Message.html#method.react
     /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
-    #[cfg(feature = "http")]
+    #[inline]
     pub async fn create_reaction<M, R>(&self, http: impl AsRef<Http>, message_id: M, reaction_type: R) -> Result<()>
         where M: Into<MessageId>, R: Into<ReactionType> {
         self.id.create_reaction(&http, message_id, reaction_type).await
@@ -77,7 +75,6 @@ impl PrivateChannel {
     /// Deletes the channel. This does not delete the contents of the channel,
     /// and is equivalent to closing a private channel on the client, which can
     /// be re-opened.
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<Channel> {
         self.id.delete(&http).await
@@ -100,7 +97,6 @@ impl PrivateChannel {
     /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn delete_messages<T: AsRef<MessageId>, It: IntoIterator<Item=T>>(&self, http: impl AsRef<Http>, message_ids: It) -> Result<()> {
         self.id.delete_messages(&http, message_ids).await
@@ -112,7 +108,6 @@ impl PrivateChannel {
     /// **Note**: Requires the [Manage Channel] permission.
     ///
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(&http, permission_type).await
@@ -125,7 +120,6 @@ impl PrivateChannel {
     ///
     /// [`Reaction`]: struct.Reaction.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn delete_reaction<M, R>(&self,
                                  http: impl AsRef<Http>,
@@ -156,7 +150,6 @@ impl PrivateChannel {
     /// [`EditMessage`]: ../../builder/struct.EditMessage.html
     /// [`Message`]: struct.Message.html
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn edit_message<F, M>(&self, http: impl AsRef<Http>, message_id: M, f: F) -> Result<Message>
         where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId> {
@@ -175,7 +168,6 @@ impl PrivateChannel {
     /// Requires the [Read Message History] permission.
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn message<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<Message> {
         self.id.message(&http, message_id).await
@@ -189,7 +181,6 @@ impl PrivateChannel {
     ///
     /// [`GetMessages`]: ../../builder/struct.GetMessages.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
         where F: FnOnce(&mut GetMessages) -> &mut GetMessages {
@@ -211,7 +202,6 @@ impl PrivateChannel {
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn reaction_users<M, R, U>(&self,
         http: impl AsRef<Http>,
@@ -228,7 +218,6 @@ impl PrivateChannel {
     /// Pins a [`Message`] to the channel.
     ///
     /// [`Message`]: struct.Message.html
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn pin<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<()> {
         self.id.pin(&http, message_id).await
@@ -236,7 +225,6 @@ impl PrivateChannel {
 
     /// Retrieves the list of messages that have been pinned in the private
     /// channel.
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn pins(&self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         self.id.pins(&http).await
@@ -252,7 +240,6 @@ impl PrivateChannel {
     ///
     /// [`ChannelId`]: ../id/struct.ChannelId.html
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
         self.id.say(&http, content).await
@@ -276,7 +263,6 @@ impl PrivateChannel {
     /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn send_files<'a, F, T, It>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
@@ -298,7 +284,6 @@ impl PrivateChannel {
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
     /// [`Message`]: struct.Message.html
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn send_message<'a, F>(&self, http: impl AsRef<Http>, f: F) -> Result<Message>
     where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
@@ -311,7 +296,6 @@ impl PrivateChannel {
     ///
     /// [`Message`]: struct.Message.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn unpin<M: Into<MessageId>>(&self, http: impl AsRef<Http>, message_id: M) -> Result<()> {
         self.id.unpin(&http, message_id).await

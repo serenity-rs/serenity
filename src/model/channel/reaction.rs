@@ -1,6 +1,4 @@
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::{
@@ -16,9 +14,9 @@ use std::{
 
 use crate::internal::prelude::*;
 
-#[cfg(feature = "http")]
-use crate::http::Http;
-#[cfg(all(feature = "http", feature = "model"))]
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
+#[cfg(feature = "model")]
 use log::warn;
 use std::convert::TryFrom;
 use std::str::FromStr;
@@ -61,7 +59,6 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    #[cfg(feature = "http")]
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
         self.channel_id.to_channel(cache_http).await
     }
@@ -81,7 +78,6 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(not(feature = "cache"))]
         let user_id = Some(self.user_id.0);
@@ -125,7 +121,6 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
     pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -156,7 +151,6 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [`Message`]: struct.Message.html
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
         self.channel_id.message(&http, self.message_id).await
@@ -168,7 +162,6 @@ impl Reaction {
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
     #[inline]
-    #[cfg(feature = "http")]
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
         self.user_id.to_user(cache_http).await
     }
@@ -198,7 +191,6 @@ impl Reaction {
     /// [`User`]: ../user/struct.User.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
     #[inline]
     pub async fn users<R, U>(&self,
                        http: impl AsRef<Http>,
@@ -210,7 +202,6 @@ impl Reaction {
         self._users(&http, &reaction_type.into(), limit, after.map(Into::into)).await
     }
 
-    #[cfg(feature = "http")]
     async fn _users(
         &self,
         http: impl AsRef<Http>,
@@ -358,7 +349,7 @@ impl Serialize for ReactionType {
     }
 }
 
-#[cfg(any(feature = "model", feature = "http"))]
+#[cfg(feature = "model")]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful
@@ -366,6 +357,7 @@ impl ReactionType {
     ///
     /// **Note**: This is mainly for use internally. There is otherwise most
     /// likely little use for it.
+    #[inline]
     pub fn as_data(&self) -> String {
         match *self {
             ReactionType::Custom {
@@ -379,7 +371,6 @@ impl ReactionType {
     }
 }
 
-#[cfg(feature = "model")]
 impl From<char> for ReactionType {
     /// Creates a `ReactionType` from a `char`.
     ///

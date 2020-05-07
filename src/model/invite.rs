@@ -1,8 +1,9 @@
 //! Models for server and channel invites.
 
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
+use std::ops::Deref;
+
 use chrono::{DateTime, FixedOffset};
+
 use super::prelude::*;
 
 #[cfg(feature = "model")]
@@ -13,11 +14,10 @@ use crate::internal::prelude::*;
 use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use crate::utils;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(feature = "http")]
-use crate::http::Http;
-use std::ops::Deref;
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
 
 /// Information about an invite code.
 ///
@@ -83,13 +83,12 @@ impl Invite {
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
     /// [Create Invite]: ../permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "client")]
+    #[inline]
     pub async fn create<C, F>(cache_http: impl CacheHttp, channel_id: C, f: F) -> Result<RichInvite>
         where C: Into<ChannelId>, F: FnOnce(CreateInvite) -> CreateInvite {
         Self::_create(cache_http, channel_id.into(), f).await
     }
 
-    #[cfg(feature = "client")]
     async fn _create<F>(cache_http: impl CacheHttp, channel_id: ChannelId, f: F) -> Result<RichInvite>
         where F: FnOnce(CreateInvite) -> CreateInvite {
         #[cfg(feature = "cache")]
@@ -120,7 +119,6 @@ impl Invite {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
@@ -138,7 +136,6 @@ impl Invite {
     }
 
     /// Gets the information about an invite.
-    #[cfg(feature = "http")]
     pub async fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 
@@ -350,7 +347,6 @@ impl RichInvite {
     /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
-    #[cfg(feature = "http")]
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {

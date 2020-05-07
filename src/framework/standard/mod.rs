@@ -21,12 +21,9 @@ use parse::map::{CommandMap, GroupMap, Map};
 use super::Framework;
 use crate::client::Context;
 use crate::model::{
-    channel::{Message},
+    channel::Message,
     permissions::Permissions,
 };
-#[cfg(feature = "cache")]
-use crate::model::channel::Channel;
-
 use std::collections::HashMap;
 use std::sync::Arc;
 use tokio::sync::Mutex;
@@ -34,6 +31,8 @@ use futures::future::BoxFuture;
 use uwl::Stream;
 use async_trait::async_trait;
 
+#[cfg(feature = "cache")]
+use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
 #[cfg(feature = "cache")]

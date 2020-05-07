@@ -18,6 +18,7 @@ use std::{
     },
     io::Error as IoError,
 };
+#[cfg(not(feature = "native_tls_backend"))]
 use url::Url;
 use futures::stream::SplitSink;
 

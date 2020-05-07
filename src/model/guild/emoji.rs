@@ -11,16 +11,13 @@ use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use std::mem;
-#[cfg(all(feature = "cache", feature = "model"))]
 use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
-#[cfg(all(feature = "cache", feature = "http"))]
-use crate::http::client::Http;
-
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::http::{Http, CacheHttp};
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
 /// guild it was created in.
@@ -90,7 +87,8 @@ impl Emoji {
     /// #    Ok(())
     /// # }
     /// ```
-    #[cfg(all(feature = "cache", feature = "http"))]
+    #[cfg(feature = "cache")]
+    #[inline]
     pub async fn delete<T>(&self, cache_and_http: T) -> Result<()>
     where T: AsRef<CacheRwLock> + AsRef<Http> {
         match self.find_guild_id(&cache_and_http).await {
@@ -107,7 +105,7 @@ impl Emoji {
     /// **Note**: Only user accounts may use this method.
     ///
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
-    #[cfg(all(feature = "cache", feature = "http"))]
+    #[cfg(feature = "cache")]
     pub async fn edit<T>(&mut self, cache_and_http: T, name: &str) -> Result<()>
     where T: AsRef<CacheRwLock> + AsRef<Http> {
         match self.find_guild_id(&cache_and_http).await {
@@ -116,15 +114,12 @@ impl Emoji {
                     "name": name,
                 });
 
-                match AsRef::<Http>::as_ref(&cache_and_http)
-                    .edit_emoji(guild_id.0, self.id.0, &map).await {
-                    Ok(emoji) => {
-                        mem::replace(self, emoji);
+                *self = AsRef::<Http>::as_ref(&cache_and_http)
+                    .http()
+                    .edit_emoji(guild_id.0, self.id.0, &map)
+                    .await?;
 
-                        Ok(())
-                    },
-                    Err(why) => Err(why),
-                }
+                Ok(())
             },
             None => Err(Error::Model(ModelError::ItemMissing)),
         }

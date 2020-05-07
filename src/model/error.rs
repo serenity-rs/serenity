@@ -38,7 +38,7 @@ use super::Permissions;
 ///             return;
 ///         }
 ///
-///         match guild_id.ban(&context, user, &8).await {
+///         match guild_id.ban(&context, user, 8).await {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },

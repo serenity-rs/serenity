@@ -91,9 +91,9 @@ pub use crate::error::{Error, Result};
 #[cfg(feature = "client")]
 pub use crate::client::Client;
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "client", feature = "cache"))]
 use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "client", feature = "cache"))]
 use std::time::Duration;
 #[cfg(feature = "client")]
 use std::sync::Arc;

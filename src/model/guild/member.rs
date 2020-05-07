@@ -1,6 +1,4 @@
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use chrono::{DateTime, FixedOffset};
 use std::fmt::{
     Display,
@@ -8,7 +6,7 @@ use std::fmt::{
     Result as FmtResult
 };
 
-#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::builder::EditMember;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
@@ -16,48 +14,13 @@ use crate::internal::prelude::*;
 use std::borrow::Cow;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::Colour;
-#[cfg(all(feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
 use crate::{cache::CacheRwLock, utils};
-#[cfg(all(feature = "http", feature = "cache"))]
-use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use tokio::time::timeout;
-#[cfg(all(feature = "cache", feature = "model"))]
+#[cfg(feature = "cache")]
 use std::time::Duration;
-
-/// A trait for allowing both u8 or &str or (u8, &str) to be passed into the `ban` methods in `Guild` and `Member`.
-pub trait BanOptions {
-    fn dmd(&self) -> u8 { 0 }
-    fn reason(&self) -> &str { "" }
-}
-
-impl BanOptions for u8 {
-    fn dmd(&self) -> u8 { *self }
-}
-
-impl BanOptions for str {
-    fn reason(&self) -> &str { self }
-}
-
-impl<'a> BanOptions for &'a str {
-    fn reason(&self) -> &str { self }
-}
-
-impl BanOptions for String {
-    fn reason(&self) -> &str { self }
-}
-
-impl<'a> BanOptions for (u8, &'a str) {
-    fn dmd(&self) -> u8 { self.0 }
-
-    fn reason(&self) -> &str { self.1 }
-}
-
-impl BanOptions for (u8, String) {
-    fn dmd(&self) -> u8 { self.0 }
-
-    fn reason(&self) -> &str { &self.1 }
-}
 
 /// Information about a member of a guild.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -91,13 +54,11 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
     pub async fn add_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
         self._add_role(&http, role_id.into()).await
     }
 
-    #[cfg(all(feature = "cache", feature = "http"))]
     async fn _add_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         if self.roles.contains(&role_id) {
             return Ok(());
@@ -120,7 +81,6 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
@@ -138,8 +98,8 @@ impl Member {
         }
     }
 
-    /// Ban the member from its guild, deleting the last X number of
-    /// days' worth of messages.
+    /// Ban a [`User`] from the guild, deleting a number of
+    /// days' worth of messages (`dmd`) between the range 0 and 7.
     ///
     /// **Note**: Requires the [Ban Members] permission.
     ///
@@ -150,32 +110,21 @@ impl Member {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub async fn ban<BO: BanOptions>(&self, http: impl AsRef<Http>, ban_options: &BO) -> Result<()> {
-        self._ban(&http, ban_options.dmd(), ban_options.reason()).await
+    pub async fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
+        self.ban_with_reason(&http, dmd, "").await
     }
 
-    #[cfg(all(feature = "cache", feature = "http"))]
-    async fn _ban(&self, http: impl AsRef<Http>, dmd: u8, reason: &str) -> Result<()> {
-        if dmd > 7 {
-            return Err(Error::Model(ModelError::DeleteMessageDaysAmount(dmd)));
-        }
-
-        if reason.len() > 512 {
-            return Err(Error::ExceededLimit(reason.to_string(), 512));
-        }
-
-        http.as_ref().ban_user(
-            self.guild_id.0,
-            self.user.id.0,
-            dmd,
-            &*reason,
-        ).await
+    /// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// [`ban`]: #method.ban
+    #[inline]
+    pub async fn ban_with_reason(&self, http: impl AsRef<Http>, dmd: u8, reason: impl AsRef<str>) -> Result<()> {
+        self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
     }
 
     /// Determines the member's colour.
-    #[cfg(all(feature = "cache", feature = "utils"))]
+    #[cfg(feature = "cache")]
     pub async fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
         let cache = cache.as_ref().read().await;
         let guild = cache.guilds.get(&self.guild_id)?.read().await;
@@ -244,7 +193,6 @@ impl Member {
     ///
     /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
     /// [`EditMember`]: ../../builder/struct.EditMember.html
-    #[cfg(feature = "cache")]
     pub async fn edit<F: FnOnce(&mut EditMember) -> &mut EditMember>(&self, http: impl AsRef<Http>, f: F) -> Result<()> {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
@@ -331,7 +279,7 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    #[cfg(feature = "http")]
+    #[inline]
     pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
         self.kick_with_reason(cache_http, "").await
     }
@@ -362,7 +310,6 @@ impl Member {
     /// Same as [`kick`]
     ///
     /// [`kick`]: #method.kick
-    #[cfg(feature = "http")]
     pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -425,13 +372,11 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
     pub async fn remove_role<R: Into<RoleId>>(&mut self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
         self._remove_role(&http, role_id.into()).await
     }
 
-    #[cfg(all(feature = "cache", feature = "http"))]
     async fn _remove_role(&mut self, http: impl AsRef<Http>, role_id: RoleId) -> Result<()> {
         if !self.roles.contains(&role_id) {
             return Ok(());
@@ -453,7 +398,6 @@ impl Member {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     pub async fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
@@ -503,7 +447,7 @@ impl Member {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    #[cfg(all(feature = "cache", feature = "http"))]
+    #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id.0, self.user.id.0).await
     }

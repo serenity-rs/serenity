@@ -17,7 +17,7 @@ use std::collections::HashMap;
 /// # #[cfg(feature = "framework")]
 /// # use serenity::framework::standard::{CommandResult, macros::command};
 /// #
-/// # #[cfg(all(feature = "http", feature = "framework"))]
+/// # #[cfg(all(feature = "model", feature = "utils", feature = "framework"))]
 /// # #[command]
 /// # async fn example(ctx: &Context) -> CommandResult {
 /// # let mut message = ChannelId(7).message(&ctx, MessageId(8)).await?;

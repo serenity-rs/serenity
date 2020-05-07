@@ -19,7 +19,7 @@ use std::mem;
 use super::channel::Message;
 #[cfg(feature = "model")]
 use crate::utils;
-#[cfg(feature = "http")]
+#[cfg(feature = "model")]
 use crate::http::Http;
 
 /// A representation of a webhook, which is a low-effort way to post messages to
@@ -144,14 +144,12 @@ impl Webhook {
             map.insert("name".to_string(), Value::String(name.to_string()));
         }
 
-        match http.as_ref().edit_webhook_with_token(self.id.0, &self.token, &map).await {
-            Ok(replacement) => {
-                mem::replace(self, replacement);
+        *self = http
+            .as_ref()
+            .edit_webhook_with_token(self.id.0, &self.token, &map)
+            .await?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     /// Executes a webhook with the fields set via the given builder.
