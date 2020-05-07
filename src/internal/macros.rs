@@ -27,8 +27,8 @@ macro_rules! status {
     }
 }
 
-// Enable/disable check for cache
-#[cfg(any(all(feature = "cache", any(feature = "client", feature = "model"))))]
+// Enable check for cache
+#[cfg(all(feature = "client", feature = "cache"))]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {
@@ -37,7 +37,8 @@ macro_rules! feature_cache {
     }
 }
 
-#[cfg(any(all(not(feature = "cache"), any(feature = "client", feature = "model"))))]
+// Disable check for cache
+#[cfg(all(not(feature = "cache"), feature = "client"))]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {

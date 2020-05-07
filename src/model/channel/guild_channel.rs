@@ -6,8 +6,7 @@ use futures::stream::StreamExt;
 use std::sync::Arc;
 #[cfg(feature = "cache")]
 use tokio::sync::RwLock;
-
-#[cfg(all(feature = "cache", feature = "model"))]
+#[cfg(feature = "cache")]
 use crate::cache::CacheRwLock;
 #[cfg(feature = "model")]
 use crate::builder::{
@@ -406,6 +405,7 @@ impl GuildChannel {
     ///
     /// **Note**: Right now this performs a clone of the guild. This will be
     /// optimized in the future.
+    #[cfg(feature = "cache")]
     #[inline]
     pub async fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
         cache.as_ref().read().await.guild(self.guild_id)

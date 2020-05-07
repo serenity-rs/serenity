@@ -16,7 +16,9 @@ use std::borrow::Cow;
 use crate::utils::Colour;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
-use crate::{cache::CacheRwLock, utils};
+#[cfg(feature = "cache")]
+use crate::cache::CacheRwLock;
+use crate::utils;
 #[cfg(all(feature = "cache", feature = "model"))]
 use tokio::time::timeout;
 #[cfg(feature = "cache")]
