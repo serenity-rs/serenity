@@ -1,11 +1,11 @@
 use crate::model::prelude::*;
 use std::cmp::Ordering;
 
-#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::CacheRwLock;
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -14,8 +14,8 @@ use crate::cache::FromStrAndCache;
 use crate::model::misc::RoleParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
-#[cfg(all(feature = "cache", feature = "http"))]
-use crate::http::client::Http;
+#[cfg(feature = "model")]
+use crate::http::Http;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -79,12 +79,9 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn delete<T>(&mut self, cache_and_http: T) -> Result<()>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
-        AsRef::<Http>::as_ref(&cache_and_http)
-            .delete_role(self.find_guild(&cache_and_http)?.0, self.id.0)
+    pub fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_role(self.guild_id.0, self.id.0)
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -109,12 +106,11 @@ impl Role {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "builder", feature = "cache", feature = "http"))]
-    pub fn edit<F: FnOnce(&mut EditRole) -> &mut EditRole, T>(&self, cache_and_http: T, f: F) -> Result<Role>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
-        self.find_guild(&cache_and_http)
-            .and_then(|guild_id| guild_id.edit_role(&cache_and_http, self.id, f))
+    #[inline]
+    pub fn edit(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut EditRole) -> &mut EditRole) -> Result<Role> {
+        self.guild_id.edit_role(http, self.id, f)
     }
+
     /// Searches the cache for the guild that owns the role.
     ///
     /// # Errors
@@ -124,6 +120,7 @@ impl Role {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
+    #[deprecated(note = "replaced with the `guild_id` field", since = "0.9.0")]
     pub fn find_guild(&self, cache: impl AsRef<CacheRwLock>) -> Result<GuildId> {
         for guild in cache.as_ref().read().guilds.values() {
             let guild = guild.read();
@@ -147,6 +144,7 @@ impl Role {
     /// The 'precise' argument is used to check if the role's permissions are
     /// precisely equivalent to the given permissions. If you need only check
     /// that the role has at least the given permissions, pass `false`.
+    #[inline]
     pub fn has_permissions(&self, permissions: Permissions, precise: bool) -> bool {
         if precise {
             self.permissions == permissions

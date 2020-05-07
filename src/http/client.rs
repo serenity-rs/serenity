@@ -273,12 +273,19 @@ impl Http {
     /// Creates a role.
     pub fn create_role(&self, guild_id: u64, map: &JsonMap) -> Result<Role> {
         let body = serde_json::to_vec(map)?;
-
-        self.fire(Request {
+        let response = self.request(Request {
             body: Some(&body),
             headers: None,
-            route: RouteInfo::CreateRole {guild_id },
-        })
+            route: RouteInfo::CreateRole { guild_id },
+        })?;
+
+        let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
+
+        if let Some(map) = v.as_object_mut() {
+            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+        }
+
+        serde_json::from_value(v).map_err(From::from)
     }
 
     /// Creates a webhook for the given [channel][`GuildChannel`]'s Id, passing in
@@ -643,12 +650,19 @@ impl Http {
     /// Changes a role in a guild.
     pub fn edit_role(&self, guild_id: u64, role_id: u64, map: &JsonMap) -> Result<Role> {
         let body = serde_json::to_vec(&map)?;
-
-        self.fire(Request {
+        let response = self.request(Request {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditRole { guild_id, role_id },
-        })
+        })?;
+
+        let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
+
+        if let Some(map) = v.as_object_mut() {
+            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+        }
+
+        serde_json::from_value(v).map_err(From::from)
     }
 
     /// Changes the position of a role in a guild.
@@ -658,11 +672,23 @@ impl Http {
             "position": position,
         }]))?;
 
-        self.fire(Request {
+        let response = self.request(Request {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditRolePosition { guild_id },
-        })
+        })?;
+
+        let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
+
+        if let Some(array) = v.as_array_mut() {
+            for role in array {
+                if let Some(map) = role.as_object_mut() {
+                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                }
+            }
+        }
+
+        serde_json::from_value(v).map_err(From::from)
     }
 
     /// Edits a the webhook with the given data.
@@ -1083,11 +1109,23 @@ impl Http {
     ///
     /// [`Guild`]: ../../model/guild/struct.Guild.html
     pub fn get_guild_roles(&self, guild_id: u64) -> Result<Vec<Role>> {
-        self.fire(Request {
+        let response = self.request(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGuildRoles { guild_id },
-        })
+        })?;
+
+        let mut v = serde_json::from_reader::<ReqwestResponse, Value>(response)?;
+
+        if let Some(array) = v.as_array_mut() {
+            for role in array {
+                if let Some(map) = role.as_object_mut() {
+                    map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                }
+            }
+        }
+
+        serde_json::from_value(v).map_err(From::from)
     }
 
     /// Retrieves the webhooks for the given [guild][`Guild`]'s Id.
@@ -1158,9 +1196,9 @@ impl Http {
     /// Gets information about a specific invite.
     pub fn get_invite(&self, mut code: &str, stats: bool) -> Result<Invite> {
         #[cfg(feature = "utils")]
-            {
-                code = crate::utils::parse_invite(code);
-            }
+        {
+            code = crate::utils::parse_invite(code);
+        }
 
         self.fire(Request {
             body: None,

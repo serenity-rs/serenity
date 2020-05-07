@@ -1,13 +1,11 @@
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
-#[cfg(all(feature = "builder", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::builder::EditChannel;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
-#[cfg(feature = "http")]
-use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
 
 /// A category of [`GuildChannel`]s.
 ///
@@ -46,7 +44,6 @@ pub struct ChannelCategory {
 #[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
-    #[cfg(feature = "http")]
     #[inline]
     pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
         self.id.create_permission(&http, target)
@@ -57,7 +54,6 @@ impl ChannelCategory {
     /// **Note**: Requires the [Manage Channel] permission.
     ///
     /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    #[cfg(feature = "http")]
     #[inline]
     pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(&http, permission_type)
@@ -66,7 +62,6 @@ impl ChannelCategory {
 
     /// Deletes this category if required permissions are met.
     #[inline]
-    #[cfg(feature = "http")]
     pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         self.id.delete(&cache_http.http()).map(|_| ())
     }
@@ -82,14 +77,13 @@ impl ChannelCategory {
     /// ```rust,ignore
     /// category.edit(&context, |c| c.name("test").bitrate(86400));
     /// ```
-    #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
+    #[cfg(feature = "utils")]
     pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
         where F: FnOnce(&mut EditChannel) -> &mut EditChannel
     {
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
-
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
