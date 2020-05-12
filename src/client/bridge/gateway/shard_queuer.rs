@@ -5,9 +5,7 @@ use tokio::sync::Mutex;
 use tokio::sync::RwLock;
 use std::{
     collections::{HashMap, VecDeque},
-    sync::{
-        Arc
-    },
+    sync::Arc,
 };
 use futures::{
     channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
@@ -19,6 +17,7 @@ use super::{
     GatewayIntents,
     ShardId,
     ShardManagerMessage,
+    ShardMessenger,
     ShardQueuerMessage,
     ShardRunner,
     ShardRunnerInfo,
@@ -206,7 +205,7 @@ impl ShardQueuer {
 
         let runner_info = ShardRunnerInfo {
             latency: None,
-            runner_tx: runner.runner_tx(),
+            runner_tx: ShardMessenger::new(runner.runner_tx()),
             stage: ConnectionStage::Disconnected,
         };
 
@@ -256,7 +255,7 @@ impl ShardQueuer {
             let client_msg = ShardClientMessage::Manager(shutdown);
             let msg = InterMessage::Client(Box::new(client_msg));
 
-            if let Err(why) = runner.runner_tx.unbounded_send(msg) {
+            if let Err(why) = runner.runner_tx.tx.unbounded_send(msg) {
                 warn!(
                     "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
                     shard_id,

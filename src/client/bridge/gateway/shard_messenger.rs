@@ -16,7 +16,7 @@ use crate::collector::{ReactionFilter, MessageFilter};
 /// [`shutdown`]: #method.shutdown
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
-    tx: Sender<InterMessage>,
+    pub(crate) tx: Sender<InterMessage>,
 }
 
 impl ShardMessenger {
@@ -102,7 +102,7 @@ impl ShardMessenger {
     ) where It: IntoIterator<Item=GuildId> {
         let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
 
-        let _ = self.send(ShardRunnerMessage::ChunkGuilds {
+        let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuilds {
             guild_ids: guilds,
             limit,
             query,
@@ -133,7 +133,7 @@ impl ShardMessenger {
     /// # }
     /// ```
     pub fn set_activity(&self, activity: Option<Activity>) {
-        let _ = self.send(ShardRunnerMessage::SetActivity(activity));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetActivity(activity));
     }
 
     /// Sets the user's full presence information.
@@ -169,7 +169,7 @@ impl ShardMessenger {
             status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send(ShardRunnerMessage::SetPresence(status, activity));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetPresence(status, activity));
     }
 
     /// Sets the user's current online status.
@@ -208,13 +208,13 @@ impl ShardMessenger {
             online_status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send(ShardRunnerMessage::SetStatus(online_status));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
     }
 
     /// Shuts down the websocket by attempting to cleanly close the
     /// connection.
     pub fn shutdown_clean(&self) {
-        let _ = self.send(ShardRunnerMessage::Close(1000, None));
+        let _ = self.send_to_shard(ShardRunnerMessage::Close(1000, None));
     }
 
     /// Sends a raw message over the WebSocket.
@@ -227,12 +227,12 @@ impl ShardMessenger {
     ///
     /// [`set_presence`]: #method.set_presence
     pub fn websocket_message(&self, message: Message) {
-        let _ = self.send(ShardRunnerMessage::Message(message));
+        let _ = self.send_to_shard(ShardRunnerMessage::Message(message));
     }
 
-    /// Sends a message to the shard. You
+    /// Sends a message to the shard.
     #[inline]
-    fn send(&self, msg: ShardRunnerMessage)
+    pub fn send_to_shard(&self, msg: ShardRunnerMessage)
         -> Result<(), TrySendError<InterMessage>> {
         self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
     }
@@ -241,13 +241,13 @@ impl ShardMessenger {
     #[inline]
     #[cfg(feature = "collector")]
     pub fn set_message_filter(&self, collector: MessageFilter) {
-        let _ = self.send(ShardRunnerMessage::SetMessageFilter(collector));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector));
     }
 
     /// Sets a new filter for a message collector.
     #[inline]
     #[cfg(feature = "collector")]
     pub fn set_reaction_filter(&self, collector: ReactionFilter) {
-        let _ = self.send(ShardRunnerMessage::SetReactionFilter(collector));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
     }
 }
