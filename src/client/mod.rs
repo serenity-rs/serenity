@@ -268,7 +268,9 @@ impl<'a> Future for ClientBuilder<'a> {
         if self.fut.is_none() {
             let data = Arc::new(RwLock::new(self.data.take().unwrap()));
             #[cfg(feature = "framework")]
-            let framework = self.framework.take().expect("No framework set");
+            let framework = self.framework.take()
+                .expect("The `framework`-feature is enabled (it's on by default), but no framework was provided.\n\
+                If you don't want to use the command framework, disable default features and specify all features you want to use.");
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
             let guild_subscriptions = self.guild_subscriptions;
