@@ -327,6 +327,35 @@ impl Member {
         self.guild_id.kick_with_reason(cache_http.http(), self.user.read().id, reason)
     }
 
+    /// Moves the member to a voice channel.
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    pub fn move_to_voice_channel<C, H>(&self, http: H, c: C) -> Result<()>
+    where
+        C: Into<ChannelId>,
+        H: AsRef<Http>,
+    {
+        self._move_to_voice_channel(http, c.into())
+    }
+
+    fn _move_to_voice_channel<H>(&self, http: H, c: ChannelId) -> Result<()>
+    where
+        H: AsRef<Http>
+    {
+        self.guild_id.move_member(http, self.user.read().id, c)
+    }
+
+    /// Disconnects the member their voice channel if any.
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    pub fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<()> {
+        self.guild_id.disconnect_member(http, self.user.read().id)
+    }
+
 
     /// Returns the guild-level permissions for the member.
     ///

@@ -77,4 +77,15 @@ impl EditMember {
         let num = Value::Number(Number::from(channel_id.0));
         self.0.insert("channel_id", num);
     }
+
+    /// Disconnects the user from their voice channel if any
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: ../model/permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    pub fn disconnect_member(&mut self) -> &mut Self {
+        self.0.insert("channel_id", Value::Null);
+
+        self
+    }
 }
