@@ -582,14 +582,12 @@ impl GuildId {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
-    #[cfg(feature = "http")]
     #[inline]
     pub fn disconnect_member<U>(self, http: impl AsRef<Http>, user_id: U) -> Result<()>
         where U: Into<UserId> {
         self._disconnect_member(&http, user_id.into())
     }
 
-    #[cfg(feature = "http")]
     fn _disconnect_member(
         self,
         http: impl AsRef<Http>,
