@@ -70,7 +70,7 @@ impl Context {
         http: Arc<Http>,
     ) -> Context {
         Context {
-            shard: runner_tx,
+            shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
