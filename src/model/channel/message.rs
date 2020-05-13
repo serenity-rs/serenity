@@ -44,7 +44,7 @@ use crate::collector::{
     ReactionCollectorBuilder, CollectReaction,
 };
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::MutexMessenger;
+use crate::client::bridge::gateway::ShardMessenger;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -726,13 +726,13 @@ impl Message {
 
     /// Await a single reaction on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectReaction<'a> {
+    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
         CollectReaction::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> ReactionCollectorBuilder<'a> {
+    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 }

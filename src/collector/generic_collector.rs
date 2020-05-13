@@ -7,10 +7,13 @@ use std::{
     task::{Context as FutContext, Poll},
 };
 use tokio::{
-    sync::mpsc::{
-        unbounded_channel,
-        UnboundedReceiver as Receiver,
-        UnboundedSender as Sender,
+    sync::{
+        mpsc::{
+            unbounded_channel,
+            UnboundedReceiver as Receiver,
+            UnboundedSender as Sender,
+        },
+        Mutex,
     },
     time::{Delay, delay_for},
 };
@@ -20,14 +23,14 @@ use futures::{
 };
 use crate::{
     client::bridge::gateway::ShardMessenger,
-    model::channel::Message,
+    model::event::Event,
 };
 
-macro_rules! impl_message_collector {
+macro_rules! impl_generic_collector {
     ($($name:ident;)*) => {
         $(
             impl<'a> $name<'a> {
-                /// Limits how many messages will attempt to be filtered.
+                /// Limits how many events will attempt to be filtered.
                 ///
                 /// The filter checks whether the message has been sent
                 /// in the right guild, channel, and by the right author.
@@ -37,13 +40,13 @@ macro_rules! impl_message_collector {
                     self
                 }
 
-                /// Sets a filter function where messages passed to the `function` must
+                /// Sets a filter function where events passed to the `function` must
                 /// return `true`, otherwise the message won't be collected and failed the filter
                 /// process.
                 /// This is the last instance to pass for a message to count as *collected*.
                 ///
                 /// This function is intended to be a message content filter.
-                pub fn filter<F: Fn(&Arc<Message>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
+                pub fn filter<F: Fn(&Arc<Event>) -> bool + 'static + Send + Sync>(mut self, function: F) -> Self {
                     self.filter.as_mut().unwrap().filter = Some(Arc::new(function));
 
                     self
@@ -74,7 +77,7 @@ macro_rules! impl_message_collector {
                 }
 
                 /// Sets a `duration` for how long the collector shall receive
-                /// messages.
+                /// events.
                 pub fn timeout(mut self, duration: Duration) -> Self {
                     self.timeout = Some(delay_for(duration));
 
@@ -87,16 +90,16 @@ macro_rules! impl_message_collector {
 
 /// Filters events on the shard's end and sends them to the collector.
 #[derive(Clone, Debug)]
-pub struct MessageFilter {
+pub struct EventFilter {
     filtered: u32,
     collected: u32,
     options: FilterOptions,
-    sender: Sender<Arc<Message>>,
+    sender: Sender<Arc<Event>>,
 }
 
-impl MessageFilter {
+impl EventFilter {
     /// Creates a new filter
-    fn new(options: FilterOptions) -> (Self, Receiver<Arc<Message>>) {
+    fn new(options: FilterOptions) -> (Self, Receiver<Arc<Event>>) {
         let (sender, receiver) = unbounded_channel();
 
         let filter = Self {
@@ -111,7 +114,7 @@ impl MessageFilter {
 
     /// Sends a `message` to the consuming collector if the `message` conforms
     /// to the constraints and the limits are not reached yet.
-    pub(crate) fn send_message(&mut self, message: &Arc<Message>) -> bool {
+    pub(crate) fn send_message(&mut self, message: &Arc<Event>) -> bool {
         if self.is_passing_constraints(&message) {
 
             if self.options.filter.as_ref().map_or(true, |f| f(&message)) {
@@ -129,9 +132,9 @@ impl MessageFilter {
     }
 
     /// Checks if the `message` passes set constraints.
-    /// Constraints are optional, as it is possible to limit messages to
+    /// Constraints are optional, as it is possible to limit events to
     /// be sent by a specific author or in a specifc guild.
-    fn is_passing_constraints(&self, message: &Arc<Message>) -> bool {
+    fn is_passing_constraints(&self, message: &Arc<Event>) -> bool {
         self.options.guild_id.map_or(true, |g| { Some(g) == message.guild_id.map(|g| g.0) })
         && self.options.channel_id.map_or(true, |g| { g == message.channel_id.0 })
         && self.options.author_id.map_or(true, |g| { g == message.author.id.0 })
@@ -151,30 +154,30 @@ impl MessageFilter {
 struct FilterOptions {
     filter_limit: Option<u32>,
     collect_limit: Option<u32>,
-    filter: Option<Arc<dyn Fn(&Arc<Message>) -> bool + 'static + Send + Sync>>,
+    filter: Option<Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>>,
     channel_id: Option<u64>,
     guild_id: Option<u64>,
     author_id: Option<u64>,
 }
 
 // Implement the common setters for all message collector types.
-impl_message_collector! {
-    CollectReply;
-    MessageCollectorBuilder;
+impl_generic_collector! {
+    CollectEvent;
+    EventCollectorBuilder;
 }
 
-/// Future building a stream of messages.
-pub struct MessageCollectorBuilder<'a> {
+/// Future building a stream of events.
+pub struct EventCollectorBuilder<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Delay>,
-    fut: Option<BoxFuture<'a, MessageCollector>>,
+    fut: Option<BoxFuture<'a, EventCollector>>,
 }
 
-impl<'a> MessageCollectorBuilder<'a> {
-    /// A future that builds a [`MessageCollector`] based on the settings.
+impl<'a> EventCollectorBuilder<'a> {
+    /// A future that builds a [`EventCollector`] based on the settings.
     ///
-    /// [`MessageCollector`]: ../struct.MessageCollector.html
+    /// [`EventCollector`]: ../struct.EventCollector.html
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
@@ -184,7 +187,7 @@ impl<'a> MessageCollectorBuilder<'a> {
         }
     }
 
-    /// Limits how many messages can be collected.
+    /// Limits how many events can be collected.
     ///
     /// A message is considered *collected*, if the message
     /// passes all the requirements.
@@ -195,19 +198,19 @@ impl<'a> MessageCollectorBuilder<'a> {
     }
 }
 
-impl<'a> Future for MessageCollectorBuilder<'a> {
-    type Output = MessageCollector;
+impl<'a> Future for EventCollectorBuilder<'a> {
+    type Output = EventCollector;
 
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = MessageFilter::new(self.filter.take().unwrap());
+            let (filter, receiver) = EventFilter::new(self.filter.take().unwrap());
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
                 shard_messenger.set_message_filter(filter);
 
-                MessageCollector {
+                EventCollector {
                     receiver: Box::pin(receiver),
                     timeout: timeout.map(Box::pin),
                 }
@@ -218,37 +221,37 @@ impl<'a> Future for MessageCollectorBuilder<'a> {
     }
 }
 
-pub struct CollectReply<'a> {
+pub struct CollectEvent<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
     timeout: Option<Delay>,
-    fut: Option<BoxFuture<'a, Option<Arc<Message>>>>,
+    fut: Option<BoxFuture<'a, Option<Arc<Event>>>>,
 }
 
-impl<'a> CollectReply<'a> {
+impl<'a> CollectEvent<'a> {
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),
-            shard: Some(shard_messenger.as_ref().clone()),
+            shard: Some((shard_messenger.as_ref()).clone()),
             timeout: None,
             fut: None,
         }
     }
 }
 
-impl<'a> Future for CollectReply<'a> {
-    type Output = Option<Arc<Message>>;
+impl<'a> Future for CollectEvent<'a> {
+    type Output = Option<Arc<Event>>;
 
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
-            let (filter, receiver) = MessageFilter::new(self.filter.take().unwrap());
+            let (filter, receiver) = EventFilter::new(self.filter.take().unwrap());
             let timeout = self.timeout.take();
 
             self.fut = Some(Box::pin(async move {
                 shard_messenger.set_message_filter(filter);
 
-                MessageCollector {
+                EventCollector {
                     receiver: Box::pin(receiver),
                     timeout: timeout.map(Box::pin),
                 }.next().await
@@ -261,9 +264,9 @@ impl<'a> Future for CollectReply<'a> {
 
 impl std::fmt::Debug for FilterOptions {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        f.debug_struct("MessageFilter")
+        f.debug_struct("EventFilter")
             .field("collect_limit", &self.collect_limit)
-            .field("filter", &"Option<Arc<dyn Fn(&Arc<Message>) -> bool + 'static + Send + Sync>>")
+            .field("filter", &"Option<Arc<dyn Fn(&Arc<Event>) -> bool + 'static + Send + Sync>>")
             .field("channel_id", &self.channel_id)
             .field("guild_id", &self.guild_id)
             .field("author_id", &self.author_id)
@@ -271,14 +274,14 @@ impl std::fmt::Debug for FilterOptions {
     }
 }
 
-/// A message collector receives messages matching a the given filter for a
+/// A message collector receives events matching a the given filter for a
 /// set duration.
-pub struct MessageCollector {
-    receiver: Pin<Box<Receiver<Arc<Message>>>>,
+pub struct EventCollector {
+    receiver: Pin<Box<Receiver<Arc<Event>>>>,
     timeout: Option<Pin<Box<Delay>>>,
 }
 
-impl MessageCollector {
+impl EventCollector {
     /// Stops collecting, this will implicitly be done once the
     /// collector drops.
     /// In case the drop does not appear until later, it is preferred to
@@ -288,8 +291,8 @@ impl MessageCollector {
     }
 }
 
-impl Stream for MessageCollector {
-    type Item = Arc<Message>;
+impl Stream for EventCollector {
+    type Item = Arc<Event>;
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
 
@@ -305,7 +308,7 @@ impl Stream for MessageCollector {
     }
 }
 
-impl Drop for MessageCollector {
+impl Drop for EventCollector {
     fn drop(&mut self) {
         self.receiver.close();
     }

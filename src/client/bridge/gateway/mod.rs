@@ -73,12 +73,8 @@ use std::{
         Result as FmtResult
     },
     time::Duration as StdDuration,
-    sync::Arc,
 };
-use tokio::sync::Mutex;
 use crate::gateway::ConnectionStage;
-
-pub type MutexMessenger = Arc<Mutex<ShardMessenger>>;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
 ///
@@ -180,4 +176,10 @@ pub struct ShardRunnerInfo {
     pub runner_tx: ShardMessenger,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,
+}
+
+impl AsRef<ShardMessenger> for ShardRunnerInfo {
+    fn as_ref(&self) -> &ShardMessenger {
+        &self.runner_tx
+    }
 }

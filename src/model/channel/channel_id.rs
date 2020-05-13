@@ -22,7 +22,7 @@ use crate::http::{Http, CacheHttp};
 #[cfg(feature = "model")]
 use serde_json::json;
 #[cfg(feature = "collector")]
-use crate::client::bridge::gateway::MutexMessenger;
+use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
     CollectReaction, ReactionCollectorBuilder,
@@ -745,25 +745,25 @@ impl ChannelId {
 
     /// Returns a future that will await one message sent in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reply<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectReply<'a> {
+    pub fn await_reply<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReply<'a> {
         CollectReply::new(shard_messenger).channel_id(self.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_replies<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> MessageCollectorBuilder<'a> {
+    pub fn await_replies<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).channel_id(self.0)
     }
 
     /// Await a single reaction in this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> CollectReaction<'a> {
+    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
         CollectReaction::new(shard_messenger).channel_id(self.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<MutexMessenger>) -> ReactionCollectorBuilder<'a> {
+    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.0)
     }
 }

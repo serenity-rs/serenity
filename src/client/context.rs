@@ -1,10 +1,8 @@
 use crate::client::bridge::gateway::ShardMessenger;
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use tokio::sync::{Mutex, RwLock};
-use std::sync::{
-    Arc,
-};
+use tokio::sync::RwLock;
+use std::sync::Arc;
 use futures::channel::mpsc::UnboundedSender as Sender;
 
 use crate::http::Http;
@@ -36,7 +34,7 @@ pub struct Context {
     /// [`Client::data`]: struct.Client.html#structfield.data
     pub data: Arc<RwLock<TypeMap>>,
     /// The messenger to communicate with the shard runner.
-    pub shard: Arc<Mutex<ShardMessenger>>,
+    pub shard: ShardMessenger,
     /// The ID of the shard this context is related to.
     pub shard_id: u64,
     pub http: Arc<Http>,
@@ -55,7 +53,7 @@ impl Context {
         cache: Arc<RwLock<Cache>>,
     ) -> Context {
         Context {
-            shard: Arc::new(Mutex::new(ShardMessenger::new(runner_tx))),
+            shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
@@ -72,7 +70,7 @@ impl Context {
         http: Arc<Http>,
     ) -> Context {
         Context {
-            shard: Arc::new(Mutex::new(ShardMessenger::new(runner_tx))),
+            shard: runner_tx,
             shard_id,
             data,
             http,
@@ -112,7 +110,7 @@ impl Context {
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
     pub async fn online(&self) {
-        self.shard.lock().await.set_status(OnlineStatus::Online);
+        self.shard.set_status(OnlineStatus::Online);
     }
 
     /// Sets the current user as being [`Idle`]. This maintains the current
@@ -148,7 +146,7 @@ impl Context {
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
     pub async fn idle(&self) {
-        self.shard.lock().await.set_status(OnlineStatus::Idle);
+        self.shard.set_status(OnlineStatus::Idle);
     }
 
     /// Sets the current user as being [`DoNotDisturb`]. This maintains the
@@ -184,7 +182,7 @@ impl Context {
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
     #[inline]
     pub async fn dnd(&self) {
-        self.shard.lock().await.set_status(OnlineStatus::DoNotDisturb);
+        self.shard.set_status(OnlineStatus::DoNotDisturb);
     }
 
     /// Sets the current user as being [`Invisible`]. This maintains the current
@@ -220,7 +218,7 @@ impl Context {
     /// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible
     #[inline]
     pub async fn invisible(&self) {
-        self.shard.lock().await.set_status(OnlineStatus::Invisible);
+        self.shard.set_status(OnlineStatus::Invisible);
     }
 
     /// "Resets" the current user's presence, by setting the activity to `None`
@@ -258,7 +256,7 @@ impl Context {
     /// [`set_presence`]: #method.set_presence
     #[inline]
     pub async fn reset_presence(&self) {
-        self.shard.lock().await.set_presence(None::<Activity>, OnlineStatus::Online);
+        self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
     }
 
     /// Sets the current activity, defaulting to an online status of [`Online`].
@@ -298,7 +296,7 @@ impl Context {
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     #[inline]
     pub async fn set_activity(&self, activity: Activity) {
-        self.shard.lock().await.set_presence(Some(activity), OnlineStatus::Online);
+        self.shard.set_presence(Some(activity), OnlineStatus::Online);
     }
 
     /// Sets the current user's presence, providing all fields to be passed.
@@ -364,7 +362,7 @@ impl Context {
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
     #[inline]
     pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
-        self.shard.lock().await.set_presence(activity, status);
+        self.shard.set_presence(activity, status);
     }
 
     /// Sets a new `filter` for the shard to check if a message event shall be
@@ -372,7 +370,7 @@ impl Context {
     #[inline]
     #[cfg(features = "collector")]
     pub async fn set_message_filter(&self, filter: MessageFilter) {
-        self.shard.lock().await.set_message_filter(filter);
+        self.shard.set_message_filter(filter);
     }
 
     /// Sets a new `filter` for the shard to check if a reaction event shall be
@@ -380,7 +378,7 @@ impl Context {
     #[inline]
     #[cfg(features = "collector")]
     pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
-        self.shard.lock().await.set_reaction_filter(filter);
+        self.shard.set_reaction_filter(filter);
     }
 }
 
@@ -407,8 +405,8 @@ impl AsRef<CacheRwLock> for Arc<Context> {
 }
 
 #[cfg(feature = "gateway")]
-impl AsRef<Arc<Mutex<ShardMessenger>>> for Context {
-    fn as_ref(&self) -> &Arc<Mutex<ShardMessenger>> {
+impl AsRef<ShardMessenger> for Context {
+    fn as_ref(&self) -> &ShardMessenger {
         &self.shard
     }
 }
