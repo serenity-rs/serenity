@@ -9,7 +9,7 @@ use crate::model::{
     id::UserId,
 };
 use crate::utils::Colour;
-use super::Args;
+use super::{Args, CommandResult};
 use futures::future::BoxFuture;
 
 mod check;
@@ -68,17 +68,6 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-#[derive(Debug, Clone)]
-pub struct CommandError(pub String);
-
-impl<T: fmt::Display> From<T> for CommandError {
-    #[inline]
-    fn from(d: T) -> Self {
-        CommandError(d.to_string())
-    }
-}
-
-pub type CommandResult = std::result::Result<(), CommandError>;
 pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
