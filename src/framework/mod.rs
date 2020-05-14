@@ -85,6 +85,9 @@ pub use self::standard::StandardFramework;
 
 pub mod simple;
 
+
+mod shared;
+
 use crate::client::Context;
 use crate::model::channel::Message;
 use async_trait::async_trait;
