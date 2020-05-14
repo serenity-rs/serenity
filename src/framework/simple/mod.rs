@@ -187,14 +187,17 @@ impl Framework for SimpleFramework {
 
         if !text.starts_with(&self.prefix) {
             self.run_normal_message(&ctx, &msg).await;
-        } else {
-            let cmd_and_args = &text[self.prefix.len()..];
-            if cmd_and_args.is_empty() {
-                self.run_prefix_only_cmd(&ctx, &msg).await;
-            } else {
-                let (cmd, args) = self.parse_cmd_name_and_args(cmd_and_args);
-                self.run_cmd(&ctx, &msg, &cmd, args).await;
-            }
+            return;
         }
+
+        let cmd_and_args = &text[self.prefix.len()..];
+        
+        if cmd_and_args.is_empty() {
+            self.run_prefix_only_cmd(&ctx, &msg).await;
+            return;
+        }
+
+        let (cmd, args) = self.parse_cmd_name_and_args(cmd_and_args);
+        self.run_cmd(&ctx, &msg, &cmd, args).await;
     }
 }
