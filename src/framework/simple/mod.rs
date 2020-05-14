@@ -9,17 +9,10 @@ use async_trait::async_trait;
 use crate::client::Context;
 use crate::model::channel::Message;
 
-pub use super::shared::args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
-
-pub struct CommandError(pub String);
-impl<T: std::fmt::Display> From<T> for CommandError {
-    #[inline]
-    fn from(d: T) -> Self {
-        CommandError(d.to_string())
-    }
-}
-
-type CommandResult = std::result::Result<(), CommandError>;
+pub use super::shared::{
+    args::{Args, Delimiter, Error as ArgError, Iter, RawArguments},
+    CommandResult
+};
 
 type Command = Box<dyn Fn(&Context, &Message, Args) -> Pin<Box<dyn Future<Output = CommandResult> + Send + Sync>> + Send + Sync>;
 type BeforeFn = Box<dyn Fn(&Context, &Message, &str) -> Pin<Box<dyn Future<Output = bool> + Send + Sync>> + Send + Sync>;
