@@ -83,6 +83,8 @@ pub mod standard;
 #[cfg(feature = "standard_framework")]
 pub use self::standard::StandardFramework;
 
+pub mod simple;
+
 use crate::client::Context;
 use crate::model::channel::Message;
 use async_trait::async_trait;
