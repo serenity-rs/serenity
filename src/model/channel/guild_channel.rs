@@ -572,37 +572,6 @@ impl GuildChannel {
         self.permissions_for_user(&cache, user_id.into())
     }
 
-    /// Calculates the permissions of a role.
-    ///
-    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the
-    /// channel is in.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
-    /// not be found in the [`Cache`].
-    ///
-    /// Returns a [`ModelError::RoleNotFound`] if the given role could not
-    /// be found in the [`Cache`].
-    ///
-    /// [`Cache`]: ../../cache/struct.Cache.html
-    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
-    /// [`ModelError::RoleNotFound`]: ../error/enum.Error.html#variant.RoleNotFound
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`Role`]: ../guild/struct.Role.html
-    #[cfg(feature = "cache")]
-    #[inline]
-    pub fn permissions_for_user<U: Into<UserId>>(&self, cache: impl AsRef<CacheRwLock>, user_id: U) -> Result<Permissions> {
-        self._permissions_for_user(&cache, user_id.into())
-    }
-
-    #[cfg(feature = "cache")]
-    fn _permissions_for_user(&self, cache: impl AsRef<CacheRwLock>, user_id: UserId) -> Result<Permissions> {
-        self.guild(&cache)
-            .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
-            .map(|g| g.read().user_permissions_in(self.id, user_id))
-    }
-
     /// Calculates the permissions of a member.
     ///
     /// The Id of the argument must be a [`Member`] of the [`Guild`] that the
@@ -697,6 +666,37 @@ impl GuildChannel {
     /// [`User`]: ../user/struct.User.html
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    #[cfg(feature = "cache")]
+    #[inline]
+    pub fn permissions_for_user<U: Into<UserId>>(&self, cache: impl AsRef<CacheRwLock>, user_id: U) -> Result<Permissions> {
+        self._permissions_for_user(&cache, user_id.into())
+    }
+
+    #[cfg(feature = "cache")]
+    fn _permissions_for_user(&self, cache: impl AsRef<CacheRwLock>, user_id: UserId) -> Result<Permissions> {
+        self.guild(&cache)
+            .ok_or_else(|| Error::Model(ModelError::GuildNotFound))
+            .map(|g| g.read().user_permissions_in(self.id, user_id))
+    }
+
+    /// Calculates the permissions of a role.
+    ///
+    /// The Id of the argument must be a [`Role`] of the [`Guild`] that the
+    /// channel is in.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::GuildNotFound`] if the channel's guild could
+    /// not be found in the [`Cache`].
+    ///
+    /// Returns a [`ModelError::RoleNotFound`] if the given role could not
+    /// be found in the [`Cache`].
+    ///
+    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
+    /// [`ModelError::RoleNotFound`]: ../error/enum.Error.html#variant.RoleNotFound
+    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
     #[inline]
     pub fn permissions_for_role<R: Into<RoleId>>(&self, cache: impl AsRef<CacheRwLock>, role_id: R) -> Result<Permissions> {
