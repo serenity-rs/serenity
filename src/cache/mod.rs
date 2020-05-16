@@ -646,12 +646,13 @@ impl Cache {
         self.guilds.read().await.get(&guild_id).map(|g| g.roles.clone())
     }
 
-
+    /// This method clones and returns all unavailable guilds.
     #[inline]
     pub async fn unavailable_guilds(&self) -> HashSet<GuildId> {
         self.unavailable_guilds.read().await.clone()
     }
 
+    /// This method returns all channels from a guild of with the given `guild_id`.
     #[inline]
     pub async fn guild_channels(&self, guild_id: impl Into<GuildId>) -> Option<HashMap<ChannelId, GuildChannel>> {
         self._guild_channels(guild_id.into()).await
