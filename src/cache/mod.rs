@@ -850,6 +850,36 @@ impl Cache {
         self.current_user.read().await.clone()
     }
 
+    /// This method returns the bot's ID.
+    #[inline]
+    pub async fn current_user_id(&self) -> UserId {
+        self.current_user.read().await.id
+    }
+
+    /// This method allows to only clone a field of the current user instead of
+    /// the entire user by providing a `field_selector`-closure picking what
+    /// you want to clone.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::cache::Cache;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let cache = Cache::default();
+    /// // We clone only the `name` instead of the entire channel.
+    /// let id = cache.current_user_field(|user| user.id).await;
+    /// println!("Current user's ID: {}", id);
+    /// #   Ok(())
+    /// # }
+    /// ```
+    #[inline]
+    pub async fn current_user_field<Ret, Fun>(&self,
+        field_selector: Fun) -> Ret
+    where Fun: FnOnce(&CurrentUser) -> Ret {
+        let user = self.current_user.read().await;
+
+        field_selector(&user)
+    }
+
     /// Updates the cache with the update implementation for an event or other
     /// custom update implementation.
     ///
