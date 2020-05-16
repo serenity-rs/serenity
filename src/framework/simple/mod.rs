@@ -147,7 +147,6 @@ impl SimpleFramework {
         self
     }
 
-    
     pub fn with_default_plaintext_help(mut self) -> Self {
         self.help(&default_plaintext_help)
     }
@@ -173,7 +172,22 @@ impl SimpleFramework {
         self
     }
 
+    async fn send_help(&self, ctx: &Context, msg: &Message) {
+        let help_cmd = self.help_cmd.as_ref().expect("Should not get here");
+        let mut cmd_list = self.commands.keys().map(|name| name.as_ref()).collect::<Vec<&str>>();
+        cmd_list.sort_unstable();
+        if self.run_before_cmd(ctx, msg, "help").await {
+            let res = help_cmd(ctx, msg, &self.prefix, &cmd_list).await;
+            self.run_after_cmd(ctx, msg, "help", res).await;
+        }
+    }
+
     async fn run_cmd(&self, ctx: &Context, msg: &Message, cmd_name: &str, args: Args) {
+
+        if self.help_cmd.is_some() && cmd_name == "help" {
+            self.send_help(ctx, msg).await;
+        }
+
         if let Some(cmd) = self.commands.get(cmd_name) {
             if self.run_before_cmd(ctx, msg, cmd_name).await {
                 let res = cmd(ctx, msg, args).await;
