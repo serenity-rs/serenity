@@ -37,11 +37,10 @@ impl EditProfile {
     /// let base64 = utils::read_image("./my_image.jpg")
     ///     .expect("Failed to read image");
     ///
-    /// let mut data = context.cache.write().await;
-    /// let _ = data.user.edit(&context, |p| {
+    /// let mut user = context.cache.current_user().await;
+    /// let _ = user.edit(&context, |p| {
     ///     p.avatar(Some(&base64))
-    /// })
-    /// .await;
+    /// }).await;
     /// #     }
     /// # }
     /// # }

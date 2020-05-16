@@ -34,11 +34,11 @@ use async_trait::async_trait;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
-use crate::model::guild::{Guild, Member};
-#[cfg(feature = "cache")]
-use crate::internal::RwLockExt;
+use crate::model::guild::Member;
+#[cfg(all(feature = "cache", feature = "http", feature = "model"))]
+use crate::model::{guild::Role, id::RoleId};
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
@@ -276,7 +276,7 @@ impl StandardFramework {
 
         #[cfg(feature = "cache")]
         {
-            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await {
+            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx).await {
                 let guild_id = channel.guild_id;
 
                 if self.config.blocked_guilds.contains(&guild_id) {
@@ -285,7 +285,7 @@ impl StandardFramework {
 
                 if let Some(guild) = guild_id.to_guild_cached(&ctx.cache).await {
 
-                    if self.config.blocked_users.contains(&guild.with(|g| g.owner_id).await) {
+                    if self.config.blocked_users.contains(&guild.owner_id) {
                         return Some(DispatchError::BlockedGuild);
                     }
                 }
@@ -844,14 +844,14 @@ impl CommonOptions for &CommandOptions {
 
 #[cfg(feature = "cache")]
 pub(crate) async fn has_correct_permissions(
-    cache: impl AsRef<CacheRwLock>,
+    cache: impl AsRef<Cache>,
     options: &impl CommonOptions,
     message: &Message,
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
     } else if let Some(guild) = message.guild(&cache).await {
-        let perms = guild.read().await.user_permissions_in(message.channel_id, message.author.id).await;
+        let perms = guild.user_permissions_in(message.channel_id, message.author.id).await;
 
         perms.contains(*options.required_permissions())
     } else {
@@ -862,7 +862,7 @@ pub(crate) async fn has_correct_permissions(
 #[cfg(all(feature = "cache", feature = "http"))]
 pub(crate) fn has_correct_roles(
     options: &impl CommonOptions,
-    guild: &Guild,
+    roles: &HashMap<RoleId, Role>,
     member: &Member)
 -> bool {
     if options.allowed_roles().is_empty() {
@@ -870,7 +870,7 @@ pub(crate) fn has_correct_roles(
     } else {
         options.allowed_roles()
             .iter()
-            .flat_map(|r| guild.role_by_name(r))
+            .flat_map(|r| roles.values().find(|role| *r == role.name))
             .any(|g| member.roles.contains(&g.id))
     }
 }

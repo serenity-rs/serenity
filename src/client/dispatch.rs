@@ -10,14 +10,12 @@ use futures::{
     future::{BoxFuture, FutureExt},
 };
 use tokio::sync::RwLock;
+#[cfg(feature = "gateway")]
 use super::{
     bridge::gateway::event::ClientEvent,
     event_handler::{EventHandler, RawEventHandler},
-    Context
 };
-#[cfg(feature = "cache")]
-use tokio::time::timeout;
-
+use super::Context;
 use crate::http::Http;
 use crate::CacheAndHttp;
 use crate::utils::TypeMap;
@@ -30,25 +28,11 @@ use crate::model::id::GuildId;
 use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
 use std::fmt;
-#[cfg(feature = "cache")]
-use log::warn;
 
 #[inline]
 #[cfg(feature = "cache")]
 async fn update<E: CacheUpdate + fmt::Debug>(cache_and_http: &Arc<CacheAndHttp>, event: &mut E) -> Option<E::Output> {
-    if let Some(millis_timeout) = cache_and_http.update_cache_timeout {
-
-        match timeout(millis_timeout, cache_and_http.cache.write()).await {
-            Ok(mut lock) => lock.update(event).await,
-            Err(_) => {
-                warn!("[dispatch] Possible deadlock: Couldn't unlock cache to update with event: {:?}", event);
-
-                None
-            }
-        }
-    } else {
-        cache_and_http.cache.write().await.update(event).await
-    }
+    cache_and_http.cache.update(event).await
 }
 
 #[inline]
@@ -63,7 +47,7 @@ fn context(
     runner_tx: &Sender<InterMessage>,
     shard_id: u64,
     http: &Arc<Http>,
-    cache: &Arc<RwLock<Cache>>,
+    cache: &Arc<Cache>,
 ) -> Context {
     Context::new(Arc::clone(data), runner_tx.clone(), shard_id, Arc::clone(http), Arc::clone(cache))
 }
@@ -416,7 +400,7 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 feature_cache! {{
-                    let old_channel = cache_and_http.cache.as_ref().read().await.channel(event.channel.id()).await;
+                    let old_channel = cache_and_http.cache.channel(event.channel.id()).await;
                     update(&cache_and_http, &mut event).await;
 
                     event_handler.channel_update(context, old_channel, event.channel).await;
@@ -444,22 +428,20 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::GuildCreate(mut event)) => {
             #[cfg(feature = "cache")]
-            let _is_new = {
-                let cache = cache_and_http.cache.as_ref().read().await;
-
-                !cache.unavailable_guilds.contains(&event.guild.id)
-            };
+            let _is_new =
+                !cache_and_http.cache.unavailable_guilds.read().await.contains(&event.guild.id);
 
             update(&cache_and_http, &mut event).await;
 
             #[cfg(feature = "cache")]
             {
-                let locked_cache = cache_and_http.cache.as_ref().read().await;
                 let context = context.clone();
 
-                if locked_cache.unavailable_guilds.is_empty() {
-                    let guild_amount = locked_cache
+                if cache_and_http.cache.unavailable_guilds.read().await.is_empty() {
+                    let guild_amount = cache_and_http.cache
                         .guilds
+                        .read()
+                        .await
                         .iter()
                         .map(|(&id, _)| id)
                         .collect::<Vec<GuildId>>();
@@ -532,7 +514,7 @@ async fn handle_event(
         DispatchEvent::Model(Event::GuildMemberUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event).await;
             let _after: Option<Member> = feature_cache! {{
-                cache_and_http.cache.as_ref().read().await.member(event.guild_id, event.user.id).await
+                cache_and_http.cache.member(event.guild_id, event.user.id).await
             } else {
                 None
             }};
@@ -602,10 +584,9 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 feature_cache! {{
-                    let before = cache_and_http.cache.as_ref().read().await
-                        .guilds
-                        .get(&event.guild.id)
-                        .cloned();
+                    let before = cache_and_http.cache
+                        .guild(event.guild.id)
+                        .await;
                     update(&cache_and_http, &mut event).await;
 
                     event_handler.guild_update(context, before, event.guild).await;
@@ -638,7 +619,7 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 feature_cache! {{
-                    let _after = cache_and_http.cache.as_ref().read().await.message(event.channel_id, event.id);
+                    let _after = cache_and_http.cache.message(event.channel_id, event.id).await;
                     event_handler.message_update(context, _before, _after, event).await;
                 } else {
                     event_handler.message_update(context, event).await;

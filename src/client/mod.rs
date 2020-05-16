@@ -21,14 +21,20 @@
 pub mod bridge;
 
 mod context;
+#[cfg(feature = "gateway")]
 mod dispatch;
 mod error;
+#[cfg(feature = "gateway")]
 mod event_handler;
+#[cfg(feature = "gateway")]
 mod extras;
 
 pub use self::{
     context::Context,
     error::Error as ClientError,
+};
+#[cfg(feature = "gateway")]
+pub use self::{
     event_handler::{EventHandler, RawEventHandler},
     extras::Extras,
 };
@@ -36,10 +42,11 @@ pub use self::{
 pub use crate::CacheAndHttp;
 
 #[cfg(feature = "cache")]
-pub use crate::cache::{Cache, CacheRwLock};
+pub use crate::cache::Cache;
 
 use crate::internal::prelude::*;
 use tokio::sync::{Mutex, RwLock};
+#[cfg(feature = "gateway")]
 use self::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::{
     boxed::Box,
@@ -66,6 +73,7 @@ use futures::future::BoxFuture;
 ///
 /// [`Client`]: #struct.Client.html
 /// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html
+#[cfg(feature = "gateway")]
 pub struct ClientBuilder<'a> {
     data: Option<TypeMap>,
     http: Option<Http>,
@@ -80,6 +88,7 @@ pub struct ClientBuilder<'a> {
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
 }
 
+#[cfg(feature = "gateway")]
 impl<'a> ClientBuilder<'a> {
     /// Construct a new builder to call methods on for the client construction.
     /// The `token` will automatically be prefixed "Bot " if not already.
@@ -261,6 +270,7 @@ impl<'a> ClientBuilder<'a> {
     }
 }
 
+#[cfg(feature = "gateway")]
 impl<'a> Future for ClientBuilder<'a> {
     type Output = Result<Client>;
 
@@ -284,7 +294,7 @@ impl<'a> Future for ClientBuilder<'a> {
 
             let cache_and_http = Arc::new(CacheAndHttp {
                 #[cfg(feature = "cache")]
-                cache: CacheRwLock::default(),
+                cache: Arc::new(Cache::default()),
                 #[cfg(feature = "cache")]
                 update_cache_timeout: self.timeout.take(),
                 http: Arc::clone(&http),
@@ -376,6 +386,7 @@ impl<'a> Future for ClientBuilder<'a> {
 /// [`EventHandler::message`]: trait.EventHandler.html#tymethod.message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
 /// [sharding docs]: ../index.html#sharding
+#[cfg(feature = "gateway")]
 pub struct Client {
     /// A TypeMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
@@ -563,6 +574,7 @@ pub struct Client {
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 
+#[cfg(feature = "gateway")]
 impl Client {
     /// Returns a builder implementing [`Future`]. You can chain the builder methods and then await
     /// in order to finish the [`Client`].

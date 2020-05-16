@@ -25,7 +25,7 @@ use super::utils::*;
 use futures::stream::StreamExt;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
 #[cfg(feature = "model")]
@@ -165,8 +165,8 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
-    async fn check_hierarchy(&self, cache: impl AsRef<CacheRwLock>, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().read().await.user.id;
+    async fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
+        let current_id = cache.as_ref().current_user.read().await.id;
 
         if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id).await {
 
@@ -212,8 +212,8 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    async fn has_perms(&self, cache: impl AsRef<CacheRwLock>, mut permissions: Permissions) -> bool {
-        let user_id = cache.as_ref().read().await.user.id;
+    async fn has_perms(&self, cache: impl AsRef<Cache>, mut permissions: Permissions) -> bool {
+        let user_id = cache.as_ref().current_user.read().await.id;
 
         let perms = self.member_permissions(user_id).await;
         permissions.remove(perms);
@@ -222,12 +222,14 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    pub async fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
+    pub async fn channel_id_from_name(&self, cache: impl AsRef<Cache>, name: impl AsRef<str>) -> Option<ChannelId> {
         let name = name.as_ref();
-        let cache = cache.as_ref().read().await;
-        let guild = cache.guilds.get(&self.id)?;
+        let guild_channels = cache
+            .as_ref()
+            .guild_channels(&self.id)
+            .await?;
 
-        for (id, channel) in guild.read().await.channels.iter() {
+        for (id, channel) in guild_channels.iter() {
 
             if channel.name == name {
                 return Some(*id)
@@ -510,7 +512,7 @@ impl Guild {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.owner_id != cache.read().await.user.id {
+                if self.owner_id != cache.current_user.read().await.id {
                     let req = Permissions::MANAGE_GUILD;
 
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -745,7 +747,7 @@ impl Guild {
     /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn greater_member_hierarchy<T, U>(&self, cache: impl AsRef<CacheRwLock>, lhs_id: T, rhs_id: U)
+    pub async fn greater_member_hierarchy<T, U>(&self, cache: impl AsRef<Cache>, lhs_id: T, rhs_id: U)
         -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
         self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into()).await
     }
@@ -753,7 +755,7 @@ impl Guild {
     #[cfg(feature = "cache")]
     async fn _greater_member_hierarchy(
         &self,
-        cache: impl AsRef<CacheRwLock>,
+        cache: impl AsRef<Cache>,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -1549,7 +1551,7 @@ impl Guild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
         self.id.shard_id(&cache).await
     }
 
@@ -1695,7 +1697,7 @@ impl Guild {
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
     ///             if let Some(guild) = guild_id.to_guild_cached(&ctx).await {
-    ///                 if let Some(role) = guild.read().await.role_by_name("role_name") {
+    ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("{:?}", role);
     ///                 }
     ///             }

@@ -7,6 +7,7 @@
 //! [`Client`]: ../struct.Client.html
 //! [`client`]: ../
 
+#[cfg(feature = "gateway")]
 pub mod gateway;
 
 #[cfg(feature = "voice")]

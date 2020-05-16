@@ -3,11 +3,7 @@ use crate::model::prelude::*;
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
 #[cfg(feature = "cache")]
-use std::sync::Arc;
-#[cfg(feature = "cache")]
-use tokio::sync::RwLock;
-#[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::builder::{
     CreateInvite,
@@ -180,12 +176,12 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #     let http = Arc::new(Http::default());
-    /// #     let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #     let cache = Cache::default();
     /// #     let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -200,13 +196,13 @@ impl GuildChannel {
     ///     deny: deny,
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
-    /// # let cache = cache.read().await;
     /// // assuming the cache has been unlocked
     /// let channel = cache
     ///     .guild_channel(channel_id)
+    ///     .await
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().await.create_permission(&http, &overwrite).await?;
+    /// channel.create_permission(&http, &overwrite).await?;
     /// #   Ok(())
     /// # }
     /// ```
@@ -219,12 +215,12 @@ impl GuildChannel {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::id::{ChannelId, UserId}};
+    /// # use serenity::{cache::Cache, http::Http, model::id::{ChannelId, UserId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// #   let http = Arc::new(Http::default());
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache = Cache::default();
     /// #   let (channel_id, user_id) = (ChannelId(0), UserId(0));
     /// #
     /// use serenity::model::channel::{
@@ -241,12 +237,12 @@ impl GuildChannel {
     ///     kind: PermissionOverwriteType::Member(user_id),
     /// };
     ///
-    /// let cache = cache.read().await;
     /// let channel = cache
     ///     .guild_channel(channel_id)
+    ///     .await
     ///     .ok_or(ModelError::ItemMissing)?;
     ///
-    /// channel.read().await.create_permission(&http, &overwrite).await?;
+    /// channel.create_permission(&http, &overwrite).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -277,8 +273,8 @@ impl GuildChannel {
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_CHANNELS;
-
-                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await? {
+                use std::ops::Deref;
+                if !utils::user_has_perms(&cache.deref(), self.id, Some(self.guild_id), req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -407,8 +403,8 @@ impl GuildChannel {
     /// optimized in the future.
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
-        cache.as_ref().read().await.guild(self.guild_id)
+    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self.guild_id).await
     }
 
     /// Gets all of the channel's invites.
@@ -480,14 +476,15 @@ impl GuildChannel {
     /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn permissions_for_user<U: Into<UserId>>(&self, cache: impl AsRef<CacheRwLock>, user_id: U) -> Result<Permissions> {
-        self._permissions_for_user(&cache, user_id.into()).await
+    pub async fn permissions_for_user(&self, cache: impl AsRef<Cache>, user_id: impl Into<UserId>)
+     -> Result<Permissions> {
+        self._permissions_for_user(cache, user_id.into()).await
     }
 
     #[cfg(feature = "cache")]
-    async fn _permissions_for_user(&self, cache: impl AsRef<CacheRwLock>, user_id: UserId) -> Result<Permissions> {
-        match self.guild(&cache).await {
-            Some(guild) => Ok(guild.read().await.user_permissions_in(self.id, user_id).await),
+    async fn _permissions_for_user(&self, cache: impl AsRef<Cache>, user_id: UserId) -> Result<Permissions> {
+        match self.guild(cache).await {
+            Some(guild) => Ok(guild.user_permissions_in(self.id, user_id).await),
             None => Err(Error::Model(ModelError::GuildNotFound)),
         }
     }
@@ -510,12 +507,11 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, msg: Message) {
-    ///         let channel = match context.cache.read().await.guild_channel(msg.channel_id) {
+    ///         let channel = match context.cache.guild_channel(msg.channel_id).await {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let channel = channel.read().await;
     ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, &msg.author).await {
     ///             println!("The user's permissions: {:?}", permissions);
     ///         }
@@ -545,13 +541,12 @@ impl GuildChannel {
     /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     ///     async fn message(&self, context: Context, mut msg: Message) {
-    ///         let channel = match context.cache.read().await.guild_channel(msg.channel_id) {
+    ///         let channel = match context.cache.guild_channel(msg.channel_id).await {
     ///             Some(channel) => channel,
     ///             None => return,
     ///         };
     ///
-    ///         let current_user_id = context.cache.read().await.user.id;
-    ///         let channel = channel.read().await;
+    ///         let current_user_id = context.cache.current_user().await.id;
     ///         if let Ok(permissions) = channel.permissions_for_user(&context.cache, current_user_id).await {
     ///
     ///             if !permissions.contains(Permissions::ATTACH_FILES | Permissions::SEND_MESSAGES) {
@@ -599,17 +594,15 @@ impl GuildChannel {
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn permissions_for_role<R: Into<RoleId>>(&self, cache: impl AsRef<CacheRwLock>, role_id: R) -> Result<Permissions> {
+    pub async fn permissions_for_role<R: Into<RoleId>>(&self, cache: impl AsRef<Cache>, role_id: R) -> Result<Permissions> {
         self._permissions_for_role(&cache, role_id.into()).await
     }
 
     #[cfg(feature = "cache")]
-    async fn _permissions_for_role(&self, cache: impl AsRef<CacheRwLock>, role_id: RoleId) -> Result<Permissions> {
+    async fn _permissions_for_role(&self, cache: impl AsRef<Cache>, role_id: RoleId) -> Result<Permissions> {
         self.guild(&cache)
             .await
             .ok_or(Error::Model(ModelError::GuildNotFound))?
-            .read()
-            .await
             .role_permissions_in(self.id, role_id)
             .await
             .ok_or(Error::Model(ModelError::GuildNotFound))
@@ -720,7 +713,7 @@ impl GuildChannel {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::SEND_MESSAGES;
 
-                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await? {
+                if !utils::user_has_perms(cache, self.id, Some(self.guild_id), req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -767,16 +760,15 @@ impl GuildChannel {
     /// [`ModelError::InvalidChannelType`]: ../error/enum.Error.html#variant.InvalidChannelType
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
-        let cache = cache.as_ref();
+    pub async fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
+        let cache: &Cache = cache.as_ref();
         let guild = cache
-            .read().await
             .guild(self.guild_id)
+            .await
             .ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {
             ChannelType::Voice => {
-                let guild = guild.read().await;
                 Ok(guild
                 .voice_states
                 .values()
@@ -795,13 +787,11 @@ impl GuildChannel {
             },
             ChannelType::News | ChannelType::Text => Ok(futures::stream::iter(
                 guild
-                    .read()
-                    .await
                     .members
                     .iter())
                     .filter_map(|e| async move {
-                        if self.permissions_for_user(&cache, e.0)
-                        .await
+                        if self.permissions_for_user(cache, e.0)
+                            .await
                             .map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false)
                         {
                             Some(e.1.clone())

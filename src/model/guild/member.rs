@@ -17,12 +17,8 @@ use crate::utils::Colour;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 #[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 use crate::utils;
-#[cfg(all(feature = "cache", feature = "model"))]
-use tokio::time::timeout;
-#[cfg(feature = "cache")]
-use std::time::Duration;
 
 /// Information about a member of a guild.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -127,13 +123,12 @@ impl Member {
 
     /// Determines the member's colour.
     #[cfg(feature = "cache")]
-    pub async fn colour(&self, cache: impl AsRef<CacheRwLock>) -> Option<Colour> {
-        let cache = cache.as_ref().read().await;
-        let guild = cache.guilds.get(&self.guild_id)?.read().await;
+    pub async fn colour(&self, cache: impl AsRef<Cache>) -> Option<Colour> {
+        let guild_roles = cache.as_ref().guild_roles(self.guild_id).await?;
 
         let mut roles = self.roles
             .iter()
-            .filter_map(|role_id| guild.roles.get(role_id))
+            .filter_map(|role_id| guild_roles.get(role_id))
             .collect::<Vec<&Role>>();
         roles.sort_by(|a, b| b.cmp(a));
 
@@ -149,13 +144,11 @@ impl Member {
     /// (This returns the first channel that can be read by the member, if there isn't
     /// one returns `None`)
     #[cfg(feature = "cache")]
-    pub async fn default_channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<GuildChannel> {
+    pub async fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
         let guild = match self.guild_id.to_guild_cached(&cache).await {
             Some(guild) => guild,
             None => return None,
         };
-
-        let guild = guild.read().await;
 
         for (cid, channel) in &guild.channels {
             if guild.user_permissions_in(*cid, self.user.id).await.read_messages() {
@@ -219,13 +212,8 @@ impl Member {
     /// position. If two or more roles have the same highest position, then the
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
-    pub async fn highest_role_info(&self, cache: impl AsRef<CacheRwLock>) -> Option<(RoleId, i64)> {
-        const TIMEOUT: Duration = Duration::from_millis(10);
+    pub async fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i64)> {
         let guild = self.guild_id.to_guild_cached(&cache).await?;
-        let guild = match timeout(TIMEOUT, guild.read()).await {
-            Ok(guild) => guild,
-            _ => return None,
-        };
 
         let mut highest = None;
 
@@ -316,11 +304,9 @@ impl Member {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let locked_cache = cache.read().await;
 
-                if let Some(guild) = locked_cache.guilds.get(&self.guild_id) {
+                if let Some(guild) = cache.guild(self.guild_id).await {
                     let req = Permissions::KICK_MEMBERS;
-                    let guild = guild.read().await;
 
                     if !guild.has_perms(cache, req).await {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -356,13 +342,11 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
-    pub async fn permissions(&self, cache: impl AsRef<CacheRwLock>) -> Result<Permissions> {
+    pub async fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
         let guild = match self.guild_id.to_guild_cached(&cache).await {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
-
-        let guild = guild.read().await;
 
         Ok(guild.member_permissions(self.user.id).await)
     }
@@ -423,11 +407,9 @@ impl Member {
     ///
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
-    pub async fn roles(&self, cache: impl AsRef<CacheRwLock>) -> Option<Vec<Role>> {
+    pub async fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
         match self.guild_id.to_guild_cached(cache).await {
             Some(guild) => Some(guild
-                .read()
-                .await
                 .roles
                 .values()
                 .filter(|role| self.roles.contains(&role.id))

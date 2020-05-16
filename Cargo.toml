@@ -112,6 +112,9 @@ features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process"]
 [dependencies.futures]
 version = "0.3"
 
+[dependencies.dashmap]
+version = "4.0.0-rc2"
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
@@ -148,7 +151,6 @@ builder = ["utils"]
 cache = []
 collector = ["gateway", "model", "tokio/stream"]
 client = [
-    "gateway",
     "http",
 ]
 extras = []
