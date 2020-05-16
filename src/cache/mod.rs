@@ -428,7 +428,7 @@ impl Cache {
         self._guild_field(id.into(), field_selector).await
     }
 
-    pub async fn _guild_field<Ret: Clone, Fun>(&self, id: GuildId, field_accessor: Fun) -> Option<Ret>
+    async fn _guild_field<Ret: Clone, Fun>(&self, id: GuildId, field_accessor: Fun) -> Option<Ret>
     where Fun: FnOnce(&Guild) -> Ret {
         let guilds = self.guilds.read().await;
         let guild = guilds.get(&id.into())?;
@@ -517,7 +517,7 @@ impl Cache {
         self._guild_channel_field(id.into(), field_selector).await
     }
 
-    pub async fn _guild_channel_field<Ret, Fun>(&self,
+    async fn _guild_channel_field<Ret, Fun>(&self,
         id: ChannelId,
         field_selector: Fun) -> Option<Ret>
     where Fun: FnOnce(&GuildChannel) -> Ret {
@@ -625,7 +625,7 @@ impl Cache {
         self._member_field(guild_id.into(), user_id.into(), field_selector).await
     }
 
-    pub async fn _member_field<Ret, Fun>(&self,
+    async fn _member_field<Ret, Fun>(&self,
         guild_id: GuildId,
         user_id: UserId,
         field_selector: Fun) -> Option<Ret>
