@@ -51,9 +51,9 @@ use crate::client::Context;
 use crate::CacheAndHttp;
 
 /// This trait will be required by functions that need [`Http`] and can
-/// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
+/// optionally use a [`Cache`] to potentially avoid REST-requests.
 ///
-/// The types [`Context`], [`CacheRwLock`], and [`Http`] implement this trait
+/// The types [`Context`], [`Cache`], and [`Http`] implement this trait
 /// and thus passing these to functions expecting `impl CacheHttp` is possible.
 ///
 /// In a situation where you have the `cache`-feature enabled but you do not
@@ -61,9 +61,8 @@ use crate::CacheAndHttp;
 ///
 /// If you are calling a function that expects `impl CacheHttp` as argument
 /// and you wish to utilise the `cache`-feature but you got no access to a
-/// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
-///
-/// [`CacheRwLock`]: ../cache/struct.CacheRwLock.html
+/// [`Cache`]: cache/struct.Cache.html
+/// [`Context`], you can pass a tuple of `(Cache, Http)`.
 /// [`Http`]: client/struct.Http.html
 /// [`Context`]: ../client/struct.Context.html
 pub trait CacheHttp: Send + Sync {
