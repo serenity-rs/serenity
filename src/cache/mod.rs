@@ -662,6 +662,11 @@ impl Cache {
         self.guilds.read().await.get(&guild_id).map(|g| g.channels.clone())
     }
 
+    /// Returns the number of guild channels in the cache.
+    pub async fn guild_channel_count(&self) -> usize {
+        self.channels.read().await.len()
+    }
+
     #[inline]
     pub async fn shard_count(&self) -> u64 {
         self.shard_count.read().await.clone()
