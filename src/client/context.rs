@@ -422,6 +422,13 @@ impl AsRef<Cache> for Context {
 }
 
 #[cfg(feature = "cache")]
+impl AsRef<Cache> for Arc<Context> {
+    fn as_ref(&self) -> &Cache {
+        &*self.cache
+    }
+}
+
+#[cfg(feature = "cache")]
 impl AsRef<Cache> for Cache {
     fn as_ref(&self) -> &Cache {
         &self
