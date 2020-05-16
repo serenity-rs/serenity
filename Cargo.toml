@@ -129,6 +129,7 @@ default = [
     "model",
     "http",
     "standard_framework",
+    "simple_framework",
     "utils",
     "rustls_backend",
 ]
@@ -141,6 +142,7 @@ default_native_tls = [
     "model",
     "http",
     "standard_framework",
+    "simple_framework",
     "utils",
     "native_tls_backend",
 ]
@@ -165,6 +167,7 @@ rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls", "rustls",
 native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-tls", "tokio-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
+simple_framework = ["framework"]
 utils = ["base64"]
 voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide", "tokio/process"]
 

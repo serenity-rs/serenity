@@ -83,9 +83,13 @@ pub mod standard;
 #[cfg(feature = "standard_framework")]
 pub use self::standard::StandardFramework;
 
+#[cfg(feature = "simple_framework")]
 pub mod simple;
 
+#[cfg(feature = "simple_framework")]
+pub use self::simple::SimpleFramework;
 
+#[cfg(any(feature = "simple_framework", feature = "standard_framework"))]
 mod shared;
 
 use crate::client::Context;
