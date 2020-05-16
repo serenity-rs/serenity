@@ -568,6 +568,15 @@ impl GuildId {
         http.as_ref().edit_member(self.0, user_id.0, &map)
     }
 
+    /// Returns the name of whatever guild this id holds.
+    #[cfg(feature = "cache")]
+    pub fn name(self, cache: impl AsRef<CacheRwLock>) -> Option<String> {
+        let guild = self.to_guild_cached(&cache)?;
+        let guild = guild.read();
+
+        Some(guild.name.to_string())
+    }
+
     /// Gets the number of [`Member`]s that would be pruned with the given
     /// number of days.
     ///
