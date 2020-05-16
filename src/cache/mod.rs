@@ -851,6 +851,7 @@ impl Cache {
         self.categories.read().await.get(&channel_id).cloned()
     }
 
+    /// This method clones and returns the user used by the bot.
     #[inline]
     pub async fn current_user(&self) -> CurrentUser {
         self.current_user.read().await.clone()
