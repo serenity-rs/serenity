@@ -623,11 +623,8 @@ impl GuildId {
 
     /// Returns the name of whatever guild this id holds.
     #[cfg(feature = "cache")]
-    pub fn name(self, cache: impl AsRef<CacheRwLock>) -> Option<String> {
-        let guild = self.to_guild_cached(&cache)?;
-        let guild = guild.read();
-
-        Some(guild.name.to_string())
+    pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
+        cache.as_ref().guild_field(self, |guild| guild.name.clone()).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
