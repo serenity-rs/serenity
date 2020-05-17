@@ -840,15 +840,38 @@ impl Cache {
         self.users.read().await.get(&user_id).cloned()
     }
 
+    /// Clones all users and returns them.
     #[inline]
-    pub async fn categories<C: Into<ChannelId>>(&self,
-                                          channel_id: C)
-                                          -> Option<ChannelCategory> {
-        self._categories(channel_id.into()).await
+    pub async fn users(&self) -> HashMap<UserId, User> {
+        self.users.read().await.clone()
     }
 
-    async fn _categories(&self, channel_id: ChannelId) -> Option<ChannelCategory> {
+    /// Returns the amount of cached users.
+    #[inline]
+    pub async fn user_count(&self) -> usize {
+        self.users.read().await.len()
+    }
+
+    /// Clones a category matching the `channel_id` and returns it.
+    #[inline]
+    pub async fn category<C: Into<ChannelId>>(&self, channel_id: C) -> Option<ChannelCategory> {
+        self._category(channel_id.into()).await
+    }
+
+    async fn _category(&self, channel_id: ChannelId) -> Option<ChannelCategory> {
         self.categories.read().await.get(&channel_id).cloned()
+    }
+
+    /// Clones all categories and returns them.
+    #[inline]
+    pub async fn categories(&self) -> HashMap<ChannelId, ChannelCategory> {
+        self.categories.read().await.clone()
+    }
+
+    /// Returns the amount of cached categories.
+    #[inline]
+    pub async fn category_count(&self) -> usize {
+        self.categories.read().await.len()
     }
 
     /// This method clones and returns the user used by the bot.
