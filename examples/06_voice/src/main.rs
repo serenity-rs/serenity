@@ -187,8 +187,8 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.await.guild_id,
+    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
+        Some(id) => id,
         None => {
             check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
 
