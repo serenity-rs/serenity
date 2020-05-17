@@ -40,12 +40,11 @@ pub use self::{
 };
 
 pub use crate::CacheAndHttp;
-
 #[cfg(feature = "cache")]
 pub use crate::cache::Cache;
-
 use crate::internal::prelude::*;
 use tokio::sync::{Mutex, RwLock};
+use log::{error, debug, info};
 #[cfg(feature = "gateway")]
 use self::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerMonitor, ShardManagerOptions};
 use std::{
@@ -54,13 +53,11 @@ use std::{
     future::Future,
     pin::Pin,
     task::{Context as FutContext, Poll},
-    time::Duration,
 };
-use log::{error, debug, info};
-
+#[cfg(any(feature = "framework", feature = "gateway"))]
+use std::time::Duration;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-
 #[cfg(feature = "voice")]
 use crate::model::id::UserId;
 #[cfg(feature = "voice")]

@@ -145,6 +145,7 @@ impl DispatchEvent {
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<'rec>(
+    #[allow(unused_variables)]
     mut event: DispatchEvent,
     #[cfg(feature = "framework")]
     framework: &'rec Arc<Box<dyn Framework + Send + Sync>>,
