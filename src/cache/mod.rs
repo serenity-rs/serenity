@@ -667,6 +667,7 @@ impl Cache {
         self.channels.read().await.len()
     }
 
+    /// Returns the number of shards.
     #[inline]
     pub async fn shard_count(&self) -> u64 {
         self.shard_count.read().await.clone()
