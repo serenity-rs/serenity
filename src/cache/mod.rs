@@ -521,7 +521,7 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub async fn guild_channel_field<Ret: Clone + Iterator, Fun>(&self,
+    pub async fn guild_channel_field<Ret: Clone, Fun>(&self,
         id: impl Into<ChannelId>,
         field_selector: Fun) -> Option<Ret>
     where Fun: FnOnce(&GuildChannel) -> Ret {
