@@ -79,9 +79,9 @@ impl SimpleFramework {
     /// let framework = SimpleFramework::new()
     ///                 .add("ping", ping);
     /// ```
-    pub fn add<T, F>(mut self, name: &str, cmd: &'static F) -> Self 
+    pub fn add<T, F>(mut self, name: &str, cmd: F) -> Self 
     where T: 'static + Future<Output=CommandResult> + Send,
-    F: Fn(&Context, &Message, Args) -> T + Send + Sync {
+    F: Fn(&Context, &Message, Args) -> T + Send + Sync + 'static {
         self.commands.insert(name.to_owned(), Box::new(move |ctx, msg, args| Box::pin(cmd(ctx, msg, args))));
         self
     }
@@ -96,9 +96,9 @@ impl SimpleFramework {
     /// Sets the function to run after each command
     /// it's passed the name of the command used and
     /// the `CommandResult` returned by the command
-    pub fn after<T, F>(mut self, after: &'static F) -> Self
+    pub fn after<T, F>(mut self, after: F) -> Self
     where T: 'static + Future<Output=()> + Send, 
-    F: Fn(&Context, &Message, &str, CommandResult) -> T + Send + Sync {
+    F: Fn(&Context, &Message, &str, CommandResult) -> T + Send + Sync + 'static {
         self.after_cmd = Some(Box::new(move |ctx, msg, cmd_name, res|  Box::pin(after(ctx, msg, cmd_name, res))));
         self
     }
@@ -107,34 +107,34 @@ impl SimpleFramework {
     /// it's passed teh name of the command used and
     /// the returned boolean determines if the command
     /// should then be run
-    pub fn before<T, F>(mut self, before: &'static F) -> Self
+    pub fn before<T, F>(mut self, before: F) -> Self
     where T: 'static + Future<Output = bool> + Send,
-    F: Fn(&Context, &Message, &str) -> T + Send + Sync {
+    F: Fn(&Context, &Message, &str) -> T + Send + Sync + 'static {
         self.before_cmd = Some(Box::new(move |ctx, msg, cmd_name| Box::pin(before(ctx, msg, cmd_name))));
         self
     }
 
     /// sets the function to run if a prefex is detected
     /// but no known command was found
-    pub fn unrecognized_cmd<T, F>(mut self, default_cmd: &'static F) -> Self
+    pub fn unrecognized_cmd<T, F>(mut self, default_cmd: F) -> Self
     where T: 'static + Future<Output = ()> + Send,
-    F: Fn(&Context, &Message, &str, Args) -> T + Send + Sync {
+    F: Fn(&Context, &Message, &str, Args) -> T + Send + Sync + 'static {
         self.default_cmd = Some(Box::new(move |ctx, msg, cmd_name, args| Box::pin(default_cmd(ctx, msg, cmd_name, args))));
         self
     }
 
     /// sets the function to run if only a prefix was given
-    pub fn prefix_only<T, F>(mut self, prefix_only: &'static F) -> Self
+    pub fn prefix_only<T, F>(mut self, prefix_only: F) -> Self
     where T: 'static + Future<Output = ()> + Send,
-    F: Fn(&Context, &Message) -> T + Send + Sync {
+    F: Fn(&Context, &Message) -> T + Send + Sync + 'static {
         self.prefix_only_cmd = Some(Box::new(move |ctx, msg| Box::pin(prefix_only(ctx, msg))));
         self
     }
 
     /// sets the function to run if no prefix was found on a message
-    pub fn normal_message<T, F>(mut self, normal_msg: &'static F) -> Self
+    pub fn normal_message<T, F>(mut self, normal_msg: F) -> Self
     where T: 'static + Future<Output = ()> + Send,
-    F: Fn(&Context, &Message) -> T + Send + Sync {
+    F: Fn(&Context, &Message) -> T + Send + Sync + 'static {
         self.normal_message_fn =  Some(Box::new(move |ctx, msg| Box::pin(normal_msg(ctx, msg))));
         self
     }
@@ -148,12 +148,12 @@ impl SimpleFramework {
     }
 
     pub fn with_default_plaintext_help(mut self) -> Self {
-        self.help(&default_plaintext_help)
+        self.help(default_plaintext_help)
     }
 
-    pub fn help<T, F>(mut self, help_fn: &'static F) -> Self
+    pub fn help<T, F>(mut self, help_fn: F) -> Self
     where T: 'static + Future<Output = CommandResult> + Send,
-    F: Fn(&Context, &Message, &str, &[&str]) -> T + Send + Sync {
+    F: Fn(&Context, &Message, &str, &[&str]) -> T + Send + Sync + 'static {
         self.help_cmd = Some(Box::new(|ctx, msg, prefix, command_list| Box::pin(help_fn(ctx, msg, prefix, command_list))));
         self
     }
@@ -234,7 +234,6 @@ impl SimpleFramework {
             normal_message(ctx, msg).await;
         }
     }
-
 
     fn parse_cmd_name_and_args<'c>(&self, text: &'c str) -> (Cow<'c, str>, Args) {
         let text = match &self.delimiters[0] {
