@@ -378,15 +378,36 @@ impl Message {
 
     /// Returns the associated `Guild` for the message if one is in the cache.
     ///
-    /// Returns `None` if the guild's Id could not be found via [`guild_id`] or
+    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
+    /// if the Guild itself is not cached.
+    ///
+    /// Requires the `cache` feature be enabled.
+    ///
+    /// **Info**:
+    /// This method will automatically clone the field you selected.
+    ///
+    /// [`guild_id`]: #method.guild_id
+    #[cfg(feature = "cache")]
+    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self.guild_id?).await
+    }
+
+    /// Returns a field to the `Guild` for the message if one is in the cache.
+    /// The field can be selected via the `field_accessor`.
+    ///
+    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
-    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
-        cache.as_ref().guild(self.guild_id?).await
+    pub async fn guild_field<Ret: Clone, Fun>(&self, cache: impl AsRef<Cache>, field_accessor: Fun) -> Option<Ret>
+    where Fun: FnOnce(&Guild) -> Ret {
+        cache.as_ref().guild_field(
+            self.guild_id?,
+            field_accessor
+        ).await
     }
 
     /// True if message was sent using direct messages.
