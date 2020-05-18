@@ -30,6 +30,25 @@ pub struct ShardManagerMonitor {
     pub shutdown: Sender<ShardId>,
 }
 
+#[derive(Debug)]
+pub enum ShardManagerError {
+    /// Returned when a shard received an [`InvalidAuthentication`] error.
+    /// An invalid token has been specified.
+    ///
+    /// [`InvalidAuthentication`]: ../../../gateway/enum.Error.html#InvalidAuthentication
+    InvalidToken,
+    /// Returned when a shard received an [`InvalidGatewayIntents`] error.
+    ///
+    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.Error.html#InvalidGatewayIntents
+    InvalidGatewayIntents,
+    /// Returned when a shard received a [`DisallowedGatewayIntents`] error.
+    ///
+    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.Error.html#DisallowedGatewayIntents
+    DisallowedGatewayIntents,
+}
+
+type Result<T> = std::result::Result<T, ShardManagerError>;
+
 impl ShardManagerMonitor {
     /// "Runs" the monitor, waiting for messages over the Receiver.
     ///
@@ -43,7 +62,7 @@ impl ShardManagerMonitor {
     /// channel (probably indicating that the shard manager should stop anyway)
     ///
     /// [`ShardManagerMessage::ShutdownAll`]: enum.ShardManagerMessage.html#variant.ShutdownAll
-    pub async fn run(&mut self) {
+    pub async fn run(&mut self) -> Result<()> {
         debug!("Starting shard manager worker");
 
         while let Some(value) = self.rx.next().await {
@@ -81,7 +100,21 @@ impl ShardManagerMonitor {
                         );
                     }
                 }
+                ShardManagerMessage::ShardInvalidAuthentication => {
+                    self.manager.lock().await.shutdown_all().await;
+                    return Err(ShardManagerError::InvalidToken);
+                },
+
+                ShardManagerMessage::ShardInvalidGatewayIntents => {
+                    self.manager.lock().await.shutdown_all().await;
+                    return Err(ShardManagerError::InvalidGatewayIntents);
+                },
+                ShardManagerMessage::ShardDisallowedGatewayIntents => {
+                    self.manager.lock().await.shutdown_all().await;
+                    return Err(ShardManagerError::DisallowedGatewayIntents);
+                },
             }
         }
+        Ok(())
     }
 }

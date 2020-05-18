@@ -1,4 +1,4 @@
-use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction};
+use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction, GatewayError};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
@@ -128,7 +128,7 @@ impl ShardRunner {
             }
 
             let pre = self.shard.stage();
-            let (event, action, successful) = self.recv_event().await;
+            let (event, action, successful) = self.recv_event().await?;
             let post = self.shard.stage();
 
             if post != pre {
@@ -350,6 +350,17 @@ impl ShardRunner {
 
                         true
                     },
+                    ShardClientMessage::Manager(ShardManagerMessage::ShardDisallowedGatewayIntents)
+                    | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidAuthentication)
+                    | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidGatewayIntents) => {
+                        // These variants should never be received.
+                        warn!(
+                            "[ShardRunner {:?}] Received a ShardError?",
+                            self.shard.shard_info(),
+                        );
+
+                        true
+                    },
                 ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query }) => {
                     self.shard.chunk_guilds(
                         guild_ids,
@@ -489,7 +500,7 @@ impl ShardRunner {
 
     /// Returns a received event, as well as whether reading the potentially
     /// present event was successful.
-    async fn recv_event(&mut self) -> (Option<Event>, Option<ShardAction>, bool) {
+    async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {
             Ok(Some(value)) => {
                 GatewayEvent::deserialize(value).map(Some).map_err(From::from)
@@ -511,35 +522,35 @@ impl ShardRunner {
                         let interval_in_secs = interval / 1000;
 
                         if seconds_passed <= interval_in_secs * 2 {
-                            return (None, None, true);
+                            return Ok((None, None, true));
                         }
                     } else {
-                        return (None, None, true);
+                        return Ok((None, None, true));
                     }
                 }
 
                 debug!("Attempting to auto-reconnect");
 
                 match self.shard.reconnection_type() {
-                    ReconnectType::Reidentify => return (None, None, false),
+                    ReconnectType::Reidentify => return Ok((None, None, false)),
                     ReconnectType::Resume => {
                         if let Err(why) = self.shard.resume().await {
                             warn!("Failed to resume: {:?}", why);
 
-                            return (None, None, false);
+                            return Ok((None, None, false));
                         }
                     },
                     ReconnectType::__Nonexhaustive => unreachable!(),
                 }
 
-                return (None, None, true);
+                return Ok((None, None, true));
             },
             Err(why) => Err(why),
         };
 
         let event = match gw_event {
             Ok(Some(event)) => Ok(event),
-            Ok(None) => return (None, None, true),
+            Ok(None) => return Ok((None, None, true)),
             Err(why) => Err(why),
         };
 
@@ -548,8 +559,36 @@ impl ShardRunner {
             Ok(None) => None,
             Err(why) => {
                 error!("Shard handler received err: {:?}", why);
+                match why {
+                    Error::Gateway(GatewayError::InvalidAuthentication) => {
+                        
+                        if let Err(_) = self.manager_tx.unbounded_send(
+                        ShardManagerMessage::ShardInvalidAuthentication) {
+                            panic!("Failed sending InvalidAuthentication error to the shard manager.");
+                        }
 
-                return (None, None, true);
+                        return Err(why);
+                    },
+                    Error::Gateway(GatewayError::InvalidGatewayIntents) => {
+                        
+                        if let Err(_) = self.manager_tx.unbounded_send(
+                        ShardManagerMessage::ShardInvalidGatewayIntents) {
+                            panic!("Failed sending InvalidGatewayIntents error to the shard manager.");
+                        }
+
+                        return Err(why);
+                    },
+                    Error::Gateway(GatewayError::DisallowedGatewayIntents) => {
+                        
+                        if let Err(_) = self.manager_tx.unbounded_send(
+                        ShardManagerMessage::ShardDisallowedGatewayIntents) {
+                            panic!("Failed sending DisallowedGatewayIntents error to the shard manager.");
+                        }
+
+                        return Err(why);
+                    },
+                    _ => return Ok((None, None, true)),
+                }
             },
         };
 
@@ -569,7 +608,7 @@ impl ShardRunner {
             _ => None,
         };
 
-        (event, action, true)
+        Ok((event, action, true))
     }
 
     async fn request_restart(&mut self) -> Result<()> {
