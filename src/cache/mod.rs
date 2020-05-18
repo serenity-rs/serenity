@@ -624,7 +624,7 @@ impl Cache {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // We clone only the `name` instead of the entire channel.
-    /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()).await {
+    /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick).await {
     ///     println!("Member's nick: {}", nick);
     /// }
     /// #   Ok(())
