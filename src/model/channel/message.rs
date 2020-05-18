@@ -397,9 +397,6 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     ///
-    /// **Info**:
-    /// This method will automatically clone the field you selected.
-    ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
     pub async fn guild_field<Ret: Clone, Fun>(&self, cache: impl AsRef<Cache>, field_accessor: Fun) -> Option<Ret>

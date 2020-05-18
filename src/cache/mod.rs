@@ -410,9 +410,6 @@ impl Cache {
     /// the entire guild by providing a `field_selector`-closure picking what
     /// you want to clone.
     ///
-    /// **Info**:
-    /// This method will automatically clone the field you selected.
-    ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
     /// #
@@ -426,17 +423,17 @@ impl Cache {
     /// # }
     /// ```
     #[inline]
-    pub async fn guild_field<Ret: Clone, Fun>(&self, id: impl Into<GuildId>, field_selector: Fun) -> Option<Ret>
+    pub async fn guild_field<Ret, Fun>(&self, id: impl Into<GuildId>, field_selector: Fun) -> Option<Ret>
     where Fun: FnOnce(&Guild) -> Ret {
         self._guild_field(id.into(), field_selector).await
     }
 
-    async fn _guild_field<Ret: Clone, Fun>(&self, id: GuildId, field_accessor: Fun) -> Option<Ret>
+    async fn _guild_field<Ret, Fun>(&self, id: GuildId, field_accessor: Fun) -> Option<Ret>
     where Fun: FnOnce(&Guild) -> Ret {
         let guilds = self.guilds.read().await;
         let guild = guilds.get(&id.into())?;
 
-        Some(field_accessor(guild)).map(|field| field.clone())
+        Some(field_accessor(guild))
     }
 
     /// Returns the number of cached guilds.
@@ -505,37 +502,34 @@ impl Cache {
     /// the entire guild by providing a `field_selector`-closure picking what
     /// you want to clone.
     ///
-    /// **Info**:
-    /// This method will automatically clone the field you selected.
-    ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // We clone only the `name` instead of the entire channel.
-    /// if let Some(channel_name) = cache.guild_channel_field(7, |channel| channel.name).await {
+    /// if let Some(channel_name) = cache.guild_channel_field(7, |channel| channel.name.clone()).await {
     ///     println!("Guild channel name: {}", channel_name);
     /// }
     /// #   Ok(())
     /// # }
     /// ```
     #[inline]
-    pub async fn guild_channel_field<Ret: Clone, Fun>(&self,
+    pub async fn guild_channel_field<Ret, Fun>(&self,
         id: impl Into<ChannelId>,
         field_selector: Fun) -> Option<Ret>
     where Fun: FnOnce(&GuildChannel) -> Ret {
         self._guild_channel_field(id.into(), field_selector).await
     }
 
-    async fn _guild_channel_field<Ret: Clone, Fun>(&self,
+    async fn _guild_channel_field<Ret, Fun>(&self,
         id: ChannelId,
         field_selector: Fun) -> Option<Ret>
     where Fun: FnOnce(&GuildChannel) -> Ret {
         let guild_channels = &self.channels.read().await;
         let channel = guild_channels.get(&id.into())?;
 
-        Some(field_selector(channel)).map(|field| field.clone())
+        Some(field_selector(channel))
     }
 
     /// Retrieves a [`Guild`]'s member from the cache based on the guild's and
@@ -615,23 +609,20 @@ impl Cache {
     /// the entire member by providing a `field_selector`-closure picking what
     /// you want to clone.
     ///
-    /// **Info**:
-    /// This method will automatically clone the field you selected.
-    ///
     /// ```rust,no_run
     /// # use serenity::cache::Cache;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # let cache = Cache::default();
     /// // We clone only the `name` instead of the entire channel.
-    /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| &member.nick).await {
+    /// if let Some(Some(nick)) = cache.member_field(7, 8, |member| member.nick.clone()).await {
     ///     println!("Member's nick: {}", nick);
     /// }
     /// #   Ok(())
     /// # }
     /// ```
     #[inline]
-    pub async fn member_field<Ret: Clone, Fun>(&self,
+    pub async fn member_field<Ret, Fun>(&self,
         guild_id: impl Into<GuildId>,
         user_id: impl Into<UserId>,
         field_selector: Fun) -> Option<Ret>
@@ -639,7 +630,7 @@ impl Cache {
         self._member_field(guild_id.into(), user_id.into(), field_selector).await
     }
 
-    async fn _member_field<Ret: Clone, Fun>(&self,
+    async fn _member_field<Ret, Fun>(&self,
         guild_id: GuildId,
         user_id: UserId,
         field_selector: Fun) -> Option<Ret>
@@ -648,7 +639,7 @@ impl Cache {
         let guild = guilds.get(&guild_id)?;
         let member = guild.members.get(&user_id)?;
 
-        Some(field_selector(member)).map(|field| field.clone())
+        Some(field_selector(member))
     }
 
     #[inline]
