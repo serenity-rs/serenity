@@ -383,9 +383,6 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     ///
-    /// **Info**:
-    /// This method will automatically clone the field you selected.
-    ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
     pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
@@ -399,6 +396,9 @@ impl Message {
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
+    ///
+    /// **Info**:
+    /// This method will automatically clone the field you selected.
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
