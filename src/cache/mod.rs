@@ -436,6 +436,11 @@ impl Cache {
         Some(field_accessor(guild).clone())
     }
 
+    /// Returns the number of cached guilds.
+    pub async fn guild_count(&self) -> usize {
+        self.guilds.read().await.len()
+    }
+
     /// Retrieves a reference to a [`Guild`]'s channel. Unlike [`channel`],
     /// this will only search guilds for the given channel.
     ///
