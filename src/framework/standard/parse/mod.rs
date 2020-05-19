@@ -343,6 +343,7 @@ pub fn command(
     }
 
     let mut last = Err(ParseError::UnrecognisedCommand(None));
+    let mut is_prefixless = false;
 
     for (group, map) in groups {
         match map {
@@ -354,7 +355,9 @@ pub fn command(
                     return res;
                 }
 
-                last = res;
+                if !is_prefixless {
+                    last = res;
+                }
             }
             Map::Prefixless(subgroups, commands) => {
                 let res = handle_group(stream, ctx, msg, config, subgroups);
@@ -370,6 +373,7 @@ pub fn command(
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
 
+                    is_prefixless = true;
                     return res;
                 }
 
