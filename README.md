@@ -194,7 +194,7 @@ Voice + youtube-dl:
 
 # Projects extending Serenity
 
-- [serenity-lavalink][project:serenity-lavalink] - A wrapper around [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [serenity-lavalink][project:serenity-lavalink] - An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
