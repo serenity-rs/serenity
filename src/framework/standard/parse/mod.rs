@@ -373,8 +373,8 @@ pub fn command(
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
 
-                    return res;
                     is_prefixless = true;
+                    return res;
                 }
 
                 last = res;
