@@ -1,5 +1,4 @@
 use super::Framework;
-use std::pin::Pin;
 use std::future::Future;
 use std::collections::HashMap;
 use std::borrow::Cow;
@@ -8,18 +7,20 @@ use log::warn;
 use crate::client::Context;
 use crate::model::channel::Message;
 
+use futures::future::BoxFuture;
+
 pub use super::shared::{
     args::{Args, Delimiter, Error as ArgError, Iter, RawArguments},
     CommandResult
 };
 
-type Command = Box<dyn Fn(&Context, &Message, Args) -> Pin<Box<dyn Future<Output = CommandResult> + Send>> + Send + Sync>;
-type BeforeFn = Box<dyn Fn(&Context, &Message, &str) -> Pin<Box<dyn Future<Output = bool> + Send>> + Send + Sync>;
-type AfterFn = Box<dyn Fn(&Context, &Message, &str, CommandResult) -> Pin<Box<dyn Future<Output = ()>  + Send>> + Send + Sync>;
-type UnrecognizedCommand = Box<dyn Fn(&Context, &Message, &str, Args) -> Pin<Box<dyn Future<Output = ()>  + Send>> + Send + Sync>;
-type NormalMessage = Box<dyn Fn(&Context, &Message) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
-type PrefixOnly = Box<dyn Fn(&Context, &Message) -> Pin<Box<dyn Future<Output = ()> + Send>> + Send + Sync>;
-type HelpCommand = Box<dyn Fn(&Context, &Message, &str, &[&str]) -> Pin<Box<dyn Future<Output = CommandResult> + Send>> + Send + Sync>;
+type Command = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult> + Send + Sync>;
+type BeforeFn = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool> + Send + Sync>;
+type AfterFn = Box<dyn for <'fut> Fn(&'fut Context, &'fut Message, &'fut str, CommandResult) -> BoxFuture<'fut, ()> + Send + Sync>;
+type UnrecognizedCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, Args) -> BoxFuture<'fut, ()> + Send + Sync>;
+type NormalMessage = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
+type PrefixOnly = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
+type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync>;
 
 pub struct SimpleFramework {
     prefix: String,
@@ -149,12 +150,14 @@ impl SimpleFramework {
 
     pub fn with_default_plaintext_help(mut self) -> Self {
         self.help(default_plaintext_help)
+        //self.help_cmd = Some(Box::new(|ctx, msg, prefix, command_list| Box::pin(default_plaintext_help(ctx, msg, prefix, command_list))));
+        //self
     }
 
     pub fn help<T, F>(mut self, help_fn: F) -> Self
     where T: 'static + Future<Output = CommandResult> + Send,
-    F: Fn(&Context, &Message, &str, &[&str]) -> T + Send + Sync + 'static {
-        self.help_cmd = Some(Box::new(|ctx, msg, prefix, command_list| Box::pin(help_fn(ctx, msg, prefix, command_list))));
+   F: 'static + Fn(&Context, &Message, &str, &[&str]) -> T + Send + Sync {
+        self.help_cmd = Some(Box::new(move |ctx, msg, prefix, command_list| Box::pin(help_fn(ctx, msg, prefix, command_list))));
         self
     }
 
