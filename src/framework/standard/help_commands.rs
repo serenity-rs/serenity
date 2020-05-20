@@ -62,7 +62,7 @@ use super::{
 };
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::{
-    cache::CacheRwLock,
+    cache::Cache,
     client::Context,
     framework::standard::CommonOptions,
     model::channel::Message,
@@ -274,24 +274,27 @@ pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
 /// and given the required permissions.
 #[cfg(feature = "cache")]
 pub async fn has_all_requirements(
-    cache: impl AsRef<CacheRwLock>,
+    cache: impl AsRef<Cache>,
     cmd: &CommandOptions,
     msg: &Message,
 ) -> bool {
-    if let Some(guild) = msg.guild(&cache).await {
-        let guild = guild.read().await;
+    if let Some(guild_id) = msg.guild_id {
 
-        if let Some(member) = guild.members.get(&msg.author.id) {
+        if let Some(member) = cache.as_ref().member(guild_id, &msg.author.id).await {
 
             if let Ok(permissions) = member.permissions(&cache).await {
 
                 return if cmd.allowed_roles.is_empty() {
                     permissions.administrator() || has_correct_permissions(&cache, &cmd, msg).await
-                } else {
+                } else if let Some(roles) = cache.as_ref().guild_roles(guild_id).await {
                     permissions.administrator()
-                        || (has_correct_roles(&cmd, &guild, member)
-                            && has_correct_permissions(&cache, &cmd, msg).await)
-                };
+                        || (has_correct_roles(&cmd, &roles, &member)
+                        && has_correct_permissions(&cache, &cmd, msg).await)
+                } else {
+                    warn!("Failed to find the guild and its roles.");
+
+                    false
+                }
             }
         }
     }
@@ -345,7 +348,7 @@ fn find_any_command_matches(
 
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn check_common_behaviour<'a>(
-    cache: &'a impl AsRef<CacheRwLock>,
+    cache: impl AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
     owners: &HashSet<UserId>,
@@ -373,10 +376,9 @@ async fn check_common_behaviour<'a>(
     }
 
     if let Some(guild) = msg.guild(&cache).await {
-        let guild = guild.read().await;
 
         if let Some(member) = guild.members.get(&msg.author.id) {
-            if !has_correct_roles(options, &guild, &member) {
+            if !has_correct_roles(options, &guild.roles, &member) {
                 return help_options.lacking_role;
             }
         }
@@ -393,7 +395,7 @@ async fn check_command_behaviour<'a>(
     owners: &'a HashSet<UserId>,
     help_options: &'a HelpOptions,
 ) -> HelpBehaviour {
-    let b = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
+    let b = check_common_behaviour(&ctx.cache, msg, &options, owners, help_options).await;
 
     if b == HelpBehaviour::Nothing {
        for check in options.checks {
@@ -1182,7 +1184,7 @@ async fn send_single_command_embed(
 
             if !command.sub_commands.is_empty() {
                 embed.field(
-                    &help_options.sub_commands_label, 
+                    &help_options.sub_commands_label,
                     format!("`{}`", command.sub_commands.join("`, `")),
                     true,
                 );

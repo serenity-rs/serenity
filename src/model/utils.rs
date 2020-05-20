@@ -14,7 +14,7 @@ use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 
 pub fn default_true() -> bool {
     true
@@ -224,13 +224,12 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 
 #[cfg(all(feature = "cache", feature = "model"))]
 pub async fn user_has_perms(
-    cache: impl AsRef<CacheRwLock>,
+    cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
     mut permissions: Permissions
 ) -> Result<bool> {
-    let cache = cache.as_ref().read().await;
-    let current_user = &cache.user;
+    let cache = cache.as_ref();
 
     let guild_id = match guild_id {
         Some(id) => id,
@@ -259,12 +258,14 @@ pub async fn user_has_perms(
         }
     };
 
-    let guild = match cache.guild(guild_id) {
+    let guild = match cache.guild(guild_id).await {
         Some(guild) => guild,
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild.read().await.user_permissions_in(channel_id, current_user.id).await;
+    let perms = guild
+        .user_permissions_in(channel_id, cache.current_user.read().await.id)
+        .await;
 
     permissions.remove(perms);
 

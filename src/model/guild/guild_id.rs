@@ -1,7 +1,7 @@
 use crate::model::prelude::*;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::builder::{EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
@@ -12,10 +12,6 @@ use crate::utils;
 use crate::builder::CreateChannel;
 #[cfg(any(feature = "model", feature = "http"))]
 use serde_json::json;
-#[cfg(feature = "cache")]
-use tokio::sync::RwLock;
-#[cfg(feature = "cache")]
-use std::sync::Arc;
 #[cfg(feature = "cache")]
 use futures::stream::Stream;
 #[cfg(feature = "collector")]
@@ -462,8 +458,8 @@ impl GuildId {
     /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn to_guild_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
-        cache.as_ref().read().await.guild(self)
+    pub async fn to_guild_cached(self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self).await
     }
 
     /// Requests [`PartialGuild`] over REST API.
@@ -537,7 +533,7 @@ impl GuildId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(member) = cache.read().await.member(self.0, user_id).await {
+                if let Some(member) = cache.member(self.0, user_id).await {
                     return Ok(member);
                 }
             }
@@ -625,6 +621,12 @@ impl GuildId {
         http.as_ref().edit_member(self.0, user_id.0, &map).await
     }
 
+    /// Returns the name of whatever guild this id holds.
+    #[cfg(feature = "cache")]
+    pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
+        cache.as_ref().guild_field(self, |guild| guild.name.clone()).await
+    }
+
     /// Gets the number of [`Member`]s that would be pruned with the given
     /// number of days.
     ///
@@ -676,8 +678,8 @@ impl GuildId {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(self, cache: impl AsRef<CacheRwLock>) -> u64 {
-        crate::utils::shard_id(self.0, cache.as_ref().read().await.shard_count)
+    pub async fn shard_id(self, cache: impl AsRef<Cache>) -> u64 {
+        crate::utils::shard_id(self.0, cache.as_ref().shard_count().await)
     }
 
     /// Returns the Id of the shard associated with the guild.

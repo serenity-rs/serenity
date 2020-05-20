@@ -149,8 +149,6 @@ async fn check_discrepancy(
                 None => return Ok(()),
             };
 
-            let guild = guild.read().await;
-
             let perms = guild.user_permissions_in(msg.channel_id, msg.author.id).await;
 
             if !perms.contains(*options.required_permissions())
@@ -162,7 +160,7 @@ async fn check_discrepancy(
             }
 
             if let Some(member) = guild.members.get(&msg.author.id) {
-                if !perms.administrator() && !has_correct_roles(options, &guild, &member) {
+                if !perms.administrator() && !has_correct_roles(options, &guild.roles, &member) {
                     return Err(DispatchError::LackingRole);
                 }
             }

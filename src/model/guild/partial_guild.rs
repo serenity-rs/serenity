@@ -8,7 +8,7 @@ use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
@@ -440,7 +440,7 @@ impl PartialGuild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
         self.id.shard_id(cache).await
     }
 
@@ -541,7 +541,7 @@ impl PartialGuild {
     ///     async fn message(&self, context: Context, msg: Message) {
     ///         if let Some(guild_id) = msg.guild_id {
     ///             if let Some(guild) = guild_id.to_guild_cached(&context).await {
-    ///                 if let Some(role) = guild.read().await.role_by_name("role_name") {
+    ///                 if let Some(role) = guild.role_by_name("role_name") {
     ///                     println!("Obtained role's reference: {:?}", role);
     ///                 }
     ///             }

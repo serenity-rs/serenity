@@ -59,7 +59,7 @@ mod shard_runner_message;
 mod intents;
 
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
-pub use self::shard_manager_monitor::ShardManagerMonitor;
+pub use self::shard_manager_monitor::{ShardManagerMonitor, ShardManagerError};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
@@ -128,7 +128,23 @@ pub enum ShardManagerMessage {
     /// move toward the next one.
     ///
     /// [`ShardRunner`]: struct.ShardRunner.html
-    ShutdownFinished(ShardId)
+    ShutdownFinished(ShardId),
+    /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.
+    /// Emitted when a shard receives an [`InvalidAuthentication`] Error
+    ///
+    /// [`InvalidAuthentication`]: ../../../gateway/enum.Error.html#InvalidAuthentication
+    ShardInvalidAuthentication,
+    /// Indicator that a shard provided undocumented gateway intents.
+    /// Emitted when a shard received an [`InvalidGatewayIntents`] error.
+    ///
+    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.Error.html#InvalidGatewayIntents
+    ShardInvalidGatewayIntents,
+    /// If a connection has been established but privileged gateway intents
+    /// were provided without enabling them prior.
+    /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
+    ///
+    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.Error.html#DisallowedGatewayIntents
+    ShardDisallowedGatewayIntents,
 }
 
 /// A message to be sent to the [`ShardQueuer`].

@@ -10,16 +10,12 @@ use crate::{internal::prelude::*, model::misc::Mentionable};
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
-#[cfg(all(feature = "cache", feature = "model"))]
-use tokio::sync::RwLock;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::utils;
 #[cfg(feature = "collector")]
@@ -61,14 +57,13 @@ impl CurrentUser {
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
     /// # async fn run() {
-    /// # use serenity::cache::{Cache, CacheRwLock};
+    /// # use serenity::cache::Cache;
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read().await;
+    /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// let user = cache.current_user().await;
     ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
@@ -498,8 +493,7 @@ impl User {
     /// #   #[cfg(feature = "cache")]
     ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let cache = ctx.cache.read().await;
-    ///             let url = match cache.user.invite_url(&ctx, Permissions::empty()).await {
+    ///             let url = match ctx.cache.current_user().await.invite_url(&ctx, Permissions::empty()).await {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -576,8 +570,7 @@ impl User {
         {
             if let Some(cache) = cache_http.cache() {
 
-                for channel in cache.read().await.private_channels.values() {
-                    let channel = channel.read().await;
+                for channel in cache.private_channels().await.values() {
 
                     if channel.recipient.id == self.id {
                         private_channel_id = Some(channel.id);
@@ -693,12 +686,8 @@ impl User {
                     {
                         if let Some(cache) = cache_http.cache() {
 
-                            if let Some(guild) = cache.read().await.guilds.get(&guild_id) {
-                                let guild = guild.read().await;
-
-                                if let Some(member) = guild.members.get(&self.id) {
-                                    has_role = Some(member.roles.contains(&role));
-                                }
+                            if let Some(member) = cache.member(guild_id, self.id).await {
+                                has_role = Some(member.roles.contains(&role));
                             }
                         }
                     }
@@ -799,7 +788,7 @@ impl User {
 
                 if let Some(guild) = guild_id.to_guild_cached(cache).await {
 
-                    if let Some(member) = guild.read().await.members.get(&self.id) {
+                    if let Some(member) = guild.members.get(&self.id) {
                         return member.nick.clone();
                     }
                 }
@@ -863,8 +852,8 @@ impl UserId {
     /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {
-        cache.as_ref().read().await.user(self)
+    pub async fn to_user_cached(self, cache: impl AsRef<Cache>) -> Option<User> {
+        cache.as_ref().user(self).await
     }
 
     /// First attempts to find a [`User`] by its Id in the cache,
@@ -880,8 +869,8 @@ impl UserId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(user) = cache.read().await.user(self) {
-                    return Ok(user.read().await.clone());
+                if let Some(user) = cache.user(self).await {
+                    return Ok(user);
                 }
             }
         }

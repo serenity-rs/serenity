@@ -7,13 +7,10 @@ use std::{
     task::{Context as FutContext, Poll},
 };
 use tokio::{
-    sync::{
-        mpsc::{
-            unbounded_channel,
-            UnboundedReceiver as Receiver,
-            UnboundedSender as Sender,
-        },
-        Mutex,
+    sync::mpsc::{
+        unbounded_channel,
+        UnboundedReceiver as Receiver,
+        UnboundedSender as Sender,
     },
     time::{Delay, delay_for},
 };

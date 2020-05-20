@@ -15,9 +15,10 @@ use super::super::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::super::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::http::{Http, CacheHttp};
+
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
 /// guild it was created in.
@@ -90,7 +91,7 @@ impl Emoji {
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn delete<T>(&self, cache_and_http: T) -> Result<()>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
+    where T: AsRef<Cache> + AsRef<Http> {
         match self.find_guild_id(&cache_and_http).await {
             Some(guild_id) => AsRef::<Http>::as_ref(&cache_and_http)
                 .delete_emoji(guild_id.0, self.id.0).await,
@@ -107,7 +108,7 @@ impl Emoji {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[cfg(feature = "cache")]
     pub async fn edit<T>(&mut self, cache_and_http: T, name: &str) -> Result<()>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
+    where T: AsRef<Cache> + AsRef<Http> {
         match self.find_guild_id(&cache_and_http).await {
             Some(guild_id) => {
                 let map = json!({
@@ -135,12 +136,12 @@ impl Emoji {
     ///
     /// ```rust,no_run
     /// # use serde_json::json;
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::{guild::{Emoji, Role}, id::EmojiId}};
+    /// # use serenity::{cache::Cache, model::{guild::{Emoji, Role}, id::EmojiId}};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// # let cache = Cache::default();
     /// #
     /// # let mut emoji = serde_json::from_value::<Emoji>(json!({
     /// #     "animated": false,
@@ -158,9 +159,8 @@ impl Emoji {
     /// # }
     /// ```
     #[cfg(feature = "cache")]
-    pub async fn find_guild_id(&self, cache: impl AsRef<CacheRwLock>) -> Option<GuildId> {
-        for guild in cache.as_ref().read().await.guilds.values() {
-            let guild = guild.read().await;
+    pub async fn find_guild_id(&self, cache: impl AsRef<Cache>) -> Option<GuildId> {
+        for guild in cache.as_ref().guilds.read().await.values() {
 
             if guild.emojis.contains_key(&self.id) {
                 return Some(guild.id);

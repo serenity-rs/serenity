@@ -15,7 +15,7 @@ use super::{Permissions, utils as model_utils};
 #[cfg(feature = "model")]
 use crate::utils;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 
@@ -252,7 +252,7 @@ impl InviteGuild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub async fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 {
+    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
         self.id.shard_id(&cache).await
     }
 
