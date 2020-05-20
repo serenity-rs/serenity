@@ -34,7 +34,7 @@ use crate::model::misc::ChannelParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use async_trait::async_trait;
 
@@ -77,11 +77,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # async fn run() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache = Cache::default();
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.guild() {
@@ -113,11 +113,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # async fn run() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache = Cache::default();
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.private() {
@@ -149,11 +149,11 @@ impl Channel {
     /// ```rust,no_run
     /// # #[cfg(all(feature = "model", feature = "cache"))]
     /// # async fn run() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::id::ChannelId};
+    /// # use serenity::{cache::Cache, model::id::ChannelId};
     /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// #   let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+    /// #   let cache = Cache::default();
     /// #   let channel = ChannelId(0).to_channel_cached(&cache).await.unwrap();
     /// #
     /// match channel.category() {
@@ -530,7 +530,7 @@ mod test {
 impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
-    async fn from_str<CRL: AsRef<CacheRwLock> + Send + Sync>(cache: CRL, s: &str) -> StdResult<Self, Self::Err> {
+    async fn from_str<CRL: AsRef<Cache> + Send + Sync>(cache: CRL, s: &str) -> StdResult<Self, Self::Err> {
         match parse_channel(s) {
             Some(x) => match ChannelId(x).to_channel_cached(&cache).await {
                 Some(channel) => Ok(channel.clone()),

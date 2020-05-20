@@ -41,13 +41,11 @@ use std::{
     path::Path,
 };
 #[cfg(feature = "cache")]
-use crate::prelude::RwLock;
-#[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
 use std::str::FromStr;
 #[cfg(feature = "cache")]
-use crate::cache::{Cache, CacheRwLock};
+use crate::cache::Cache;
 
 /// Converts a HashMap into a final `serde_json::Map` representation.
 pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
@@ -452,48 +450,6 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 #[inline]
 pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }
 
-/// A function for doing automatic `read`ing (and the releasing of the guard as well)
-/// This is particularly useful if you just want to use the cache for this one time,
-/// or don't want to be messing with the `RwLock` directly.
-///
-/// # Examples
-///
-/// Return the bot's id
-///
-/// ```rust,ignore
-/// use serenity::utils;
-///
-/// // assuming that the id is `1234`:
-/// assert_eq!(1234, utils::with_cache(|cache|cache.as_ref().user.id));
-/// ```
-#[cfg(feature = "cache")]
-pub async fn with_cache<T, F>(cache: impl AsRef<CacheRwLock>, f: F) -> T
-    where F: Fn(&Cache) -> T {
-    let cache = cache.as_ref().read().await;
-    f(&cache)
-}
-
-/// Like [`with_cache`] but as the name says, allows for modifications to be done.
-///
-/// # Examples
-///
-/// Return the bot's id, and changes the shard count
-///
-/// ```rust,ignore
-/// use serenity::utils;
-///
-/// // assuming that the id is `1234`:
-/// assert_eq!(1234, utils::with_cache_mut(|cache| { cache.shard_count = 8;cache.as_ref().user.id }));
-/// ```
-///
-/// [`with_cache`]: #fn.with_cache
-#[cfg(feature = "cache")]
-pub async fn with_cache_mut<T, F>(cache: impl AsRef<CacheRwLock>, mut f: F) -> T
-    where F: FnMut(&mut Cache) -> T {
-    let mut cache = cache.as_ref().write().await;
-    f(&mut cache)
-}
-
 /// Struct that allows to alter [`content_safe`]'s behaviour.
 ///
 /// [`content_safe`]: fn.content_safe.html
@@ -609,7 +565,7 @@ impl Default for ContentSafeOptions {
 
 #[cfg(feature = "cache")]
 #[inline]
-async fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
+async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@&") {
@@ -646,7 +602,7 @@ async fn clean_roles(cache: impl AsRef<CacheRwLock>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-async fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
+async fn clean_channels(cache: impl AsRef<Cache>, s: &mut String) {
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<#") {
@@ -659,7 +615,7 @@ async fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
             if let Ok(id) = ChannelId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
 
-                *s = if let Some(Channel::Guild(channel)) = id._to_channel_cached(&cache).await {
+                *s = if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache).await {
                     let replacement = format!("#{}", &channel.name);
                     s.replace(&to_replace, &replacement)
                 } else {
@@ -684,7 +640,8 @@ async fn clean_channels(cache: &RwLock<Cache>, s: &mut String) {
 
 #[cfg(feature = "cache")]
 #[inline]
-async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
+async fn clean_users(cache: impl AsRef<Cache>, s: &mut String, show_discriminator: bool, guild: Option<GuildId>) {
+    let cache = cache.as_ref();
     let mut progress = 0;
 
     while let Some(mut mention_start) = s[progress..].find("<@") {
@@ -703,11 +660,11 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
             };
 
             if let Ok(id) = UserId::from_str(&s[mention_start..mention_end]) {
-                let replacement = if let Some(guild) = guild {
+                let replacement = if let Some(guild_id) = guild {
 
-                    if let Some(guild) = cache.read().await.guild(&guild) {
+                    if let Some(guild) = cache.guild(guild_id).await {
 
-                        if let Some(member) = guild.read().await.members.get(&id) {
+                        if let Some(member) = guild.members.get(&id) {
 
                             if show_discriminator {
                                 format!("@{}", member.distinct().await)
@@ -720,21 +677,16 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
                     } else {
                         "@invalid-user".to_string()
                     }
-                } else {
-                    let user = cache.read().await.users.get(&id).cloned();
-
-                    if let Some(user) = user {
-                        let user = user.read().await;
-
-                        if show_discriminator {
-                            format!("@{}#{:04}", user.name, user.discriminator)
-                        } else {
-                            format!("@{}", user.name)
-                        }
+                } else if let Some(user) = cache.user(id).await {
+                    if show_discriminator {
+                        format!("@{}#{:04}", user.name, user.discriminator)
                     } else {
-                        "@invalid-user".to_string()
+                        format!("@{}", user.name)
                     }
+                } else {
+                    "@invalid-user".to_string()
                 };
+
 
                 let code_start = if has_exclamation { "<@!" } else { "<@" };
                 let to_replace = format!("{}{}>", code_start, &s[mention_start..mention_end]);
@@ -770,11 +722,11 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
 ///
 /// ```rust
 /// # use std::sync::Arc;
-/// # use serenity::client::{Cache, CacheRwLock};
+/// # use serenity::client::Cache;
 /// # use tokio::sync::RwLock;
 /// #
 /// # async fn run() {
-/// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+/// # let cache = Cache::default();
 /// use serenity::utils::{
 ///     content_safe,
 ///     ContentSafeOptions,
@@ -789,37 +741,36 @@ async fn clean_users(cache: &RwLock<Cache>, s: &mut String, show_discriminator: 
 /// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
 /// [`Cache`]: ../cache/struct.Cache.html
 #[cfg(feature = "cache")]
-pub async fn content_safe(cache: impl AsRef<CacheRwLock>, s: impl AsRef<str>, options: &ContentSafeOptions) -> String {
-    let mut s = s.as_ref().to_string();
-    let cache = cache.as_ref();
+pub async fn content_safe(cache: impl AsRef<Cache>, s: impl AsRef<str>, options: &ContentSafeOptions) -> String {
+    let mut content = s.as_ref().to_string();
 
     if options.clean_role {
-        clean_roles(&cache, &mut s).await;
+        clean_roles(&cache, &mut content).await;
     }
 
     if options.clean_channel {
-        clean_channels(&cache, &mut s).await;
+        clean_channels(&cache, &mut content).await;
     }
 
     if options.clean_user {
-        clean_users(&cache, &mut s, options.show_discriminator, options.guild_reference).await;
+        clean_users(&cache, &mut content, options.show_discriminator, options.guild_reference).await;
     }
 
     if options.clean_here {
-        s = s.replace("@here", "@\u{200B}here");
+        content = content.replace("@here", "@\u{200B}here");
     }
 
     if options.clean_everyone {
-        s = s.replace("@everyone", "@\u{200B}everyone");
+        content = content.replace("@everyone", "@\u{200B}everyone");
     }
 
-    s
+    content
 }
 
 #[cfg(test)]
 mod test {
     #[cfg(feature = "cache")]
-    use crate::cache::CacheRwLock;
+    use crate::cache::Cache;
 
     use super::*;
 
@@ -876,8 +827,6 @@ mod test {
             collections::HashMap,
             sync::Arc,
         };
-        use tokio::time::timeout;
-        use std::time::Duration;
 
         let user = User {
             id: UserId(100000000000000000),
@@ -966,16 +915,14 @@ mod test {
             _nonexhaustive: (),
         };
 
-        let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
+        let cache = Arc::new(Cache::default());
 
-        {
-            let mut cache = timeout(Duration::from_millis(10), cache.write()).await.unwrap();
-            guild.members.insert(user.id, member.clone());
-            guild.roles.insert(role.id, role.clone());
-            cache.users.insert(user.id, Arc::new(RwLock::new(user.clone())));
-            cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild.clone())));
-            cache.channels.insert(channel.id, Arc::new(RwLock::new(channel.clone())));
-        }
+        guild.members.insert(user.id, member.clone());
+        guild.roles.insert(role.id, role.clone());
+        cache.users.write().await.insert(user.id, user.clone());
+        cache.guilds.write().await.insert(guild.id, guild.clone());
+        cache.channels.write().await.insert(channel.id, channel.clone());
+
 
         let with_user_metions = "<@!100000000000000000> <@!000000000000000000> <@123> <@!123> \
         <@!123123123123123123123> <@123> <@123123123123123123> <@!invalid> \

@@ -6,8 +6,7 @@ use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
-
+use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::cache::FromStrAndCache;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -123,9 +122,8 @@ impl Role {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     #[deprecated(note = "replaced with the `guild_id` field", since = "0.9.0")]
-    pub async fn find_guild(&self, cache: impl AsRef<CacheRwLock>) -> Result<GuildId> {
-        for guild in cache.as_ref().read().await.guilds.values() {
-            let guild = guild.read().await;
+    pub async fn find_guild(&self, cache: impl AsRef<Cache>) -> Result<GuildId> {
+        for guild in cache.as_ref().guilds.read().await.values() {
 
             if guild.roles.contains_key(&RoleId(self.id.0)) {
                 return Ok(guild.id);
@@ -190,14 +188,13 @@ impl RoleId {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
-    pub async fn to_role_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Role> {
+    pub async fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
         self._to_role_cached(&cache).await
     }
 
     #[cfg(feature = "cache")]
-    pub(crate) async fn _to_role_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Role> {
-        for guild in cache.as_ref().read().await.guilds.values() {
-            let guild = guild.read().await;
+    pub(crate) async fn _to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
+        for guild in cache.as_ref().guilds.read().await.values() {
 
             if !guild.roles.contains_key(&self) {
                 continue;
@@ -227,7 +224,7 @@ impl<'a> From<&'a Role> for RoleId {
 impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
-    async fn from_str<CRL: AsRef<CacheRwLock> + Send + Sync>(cache: CRL, s: &str) -> StdResult<Self, Self::Err> {
+    async fn from_str<CRL: AsRef<Cache> + Send + Sync>(cache: CRL, s: &str) -> StdResult<Self, Self::Err> {
         match parse_role(s) {
             Some(x) => match RoleId(x).to_role_cached(&cache).await {
                 Some(role) => Ok(role),

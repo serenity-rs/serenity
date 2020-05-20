@@ -3,14 +3,10 @@
 use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 use serde_json::Value;
-#[cfg(feature = "cache")]
-use std::sync::Arc;
-#[cfg(feature = "cache")]
-use tokio::sync::RwLock;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
@@ -125,15 +121,16 @@ impl Message {
     /// Returns `None` if the channel is not in the cache.
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn channel(&self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> {
-        cache.as_ref().read().await.channel(self.channel_id).await
+    pub async fn channel(&self, cache: impl AsRef<Cache>) -> Option<Channel> {
+        cache.as_ref().channel(self.channel_id).await
     }
 
     /// A util function for determining whether this message was sent by someone else, or the
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
-    pub async fn is_own(&self, cache: impl AsRef<CacheRwLock>) -> bool {
-        self.author.id == cache.as_ref().read().await.user.id
+    #[inline]
+    pub async fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
+        self.author.id == cache.as_ref().current_user().await.id
     }
 
     /// Deletes the message.
@@ -155,7 +152,7 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
-                let is_author = self.author.id == cache.read().await.user.id;
+                let is_author = self.author.id == cache.current_user.read().await.id;
                 let has_perms = super::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
 
                 if !is_author && !has_perms {
@@ -267,7 +264,7 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.author.id != cache.read().await.user.id {
+                if self.author.id != cache.current_user.read().await.id {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -321,7 +318,7 @@ impl Message {
     /// Returns message content, but with user and role mentions replaced with
     /// names and everyone/here mentions cancelled.
     #[cfg(feature = "cache")]
-    pub async fn content_safe(&self, cache: impl AsRef<CacheRwLock>) -> String {
+    pub async fn content_safe(&self, cache: impl AsRef<Cache>) -> String {
         let mut result = self.content.clone();
 
         // First replace all user mentions.
@@ -381,15 +378,33 @@ impl Message {
 
     /// Returns the associated `Guild` for the message if one is in the cache.
     ///
-    /// Returns `None` if the guild's Id could not be found via [`guild_id`] or
+    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
     /// if the Guild itself is not cached.
     ///
     /// Requires the `cache` feature be enabled.
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
-    pub async fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
-        cache.as_ref().read().await.guild(self.guild_id?)
+    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
+        cache.as_ref().guild(self.guild_id?).await
+    }
+
+    /// Returns a field to the `Guild` for the message if one is in the cache.
+    /// The field can be selected via the `field_accessor`.
+    ///
+    /// Returns `None` if the guild's ID could not be found via [`guild_id`] or
+    /// if the Guild itself is not cached.
+    ///
+    /// Requires the `cache` feature be enabled.
+    ///
+    /// [`guild_id`]: #method.guild_id
+    #[cfg(feature = "cache")]
+    pub async fn guild_field<Ret: Clone, Fun>(&self, cache: impl AsRef<Cache>, field_accessor: Fun) -> Option<Ret>
+    where Fun: FnOnce(&Guild) -> Ret {
+        cache.as_ref().guild_field(
+            self.guild_id?,
+            field_accessor
+        ).await
     }
 
     /// True if message was sent using direct messages.
@@ -407,11 +422,8 @@ impl Message {
     ///
     /// [`Guild::members`]: ../guild/struct.Guild.html#structfield.members
     #[cfg(feature = "cache")]
-    pub async fn member(&self, cache: impl AsRef<CacheRwLock>) -> Option<Member> {
-        match self.guild(&cache).await {
-            Some(guild) => guild.read().await.members.get(&self.author.id).cloned(),
-            None => None,
-        }
+    pub async fn member(&self, cache: impl AsRef<Cache>) -> Option<Member> {
+        cache.as_ref().member(self.guild_id?, self.author.id).await
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
@@ -575,8 +587,9 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
-                let is_author = self.author.id == cache.read().await.user.id;
-                let has_perms = super::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
+                let is_author = self.author.id == cache.current_user.read().await.id;
+                let has_perms =
+                    super::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
 
                 if !is_author && !has_perms {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));

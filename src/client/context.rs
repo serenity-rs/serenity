@@ -1,4 +1,6 @@
+#[cfg(feature = "gateway")]
 use crate::client::bridge::gateway::ShardMessenger;
+#[cfg(feature = "gateway")]
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
 use tokio::sync::RwLock;
@@ -9,7 +11,9 @@ use crate::http::Http;
 use crate::utils::TypeMap;
 
 #[cfg(feature = "cache")]
-pub use crate::cache::{Cache, CacheRwLock};
+pub use crate::cache::Cache;
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
 
 /// The context is a general utility struct provided on event dispatches, which
 /// helps with dealing with the current "context" of the event dispatch.
@@ -39,30 +43,43 @@ pub struct Context {
     pub shard_id: u64,
     pub http: Arc<Http>,
     #[cfg(feature = "cache")]
-    pub cache: CacheRwLock,
+    pub cache: Arc<Cache>,
 }
 
 impl Context {
     /// Create a new Context to be passed to an event handler.
-    #[cfg(feature = "cache")]
+    #[cfg(all(feature = "cache", feature = "gateway"))]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         http: Arc<Http>,
-        cache: Arc<RwLock<Cache>>,
+        cache: Arc<Cache>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
-            cache: cache.into(),
+            cache,
+        }
+    }
+
+    #[cfg(all(not(feature = "cache"), not(feature = "gateway")))]
+    pub fn easy(
+        data: Arc<RwLock<TypeMap>>,
+        shard_id: u64,
+        http: Arc<Http>,
+    ) -> Context {
+        Context {
+            shard_id,
+            data,
+            http,
         }
     }
 
     /// Create a new Context to be passed to an event handler.
-    #[cfg(not(feature = "cache"))]
+    #[cfg(all(not(feature = "cache"), feature = "gateway"))]
     pub(crate) fn new(
         data: Arc<RwLock<TypeMap>>,
         runner_tx: Sender<InterMessage>,
@@ -108,6 +125,7 @@ impl Context {
     /// ```
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn online(&self) {
         self.shard.set_status(OnlineStatus::Online);
@@ -144,6 +162,7 @@ impl Context {
     /// ```
     ///
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn idle(&self) {
         self.shard.set_status(OnlineStatus::Idle);
@@ -180,6 +199,7 @@ impl Context {
     /// ```
     ///
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn dnd(&self) {
         self.shard.set_status(OnlineStatus::DoNotDisturb);
@@ -216,6 +236,7 @@ impl Context {
     ///
     /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
     /// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn invisible(&self) {
         self.shard.set_status(OnlineStatus::Invisible);
@@ -254,6 +275,7 @@ impl Context {
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
     /// [`set_presence`]: #method.set_presence
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn reset_presence(&self) {
         self.shard.set_presence(None::<Activity>, OnlineStatus::Online);
@@ -294,6 +316,7 @@ impl Context {
     /// ```
     ///
     /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn set_activity(&self, activity: Activity) {
         self.shard.set_presence(Some(activity), OnlineStatus::Online);
@@ -360,6 +383,7 @@ impl Context {
     ///
     /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
     /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
+    #[cfg(feature = "gateway")]
     #[inline]
     pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {
         self.shard.set_presence(activity, status);
@@ -368,7 +392,7 @@ impl Context {
     /// Sets a new `filter` for the shard to check if a message event shall be
     /// sent back to `filter`'s paired receiver.
     #[inline]
-    #[cfg(features = "collector")]
+    #[cfg(feature = "collector")]
     pub async fn set_message_filter(&self, filter: MessageFilter) {
         self.shard.set_message_filter(filter);
     }
@@ -376,7 +400,7 @@ impl Context {
     /// Sets a new `filter` for the shard to check if a reaction event shall be
     /// sent back to `filter`'s paired receiver.
     #[inline]
-    #[cfg(features = "collector")]
+    #[cfg(feature = "collector")]
     pub async fn set_reaction_filter(&self, filter: ReactionFilter) {
         self.shard.set_reaction_filter(filter);
     }
@@ -391,16 +415,23 @@ impl AsRef<Http> for Arc<Context> {
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<CacheRwLock> for Context {
-    fn as_ref(&self) -> &CacheRwLock {
+impl AsRef<Cache> for Context {
+    fn as_ref(&self) -> &Cache {
         &self.cache
     }
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<CacheRwLock> for Arc<Context> {
-    fn as_ref(&self) -> &CacheRwLock {
-        &self.cache
+impl AsRef<Cache> for Arc<Context> {
+    fn as_ref(&self) -> &Cache {
+        &*self.cache
+    }
+}
+
+#[cfg(feature = "cache")]
+impl AsRef<Cache> for Cache {
+    fn as_ref(&self) -> &Cache {
+        &self
     }
 }
 

@@ -10,9 +10,7 @@ use crate::builder::{
     GetMessages
 };
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::{Cache, CacheRwLock};
-#[cfg(all(feature = "cache", feature = "model"))]
-use tokio::sync::RwLock;
+use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
 #[cfg(feature = "model")]
@@ -357,15 +355,14 @@ impl ChannelId {
     /// [`Channel`]: ../channel/enum.Channel.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn to_channel_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Channel> {
-        self._to_channel_cached(&cache.as_ref()).await
+    pub async fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
+        self._to_channel_cached(cache.as_ref()).await
     }
 
     /// To allow testing pass their own cache instead of using the globale one.
     #[cfg(feature = "cache")]
-    #[inline]
-    pub(crate) async fn _to_channel_cached(self, cache: &RwLock<Cache>) -> Option<Channel> {
-        cache.read().await.channel(self).await
+    pub(crate) async fn _to_channel_cached(self, cache: &Cache) -> Option<Channel> {
+        cache.channel(self).await
     }
 
     /// First attempts to find a [`Channel`] by its Id in the cache,
@@ -381,7 +378,7 @@ impl ChannelId {
         {
             if let Some(cache) = cache_http.cache() {
 
-                if let Some(channel) = cache.read().await.channel(self).await {
+                if let Some(channel) = cache.channel(self).await {
                     return Ok(channel.clone());
                 }
             }
@@ -458,7 +455,7 @@ impl ChannelId {
 
     /// Returns the name of whatever channel this id holds.
     #[cfg(feature = "cache")]
-    pub async fn name(self, cache: impl AsRef<CacheRwLock>) -> Option<String> {
+    pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
         let channel = if let Some(c) = self.to_channel_cached(&cache).await {
             c
         } else {

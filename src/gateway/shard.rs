@@ -409,8 +409,8 @@ impl Shard {
                 return Err(Error::Gateway(GatewayError::NoAuthentication));
             },
             Some(close_codes::AUTHENTICATION_FAILED) => {
-                panic!("[Shard {:?}] Sent invalid authentication, please check the token.",
-                    self.shard_info);
+                error!("[Shard {:?}] Sent invalid authentication, please check the token.", self.shard_info);
+                return Err(Error::Gateway(GatewayError::InvalidAuthentication));
             },
             Some(close_codes::ALREADY_AUTHENTICATED) => {
                 warn!("[Shard {:?}] Already authenticated.",
@@ -445,10 +445,14 @@ impl Shard {
                 self.session_id = None;
             },
             Some(close_codes::INVALID_GATEWAY_INTENTS) => {
-                panic!("[Shard {:?}] Invalid gateway intents have been provided.", self.shard_info);
+                error!("[Shard {:?}] Invalid gateway intents have been provided.", self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::InvalidGatewayIntents));
             },
            Some(close_codes::DISALLOWED_GATEWAY_INTENTS) => {
-                panic!("[Shard {:?}] Disallowed gateway intents have been provided.", self.shard_info);
+                error!("[Shard {:?}] Disallowed gateway intents have been provided.", self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::DisallowedGatewayIntents));
             },
             Some(other) if !clean => {
                 warn!(

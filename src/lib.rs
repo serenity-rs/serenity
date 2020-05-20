@@ -88,11 +88,11 @@ mod error;
 
 pub use crate::error::{Error, Result};
 
-#[cfg(feature = "client")]
+#[cfg(all(feature = "client", feature = "gateway"))]
 pub use crate::client::Client;
 
 #[cfg(all(feature = "client", feature = "cache"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(all(feature = "client", feature = "cache"))]
 use std::time::Duration;
 #[cfg(feature = "client")]
@@ -105,7 +105,7 @@ use crate::http::Http;
 #[derive(Default)]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
-    pub cache: CacheRwLock,
+    pub cache: Arc<Cache>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     pub http: Arc<Http>,

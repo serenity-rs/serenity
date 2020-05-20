@@ -3,9 +3,7 @@ use crate::model::prelude::*;
 use serde_json::Value;
 use std::{
     collections::HashMap,
-    sync::Arc,
 };
-use tokio::sync::RwLock;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use async_trait::async_trait;
@@ -106,7 +104,7 @@ pub trait EventHandler: Send + Sync {
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
     #[cfg(feature = "cache")]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Arc<RwLock<Guild>>>) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Guild>) {}
 
     /// Dispatched when a guild is deleted.
     ///
@@ -198,7 +196,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's old full data (if available) and the new, albeit partial data.
     #[cfg(feature = "cache")]
-    async fn guild_update(&self, _ctx: Context, _old_data_if_available: Option<Arc<RwLock<Guild>>>, _new_but_incomplete: PartialGuild) {}
+    async fn guild_update(&self, _ctx: Context, _old_data_if_available: Option<Guild>, _new_but_incomplete: PartialGuild) {}
 
     /// Dispatched when the guild is updated.
     ///

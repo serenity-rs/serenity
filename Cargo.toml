@@ -150,7 +150,6 @@ builder = ["utils"]
 cache = []
 collector = ["gateway", "model", "tokio/stream"]
 client = [
-    "gateway",
     "http",
 ]
 extras = []

@@ -6,11 +6,15 @@ use async_trait::async_trait;
 /// This may be implemented on a type and used to update the cache via
 /// [`Cache::update`].
 ///
+/// **Info**:
+/// You may not access the fields of the cache, as they are public for the
+/// the crate only.
+///
 /// # Examples
 ///
 /// Creating a custom struct implementation to update the cache with:
 ///
-/// ```rust
+/// ```rust,ignore
 /// use serde_json::json;
 /// use serenity::{
 ///     cache::{Cache, CacheUpdate},
@@ -40,12 +44,12 @@ use async_trait::async_trait;
 ///     // A copy of the old user's data, if it existed in the cache.
 ///     type Output = User;
 ///
-///     async fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+///     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
 ///         // If an entry for the user already exists, update its fields.
-///         match cache.users.entry(self.user_id) {
+///         let users = cache.users.write().await;
+///         match users.entry(self.user_id) {
 ///             Entry::Occupied(entry) => {
 ///                 let user = entry.get();
-///                 let mut user = user.write().await;
 ///                 let old_user = user.clone();
 ///
 ///                 user.bot = self.user_is_bot;
@@ -74,7 +78,7 @@ use async_trait::async_trait;
 ///                     "username": self.user_name.clone(),
 ///                 })).expect("Error making user");
 ///
-///                 entry.insert(Arc::new(RwLock::new(user)));
+///                 entry.insert(user);
 ///
 ///                 // There was no old copy, so return None.
 ///                 None
@@ -111,5 +115,5 @@ pub trait CacheUpdate {
     type Output;
 
     /// Updates the cache with the implementation.
-    async fn update(&mut self, _: &mut Cache) -> Option<Self::Output>;
+    async fn update(&mut self, _: &Cache) -> Option<Self::Output>;
 }
