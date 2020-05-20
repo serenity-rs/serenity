@@ -1,3 +1,8 @@
+/// An alternative to the [`StandardFramework`]
+/// much less configurability, but less complex and no procedural macros
+///
+/// [`StandardFramework`]: ../standard/index.html
+
 use super::Framework;
 use std::collections::HashMap;
 use std::borrow::Cow;
@@ -70,7 +75,6 @@ impl SimpleFramework {
     /// Inserts a basic ping command into the framework
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
     /// # use serenity::client::{Client, Context};
     /// # use serenity::framework::simple::{SimpleFramework, Args, CommandResult};
     /// # use serenity::model::channel::Message;
@@ -92,7 +96,7 @@ impl SimpleFramework {
     }
 
     /// sets the prefix which the simple framework will look for
-    /// defaults to '!'
+    /// defaults to "!"
     pub fn prefix(mut self, prefix: &str) -> Self {
         self.prefix = prefix.to_owned();
         self
@@ -101,6 +105,23 @@ impl SimpleFramework {
     /// Sets the function to run after each command
     /// it's passed the name of the command used and
     /// the `CommandResult` returned by the command
+    ///
+    /// # Example
+    ///
+    /// ```rust,no_run
+    /// # use serenity::client::{Client, Context};
+    /// # use serenity::framework::simple::{SimpleFramework, CommandResult};
+    /// # use serenity::model::channel::Message;
+    ///
+    /// async fn after_fn(ctx: &Context, msg: &Message, cmd_name: &str, res: CommandResult) {
+    ///     if let Err(why) = res {
+    ///         eprintln!("The command {} returned the following error: {:?}", cmd_name, why);
+    ///     }
+    /// }
+    ///
+    /// let framework = SimpleFramework::new()
+    ///                 .after(after_fn);
+    /// ```
     pub fn after<F>(mut self, after: F) -> Self
     where F: for<'r, 's, 't>
     AsyncFn4<&'r Context, &'s Message, &'t str, CommandResult, Output = ()>
@@ -153,7 +174,7 @@ impl SimpleFramework {
         self
     }
 
-    /// Default help sends only a list of all command names
+    /// Default help sends a list of all command names
     pub fn with_default_plaintext_help(self) -> Self {
         self.help(default_plaintext_help)
     }
