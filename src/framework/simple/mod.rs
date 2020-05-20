@@ -23,12 +23,12 @@ type AfterFn = Box<dyn for <'fut> Fn(&'fut Context, &'fut Message, &'fut str, Co
 type UnrecognizedCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, Args) -> BoxFuture<'fut, ()> + Send + Sync>;
 type NormalMessage = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
 type PrefixOnly = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
-type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync + 'static>;
+type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync + 'static>;
 
 pub struct SimpleFramework {
     prefix: String,
     commands: HashMap<String, Command>,
-    //a Vec Only to interface with the Args struct easier
+    //a Vec only to interface with the Args struct easier
     delimiters: Vec<Delimiter>,
     case_insensitive: bool,
     before_cmd: Option<BeforeFn>,
@@ -73,7 +73,8 @@ impl SimpleFramework {
     /// # use serenity::prelude::*;
     /// # use serenity::client::{Client, Context};
     /// # use serenity::framework::simple::{SimpleFramework, Args, CommandResult};
-    /// 
+    /// # use serenity::model::channel::Message;
+    ///
     /// async fn ping(ctx: &Context, msg: &Message, _: Args) -> CommandResult {
     ///     msg.channel_id.say(&ctx.http, "pong!").await?;
     ///
@@ -152,17 +153,16 @@ impl SimpleFramework {
         self
     }
 
+    /// Default help sends only a list of all command names
     pub fn with_default_plaintext_help(self) -> Self {
         self.help(default_plaintext_help)
-        //self.help_cmd = Some(Box::new(|ctx, msg, prefix, command_list| Box::pin(default_plaintext_help(ctx, msg, prefix, command_list))));
-        //self
     }
 
     pub fn help<F>(mut self, help_fn: F) -> Self
     where F: for<'r, 's, 't0, 't1, 't2>
-    AsyncFn4<&'r Context, &'s Message, &'t0 str, &'t1[&'t2 str], Output = CommandResult>
+    AsyncFn3<&'r Context, &'s Message, &'t1[&'t2 str], Output = CommandResult>
     + Send + Sync + 'static {
-        self.help_cmd = Some(Box::new(move |ctx, msg, prefix, command_list| Box::pin(help_fn.call(ctx, msg, prefix, command_list))));
+        self.help_cmd = Some(Box::new(move |ctx, msg, command_list| Box::pin(help_fn.call(ctx, msg, command_list))));
         self
     }
 
@@ -185,7 +185,7 @@ impl SimpleFramework {
         let mut cmd_list = self.commands.keys().map(|name| name.as_ref()).collect::<Vec<&str>>();
         cmd_list.sort_unstable();
         if self.run_before_cmd(ctx, msg, "help").await {
-            let res = help_cmd(ctx, msg, &self.prefix, &cmd_list).await;
+            let res = help_cmd(ctx, msg, &cmd_list).await;
             self.run_after_cmd(ctx, msg, "help", res).await;
         }
     }
@@ -231,7 +231,7 @@ impl SimpleFramework {
             prefix_only(ctx, msg).await;
             return;
         }
-        //if no prefix only command is set, run normal message instead in this case
+        // if no prefix only command is set, run normal message instead in this case
         if let Some(normal_message) = &self.normal_message_fn {
             normal_message(ctx, msg).await;
         }
@@ -248,13 +248,19 @@ impl SimpleFramework {
             Delimiter::Multiple(delim) => text.splitn(2, delim).collect::<Vec<&str>>(),
             Delimiter::Single(delim) => text.splitn(2, *delim).collect::<Vec<&str>>(),
         };
-
+        
         let cmd = if self.case_insensitive {
             Cow::Owned(text[0].to_lowercase())
         } else {
             Cow::Borrowed(text[0])
         };
-        let args = Args::new(text[1], &self.delimiters);
+
+        // if no arguments were given, create an Args from an empty string
+        let args = match text.get(1) {
+            Some(val) => Args::new(val, &self.delimiters),
+            None => Args::new("", &self.delimiters),
+        };
+
         (cmd, args)
     }
 
@@ -283,12 +289,11 @@ impl Framework for SimpleFramework {
     }
 }
 
-async fn default_plaintext_help(ctx: &Context, msg: &Message, prefix: &str, command_list: &[&str]) -> CommandResult {
+async fn default_plaintext_help(ctx: &Context, msg: &Message, command_list: &[&str]) -> CommandResult {
     let mut help_text = String::from("Here is a list of commands:\n");
     help_text = command_list.iter().fold(
         help_text, 
         |mut text, cmd| {
-            text.push_str(prefix);
             text.push_str(cmd);
             text.push('\n');
             text
