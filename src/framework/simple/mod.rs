@@ -1,5 +1,4 @@
 use super::Framework;
-use std::future::Future;
 use std::collections::HashMap;
 use std::borrow::Cow;
 use async_trait::async_trait;
@@ -14,13 +13,17 @@ pub use super::shared::{
     CommandResult
 };
 
+mod traits;
+
+use self::traits::*;
+
 type Command = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult> + Send + Sync>;
 type BeforeFn = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool> + Send + Sync>;
 type AfterFn = Box<dyn for <'fut> Fn(&'fut Context, &'fut Message, &'fut str, CommandResult) -> BoxFuture<'fut, ()> + Send + Sync>;
 type UnrecognizedCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, Args) -> BoxFuture<'fut, ()> + Send + Sync>;
 type NormalMessage = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
 type PrefixOnly = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
-type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync>;
+type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync + 'static>;
 
 pub struct SimpleFramework {
     prefix: String,
@@ -80,10 +83,10 @@ impl SimpleFramework {
     /// let framework = SimpleFramework::new()
     ///                 .add("ping", ping);
     /// ```
-    pub fn add<T, F>(mut self, name: &str, cmd: F) -> Self 
-    where T: 'static + Future<Output=CommandResult> + Send,
-    F: Fn(&Context, &Message, Args) -> T + Send + Sync + 'static {
-        self.commands.insert(name.to_owned(), Box::new(move |ctx, msg, args| Box::pin(cmd(ctx, msg, args))));
+    pub fn add<F>(mut self, name: &str, cmd: F) -> Self 
+    where F: for<'r, 's> AsyncFn3<&'r Context, &'s Message, Args, Output = CommandResult> + Send + Sync + 'static {
+    //F: Fn(&Context, &Message, Args) -> T + Send + Sync + 'static {
+        self.commands.insert(name.to_owned(), Box::new(move |ctx, msg, args| Box::pin(cmd.call(ctx, msg, args))));
         self
     }
 
@@ -97,46 +100,47 @@ impl SimpleFramework {
     /// Sets the function to run after each command
     /// it's passed the name of the command used and
     /// the `CommandResult` returned by the command
-    pub fn after<T, F>(mut self, after: F) -> Self
-    where T: 'static + Future<Output=()> + Send, 
-    F: Fn(&Context, &Message, &str, CommandResult) -> T + Send + Sync + 'static {
-        self.after_cmd = Some(Box::new(move |ctx, msg, cmd_name, res|  Box::pin(after(ctx, msg, cmd_name, res))));
+    pub fn after<F>(mut self, after: F) -> Self
+    where F: for<'r, 's, 't>
+    AsyncFn4<&'r Context, &'s Message, &'t str, CommandResult, Output = ()>
+    + Send + Sync + 'static {
+        self.after_cmd = Some(Box::new(move |ctx, msg, cmd_name, res|  Box::pin(after.call(ctx, msg, cmd_name, res))));
         self
     }
 
     /// Sets the function to run before each command
-    /// it's passed teh name of the command used and
+    /// it's passed the name of the command used and
     /// the returned boolean determines if the command
     /// should then be run
-    pub fn before<T, F>(mut self, before: F) -> Self
-    where T: 'static + Future<Output = bool> + Send,
-    F: Fn(&Context, &Message, &str) -> T + Send + Sync + 'static {
-        self.before_cmd = Some(Box::new(move |ctx, msg, cmd_name| Box::pin(before(ctx, msg, cmd_name))));
+    pub fn before<F>(mut self, before: F) -> Self
+    where F: for<'r, 's, 't>
+    AsyncFn3<&'r Context, &'s Message, &'t str, Output = bool>
+    + Send + Sync + 'static {
+        self.before_cmd = Some(Box::new(move |ctx, msg, cmd_name| Box::pin(before.call(ctx, msg, cmd_name))));
         self
     }
 
     /// sets the function to run if a prefex is detected
     /// but no known command was found
-    pub fn unrecognized_cmd<T, F>(mut self, default_cmd: F) -> Self
-    where T: 'static + Future<Output = ()> + Send,
-    F: Fn(&Context, &Message, &str, Args) -> T + Send + Sync + 'static {
-        self.default_cmd = Some(Box::new(move |ctx, msg, cmd_name, args| Box::pin(default_cmd(ctx, msg, cmd_name, args))));
+    pub fn unrecognized_cmd<F>(mut self, default_cmd: F) -> Self
+    where F: for<'r, 's, 't> 
+    AsyncFn4<&'r Context, &'s Message, &'t str, Args, Output = ()>
+    + Send + Sync + 'static {
+        self.default_cmd = Some(Box::new(move |ctx, msg, cmd_name, args| Box::pin(default_cmd.call(ctx, msg, cmd_name, args))));
         self
     }
 
     /// sets the function to run if only a prefix was given
-    pub fn prefix_only<T, F>(mut self, prefix_only: F) -> Self
-    where T: 'static + Future<Output = ()> + Send,
-    F: Fn(&Context, &Message) -> T + Send + Sync + 'static {
-        self.prefix_only_cmd = Some(Box::new(move |ctx, msg| Box::pin(prefix_only(ctx, msg))));
+    pub fn prefix_only<F>(mut self, prefix_only: F) -> Self
+    where F: for<'a, 'b> AsyncFn2<&'a Context, &'b Message, Output = ()> + Send + Sync + 'static {
+        self.prefix_only_cmd = Some(Box::new(move |ctx, msg| Box::pin(prefix_only.call(ctx, msg))));
         self
     }
 
     /// sets the function to run if no prefix was found on a message
-    pub fn normal_message<T, F>(mut self, normal_msg: F) -> Self
-    where T: 'static + Future<Output = ()> + Send,
-    F: Fn(&Context, &Message) -> T + Send + Sync + 'static {
-        self.normal_message_fn =  Some(Box::new(move |ctx, msg| Box::pin(normal_msg(ctx, msg))));
+    pub fn normal_message<F>(mut self, normal_msg: F) -> Self
+    where F: for<'a, 'b> AsyncFn2<&'a Context, &'b Message, Output = ()> + Send + Sync + 'static {
+        self.normal_message_fn =  Some(Box::new(move |ctx, msg| Box::pin(normal_msg.call(ctx, msg))));
         self
     }
 
@@ -148,16 +152,17 @@ impl SimpleFramework {
         self
     }
 
-    pub fn with_default_plaintext_help(mut self) -> Self {
+    pub fn with_default_plaintext_help(self) -> Self {
         self.help(default_plaintext_help)
         //self.help_cmd = Some(Box::new(|ctx, msg, prefix, command_list| Box::pin(default_plaintext_help(ctx, msg, prefix, command_list))));
         //self
     }
 
-    pub fn help<T, F>(mut self, help_fn: F) -> Self
-    where T: 'static + Future<Output = CommandResult> + Send,
-   F: 'static + Fn(&Context, &Message, &str, &[&str]) -> T + Send + Sync {
-        self.help_cmd = Some(Box::new(move |ctx, msg, prefix, command_list| Box::pin(help_fn(ctx, msg, prefix, command_list))));
+    pub fn help<F>(mut self, help_fn: F) -> Self
+    where F: for<'r, 's, 't0, 't1, 't2>
+    AsyncFn4<&'r Context, &'s Message, &'t0 str, &'t1[&'t2 str], Output = CommandResult>
+    + Send + Sync + 'static {
+        self.help_cmd = Some(Box::new(move |ctx, msg, prefix, command_list| Box::pin(help_fn.call(ctx, msg, prefix, command_list))));
         self
     }
 
