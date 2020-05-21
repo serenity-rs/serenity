@@ -11,6 +11,8 @@
 //! features = ["framework", "simple_framework"]
 //! ```
 
+use std::env;
+
 use serenity::client::{Client, Context};
 use serenity::framework::simple::{SimpleFramework, Args, CommandResult};
 use serenity::model::channel::Message;
@@ -18,7 +20,7 @@ use serenity::model::channel::Message;
 // A function called before every command function, returned bool
 // is if the named command should be run or not
 async fn before(_ctx: &Context, _msg: &Message, cmd_name: &str) -> bool {
-    println!("Recieved a {} command", name);
+    println!("Recieved a {} command", cmd_name);
     true
 }
 
@@ -68,7 +70,6 @@ async fn main() {
         .with_default_help();
 
     let mut client = Client::new(&token)
-        .event_handler(Handler)
         .framework(framework)
         .await
         .expect("Err creating client");
