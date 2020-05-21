@@ -104,4 +104,9 @@ jobs:
       CARGO_TARGET_DIR='..' cd examples/13_gateway_intents
       cargo build
     displayName: 'Build example 13'
-    
+
+  - bash: |
+      source $HOME/.cargo/env
+      CARGO_TARGET_DIR='..' cd examples/14_simple_framework
+      cargo build
+    displayName: 'Build example 14'
