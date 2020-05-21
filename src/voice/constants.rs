@@ -18,3 +18,8 @@ pub const FRAME_LEN_MS: usize = 1000 / AUDIO_FRAME_RATE;
 
 /// Maximum number of audio frames/packets to be sent per second to be buffered.
 pub const CHILD_BUFFER_LEN: usize = AUDIO_FRAME_RATE / 2;
+
+/// Maximum packet size for a voice packet.
+///
+/// Set a safe amount below the Ethernet MTU to avoid framgnetation/rejection.
+pub const VOICE_PACKET_MAX: usize = 1460;

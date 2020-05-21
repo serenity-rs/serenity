@@ -22,21 +22,35 @@ use crate::internal::{
 };
 use crate::model::event::{VoiceEvent, VoiceSpeakingState};
 use discortp::{
+    demux::{
+        self,
+        Demuxed,
+    },
     discord::{
         IpDiscoveryPacket,
         IpDiscoveryType,
         MutableIpDiscoveryPacket,
-
     },
-    rtp::MutableRtpPacket,
+    rtp::{
+        MutableRtpPacket,
+        RtpPacket,
+        RtpType,
+    },
+    MutablePacket,
+    Packet,
 };
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
-use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
+use sodiumoxide::crypto::secretbox::{
+    self,
+    MACBYTES,
+    NONCEBYTES,
+    Key,
+    Nonce,
+};
 use std::{
     collections::HashMap,
-    io::Write,
     net::{SocketAddr, ToSocketAddrs, UdpSocket},
     sync::{
         mpsc::{
@@ -90,13 +104,12 @@ pub struct Connection {
     keepalive_timer: Timer,
     key: Key,
     last_heartbeat_nonce: Option<u64>,
-    sequence: u16,
+    packet: [u8; VOICE_PACKET_MAX],
     silence_frames: u8,
     soft_clip: SoftClip,
     speaking: VoiceSpeakingState,
     ssrc: u32,
     thread_items: ThreadItems,
-    timestamp: u32,
     udp: UdpSocket,
 }
 
@@ -193,14 +206,20 @@ impl Connection {
         encoder.set_bitrate(DEFAULT_BITRATE)?;
         let soft_clip = SoftClip::new(Channels::Stereo);
 
-        // Per discord dev team's current recommendations:
-        // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
-        let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
         info!(
-            "[Voice] WS heartbeat duration given as {}ms, adjusted to {}ms.",
+            "[Voice] WS heartbeat duration {}ms.",
             hello.heartbeat_interval,
-            temp_heartbeat,
         );
+
+        let mut packet = [0u8; VOICE_PACKET_MAX];
+
+        let mut rtp = MutableRtpPacket::new(&mut packet[..])
+            .expect("There is provably enough space to squeeze in an RTP header.");
+        rtp.set_version(2);
+        rtp.set_payload_type(RtpType::Dynamic(120));
+        rtp.set_sequence(random::<u16>().into());
+        rtp.set_timestamp(random::<u32>().into());
+        rtp.set_ssrc(ready.ssrc);
 
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
@@ -211,16 +230,15 @@ impl Connection {
             encoder,
             encoder_stereo: false,
             key,
-            keepalive_timer: Timer::new(temp_heartbeat),
+            keepalive_timer: Timer::new(hello.heartbeat_interval as u64),
             last_heartbeat_nonce: None,
+            packet,
             udp,
-            sequence: 0,
             silence_frames: 0,
             soft_clip,
             speaking: VoiceSpeakingState::empty(),
             ssrc: ready.ssrc,
             thread_items,
-            timestamp: 0,
         })
     }
 
@@ -292,6 +310,19 @@ impl Connection {
         packet: &[u8],
         nonce: &mut Nonce,
         ) -> Result<()> {
+        match demux::demux(packet) {
+            Demuxed::Rtp(rtp) => {},
+            Demuxed::Rtcp(rtcp) => {
+                println!("{:?}", rtcp);
+                println!("{:?}", rtcp.payload());
+            },
+            Demuxed::FailedParse(t) => {
+                warn!("[voice] Failed to parse message of type {:?}.", t);
+            }
+            _ => {
+                warn!("[voice] Illegal UDP packet from voice server.");
+            }
+        }
 
         if let Some(receiver) = receiver.as_mut() {
             let mut handle = &packet[2..];
@@ -491,8 +522,7 @@ impl Connection {
 
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
-        let mut packet = vec![0u8; size as usize].into_boxed_slice();
-        let mut nonce = secretbox::Nonce([0; 24]);
+        let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
 
         while let Ok(status) = self.thread_items.rx.try_recv() {
             match status {
@@ -576,10 +606,9 @@ impl Connection {
 
         self.set_speaking(true)?;
 
-        let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
+        self.prep_and_send_packet(mix_buffer, &opus_frame, nonce)?;
         audio_timer.r#await();
 
-        self.udp.send_to(&packet[..index], self.destination)?;
         self.audio_timer.reset();
 
         self.audio_commands_events(&mut sources);
@@ -587,47 +616,49 @@ impl Connection {
         Ok(())
     }
 
-    fn prep_packet(&mut self,
-                   packet: &mut [u8],
+    fn prep_and_send_packet(&mut self,
                    buffer: [f32; 1920],
                    opus_frame: &[u8],
                    mut nonce: Nonce)
-                   -> Result<usize> {
-        {
-            let mut cursor = &mut packet[..HEADER_LEN];
-            cursor.write_all(&[0x80, 0x78])?;
-            cursor.write_u16::<BigEndian>(self.sequence)?;
-            cursor.write_u32::<BigEndian>(self.timestamp)?;
-            cursor.write_u32::<BigEndian>(self.ssrc)?;
-        }
+                   -> Result<()> {
+        let index = {
+            let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
+                .expect("There is provably enough space to squeeze in an RTP header.");
 
-        nonce.0[..HEADER_LEN]
-            .clone_from_slice(&packet[..HEADER_LEN]);
+            let pkt = rtp.packet();
+            let rtp_len = RtpPacket::minimum_packet_size();
+            nonce.0[..rtp_len]
+                .copy_from_slice(&pkt[..rtp_len]);
 
-        let sl_index = packet.len() - 16;
-        let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
+            let payload = rtp.payload_mut();
 
-        let len = if opus_frame.is_empty() {
-            self.encoder
-                .encode_float(&buffer[..buffer_len], &mut packet[HEADER_LEN..sl_index])?
-        } else {
-            let len = opus_frame.len();
-            packet[HEADER_LEN..HEADER_LEN + len]
-                .clone_from_slice(opus_frame);
-            len
+            let payload_len = if opus_frame.is_empty() {
+                let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
+                self.encoder
+                    .encode_float(&buffer[..buffer_len], &mut payload[MACBYTES..])?
+            } else {
+                let len = opus_frame.len();
+                payload[MACBYTES..MACBYTES + len]
+                    .clone_from_slice(opus_frame);
+                len
+            };
+
+            let final_payload_size = MACBYTES + payload_len;
+
+            let tag = secretbox::seal_detached(&mut payload[MACBYTES..final_payload_size], &nonce, &self.key);
+            payload[..MACBYTES].copy_from_slice(&tag.0[..]);
+
+            rtp_len + final_payload_size
         };
 
-        let crypted = {
-            let slice = &packet[HEADER_LEN..HEADER_LEN + len];
-            secretbox::seal(slice, &nonce, &self.key)
-        };
-        let index = HEADER_LEN + crypted.len();
-        packet[HEADER_LEN..index].clone_from_slice(&crypted);
+        self.udp.send_to(&self.packet[..index], self.destination)?;
 
-        self.sequence = self.sequence.wrapping_add(1);
-        self.timestamp = self.timestamp.wrapping_add(960);
+        let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
+            .expect("There is provably enough space to squeeze in an RTP header.");
+        rtp.set_sequence(rtp.get_sequence() + 1);
+        rtp.set_timestamp(rtp.get_timestamp() + 960);
 
-        Ok(HEADER_LEN + crypted.len())
+        Ok(())
     }
 
     fn set_speaking(&mut self, speaking: bool) -> Result<()> {

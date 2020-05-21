@@ -14,8 +14,8 @@ mod payload;
 mod threading;
 pub mod tracks;
 
-pub use audiopus::Bitrate;
-
+pub use audiopus::{self as opus, Bitrate};
+pub use discortp as packet;
 pub use self::{
     audio::{
         Audio,
@@ -44,7 +44,6 @@ pub use self::{
     },
     manager::Manager,
 };
-pub use audiopus as opus;
 
 use self::connection_info::ConnectionInfo;
 

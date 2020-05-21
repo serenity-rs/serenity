@@ -318,7 +318,7 @@ fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         let send_http = ctx.http.clone();
         let chan_id = msg.channel_id;
 
-        // This shows how t0 periodically fire an event, in this case to
+        // This shows how to periodically fire an event, in this case to
         // periodically make a track quieter until it can be no longer heard.
         let _ = song.add_event(
             Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
