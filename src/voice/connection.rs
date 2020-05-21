@@ -171,7 +171,10 @@ impl Connection {
         let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
         {
             let mut view = MutableIpDiscoveryPacket::new(&mut bytes[..])
-                .expect("[Voice] There are enough bytes to encode a discovery packet.");
+                .expect(
+                    "[Voice] Too few bytes in 'bytes' for IPDiscovery packet.\
+                    (Blame: IpDiscoveryPacket::const_packet_size()?)"
+                );
             view.set_pkt_type(IpDiscoveryType::Request);
             view.set_length(70);
             view.set_ssrc(ready.ssrc);
@@ -182,7 +185,7 @@ impl Connection {
         let (len, _addr) = udp.recv_from(&mut bytes)?;
         {
             let view = IpDiscoveryPacket::new(&bytes[..len])
-                .expect("[voice] Should be enough space to view a packet we just fully received.");
+                .ok_or_else(|| Error::Voice(VoiceError::IllegalDiscoveryResponse))?;
 
             debug_assert!(
                 view.get_pkt_type() == IpDiscoveryType::Response,
@@ -214,7 +217,10 @@ impl Connection {
         let mut packet = [0u8; VOICE_PACKET_MAX];
 
         let mut rtp = MutableRtpPacket::new(&mut packet[..])
-            .expect("There is provably enough space to squeeze in an RTP header.");
+            .expect(
+                "[Voice] Too few bytes in self.packet for RTP header.\
+                (Blame: VOICE_PACKET_MAX?)"
+            );
         rtp.set_version(2);
         rtp.set_payload_type(RtpType::Dynamic(120));
         rtp.set_sequence(random::<u16>().into());
@@ -317,10 +323,10 @@ impl Connection {
                 println!("{:?}", rtcp.payload());
             },
             Demuxed::FailedParse(t) => {
-                warn!("[voice] Failed to parse message of type {:?}.", t);
+                warn!("[Voice] Failed to parse message of type {:?}.", t);
             }
             _ => {
-                warn!("[voice] Illegal UDP packet from voice server.");
+                warn!("[Voice] Illegal UDP packet from voice server.");
             }
         }
 
@@ -623,7 +629,10 @@ impl Connection {
                    -> Result<()> {
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
-                .expect("There is provably enough space to squeeze in an RTP header.");
+                .expect(
+                    "[Voice] Too few bytes in self.packet for RTP header.\
+                    (Blame: VOICE_PACKET_MAX?)"
+                );
 
             let pkt = rtp.packet();
             let rtp_len = RtpPacket::minimum_packet_size();
@@ -654,7 +663,10 @@ impl Connection {
         self.udp.send_to(&self.packet[..index], self.destination)?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
-            .expect("There is provably enough space to squeeze in an RTP header.");
+            .expect(
+                "[Voice] Too few bytes in self.packet for RTP header.\
+                (Blame: VOICE_PACKET_MAX?)"
+            );
         rtp.set_sequence(rtp.get_sequence() + 1);
         rtp.set_timestamp(rtp.get_timestamp() + 960);
 
