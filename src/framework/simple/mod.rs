@@ -28,7 +28,7 @@ type AfterFn = Box<dyn for <'fut> Fn(&'fut Context, &'fut Message, &'fut str, Co
 type UnrecognizedCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut str, Args) -> BoxFuture<'fut, ()> + Send + Sync>;
 type NormalMessage = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
 type PrefixOnly = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()> + Send + Sync>;
-type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync + 'static>;
+type HelpCommand = Box<dyn for<'fut> Fn(&'fut Context, &'fut Message, Args, &'fut [&'fut str]) -> BoxFuture<'fut, CommandResult> + Send + Sync + 'static>;
 
 pub struct SimpleFramework {
     prefix: String,
@@ -142,7 +142,7 @@ impl SimpleFramework {
         self
     }
 
-    /// sets the function to run if a prefex is detected
+    /// Sets the function to run if a prefex is detected
     /// but no known command was found
     pub fn unrecognized_cmd<F>(mut self, default_cmd: F) -> Self
     where F: for<'r, 's, 't> 
@@ -159,14 +159,14 @@ impl SimpleFramework {
         self
     }
 
-    /// sets the function to run if no prefix was found on a message
+    /// Sets the function to run if no prefix was found on a message
     pub fn normal_message<F>(mut self, normal_msg: F) -> Self
     where F: for<'a, 'b> AsyncFn2<&'a Context, &'b Message, Output = ()> + Send + Sync + 'static {
         self.normal_message_fn =  Some(Box::new(move |ctx, msg| Box::pin(normal_msg.call(ctx, msg))));
         self
     }
 
-    /// sets the delimiter between a command's name and any
+    /// Sets the delimiter between a command's name and any
     /// arguments it may have recieived, defaults to a space
     pub fn delimiter<T: Into<Delimiter>>(mut self, new_delimiter: T) -> Self {
         self.delimiters.clear();
@@ -175,19 +175,22 @@ impl SimpleFramework {
     }
 
     /// Default help sends a list of all command names
-    pub fn with_default_plaintext_help(self) -> Self {
+    pub fn with_default_help(self) -> Self {
         self.help(default_plaintext_help)
     }
 
+    /// Sets the function to run if {prefix}help is detected
+    /// the last argument is an array of all the command names
     pub fn help<F>(mut self, help_fn: F) -> Self
     where F: for<'r, 's, 't0, 't1, 't2>
-    AsyncFn3<&'r Context, &'s Message, &'t1[&'t2 str], Output = CommandResult>
+    AsyncFn4<&'r Context, &'s Message, Args, &'t1[&'t2 str], Output = CommandResult>
     + Send + Sync + 'static {
-        self.help_cmd = Some(Box::new(move |ctx, msg, command_list| Box::pin(help_fn.call(ctx, msg, command_list))));
+        self.help_cmd = Some(Box::new(move |ctx, msg, args, command_list| Box::pin(help_fn.call(ctx, msg, args, command_list))));
         self
     }
 
     /// Stores all command names as lowercase strings, and converts to lowercase before checking for a command
+    /// Note: This has the side-effect of converting all existing command names to lowercase when set to true
     pub fn case_insensitivity(mut self, case_insensitive: bool) -> Self {
         self.case_insensitive = case_insensitive;
         if self.case_insensitive {
@@ -201,12 +204,12 @@ impl SimpleFramework {
         self
     }
 
-    async fn send_help(&self, ctx: &Context, msg: &Message) {
+    async fn send_help(&self, ctx: &Context, msg: &Message, args: Args) {
         let help_cmd = self.help_cmd.as_ref().expect("Should not get here");
         let mut cmd_list = self.commands.keys().map(|name| name.as_ref()).collect::<Vec<&str>>();
         cmd_list.sort_unstable();
         if self.run_before_cmd(ctx, msg, "help").await {
-            let res = help_cmd(ctx, msg, &cmd_list).await;
+            let res = help_cmd(ctx, msg, args, &cmd_list).await;
             self.run_after_cmd(ctx, msg, "help", res).await;
         }
     }
@@ -214,7 +217,8 @@ impl SimpleFramework {
     async fn run_cmd(&self, ctx: &Context, msg: &Message, cmd_name: &str, args: Args) {
 
         if self.help_cmd.is_some() && cmd_name == "help" {
-            self.send_help(ctx, msg).await;
+            self.send_help(ctx, msg, args).await;
+            return;
         }
 
         if let Some(cmd) = self.commands.get(cmd_name) {
@@ -310,17 +314,15 @@ impl Framework for SimpleFramework {
     }
 }
 
-async fn default_plaintext_help(ctx: &Context, msg: &Message, command_list: &[&str]) -> CommandResult {
-    let mut help_text = String::from("Here is a list of commands:\n");
-    help_text = command_list.iter().fold(
-        help_text, 
-        |mut text, cmd| {
-            text.push_str(cmd);
-            text.push('\n');
-            text
-        });
-    if let Err(why) = msg.channel_id.say(ctx, &help_text).await {
+async fn default_plaintext_help(ctx: &Context, msg: &Message, _: Args, command_list: &[&str]) -> CommandResult {
+    let help_text = format!(
+        "Here is a list of commands:\n{}",
+        command_list.join("\n")
+    );
+    
+    if let Err(why) = msg.channel_id.say(ctx, help_text).await {
         warn!("Failed to send help message because: {:?}", why);
+        return Err(why.into());
     }
     Ok(())
 }
