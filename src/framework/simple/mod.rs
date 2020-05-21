@@ -113,7 +113,7 @@ impl SimpleFramework {
     /// # use serenity::framework::simple::{SimpleFramework, CommandResult};
     /// # use serenity::model::channel::Message;
     ///
-    /// async fn after_fn(ctx: &Context, msg: &Message, cmd_name: &str, res: CommandResult) {
+    /// async fn after_fn(_ctx: &Context, _msg: &Message, cmd_name: &str, res: CommandResult) {
     ///     if let Err(why) = res {
     ///         eprintln!("The command {} returned the following error: {:?}", cmd_name, why);
     ///     }
