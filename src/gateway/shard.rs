@@ -66,7 +66,7 @@ use tungstenite::handshake::client::Request;
 /// [`Client`]: ../client/struct.Client.html
 /// [`new`]: #method.new
 /// [`receive`]: #method.receive
-/// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
+/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
 /// [module docs]: index.html#sharding
 pub struct Shard {
     pub client: WsClient,
