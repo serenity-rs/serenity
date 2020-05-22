@@ -577,6 +577,30 @@ impl GuildId {
         Some(guild.name.to_string())
     }
 
+    /// Disconnects a member from a voice channel in the guild.
+    ///
+    /// Requires the [Move Members] permission.
+    ///
+    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    #[inline]
+    pub fn disconnect_member<U>(self, http: impl AsRef<Http>, user_id: U) -> Result<()>
+        where U: Into<UserId> {
+        self._disconnect_member(&http, user_id.into())
+    }
+
+    fn _disconnect_member(
+        self,
+        http: impl AsRef<Http>,
+        user_id: UserId,
+    ) -> Result<()> {
+        let mut map = Map::new();
+        map.insert(
+            "channel_id".to_string(),
+            Value::Null
+        );
+        http.as_ref().edit_member(self.0, user_id.0, &map)
+    }
+
     /// Gets the number of [`Member`]s that would be pruned with the given
     /// number of days.
     ///
