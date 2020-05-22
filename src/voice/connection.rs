@@ -69,7 +69,7 @@ use std::{
     time::Instant,
 };
 
-use super::audio::{Audio, AudioReceiver, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE};
+use super::audio::{Audio, AudioReceiver};
 use super::connection_info::ConnectionInfo;
 use super::{constants::*, payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
 use url::Url;
@@ -187,10 +187,9 @@ impl Connection {
             let view = IpDiscoveryPacket::new(&bytes[..len])
                 .ok_or_else(|| Error::Voice(VoiceError::IllegalDiscoveryResponse))?;
 
-            debug_assert!(
-                view.get_pkt_type() == IpDiscoveryType::Response,
-                "[Voice] Server responded with illegal Ip Discovery packet type.",
-            );
+            if view.get_pkt_type() != IpDiscoveryType::Response {
+                return Err(Error::Voice(VoiceError::IllegalDiscoveryResponse));
+            }
 
             let addr = String::from_utf8_lossy(&view.get_address_raw());
             client.send_json(&payload::build_select_protocol(addr, view.get_port()))?;
@@ -336,11 +335,12 @@ impl Connection {
             let timestamp = handle.read_u32::<BigEndian>()?;
             let ssrc = handle.read_u32::<BigEndian>()?;
 
-            nonce.0[..HEADER_LEN]
-                .clone_from_slice(&packet[..HEADER_LEN]);
+            let rtp_len = RtpPacket::minimum_packet_size();
+            nonce.0[..rtp_len]
+                .clone_from_slice(&packet[..rtp_len]);
 
             if let Ok(mut decrypted) =
-                secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
+                secretbox::open(&packet[rtp_len..], &nonce, &self.key) {
                 let channels = opus_packet::nb_channels(&decrypted)?;
 
                 let entry =
@@ -537,7 +537,7 @@ impl Connection {
                 },
                 ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
                     if let Some(receiver) = receiver.as_mut() {
-                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                        receiver.speaking_state_update(ev.ssrc, ev.user_id.0, ev.speaking);
                     }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {

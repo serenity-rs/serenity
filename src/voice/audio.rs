@@ -31,15 +31,20 @@ use super::{
     input::Input,
 };
 
-pub const HEADER_LEN: usize = 12;
-pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
-pub const DEFAULT_BITRATE: Bitrate = Bitrate::BitsPerSecond(128_000);
-
 /// A receiver for incoming audio.
 pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: VoiceSpeakingState) { }
+    /// Fired on receipt of a speaking state update from another host.
+    ///
+    /// Note: this will fire when a user starts speaking for the first time,
+    /// or changes their capabilities. 
+    fn speaking_state_update(&mut self, _ssrc: u32, _user_id: u64, _speaking_state: VoiceSpeakingState) { }
+
+    /// Fires when a user starts speaking, or stops speaking
+    /// (*i.e.*, 5 consecutive silent frames).
+    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) { }    
 
     #[allow(clippy::too_many_arguments)]
+    /// Fires 
     fn voice_packet(&mut self,
                     _ssrc: u32,
                     _sequence: u16,
@@ -48,8 +53,14 @@ pub trait AudioReceiver: Send {
                     _data: &[i16],
                     _compressed_size: usize) { }
 
+    /// Fires on receipt of an RTCP packet, containing various call stats
+    /// such as latency reports.
+    fn rtcp_packet(&mut self, data: u32) { }
+
+    /// Fires whenever a user connects to the same stream as the bot.
     fn client_connect(&mut self, _ssrc: u32, _user_id: u64) { }
 
+    /// Fires whenever a user disconnects from the same stream as the bot.
     fn client_disconnect(&mut self, _user_id: u64) { }
 }
 

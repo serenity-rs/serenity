@@ -7,10 +7,11 @@ use std::{
     time::Duration,
 };
 use super::{
-    connection::Connection,
-    Status,
     audio,
+    connection::Connection,
+    constants::*,
     events::GlobalEvents,
+    Status,
 };
 use log::{error, warn};
 
@@ -28,7 +29,7 @@ fn runner(rx: &MpscReceiver<Status>) {
     let mut receiver = None;
     let mut connection = None;
     let mut timer = Timer::new(20);
-    let mut bitrate = audio::DEFAULT_BITRATE;
+    let mut bitrate = DEFAULT_BITRATE;
     let mut events = GlobalEvents::default();
     let mut fired_track_evts = HashMap::new();
     let mut time_in_call = Duration::default();
