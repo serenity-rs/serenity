@@ -1,19 +1,20 @@
-use crate::internal::Timer;
-use crate::model::id::GuildId;
+use crate::{
+    internal::Timer,
+    model::id::GuildId,
+    voice::{
+        connection::Connection,
+        constants::*,
+        events::GlobalEvents,
+        Status,
+    },
+};
+use log::{error, warn};
 use std::{
     collections::HashMap,
     sync::mpsc::{Receiver as MpscReceiver, TryRecvError},
     thread::Builder as ThreadBuilder,
     time::Duration,
 };
-use super::{
-    audio,
-    connection::Connection,
-    constants::*,
-    events::GlobalEvents,
-    Status,
-};
-use log::{error, warn};
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice (G{})", guild_id);
@@ -54,14 +55,14 @@ fn runner(rx: &MpscReceiver<Status>) {
                 Ok(Status::SetReceiver(r)) => {
                     receiver = r;
                 },
-                Ok(Status::SetSender(s)) => {
+                Ok(Status::SetTrack(s)) => {
                     senders.clear();
 
                     if let Some(aud) = s {
                         senders.push(aud);
                     }
                 },
-                Ok(Status::AddSender(s)) => {
+                Ok(Status::AddTrack(s)) => {
                     senders.push(s);
                 },
                 Ok(Status::SetBitrate(b)) => {

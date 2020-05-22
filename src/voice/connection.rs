@@ -13,14 +13,6 @@ use byteorder::{
     ReadBytesExt,
     WriteBytesExt
 };
-use crate::constants::VOICE_GATEWAY_VERSION;
-use crate::gateway::WsClient;
-use crate::internal::prelude::*;
-use crate::internal::{
-    ws_impl::{ReceiverExt, SenderExt},
-    Timer
-};
-use crate::model::event::{VoiceEvent, VoiceSpeakingState};
 use discortp::{
     demux::{
         self,
@@ -69,9 +61,28 @@ use std::{
     time::Instant,
 };
 
-use super::audio::{Audio, AudioReceiver};
-use super::connection_info::ConnectionInfo;
-use super::{constants::*, payload, EventContext, TrackEvent, VoiceError, CRYPTO_MODE};
+use crate::{
+    constants::VOICE_GATEWAY_VERSION,
+    gateway::WsClient,
+    internal::prelude::*,
+    internal::{
+        ws_impl::{ReceiverExt, SenderExt},
+        Timer,
+    },
+    model::event::{VoiceEvent, VoiceSpeakingState},
+    voice::{
+        audio::AudioReceiver,
+        connection_info::ConnectionInfo,
+        constants::*,
+        payload,
+        tracks::Track,
+        CRYPTO_MODE,
+        EventContext,
+        TrackEvent,
+        VoiceError,
+    },
+};
+
 use url::Url;
 use log::{debug, info, warn};
 
@@ -412,7 +423,7 @@ impl Connection {
     #[inline]
     fn remove_unfinished_files(
         &mut self,
-        sources: &mut Vec<Audio>,
+        sources: &mut Vec<Track>,
         _opus_frame: &[u8],
         mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
         fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
@@ -498,7 +509,7 @@ impl Connection {
     }
 
     #[inline]
-    pub fn audio_commands_events(&mut self, sources: &mut Vec<Audio>) {
+    pub fn audio_commands_events(&mut self, sources: &mut Vec<Track>) {
         for audio in sources.iter_mut() {
             audio.process_commands();
             let state = audio.get_state();
@@ -510,7 +521,7 @@ impl Connection {
 
     #[allow(unused_variables)]
     pub fn cycle(&mut self,
-                mut sources: &mut Vec<Audio>,
+                mut sources: &mut Vec<Track>,
                 mut receiver: &mut Option<Box<dyn AudioReceiver>>,
                 fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
                 audio_timer: &mut Timer,

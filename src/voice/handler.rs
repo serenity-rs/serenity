@@ -10,21 +10,23 @@ use crate::{
         },
         voice::VoiceState,
     },
+    voice::{
+        audio::AudioReceiver,
+        input::Input,
+        tracks::{
+            Track,
+            TrackHandle,
+        },
+        Event,
+        EventContext,
+        EventData,
+        Status as VoiceStatus,
+        connection_info::ConnectionInfo,
+        threading,
+    },
 };
 use serde_json::json;
 use std::sync::mpsc::{self, Sender as MpscSender};
-use super::{
-    Audio,
-    AudioHandle,
-    AudioReceiver,
-    input::Input,
-    Event,
-    EventContext,
-    EventData,
-    Status as VoiceStatus,
-    connection_info::ConnectionInfo,
-    threading,
-};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -261,9 +263,9 @@ impl Handler {
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
-    pub fn play_source(&mut self, source: Input) -> AudioHandle {
+    pub fn play_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
-        self.send(VoiceStatus::AddSender(player));
+        self.send(VoiceStatus::AddTrack(player));
 
         handle
     }
@@ -274,40 +276,40 @@ impl Handler {
     /// to the channel.
     ///
     /// [`play_only_source`]: #method.play_only_source
-    pub fn play_only_source(&mut self, source: Input) -> AudioHandle {
+    pub fn play_only_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
-        self.send(VoiceStatus::SetSender(Some(player)));
+        self.send(VoiceStatus::SetTrack(Some(player)));
 
         handle
     }
 
-    /// Plays audio from an [`Audio`] object.
+    /// Plays audio from a [`Track`] object.
     ///
     /// This will be one half of the return value of [`voice::create_player`].
     /// The main difference between this function and [`play_source`] is
-    /// that this allows for direct manipulation of the [`Audio`] object
+    /// that this allows for direct manipulation of the [`Track`] object
     /// before it is passed over to the voice and mixing contexts.
     ///
     /// [`voice::create_player`]: fn.create_player.html
-    /// [`Audio`]: struct.Audio.html
+    /// [`Track`]: struct.Audio.html
     /// [`play_source`]: #method.play_source
-    pub fn play(&mut self, audio: Audio) {
-        self.send(VoiceStatus::AddSender(audio));
+    pub fn play(&mut self, track: Track) {
+        self.send(VoiceStatus::AddTrack(track));
     }
 
-    /// Plays audio from an [`Audio`] object.
+    /// Exclusively plays audio from a [`Track`] object.
     ///
     /// This will be one half of the return value of [`voice::create_player`].
     /// As in [`play_only_source`], this stops all other sources attached to the
     /// channel. Like [`play`], however, this allows for direct manipulation of the
-    /// [`Audio`] object before it is passed over to the voice and mixing contexts.
+    /// [`Track`] object before it is passed over to the voice and mixing contexts.
     ///
     /// [`voice::create_player`]: fn.create_player.html
-    /// [`Audio`]: struct.Audio.html
+    /// [`Track`]: struct.Audio.html
     /// [`play_only_source`]: #method.play_only_source
     /// [`play`]: #method.play
-    pub fn play_only(&mut self, audio: Audio) {
-        self.send(VoiceStatus::SetSender(Some(audio)));
+    pub fn play_only(&mut self, track: Track) {
+        self.send(VoiceStatus::SetTrack(Some(track)));
     }
 
     /// Sets the bitrate for encoding Opus packets sent along
@@ -322,7 +324,7 @@ impl Handler {
     }
 
     /// Stops playing audio from all sources, if any are set.
-    pub fn stop(&mut self) { self.send(VoiceStatus::SetSender(None)) }
+    pub fn stop(&mut self) { self.send(VoiceStatus::SetTrack(None)) }
 
     /// Attach a global event handler to an audio context. Global events will receive
     /// [`EventContext::Global`].
@@ -335,7 +337,7 @@ impl Handler {
     /// within the supplied function or closure. *Taking excess time could prevent
     /// timely sending of packets, causing audio glitches and delays*.
     ///
-    /// [`Audio`]: struct.Audio.html
+    /// [`Track`]: struct.Audio.html
     /// [`EventContext::Global`]: enum.EventContext.html#variant.Global
     pub fn add_global_event<F>(&mut self, event: Event, action: F) 
         where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static

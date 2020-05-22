@@ -1,4 +1,4 @@
-//! Audio input data streams and sources.
+//! Raw audio input data streams and sources.
 
 pub mod cached;
 pub mod utils;
@@ -9,7 +9,12 @@ use cached::{CompressedSource, MemorySource};
 use crate::{
     internal::prelude::*,
     prelude::SerenityError,
+    voice::{
+	    constants::*,
+	    VoiceError,
+    },
 };
+use log::debug;
 use parking_lot::Mutex;
 use std::{
     ffi::OsStr,
@@ -33,12 +38,21 @@ use std::{
     sync::Arc,
     time::Duration,
 };
-use super::{
-    AudioType,
-    VoiceError, 
-    constants::*,
-};
-use log::debug;
+
+#[non_exhaustive]
+#[derive(Copy, Clone, Debug)]
+pub enum InputType {
+    Opus,
+    Pcm,
+    FloatPcm,
+}
+
+#[non_exhaustive]
+pub enum InputTypeData {
+    Opus(OpusDecoder),
+    Pcm,
+    FloatPcm,
+}
 
 /// Handle for a child process which ensures that any subprocesses are properly closed
 /// on drop.
@@ -185,7 +199,7 @@ impl<R: Read + Seek> ReadSeek for R {
 pub struct Input {
     pub stereo: bool,
     pub reader: Reader,
-    pub kind: AudioType,
+    pub kind: InputType,
     pub decoder: Option<Arc<Mutex<OpusDecoder>>>,
 }
 
@@ -194,12 +208,12 @@ impl Input {
         Input {
             stereo: is_stereo,
             reader,
-            kind: AudioType::FloatPcm,
+            kind: InputType::FloatPcm,
             decoder: None,
         }
     }
 
-    pub fn new(stereo: bool, reader: Reader, kind: AudioType, decoder: Option<Arc<Mutex<OpusDecoder>>>) -> Self {
+    pub fn new(stereo: bool, reader: Reader, kind: InputType, decoder: Option<Arc<Mutex<OpusDecoder>>>) -> Self {
         Input {
             stereo,
             reader,
@@ -216,26 +230,26 @@ impl Input {
         self.stereo
     }
 
-    pub fn get_type(&self) -> AudioType {
+    pub fn get_type(&self) -> InputType {
         self.kind
     }
 
     #[inline]
     pub fn mix(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> usize {
         match self.kind {
-            AudioType::Opus => unimplemented!(),
+            InputType::Opus => unimplemented!(),
                     // if self.reader.decode_and_add_opus_frame(&mut float_buffer, vol).is_some() {
                     //     0 //; opus_frame.len()
                     // } else {
                     //     0
                     // },
-            AudioType::Pcm => {
+            InputType::Pcm => {
                 match self.reader.add_pcm_frame(float_buffer, self.stereo, volume) {
                     Some(len) => len,
                     None => 0,
                 }
             },
-            AudioType::FloatPcm => {
+            InputType::FloatPcm => {
                 match self.reader.add_float_pcm_frame(float_buffer, self.stereo, volume) {
                     Some(len) => len,
                     None => 0,
@@ -261,8 +275,8 @@ impl Read for Input {
         let mut written_floats = 0;
         // Read::read(&mut self.reader, buffer)
         match self.kind {
-            AudioType::Opus => unimplemented!(),
-            AudioType::Pcm => {
+            InputType::Opus => unimplemented!(),
+            InputType::Pcm => {
                 //FIXME: probably stifiling an error.
                 let mut buffer = &mut buffer[..];
                 while written_floats < float_space {
@@ -275,7 +289,7 @@ impl Read for Input {
                 }
                 Ok(written_floats)
             },
-            AudioType::FloatPcm => {
+            InputType::FloatPcm => {
                 Read::read(&mut self.reader, buffer)
             },
         }
@@ -512,7 +526,7 @@ fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), AudioType::FloatPcm, None))
+    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), InputType::FloatPcm, None))
 }
 
 // /// Creates a streamed audio source from a DCA file.
@@ -570,7 +584,7 @@ fn _ffmpeg_optioned(
 //     Box::new(Input {
 //         stereo: is_stereo,
 //         reader,
-//         kind: AudioType::Opus,
+//         kind: InputType::Opus,
 //         decoder: Some(
 //             Arc::new(Mutex::new(
 //                 // We always want to decode *to* stereo, for mixing reasons.
@@ -627,7 +641,7 @@ fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), AudioType::FloatPcm, None))
+    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), InputType::FloatPcm, None))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.

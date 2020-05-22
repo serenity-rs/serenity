@@ -30,6 +30,10 @@ use audiopus::{
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::{
     internal::prelude::*,
+    voice::{
+        constants::*,
+        input::InputType,
+    },
 };
 use parking_lot::{
     lock_api::MutexGuard,
@@ -56,10 +60,6 @@ use std::{
         Arc,
     },
     time::Duration,
-};
-use crate::voice::{
-    AudioType,
-    constants::*,
 };
 use super::{utils, Input, ReadAudioExt, Reader};
 
@@ -219,7 +219,7 @@ impl From<MemorySource> for Input {
     fn from(src: MemorySource) -> Self {
         Self {
             stereo: src.cache.core.is_stereo(),
-            kind: AudioType::FloatPcm,
+            kind: InputType::FloatPcm,
             decoder: None,
 
             reader: Reader::InMemory(src),
@@ -394,7 +394,7 @@ impl From<CompressedSource> for Input {
     fn from(src: CompressedSource) -> Self {
         Input {
             stereo: src.cache.core.is_stereo(),
-            kind: AudioType::FloatPcm,
+            kind: InputType::FloatPcm,
             decoder: None,
 
             reader: Reader::Compressed(src),
@@ -759,11 +759,11 @@ impl EncodingData {
     }
 }
 
-impl From<&EncodingData> for AudioType {
+impl From<&EncodingData> for InputType {
     fn from(a: &EncodingData) -> Self {
         match a {
-            EncodingData::FloatPcm => AudioType::FloatPcm,
-            EncodingData::Opus{ .. } => AudioType::Opus,
+            EncodingData::FloatPcm => InputType::FloatPcm,
+            EncodingData::Opus{ .. } => InputType::Opus,
         }
     }
 }

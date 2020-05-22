@@ -17,23 +17,7 @@ pub mod tracks;
 pub use audiopus::{self as opus, Bitrate};
 pub use discortp as packet;
 pub use self::{
-    audio::{
-        Audio,
-        AudioCommand,
-        AudioFn,
-        AudioHandle,
-        AudioQueryResult,
-        AudioReceiver,
-        AudioResult,
-        AudioState,
-        AudioType,
-        BlockingAudioQueryResult,
-        LoopState,
-        PlayMode,
-        // ReadSeek,
-        TrackQueue,
-        create_player,
-    },
+    audio::AudioReceiver,
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
     events::{Event, EventContext, EventData, EventStore, TrackEvent},
@@ -43,9 +27,11 @@ pub use self::{
         ytdl,
     },
     manager::Manager,
+    tracks::create_player,
 };
 
-use self::connection_info::ConnectionInfo;
+use connection_info::ConnectionInfo;
+use tracks::Track;
 
 const CRYPTO_MODE: &str = "xsalsa20_poly1305";
 
@@ -54,8 +40,8 @@ pub(crate) enum Status {
     Connect(ConnectionInfo),
     Disconnect,
     SetReceiver(Option<Box<dyn AudioReceiver>>),
-    SetSender(Option<Audio>),
-    AddSender(Audio),
+    SetTrack(Option<Track>),
+    AddTrack(Track),
     SetBitrate(Bitrate),
     AddEvent(EventData),
 }

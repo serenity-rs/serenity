@@ -1,3 +1,8 @@
+use crate::voice::tracks::{
+	Track,
+	TrackHandle,
+	TrackState
+};
 use std::{
 	cmp::Ordering,
 	collections::{
@@ -6,27 +11,26 @@ use std::{
 	},
 	time::Duration,
 };
-use super::{Audio, AudioHandle, AudioState};
 
 /// Information about which tracks, if any, fired an event.
 ///
-/// Local events ([`Audio`]-specific) are guaranteed to have
+/// Local events ([`Track`]-specific) are guaranteed to have
 /// an attached track, while global timing events will not.
 ///
-/// [`Audio`]: struct.Audio.html
+/// [`Track`]: struct.Track.html
 /// [`Handler::add_global_event`]: struct.Handler.html#method.add_global_event
 pub enum EventContext<'a> {
-	/// Local event context, passed to events created via [`AudioHandle::add_event`]
+	/// Local event context, passed to events created via [`TrackHandle::add_event`]
 	/// or [`EventStore::add_event`].
 	///
 	/// [`EventStore::add_event`]: struct.EventStore.html#method.add_event
-	/// [`AudioHandle::add_event`]: struct.AudioHandle.html#method.add_event
-	Track(&'a AudioState, &'a AudioHandle),
+	/// [`TrackHandle::add_event`]: struct.TrackHandle.html#method.add_event
+	Track(&'a TrackState, &'a TrackHandle),
 
 	/// Global event context, passed to events created via [`Handler::add_global_event`].
 	///
 	/// [`Handler::add_global_event`]: struct.Handler.html#method.add_global_event
-	Global(Option<Vec<&'a mut Audio>>),
+	Global(Option<Vec<&'a mut Track>>),
 }
 
 #[derive(Debug, Eq, Hash, PartialEq)]
@@ -259,7 +263,7 @@ pub(crate) struct GlobalEvents {
 }
 
 impl GlobalEvents {
-	pub(crate) fn march_and_process(&mut self, sources: &mut Vec<Audio>, events: &mut HashMap<TrackEvent, Vec<usize>>) {
+	pub(crate) fn march_and_process(&mut self, sources: &mut Vec<Track>, events: &mut HashMap<TrackEvent, Vec<usize>>) {
 		self.time += Duration::from_millis(20);
 		self.store.process_timed(self.time, EventContext::Global(None));
 
