@@ -577,7 +577,7 @@ impl GuildId {
         Some(guild.name.to_string())
     }
 
-    /// Disconnects a member from a voice channel in a guild.
+    /// Disconnects a member from a voice channel in the guild.
     ///
     /// Requires the [Move Members] permission.
     ///

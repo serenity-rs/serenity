@@ -347,7 +347,7 @@ impl Member {
         self.guild_id.move_member(http, self.user.read().id, c)
     }
 
-    /// Disconnects the member their voice channel if any.
+    /// Disconnects the member from their voice channel if any.
     ///
     /// Requires the [Move Members] permission.
     ///
