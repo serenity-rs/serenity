@@ -13,7 +13,7 @@ macro_rules! cdn {
 #[cfg(feature = "http")]
 macro_rules! api {
     ($e:expr) => {
-        concat!("https://discordapp.com/api/v6", $e)
+        concat!("https://discord.com/api/v6", $e)
     };
     ($e:expr, $($rest:tt)*) => {
         format!(api!($e), $($rest)*)
@@ -23,7 +23,7 @@ macro_rules! api {
 #[cfg(feature = "http")]
 macro_rules! status {
     ($e:expr) => {
-        concat!("https://status.discordapp.com/api/v2", $e)
+        concat!("https://status.discord.com/api/v2", $e)
     }
 }
 

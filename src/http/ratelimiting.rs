@@ -37,7 +37,7 @@
 //! variants) have an associated u64 as data. This is the Id of the parameter,
 //! differentiating between different ratelimits.
 //!
-//! [Taken from]: https://discordapp.com/developers/docs/topics/rate-limits#rate-limits
+//! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
 pub use super::routing::Route;
 
@@ -218,7 +218,7 @@ impl Ratelimiter {
 ///
 /// [`Http`]: ../client/struct.Http.html#structfield.routes
 /// [`Route`]: ../routing/enum.Route.html
-/// [Discord docs]: https://discordapp.com/developers/docs/topics/rate-limits
+/// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits
 #[derive(Debug)]
 pub struct Ratelimit {
     /// The total number of requests that can be made in a period of time.

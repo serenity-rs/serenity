@@ -1272,7 +1272,7 @@ fn normalize(text: &str) -> String {
         .replace("discord.me", "discord\u{2024}me")
         .replace("discordlist.net", "discordlist\u{2024}net")
         .replace("discordservers.com", "discordservers\u{2024}com")
-        .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
+        .replace("discord.com/invite", "discordapp\u{2024}com/invite")
         // Remove right-to-left override and other similar annoying symbols
         .replace('\u{202E}', " ") // RTL Override
         .replace('\u{200F}', " ") // RTL Mark
@@ -1584,7 +1584,7 @@ mod test {
         assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
         assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
         assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
-        assert_eq!(super::normalize("discordapp.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(super::normalize("discord.com/invite"), "discordapp\u{2024}com/invite");
         assert_eq!(super::normalize("\u{202E}"), " ");
         assert_eq!(super::normalize("\u{200F}"), " ");
         assert_eq!(super::normalize("\u{202B}"), " ");

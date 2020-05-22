@@ -78,12 +78,12 @@ pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// 2. Retrieving the code from the URL `"http://discordapp.com/invite/0cDvIgU2voY8RSYL"`:
+/// 2. Retrieving the code from the URL `"http://discord.com/invite/0cDvIgU2voY8RSYL"`:
 ///
 /// ```rust
 /// use serenity::utils;
 ///
-/// let url = "http://discordapp.com/invite/0cDvIgU2voY8RSYL";
+/// let url = "http://discord.com/invite/0cDvIgU2voY8RSYL";
 ///
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
@@ -94,8 +94,8 @@ pub fn parse_invite(code: &str) -> &str {
     let lower = code.to_lowercase();
     if lower.starts_with("discord.gg/") {
         &code[11..]
-    } else if lower.starts_with("discordapp.com/invite/") {
-        &code[22..]
+    } else if lower.starts_with("discord.com/invite/") {
+        &code[19..]
     } else {
         code
     }
@@ -829,9 +829,9 @@ mod test {
         assert_eq!(parse_invite("http://discord.gg/abc"), "abc");
         assert_eq!(parse_invite("discord.gg/abc"), "abc");
         assert_eq!(parse_invite("DISCORD.GG/ABC"), "ABC");
-        assert_eq!(parse_invite("https://discordapp.com/invite/abc"), "abc");
-        assert_eq!(parse_invite("http://discordapp.com/invite/abc"), "abc");
-        assert_eq!(parse_invite("discordapp.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("https://discord.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("http://discord.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("discord.com/invite/abc"), "abc");
     }
 
     #[test]

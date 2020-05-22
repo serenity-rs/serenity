@@ -13,7 +13,7 @@
 //! [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
 //! [`CreateEmbed`]: struct.CreateEmbed.html
 //! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
-//! [here]: https://discordapp.com/developers/docs/resources/channel#embed-object
+//! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
 use crate::internal::prelude::*;
 use crate::model::channel::Embed;
