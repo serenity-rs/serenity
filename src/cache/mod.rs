@@ -813,6 +813,13 @@ impl Cache {
         self.settings.read().await.clone()
     }
 
+    /// Sets the maximum amount of messages per channel to cache.
+    ///
+    /// By default, no messages will be cached.
+    pub async fn set_max_messages(&self, max: usize) {
+        self.settings.write().await.max_messages = max;
+    }
+
     /// Retrieves a `User` from the cache's [`users`] map, if it exists.
     ///
     /// The only advantage of this method is that you can pass in anything that
