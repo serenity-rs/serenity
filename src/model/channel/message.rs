@@ -319,7 +319,14 @@ impl Message {
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
             let _ = write!(at_distinct, "{:04}", u.discriminator);
-            result = result.replace(&u.mention(), &at_distinct);
+            let mut m = u.mention();
+            // Check whether we're replacing a nickname mention or a normal mention.
+            // `UserId::mention` returns a normal mention. If it isn't present in the message, it's a nickname mention.
+            if !result.contains(&m) {
+                m.insert(2, '!');
+            }
+
+            result = result.replace(&m, &at_distinct);
         }
 
         // Then replace all role mentions.
