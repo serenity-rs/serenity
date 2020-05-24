@@ -217,7 +217,7 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
+    /// assert_eq!(url, "https://discord.com/api/oauth2/authorize? \
     ///                  client_id=249608697955745802&scope=bot");
     /// # }
     /// #
@@ -274,7 +274,7 @@ impl CurrentUser {
         let client_id = http.as_ref().get_current_application_info().map(|v| v.id)?;
 
         let mut url = format!(
-            "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
+            "https://discord.com/api/oauth2/authorize?client_id={}&scope=bot",
             client_id
         );
 

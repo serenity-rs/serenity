@@ -194,7 +194,7 @@ impl Connection {
         let soft_clip = SoftClip::new(Channels::Stereo);
 
         // Per discord dev team's current recommendations:
-        // (https://discordapp.com/developers/docs/topics/voice-connections#heartbeating)
+        // (https://discord.com/developers/docs/topics/voice-connections#heartbeating)
         let temp_heartbeat = (hello.heartbeat_interval as f64 * 0.75) as u64;
         info!(
             "[Voice] WS heartbeat duration given as {}ms, adjusted to {}ms.",

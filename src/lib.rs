@@ -49,7 +49,7 @@
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
 //! [cache docs]: cache/index.html
 //! [client's module-level documentation]: client/index.html
-//! [docs]: https://discordapp.com/developers/docs/intro
+//! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]

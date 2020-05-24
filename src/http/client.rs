@@ -134,7 +134,7 @@ impl Http {
     ///
     /// [`Guild`]: ../../model/guild/struct.Guild.html
     /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
-    /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-channel
+    /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-channel
     /// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     pub fn create_channel(&self, guild_id: u64, map: &JsonMap) -> Result<GuildChannel> {
         let body = serde_json::to_vec(map)?;
@@ -193,11 +193,11 @@ impl Http {
     /// [`Guild`]: ../../model/guild/struct.Guild.html
     /// [`PartialGuild`]: ../../model/guild/struct.PartialGuild.html
     /// [`Shard`]: ../../gateway/struct.Shard.html
-    /// [GameBridge]: https://discordapp.com/developers/docs/topics/gamebridge
+    /// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge
     /// [US West Region]: ../../model/guild/enum.Region.html#variant.UsWest
     /// [documentation on this endpoint]:
-    /// https://discordapp.com/developers/docs/resources/guild#create-guild
-    /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
+    /// https://discord.com/developers/docs/resources/guild#create-guild
+    /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub fn create_guild(&self, map: &Value) -> Result<PartialGuild> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
@@ -215,7 +215,7 @@ impl Http {
     /// [`Guild`]: ../../model/guild/struct.Guild.html
     /// [`Integration`]: ../../model/guild/struct.Integration.html
     /// [Manage Guild]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    /// [docs]: https://discordapp.com/developers/docs/resources/guild#create-guild-integration
+    /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-integration
     pub fn create_guild_integration(&self, guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
         self.wind(204, Request {
             body: Some(map.to_string().as_bytes()),
@@ -235,7 +235,7 @@ impl Http {
     /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     /// [`RichInvite`]: ../../model/invite/struct.RichInvite.html
     /// [Create Invite]: ../../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
-    /// [docs]: https://discordapp.com/developers/docs/resources/channel#create-channel-invite
+    /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
     pub fn create_invite(&self, channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
         let body = serde_json::to_vec(map)?;
 
@@ -796,7 +796,7 @@ impl Http {
     ///
     /// [`Channel`]: ../../model/channel/enum.Channel.html
     /// [`Message`]: ../../model/channel/struct.Message.html
-    /// [Discord docs]: https://discordapp.com/developers/docs/resources/webhook#querystring-params
+    /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#querystring-params
     pub fn execute_webhook(&self,
                         webhook_id: u64,
                         token: &str,
@@ -1138,7 +1138,7 @@ impl Http {
     /// let guilds = http.as_ref().get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
     /// ```
     ///
-    /// [docs]: https://discordapp.com/developers/docs/resources/user#get-current-user-guilds
+    /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guilds
     pub fn get_guilds(&self, target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
         let (after, before) = match *target {
             GuildPagination::After(id) => (Some(id.0), None),
