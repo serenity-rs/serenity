@@ -301,13 +301,13 @@ impl Message {
             at_distinct.push('#');
             let _ = write!(at_distinct, "{:04}", u.discriminator);
             let mut m = u.mention();
-            // Find out is there need to add `!` to mention.
-            if result.contains(&m) {
-                result = result.replace(&m, &at_distinct);
-            } else {
+            // Check whether we're replacing a nickname mention or a normal mention.
+            // `UserId::mention` returns a normal mention. If it isn't present in the message, it's a nickname mention.
+            if !result.contains(&m) {
                 m.insert(2, '!');
-                result = result.replace(&m, &at_distinct);
             }
+
+            result = result.replace(&m, &at_distinct);
         }
 
         // Then replace all role mentions.
