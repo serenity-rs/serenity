@@ -300,7 +300,14 @@ impl Message {
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
             let _ = write!(at_distinct, "{:04}", u.discriminator);
-            result = result.replace(&u.mention(), &at_distinct);
+            let mut m = u.mention();
+            // Find out is there need to add `!` to mention.
+            if result.contains(&m) {
+                result = result.replace(&m, &at_distinct);
+            } else {
+                m.insert(2, '!');
+                result = result.replace(&m, &at_distinct);
+            }
         }
 
         // Then replace all role mentions.
