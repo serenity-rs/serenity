@@ -6,7 +6,7 @@ mod connection_info;
 mod constants;
 mod dca;
 mod error;
-mod events;
+pub mod events;
 mod handler;
 pub mod input;
 mod manager;
@@ -20,7 +20,7 @@ pub use self::{
     audio::AudioReceiver,
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
-    events::{Event, EventContext, EventData, EventStore, TrackEvent},
+    events::{Event, EventContext, TrackEvent},
     handler::Handler,
     input::{
         ffmpeg,
@@ -31,6 +31,7 @@ pub use self::{
 };
 
 use connection_info::ConnectionInfo;
+use events::EventData;
 use tracks::Track;
 
 const CRYPTO_MODE: &str = "xsalsa20_poly1305";

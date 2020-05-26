@@ -13,6 +13,27 @@ use byteorder::{
     ReadBytesExt,
     WriteBytesExt
 };
+use crate::{
+    constants::VOICE_GATEWAY_VERSION,
+    gateway::WsClient,
+    internal::prelude::*,
+    internal::{
+        ws_impl::{ReceiverExt, SenderExt},
+        Timer,
+    },
+    model::event::{VoiceEvent, VoiceSpeakingState},
+    voice::{
+        audio::AudioReceiver,
+        connection_info::ConnectionInfo,
+        constants::*,
+        payload,
+        tracks::{Track, PlayMode},
+        CRYPTO_MODE,
+        EventContext,
+        TrackEvent,
+        VoiceError,
+    },
+};
 use discortp::{
     demux::{
         self,
@@ -31,6 +52,7 @@ use discortp::{
     MutablePacket,
     Packet,
 };
+use log::{debug, info, warn};
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
@@ -60,31 +82,7 @@ use std::{
     time::Duration,
     time::Instant,
 };
-
-use crate::{
-    constants::VOICE_GATEWAY_VERSION,
-    gateway::WsClient,
-    internal::prelude::*,
-    internal::{
-        ws_impl::{ReceiverExt, SenderExt},
-        Timer,
-    },
-    model::event::{VoiceEvent, VoiceSpeakingState},
-    voice::{
-        audio::AudioReceiver,
-        connection_info::ConnectionInfo,
-        constants::*,
-        payload,
-        tracks::Track,
-        CRYPTO_MODE,
-        EventContext,
-        TrackEvent,
-        VoiceError,
-    },
-};
-
 use url::Url;
-use log::{debug, info, warn};
 
 #[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
@@ -421,7 +419,7 @@ impl Connection {
     }
 
     #[inline]
-    fn remove_unfinished_files(
+    fn mix_tracks(
         &mut self,
         sources: &mut Vec<Track>,
         _opus_frame: &[u8],
@@ -437,12 +435,11 @@ impl Connection {
             let mut aud = sources.get_mut(i).unwrap();
 
             let vol = aud.volume;
-            let skip = !aud.playing || aud.finished;
 
             let stream = &mut aud.source;
 
-            if skip {
-                if aud.finished {
+            if aud.playing != PlayMode::Play {
+                if aud.playing.is_done() {
                     // CLEAN UP: DUPED
                     fired_track_evts.entry(TrackEvent::End)
                         .or_default()
@@ -493,10 +490,11 @@ impl Connection {
                         .push(i);
                 }
             } else {
-                aud.finished = true;
+                aud.end();
             }
 
-            if aud.finished {
+            // TODO: split these.
+            if aud.playing.is_done() {
                 fired_track_evts.entry(TrackEvent::End)
                     .or_default()
                     .push(i);
@@ -512,7 +510,7 @@ impl Connection {
     pub fn audio_commands_events(&mut self, sources: &mut Vec<Track>) {
         for audio in sources.iter_mut() {
             audio.process_commands();
-            let state = audio.get_state();
+            let state = audio.state();
             // FIXME: ideally, hand over direct audio object access, rather than handler...
             let handle = audio.handle.clone();
             audio.events.process_timed(audio.position, EventContext::Track(&state, &handle));
@@ -595,7 +593,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points)?;
+        let len = self.mix_tracks(&mut sources, &opus_frame, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 

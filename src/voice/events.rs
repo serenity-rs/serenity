@@ -288,7 +288,7 @@ impl GlobalEvents {
 				}
 
 				for audio in &mut auds {
-					let state = audio.get_state();
+					let state = audio.state();
 		            let handle = audio.handle.clone();
 		            audio.events.process_track(audio.position, *evt, EventContext::Track(&state, &handle));
 				}

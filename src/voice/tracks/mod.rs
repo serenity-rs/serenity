@@ -63,7 +63,7 @@ pub struct Track {
     ///
     /// [`play`]: #method.play
     /// [`pause`]: #method.pause
-    pub playing: bool,
+    pub(crate) playing: PlayMode,
 
     /// The desired volume for playback.
     ///
@@ -74,22 +74,16 @@ pub struct Track {
     /// [`volume`]: #method.volume
     pub volume: f32,
 
-    /// Whether or not the sound has finished, or reached the end of its stream.
-    ///
-    /// ***Read-only*** for now.
-    pub finished: bool,
-
     /// Underlying data access object.
     ///
     /// *Calling code is not expected to use this.*
-    pub source: Input,
+    pub(crate) source: Input,
 
-    /// The current position for playback.
-    ///
-    /// Consider the position fields **read-only** for now.
-    pub position: Duration,
-    pub position_modified: bool,
+    /// The current playback position in the track.
+    pub(crate) position: Duration,
 
+    /// The total length of time this track has been active.
+    pub(crate) play_time: Duration,
 
     /// List of events attached to this audio track.
     ///
@@ -102,7 +96,7 @@ pub struct Track {
     /// Track commands are sent in this manner to ensure that access
     /// occurs in a thread-safe manner, without allowing any external
     /// code to lock access to audio objects and block packet generation.
-    pub commands: Receiver<TrackCommand>,
+    pub(crate) commands: Receiver<TrackCommand>,
 
     /// Handle for safe control of this audio track from other threads.
     ///
@@ -117,12 +111,11 @@ pub struct Track {
 impl Track {
     pub fn new(source: Input, commands: Receiver<TrackCommand>, handle: TrackHandle) -> Self {
         Self {
-            playing: true,
+            playing: Default::default(),
             volume: 1.0,
-            finished: false,
             source,
-            position: Duration::new(0, 0),
-            position_modified: false,
+            position: Default::default(),
+            play_time: Default::default(),
             events: EventStore::new(),
             commands,
             handle,
@@ -130,58 +123,62 @@ impl Track {
         }
     }
 
-    /// Sets [`playing`] to `true` in a manner that allows method chaining.
-    ///
-    /// [`playing`]: #structfield.playing
+    /// Sets a track to playing if it is paused.
     pub fn play(&mut self) -> &mut Self {
-        self.playing = true;
-
-        self
+        self.set_playing(PlayMode::Play)
     }
 
-    /// Sets [`playing`] to `false` in a manner that allows method chaining.
-    ///
-    /// [`playing`]: #structfield.playing
+    /// Pauses a track if it is playing.
     pub fn pause(&mut self) -> &mut Self {
-        self.playing = false;
-
-        self
+        self.set_playing(PlayMode::Pause)
     }
 
-    /// Sets [`finished`] to `true` in a manner that allows method chaining.
+    /// Manually stops a track.
     ///
     /// This will cause the audio track to be removed, with any relevant events triggered.
-    ///
-    /// [`playing`]: #structfield.playing
+    /// Stopped/ended tracks cannot be restarted.
     pub fn stop(&mut self) -> &mut Self {
-        self.finished = true;
+        self.set_playing(PlayMode::Stop)
+    }
 
-        self
+    pub(crate) fn end(&mut self) -> &mut Self {
+        self.set_playing(PlayMode::End)
+    }
+
+    #[inline]
+    fn set_playing(&mut self, new_state: PlayMode) -> &mut Self {
+    	self.playing = self.playing.change_to(new_state);
+
+    	self
+    }
+
+    pub fn playing(&self) -> PlayMode {
+    	self.playing
     }
 
     /// Sets [`volume`] in a manner that allows method chaining.
     ///
     /// [`volume`]: #structfield.volume
-    pub fn volume(&mut self, volume: f32) -> &mut Self {
+    pub fn set_volume(&mut self, volume: f32) -> &mut Self {
         self.volume = volume;
 
         self
     }
 
-    /// Change the position in the stream for subsequent playback.
-    ///
-    /// Currently a No-op.
-    pub fn position(&mut self, position: Duration) -> &mut Self {
-        self.position = position;
-        self.position_modified = true;
+    /// Returns the current playback position.
+    pub fn position(&self) -> Duration {
+        self.position
+    }
 
-        self
+    /// Returns the total length of time this track has been active.
+    pub fn play_time(&self) -> Duration {
+        self.play_time
     }
 
     /// Sets [`loops`] in a manner that allows method chaining.
     ///
     /// [`loops`]: #structfield.loops
-    pub fn loops(&mut self, loops: LoopState) -> &mut Self {
+    pub fn set_loops(&mut self, loops: LoopState) -> &mut Self {
         self.loops = loops;
         self   
     }
@@ -198,11 +195,9 @@ impl Track {
     }
 
     /// Steps playback location forward by one frame.
-    ///
-    /// *Used internally*, although in future this might affect seek position.
     pub(crate) fn step_frame(&mut self) {
         self.position += Duration::from_millis(20);
-        self.position_modified = false;
+        self.play_time += Duration::from_millis(20);
     }
 
     /// Receives and acts upon any commands forwarded by [`TrackHandle`]s.
@@ -214,8 +209,9 @@ impl Track {
         // Note: disconnection and an empty channel are both valid,
         // and should allow the audio object to keep running as intended.
         //
-        // However, a paused and disconnected stream MUST be stopped
-        // to prevent resource leakage.
+        // However, a paused and disconnected stream may never be revived,
+        // (i.e., if a later event would unpause it, there would still be a handle).
+        // We should then delete it TODO.
         loop {
             match self.commands.try_recv() {
                 Ok(cmd) => {
@@ -224,18 +220,21 @@ impl Track {
                         Play => {self.play();},
                         Pause => {self.pause();},
                         Stop => {self.stop();},
-                        Volume(vol) => {self.volume(vol);},
+                        Volume(vol) => {self.set_volume(vol);},
                         Seek(time) => {self.seek_time(time);},
                         AddEvent(evt) => self.events.add_event(evt, self.position),
                         Do(action) => action(self),
-                        Request(tx) => {let _ = tx.send(Box::new(self.get_state()));},
-                        Loop(loops) => {self.loops(loops);},
+                        Request(tx) => {let _ = tx.send(Box::new(self.state()));},
+                        Loop(loops) => {self.set_loops(loops);},
                     }
                 },
                 Err(TryRecvError::Disconnected) => {
-                    if !self.playing {
-                        self.finished = true;
-                    }
+                    // if self.playing {
+                    //     self.finished = true;
+                    // }
+
+                    // TODO: issue with keeping the track handle in the struct...
+                    // this branch will never be visited.
                     break;
                 },
                 Err(TryRecvError::Empty) => {
@@ -251,12 +250,12 @@ impl Track {
     /// threads in response to an [`TrackHandle`].
     ///
     /// [`TrackHandle`]: struct.TrackHandle.html
-    pub fn get_state(&self) -> TrackState {
+    pub fn state(&self) -> TrackState {
         TrackState {
             playing: self.playing,
             volume: self.volume,
-            finished: self.finished,
             position: self.position,
+            play_time: self.play_time,
             loops: self.loops,
         }
     }
@@ -301,10 +300,10 @@ pub fn create_player(source: Input) -> (Track, TrackHandle) {
 /// [`TrackHandle::get_info_blocking`]: struct.TrackHandle.html#method.get_info_blocking
 #[derive(Debug, Default)]
 pub struct TrackState {
-    pub playing: bool,
+    pub playing: PlayMode,
     pub volume: f32,
-    pub finished: bool,
     pub position: Duration,
+    pub play_time: Duration,
     pub loops: LoopState,
 }
 
@@ -377,7 +376,7 @@ impl TrackHandle {
     /// This is *final*, and will cause the audio context to fire
     /// a [`TrackEvent::End`] event.
     ///
-    /// [`TrackEvent::End`]: enum.TrackEvent.html#variant.End
+    /// [`TrackEvent::End`]: ../events/enum.TrackEvent.html#variant.End
     pub fn stop(&self) -> TrackResult {
         self.send(TrackCommand::Stop)
     }
@@ -404,7 +403,7 @@ impl TrackHandle {
     /// then all calls will fail.
     ///
     /// [`TrackSource`]: trait.TrackSource.html
-    pub fn seek(&self, position: Duration) -> TrackResult {
+    pub fn seek_time(&self, position: Duration) -> TrackResult {
         if self.seekable {
             self.send(TrackCommand::Seek(position))
         } else {
@@ -495,8 +494,19 @@ impl TrackHandle {
 }
 
 #[derive(Clone, Copy, Debug)]
+/// Looping behaviour for a [`Track`].
+///
+/// [`Track`]: struct.Track.html
 pub enum LoopState {
+	/// Track will loop endlessly until loop state is changed or
+	/// manually stopped.
     Infinite,
+
+    /// Track will loop `n` more times.
+    ///
+    /// `Finite(0)` is the `Default`, stopping the track once its [`Input`] ends.
+    ///
+    /// [`Input`]: ../input/struct.Input.html
     Finite(usize),
 }
 
@@ -540,9 +550,43 @@ impl std::fmt::Debug for TrackCommand {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+/// Playback status of a track.
 pub enum PlayMode {
+	/// The track is currently playing.
     Play,
+
+    /// The track is currently paused, and may be resumed.
     Pause,
+
+    /// The track has been manually stopped, and cannot be restarted.
     Stop,
+
+    /// The track has naturally ended, and cannot be restarted.
+    End,
+}
+
+impl PlayMode {
+	/// Returns whether 
+	pub fn is_done(self) -> bool {
+		matches!(self, PlayMode::Stop | PlayMode::End)
+	}
+
+	fn change_to(self, other: Self) -> PlayMode {
+		use PlayMode::*;
+
+		// Idea: a finished track cannot be restarted -- this action is final.
+		// We may want to change this in future so that seekable tracks can uncancel
+		// themselves, perhaps, but this requires a bit more machinery to readd...
+		match self {
+			Play | Pause => other,
+			a@_ => a,
+		}
+	}
+}
+
+impl Default for PlayMode {
+	fn default() -> Self {
+		PlayMode::Play
+	}
 }
