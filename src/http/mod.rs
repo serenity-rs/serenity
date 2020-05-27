@@ -72,15 +72,16 @@ pub trait CacheHttp {
     fn cache(&self) -> Option<&CacheRwLock> { None }
 }
 
-#[cfg(feature = "client")]
-impl CacheHttp for Context {
-    fn http(&self) -> &Http { &self.http }
+impl<T> CacheHttp for &T
+    where T: CacheHttp
+{
+    fn http(&self) -> &Http { (*self).http() }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&CacheRwLock> { (*self).cache() }
 }
 
 #[cfg(feature = "client")]
-impl CacheHttp for &Context {
+impl CacheHttp for Context {
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
@@ -94,21 +95,7 @@ impl CacheHttp for CacheAndHttp {
 }
 
 #[cfg(feature = "client")]
-impl CacheHttp for &CacheAndHttp {
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(feature = "client")]
 impl CacheHttp for Arc<CacheAndHttp> {
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(feature = "client")]
-impl CacheHttp for &Arc<CacheAndHttp> {
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
     fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
@@ -120,15 +107,7 @@ impl CacheHttp for (&CacheRwLock, &Http) {
     fn http(&self) -> &Http { &self.1 }
 }
 
-impl CacheHttp for &Http {
-    fn http(&self) -> &Http { *self }
-}
-
 impl CacheHttp for Arc<Http> {
-    fn http(&self) -> &Http { &*self }
-}
-
-impl CacheHttp for &Arc<Http> {
     fn http(&self) -> &Http { &*self }
 }
 
