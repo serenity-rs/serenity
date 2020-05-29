@@ -1,6 +1,7 @@
 use std::{
     collections::HashSet,
     fmt,
+    error::Error as StdError,
 };
 use crate::client::Context;
 use crate::model::{
@@ -67,16 +68,7 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-#[derive(Debug, Clone)]
-pub struct CommandError(pub String);
-
-impl<T: fmt::Display> From<T> for CommandError {
-    #[inline]
-    fn from(d: T) -> Self {
-        CommandError(d.to_string())
-    }
-}
-
+pub type CommandError = Box<dyn StdError>;
 pub type CommandResult = ::std::result::Result<(), CommandError>;
 
 pub type CommandFn = fn(&Context, &Message, Args) -> CommandResult;
