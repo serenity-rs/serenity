@@ -1,4 +1,5 @@
 use audiopus::{Bitrate, SampleRate};
+use std::time::Duration;
 
 /// Sample rate of audio to be sent to Discord.
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
@@ -8,6 +9,9 @@ pub const SAMPLE_RATE_RAW: usize = 48_000;
 
 /// Number of audio frames/packets to be sent per second.
 pub const AUDIO_FRAME_RATE: usize = 50;
+
+/// Length of time between any two audio frames.
+pub const TIMESTEP_LENGTH: Duration = Duration::from_millis(1000 / AUDIO_FRAME_RATE as u64);
 
 /// Default bitrate for audio.
 pub const DEFAULT_BITRATE: Bitrate = Bitrate::BitsPerSecond(128_000);
@@ -32,5 +36,5 @@ pub const CHILD_BUFFER_LEN: usize = AUDIO_FRAME_RATE / 2;
 
 /// Maximum packet size for a voice packet.
 ///
-/// Set a safe amount below the Ethernet MTU to avoid framgnetation/rejection.
+/// Set a safe amount below the Ethernet MTU to avoid fragmentation/rejection.
 pub const VOICE_PACKET_MAX: usize = 1460;

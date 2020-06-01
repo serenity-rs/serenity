@@ -4,6 +4,7 @@ mod queue;
 
 use crate::{
 	voice::{
+        constants::*,
 		events::{
 	        Event,
 	        EventContext,
@@ -11,6 +12,11 @@ use crate::{
 	        EventStore,
 	    },
 	    input::Input,
+        threading::{
+            EventMessage,
+            Interconnect,
+            TrackStateChange,
+        },
 	},
 };
 use std::{
@@ -72,7 +78,7 @@ pub struct Track {
     /// Can be controlled with [`volume`] if chaining is desired.
     ///
     /// [`volume`]: #method.volume
-    pub volume: f32,
+    pub(crate) volume: f32,
 
     /// Underlying data access object.
     ///
@@ -89,7 +95,7 @@ pub struct Track {
     ///
     /// This may be used to add additional events to a track
     /// before it is sent to the audio context for playing.
-    pub events: EventStore,
+    pub events: Option<EventStore>,
 
     /// Channel from which commands are received.
     ///
@@ -116,7 +122,7 @@ impl Track {
             source,
             position: Default::default(),
             play_time: Default::default(),
-            events: EventStore::new(),
+            events: Some(EventStore::new()),
             commands,
             handle,
             loops: LoopState::Finite(0),
@@ -166,6 +172,11 @@ impl Track {
     }
 
     /// Returns the current playback position.
+    pub fn volume(&self) -> f32 {
+        self.volume
+    }
+
+    /// Returns the current playback position.
     pub fn position(&self) -> Duration {
         self.position
     }
@@ -196,8 +207,8 @@ impl Track {
 
     /// Steps playback location forward by one frame.
     pub(crate) fn step_frame(&mut self) {
-        self.position += Duration::from_millis(20);
-        self.play_time += Duration::from_millis(20);
+        self.position += TIMESTEP_LENGTH;
+        self.play_time += TIMESTEP_LENGTH;
     }
 
     /// Receives and acts upon any commands forwarded by [`TrackHandle`]s.
@@ -205,7 +216,7 @@ impl Track {
     /// *Used internally*, this should not be exposed to users.
     ///
     /// [`TrackHandle`]: struct.TrackHandle.html
-    pub(crate) fn process_commands(&mut self) {
+    pub(crate) fn process_commands(&mut self, index: usize, ic: &Interconnect) {
         // Note: disconnection and an empty channel are both valid,
         // and should allow the audio object to keep running as intended.
         //
@@ -217,15 +228,38 @@ impl Track {
                 Ok(cmd) => {
                     use TrackCommand::*;
                     match cmd {
-                        Play => {self.play();},
-                        Pause => {self.pause();},
-                        Stop => {self.stop();},
-                        Volume(vol) => {self.set_volume(vol);},
-                        Seek(time) => {self.seek_time(time);},
-                        AddEvent(evt) => self.events.add_event(evt, self.position),
-                        Do(action) => action(self),
+                        Play => {
+                            self.play();
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                        },
+                        Pause => {
+                            self.pause();
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                        },
+                        Stop => {
+                            self.stop();
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                        },
+                        Volume(vol) => {
+                            self.set_volume(vol);
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Volume(self.volume)));
+                        },
+                        Seek(time) => {
+                            self.seek_time(time);
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Position(self.position)));
+                        },
+                        AddEvent(evt) => {
+                            ic.events.send(EventMessage::AddTrackEvent(index, evt));
+                        },
+                        Do(action) => {
+                            action(self);
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Total(self.state())));
+                        },
                         Request(tx) => {let _ = tx.send(Box::new(self.state()));},
-                        Loop(loops) => {self.set_loops(loops);},
+                        Loop(loops) => {
+                            self.set_loops(loops);
+                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Loops(self.loops, true)));
+                        },
                     }
                 },
                 Err(TryRecvError::Disconnected) => {
@@ -298,13 +332,22 @@ pub fn create_player(source: Input) -> (Track, TrackHandle) {
 /// [`Track`]: struct.Track.html
 /// [`TrackHandle::get_info`]: struct.TrackHandle.html#method.get_info
 /// [`TrackHandle::get_info_blocking`]: struct.TrackHandle.html#method.get_info_blocking
-#[derive(Debug, Default)]
+#[derive(Copy, Clone, Debug, Default, PartialEq)]
 pub struct TrackState {
     pub playing: PlayMode,
     pub volume: f32,
     pub position: Duration,
     pub play_time: Duration,
     pub loops: LoopState,
+}
+
+impl TrackState {
+    pub(crate) fn step_frame(&mut self) {
+        if self.playing == PlayMode::Play {
+            self.position += TIMESTEP_LENGTH;
+            self.play_time += TIMESTEP_LENGTH;
+        }
+    }
 }
 
 /// Alias for most result-free calls to an [`TrackHandle`].
@@ -420,7 +463,7 @@ impl TrackHandle {
     /// [`Track`]: struct.Track.html
     /// [`EventContext::Track`]: enum.EventContext.html#variant.Track
     pub fn add_event<F>(&self, event: Event, action: F) -> TrackResult 
-        where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
+        where F: FnMut(EventContext) -> Option<Event> + Send + Sync + 'static
     {
         self.send(TrackCommand::AddEvent(EventData::new(event, action)))
     }
@@ -493,7 +536,7 @@ impl TrackHandle {
     }
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Copy, Clone, Debug, Eq, PartialEq)]
 /// Looping behaviour for a [`Track`].
 ///
 /// [`Track`]: struct.Track.html
@@ -567,7 +610,7 @@ pub enum PlayMode {
 }
 
 impl PlayMode {
-	/// Returns whether 
+	/// Returns whether the track has irreversibly stopped.
 	pub fn is_done(self) -> bool {
 		matches!(self, PlayMode::Stop | PlayMode::End)
 	}

@@ -103,31 +103,33 @@ impl TrackQueue {
             track.pause();
         }
 
-        track.events.add_event(
-            EventData::new(
-                Event::Track(TrackEvent::End),
-                move |_ctx| {
-                    let mut inner = remote_lock.lock();
-                    let _old = inner.tracks.pop_front();
+        track.events.as_mut()
+            .expect("[Voice] Queue inspecting EventStore on new Track: did not exist.")
+            .add_event(
+                EventData::new(
+                    Event::Track(TrackEvent::End),
+                    move |_ctx| {
+                        let mut inner = remote_lock.lock();
+                        let _old = inner.tracks.pop_front();
 
-                    // If any audio files die unexpectedly, then keep going until we
-                    // find one which works, or we run out.
-                    let mut keep_looking = true;
-                    while keep_looking && !inner.tracks.is_empty() {
-                        if let Some(new) = inner.tracks.front() {
-                            keep_looking = new.play().is_err();
+                        // If any audio files die unexpectedly, then keep going until we
+                        // find one which works, or we run out.
+                        let mut keep_looking = true;
+                        while keep_looking && !inner.tracks.is_empty() {
+                            if let Some(new) = inner.tracks.front() {
+                                keep_looking = new.play().is_err();
 
-                            // Discard files which cannot be used for whatever reason.
-                            if keep_looking {
-                                let _ = inner.tracks.pop_front();
+                                // Discard files which cannot be used for whatever reason.
+                                if keep_looking {
+                                    let _ = inner.tracks.pop_front();
+                                }
                             }
                         }
-                    }
 
-                    None
-                }),
-            track.position,
-        );
+                        None
+                    }),
+                track.position,
+            );
 
         handler.play(track);
         inner.tracks.push_back(track_handle);

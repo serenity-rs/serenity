@@ -26,10 +26,15 @@ use crate::{
         audio::AudioReceiver,
         connection_info::ConnectionInfo,
         constants::*,
+        events::{EventContext, UntimedEvent},
         payload,
+        threading::{
+            EventMessage,
+            Interconnect,
+            TrackStateChange,
+        },
         tracks::{Track, PlayMode},
         CRYPTO_MODE,
-        EventContext,
         TrackEvent,
         VoiceError,
     },
@@ -424,30 +429,23 @@ impl Connection {
         sources: &mut Vec<Track>,
         _opus_frame: &[u8],
         mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
-        fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
+        fired_track_evts: &mut HashMap<UntimedEvent, EventContext>,
         time_in_call: &mut Duration,
         entry_points: &mut u64,
+        interconnect: &Interconnect,
     ) -> Result<usize> {
         let mut len = 0;
         let mut i = 0;
 
         while i < sources.len() {
-            let mut aud = sources.get_mut(i).unwrap();
+            let aud = sources.get_mut(i).unwrap();
 
             let vol = aud.volume;
 
             let stream = &mut aud.source;
 
-            if aud.playing != PlayMode::Play {
-                if aud.playing.is_done() {
-                    // CLEAN UP: DUPED
-                    fired_track_evts.entry(TrackEvent::End)
-                        .or_default()
-                        .push(i);
-                }
-            
+            if aud.playing != PlayMode::Play {          
                 i += 1;
-
                 continue;
             }
 
@@ -485,19 +483,11 @@ impl Connection {
                 aud.step_frame();
             } else if aud.do_loop() {
                 if aud.seek_time(Default::default()).is_some() {
-                    fired_track_evts.entry(TrackEvent::Loop)
-                        .or_default()
-                        .push(i);
+                    interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(aud.loops, false)));
                 }
+
             } else {
                 aud.end();
-            }
-
-            // TODO: split these.
-            if aud.playing.is_done() {
-                fired_track_evts.entry(TrackEvent::End)
-                    .or_default()
-                    .push(i);
             }
 
             i += 1;
@@ -507,25 +497,22 @@ impl Connection {
     }
 
     #[inline]
-    pub fn audio_commands_events(&mut self, sources: &mut Vec<Track>) {
-        for audio in sources.iter_mut() {
-            audio.process_commands();
-            let state = audio.state();
-            // FIXME: ideally, hand over direct audio object access, rather than handler...
-            let handle = audio.handle.clone();
-            audio.events.process_timed(audio.position, EventContext::Track(&state, &handle));
+    fn audio_commands_events(&mut self, sources: &mut Vec<Track>, interconnect: &Interconnect) {
+        for (i, audio) in sources.iter_mut().enumerate() {
+            audio.process_commands(i, interconnect);
         }
     }
 
     #[allow(unused_variables)]
-    pub fn cycle(&mut self,
+    pub(crate) fn cycle(&mut self,
                 mut sources: &mut Vec<Track>,
                 mut receiver: &mut Option<Box<dyn AudioReceiver>>,
-                fired_track_evts: &mut HashMap<TrackEvent, Vec<usize>>,
+                fired_track_evts: &mut HashMap<UntimedEvent, EventContext>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate,
                 mut time_in_call: &mut Duration,
-                mut entry_points: &mut u64)
+                mut entry_points: &mut u64,
+                interconnect: &Interconnect)
                  -> Result<()> {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
@@ -593,7 +580,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.mix_tracks(&mut sources, &opus_frame, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points)?;
+        let len = self.mix_tracks(&mut sources, &opus_frame, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points, interconnect)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -626,7 +613,7 @@ impl Connection {
 
         self.audio_timer.reset();
 
-        self.audio_commands_events(&mut sources);
+        self.audio_commands_events(&mut sources, interconnect);
 
         Ok(())
     }

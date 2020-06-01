@@ -340,7 +340,7 @@ impl Handler {
     /// [`Track`]: struct.Audio.html
     /// [`EventContext::Global`]: enum.EventContext.html#variant.Global
     pub fn add_global_event<F>(&mut self, event: Event, action: F) 
-        where F: FnMut(&mut EventContext<'_>) -> Option<Event> + Send + Sync + 'static
+        where F: FnMut(EventContext) -> Option<Event> + Send + Sync + 'static
     {
         self.send(VoiceStatus::AddEvent(EventData::new(event, action)));
     }
