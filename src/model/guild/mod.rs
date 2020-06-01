@@ -85,7 +85,7 @@ pub struct Guild {
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
     ///
-    /// [Discord Partnership]: https://discordapp.com/partners
+    /// [Discord Partnership]: https://discord.com/partners
     pub features: Vec<String>,
     /// The hash of the icon used by the guild.
     ///
@@ -371,7 +371,7 @@ impl Guild {
     /// [`PartialGuild`]: struct.PartialGuild.html
     /// [`Shard`]: ../../gateway/struct.Shard.html
     /// [US West region]: enum.Region.html#variant.UsWest
-    /// [whitelist]: https://discordapp.com/developers/docs/resources/guild#create-guild
+    /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
     pub fn create(http: impl AsRef<Http>, name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,

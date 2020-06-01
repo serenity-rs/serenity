@@ -105,9 +105,6 @@ version = "0.18"
 version = "0.2"
 package = "http"
 
-[dev-dependencies.matches]
-version = "0.1"
-
 [features]
 default = [
     "builder",

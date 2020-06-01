@@ -48,7 +48,7 @@ pub enum Route {
     // Additionally, this needs to be a `LightMethod` from the parent module
     // and _not_ a `reqwest` `Method` due to `reqwest`'s not deriving `Copy`.
     //
-    // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
+    // [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
     ChannelsIdMessagesId(LightMethod, u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
     ///

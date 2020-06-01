@@ -192,14 +192,9 @@ Voice + youtube-dl:
 
 - youtube-dl (Arch: `community/youtube-dl`)
 
-# Related Projects
+# Projects extending Serenity
 
-- [Discord.net][library:Discord.net]
-- [JDA][library:JDA]
-- [disco][library:disco]
-- [discordrb][library:discordrb]
-- [discord.js][library:discord.js]
-- [discord.py][library:discord.py]
+- [serenity-lavalink][project:serenity-lavalink]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
@@ -217,19 +212,16 @@ Voice + youtube-dl:
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [crates.io link]: https://crates.io/crates/serenity
 [crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
-[discord docs]: https://discordapp.com/developers/docs/intro
+[discord docs]: https://discord.com/developers/docs/intro
 [docs]: https://docs.rs/serenity
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
 [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/WBdGJCc
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
-[library:Discord.net]: https://github.com/discord-net/Discord.Net
-[library:JDA]: https://github.com/DV8FromTheWorld/JDA
-[library:disco]: https://github.com/b1naryth1ef/disco
-[library:discordrb]: https://github.com/meew0/discordrb
-[library:discord.js]: https://github.com/discordjs/discord.js
-[library:discord.py]: https://github.com/Rapptz/discord.py
+[project:serenity-lavalink]: https://gitlab.com/nitsuga5124/serenity-lavalink/
+[repo:lavalink]: https://github.com/Frederikam/Lavalink
+[repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
 [rust 1.39.0+ badge]: https://img.shields.io/badge/rust-1.39.0+-93450a.svg?style=flat-square
 [rust 1.39.0+ link]: https://blog.rust-lang.org/2019/11/07/Rust-1.39.0.html

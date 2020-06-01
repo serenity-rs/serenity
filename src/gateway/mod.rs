@@ -44,7 +44,7 @@
 //! [`Client::start_shard`]: ../client/struct.Client.html#method.start_shard
 //! [`Client::start_shard_range`]: ../client/struct.Client.html#method.start_shard_range
 //! [`Client::start_shards`]: ../client/struct.Client.html#method.start_shards
-//! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
+//! [docs]: https://discord.com/developers/docs/topics/gateway#sharding
 
 mod error;
 mod shard;

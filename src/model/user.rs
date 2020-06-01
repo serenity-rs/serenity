@@ -202,7 +202,7 @@ impl CurrentUser {
     ///     },
     /// };
     ///
-    /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
+    /// assert_eq!(url, "https://discord.com/api/oauth2/authorize? \
     ///                  client_id=249608697955745802&scope=bot");
     /// # }
     /// #
@@ -258,7 +258,7 @@ impl CurrentUser {
         let client_id = http.as_ref().get_current_application_info().map(|v| v.id)?;
 
         let mut url = format!(
-            "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
+            "https://discord.com/api/oauth2/authorize?client_id={}&scope=bot",
             client_id
         );
 
@@ -474,7 +474,13 @@ impl User {
     ///
     /// [current user]: struct.CurrentUser.html
     #[inline]
-    pub fn create_dm_channel(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> { self.id.create_dm_channel(&http) }
+    pub fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+        if self.bot {
+            return Err(Error::Model(ModelError::MessagingBot));
+        }
+
+        self.id.create_dm_channel(cache_http)
+    }
 
     /// Retrieves the time that this user was created at.
     #[inline]
@@ -568,37 +574,8 @@ impl User {
     #[allow(clippy::let_and_return)]
     pub fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
         where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
-        if self.bot {
-            return Err(Error::Model(ModelError::MessagingBot));
-        }
-
-        // Silences a warning when compiling without the `cache` feature.
-        #[allow(unused_mut)]
-        let mut private_channel_id = None;
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                private_channel_id = cache.read().private_channels
-                    .values()
-                    .map(|ch| ch.read())
-                    .find(|ch| ch.recipient.read().id == self.id)
-                    .map(|ch| ch.id);
-            }
-        }
-
-        let private_channel_id = match private_channel_id {
-            Some(id) => id,
-            None => {
-                let map = json!({
-                    "recipient_id": self.id.0,
-                });
-
-                cache_http.http().create_private_channel(&map)?.id
-            }
-        };
-
-        private_channel_id.send_message(&cache_http.http(), f)
+        self.create_dm_channel(&cache_http)?
+            .send_message(&cache_http.http(), f)
     }
 
     /// This is an alias of [direct_message].
@@ -806,12 +783,25 @@ impl UserId {
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: ../user/struct.CurrentUser.html
-    pub fn create_dm_channel(self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
+    pub fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(channel) = cache.read().private_channels
+                    .values()
+                    .map(|ch| ch.read())
+                    .find(|ch| ch.recipient.read().id == self)
+                {
+                    return Ok(channel.clone());
+                }
+            }
+        }
+
         let map = json!({
             "recipient_id": self.0,
         });
 
-        http.as_ref().create_private_channel(&map)
+        cache_http.http().create_private_channel(&map)
     }
 
     /// Attempts to find a [`User`] by its Id in the cache.
