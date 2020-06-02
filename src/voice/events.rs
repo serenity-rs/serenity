@@ -1,10 +1,13 @@
 use crate::{
-	model::event::VoiceSpeakingState,
+	model::event::{
+		VoiceSpeaking,
+		VoiceClientConnect,
+		VoiceClientDisconnect,
+	},
 	voice::{
 		constants::*,
 		tracks::{
 			PlayMode,
-			Track,
 			TrackHandle,
 			TrackState,
 		},
@@ -16,7 +19,6 @@ use std::{
 		BinaryHeap,
 		HashMap,
 	},
-	sync::Arc,
 	time::Duration,
 };
 
@@ -36,11 +38,7 @@ pub enum EventContext {
 	/// [`TrackHandle::add_event`]: struct.TrackHandle.html#method.add_event
 	Track(Vec<(TrackState, TrackHandle)>),
 
-	SpeakingStateUpdate {
-		ssrc: u32,
-		user_id: u64,
-		speaking_state: VoiceSpeakingState,
-	},
+	SpeakingStateUpdate(VoiceSpeaking),
 
 	SpeakingUpdate {
 		ssrc: u32,
@@ -60,15 +58,9 @@ pub enum EventContext {
 		data: u32, // FIXME.
 	},
 
-	ClientConnect {
-		audio_ssrc: u32,
-		video_ssrc: u32,
-		user_id: u64,
-	},
+	ClientConnect(VoiceClientConnect),
 
-	ClientDisconnect {
-		user_id: u64,	
-	},
+	ClientDisconnect(VoiceClientDisconnect),
 }
 
 impl EventContext {
@@ -352,7 +344,7 @@ impl EventStore {
 	}
 
 	/// Processes all events due up to and including `now`.
-	pub(crate) fn process_timed(&mut self, now: Duration, mut ctx: EventContext) {
+	pub(crate) fn process_timed(&mut self, now: Duration, ctx: EventContext) {
 		while let Some(evt) = self.timed.peek() {
 			if evt.fire_time.as_ref().expect("Timed event must have a fire_time.") > &now {
 				break;
@@ -371,7 +363,7 @@ impl EventStore {
 	}
 
 	/// Processes all events attached to the given track event.
-	pub(crate) fn process_untimed(&mut self, now: Duration, untimed_event: UntimedEvent, mut ctx: EventContext) {
+	pub(crate) fn process_untimed(&mut self, now: Duration, untimed_event: UntimedEvent, ctx: EventContext) {
 		// move a Vec in and out: not too expensive, but could be better.
 		// Although it's obvious that moving an event out of one vec and into
 		// another necessitates that they be different event types, thus entries,
@@ -407,62 +399,6 @@ pub(crate) struct GlobalEvents {
 }
 
 impl GlobalEvents {
-	// pub(crate) fn march_and_process(&mut self, sources: &mut Vec<Track>, events: &mut HashMap<UntimedEvent, EventContext>) {
-	// 	self.time += Duration::from_millis(20);
-	// 	// FIXME: make this return all active?
-	// 	self.store.process_timed(self.time, EventContext::Track(vec![]));
-
-	// 	for (evt, ctx) in events.iter() {
-	// 		if let EventContext::Track(indices) = ctx {
-	// 			// Peek to see if there are any listeners and events at all...
-	// 			let should_work = !indices.is_empty();
-
-	// 			if should_work {
-	// 				let mut local_sources = &mut sources[..];
-	// 				let mut auds = Vec::with_capacity(local_sources.len());
-
-	// 				// filter_map etc. on the indices wouldn't work here...
-	// 				// So far as I can tell, this was the only way to convince the compiler
-	// 				// that the references would survive.
-	// 				let mut removed = 0;
-	// 				for i in indices {
-	// 					let (_, edge) = local_sources.split_at_mut(i - removed);
-	// 					let (val, rest) = edge.split_at_mut(1);
-	// 					local_sources = rest;
-	// 					auds.push(&mut val[0]);
-	// 					removed += i;
-	// 				}
-
-	// 				for audio in &mut auds {
-	// 					let state = audio.state();
-	// 		            let handle = audio.handle.clone();
-	// 		            audio.events.process_untimed(audio.position, *evt, EventContext::Track(&state, &handle));
-	// 				}
-
-	// 				self.store.process_untimed(self.time, *evt, EventContext::Track(Some(auds.iter().map(|a| &a.handle).collect())));
-	// 			}
-	// 		} else {
-	// 			// TODO: other untimed events
-	// 			// self.store.process_untimed(self.time, *evt, EventContext::Global(GlobalContext::Track(Some(auds))));
-	// 		}
-	// 	}
-
-	// 	// remove audios, too.
-	// 	let to_cull = events.entry(TrackEvent::End.into()).or_insert_with(|| EventContext::Track(vec![]));
-	// 	if let EventContext::Track(to_cull) = to_cull {
-	// 		for (count, index) in to_cull.iter().enumerate() {
-	// 			let _ = sources.remove(index - count);
-	// 		}
-	// 	}
-
-	// 	// Now drain vecs.
-	// 	for (_evt, indices) in events.iter_mut() {
-	// 		if let EventContext::Track(indices) = indices {
-	// 			indices.clear();
-	// 		}
-	// 	}
-	// }
-
 	pub(crate) fn add_event(&mut self, evt: EventData) {
 		self.store.add_event(evt, self.time);
 	}
@@ -529,9 +465,6 @@ impl GlobalEvents {
 
 				self.store.process_untimed(self.time, untimed, EventContext::Track(global_ctx))
 			}
-			// let global_ctx = indices.map(|i| (
-			// 		states.get(i).expect("[Voice] Missing state index for "),
-			// 	))
 		}
 
 		// Now drain vecs.

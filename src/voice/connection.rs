@@ -1,17 +1,9 @@
 use audiopus::{
-    packet as opus_packet,
     Application as CodingMode,
     Bitrate,
     Channels,
-    coder::Decoder as OpusDecoder,
     coder::Encoder as OpusEncoder,
     softclip::SoftClip,
-};
-use byteorder::{
-    BigEndian,
-    ByteOrder,
-    ReadBytesExt,
-    WriteBytesExt
 };
 use crate::{
     constants::VOICE_GATEWAY_VERSION,
@@ -25,7 +17,6 @@ use crate::{
     voice::{
         connection_info::ConnectionInfo,
         constants::*,
-        events::{EventContext, UntimedEvent},
         payload,
         threading::{
             AuxPacketMessage,
@@ -35,15 +26,10 @@ use crate::{
         },
         tracks::{Track, PlayMode},
         CRYPTO_MODE,
-        TrackEvent,
         VoiceError,
     },
 };
 use discortp::{
-    demux::{
-        self,
-        Demuxed,
-    },
     discord::{
         IpDiscoveryPacket,
         IpDiscoveryType,
@@ -58,7 +44,6 @@ use discortp::{
     Packet,
 };
 use log::{debug, info, warn};
-use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
 use sodiumoxide::crypto::secretbox::{
@@ -69,21 +54,8 @@ use sodiumoxide::crypto::secretbox::{
     Nonce,
 };
 use std::{
-    collections::HashMap,
     net::{SocketAddr, ToSocketAddrs, UdpSocket},
-    sync::{
-        mpsc::{
-            self,
-            Receiver as MpscReceiver,
-            Sender as MpscSender
-        },
-        Arc,
-    },
-    thread::{
-        self,
-        Builder as ThreadBuilder,
-        JoinHandle
-    },
+    thread,
     time::Duration,
     time::Instant,
 };
@@ -91,21 +63,6 @@ use url::Url;
 
 #[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
-
-enum ReceiverStatus {
-    Udp(Vec<u8>),
-    Websocket(VoiceEvent),
-}
-
-#[allow(dead_code)]
-struct ThreadItems {
-    rx: MpscReceiver<ReceiverStatus>,
-    tx: MpscSender<ReceiverStatus>,
-    udp_close_sender: MpscSender<i32>,
-    udp_thread: JoinHandle<()>,
-    ws_close_sender: MpscSender<i32>,
-    ws_thread: JoinHandle<()>,
-}
 
 pub(crate) struct Connection {
     audio_timer: Timer,
@@ -116,8 +73,6 @@ pub(crate) struct Connection {
     packet: [u8; VOICE_PACKET_MAX],
     silence_frames: u8,
     soft_clip: SoftClip,
-    speaking: VoiceSpeakingState,
-    ssrc: u32,
     udp: UdpSocket,
 }
 
@@ -249,12 +204,9 @@ impl Connection {
             encoder,
             key,
             packet,
-            udp,
             silence_frames: 0,
             soft_clip,
-            speaking: VoiceSpeakingState::empty(),
-            ssrc: ready.ssrc,
-            // thread_items,
+            udp,
         })
     }
 
@@ -313,92 +265,6 @@ impl Connection {
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
     }
-
-    // #[inline]
-    // fn handle_received_udp(
-    //     &mut self,
-    //     interconnect: &Interconnect,
-    //     buffer: &mut [i16; 1920],
-    //     packet: &[u8],
-    //     nonce: &mut Nonce,
-    //     ) -> Result<()> {
-    //     match demux::demux(packet) {
-    //         Demuxed::Rtp(rtp) => {
-    //             println!("{:?}", rtp);
-    //             println!("{:?}", rtp.payload());
-    //         },
-    //         Demuxed::Rtcp(rtcp) => {
-    //             println!("{:?}", rtcp);
-    //             println!("{:?}", rtcp.payload());
-    //         },
-    //         Demuxed::FailedParse(t) => {
-    //             warn!("[Voice] Failed to parse message of type {:?}.", t);
-    //         }
-    //         _ => {
-    //             warn!("[Voice] Illegal UDP packet from voice server.");
-    //         }
-    //     }
-
-    //     // Old code: make this nicer and integrate with above Demux.
-    //     let mut handle = &packet[2..];
-    //     let sequence = handle.read_u16::<BigEndian>()?;
-    //     let timestamp = handle.read_u32::<BigEndian>()?;
-    //     let ssrc = handle.read_u32::<BigEndian>()?;
-
-    //     let rtp_len = RtpPacket::minimum_packet_size();
-    //     nonce.0[..rtp_len]
-    //         .clone_from_slice(&packet[..rtp_len]);
-
-    //     if let Ok(mut decrypted) =
-    //         secretbox::open(&packet[rtp_len..], &nonce, &self.key) {
-    //         let channels = opus_packet::nb_channels(&decrypted)?;
-
-    //         let entry =
-    //             self.decoder_map.entry((ssrc, channels)).or_insert_with(
-    //                 || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
-    //             );
-
-    //         // Strip RTP Header Extensions (one-byte)
-    //         if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
-    //             // Read the length bytes as a big-endian u16.
-    //             let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
-    //             let mut offset = 4;
-    //             for _ in 0..header_extension_len {
-    //                 let byte = decrypted[offset];
-    //                 offset += 1;
-    //                 if byte == 0 {
-    //                     continue;
-    //                 }
-
-    //                 offset += 1 + (0b1111 & (byte >> 4)) as usize;
-    //             }
-
-    //             // Skip over undocumented Discord byte
-    //             offset += 1;
-
-    //             decrypted = decrypted.split_off(offset);
-    //         }
-
-    //         let len = entry.decode(Some(&decrypted), &mut buffer[..], false)?;
-
-    //         let is_stereo = channels == Channels::Stereo;
-
-    //         let b = if is_stereo { len * 2 } else { len };
-
-    //         interconnect.events.send(EventMessage::FireCoreEvent(
-    //             EventContext::VoicePacket {
-    //                 ssrc,
-    //                 sequence,
-    //                 timestamp,
-    //                 stereo: is_stereo,
-    //                 data: buffer[..b].to_vec(),
-    //                 compressed_size: decrypted.len(),
-    //             }
-    //         ));
-    //     }
-
-    //     Ok(())
-    // }
 
     #[inline]
     fn mix_tracks(
@@ -483,7 +349,6 @@ impl Connection {
 
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
-        let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
 
         // Reconfigure encoder bitrate.
         // From my testing, it seemed like this needed to be set every cycle.
@@ -505,7 +370,7 @@ impl Connection {
                 self.silence_frames -= 1;
 
                 // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
+                opus_frame.extend_from_slice(&SILENT_FRAME);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 interconnect.aux_packets.send(AuxPacketMessage::Speaking(false));
@@ -524,7 +389,7 @@ impl Connection {
 
         interconnect.aux_packets.send(AuxPacketMessage::Speaking(true));
 
-        self.prep_and_send_packet(mix_buffer, &opus_frame, nonce)?;
+        self.prep_and_send_packet(mix_buffer, &opus_frame)?;
         audio_timer.r#await();
 
         self.audio_timer.reset_from_deadline();
@@ -536,9 +401,9 @@ impl Connection {
 
     fn prep_and_send_packet(&mut self,
                    buffer: [f32; 1920],
-                   opus_frame: &[u8],
-                   mut nonce: Nonce)
+                   opus_frame: &[u8])
                    -> Result<()> {
+        let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
                 .expect(
@@ -637,88 +502,6 @@ where T: for<'a> PartialEq<&'a str>,
       It : IntoIterator<Item=T>
 {
     modes.into_iter().any(|s| s == CRYPTO_MODE)
-}
-
-#[inline]
-fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<ThreadItems> {
-    let (udp_close_sender, udp_close_reader) = mpsc::channel();
-
-    let current_thread = thread::current();
-    let thread_name = current_thread.name().unwrap_or("serenity voice");
-
-    let (tx, rx) = mpsc::channel();
-    let tx_udp = tx.clone();
-    let udp_clone = udp.try_clone()?;
-
-    let udp_thread = ThreadBuilder::new()
-        .name(format!("{} UDP", thread_name))
-        .spawn(move || {
-            let _ = udp_clone.set_read_timeout(Some(Duration::from_millis(250)));
-
-            let mut buffer = [0; 512];
-
-            'outer: loop {
-                if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
-                    let piece = buffer[..len].to_vec();
-                    let send = tx_udp.send(ReceiverStatus::Udp(piece));
-
-                    if send.is_err() {
-                        break 'outer;
-                    }
-                } else if udp_close_reader.try_recv().is_ok() {
-                    break 'outer;
-                }
-            }
-
-            info!("[Voice] UDP thread exited.");
-        })?;
-
-    let (ws_close_sender, ws_thread) = start_ws_thread(client, &tx)?;
-
-    Ok(ThreadItems {
-        rx,
-        tx,
-        udp_close_sender,
-        udp_thread,
-        ws_close_sender,
-        ws_thread,
-    })
-}
-
-#[inline]
-fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>) -> Result<(MpscSender<i32>, JoinHandle<()>)> {
-    let current_thread = thread::current();
-    let thread_name = current_thread.name().unwrap_or("serenity voice");
-
-    let tx_ws = tx.clone();
-    let (ws_close_sender, ws_close_reader) = mpsc::channel();
-
-    let ws_thread = ThreadBuilder::new()
-        .name(format!("{} WS", thread_name))
-        .spawn(move || {
-            'outer: loop {
-                while let Ok(Some(value)) = client.lock().try_recv_json() {
-                    debug!("VOX WS {:#?}", value);
-                    let msg = match VoiceEvent::deserialize(value) {
-                        Ok(msg) => msg,
-                        Err(_) => break,
-                    };
-
-                    if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
-                        break 'outer;
-                    }
-                }
-
-                if ws_close_reader.try_recv().is_ok() {
-                    break 'outer;
-                }
-
-                thread::sleep(Duration::from_millis(25));
-            }
-            info!("[Voice] WS thread exited.");
-        })?;
-
-    Ok((ws_close_sender, ws_thread))
 }
 
 #[inline]

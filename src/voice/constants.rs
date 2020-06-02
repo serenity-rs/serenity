@@ -43,4 +43,7 @@ pub const VOICE_PACKET_MAX: usize = 1460;
 ///
 /// Passive monitoring of Discord itself shows that these fire every 5 seconds
 /// irrespective of outgoing UDP traffic.
-pub const UDP_KEEPALIVE_GAP: Duration = Duration::from_millis(5_000);
+pub const UDP_KEEPALIVE_GAP_MS: u64 = 5_000;
+
+/// Opus silent frame, used to signal speech start and end (and prevent audio glitching).
+pub const SILENT_FRAME: [u8; 3] = [0xf8, 0xff, 0xfe];
