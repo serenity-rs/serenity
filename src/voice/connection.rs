@@ -23,12 +23,12 @@ use crate::{
     },
     model::event::{VoiceEvent, VoiceSpeakingState},
     voice::{
-        audio::AudioReceiver,
         connection_info::ConnectionInfo,
         constants::*,
         events::{EventContext, UntimedEvent},
         payload,
         threading::{
+            AuxPacketMessage,
             EventMessage,
             Interconnect,
             TrackStateChange,
@@ -107,28 +107,22 @@ struct ThreadItems {
     ws_thread: JoinHandle<()>,
 }
 
-pub struct Connection {
+pub(crate) struct Connection {
     audio_timer: Timer,
-    client: Arc<Mutex<WsClient>>,
     connection_info: ConnectionInfo,
-    decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
     encoder: OpusEncoder,
-    encoder_stereo: bool,
-    keepalive_timer: Timer,
     key: Key,
-    last_heartbeat_nonce: Option<u64>,
     packet: [u8; VOICE_PACKET_MAX],
     silence_frames: u8,
     soft_clip: SoftClip,
     speaking: VoiceSpeakingState,
     ssrc: u32,
-    thread_items: ThreadItems,
     udp: UdpSocket,
 }
 
 impl Connection {
-    pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
+    pub(crate) fn new(mut info: ConnectionInfo, interconnect: &Interconnect) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
         #[cfg(not(feature = "native_tls_backend"))]
@@ -212,8 +206,6 @@ impl Connection {
         let key = encryption_key(&mut client)?;
 
         unset_blocking(&mut client)?;
-        let mutexed_client = Arc::new(Mutex::new(client));
-        let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
 
         info!("[Voice] Connected to: {}", info.endpoint);
 
@@ -240,33 +232,38 @@ impl Connection {
         rtp.set_timestamp(random::<u32>().into());
         rtp.set_ssrc(ready.ssrc);
 
+        interconnect.aux_packets.send(AuxPacketMessage::UdpDestination(destination));
+        interconnect.aux_packets.send(AuxPacketMessage::UdpKey(key.clone()));
+        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval));
+        interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc));
+        interconnect.aux_packets.send(AuxPacketMessage::Udp(
+            udp.try_clone()
+                .expect("[Voice] Failed to clone UDP")
+        ));
+        interconnect.aux_packets.send(AuxPacketMessage::Ws(client));
+
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
-            client: mutexed_client,
             connection_info: info,
-            decoder_map: HashMap::new(),
             destination,
             encoder,
-            encoder_stereo: false,
             key,
-            keepalive_timer: Timer::new(hello.heartbeat_interval as u64),
-            last_heartbeat_nonce: None,
             packet,
             udp,
             silence_frames: 0,
             soft_clip,
             speaking: VoiceSpeakingState::empty(),
             ssrc: ready.ssrc,
-            thread_items,
+            // thread_items,
         })
     }
 
-    pub fn reconnect(&mut self) -> Result<()> {
+    pub fn reconnect(&mut self, interconnect: &Interconnect) -> Result<()> {
         let url = generate_url(&mut self.connection_info.endpoint)?;
 
         // Thread may have died, we want to send to prompt a clean exit
         // (if at all possible) and then proceed as normal.
-        let _ = self.thread_items.ws_close_sender.send(0);
+        // let _ = self.thread_items.ws_close_sender.send(0);
 
         #[cfg(not(feature = "native_tls_backend"))]
         let mut client = create_rustls_client(url)?;
@@ -308,120 +305,100 @@ impl Connection {
 
         let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
 
-        self.keepalive_timer = Timer::new(hello.heartbeat_interval as u64);
-
         unset_blocking(&mut client)?;
-        let mutexed_client = Arc::new(Mutex::new(client));
-        let (ws_close_sender, ws_thread) = start_ws_thread(mutexed_client, &self.thread_items.tx)?;
 
-        self.thread_items.ws_close_sender = ws_close_sender;
-        self.thread_items.ws_thread = ws_thread;
+        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval));
+        interconnect.aux_packets.send(AuxPacketMessage::Ws(client));
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
     }
 
-    #[inline]
-    fn handle_received_udp(
-        &mut self,
-        receiver: &mut Option<Box<dyn AudioReceiver>>,
-        buffer: &mut [i16; 1920],
-        packet: &[u8],
-        nonce: &mut Nonce,
-        ) -> Result<()> {
-        match demux::demux(packet) {
-            Demuxed::Rtp(rtp) => {},
-            Demuxed::Rtcp(rtcp) => {
-                println!("{:?}", rtcp);
-                println!("{:?}", rtcp.payload());
-            },
-            Demuxed::FailedParse(t) => {
-                warn!("[Voice] Failed to parse message of type {:?}.", t);
-            }
-            _ => {
-                warn!("[Voice] Illegal UDP packet from voice server.");
-            }
-        }
+    // #[inline]
+    // fn handle_received_udp(
+    //     &mut self,
+    //     interconnect: &Interconnect,
+    //     buffer: &mut [i16; 1920],
+    //     packet: &[u8],
+    //     nonce: &mut Nonce,
+    //     ) -> Result<()> {
+    //     match demux::demux(packet) {
+    //         Demuxed::Rtp(rtp) => {
+    //             println!("{:?}", rtp);
+    //             println!("{:?}", rtp.payload());
+    //         },
+    //         Demuxed::Rtcp(rtcp) => {
+    //             println!("{:?}", rtcp);
+    //             println!("{:?}", rtcp.payload());
+    //         },
+    //         Demuxed::FailedParse(t) => {
+    //             warn!("[Voice] Failed to parse message of type {:?}.", t);
+    //         }
+    //         _ => {
+    //             warn!("[Voice] Illegal UDP packet from voice server.");
+    //         }
+    //     }
 
-        if let Some(receiver) = receiver.as_mut() {
-            let mut handle = &packet[2..];
-            let seq = handle.read_u16::<BigEndian>()?;
-            let timestamp = handle.read_u32::<BigEndian>()?;
-            let ssrc = handle.read_u32::<BigEndian>()?;
+    //     // Old code: make this nicer and integrate with above Demux.
+    //     let mut handle = &packet[2..];
+    //     let sequence = handle.read_u16::<BigEndian>()?;
+    //     let timestamp = handle.read_u32::<BigEndian>()?;
+    //     let ssrc = handle.read_u32::<BigEndian>()?;
 
-            let rtp_len = RtpPacket::minimum_packet_size();
-            nonce.0[..rtp_len]
-                .clone_from_slice(&packet[..rtp_len]);
+    //     let rtp_len = RtpPacket::minimum_packet_size();
+    //     nonce.0[..rtp_len]
+    //         .clone_from_slice(&packet[..rtp_len]);
 
-            if let Ok(mut decrypted) =
-                secretbox::open(&packet[rtp_len..], &nonce, &self.key) {
-                let channels = opus_packet::nb_channels(&decrypted)?;
+    //     if let Ok(mut decrypted) =
+    //         secretbox::open(&packet[rtp_len..], &nonce, &self.key) {
+    //         let channels = opus_packet::nb_channels(&decrypted)?;
 
-                let entry =
-                    self.decoder_map.entry((ssrc, channels)).or_insert_with(
-                        || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
-                    );
+    //         let entry =
+    //             self.decoder_map.entry((ssrc, channels)).or_insert_with(
+    //                 || OpusDecoder::new(SAMPLE_RATE, channels).unwrap(),
+    //             );
 
-                // Strip RTP Header Extensions (one-byte)
-                if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
-                    // Read the length bytes as a big-endian u16.
-                    let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
-                    let mut offset = 4;
-                    for _ in 0..header_extension_len {
-                        let byte = decrypted[offset];
-                        offset += 1;
-                        if byte == 0 {
-                            continue;
-                        }
+    //         // Strip RTP Header Extensions (one-byte)
+    //         if decrypted[0] == 0xBE && decrypted[1] == 0xDE {
+    //             // Read the length bytes as a big-endian u16.
+    //             let header_extension_len = BigEndian::read_u16(&decrypted[2..4]);
+    //             let mut offset = 4;
+    //             for _ in 0..header_extension_len {
+    //                 let byte = decrypted[offset];
+    //                 offset += 1;
+    //                 if byte == 0 {
+    //                     continue;
+    //                 }
 
-                        offset += 1 + (0b1111 & (byte >> 4)) as usize;
-                    }
+    //                 offset += 1 + (0b1111 & (byte >> 4)) as usize;
+    //             }
 
-                    // Skip over undocumented Discord byte
-                    offset += 1;
+    //             // Skip over undocumented Discord byte
+    //             offset += 1;
 
-                    decrypted = decrypted.split_off(offset);
-                }
+    //             decrypted = decrypted.split_off(offset);
+    //         }
 
-                let len = entry.decode(Some(&decrypted), &mut buffer[..], false)?;
+    //         let len = entry.decode(Some(&decrypted), &mut buffer[..], false)?;
 
-                let is_stereo = channels == Channels::Stereo;
+    //         let is_stereo = channels == Channels::Stereo;
 
-                let b = if is_stereo { len * 2 } else { len };
+    //         let b = if is_stereo { len * 2 } else { len };
 
-                receiver
-                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
-            }
-        }
+    //         interconnect.events.send(EventMessage::FireCoreEvent(
+    //             EventContext::VoicePacket {
+    //                 ssrc,
+    //                 sequence,
+    //                 timestamp,
+    //                 stereo: is_stereo,
+    //                 data: buffer[..b].to_vec(),
+    //                 compressed_size: decrypted.len(),
+    //             }
+    //         ));
+    //     }
 
-        Ok(())
-    }
-
-    #[inline]
-    fn check_audio_timer(&mut self) -> Result<()> {
-        if self.audio_timer.check() {
-            info!("[Voice] UDP keepalive");
-            let mut bytes = [0; 4];
-            (&mut bytes[..]).write_u32::<BigEndian>(self.ssrc)?;
-            self.udp.send_to(&bytes, self.destination)?;
-            info!("[Voice] UDP keepalive sent");
-        }
-
-        Ok(())
-    }
-
-    #[inline]
-    fn check_keepalive_timer(&mut self) -> Result<()> {
-        if self.keepalive_timer.check() {
-            info!("[Voice] WS keepalive");
-            let nonce = random::<u64>();
-            self.last_heartbeat_nonce = Some(nonce);
-            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
-            info!("[Voice] WS keepalive sent");
-        }
-
-        Ok(())
-    }
+    //     Ok(())
+    // }
 
     #[inline]
     fn mix_tracks(
@@ -429,7 +406,6 @@ impl Connection {
         sources: &mut Vec<Track>,
         _opus_frame: &[u8],
         mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
-        fired_track_evts: &mut HashMap<UntimedEvent, EventContext>,
         time_in_call: &mut Duration,
         entry_points: &mut u64,
         interconnect: &Interconnect,
@@ -447,21 +423,6 @@ impl Connection {
             if aud.playing != PlayMode::Play {          
                 i += 1;
                 continue;
-            }
-
-            // Assume this for now, at least.
-            // We'll be fusing streams, so we can either keep
-            // as stereo or downmix to mono.
-            let is_stereo = true;
-
-            if is_stereo != self.encoder_stereo {
-                let channels = if is_stereo {
-                    Channels::Stereo
-                } else {
-                    Channels::Mono
-                };
-                self.encoder = OpusEncoder::new(SAMPLE_RATE, channels, CodingMode::Audio)?;
-                self.encoder_stereo = is_stereo;
             }
 
             let now = Instant::now();
@@ -506,8 +467,6 @@ impl Connection {
     #[allow(unused_variables)]
     pub(crate) fn cycle(&mut self,
                 mut sources: &mut Vec<Track>,
-                mut receiver: &mut Option<Box<dyn AudioReceiver>>,
-                fired_track_evts: &mut HashMap<UntimedEvent, EventContext>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate,
                 mut time_in_call: &mut Duration,
@@ -526,52 +485,9 @@ impl Connection {
         let mut mix_buffer = [0f32; 960 * 2];
         let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
 
-        while let Ok(status) = self.thread_items.rx.try_recv() {
-            match status {
-                ReceiverStatus::Udp(packet) => {
-                    self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce)?;
-                },
-                ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.speaking_state_update(ev.ssrc, ev.user_id.0, ev.speaking);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.client_disconnect(ev.user_id.0);
-                    }
-                },
-                ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
-                    if let Some(nonce) = self.last_heartbeat_nonce {
-
-                        if ev.nonce == nonce {
-                            info!("[Voice] Heartbeat ACK received.");
-                        } else {
-                            warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                        }
-
-                        self.last_heartbeat_nonce = None;
-                    }
-                },
-                ReceiverStatus::Websocket(other) => {
-                    info!("[Voice] Received other websocket data: {:?}", other);
-                },
-            }
-        }
-
-        // Send the voice websocket keepalive if it's time
-        self.check_keepalive_timer()?;
-
-        // Send UDP keepalive if it's time
-        self.check_audio_timer()?;
-
         // Reconfigure encoder bitrate.
         // From my testing, it seemed like this needed to be set every cycle.
+        // FIXME: test ths again...
         if let Err(e) = self.encoder.set_bitrate(bitrate) {
             warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
         }
@@ -580,7 +496,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.mix_tracks(&mut sources, &opus_frame, &mut mix_buffer, fired_track_evts, &mut time_in_call, &mut entry_points, interconnect)?;
+        let len = self.mix_tracks(&mut sources, &opus_frame, &mut mix_buffer, &mut time_in_call, &mut entry_points, interconnect)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -592,7 +508,7 @@ impl Connection {
                 opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                self.set_speaking(false)?;
+                interconnect.aux_packets.send(AuxPacketMessage::Speaking(false));
 
                 audio_timer.r#await();
 
@@ -606,12 +522,12 @@ impl Connection {
             }
         }
 
-        self.set_speaking(true)?;
+        interconnect.aux_packets.send(AuxPacketMessage::Speaking(true));
 
         self.prep_and_send_packet(mix_buffer, &opus_frame, nonce)?;
         audio_timer.r#await();
 
-        self.audio_timer.reset();
+        self.audio_timer.reset_from_deadline();
 
         self.audio_commands_events(&mut sources, interconnect);
 
@@ -638,9 +554,8 @@ impl Connection {
             let payload = rtp.payload_mut();
 
             let payload_len = if opus_frame.is_empty() {
-                let buffer_len = if self.encoder_stereo { 960 * 2 } else { 960 };
                 self.encoder
-                    .encode_float(&buffer[..buffer_len], &mut payload[MACBYTES..])?
+                    .encode_float(&buffer[..STEREO_FRAME_SIZE], &mut payload[MACBYTES..])?
             } else {
                 let len = opus_frame.len();
                 payload[MACBYTES..MACBYTES + len]
@@ -668,26 +583,10 @@ impl Connection {
 
         Ok(())
     }
-
-    fn set_speaking(&mut self, speaking: bool) -> Result<()> {
-        if self.speaking.contains(VoiceSpeakingState::MICROPHONE) == speaking {
-            return Ok(());
-        }
-
-        self.speaking.set(VoiceSpeakingState::MICROPHONE, speaking);
-
-        info!("[Voice] Speaking update: {}", speaking);
-        let o = self.client.lock().send_json(&payload::build_speaking(self.speaking, self.ssrc));
-        info!("[Voice] Speaking update confirmed.");
-        o
-    }
 }
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        let _ = self.thread_items.udp_close_sender.send(0);
-        let _ = self.thread_items.ws_close_sender.send(0);
-
         info!("[Voice] Disconnected");
     }
 }

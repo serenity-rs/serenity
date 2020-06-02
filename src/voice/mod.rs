@@ -1,6 +1,5 @@
 //! A module for connecting to voice channels.
 
-mod audio;
 mod connection;
 mod connection_info;
 mod constants;
@@ -17,10 +16,9 @@ pub mod tracks;
 pub use audiopus::{self as opus, Bitrate};
 pub use discortp as packet;
 pub use self::{
-    audio::AudioReceiver,
     dca::DcaMetadata,
     error::{DcaError, VoiceError},
-    events::{Event, EventContext, TrackEvent},
+    events::{CoreEvent, Event, EventContext, TrackEvent},
     handler::Handler,
     input::{
         ffmpeg,
@@ -40,7 +38,6 @@ const CRYPTO_MODE: &str = "xsalsa20_poly1305";
 pub(crate) enum Status {
     Connect(ConnectionInfo),
     Disconnect,
-    SetReceiver(Option<Box<dyn AudioReceiver>>),
     SetTrack(Option<Track>),
     AddTrack(Track),
     SetBitrate(Bitrate),

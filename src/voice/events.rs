@@ -61,13 +61,30 @@ pub enum EventContext {
 	},
 
 	ClientConnect {
-		ssrc: u32,
+		audio_ssrc: u32,
+		video_ssrc: u32,
 		user_id: u64,
 	},
 
 	ClientDisconnect {
 		user_id: u64,	
 	},
+}
+
+impl EventContext {
+	pub fn to_core_event(&self) -> Option<CoreEvent> {
+		use EventContext::*;
+
+		match self {
+			SpeakingStateUpdate{ .. } => Some(CoreEvent::SpeakingStateUpdate),
+			SpeakingUpdate{ .. } => Some(CoreEvent::SpeakingUpdate),
+			VoicePacket{ .. } => Some(CoreEvent::VoicePacket),
+			RtcpPacket{ .. } => Some(CoreEvent::RtcpPacket),
+			ClientConnect{ .. } => Some(CoreEvent::ClientConnect),
+			ClientDisconnect{ .. } => Some(CoreEvent::ClientDisconnect),
+			_ => None,
+		}
+	}
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]

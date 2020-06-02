@@ -38,3 +38,9 @@ pub const CHILD_BUFFER_LEN: usize = AUDIO_FRAME_RATE / 2;
 ///
 /// Set a safe amount below the Ethernet MTU to avoid fragmentation/rejection.
 pub const VOICE_PACKET_MAX: usize = 1460;
+
+/// Delay between sends of UDP keepalive frames.
+///
+/// Passive monitoring of Discord itself shows that these fire every 5 seconds
+/// irrespective of outgoing UDP traffic.
+pub const UDP_KEEPALIVE_GAP: Duration = Duration::from_millis(5_000);

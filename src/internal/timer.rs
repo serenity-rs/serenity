@@ -36,7 +36,7 @@ impl Timer {
             }
         }
 
-        self.due = self.due + self.duration;
+        self.reset_from_deadline();
     }
 
     pub fn check(&mut self) -> bool {
@@ -50,4 +50,6 @@ impl Timer {
     }
 
     pub fn reset(&mut self) { self.due = Utc::now() + self.duration; }
+
+    pub fn reset_from_deadline(&mut self) { self.due = self.due + self.duration; }
 }

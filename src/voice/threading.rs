@@ -1,6 +1,22 @@
+use audiopus::{
+    packet as opus_packet,
+    Application as CodingMode,
+    Bitrate,
+    Channels,
+    coder::Decoder as OpusDecoder,
+    coder::Encoder as OpusEncoder,
+    softclip::SoftClip,
+};
 use crate::{
-    internal::Timer,
-    model::id::GuildId,
+    gateway::WsClient,
+    internal::{
+        ws_impl::{ReceiverExt, SenderExt},
+        Timer,
+    },
+    model::{
+        event::{VoiceEvent, VoiceSpeakingState},
+        id::GuildId,
+    },
     voice::{
         connection::Connection,
         constants::*,
@@ -13,6 +29,7 @@ use crate::{
             TrackEvent,
             UntimedEvent,
         },
+        payload,
         tracks::{
             LoopState,
             PlayMode,
@@ -22,10 +39,42 @@ use crate::{
         Status,
     },
 };
-use log::{error, warn};
+use discortp::{
+    demux::{
+        self,
+        Demuxed,
+    },
+    discord::{
+        IpDiscoveryPacket,
+        IpDiscoveryType,
+        MutableIpDiscoveryPacket,
+        MutableKeepalivePacket,
+    },
+    rtp::{
+        MutableRtpPacket,
+        RtpPacket,
+        RtpType,
+    },
+    MutablePacket,
+    Packet,
+};
+use log::{debug, error, info, warn};
+use rand::random;
+use serde::Deserialize;
+use sodiumoxide::crypto::secretbox::{
+    self,
+    MACBYTES,
+    NONCEBYTES,
+    Key,
+    Nonce,
+};
 use std::{
     collections::HashMap,
     io::Result as IoResult,
+    net::{
+        SocketAddr,
+        UdpSocket,
+    },
     sync::mpsc::{
         self,
         Receiver as MpscReceiver,
@@ -35,6 +84,60 @@ use std::{
     thread::Builder as ThreadBuilder,
     time::Duration,
 };
+
+#[derive(Clone, Debug)]
+pub(crate) struct Interconnect {
+    pub(crate) events: MpscSender<EventMessage>,
+    pub(crate) mixer: MpscSender<()>,
+    pub(crate) voice_packets: MpscSender<()>,
+    pub(crate) aux_packets: MpscSender<AuxPacketMessage>,
+}
+
+impl Interconnect {
+    fn poison(&self) {
+        self.events.send(EventMessage::Poison);
+        self.mixer.send(());
+        self.voice_packets.send(());
+        self.aux_packets.send(AuxPacketMessage::Poison);
+    }
+}
+
+pub(crate) enum EventMessage {
+    // Event related.
+    // Track events should fire off the back of state changes.
+    AddGlobalEvent(EventData),
+    AddTrackEvent(usize, EventData),
+    FireCoreEvent(EventContext),
+
+    AddTrack(EventStore, TrackState, TrackHandle),
+    ChangeState(usize, TrackStateChange),
+    RemoveTrack(usize),
+    Tick,
+
+    Poison,
+}
+
+pub(crate) enum TrackStateChange {
+    Mode(PlayMode),
+    Volume(f32),
+    Position(Duration),
+    // Bool indicates user-set.
+    Loops(LoopState, bool),
+    Total(TrackState),
+}
+
+pub(crate) enum AuxPacketMessage {
+    Udp(UdpSocket),
+    UdpDestination(SocketAddr),
+    UdpKey(Key),
+    Ws(WsClient),
+
+    SetSsrc(u32),
+    SetKeepalive(f64),
+    Speaking(bool),
+
+    Poison,
+}
 
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice Iface (G{})", guild_id);
@@ -54,8 +157,8 @@ fn start_internals(guild_id: GuildId) -> Interconnect {
     let interconnect = Interconnect {
         events: evt_tx,
         mixer: mixer_tx,
-        packet_transmitter: pkt_out_tx,
-        packet_receiver: pkt_in_tx,
+        voice_packets: pkt_out_tx,
+        aux_packets: pkt_in_tx,
     };
 
     // FIXME: clean this up...
@@ -68,12 +171,13 @@ fn start_internals(guild_id: GuildId) -> Interconnect {
         .spawn(move || evt_runner(ic, evt_rx))
         .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
 
-    // let name = format!("Serenity Voice Event Dispatcher (G{})", guild_id);
-    // let ic = interconnect.clone();
-    // ThreadBuilder::new()
-    //     .name(name)
-    //     .spawn(move || evt_runner(ic, evt_rx))
-    //     .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
+    let name = format!("Serenity Voice Auxiliary Network (G{})", guild_id);
+
+    let ic = interconnect.clone();
+    ThreadBuilder::new()
+        .name(name)
+        .spawn(move || aux_runner(ic, pkt_in_rx))
+        .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
 
     interconnect
 }
@@ -99,7 +203,9 @@ fn evt_runner(interconnect: Interconnect, evt_rx: MpscReceiver<EventMessage>) {
 
                 event_store.add_event(data, state.position);
             },
-            Ok(FireCoreEvent(evt, ctx)) => {
+            Ok(FireCoreEvent(ctx)) => {
+                let evt = ctx.to_core_event()
+                    .expect("[Voice] Event thread was passed a non-core event in FireCoreEvent.");
                 global.fire_core_event(evt, ctx);
             },
             Ok(AddTrack(store, state, handle)) => {
@@ -159,46 +265,185 @@ fn evt_runner(interconnect: Interconnect, evt_rx: MpscReceiver<EventMessage>) {
     }
 }
 
-#[derive(Clone, Debug)]
-pub(crate) struct Interconnect {
-    pub(crate) events: MpscSender<EventMessage>,
-    pub(crate) mixer: MpscSender<()>,
-    pub(crate) packet_transmitter: MpscSender<()>,
-    pub(crate) packet_receiver: MpscSender<()>,
+struct SsrcState {
+    silent_frame_count: usize,
+    decoder: OpusDecoder,
 }
 
-pub(crate) enum EventMessage {
-    // Event related.
-    // Track events should fire off the back of state changes.
-    AddGlobalEvent(EventData),
-    AddTrackEvent(usize, EventData),
-    FireCoreEvent(CoreEvent, EventContext),
-
-    AddTrack(EventStore, TrackState, TrackHandle),
-    ChangeState(usize, TrackStateChange),
-    RemoveTrack(usize),
-    Tick,
-
-    Poison,
+fn decrypt_udp_in_place() -> Result<(), ()> {
+    Ok(())
 }
 
-pub(crate) enum TrackStateChange {
-    Mode(PlayMode),
-    Volume(f32),
-    Position(Duration),
-    // Bool indicates user-set.
-    Loops(LoopState, bool),
-    Total(TrackState),
+fn aux_runner(interconnect: Interconnect, evt_rx: MpscReceiver<AuxPacketMessage>) {
+    // FIXME: should be hinted at by event thread.
+    let mut should_decrypt = true;
+
+    let mut udp_buffer = [0u8; VOICE_PACKET_MAX];
+    let mut udp_key = None;
+    let mut udp_socket: Option<UdpSocket> = None;
+    let mut ws_client: Option<WsClient> = None;
+    let mut destination = None;
+
+    let mut ws_ka_time = Timer::new(45_000);
+    let mut udp_ka_time = Timer::new(5_000);
+
+    let mut ssrc = 0;
+    let mut keepalive_bytes = [0u8; MutableKeepalivePacket::minimum_packet_size()];
+
+    let mut speaking = VoiceSpeakingState::empty();
+    let mut last_heartbeat_nonce: Option<u64> = None;
+    let mut decoder_map: HashMap<u32, SsrcState> = Default::default();
+
+    'aux_runner: loop {
+        if let Some(ws) = ws_client.as_mut() {
+            if ws_ka_time.check() {
+                let nonce = random::<u64>();
+                last_heartbeat_nonce = Some(nonce);
+                ws.send_json(&payload::build_heartbeat(nonce));
+                ws_ka_time.reset_from_deadline();
+            }
+
+            while let Ok(Some(value)) = ws.try_recv_json() {
+                let msg = match VoiceEvent::deserialize(&value) {
+                    Ok(m) => m,
+                    Err(_) => {
+                        warn!("[Voice] Unexpected Websocket message: {:?}", value);
+                        break
+                    },
+                };
+
+                match msg {
+                    VoiceEvent::Speaking(ev) => {
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            EventContext::SpeakingStateUpdate {
+                                ssrc: ev.ssrc,
+                                user_id: ev.user_id.0,
+                                speaking_state: ev.speaking,
+                            }
+                        ));
+                    },
+                    VoiceEvent::ClientConnect(ev) => {
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            EventContext::ClientConnect {
+                                audio_ssrc: ev.audio_ssrc,
+                                video_ssrc: ev.video_ssrc,
+                                user_id: ev.user_id.0,
+                            }
+                        ));
+                    },
+                    VoiceEvent::ClientDisconnect(ev) => {
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            EventContext::ClientDisconnect {
+                                user_id: ev.user_id.0,
+                            }
+                        ));
+                    },
+                    VoiceEvent::HeartbeatAck(ev) => {
+                        if let Some(nonce) = last_heartbeat_nonce {
+                            if ev.nonce == nonce {
+                                info!("[Voice] Heartbeat ACK received.");
+                            } else {
+                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            }
+
+                            last_heartbeat_nonce = None;
+                        }
+                    },
+                    other => {
+                        info!("[Voice] Received other websocket data: {:?}", other);
+                    },
+                }
+            }
+        }
+
+        if let Some(udp) = udp_socket.as_mut() {
+            if udp_ka_time.check() {
+                udp.send_to(
+                    &keepalive_bytes,
+                    destination.expect("[Voice] Tried to send keepalive without valid destination.")
+                );
+                udp_ka_time.reset_from_deadline();
+            }
+
+            while let Ok((len, _addr)) = udp.recv_from(&mut udp_buffer[..]) {
+                if !should_decrypt {
+                    continue;
+                }
+
+                let packet = &udp_buffer[..len];
+
+                match demux::demux(packet) {
+                    Demuxed::Rtp(rtp) => {
+                        println!("{:?}", rtp);
+                        println!("{:?}", rtp.payload());
+                    },
+                    Demuxed::Rtcp(rtcp) => {
+                        println!("{:?}", rtcp);
+                        println!("{:?}", rtcp.payload());
+                    },
+                    Demuxed::FailedParse(t) => {
+                        warn!("[Voice] Failed to parse message of type {:?}.", t);
+                    }
+                    _ => {
+                        warn!("[Voice] Illegal UDP packet from voice server.");
+                    }
+                }
+            }
+        }
+
+        loop {
+            use AuxPacketMessage::*;
+            match evt_rx.try_recv() {
+                Ok(Udp(udp)) => {
+                    let _ = udp.set_read_timeout(Some(TIMESTEP_LENGTH / 2));
+
+                    udp_socket = Some(udp);
+                    udp_ka_time.reset();
+                },
+                Ok(UdpKey(new_key)) => {
+                    udp_key = Some(new_key);
+                },
+                Ok(UdpDestination(addr)) => {
+                    destination = Some(addr);
+                }
+                Ok(Ws(data)) => {
+                    ws_client = Some(data);
+                    ws_ka_time.reset();
+                },
+                Ok(SetSsrc(new_ssrc)) => {
+                    ssrc = new_ssrc;
+                    let mut ka = MutableKeepalivePacket::new(&mut keepalive_bytes[..])
+                        .expect("[Voice] Insufficient bytes given to keepalive packet.");
+                    ka.set_ssrc(new_ssrc);
+                },
+                Ok(SetKeepalive(keepalive)) => {
+                    ws_ka_time = Timer::new(keepalive as u64);
+                }
+                Ok(Speaking(is_speaking)) => {
+                    if speaking.contains(VoiceSpeakingState::MICROPHONE) != is_speaking {
+                        speaking.set(VoiceSpeakingState::MICROPHONE, is_speaking);    
+                        if let Some(client) = ws_client.as_mut() {
+                            client.send_json(&payload::build_speaking(speaking, ssrc));
+                        }
+                    }
+                }
+                Err(TryRecvError::Disconnected) | Ok(Poison) => {
+                    break 'aux_runner;
+                },
+                Err(_) => {
+                    // No message.
+                    break;
+                }
+            }
+        }
+    }
 }
 
 fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
     let mut senders = Vec::new();
-    let mut receiver = None;
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = DEFAULT_BITRATE;
-    let mut events = GlobalEvents::default();
-    let mut fired_track_evts = HashMap::new();
     let mut time_in_call = Duration::default();
     let mut entry_points = 0u64;
 
@@ -208,7 +453,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         loop {
             match rx.try_recv() {
                 Ok(Status::Connect(info)) => {
-                    connection = match Connection::new(info) {
+                    connection = match Connection::new(info, &interconnect) {
                         Ok(connection) => Some(connection),
                         Err(why) => {
                             warn!("[Voice] Error connecting: {:?}", why);
@@ -219,9 +464,6 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 },
                 Ok(Status::Disconnect) => {
                     connection = None;
-                },
-                Ok(Status::SetReceiver(r)) => {
-                    receiver = r;
                 },
                 Ok(Status::SetTrack(s)) => {
                     senders.clear();
@@ -244,7 +486,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                     bitrate = b;
                 },
                 Ok(Status::AddEvent(evt)) => {
-                    events.add_event(evt);
+                    interconnect.events.send(EventMessage::AddGlobalEvent(evt));
                 }
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
@@ -266,7 +508,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut senders, &mut receiver, &mut fired_track_evts, &mut timer, bitrate, &mut time_in_call, &mut entry_points, &interconnect);
+                let cycle = connection.cycle(&mut senders, &mut timer, bitrate, &mut time_in_call, &mut entry_points, &interconnect);
 
                 match cycle {
                     Ok(()) => {
@@ -309,7 +551,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         // another.
         if error {
             let mut conn = connection.expect("[Voice] Shouldn't have had a voice connection error without a connection.");
-            connection = conn.reconnect()
+            connection = conn.reconnect(&interconnect)
                 .ok()
                 .map(|_| conn);
         }

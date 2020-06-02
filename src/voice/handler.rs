@@ -11,7 +11,6 @@ use crate::{
         voice::VoiceState,
     },
     voice::{
-        audio::AudioReceiver,
         input::Input,
         tracks::{
             Track,
@@ -227,17 +226,6 @@ impl Handler {
 
             self.update();
         }
-    }
-
-    /// Sets a receiver, i.e. a way to receive audio. Most use cases for bots do
-    /// not require this.
-    ///
-    /// The `receiver` argument can be thought of as an "optional Option". You
-    /// can pass in just a boxed receiver, and do not need to specify `Some`.
-    ///
-    /// Pass `None` to drop the current receiver, if one exists.
-    pub fn listen(&mut self, receiver: Option<Box<dyn AudioReceiver>>) {
-        self.send(VoiceStatus::SetReceiver(receiver))
     }
 
     /// Sets whether the current connection is to be muted.
