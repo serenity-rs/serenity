@@ -18,7 +18,7 @@ pub use super::shared::{
     CommandResult
 };
 
-mod traits;
+pub mod traits;
 
 use self::traits::*;
 
