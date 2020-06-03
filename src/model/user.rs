@@ -170,7 +170,7 @@ impl CurrentUser {
         loop {
             let mut pagination = http.as_ref().get_guilds(
                 &GuildPagination::After(guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id)),
-                100,
+                Some(100),
             )?;
             let len = pagination.len();
             guilds.append(&mut pagination);

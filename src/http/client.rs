@@ -1179,7 +1179,7 @@ impl Http {
     /// ```
     ///
     /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guilds
-    pub fn get_guilds(&self, target: &GuildPagination, limit: u64) -> Result<Vec<GuildInfo>> {
+    pub fn get_guilds(&self, target: &GuildPagination, limit: Option<u64>) -> Result<Vec<GuildInfo>> {
         let (after, before) = match *target {
             GuildPagination::After(id) => (Some(id.0), None),
             GuildPagination::Before(id) => (None, Some(id.0)),
