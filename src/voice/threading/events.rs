@@ -16,7 +16,7 @@ use crate::{
         },
     },
 };
-use log::{debug, error, info, warn};
+use log::{debug, error, info, trace, warn};
 use std::sync::mpsc::Receiver as MpscReceiver;
 
 pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMessage>) {
@@ -30,9 +30,12 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
         use EventMessage::*;
         match evt_rx.recv() {
             Ok(AddGlobalEvent(data)) => {
+                info!("[Voice] Global event added.");
                 global.add_event(data);
             },
             Ok(AddTrackEvent(i, data)) => {
+                info!("[Voice] Adding event to track {}.", i);
+
                 let event_store = events.get_mut(i)
                     .expect("[Voice] Event thread was given an illegal store index for AddTrackEvent.");
                 let state = states.get_mut(i)
@@ -44,18 +47,26 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
                 let ctx = ctx.to_user_context();
                 let evt = ctx.to_core_event()
                     .expect("[Voice] Event thread was passed a non-core event in FireCoreEvent.");
+
+                trace!("[Voice] Firing core event {:?}.", evt);
+
                 global.fire_core_event(evt, ctx);
             },
             Ok(AddTrack(store, state, handle)) => {
                 events.push(store);
                 states.push(state);
                 handles.push(handle);
+
+                info!("[Voice] Event state for track {} added", events.len());
             },
             Ok(ChangeState(i, change)) => {
                 use TrackStateChange::*;
 
+                let max_states = states.len();
                 let state = states.get_mut(i)
                     .expect("[Voice] Event thread was given an illegal state index for ChangeState.");
+
+                debug!("[Voice] Changing state for track {} of {}: {:?}", i, max_states, change);
 
                 match change {
                     Mode(mode) => {
@@ -77,12 +88,14 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
                         }
                     },
                     Total(new) => {
-                        // Massive, unprecendented state changes.
+                        // Massive, unprecedented state changes.
                         *state = new;
                     },
                 }
             },
             Ok(RemoveTrack(i)) => {
+                info!("[Voice] Event state for track {} of {} removed.", i, events.len());
+
                 events.remove(i);
                 states.remove(i);
                 handles.remove(i);

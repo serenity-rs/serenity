@@ -1,3 +1,5 @@
+//! Events relating to tracks, timing, and other callers.
+
 use crate::{
     model::event::{
         VoiceSpeaking,
@@ -257,6 +259,18 @@ impl From<TrackEvent> for UntimedEvent {
 impl From<CoreEvent> for UntimedEvent {
     fn from(evt: CoreEvent) -> Self {
         UntimedEvent::Core(evt)
+    }
+}
+
+impl From<TrackEvent> for Event {
+    fn from(evt: TrackEvent) -> Self {
+        Event::Track(evt)
+    }
+}
+
+impl From<CoreEvent> for Event {
+    fn from(evt: CoreEvent) -> Self {
+        Event::Core(evt)
     }
 }
 
@@ -525,7 +539,7 @@ impl GlobalEvents {
             }
 
             // Global untimed track events.
-            if self.store.untimed.contains_key(&untimed) {
+            if self.store.untimed.contains_key(&untimed) && indices.len() > 0 {
                 let global_ctx: Vec<(&TrackState, &TrackHandle)> = indices.iter().map(|i| (
                     states.get(*i).expect("[Voice] Missing state index for Tick (global untimed)"),
                     handles.get(*i).expect("[Voice] Missing handle index for Tick (global untimed)"),

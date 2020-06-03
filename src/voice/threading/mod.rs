@@ -67,6 +67,7 @@ pub(crate) enum EventMessage {
     Poison,
 }
 
+#[derive(Debug)]
 pub(crate) enum TrackStateChange {
     Mode(PlayMode),
     Volume(f32),
@@ -197,22 +198,31 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
 
                 match cycle {
                     Ok(()) => {
-                        // Tick
-                        interconnect.events.send(EventMessage::Tick);
-
-                        // Strip expired sources.
+                        // Send state changes
                         let mut i = 0;
+                        let mut to_remove = Vec::with_capacity(tracks.len());
                         while i < tracks.len() {
                             let aud = tracks.get_mut(i)
                                 .expect("[Voice] Tried to remove an illegal track index.");
 
                             if aud.playing.is_done() {
+                                let p_state = aud.playing();
                                 tracks.remove(i);
-                                interconnect.events.send(EventMessage::RemoveTrack(i));
+                                to_remove.push(i);
+                                interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Mode(p_state)));
                             } else {
                                 i += 1;
                             }
                         }
+
+                        // Tick
+                        interconnect.events.send(EventMessage::Tick);
+
+                        // Then do removals.
+                        for i in &to_remove[..] {
+                            interconnect.events.send(EventMessage::RemoveTrack(*i));
+                        }
+
                         false
                     },
                     Err(why) => {

@@ -17,9 +17,9 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, event::VoiceSpeakingState, gateway::Ready, id::ChannelId, misc::Mentionable},
+    model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
     prelude::*,
-    voice::AudioReceiver,
+    voice::{CoreEvent, EventContext},
     Result as SerenityResult,
 };
 
@@ -34,56 +34,6 @@ struct Handler;
 impl EventHandler for Handler {
     fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
-    }
-}
-
-struct Receiver;
-
-impl Receiver {
-    pub fn new() -> Self {
-        // You can manage state here, such as a buffer of audio packet bytes so
-        // you can later store them in intervals.
-        Self { }
-    }
-}
-
-impl AudioReceiver for Receiver {
-    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: VoiceSpeakingState) {
-        // You can implement logic here so that you can differentiate users'
-        // SSRCs and map the SSRC to the User ID and maintain a state in
-        // `Receiver`. Using this map, you can map the `ssrc` in `voice_packet`
-        // to the user ID and handle their audio packets separately.
-    }
-
-    fn voice_packet(
-        &mut self,
-        ssrc: u32,
-        sequence: u16,
-        _timestamp: u32,
-        _stereo: bool,
-        data: &[i16],
-        compressed_size: usize,
-    ) {
-        println!("Audio packet's first 5 bytes: {:?}", data.get(..5));
-        println!(
-            "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
-            sequence,
-            data.len(),
-            compressed_size,
-            ssrc,
-        );
-    }
-
-    fn client_connect(&mut self, _ssrc: u32, _user_id: u64) {
-        // You can implement your own logic here to handle a user who has joined the
-        // voice channel e.g., allocate structures, map their SSRC to User ID.
-    }
-
-    fn client_disconnect(&mut self, _user_id: u64) {
-        // You can implement your own logic here to handle a user who has left the
-        // voice channel e.g., finalise processing of statistics etc.
-        // You will typically need to map the User ID to their SSRC; observed when
-        // speaking or connecting.
     }
 }
 
@@ -137,7 +87,106 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
-        handler.listen(Some(Box::new(Receiver::new())));
+        // Receiving audio (and similar tasks) are achieved
+        // by creating a global event handler.
+        handler.add_global_event(
+            CoreEvent::SpeakingStateUpdate.into(),
+            |ctx| {
+                if let EventContext::SpeakingStateUpdate(s) = ctx {
+                    // You can implement logic here so that you can differentiate users'
+                    // SSRCs and map the SSRC to the User ID and maintain this state.
+                    // Using this map, you can map the `ssrc` in `voice_packet`
+                    // to the user ID and handle their audio packets separately.
+
+                    println!("Speaking state update: {:?}", s);
+                }
+
+                None
+            }
+        );
+
+        handler.add_global_event(
+            CoreEvent::SpeakingUpdate.into(),
+            |ctx| {
+                if let EventContext::SpeakingUpdate {ssrc, speaking} = ctx {
+                    // You can implement logic here which reacts to a user starting
+                    // or stopping speaking.
+
+                    println!(
+                        "Source {} has {} speaking.",
+                        ssrc,
+                        if *speaking {"started"} else {"stopped"},
+                    );
+                }
+
+                None
+            }
+        );
+
+        handler.add_global_event(
+            CoreEvent::VoicePacket.into(),
+            |ctx| {
+                if let EventContext::VoicePacket {audio, packet, payload_offset} = ctx {
+                    // An event which fires for every received audio packet,
+                    // containing the decoded data.
+
+                    println!("Audio packet's first 5 bytes: {:?}", audio.get(..5.min(audio.len())));
+                    println!(
+                        "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
+                        packet.sequence.0,
+                        audio.len(),
+                        packet.payload.len(),
+                        packet.ssrc,
+                    );
+                }
+
+                None
+            }
+        );
+
+        handler.add_global_event(
+            CoreEvent::RtcpPacket.into(),
+            |ctx| {
+                if let EventContext::RtcpPacket {packet, payload_offset} = ctx {
+                    // An event which fires for every received rtcp packet,
+                    // containing the call statistics and reporting information.
+                    println!("RTCP packet received: {:?}", packet);
+                }
+
+                None
+            }
+        );
+
+        handler.add_global_event(
+            CoreEvent::ClientConnect.into(),
+            |ctx| {
+                if let EventContext::ClientConnect(s) = ctx {
+                    // You can implement your own logic here to handle a user who has joined the
+                    // voice channel e.g., allocate structures, map their SSRC to User ID.
+
+                    println!("Client connected: {:?}", s);
+                }
+
+                None
+            }
+        );
+
+        handler.add_global_event(
+            CoreEvent::ClientDisconnect.into(),
+            |ctx| {
+                if let EventContext::ClientDisconnect(s) = ctx {
+                    // You can implement your own logic here to handle a user who has left the
+                    // voice channel e.g., finalise processing of statistics etc.
+                    // You will typically need to map the User ID to their SSRC; observed when
+                    // speaking or connecting.
+
+                    println!("Client disconnected: {:?}", s);
+                }
+
+                None
+            }
+        );
+
         check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));

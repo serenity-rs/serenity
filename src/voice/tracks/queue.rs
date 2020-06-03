@@ -15,6 +15,7 @@ use crate::{
         },
     },
 };
+use log::{debug, info, warn};
 use parking_lot::Mutex;
 use std::{
     collections::VecDeque,
@@ -96,6 +97,7 @@ impl TrackQueue {
     /// [`Track`]: struct.Audio.html
     /// [`voice::create_player`]: fn.create_player.html
     pub fn add(&self, mut track: Track, track_handle: TrackHandle, handler: &mut Handler) {
+        info!("Track added to queue.");
         let remote_lock = self.inner.clone();
         let mut inner = self.inner.lock();
 
@@ -108,19 +110,24 @@ impl TrackQueue {
             .add_event(
                 EventData::new(
                     Event::Track(TrackEvent::End),
-                    move |_ctx| {
+                    move |ctx| {
                         let mut inner = remote_lock.lock();
                         let _old = inner.tracks.pop_front();
+
+                        info!("Queued track ended: {:?}.", ctx);
+                        info!("{} tracks remain.", inner.tracks.len());
 
                         // If any audio files die unexpectedly, then keep going until we
                         // find one which works, or we run out.
                         let mut keep_looking = true;
                         while keep_looking && !inner.tracks.is_empty() {
                             if let Some(new) = inner.tracks.front() {
+
                                 keep_looking = new.play().is_err();
 
                                 // Discard files which cannot be used for whatever reason.
                                 if keep_looking {
+                                    warn!("Track in Queue couldn't be played...");
                                     let _ = inner.tracks.pop_front();
                                 }
                             }
@@ -187,8 +194,6 @@ impl TrackQueue {
         let mut inner = self.inner.lock();
 
         let out = inner.stop_current();
-
-        let _ = inner.tracks.pop_front();
 
         out
     }

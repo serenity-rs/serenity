@@ -14,7 +14,7 @@ use crate::{
         VoiceError,
     },
 };
-use log::debug;
+use log::{debug, warn};
 use parking_lot::Mutex;
 use std::{
     ffi::OsStr,
@@ -314,6 +314,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 let raw = match self.read_i16::<LittleEndian>() {
                     Ok(v) => v,
                     Err(ref e) => {
+                        warn!("abrupt end? {:?}", e);
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(i)
                         } else {
@@ -331,6 +332,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 let raw = match self.read_i16::<LittleEndian>() {
                     Ok(v) => v,
                     Err(ref e) => {
+                        warn!("abrupt end? {:?}", e);
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(i)
                         } else {
@@ -356,6 +358,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 let sample = match self.read_f32::<LittleEndian>() {
                     Ok(v) => v,
                     Err(ref e) => {
+                        warn!("abrupt end? {:?}", e);
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(i)
                         } else {
@@ -372,6 +375,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 let raw = match self.read_f32::<LittleEndian>() {
                     Ok(v) => v,
                     Err(ref e) => {
+                        warn!("abrupt end? {:?}", e);
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(i)
                         } else {

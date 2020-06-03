@@ -37,14 +37,14 @@ use serenity::{
     Result as SerenityResult,
     voice::{
         self,
-        Event,
-        EventContext,
         input::{
             self,
             RestartableSource,
         },
+        tracks::TrackQueue,
+        Event,
+        EventContext,
         TrackEvent,
-        TrackQueue,
     },
 };
 
@@ -72,7 +72,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(deafen, join, leave, mute, play_fade, queue, stop, ping, undeafen, unmute)]
+#[commands(deafen, join, leave, mute, play_fade, queue, skip, stop, ping, undeafen, unmute)]
 struct General;
 
 fn main() {
@@ -175,7 +175,7 @@ fn join(ctx: &Context, msg: &Message) -> CommandResult {
         handle.add_global_event(
             Event::Track(TrackEvent::End),
             move |ctx| {
-                if let EventContext::Global(Some(track_list)) = ctx {
+                if let EventContext::Track(track_list) = ctx {
                     check_msg(chan_id.say(&send_http, &format!("Tracks ended: {}.", track_list.len())));
                 }
 
@@ -188,11 +188,9 @@ fn join(ctx: &Context, msg: &Message) -> CommandResult {
 
         handle.add_global_event(
             Event::Periodic(Duration::from_secs(60), None),
-            move |ctx| {
-                if let EventContext::Global(_) = ctx {
-                    i += 1;
-                    check_msg(chan_id.say(&send_http, &format!("I've been in this channel for {} minutes!", i)));
-                }
+            move |_ctx| {
+                i += 1;
+                check_msg(chan_id.say(&send_http, &format!("I've been in this channel for {} minutes!", i)));
 
                 None
             }
@@ -301,7 +299,7 @@ fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut manager = manager_lock.lock();
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match RestartableSource::ffmpeg("test.mp3") {
+        let source = match input::ytdl(&url) {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
@@ -323,11 +321,11 @@ fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         let _ = song.add_event(
             Event::Periodic(Duration::from_secs(5), Some(Duration::from_secs(7))),
             move |evt_ctx| {
-                if let EventContext::Track(state, aud) = evt_ctx {
-                    let _ = aud.set_volume(state.volume / 2.0);
+                if let EventContext::Track(&[(state, track)]) = evt_ctx {
+                    let _ = track.set_volume(state.volume / 2.0);
 
                     if state.volume < 1e-2 {
-                        let _ = aud.stop();
+                        let _ = track.stop();
                         check_msg(chan_id.say(&send_http, "Stopping song..."));
                         Some(Event::Cancel)
                     } else {
@@ -412,6 +410,31 @@ fn queue(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         queue.add_source(source, handler);
 
         check_msg(msg.channel_id.say(&ctx.http, format!("Added song to queue: position {}", queue.len())));
+    } else {
+        check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
+    }
+
+    Ok(())
+}
+
+#[command]
+fn skip(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
+        Some(channel) => channel.read().guild_id,
+        None => {
+            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info"));
+
+            return Ok(());
+        },
+    };
+
+    let queues_lock = ctx.data.read().get::<VoiceQueueManager>().cloned().expect("Expected VoiceQueueManager in ShareMap.");
+    let mut track_queues = queues_lock.lock();
+
+    if let Some(queue) = track_queues.get_mut(&guild_id) {
+        let _ = queue.skip();
+
+        check_msg(msg.channel_id.say(&ctx.http, format!("Song skipped: {} in queue.", queue.len())));
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Not in a voice channel to play in"));
     }

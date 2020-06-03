@@ -62,7 +62,6 @@ use url::Url;
 use crate::internal::ws_impl::create_rustls_client;
 
 pub(crate) struct Connection {
-    audio_timer: Timer,
     connection_info: ConnectionInfo,
     destination: SocketAddr,
     encoder: OpusEncoder,
@@ -195,7 +194,6 @@ impl Connection {
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)));
 
         Ok(Connection {
-            audio_timer: Timer::new(1000 * 60 * 4),
             connection_info: info,
             destination,
             encoder,
@@ -370,8 +368,6 @@ impl Connection {
 
         self.prep_and_send_packet(mix_buffer, &opus_frame)?;
         audio_timer.r#await();
-
-        self.audio_timer.reset_from_deadline();
 
         self.audio_commands_events(&mut tracks, interconnect);
 
