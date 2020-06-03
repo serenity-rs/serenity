@@ -166,7 +166,19 @@ impl CurrentUser {
     /// ```
     #[inline]
     pub fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
-        http.as_ref().get_guilds(&GuildPagination::After(GuildId(1)), 100)
+        let mut guilds = Vec::new();
+        loop {
+            let mut pagination = http.as_ref().get_guilds(
+                &GuildPagination::After(guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id)),
+                100,
+            )?;
+            let len = pagination.len();
+            guilds.append(&mut pagination);
+            if len != 100 {
+                break;
+            }
+        }
+        Ok(guilds)
     }
 
     /// Returns the invite url for the bot with the given permissions.
