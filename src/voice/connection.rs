@@ -13,7 +13,7 @@ use crate::{
         ws_impl::{ReceiverExt, SenderExt},
         Timer,
     },
-    model::event::{VoiceEvent, VoiceSpeakingState},
+    model::event::VoiceEvent,
     voice::{
         connection_info::ConnectionInfo,
         constants::*,
@@ -51,12 +51,9 @@ use sodiumoxide::crypto::secretbox::{
     MACBYTES,
     NONCEBYTES,
     Key,
-    Nonce,
 };
 use std::{
     net::{SocketAddr, ToSocketAddrs, UdpSocket},
-    thread,
-    time::Duration,
     time::Instant,
 };
 use url::Url;
@@ -195,7 +192,7 @@ impl Connection {
             udp.try_clone()
                 .expect("[Voice] Failed to clone UDP")
         ));
-        interconnect.aux_packets.send(AuxPacketMessage::Ws(client));
+        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)));
 
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
@@ -260,7 +257,7 @@ impl Connection {
         unset_blocking(&mut client)?;
 
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval));
-        interconnect.aux_packets.send(AuxPacketMessage::Ws(client));
+        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)));
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
@@ -279,9 +276,7 @@ impl Connection {
 
         while i < tracks.len() {
             let aud = tracks.get_mut(i).unwrap();
-
             let vol = aud.volume;
-
             let stream = &mut aud.source;
 
             if aud.playing != PlayMode::Play {          
@@ -289,9 +284,7 @@ impl Connection {
                 continue;
             }
 
-            let now = Instant::now();
             let temp_len = stream.mix(&mut mix_buffer, vol);
-            let later = Instant::now();
 
             len = len.max(temp_len);
             if temp_len > 0 {
@@ -301,7 +294,6 @@ impl Connection {
                     interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
                     interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(aud.loops, false)));
                 }
-
             } else {
                 aud.end();
             }

@@ -3,21 +3,21 @@
 mod queue;
 
 use crate::{
-	voice::{
+    voice::{
         constants::*,
-		events::{
-	        Event,
-	        EventContext,
-	        EventData,
-	        EventStore,
-	    },
-	    input::Input,
+        events::{
+            Event,
+            EventContext,
+            EventData,
+            EventStore,
+        },
+        input::Input,
         threading::{
             EventMessage,
             Interconnect,
             TrackStateChange,
         },
-	},
+    },
 };
 use std::{
     sync::{
@@ -153,13 +153,13 @@ impl Track {
 
     #[inline]
     fn set_playing(&mut self, new_state: PlayMode) -> &mut Self {
-    	self.playing = self.playing.change_to(new_state);
+        self.playing = self.playing.change_to(new_state);
 
-    	self
+        self
     }
 
     pub fn playing(&self) -> PlayMode {
-    	self.playing
+        self.playing
     }
 
     /// Sets [`volume`] in a manner that allows method chaining.
@@ -343,10 +343,8 @@ pub struct TrackState {
 
 impl TrackState {
     pub(crate) fn step_frame(&mut self) {
-        if self.playing == PlayMode::Play {
-            self.position += TIMESTEP_LENGTH;
-            self.play_time += TIMESTEP_LENGTH;
-        }
+        self.position += TIMESTEP_LENGTH;
+        self.play_time += TIMESTEP_LENGTH;
     }
 }
 
@@ -463,7 +461,7 @@ impl TrackHandle {
     /// [`Track`]: struct.Track.html
     /// [`EventContext::Track`]: enum.EventContext.html#variant.Track
     pub fn add_event<F>(&self, event: Event, action: F) -> TrackResult 
-        where F: FnMut(EventContext) -> Option<Event> + Send + Sync + 'static
+        where F: FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static
     {
         let cmd = TrackCommand::AddEvent(EventData::new(event, action));
         if event.is_global_only() {
@@ -546,8 +544,8 @@ impl TrackHandle {
 ///
 /// [`Track`]: struct.Track.html
 pub enum LoopState {
-	/// Track will loop endlessly until loop state is changed or
-	/// manually stopped.
+    /// Track will loop endlessly until loop state is changed or
+    /// manually stopped.
     Infinite,
 
     /// Track will loop `n` more times.
@@ -601,7 +599,7 @@ impl std::fmt::Debug for TrackCommand {
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 /// Playback status of a track.
 pub enum PlayMode {
-	/// The track is currently playing.
+    /// The track is currently playing.
     Play,
 
     /// The track is currently paused, and may be resumed.
@@ -615,26 +613,26 @@ pub enum PlayMode {
 }
 
 impl PlayMode {
-	/// Returns whether the track has irreversibly stopped.
-	pub fn is_done(self) -> bool {
-		matches!(self, PlayMode::Stop | PlayMode::End)
-	}
+    /// Returns whether the track has irreversibly stopped.
+    pub fn is_done(self) -> bool {
+        matches!(self, PlayMode::Stop | PlayMode::End)
+    }
 
-	fn change_to(self, other: Self) -> PlayMode {
-		use PlayMode::*;
+    fn change_to(self, other: Self) -> PlayMode {
+        use PlayMode::*;
 
-		// Idea: a finished track cannot be restarted -- this action is final.
-		// We may want to change this in future so that seekable tracks can uncancel
-		// themselves, perhaps, but this requires a bit more machinery to readd...
-		match self {
-			Play | Pause => other,
-			a@_ => a,
-		}
-	}
+        // Idea: a finished track cannot be restarted -- this action is final.
+        // We may want to change this in future so that seekable tracks can uncancel
+        // themselves, perhaps, but this requires a bit more machinery to readd...
+        match self {
+            Play | Pause => other,
+            state => state,
+        }
+    }
 }
 
 impl Default for PlayMode {
-	fn default() -> Self {
-		PlayMode::Play
-	}
+    fn default() -> Self {
+        PlayMode::Play
+    }
 }

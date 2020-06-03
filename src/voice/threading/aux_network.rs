@@ -12,7 +12,7 @@ use crate::{
     voice::{
         constants::*,
         events::{
-            EventContext,
+            CoreContext,
         },
         payload,
         threading::{
@@ -194,139 +194,11 @@ impl AuxNetwork {
     }
 
     fn run(&mut self, interconnect: &Interconnect) {
+        // FIXME: Subdivide me!
         'aux_runner: loop {
-            if let Some(ws) = self.ws_client.as_mut() {
-                if self.ws_keepalive_time.check() {
-                    let nonce = random::<u64>();
-                    self.last_heartbeat_nonce = Some(nonce);
-                    ws.send_json(&payload::build_heartbeat(nonce));
-                    self.ws_keepalive_time.reset_from_deadline();
-                }
+            self.process_ws_messages(interconnect);
 
-                // FIXME: need to propagate WS disconnection back to main thread to trigger reconnect.
-
-                while let Ok(Some(value)) = ws.try_recv_json() {
-                    let msg = match VoiceEvent::deserialize(&value) {
-                        Ok(m) => m,
-                        Err(_) => {
-                            warn!("[Voice] Unexpected Websocket message: {:?}", value);
-                            break
-                        },
-                    };
-
-                    match msg {
-                        VoiceEvent::Speaking(ev) => {
-                            interconnect.events.send(EventMessage::FireCoreEvent(
-                                EventContext::SpeakingStateUpdate(ev)
-                            ));
-                        },
-                        VoiceEvent::ClientConnect(ev) => {
-                            interconnect.events.send(EventMessage::FireCoreEvent(
-                                EventContext::ClientConnect(ev)
-                            ));
-                        },
-                        VoiceEvent::ClientDisconnect(ev) => {
-                            interconnect.events.send(EventMessage::FireCoreEvent(
-                                EventContext::ClientDisconnect(ev)
-                            ));
-                        },
-                        VoiceEvent::HeartbeatAck(ev) => {
-                            if let Some(nonce) = self.last_heartbeat_nonce.take() {
-                                if ev.nonce == nonce {
-                                    info!("[Voice] Heartbeat ACK received.");
-                                } else {
-                                    warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
-                                }
-                            }
-                        },
-                        other => {
-                            info!("[Voice] Received other websocket data: {:?}", other);
-                        },
-                    }
-                }
-            }
-
-            if let Some(udp) = self.udp_socket.as_mut() {
-                if self.udp_keepalive_time.check() {
-                    udp.send_to(
-                        &self.keepalive_bytes,
-                        self.destination.expect("[Voice] Tried to send keepalive without valid destination.")
-                    );
-                    self.udp_keepalive_time.reset_from_deadline();
-                }
-
-                while let Ok((len, _addr)) = udp.recv_from(&mut self.packet_buffer[..]) {
-                    if !self.should_parse {
-                        continue;
-                    }
-
-                    let packet = &mut self.packet_buffer[..len];
-                    let key = self.key.as_ref().expect("[Voice] Tried to decrypt without a valid key.");
-
-                    match demux::demux_mut(packet) {
-                        DemuxedMut::Rtp(mut rtp) => {
-                            let rtp_body_start = decrypt_in_place(
-                                &mut rtp,
-                                key,
-                            ).expect("[Voice] RTP decryption failed.");
-
-                            let entry = self.decoder_map.entry(rtp.get_ssrc())
-                                .or_insert_with(
-                                    || SsrcState::new(rtp.to_immutable()),
-                                );
-
-                            let (delta, audio) = entry.process(rtp.to_immutable(), rtp_body_start);
-
-                            match delta {
-                                SpeakingDelta::Start => {
-                                    interconnect.events.send(EventMessage::FireCoreEvent(
-                                        EventContext::SpeakingUpdate {
-                                            ssrc: rtp.get_ssrc(),
-                                            speaking: true,
-                                        },
-                                    ));
-                                },
-                                SpeakingDelta::Stop => {
-                                    interconnect.events.send(EventMessage::FireCoreEvent(
-                                        EventContext::SpeakingUpdate {
-                                            ssrc: rtp.get_ssrc(),
-                                            speaking: false,
-                                        },
-                                    ));
-                                },
-                                _ => {},
-                            }
-
-                            interconnect.events.send(EventMessage::FireCoreEvent(
-                                EventContext::VoicePacket {
-                                    audio,
-                                    packet: rtp.from_packet(),
-                                    payload_offset: rtp_body_start,
-                                },
-                            ));
-                        },
-                        DemuxedMut::Rtcp(mut rtcp) => {
-                            let rtcp_body_start = decrypt_in_place(
-                                &mut rtcp,
-                                key,
-                            ).expect("[Voice] RTCP decryption failed.");
-
-                            interconnect.events.send(EventMessage::FireCoreEvent(
-                                EventContext::RtcpPacket {
-                                    packet: rtcp.from_packet(),
-                                    payload_offset: rtcp_body_start,
-                                },
-                            ));
-                        },
-                        DemuxedMut::FailedParse(t) => {
-                            warn!("[Voice] Failed to parse message of type {:?}.", t);
-                        }
-                        _ => {
-                            warn!("[Voice] Illegal UDP packet from voice server.");
-                        }
-                    }
-                }
-            }
+            self.process_udp_messages(interconnect);
 
             loop {
                 use AuxPacketMessage::*;
@@ -344,7 +216,7 @@ impl AuxNetwork {
                         self.destination = Some(addr);
                     }
                     Ok(Ws(data)) => {
-                        self.ws_client = Some(data);
+                        self.ws_client = Some(*data);
                         self.ws_keepalive_time.reset();
                     },
                     Ok(SetSsrc(new_ssrc)) => {
@@ -370,6 +242,143 @@ impl AuxNetwork {
                     Err(_) => {
                         // No message.
                         break;
+                    }
+                }
+            }
+        }
+    }
+
+    fn process_ws_messages(&mut self, interconnect: &Interconnect) {
+        if let Some(ws) = self.ws_client.as_mut() {
+            if self.ws_keepalive_time.check() {
+                let nonce = random::<u64>();
+                self.last_heartbeat_nonce = Some(nonce);
+                ws.send_json(&payload::build_heartbeat(nonce));
+                self.ws_keepalive_time.reset_from_deadline();
+            }
+
+            // FIXME: need to propagate WS disconnection back to main thread to trigger reconnect.
+
+            while let Ok(Some(value)) = ws.try_recv_json() {
+                let msg = match VoiceEvent::deserialize(&value) {
+                    Ok(m) => m,
+                    Err(_) => {
+                        warn!("[Voice] Unexpected Websocket message: {:?}", value);
+                        break
+                    },
+                };
+
+                match msg {
+                    VoiceEvent::Speaking(ev) => {
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            CoreContext::SpeakingStateUpdate(ev)
+                        ));
+                    },
+                    VoiceEvent::ClientConnect(ev) => {
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            CoreContext::ClientConnect(ev)
+                        ));
+                    },
+                    VoiceEvent::ClientDisconnect(ev) => {
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            CoreContext::ClientDisconnect(ev)
+                        ));
+                    },
+                    VoiceEvent::HeartbeatAck(ev) => {
+                        if let Some(nonce) = self.last_heartbeat_nonce.take() {
+                            if ev.nonce == nonce {
+                                info!("[Voice] Heartbeat ACK received.");
+                            } else {
+                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                            }
+                        }
+                    },
+                    other => {
+                        info!("[Voice] Received other websocket data: {:?}", other);
+                    },
+                }
+            }
+        }
+    }
+
+    fn process_udp_messages(&mut self, interconnect: &Interconnect) {
+        if let Some(udp) = self.udp_socket.as_mut() {
+            if self.udp_keepalive_time.check() {
+                udp.send_to(
+                    &self.keepalive_bytes,
+                    self.destination.expect("[Voice] Tried to send keepalive without valid destination.")
+                );
+                self.udp_keepalive_time.reset_from_deadline();
+            }
+
+            while let Ok((len, _addr)) = udp.recv_from(&mut self.packet_buffer[..]) {
+                if !self.should_parse {
+                    continue;
+                }
+
+                let packet = &mut self.packet_buffer[..len];
+                let key = self.key.as_ref().expect("[Voice] Tried to decrypt without a valid key.");
+
+                match demux::demux_mut(packet) {
+                    DemuxedMut::Rtp(mut rtp) => {
+                        let rtp_body_start = decrypt_in_place(
+                            &mut rtp,
+                            key,
+                        ).expect("[Voice] RTP decryption failed.");
+
+                        let entry = self.decoder_map.entry(rtp.get_ssrc())
+                            .or_insert_with(
+                                || SsrcState::new(rtp.to_immutable()),
+                            );
+
+                        let (delta, audio) = entry.process(rtp.to_immutable(), rtp_body_start);
+
+                        match delta {
+                            SpeakingDelta::Start => {
+                                interconnect.events.send(EventMessage::FireCoreEvent(
+                                    CoreContext::SpeakingUpdate {
+                                        ssrc: rtp.get_ssrc(),
+                                        speaking: true,
+                                    },
+                                ));
+                            },
+                            SpeakingDelta::Stop => {
+                                interconnect.events.send(EventMessage::FireCoreEvent(
+                                    CoreContext::SpeakingUpdate {
+                                        ssrc: rtp.get_ssrc(),
+                                        speaking: false,
+                                    },
+                                ));
+                            },
+                            _ => {},
+                        }
+
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            CoreContext::VoicePacket {
+                                audio,
+                                packet: rtp.from_packet(),
+                                payload_offset: rtp_body_start,
+                            },
+                        ));
+                    },
+                    DemuxedMut::Rtcp(mut rtcp) => {
+                        let rtcp_body_start = decrypt_in_place(
+                            &mut rtcp,
+                            key,
+                        ).expect("[Voice] RTCP decryption failed.");
+
+                        interconnect.events.send(EventMessage::FireCoreEvent(
+                            CoreContext::RtcpPacket {
+                                packet: rtcp.from_packet(),
+                                payload_offset: rtcp_body_start,
+                            },
+                        ));
+                    },
+                    DemuxedMut::FailedParse(t) => {
+                        warn!("[Voice] Failed to parse message of type {:?}.", t);
+                    }
+                    _ => {
+                        warn!("[Voice] Illegal UDP packet from voice server.");
                     }
                 }
             }

@@ -41,6 +41,7 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
                 event_store.add_event(data, state.position);
             },
             Ok(FireCoreEvent(ctx)) => {
+                let ctx = ctx.to_user_context();
                 let evt = ctx.to_core_event()
                     .expect("[Voice] Event thread was passed a non-core event in FireCoreEvent.");
                 global.fire_core_event(evt, ctx);

@@ -1,13 +1,13 @@
 use audiopus::{
-	coder::Decoder,
-	Channels,
-	Result as OpusResult,
-	SampleRate,
+    coder::Decoder,
+    Channels,
+    Result as OpusResult,
+    SampleRate,
 };
 use crate::voice::constants::*;
 use std::{
-	mem,
-	time::Duration,
+    mem,
+    time::Duration,
 };
 
 pub fn timestamp_to_sample_count(timestamp: Duration, stereo: bool) -> usize {

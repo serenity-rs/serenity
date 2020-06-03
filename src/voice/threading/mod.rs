@@ -9,7 +9,7 @@ use crate::{
         connection::Connection,
         constants::*,
         events::{
-            EventContext,
+            CoreContext,
             EventData,
             EventStore,
         },
@@ -42,16 +42,12 @@ use std::{
 #[derive(Clone, Debug)]
 pub(crate) struct Interconnect {
     pub(crate) events: MpscSender<EventMessage>,
-    pub(crate) mixer: MpscSender<()>,
-    pub(crate) voice_packets: MpscSender<()>,
     pub(crate) aux_packets: MpscSender<AuxPacketMessage>,
 }
 
 impl Interconnect {
     fn poison(&self) {
         self.events.send(EventMessage::Poison);
-        self.mixer.send(());
-        self.voice_packets.send(());
         self.aux_packets.send(AuxPacketMessage::Poison);
     }
 }
@@ -61,7 +57,7 @@ pub(crate) enum EventMessage {
     // Track events should fire off the back of state changes.
     AddGlobalEvent(EventData),
     AddTrackEvent(usize, EventData),
-    FireCoreEvent(EventContext),
+    FireCoreEvent(CoreContext),
 
     AddTrack(EventStore, TrackState, TrackHandle),
     ChangeState(usize, TrackStateChange),
@@ -84,7 +80,7 @@ pub(crate) enum AuxPacketMessage {
     Udp(UdpSocket),
     UdpDestination(SocketAddr),
     UdpKey(Key),
-    Ws(WsClient),
+    Ws(Box<WsClient>),
 
     SetSsrc(u32),
     SetKeepalive(f64),
@@ -104,15 +100,11 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
 
 fn start_internals(guild_id: GuildId) -> Interconnect {
     let (evt_tx, evt_rx) = mpsc::channel();
-    let (mixer_tx, mixer_rx) = mpsc::channel();
-    let (pkt_out_tx, pkt_out_rx) = mpsc::channel();
-    let (pkt_in_tx, pkt_in_rx) = mpsc::channel();
+    let (pkt_aux_tx, pkt_aux_rx) = mpsc::channel();
 
     let interconnect = Interconnect {
         events: evt_tx,
-        mixer: mixer_tx,
-        voice_packets: pkt_out_tx,
-        aux_packets: pkt_in_tx,
+        aux_packets: pkt_aux_tx,
     };
 
     // FIXME: clean this up...
@@ -128,7 +120,7 @@ fn start_internals(guild_id: GuildId) -> Interconnect {
     let ic = interconnect.clone();
     ThreadBuilder::new()
         .name(name)
-        .spawn(move || aux_network::runner(ic, pkt_in_rx))
+        .spawn(move || aux_network::runner(ic, pkt_aux_rx))
         .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
 
     interconnect

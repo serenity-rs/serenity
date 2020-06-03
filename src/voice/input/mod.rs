@@ -10,8 +10,8 @@ use crate::{
     internal::prelude::*,
     prelude::SerenityError,
     voice::{
-	    constants::*,
-	    VoiceError,
+        constants::*,
+        VoiceError,
     },
 };
 use log::debug;
@@ -19,9 +19,9 @@ use parking_lot::Mutex;
 use std::{
     ffi::OsStr,
     fmt::{
-    	Debug,
-    	Error as FormatError,
-    	Formatter,
+        Debug,
+        Error as FormatError,
+        Formatter,
     },
     io::{
         self,
@@ -69,9 +69,9 @@ fn child_to_reader<T>(child: Child) -> Reader {
 }
 
 impl From<Child> for Reader {
-	fn from(container: Child) -> Self {
-	    child_to_reader::<f32>(container)
-	}
+    fn from(container: Child) -> Self {
+        child_to_reader::<f32>(container)
+    }
 }
 
 impl Read for ChildContainer {
@@ -147,20 +147,20 @@ impl Seek for Reader {
 }
 
 impl Debug for Reader {
-	fn fmt(&self, f: &mut Formatter<'_>) -> StdResult<(), FormatError> {
-		use Reader::*;
-		let field = match self {
-    		Pipe(a) => format!("{:?}", a),
-    		InMemory(a) => format!("{:?}", a),
-    		Compressed(a) => format!("{:?}", a),
-    		Restartable(a) => format!("{:?}", a),
-    		Extension(_) => "Extension".to_string(),
-    		ExtensionSeek(_) => "ExtensionSeek".to_string(),
-    	};
-	    f.debug_tuple("Reader")
-	    	.field(&field)
-	    	.finish()
-	}
+    fn fmt(&self, f: &mut Formatter<'_>) -> StdResult<(), FormatError> {
+        use Reader::*;
+        let field = match self {
+            Pipe(a) => format!("{:?}", a),
+            InMemory(a) => format!("{:?}", a),
+            Compressed(a) => format!("{:?}", a),
+            Restartable(a) => format!("{:?}", a),
+            Extension(_) => "Extension".to_string(),
+            ExtensionSeek(_) => "ExtensionSeek".to_string(),
+        };
+        f.debug_tuple("Reader")
+            .field(&field)
+            .finish()
+    }
 }
 
 /// Fusion trait for custom input sources which allow seeking.
@@ -771,13 +771,13 @@ impl RestartableSource {
 }
 
 impl Debug for RestartableSource {
-	fn fmt(&self, f: &mut Formatter<'_>) -> StdResult<(), FormatError> {
-	    f.debug_struct("Reader")
-	    	.field("position", &self.position)
-	    	.field("recreator", &"<fn>")
-	    	.field("source", &self.source)
-	    	.finish()
-	}
+    fn fmt(&self, f: &mut Formatter<'_>) -> StdResult<(), FormatError> {
+        f.debug_struct("Reader")
+            .field("position", &self.position)
+            .field("recreator", &"<fn>")
+            .field("source", &self.source)
+            .finish()
+    }
 }
 
 impl From<RestartableSource> for Input {
