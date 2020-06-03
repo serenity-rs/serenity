@@ -122,7 +122,7 @@ impl Track {
             source,
             position: Default::default(),
             play_time: Default::default(),
-            events: Some(EventStore::new()),
+            events: Some(EventStore::new_local()),
             commands,
             handle,
             loops: LoopState::Finite(0),
@@ -465,7 +465,12 @@ impl TrackHandle {
     pub fn add_event<F>(&self, event: Event, action: F) -> TrackResult 
         where F: FnMut(EventContext) -> Option<Event> + Send + Sync + 'static
     {
-        self.send(TrackCommand::AddEvent(EventData::new(event, action)))
+        let cmd = TrackCommand::AddEvent(EventData::new(event, action));
+        if event.is_global_only() {
+            Err(SendError(cmd))
+        } else {
+            self.send(cmd)
+        }
     }
 
     /// Perform an arbitrary action on a raw [`Track`] object.

@@ -32,6 +32,7 @@ use discortp::{
         RtpExtensionPacket,
         RtpPacket,
     },
+    FromPacket,
     MutablePacket,
     Packet,
     PacketSize,
@@ -75,7 +76,7 @@ enum SpeakingDelta {
 impl SsrcState {
     fn new(pkt: RtpPacket<'_>) -> Self {
         Self {
-            silent_frame_count: 0,
+            silent_frame_count: 5, // We do this to make the first speech packet fire an event.
             decoder: OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)
                 .expect("[Voice] Failed to create new Opus decoder for source.",),
             last_seq: pkt.get_sequence().into(),
@@ -296,19 +297,13 @@ impl AuxNetwork {
                                 _ => {},
                             }
 
-                            // println!("{:?} -> {:?}", rtp, audio);
-
-                            // FIXME: change this.
-                            // interconnect.events.send(EventMessage::FireCoreEvent(
-                            //     EventContext::VoicePacket {
-                            //         ssrc: u32,
-                            //         sequence: u16,
-                            //         timestamp: u32,
-                            //         stereo: bool,
-                            //         data: Vec<i16>,
-                            //         compressed_size: usize
-                            //     },
-                            // ));
+                            interconnect.events.send(EventMessage::FireCoreEvent(
+                                EventContext::VoicePacket {
+                                    audio,
+                                    packet: rtp.from_packet(),
+                                    payload_offset: rtp_body_start,
+                                },
+                            ));
                         },
                         DemuxedMut::Rtcp(mut rtcp) => {
                             let rtcp_body_start = decrypt_in_place(
@@ -316,6 +311,12 @@ impl AuxNetwork {
                                 key,
                             ).expect("[Voice] RTCP decryption failed.");
 
+                            interconnect.events.send(EventMessage::FireCoreEvent(
+                                EventContext::RtcpPacket {
+                                    packet: rtcp.from_packet(),
+                                    payload_offset: rtcp_body_start,
+                                },
+                            ));
                         },
                         DemuxedMut::FailedParse(t) => {
                             warn!("[Voice] Failed to parse message of type {:?}.", t);

@@ -41,8 +41,7 @@ version = "0.4"
 [dependencies.discortp]
 features = ["discord-full"]
 optional = true
-# version = "1.0"
-git = "https://github.com/FelixMcFelix/discortp"
+version = "0.2.0"
 
 [dependencies.flate2]
 optional = true

@@ -13,6 +13,10 @@ use crate::{
 		},
 	},
 };
+use discortp::{
+	rtcp::Rtcp,
+	rtp::Rtp,
+};
 use std::{
 	cmp::Ordering,
 	collections::{
@@ -31,35 +35,49 @@ use std::{
 /// [`Handler::add_global_event`]: struct.Handler.html#method.add_global_event
 #[derive(Clone, Debug)]
 pub enum EventContext {
-	/// Local event context, passed to events created via [`TrackHandle::add_event`]
-	/// or [`EventStore::add_event`].
+	/// Track event context, passed to events created via [`TrackHandle::add_event`],
+	/// [`EventStore::add_event`], or relevant global events.
 	///
 	/// [`EventStore::add_event`]: struct.EventStore.html#method.add_event
 	/// [`TrackHandle::add_event`]: struct.TrackHandle.html#method.add_event
 	Track(Vec<(TrackState, TrackHandle)>),
 
+	/// Speaking state update, typically describing how another voice
+	/// user is transmitting audio data. Clients must send at least one such
+	/// packet to allow SSRC/UserID matching.
 	SpeakingStateUpdate(VoiceSpeaking),
 
+	/// Speaking state transition, describing whether a given source has started/stopped
+	/// transmitting. This fires in response to a silent burst, or the first packet
+	/// breaking such a burst.
 	SpeakingUpdate {
 		ssrc: u32,
 		speaking: bool,
 	},
 
+	/// Opus audio packet, received from another stream (detailed in `packet`).
+	/// `payload_offset` contains the true payload location within the raw packet,
+	/// if extensions or raw packet data are required.
+	/// if `audio.len() == 0`, then this packet arrived out-of-order.
 	VoicePacket {
-		ssrc: u32,
-        sequence: u16,
-        timestamp: u32,
-        stereo: bool,
-        data: Vec<i16>,
-        compressed_size: usize
+		audio: Vec<i16>,
+        packet: Rtp,
+        payload_offset: usize,
 	},
 
+	/// Telemetry/statistics packet, received from another stream (detailed in `packet`).
+	/// `payload_offset` contains the true payload location within the raw packet,
+	/// if to allow manual decoding of Rtcp packet bodies.
 	RtcpPacket {
-		data: u32, // FIXME.
+		packet: Rtcp,
+        payload_offset: usize,
 	},
 
+	/// Fired whenever a client connects to a call for the first time, allowing SSRC/UserID
+	/// matching.
 	ClientConnect(VoiceClientConnect),
 
+	/// Fired whenever a client disconnects.
 	ClientDisconnect(VoiceClientDisconnect),
 }
 
@@ -307,11 +325,19 @@ impl Eq for EventData {}
 pub struct EventStore {
 	timed: BinaryHeap<EventData>,
 	untimed: HashMap<UntimedEvent, Vec<EventData>>,
+	local_only: bool,
 }
 
 impl EventStore {
 	pub fn new() -> Self {
 		Default::default()
+	}
+
+	pub fn new_local() -> Self {
+		EventStore {
+			local_only: true,
+			..Default::default()
+		}
 	}
 
 	/// Add an event to this store.
@@ -321,6 +347,10 @@ impl EventStore {
 	/// [`EventData::compute_activation`]: struct.EventData.html#method.compute_activation
 	pub fn add_event(&mut self, mut evt: EventData, now: Duration) {
 		evt.compute_activation(now);
+
+		if self.local_only && evt.event.is_global_only() {
+			return;
+		}
 
 		use Event::*;
 		match evt.event {
@@ -437,7 +467,7 @@ impl GlobalEvents {
                 let handle = handles.get_mut(i)
                     .expect("[Voice] Missing handle index for Tick (local timed).");
 
-                event_store.process_timed(state.position, EventContext::Track(vec![(state.clone(), handle.clone())]));
+                event_store.process_timed(state.play_time, EventContext::Track(vec![(state.clone(), handle.clone())]));
 			}
 		}
 

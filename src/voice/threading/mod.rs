@@ -135,12 +135,10 @@ fn start_internals(guild_id: GuildId) -> Interconnect {
 }
 
 fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
-    let mut senders = Vec::new();
+    let mut tracks = Vec::new();
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = DEFAULT_BITRATE;
-    let mut time_in_call = Duration::default();
-    let mut entry_points = 0u64;
 
     let interconnect = start_internals(guild_id);
 
@@ -161,10 +159,10 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                     connection = None;
                 },
                 Ok(Status::SetTrack(s)) => {
-                    senders.clear();
+                    tracks.clear();
 
                     if let Some(aud) = s {
-                        senders.push(aud);
+                        tracks.push(aud);
                     }
                 },
                 Ok(Status::AddTrack(mut s)) => {
@@ -173,7 +171,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                     let state = s.state();
                     let handle = s.handle.clone();
 
-                    senders.push(s);
+                    tracks.push(s);
 
                     interconnect.events.send(EventMessage::AddTrack(evts, state, handle));
                 },
@@ -203,7 +201,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut senders, &mut timer, bitrate, &mut time_in_call, &mut entry_points, &interconnect);
+                let cycle = connection.cycle(&mut tracks, &mut timer, bitrate, &interconnect);
 
                 match cycle {
                     Ok(()) => {
@@ -212,12 +210,12 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
 
                         // Strip expired sources.
                         let mut i = 0;
-                        while i < senders.len() {
-                            let aud = senders.get_mut(i)
+                        while i < tracks.len() {
+                            let aud = tracks.get_mut(i)
                                 .expect("[Voice] Tried to remove an illegal track index.");
 
                             if aud.playing.is_done() {
-                                senders.remove(i);
+                                tracks.remove(i);
                                 interconnect.events.send(EventMessage::RemoveTrack(i));
                             } else {
                                 i += 1;

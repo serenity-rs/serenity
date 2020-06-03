@@ -269,18 +269,16 @@ impl Connection {
     #[inline]
     fn mix_tracks(
         &mut self,
-        sources: &mut Vec<Track>,
+        tracks: &mut Vec<Track>,
         _opus_frame: &[u8],
         mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
-        time_in_call: &mut Duration,
-        entry_points: &mut u64,
         interconnect: &Interconnect,
     ) -> Result<usize> {
         let mut len = 0;
         let mut i = 0;
 
-        while i < sources.len() {
-            let aud = sources.get_mut(i).unwrap();
+        while i < tracks.len() {
+            let aud = tracks.get_mut(i).unwrap();
 
             let vol = aud.volume;
 
@@ -295,21 +293,12 @@ impl Connection {
             let temp_len = stream.mix(&mut mix_buffer, vol);
             let later = Instant::now();
 
-            *time_in_call += later - now;
-            *entry_points += 1;
-
-            if *entry_points % 1000 == 0 {
-                println!("Average cost {:?}ns", time_in_call.as_nanos()/(*entry_points as u128));
-
-                *time_in_call = Duration::default();
-                *entry_points = 0;
-            }
-
             len = len.max(temp_len);
             if temp_len > 0 {
                 aud.step_frame();
             } else if aud.do_loop() {
-                if aud.seek_time(Default::default()).is_some() {
+                if let Some(time) = aud.seek_time(Default::default()) {
+                    interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
                     interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(aud.loops, false)));
                 }
 
@@ -324,19 +313,17 @@ impl Connection {
     }
 
     #[inline]
-    fn audio_commands_events(&mut self, sources: &mut Vec<Track>, interconnect: &Interconnect) {
-        for (i, audio) in sources.iter_mut().enumerate() {
+    fn audio_commands_events(&mut self, tracks: &mut Vec<Track>, interconnect: &Interconnect) {
+        for (i, audio) in tracks.iter_mut().enumerate() {
             audio.process_commands(i, interconnect);
         }
     }
 
     #[allow(unused_variables)]
     pub(crate) fn cycle(&mut self,
-                mut sources: &mut Vec<Track>,
+                mut tracks: &mut Vec<Track>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate,
-                mut time_in_call: &mut Duration,
-                mut entry_points: &mut u64,
                 interconnect: &Interconnect)
                  -> Result<()> {
         // We need to actually reserve enough space for the desired bitrate.
@@ -361,7 +348,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.mix_tracks(&mut sources, &opus_frame, &mut mix_buffer, &mut time_in_call, &mut entry_points, interconnect)?;
+        let len = self.mix_tracks(&mut tracks, &opus_frame, &mut mix_buffer, interconnect)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -394,15 +381,12 @@ impl Connection {
 
         self.audio_timer.reset_from_deadline();
 
-        self.audio_commands_events(&mut sources, interconnect);
+        self.audio_commands_events(&mut tracks, interconnect);
 
         Ok(())
     }
 
-    fn prep_and_send_packet(&mut self,
-                   buffer: [f32; 1920],
-                   opus_frame: &[u8])
-                   -> Result<()> {
+    fn prep_and_send_packet(&mut self, buffer: [f32; 1920], opus_frame: &[u8]) -> Result<()> {
         let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
