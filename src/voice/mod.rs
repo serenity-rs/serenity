@@ -10,7 +10,7 @@ mod handler;
 pub mod input;
 mod manager;
 mod payload;
-mod threading;
+pub(crate) mod threading;
 pub mod tracks;
 
 pub use audiopus::{self as opus, Bitrate};

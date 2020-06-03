@@ -9,7 +9,8 @@ use std::{
         Error as FormatError
     },
     io::Error as IoError,
-    num::ParseIntError
+    num::ParseIntError,
+    sync::mpsc::SendError,
 };
 
 #[cfg(feature = "http")]
@@ -28,6 +29,8 @@ use crate::http::HttpError;
 use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
 use crate::voice::VoiceError;
+#[cfg(feature = "voice")]
+use crate::voice::threading::AuxPacketMessage;
 
 /// The common result type between most library functions.
 ///
@@ -108,6 +111,9 @@ pub enum Error {
     /// [voice module]: voice/index.html
     #[cfg(feature = "voice")]
     Voice(VoiceError),
+    /// Voice thread issue, requiring regeneration of child threads.
+    #[cfg(feature = "voice")]
+    VoiceInterconnectFailure,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -145,6 +151,11 @@ impl From<OpusError> for Error {
 #[cfg(feature = "voice")]
 impl From<VoiceError> for Error {
     fn from(e: VoiceError) -> Error { Error::Voice(e) }
+}
+
+#[cfg(feature = "voice")]
+impl From<SendError<AuxPacketMessage>> for Error {
+    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::VoiceInterconnectFailure }
 }
 
 #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
@@ -197,6 +208,8 @@ impl Display for Error {
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "voice")]
             Error::Voice(_) => f.write_str("Voice error"),
+            #[cfg(feature = "voice")]
+            e@Error::VoiceInterconnectFailure => fmt::Display::fmt(&e, f),
             Error::__Nonexhaustive => unreachable!(),
         }
     }

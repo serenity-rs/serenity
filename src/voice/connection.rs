@@ -52,17 +52,14 @@ use sodiumoxide::crypto::secretbox::{
     NONCEBYTES,
     Key,
 };
-use std::{
-    net::{SocketAddr, ToSocketAddrs, UdpSocket},
-    time::Instant,
-};
+use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use url::Url;
 
 #[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
 
 pub(crate) struct Connection {
-    connection_info: ConnectionInfo,
+    pub(crate) connection_info: ConnectionInfo,
     destination: SocketAddr,
     encoder: OpusEncoder,
     key: Key,
@@ -183,15 +180,15 @@ impl Connection {
         rtp.set_timestamp(random::<u32>().into());
         rtp.set_ssrc(ready.ssrc);
 
-        interconnect.aux_packets.send(AuxPacketMessage::UdpDestination(destination));
-        interconnect.aux_packets.send(AuxPacketMessage::UdpKey(key.clone()));
-        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval));
-        interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc));
+        interconnect.aux_packets.send(AuxPacketMessage::UdpDestination(destination))?;
+        interconnect.aux_packets.send(AuxPacketMessage::UdpKey(key.clone()))?;
+        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
+        interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
         interconnect.aux_packets.send(AuxPacketMessage::Udp(
             udp.try_clone()
                 .expect("[Voice] Failed to clone UDP")
-        ));
-        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)));
+        ))?;
+        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         Ok(Connection {
             connection_info: info,
@@ -254,8 +251,8 @@ impl Connection {
 
         unset_blocking(&mut client)?;
 
-        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval));
-        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)));
+        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
+        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
@@ -289,8 +286,8 @@ impl Connection {
                 aud.step_frame();
             } else if aud.do_loop() {
                 if let Some(time) = aud.seek_time(Default::default()) {
-                    interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
-                    interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(aud.loops, false)));
+                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
+                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(aud.loops, false)));
                 }
             } else {
                 aud.end();
@@ -350,7 +347,7 @@ impl Connection {
                 opus_frame.extend_from_slice(&SILENT_FRAME);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                interconnect.aux_packets.send(AuxPacketMessage::Speaking(false));
+                interconnect.aux_packets.send(AuxPacketMessage::Speaking(false))?;
 
                 audio_timer.r#await();
 
@@ -364,7 +361,7 @@ impl Connection {
             }
         }
 
-        interconnect.aux_packets.send(AuxPacketMessage::Speaking(true));
+        interconnect.aux_packets.send(AuxPacketMessage::Speaking(true))?;
 
         self.prep_and_send_packet(mix_buffer, &opus_frame)?;
         audio_timer.r#await();

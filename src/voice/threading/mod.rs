@@ -2,6 +2,7 @@ mod aux_network;
 mod events;
 
 use crate::{
+    error::Error,
     gateway::WsClient,
     internal::Timer,
     model::id::GuildId,
@@ -22,7 +23,7 @@ use crate::{
         Status,
     },
 };
-use log::{error, warn};
+use log::{error, info, warn};
 use sodiumoxide::crypto::secretbox::Key;
 use std::{
     net::{
@@ -41,14 +42,20 @@ use std::{
 
 #[derive(Clone, Debug)]
 pub(crate) struct Interconnect {
+    pub(crate) core: MpscSender<CoreMessage>,
     pub(crate) events: MpscSender<EventMessage>,
     pub(crate) aux_packets: MpscSender<AuxPacketMessage>,
 }
 
 impl Interconnect {
     fn poison(&self) {
-        self.events.send(EventMessage::Poison);
-        self.aux_packets.send(AuxPacketMessage::Poison);
+        let _ = self.events.send(EventMessage::Poison);
+        let _ = self.aux_packets.send(AuxPacketMessage::Poison);
+    }
+
+    fn restart(self, guild_id: GuildId) -> Self {
+        self.poison();
+        start_internals(guild_id, self.core)
     }
 }
 
@@ -90,6 +97,10 @@ pub(crate) enum AuxPacketMessage {
     Poison,
 }
 
+pub(crate) enum CoreMessage {
+    Reconnect,
+}
+
 pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
     let name = format!("Serenity Voice Iface (G{})", guild_id);
 
@@ -99,17 +110,16 @@ pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
         .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
 }
 
-fn start_internals(guild_id: GuildId) -> Interconnect {
+fn start_internals(guild_id: GuildId, core: MpscSender<CoreMessage>) -> Interconnect {
     let (evt_tx, evt_rx) = mpsc::channel();
     let (pkt_aux_tx, pkt_aux_rx) = mpsc::channel();
 
     let interconnect = Interconnect {
+        core,
         events: evt_tx,
         aux_packets: pkt_aux_tx,
     };
 
-    // FIXME: clean this up...
-    // Might need to keep join-handles etc.
     let name = format!("Serenity Voice Event Dispatcher (G{})", guild_id);
     let ic = interconnect.clone();
     ThreadBuilder::new()
@@ -133,7 +143,9 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
     let mut timer = Timer::new(20);
     let mut bitrate = DEFAULT_BITRATE;
 
-    let interconnect = start_internals(guild_id);
+    let (reconnect_tx, reconnect_rx) = mpsc::channel();
+
+    let mut interconnect = start_internals(guild_id, reconnect_tx);
 
     'runner: loop {
         loop {
@@ -166,13 +178,13 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
 
                     tracks.push(s);
 
-                    interconnect.events.send(EventMessage::AddTrack(evts, state, handle));
+                    let _ = interconnect.events.send(EventMessage::AddTrack(evts, state, handle));
                 },
                 Ok(Status::SetBitrate(b)) => {
                     bitrate = b;
                 },
                 Ok(Status::AddEvent(evt)) => {
-                    interconnect.events.send(EventMessage::AddGlobalEvent(evt));
+                    let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
                 }
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
@@ -209,23 +221,27 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                                 let p_state = aud.playing();
                                 tracks.remove(i);
                                 to_remove.push(i);
-                                interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Mode(p_state)));
+                                let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Mode(p_state)));
                             } else {
                                 i += 1;
                             }
                         }
 
                         // Tick
-                        interconnect.events.send(EventMessage::Tick);
+                        let _ = interconnect.events.send(EventMessage::Tick);
 
                         // Then do removals.
                         for i in &to_remove[..] {
-                            interconnect.events.send(EventMessage::RemoveTrack(*i));
+                            let _ = interconnect.events.send(EventMessage::RemoveTrack(*i));
                         }
 
                         false
                     },
                     Err(why) => {
+                        if matches!(why, Error::VoiceInterconnectFailure) {
+                            interconnect = interconnect.restart(guild_id);
+                        }
+
                         error!(
                             "(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",
                             why
@@ -242,13 +258,51 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
             },
         };
 
+        let remote_error = match reconnect_rx.try_recv() {
+            Err(TryRecvError::Empty) => {
+                false
+            },
+            _ => {
+                true
+            },
+        };
+
         // If there was an error, then just reset the connection and try to get
         // another.
-        if error {
-            let mut conn = connection.expect("[Voice] Shouldn't have had a voice connection error without a connection.");
-            connection = conn.reconnect(&interconnect)
-                .ok()
-                .map(|_| conn);
+        if error || remote_error {
+            if let Some(mut conn) = connection.take() {
+                // try once: if interconnect, try again.
+                // if still issue, full connect.
+                let info = conn.connection_info.clone();
+
+                let full_connect = match conn.reconnect(&interconnect) {
+                    Ok(()) => {
+                        connection = Some(conn);
+                        false
+                    },
+                    Err(Error::VoiceInterconnectFailure) => {
+                        interconnect = interconnect.restart(guild_id);
+
+                        match conn.reconnect(&interconnect) {
+                            Ok(()) => {
+                                connection = Some(conn);
+                                false
+                            },
+                            _ => true,
+                        }
+                    },
+                    _ => true,
+                };
+
+                if full_connect {
+                    connection = Connection::new(info, &interconnect)
+                        .map_err(|e| {error!("[Voice] Catastrophic connection failure. Stopping. {:?}", e); e})
+                        .ok();
+                }
+            }
         }
     }
+
+    info!("[Voice] Main thread exited");
+    interconnect.poison();
 }

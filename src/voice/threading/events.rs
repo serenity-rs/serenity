@@ -109,4 +109,6 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
             },
         }
     }
+
+    info!("[Voice] Event thread exited.");
 }

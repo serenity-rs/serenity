@@ -191,7 +191,7 @@ impl TrackQueue {
 
     /// Skip to the next track in the queue, if it exists.
     pub fn skip(&self) -> TrackResult {
-        let mut inner = self.inner.lock();
+        let inner = self.inner.lock();
 
         let out = inner.stop_current();
 

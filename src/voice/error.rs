@@ -16,6 +16,8 @@ pub enum VoiceError {
     #[doc(hidden)] HostnameResolve,
     #[doc(hidden)] KeyGen,
     #[doc(hidden)] IllegalDiscoveryResponse,
+    #[doc(hidden)] IllegalVoicePacket,
+    #[doc(hidden)] Decryption,
     /// An error occurred while checking if a path is stereo.
     Streams,
     #[doc(hidden)] VoiceModeInvalid,

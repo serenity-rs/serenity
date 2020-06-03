@@ -219,10 +219,11 @@ impl Track {
     pub(crate) fn process_commands(&mut self, index: usize, ic: &Interconnect) {
         // Note: disconnection and an empty channel are both valid,
         // and should allow the audio object to keep running as intended.
-        //
-        // However, a paused and disconnected stream may never be revived,
-        // (i.e., if a later event would unpause it, there would still be a handle).
-        // We should then delete it TODO.
+
+        // Note that interconnect failures are not currently errors.
+        // In correct operation, the event thread should never panic,
+        // but it receiving status updates is secondary do actually
+        // doing the work.
         loop {
             match self.commands.try_recv() {
                 Ok(cmd) => {
@@ -230,43 +231,39 @@ impl Track {
                     match cmd {
                         Play => {
                             self.play();
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
                         },
                         Pause => {
                             self.pause();
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
                         },
                         Stop => {
                             self.stop();
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
                         },
                         Volume(vol) => {
                             self.set_volume(vol);
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Volume(self.volume)));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Volume(self.volume)));
                         },
                         Seek(time) => {
                             self.seek_time(time);
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Position(self.position)));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Position(self.position)));
                         },
                         AddEvent(evt) => {
-                            ic.events.send(EventMessage::AddTrackEvent(index, evt));
+                            let _ = ic.events.send(EventMessage::AddTrackEvent(index, evt));
                         },
                         Do(action) => {
                             action(self);
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Total(self.state())));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Total(self.state())));
                         },
                         Request(tx) => {let _ = tx.send(Box::new(self.state()));},
                         Loop(loops) => {
                             self.set_loops(loops);
-                            ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Loops(self.loops, true)));
+                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Loops(self.loops, true)));
                         },
                     }
                 },
                 Err(TryRecvError::Disconnected) => {
-                    // if self.playing {
-                    //     self.finished = true;
-                    // }
-
                     // TODO: issue with keeping the track handle in the struct...
                     // this branch will never be visited.
                     break;
