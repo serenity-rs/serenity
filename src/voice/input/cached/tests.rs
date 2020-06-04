@@ -13,7 +13,7 @@ use std::io::{Cursor, Read};
 #[test]
 fn memory_source_output_matches_input() {
     let input_bytes: Vec<u8> = vec![0, 1, 2, 3, 4, 5, 6, 7, 8, 20, 25, 64];
-    let input = Input::new(false, Reader::Extension(Box::new(Cursor::new(input_bytes.clone()))), InputType::FloatPcm, None);
+    let input = Input::new(false, Reader::Extension(Box::new(Cursor::new(input_bytes.clone()))), InputType::FloatPcm, None, None);
     let mut src = MemorySource::new(input, None);
 
     let mut cursor = 0;
@@ -35,7 +35,7 @@ fn memory_source_output_matches_input() {
 #[test]
 fn memory_source_wont_read_past_end() {
     let input_bytes: Vec<u8> = vec![0, 1, 2, 3, 4];
-    let input = Input::new(false, Reader::Extension(Box::new(Cursor::new(input_bytes.clone()))), InputType::FloatPcm, None);
+    let input = Input::new(false, Reader::Extension(Box::new(Cursor::new(input_bytes.clone()))), InputType::FloatPcm, None, None);
     let mut src = MemorySource::new(input, None);
 
     let _ = src.consume(input_bytes.len());
