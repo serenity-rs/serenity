@@ -852,7 +852,7 @@ fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
     }
 }
 
-/// A wrapper around a method to create a new [`AudioSource`] which
+/// A wrapper around a method to create a new [`Input`] which
 /// seeks backward by recreating the source.
 ///
 /// The main purpose of this wrapper is to enable seeking on
@@ -866,9 +866,9 @@ fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
 /// cannot be spared. Forward seeks will drain the track until reaching
 /// the desired timestamp.
 ///
-/// [`AudioSource`]: trait.AudioSource.html
-/// [`MemorySource`]: struct.MemorySource.html
-/// [`CompressedSource`]: struct.CompressedSource.html
+/// [`Input`]: struct.Input.html
+/// [`MemorySource`]: cached/struct.MemorySource.html
+/// [`CompressedSource`]: cached/struct.CompressedSource.html
 pub struct RestartableSource {
     position: usize,
     recreator: Box<dyn Fn(Option<Duration>) -> Result<Input> + Send + 'static>,

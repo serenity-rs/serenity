@@ -37,7 +37,7 @@ pub use queue::*;
 /// Control object for audio playback.
 ///
 /// Accessed by both commands and the playback code -- as such, access from user code is
-/// almost always guarded via an [`TrackHandle`]. You should expect to receive
+/// almost always guarded via a [`TrackHandle`]. You should expect to receive
 /// access to a raw object of this type via [`voice::create_player`], for use in
 /// [`Handler::play`] or [`Handler::play_only`].
 ///
@@ -57,8 +57,8 @@ pub use queue::*;
 /// // Future access occurs via audio_handle.
 /// ```
 ///
-/// [`Handler::play_only`]: struct.Handler.html#method.play_only
-/// [`Handler::play`]: struct.Handler.html#method.play
+/// [`Handler::play_only`]: ../struct.Handler.html#method.play_only
+/// [`Handler::play`]: ../struct.Handler.html#method.play
 /// [`TrackHandle`]: struct.TrackHandle.html
 /// [`voice::create_player`]: fn.create_player.html
 pub struct Track {
@@ -378,7 +378,7 @@ pub type BlockingTrackQueryResult = Result<Box<TrackState>, SendError<TrackComma
 pub type TrackFn = fn(&mut Track) -> ();
 
 #[derive(Clone, Debug)]
-/// Handle for safe control of an [`Track`] track from other threads, outside
+/// Handle for safe control of a [`Track`] track from other threads, outside
 /// of the audio mixing and voice handling context.
 ///
 /// Almost all method calls here are fallible; in most cases, this will be because
@@ -424,23 +424,23 @@ impl TrackHandle {
         self.send(TrackCommand::Volume(volume))
     }
 
-    /// Denotes whether the underlying [`TrackSource`] stream is compatible with arbitrary seeking.
+    /// Denotes whether the underlying [`Input`] stream is compatible with arbitrary seeking.
     ///
     /// If this returns `false`, all calls to [`seek`] will fail, and the track is
     /// incapable of looping.
     ///
     /// [`seek`]: #method.seek
-    /// [`TrackSource`]: trait.TrackSource.html
+    /// [`Input`]: ../input/struct.Input.html
     pub fn is_seekable(&self) -> bool {
         self.seekable
     }
 
     /// Seeks along the track to the specified position.
     ///
-    /// If the underlying [`TrackSource`] does not support this behaviour,
+    /// If the underlying [`Input`] does not support this behaviour,
     /// then all calls will fail.
     ///
-    /// [`TrackSource`]: trait.TrackSource.html
+    /// [`Input`]: ../input/struct.Input.html
     pub fn seek_time(&self, position: Duration) -> TrackResult {
         if self.seekable {
             self.send(TrackCommand::Seek(position))
@@ -456,7 +456,7 @@ impl TrackHandle {
     /// timely sending of packets, causing audio glitches and delays*.
     ///
     /// [`Track`]: struct.Track.html
-    /// [`EventContext::Track`]: enum.EventContext.html#variant.Track
+    /// [`EventContext::Track`]: ../events/enum.EventContext.html#variant.Track
     pub fn add_event<F>(&self, event: Event, action: F) -> TrackResult 
         where F: FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static
     {

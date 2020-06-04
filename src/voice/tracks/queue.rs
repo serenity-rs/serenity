@@ -58,7 +58,7 @@ use std::{
 /// }
 /// ```
 ///
-/// [`TrackEvent`]: enum.TrackEvent.html
+/// [`TrackEvent`]: ../events/enum.TrackEvent.html
 pub struct TrackQueue {
     inner: Arc<Mutex<TrackQueueCore>>,
 }
@@ -94,7 +94,7 @@ impl TrackQueue {
     /// This is used with [`voice::create_player`] if additional configuration or event handlers
     /// are required before enqueueing the audio track.
     ///
-    /// [`Track`]: struct.Audio.html
+    /// [`Track`]: struct.Track.html
     /// [`voice::create_player`]: fn.create_player.html
     pub fn add(&self, mut track: Track, track_handle: TrackHandle, handler: &mut Handler) {
         info!("Track added to queue.");

@@ -187,9 +187,11 @@ impl MemorySource {
     /// Wrap an existing [`Input`] with an in-memory store of raw 32-bit floating point audio.
     ///
     /// `length_hint` may be used to control the size of the initial chunk, preventing
-    /// needless allocations and copies.
+    /// needless allocations and copies. If this is not present, the value specified in
+    /// `source`'s [`Metadata.duration`] will be used.
     ///
-    /// [`Input`]: struct.Input.html
+    /// [`Input`]: ../struct.Input.html
+    /// [`Metadata.duration`]: ../struct.Metadata.html#structfield.duration
     pub fn new(source: Input, config: Option<CacheConfig>) -> Self {
         let core_raw = RawStore::new(source, EncodingData::FloatPcm, config)
             .expect("This should only be fallible for Opus caches.");
@@ -313,9 +315,11 @@ impl CompressedSource {
     /// Wrap an existing `Input` with an in-memory store, compressed using Opus.
     ///
     /// `length_hint` may be used to control the size of the initial chunk, preventing
-    /// needless allocations and copies.
+    /// needless allocations and copies. If this is not present, the value specified in
+    /// `source`'s [`Metadata.duration`] will be used.
     ///
-    /// [`Input`]: struct.Input.html
+    /// [`Input`]: ../struct.Input.html
+    /// [`Metadata.duration`]: ../struct.Metadata.html#structfield.duration
     pub fn new(source: Input, bitrate: Bitrate, config: Option<CacheConfig>) -> Result<Self> {
         let channels = if source.stereo { Channels::Stereo } else { Channels::Mono };
         let mut encoder = OpusEncoder::new(SampleRate::Hz48000, channels, Application::Audio)?;
@@ -331,7 +335,7 @@ impl CompressedSource {
     /// `length_hint` functions as in [`new`]. This function's behaviour is undefined if your encoder
     /// has a different sample rate than 48kHz, and if the decoder has a different channel count from the source.
     ///
-    /// [`Input`]: struct.Input.html
+    /// [`Input`]: ../struct.Input.html
     /// [`new`]: #method.new
     pub fn with_encoder(source: Input, encoder: OpusEncoder, config: Option<CacheConfig>) -> Result<Self> {
         let encoder_data = EncodingData::Opus{
@@ -549,10 +553,10 @@ pub struct CompressedSourceBase {
 }
 
 impl CompressedSourceBase {
-    /// Create a new handle, suitable for conversion to an [`Input`] or [`Audio`].
+    /// Create a new handle, suitable for conversion to an [`Input`] or [`Track`].
     ///
-    /// [`Input`]: struct.Input.html
-    /// [`Audio`]: struct.Audio.html
+    /// [`Input`]: ../struct.Input.html
+    /// [`Track`]: ../../tracks/struct.Track.html
     pub fn new_handle(&self) -> Result<CompressedSource> {
         Ok(CompressedSource {
             cache: self.cache.new_handle(),

@@ -249,8 +249,8 @@ impl Handler {
     ///
     /// This can be a source created via [`voice::ffmpeg`] or [`voice::ytdl`].
     ///
-    /// [`voice::ffmpeg`]: fn.ffmpeg.html
-    /// [`voice::ytdl`]: fn.ytdl.html
+    /// [`voice::ffmpeg`]: input/fn.ffmpeg.html
+    /// [`voice::ytdl`]: input/fn.ytdl.html
     pub fn play_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
         self.send(VoiceStatus::AddTrack(player));
@@ -278,8 +278,8 @@ impl Handler {
     /// that this allows for direct manipulation of the [`Track`] object
     /// before it is passed over to the voice and mixing contexts.
     ///
-    /// [`voice::create_player`]: fn.create_player.html
-    /// [`Track`]: struct.Audio.html
+    /// [`voice::create_player`]: tracks/fn.create_player.html
+    /// [`Track`]: tracks/struct.Track.html
     /// [`play_source`]: #method.play_source
     pub fn play(&mut self, track: Track) {
         self.send(VoiceStatus::AddTrack(track));
@@ -292,8 +292,8 @@ impl Handler {
     /// channel. Like [`play`], however, this allows for direct manipulation of the
     /// [`Track`] object before it is passed over to the voice and mixing contexts.
     ///
-    /// [`voice::create_player`]: fn.create_player.html
-    /// [`Track`]: struct.Audio.html
+    /// [`voice::create_player`]: tracks/fn.create_player.html
+    /// [`Track`]: tracks/struct.Track.html
     /// [`play_only_source`]: #method.play_only_source
     /// [`play`]: #method.play
     pub fn play_only(&mut self, track: Track) {
@@ -314,19 +314,20 @@ impl Handler {
     /// Stops playing audio from all sources, if any are set.
     pub fn stop(&mut self) { self.send(VoiceStatus::SetTrack(None)) }
 
-    /// Attach a global event handler to an audio context. Global events will receive
-    /// [`EventContext::Global`].
+    /// Attach a global event handler to an audio context. Global events may receive
+    /// any [`EventContext`].
     ///
     /// Global timing events will tick regardless of whether audio is playing,
-    /// so long as the bot is connected to a voice channel, and have `None` tracks.
-    /// TrackEvents will respond to all tracks, giving `Some(...)` audio elements.
+    /// so long as the bot is connected to a voice channel, and have no tracks.
+    /// [`TrackEvent`]s will respond to all relevant tracks, giving some audio elements.
     ///
     /// Users **must** ensure that no costly work or blocking occurs
     /// within the supplied function or closure. *Taking excess time could prevent
     /// timely sending of packets, causing audio glitches and delays*.
     ///
-    /// [`Track`]: struct.Audio.html
-    /// [`EventContext::Global`]: enum.EventContext.html#variant.Global
+    /// [`Track`]: tracks/struct.Track.html
+    /// [`TrackEvent`]: events/enum.TrackEvent.html
+    /// [`EventContext`]: events/enum.EventContext.html
     pub fn add_global_event<F>(&mut self, event: Event, action: F) 
         where F: FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static
     {

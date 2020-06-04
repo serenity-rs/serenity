@@ -28,20 +28,20 @@ use std::{
     time::Duration,
 };
 
-/// Information about which tracks, if any, fired an event.
+/// Information about which tracks or data fired an event.
 ///
-/// Local events ([`Track`]-specific) are guaranteed to have
-/// an attached track, while global timing events will not.
+/// [`Track`] events may be local or global, and have no tracks
+/// if fired on the global context via [`Handler::add_global_event`].
 ///
-/// [`Track`]: struct.Track.html
-/// [`Handler::add_global_event`]: struct.Handler.html#method.add_global_event
+/// [`Track`]: ../tracks/struct.Track.html
+/// [`Handler::add_global_event`]: ../struct.Handler.html#method.add_global_event
 #[derive(Clone, Debug)]
 pub enum EventContext<'a> {
     /// Track event context, passed to events created via [`TrackHandle::add_event`],
     /// [`EventStore::add_event`], or relevant global events.
     ///
     /// [`EventStore::add_event`]: struct.EventStore.html#method.add_event
-    /// [`TrackHandle::add_event`]: struct.TrackHandle.html#method.add_event
+    /// [`TrackHandle::add_event`]: ../tracks/struct.TrackHandle.html#method.add_event
     Track(&'a [(&'a TrackState, &'a TrackHandle)]),
 
     /// Speaking state update, typically describing how another voice
