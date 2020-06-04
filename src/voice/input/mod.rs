@@ -54,6 +54,12 @@ pub enum InputTypeData {
     FloatPcm,
 }
 
+#[non_exhaustive]
+pub enum Container {
+    Raw,
+    Dca,
+}
+
 /// Handle for a child process which ensures that any subprocesses are properly closed
 /// on drop.
 #[derive(Debug)]
@@ -192,11 +198,175 @@ impl<R: Read + Seek> ReadSeek for R {
     }
 }
 
+/// Information about an [`Input`] source.
+///
+/// [`Input`]: struct.Input.html
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct Metadata {
+    pub title: Option<String>,
+    pub artist: Option<String>,
+    pub date: Option<String>,
+
+    pub channels: Option<u8>,
+    pub start_time: Option<Duration>,
+    pub duration: Option<Duration>,
+    pub sample_rate: Option<u32>,
+}
+
+impl Metadata {
+    /// Extract metadata and details from the output of
+    /// `ffprobe`.
+    pub fn from_ffprobe_json(value: &Value) -> Self {
+        let format = value
+            .as_object()
+            .and_then(|m| m.get("format"));
+
+        let duration = format
+            .and_then(|m| m.get("duration"))
+            .and_then(Value::as_str)
+            .and_then(|v| v.parse::<f64>().ok())
+            .map(Duration::from_secs_f64);
+
+        let start_time = format
+            .and_then(|m| m.get("start_time"))
+            .and_then(Value::as_str)
+            .and_then(|v| v.parse::<f64>().ok())
+            .map(Duration::from_secs_f64);
+
+        let tags = format
+            .and_then(|m| m.get("tags"));
+
+        let title = tags
+            .and_then(|m| m.get("title"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+
+        let artist = tags
+            .and_then(|m| m.get("artist"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+
+        let date = tags
+            .and_then(|m| m.get("date"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+
+        let stream = value
+            .as_object()
+            .and_then(|m| m.get("streams"))
+            .and_then(|v| v.as_array())
+            .and_then(|v|
+                v.iter()
+                    .filter(|line|
+                        line.get("codec_type").and_then(Value::as_str) == Some("audio")
+                    )
+                    .nth(0)
+            );
+
+        let channels = stream
+            .and_then(|m| m.get("channels"))
+            .and_then(Value::as_u64)
+            .map(|v| v as u8);
+
+        let sample_rate = stream
+            .and_then(|m| m.get("sample_rate"))
+            .and_then(Value::as_str)
+            .and_then(|v| v.parse::<u64>().ok())
+            .map(|v| v as u32);
+
+        Self {
+            title,
+            artist,
+            date,
+
+            channels,
+            start_time,
+            duration,
+            sample_rate,
+        }
+    }
+
+    /// Use `youtube-dl` to extract metadata for an online resource.
+    pub fn from_ytdl_uri(uri: &str) -> Self {
+        let args = ["-s", "-j"];
+
+        let out: Option<Value> = Command::new("youtube-dl")
+            .args(&args)
+            .arg(uri)
+            .stdin(Stdio::null())
+            .output()
+            .ok()
+            .and_then(|r| serde_json::from_reader(&r.stdout[..]).ok());
+
+        let value = out.unwrap_or_default();
+        let obj = value.as_object();
+
+        let track = obj
+            .and_then(|m| m.get("track"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+
+        let title = track.or_else(|| obj
+            .and_then(|m| m.get("title"))
+            .and_then(Value::as_str)
+            .map(str::to_string)
+        );
+
+        let artist = obj
+            .and_then(|m| m.get("artist"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+
+        let r_date = obj
+            .and_then(|m| m.get("release_date"))
+            .and_then(Value::as_str)
+            .map(str::to_string);
+
+        let date = r_date.or_else(|| obj
+            .and_then(|m| m.get("upload_date"))
+            .and_then(Value::as_str)
+            .map(str::to_string)
+        );
+
+        let duration = obj
+            .and_then(|m| m.get("duration"))
+            .and_then(Value::as_f64)
+            .map(Duration::from_secs_f64);
+
+        Self {
+            title,
+            artist,
+            date,
+
+            channels: Some(2),
+            duration,
+            sample_rate: Some(SAMPLE_RATE_RAW as u32),
+
+            ..Default::default()
+        }
+    }
+
+    /// Move all fields from a `Metadata` object into a new one.
+    pub fn take(&mut self) -> Self {
+        Self {
+            title: self.title.take(),
+            artist: self.artist.take(),
+            date: self.date.take(),
+
+            channels: self.channels.take(),
+            start_time: self.start_time.take(),
+            duration: self.duration.take(),
+            sample_rate: self.sample_rate.take(),
+        }
+    }
+}
+
 /// Data and metadata needed to correctly parse a [`Reader`]'s audio bytestream.
 ///
 /// [`Reader`]: enum.Reader.html
 #[derive(Debug)]
 pub struct Input {
+    pub metadata: Metadata,
     pub stereo: bool,
     pub reader: Reader,
     pub kind: InputType,
@@ -206,6 +376,7 @@ pub struct Input {
 impl Input {
     pub fn float_pcm(is_stereo: bool, reader: Reader) -> Input {
         Input {
+            metadata: Default::default(),
             stereo: is_stereo,
             reader,
             kind: InputType::FloatPcm,
@@ -213,8 +384,9 @@ impl Input {
         }
     }
 
-    pub fn new(stereo: bool, reader: Reader, kind: InputType, decoder: Option<Arc<Mutex<OpusDecoder>>>) -> Self {
+    pub fn new(stereo: bool, reader: Reader, kind: InputType, decoder: Option<Arc<Mutex<OpusDecoder>>>, metadata: Option<Metadata>) -> Self {
         Input {
+            metadata: metadata.unwrap_or_default(),
             stereo,
             reader,
             kind,
@@ -314,7 +486,6 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 let raw = match self.read_i16::<LittleEndian>() {
                     Ok(v) => v,
                     Err(ref e) => {
-                        warn!("abrupt end? {:?}", e);
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(i)
                         } else {
@@ -459,8 +630,9 @@ pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
 
 fn _ffmpeg(path: &OsStr) -> Result<Input> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
-    let is_stereo = is_stereo(path).unwrap_or(false);
-    let stereo_val = if is_stereo { "2" } else { "1" };
+    let is_stereo = is_stereo(path.as_ref())
+        .unwrap_or_else(|_e| (false, Default::default()));
+    let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
     _ffmpeg_optioned(path, &[], &[
         "-f",
@@ -514,11 +686,11 @@ fn _ffmpeg_optioned(
     path: &OsStr,
     pre_input_args: &[&str],
     args: &[&str],
-    is_stereo_known: Option<bool>,
+    is_stereo_known: Option<(bool, Metadata)>,
 ) -> Result<Input> {
-    let is_stereo = is_stereo_known
+    let (is_stereo, metadata) = is_stereo_known
         .or_else(|| is_stereo(path).ok())
-        .unwrap_or(false);
+        .unwrap_or_else(|| (false, Default::default()));
 
     let command = Command::new("ffmpeg")
         .args(pre_input_args)
@@ -530,7 +702,7 @@ fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), InputType::FloatPcm, None))
+    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), InputType::FloatPcm, None, Some(metadata)))
 }
 
 // /// Creates a streamed audio source from a DCA file.
@@ -645,7 +817,11 @@ fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), InputType::FloatPcm, None))
+    let metadata = Metadata::from_ytdl_uri(uri);
+
+    debug!("[Voice] ytdl metadata {:?}", metadata);
+
+    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), InputType::FloatPcm, None, Some(metadata)))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
@@ -654,8 +830,8 @@ pub fn ytdl_search(name: &str) -> Result<Input> {
     ytdl(&format!("ytsearch1:{}",name))
 }
 
-fn is_stereo(path: &OsStr) -> Result<bool> {
-    let args = ["-v", "quiet", "-of", "json", "-show_streams", "-i"];
+fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
+    let args = ["-v", "quiet", "-of", "json", "-show_format", "-show_streams", "-i"];
 
     let out = Command::new("ffprobe")
         .args(&args)
@@ -665,21 +841,15 @@ fn is_stereo(path: &OsStr) -> Result<bool> {
 
     let value: Value = serde_json::from_reader(&out.stdout[..])?;
 
-    let streams = value
-        .as_object()
-        .and_then(|m| m.get("streams"))
-        .and_then(|v| v.as_array())
-        .ok_or(Error::Voice(VoiceError::Streams))?;
+    let metadata = Metadata::from_ffprobe_json(&value);
 
-    let check = streams.iter().any(|stream| {
-        let channels = stream
-            .as_object()
-            .and_then(|m| m.get("channels").and_then(|v| v.as_i64()));
+    debug!("[Voice] FFprobe metadata {:?}", metadata);
 
-        channels == Some(2)
-    });
-
-    Ok(check)
+    if let Some(count) = metadata.channels {
+        Ok((count == 2, metadata))
+    } else {
+        Err(Error::Voice(VoiceError::Streams))
+    }
 }
 
 /// A wrapper around a method to create a new [`AudioSource`] which
@@ -723,8 +893,9 @@ impl RestartableSource {
         Self::new(move |time: Option<Duration>| {
             if let Some(time) = time {
 
-                let is_stereo = is_stereo(path.as_ref()).unwrap_or(false);
-                let stereo_val = if is_stereo { "2" } else { "1" };
+                let is_stereo = is_stereo(path.as_ref())
+                    .unwrap_or_else(|_e| (false, Default::default()));
+                let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
                 let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
                 _ffmpeg_optioned(path.as_ref(), &[
@@ -785,8 +956,9 @@ impl Debug for RestartableSource {
 }
 
 impl From<RestartableSource> for Input {
-    fn from(src: RestartableSource) -> Self {
+    fn from(mut src: RestartableSource) -> Self {
         Self {
+            metadata: src.source.metadata.take(),
             stereo: src.source.stereo,
             kind: src.source.kind,
             decoder: None,

@@ -66,7 +66,7 @@ use std::{
     },
     time::Duration,
 };
-use super::{utils, Input, ReadAudioExt, Reader};
+use super::{utils, Input, Metadata, ReadAudioExt, Reader};
 
 /// Expected amount of time that an input should last.
 #[derive(Copy, Clone, Debug)]
@@ -222,7 +222,12 @@ impl MemorySource {
 
 impl From<MemorySource> for Input {
     fn from(src: MemorySource) -> Self {
+        let metadata = src.cache.core.metadata()
+            .map(|m| m.clone())
+            .unwrap_or_default();
+
         Self {
+            metadata,
             stereo: src.cache.core.is_stereo(),
             kind: InputType::FloatPcm,
             decoder: None,
@@ -397,7 +402,12 @@ impl CompressedSource {
 
 impl From<CompressedSource> for Input {
     fn from(src: CompressedSource) -> Self {
+        let metadata = src.cache.core.metadata()
+            .map(|m| m.clone())
+            .unwrap_or_default();
+
         Input {
+            metadata,
             stereo: src.cache.core.is_stereo(),
             kind: InputType::FloatPcm,
             decoder: None,
@@ -614,6 +624,13 @@ impl SharedStore {
     fn do_finalise(&self) {
         self.get_mut_ref()
             .do_finalise()
+    }
+
+    fn metadata(&self) -> Option<&Metadata> {
+        self.get_mut_ref()
+            .source
+            .as_ref()
+            .map(|input| &input.metadata)
     }
 }
 
@@ -838,7 +855,11 @@ impl RawStore {
             config.chunk_size = cost_per_sec * 5;
         };
 
-        let mut start_size = if let Some(length) = config.length_hint {
+        // Metadata could also provide a time.
+        let length_hint = config.length_hint
+            .or_else(|| source.metadata.duration.map(LengthHint::Time));
+
+        let mut start_size = if let Some(length) = length_hint {
             match length {
                 LengthHint::Bytes(a) => a,
                 LengthHint::Time(t) => {
@@ -1027,7 +1048,7 @@ impl RawStore {
     // Note: if you get a Rope, you need to later call remove_rope to remain sound.
     // This call has the side effect of trying to safely delete the rope.
     fn get_location(&mut self) -> (CacheReadLocation, FinaliseState) {
-        let mut finalised = self.finalised();
+        let finalised = self.finalised();
 
         let loc = if finalised.is_backing_ready() {
             // try to remove rope.
