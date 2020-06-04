@@ -1175,7 +1175,7 @@ impl Http {
     ///
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// let guilds = http.as_ref().get_guilds(&GuildPagination::After(guild_id), 10).unwrap();
+    /// let guilds = http.as_ref().get_guilds(&GuildPagination::After(guild_id), Some(10)).unwrap();
     /// ```
     ///
     /// [docs]: https://discord.com/developers/docs/resources/user#get-current-user-guilds
