@@ -1,9 +1,13 @@
 //! Raw audio input data streams and sources.
 
 pub mod cached;
+mod dca;
 pub mod utils;
 
-use audiopus::coder::Decoder as OpusDecoder;
+use audiopus::{
+    coder::Decoder as OpusDecoder,
+    Channels,
+};
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::{CompressedSource, MemorySource};
 use crate::{
@@ -11,12 +15,15 @@ use crate::{
     prelude::SerenityError,
     voice::{
         constants::*,
+        error::DcaError,
         VoiceError,
     },
 };
+use dca::DcaMetadata;
 use log::{debug, warn};
 use parking_lot::Mutex;
 use std::{
+    fs::File,
     ffi::OsStr,
     fmt::{
         Debug,
@@ -39,6 +46,9 @@ use std::{
     time::Duration,
 };
 
+/// Type of data being passed into an [`Input`].
+///
+/// [`Input`]: struct.Input.html
 #[non_exhaustive]
 #[derive(Copy, Clone, Debug)]
 pub enum InputType {
@@ -47,17 +57,76 @@ pub enum InputType {
     FloatPcm,
 }
 
+impl InputType {
+    pub fn sample_len(&self) -> usize {
+        use InputType::*;
+
+        match self {
+            Opus | FloatPcm => mem::size_of::<f32>(),
+            Pcm => mem::size_of::<i16>(),
+            _ => unimplemented!(),
+        }
+    }
+}
+
+/// State used to decode input bytes of an [`Input`].
+///
+/// [`Input`]: struct.Input.html
 #[non_exhaustive]
+#[derive(Clone, Debug)]
 pub enum InputTypeData {
-    Opus(OpusDecoder),
+    Opus(Arc<Mutex<OpusDecoder>>),
     Pcm,
     FloatPcm,
 }
 
+impl From<&InputTypeData> for InputType {
+    fn from(f: &InputTypeData) -> Self {
+        use InputTypeData::*;
+
+        match f {
+            Opus(_) => Self::Opus,
+            Pcm => Self::Pcm,
+            FloatPcm => Self::FloatPcm,
+        }
+    }
+}
+
+/// Information used in audio frame detection.
+pub struct Frame {
+    pub header_len: usize,
+    pub frame_len: usize,
+}
+
+/// Marker for decoding framed input files.
 #[non_exhaustive]
+#[derive(Clone, Copy, Debug)]
 pub enum Container {
     Raw,
     Dca,
+}
+
+impl Container {
+    pub fn next_frame_length(&mut self, mut reader: impl Read, input: InputType) -> IoResult<Frame> {
+        use Container::*;
+
+        match self {
+            Raw => Ok(Frame{header_len: 0, frame_len: input.sample_len()}),
+            Dca => reader.read_i16::<LittleEndian>().map(|frame_len| Frame {
+                header_len: mem::size_of::<i16>(),
+                frame_len: frame_len.min(0) as usize,
+            }),
+        }
+    }
+
+    pub fn is_seek_trivial(&self) -> bool {
+        use Container::*;
+
+        match self {
+            Raw => true,
+            _ => false,
+        }
+    }
 }
 
 /// Handle for a child process which ensures that any subprocesses are properly closed
@@ -106,6 +175,7 @@ pub enum Reader {
     InMemory(MemorySource),
     Compressed(CompressedSource),
     Restartable(RestartableSource),
+    File(BufReader<File>),
     Extension(Box<dyn Read + Send>),
     ExtensionSeek(Box<dyn ReadSeek + Send>),
 }
@@ -131,6 +201,7 @@ impl Read for Reader {
             InMemory(a) => Read::read(a, buffer),
             Compressed(a) => Read::read(a, buffer),
             Restartable(a) => Read::read(a, buffer),
+            File(a) => Read::read(a, buffer),
             Extension(a) => a.read(buffer),
             ExtensionSeek(a) => a.read(buffer),
         }
@@ -146,6 +217,7 @@ impl Seek for Reader {
                 "Seeking not supported on Reader of this type.")),
             InMemory(a) => Seek::seek(a, pos),
             Compressed(a) => Seek::seek(a, pos),
+            File(a) => Seek::seek(a, pos),
             Restartable(a) => Seek::seek(a, pos),
             ExtensionSeek(a) => a.seek(pos),
         }
@@ -160,6 +232,7 @@ impl Debug for Reader {
             InMemory(a) => format!("{:?}", a),
             Compressed(a) => format!("{:?}", a),
             Restartable(a) => format!("{:?}", a),
+            File(a) => format!("{:?}", a),
             Extension(_) => "Extension".to_string(),
             ExtensionSeek(_) => "ExtensionSeek".to_string(),
         };
@@ -369,8 +442,8 @@ pub struct Input {
     pub metadata: Metadata,
     pub stereo: bool,
     pub reader: Reader,
-    pub kind: InputType,
-    pub decoder: Option<Arc<Mutex<OpusDecoder>>>,
+    pub kind: InputTypeData,
+    pub container: Container,
 }
 
 impl Input {
@@ -379,18 +452,18 @@ impl Input {
             metadata: Default::default(),
             stereo: is_stereo,
             reader,
-            kind: InputType::FloatPcm,
-            decoder: None,
+            kind: InputTypeData::FloatPcm,
+            container: Container::Raw,
         }
     }
 
-    pub fn new(stereo: bool, reader: Reader, kind: InputType, decoder: Option<Arc<Mutex<OpusDecoder>>>, metadata: Option<Metadata>) -> Self {
+    pub fn new(stereo: bool, reader: Reader, kind: InputTypeData, container: Container, metadata: Option<Metadata>) -> Self {
         Input {
             metadata: metadata.unwrap_or_default(),
             stereo,
             reader,
             kind,
-            decoder,
+            container,
         }
     }
 
@@ -403,30 +476,14 @@ impl Input {
     }
 
     pub fn get_type(&self) -> InputType {
-        self.kind
+        (&self.kind).into()
     }
 
     #[inline]
     pub fn mix(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> usize {
-        match self.kind {
-            InputType::Opus => unimplemented!(),
-                    // if self.reader.decode_and_add_opus_frame(&mut float_buffer, vol).is_some() {
-                    //     0 //; opus_frame.len()
-                    // } else {
-                    //     0
-                    // },
-            InputType::Pcm => {
-                match self.reader.add_pcm_frame(float_buffer, self.stereo, volume) {
-                    Some(len) => len,
-                    None => 0,
-                }
-            },
-            InputType::FloatPcm => {
-                match self.reader.add_float_pcm_frame(float_buffer, self.stereo, volume) {
-                    Some(len) => len,
-                    None => 0,
-                }
-            },
+        match self.reader.add_float_pcm_frame(float_buffer, self.stereo, volume) {
+            Some(len) => len,
+            None => 0,
         }
     }
 
@@ -445,11 +502,34 @@ impl Read for Input {
         // to floating point output.
         let float_space = buffer.len() / mem::size_of::<f32>();
         let mut written_floats = 0;
-        // Read::read(&mut self.reader, buffer)
-        match self.kind {
-            InputType::Opus => unimplemented!(),
-            InputType::Pcm => {
-                //FIXME: probably stifiling an error.
+
+        match &mut self.kind {
+            InputTypeData::Opus(decoder) => {
+                if matches!(self.container, Container::Raw) {
+                    return Err(IoError::new(
+                        IoErrorKind::InvalidInput,
+                        "Raw container cannot demarcate Opus frames.")
+                    );
+                }
+
+                let mut opus_data_buffer = [0u8; 4000];
+                let mut opus_out_buffer = [0f32; STEREO_FRAME_SIZE];
+
+                let frame = self.container.next_frame_length(&mut self.reader, InputType::Opus)?;
+
+                let seen = Read::read(&mut self.reader, &mut opus_data_buffer[..frame.frame_len])?;
+                let mut decoder = decoder.lock();
+                let samples = decoder.decode_float(Some(&opus_data_buffer[..seen]), &mut opus_out_buffer[..], false)
+                    .unwrap_or(0);
+
+                let mut buffer = &mut buffer[..];
+                while written_floats < float_space.min(samples) {
+                    buffer.write_f32::<LittleEndian>(opus_out_buffer[written_floats])?;
+                    written_floats += 1;
+                }
+                Ok(written_floats * mem::size_of::<f32>())
+            },
+            InputTypeData::Pcm => {
                 let mut buffer = &mut buffer[..];
                 while written_floats < float_space {
                     if let Ok(signal) = self.reader.read_i16::<LittleEndian>() {
@@ -459,9 +539,9 @@ impl Read for Input {
                         break;
                     }
                 }
-                Ok(written_floats)
+                Ok(written_floats * mem::size_of::<f32>())
             },
-            InputType::FloatPcm => {
+            InputTypeData::FloatPcm => {
                 Read::read(&mut self.reader, buffer)
             },
         }
@@ -470,59 +550,12 @@ impl Read for Input {
 
 /// Extension trait to pull frames of audio from a byte source.
 pub trait ReadAudioExt {
-    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
-
     fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
 
     fn consume(&mut self, amt: usize) -> usize where Self: Sized;
 }
 
 impl<R: Read + Sized> ReadAudioExt for R {
-    fn add_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize> {
-        // Duplicate this to avoid repeating the stereo check.
-        // This should let us unconditionally duplicate samples in the main loop body.
-        if true_stereo {
-            for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
-                let raw = match self.read_i16::<LittleEndian>() {
-                    Ok(v) => v,
-                    Err(ref e) => {
-                        return if e.kind() == IoErrorKind::UnexpectedEof {
-                            Some(i)
-                        } else {
-                            None
-                        }
-                    },
-                };
-                let sample = f32::from(raw) / 32768.0;
-
-                *float_buffer_element += sample * volume;
-            }
-        } else {
-            let mut float_index = 0;
-            for i in 0..float_buffer.len() / 2 {
-                let raw = match self.read_i16::<LittleEndian>() {
-                    Ok(v) => v,
-                    Err(ref e) => {
-                        warn!("abrupt end? {:?}", e);
-                        return if e.kind() == IoErrorKind::UnexpectedEof {
-                            Some(i)
-                        } else {
-                            None
-                        }
-                    },
-                };
-                let sample = volume * f32::from(raw) / 32768.0;
-
-                float_buffer[float_index] += sample;
-                float_buffer[float_index+1] += sample;
-
-                float_index += 2;
-            }
-        }
-
-        Some(float_buffer.len())
-    }
-
     fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], stereo: bool, volume: f32) -> Option<usize> {
         if stereo {
             for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
@@ -570,58 +603,6 @@ impl<R: Read + Sized> ReadAudioExt for R {
         io::copy(&mut self.by_ref().take(amt as u64), &mut io::sink()).unwrap_or(0) as usize
     }
 }
-
-// impl AudioSource for Input {
-//     // FIXME: COMPLETELY BROKEN
-//     // this assumes DCA exculsively.
-//     // DOES NOT WORK FOR OPUS IN THE GENERAL CASE.
-//     fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
-//         match self.reader.read_i16::<LittleEndian>() {
-//             Ok(size) => {
-//                 if size <= 0 {
-//                     warn!("Invalid opus frame size: {}", size);
-//                     return None;
-//                 }
-
-//                 let mut frame = Vec::with_capacity(size as usize);
-
-//                 {
-//                     let reader = self.reader.by_ref();
-
-//                     if reader.take(size as u64).read_to_end(&mut frame).is_err() {
-//                         return None;
-//                     }
-//                 }
-
-//                 Some(frame)
-//             },
-//             Err(ref e) => if e.kind() == IoErrorKind::UnexpectedEof {
-//                 Some(Vec::new())
-//             } else {
-//                 None
-//             },
-//         }
-//     }
-
-//     fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> Option<usize> {
-//         let decoder_lock = self.decoder.as_mut()?.clone();
-//         let frame = self.read_opus_frame()?;
-//         let mut local_buf = [0f32; 960 * 2];
-
-//         let count = {
-//             let mut decoder = decoder_lock.lock();
-
-//             decoder.decode_float(frame.as_slice(), &mut local_buf[..], false).ok()?
-//         };
-
-//         for (i, float_buffer_element) in float_buffer.iter_mut().enumerate().take(1920) {
-//             *float_buffer_element += local_buf[i] * volume;
-//         }
-
-//         Some(count)
-//     }
-// }
-
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.
 pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
@@ -702,73 +683,64 @@ fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), InputType::FloatPcm, None, Some(metadata)))
+    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), InputTypeData::FloatPcm, Container::Raw, Some(metadata)))
 }
 
-// /// Creates a streamed audio source from a DCA file.
-// /// Currently only accepts the [DCA1 format](https://github.com/bwmarrin/dca).
-// pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<dyn AudioSource>, DcaError> {
-//     _dca(path.as_ref())
-// }
+/// Creates a streamed audio source from a DCA file.
+/// Currently only accepts the [DCA1 format](https://github.com/bwmarrin/dca).
+pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Input, DcaError> {
+    _dca(path.as_ref())
+}
 
-// fn _dca(path: &OsStr) -> StdResult<Box<dyn AudioSource>, DcaError> {
-//     let file = File::open(path).map_err(DcaError::IoError)?;
+fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
+    let file = File::open(path).map_err(DcaError::IoError)?;
 
-//     let mut reader = BufReader::new(file);
+    let mut reader = BufReader::new(file);
 
-//     let mut header = [0u8; 4];
+    let mut header = [0u8; 4];
 
-//     // Read in the magic number to verify it's a DCA file.
-//     reader.read_exact(&mut header).map_err(DcaError::IoError)?;
+    // Read in the magic number to verify it's a DCA file.
+    reader.read_exact(&mut header).map_err(DcaError::IoError)?;
 
-//     if header != b"DCA1"[..] {
-//         return Err(DcaError::InvalidHeader);
-//     }
+    if header != b"DCA1"[..] {
+        return Err(DcaError::InvalidHeader);
+    }
 
-//     reader.read_exact(&mut header).map_err(DcaError::IoError)?;
+    reader.read_exact(&mut header).map_err(DcaError::IoError)?;
 
-//     let size = (&header[..]).read_i32::<LittleEndian>().unwrap();
+    let size = (&header[..]).read_i32::<LittleEndian>().unwrap();
 
-//     // Sanity check
-//     if size < 2 {
-//         return Err(DcaError::InvalidSize(size));
-//     }
+    // Sanity check
+    if size < 2 {
+        return Err(DcaError::InvalidSize(size));
+    }
 
-//     let mut raw_json = Vec::with_capacity(size as usize);
+    let mut raw_json = Vec::with_capacity(size as usize);
 
-//     {
-//         let json_reader = reader.by_ref();
-//         json_reader
-//             .take(size as u64)
-//             .read_to_end(&mut raw_json)
-//             .map_err(DcaError::IoError)?;
-//     }
+    {
+        let json_reader = reader.by_ref();
+        json_reader
+            .take(size as u64)
+            .read_to_end(&mut raw_json)
+            .map_err(DcaError::IoError)?;
+    }
 
-//     let metadata = serde_json::from_slice::<DcaMetadata>(raw_json.as_slice())
-//         .map_err(DcaError::InvalidMetadata)?;
+    let metadata: Metadata = serde_json::from_slice::<DcaMetadata>(raw_json.as_slice())
+        .map_err(DcaError::InvalidMetadata)?
+        .into();
 
-//     Ok(opus(metadata.is_stereo(), reader))
-// }
+    let stereo = metadata.channels == Some(2);
 
-// /// Creates an Opus audio source. This makes certain assumptions: namely, that the input stream
-// /// is composed ONLY of opus frames of the variety that Discord expects.
-// ///
-// /// If you want to decode a `.opus` file, use [`ffmpeg`]
-// ///
-// /// [`ffmpeg`]: fn.ffmpeg.html
-// pub fn opus<R: Read + Send + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource + Send> {
-//     Box::new(Input {
-//         stereo: is_stereo,
-//         reader,
-//         kind: InputType::Opus,
-//         decoder: Some(
-//             Arc::new(Mutex::new(
-//                 // We always want to decode *to* stereo, for mixing reasons.
-//                 OpusDecoder::new(audio::SAMPLE_RATE, Channels::Stereo).unwrap()
-//             ))
-//         ),
-//     })
-// }
+    Ok(Input {
+        metadata,
+        stereo,
+        reader: Reader::File(reader),
+        kind: InputTypeData::Opus(
+            Arc::new(Mutex::new(OpusDecoder::new(SAMPLE_RATE, Channels::Stereo).map_err(DcaError::Opus)?))
+        ),
+        container: Container::Dca,
+    })
+}
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub fn ytdl(uri: &str) -> Result<Input> {
@@ -821,7 +793,7 @@ fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
 
     debug!("[Voice] ytdl metadata {:?}", metadata);
 
-    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), InputType::FloatPcm, None, Some(metadata)))
+    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), InputTypeData::FloatPcm, Container::Raw, Some(metadata)))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
@@ -957,13 +929,14 @@ impl Debug for RestartableSource {
 
 impl From<RestartableSource> for Input {
     fn from(mut src: RestartableSource) -> Self {
+        let kind = src.source.kind.clone();
         Self {
             metadata: src.source.metadata.take(),
             stereo: src.source.stereo,
-            kind: src.source.kind,
-            decoder: None,
+            kind,
+            container: src.source.container,
 
-            reader: Reader::Restartable(src),   
+            reader: Reader::Restartable(src), 
         }
     }
 }

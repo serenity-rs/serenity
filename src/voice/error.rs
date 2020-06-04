@@ -1,3 +1,4 @@
+use audiopus::Error as OpusError;
 use serde_json::{Error as JsonError, Value};
 use std::{
     io::Error as IoError,
@@ -42,6 +43,5 @@ pub enum DcaError {
     InvalidHeader,
     InvalidMetadata(JsonError),
     InvalidSize(i32),
-    #[doc(hidden)]
-    __Nonexhaustive,
+    Opus(OpusError),
 }

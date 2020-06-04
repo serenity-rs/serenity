@@ -32,7 +32,11 @@ use crate::{
     internal::prelude::*,
     voice::{
         constants::*,
-        input::InputType,
+        input::{
+            Container,
+            InputType,
+            InputTypeData,
+        },
     },
 };
 use log::{debug, info, warn};
@@ -231,8 +235,8 @@ impl From<MemorySource> for Input {
         Self {
             metadata,
             stereo: src.cache.core.is_stereo(),
-            kind: InputType::FloatPcm,
-            decoder: None,
+            kind: InputTypeData::FloatPcm,
+            container: Container::Raw,
 
             reader: Reader::InMemory(src),
         }
@@ -413,8 +417,8 @@ impl From<CompressedSource> for Input {
         Input {
             metadata,
             stereo: src.cache.core.is_stereo(),
-            kind: InputType::FloatPcm,
-            decoder: None,
+            kind: InputTypeData::FloatPcm,
+            container: Container::Raw,
 
             reader: Reader::Compressed(src),
         }   

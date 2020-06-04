@@ -3,7 +3,6 @@
 mod connection;
 mod connection_info;
 mod constants;
-mod dca;
 mod error;
 pub mod events;
 mod handler;
@@ -16,7 +15,6 @@ pub mod tracks;
 pub use audiopus::{self as opus, Bitrate};
 pub use discortp as packet;
 pub use self::{
-    dca::DcaMetadata,
     error::{DcaError, VoiceError},
     events::{CoreEvent, Event, EventContext, TrackEvent},
     handler::Handler,
