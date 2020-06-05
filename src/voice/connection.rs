@@ -70,7 +70,7 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) fn new(mut info: ConnectionInfo, interconnect: &Interconnect) -> Result<Connection> {
+    pub(crate) fn new(mut info: ConnectionInfo, interconnect: &Interconnect, bitrate: Bitrate) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
         #[cfg(not(feature = "native_tls_backend"))]
@@ -159,7 +159,7 @@ impl Connection {
 
         // Encode for Discord in Stereo, as required.
         let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
-        encoder.set_bitrate(DEFAULT_BITRATE)?;
+        encoder.set_bitrate(bitrate)?;
         let soft_clip = SoftClip::new(Channels::Stereo);
 
         info!(
@@ -207,7 +207,6 @@ impl Connection {
 
         // Thread may have died, we want to send to prompt a clean exit
         // (if at all possible) and then proceed as normal.
-        // let _ = self.thread_items.ws_close_sender.send(0);
 
         #[cfg(not(feature = "native_tls_backend"))]
         let mut client = create_rustls_client(url)?;
@@ -259,44 +258,44 @@ impl Connection {
     }
 
     #[inline]
-    fn mix_tracks(
+    fn mix_tracks<'a>(
         &mut self,
         tracks: &mut Vec<Track>,
-        _opus_frame: &[u8],
-        mut mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
+        opus_frame: &'a mut [u8],
+        mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
         interconnect: &Interconnect,
-    ) -> Result<usize> {
+    ) -> Result<(usize, &'a[u8])> {
         let mut len = 0;
-        let mut i = 0;
 
-        while i < tracks.len() {
-            let aud = tracks.get_mut(i).unwrap();
-            let vol = aud.volume;
-            let stream = &mut aud.source;
+        for (i, track) in tracks.iter_mut().enumerate() {
+            let vol = track.volume;
+            let stream = &mut track.source;
 
-            if aud.playing != PlayMode::Play {          
-                i += 1;
+            if track.playing != PlayMode::Play {
                 continue;
             }
 
-            let temp_len = stream.mix(&mut mix_buffer, vol);
+            let temp_len = stream.mix(mix_buffer, vol);
 
             len = len.max(temp_len);
             if temp_len > 0 {
-                aud.step_frame();
-            } else if aud.do_loop() {
-                if let Some(time) = aud.seek_time(Default::default()) {
+                track.step_frame();
+            } else if track.do_loop() {
+                if let Some(time) = track.seek_time(Default::default()) {
                     let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
-                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(aud.loops, false)));
+                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(track.loops, false)));
                 }
             } else {
-                aud.end();
+                track.end();
             }
-
-            i += 1;
         };
 
-        Ok(len)
+        // If opus frame passthorugh were supported, we'd do it in this function.
+        // This requires that we have only one track, who has volume 1.0, and an
+        // Opus codec type.
+        //
+        // For now, we make this override possible but don't perform the work itself.
+        Ok((len, &opus_frame[..0]))
     }
 
     #[inline]
@@ -313,29 +312,17 @@ impl Connection {
                 bitrate: Bitrate,
                 interconnect: &Interconnect)
                  -> Result<()> {
-        // We need to actually reserve enough space for the desired bitrate.
-        let size = match bitrate {
-            // If user specified, we can calculate. 20ms means 50fps.
-            Bitrate::BitsPerSecond(b) => b / 50,
-            // Otherwise, just have a lot preallocated.
-            _ => 5120,
-        } + 16;
+        let mut opus_frame_backing = [0u8; STEREO_FRAME_SIZE];
+        let mut mix_buffer = [0f32; STEREO_FRAME_SIZE];
 
-        let mut buffer = [0i16; 960 * 2];
-        let mut mix_buffer = [0f32; 960 * 2];
+        // Slice which mix tracks may use to passthrough direct Opus frames.
+        let mut opus_space = &mut opus_frame_backing[..];
 
-        // Reconfigure encoder bitrate.
-        // From my testing, it seemed like this needed to be set every cycle.
-        // FIXME: test ths again...
-        if let Err(e) = self.encoder.set_bitrate(bitrate) {
-            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
-        }
-
-        let mut opus_frame = Vec::new();
+        println!("{:?}", self.encoder.bitrate());
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.mix_tracks(&mut tracks, &opus_frame, &mut mix_buffer, interconnect)?;
+        let (len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -344,7 +331,7 @@ impl Connection {
                 self.silence_frames -= 1;
 
                 // Explicit "Silence" frame.
-                opus_frame.extend_from_slice(&SILENT_FRAME);
+                opus_frame = &SILENT_FRAME[..];
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 interconnect.aux_packets.send(AuxPacketMessage::Speaking(false))?;
@@ -355,20 +342,21 @@ impl Connection {
             }
         } else {
             self.silence_frames = 5;
-
-            for value in &mut buffer[len..] {
-                *value = 0;
-            }
         }
 
         interconnect.aux_packets.send(AuxPacketMessage::Speaking(true))?;
 
-        self.prep_and_send_packet(mix_buffer, &opus_frame)?;
+        self.prep_and_send_packet(mix_buffer, opus_frame)?;
         audio_timer.r#await();
 
         self.audio_commands_events(&mut tracks, interconnect);
 
         Ok(())
+    }
+
+    pub(crate) fn set_bitrate(&mut self, bitrate: Bitrate) -> Result<()> {
+        self.encoder.set_bitrate(bitrate)
+            .map_err(Into::into)
     }
 
     fn prep_and_send_packet(&mut self, buffer: [f32; 1920], opus_frame: &[u8]) -> Result<()> {

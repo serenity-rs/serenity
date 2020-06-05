@@ -151,7 +151,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         loop {
             match rx.try_recv() {
                 Ok(Status::Connect(info)) => {
-                    connection = match Connection::new(info, &interconnect) {
+                    connection = match Connection::new(info, &interconnect, bitrate) {
                         Ok(connection) => Some(connection),
                         Err(why) => {
                             warn!("[Voice] Error connecting: {:?}", why);
@@ -182,6 +182,11 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 },
                 Ok(Status::SetBitrate(b)) => {
                     bitrate = b;
+                    if let Some(conn) = connection.as_mut() {
+                        if let Err(e) = conn.set_bitrate(b) {
+                            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
+                        }
+                    }
                 },
                 Ok(Status::AddEvent(evt)) => {
                     let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
@@ -295,7 +300,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 };
 
                 if full_connect {
-                    connection = Connection::new(info, &interconnect)
+                    connection = Connection::new(info, &interconnect, bitrate)
                         .map_err(|e| {error!("[Voice] Catastrophic connection failure. Stopping. {:?}", e); e})
                         .ok();
                 }
