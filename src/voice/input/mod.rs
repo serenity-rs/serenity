@@ -51,15 +51,15 @@ use std::{
 /// [`Input`]: struct.Input.html
 #[non_exhaustive]
 #[derive(Copy, Clone, Debug)]
-pub enum InputType {
+pub enum CodecType {
     Opus,
     Pcm,
     FloatPcm,
 }
 
-impl InputType {
+impl CodecType {
     pub fn sample_len(&self) -> usize {
-        use InputType::*;
+        use CodecType::*;
 
         match self {
             Opus | FloatPcm => mem::size_of::<f32>(),
@@ -74,15 +74,15 @@ impl InputType {
 /// [`Input`]: struct.Input.html
 #[non_exhaustive]
 #[derive(Clone, Debug)]
-pub enum InputTypeData {
+pub enum Codec {
     Opus(Arc<Mutex<OpusDecoder>>),
     Pcm,
     FloatPcm,
 }
 
-impl From<&InputTypeData> for InputType {
-    fn from(f: &InputTypeData) -> Self {
-        use InputTypeData::*;
+impl From<&Codec> for CodecType {
+    fn from(f: &Codec) -> Self {
+        use Codec::*;
 
         match f {
             Opus(_) => Self::Opus,
@@ -107,7 +107,7 @@ pub enum Container {
 }
 
 impl Container {
-    pub fn next_frame_length(&mut self, mut reader: impl Read, input: InputType) -> IoResult<Frame> {
+    pub fn next_frame_length(&mut self, mut reader: impl Read, input: CodecType) -> IoResult<Frame> {
         use Container::*;
 
         match self {
@@ -442,7 +442,7 @@ pub struct Input {
     pub metadata: Metadata,
     pub stereo: bool,
     pub reader: Reader,
-    pub kind: InputTypeData,
+    pub kind: Codec,
     pub container: Container,
 }
 
@@ -452,12 +452,12 @@ impl Input {
             metadata: Default::default(),
             stereo: is_stereo,
             reader,
-            kind: InputTypeData::FloatPcm,
+            kind: Codec::FloatPcm,
             container: Container::Raw,
         }
     }
 
-    pub fn new(stereo: bool, reader: Reader, kind: InputTypeData, container: Container, metadata: Option<Metadata>) -> Self {
+    pub fn new(stereo: bool, reader: Reader, kind: Codec, container: Container, metadata: Option<Metadata>) -> Self {
         Input {
             metadata: metadata.unwrap_or_default(),
             stereo,
@@ -475,7 +475,7 @@ impl Input {
         self.stereo
     }
 
-    pub fn get_type(&self) -> InputType {
+    pub fn get_type(&self) -> CodecType {
         (&self.kind).into()
     }
 
@@ -504,7 +504,7 @@ impl Read for Input {
         let mut written_floats = 0;
 
         match &mut self.kind {
-            InputTypeData::Opus(decoder) => {
+            Codec::Opus(decoder) => {
                 if matches!(self.container, Container::Raw) {
                     return Err(IoError::new(
                         IoErrorKind::InvalidInput,
@@ -515,7 +515,7 @@ impl Read for Input {
                 let mut opus_data_buffer = [0u8; 4000];
                 let mut opus_out_buffer = [0f32; STEREO_FRAME_SIZE];
 
-                let frame = self.container.next_frame_length(&mut self.reader, InputType::Opus)?;
+                let frame = self.container.next_frame_length(&mut self.reader, CodecType::Opus)?;
 
                 let seen = Read::read(&mut self.reader, &mut opus_data_buffer[..frame.frame_len])?;
                 let mut decoder = decoder.lock();
@@ -529,7 +529,7 @@ impl Read for Input {
                 }
                 Ok(written_floats * mem::size_of::<f32>())
             },
-            InputTypeData::Pcm => {
+            Codec::Pcm => {
                 let mut buffer = &mut buffer[..];
                 while written_floats < float_space {
                     if let Ok(signal) = self.reader.read_i16::<LittleEndian>() {
@@ -541,7 +541,7 @@ impl Read for Input {
                 }
                 Ok(written_floats * mem::size_of::<f32>())
             },
-            InputTypeData::FloatPcm => {
+            Codec::FloatPcm => {
                 Read::read(&mut self.reader, buffer)
             },
         }
@@ -683,7 +683,7 @@ fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), InputTypeData::FloatPcm, Container::Raw, Some(metadata)))
+    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), Codec::FloatPcm, Container::Raw, Some(metadata)))
 }
 
 /// Creates a streamed audio source from a DCA file.
@@ -735,7 +735,7 @@ fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
         metadata,
         stereo,
         reader: Reader::File(reader),
-        kind: InputTypeData::Opus(
+        kind: Codec::Opus(
             Arc::new(Mutex::new(OpusDecoder::new(SAMPLE_RATE, Channels::Stereo).map_err(DcaError::Opus)?))
         ),
         container: Container::Dca,
@@ -793,7 +793,7 @@ fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
 
     debug!("[Voice] ytdl metadata {:?}", metadata);
 
-    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), InputTypeData::FloatPcm, Container::Raw, Some(metadata)))
+    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), Codec::FloatPcm, Container::Raw, Some(metadata)))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.

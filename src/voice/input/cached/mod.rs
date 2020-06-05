@@ -34,8 +34,8 @@ use crate::{
         constants::*,
         input::{
             Container,
-            InputType,
-            InputTypeData,
+            CodecType,
+            Codec,
         },
     },
 };
@@ -235,7 +235,7 @@ impl From<MemorySource> for Input {
         Self {
             metadata,
             stereo: src.cache.core.is_stereo(),
-            kind: InputTypeData::FloatPcm,
+            kind: Codec::FloatPcm,
             container: Container::Raw,
 
             reader: Reader::InMemory(src),
@@ -417,7 +417,7 @@ impl From<CompressedSource> for Input {
         Input {
             metadata,
             stereo: src.cache.core.is_stereo(),
-            kind: InputTypeData::FloatPcm,
+            kind: Codec::FloatPcm,
             container: Container::Raw,
 
             reader: Reader::Compressed(src),
@@ -779,11 +779,11 @@ impl EncodingData {
     }
 }
 
-impl From<&EncodingData> for InputType {
+impl From<&EncodingData> for CodecType {
     fn from(a: &EncodingData) -> Self {
         match a {
-            EncodingData::FloatPcm => InputType::FloatPcm,
-            EncodingData::Opus{ .. } => InputType::Opus,
+            EncodingData::FloatPcm => CodecType::FloatPcm,
+            EncodingData::Opus{ .. } => CodecType::Opus,
         }
     }
 }
