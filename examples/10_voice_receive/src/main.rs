@@ -17,7 +17,13 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
+    model::{
+        channel::Message,
+        event::{VoiceClientConnect, VoiceClientDisconnect, VoiceSpeaking},
+        gateway::Ready,
+        id::ChannelId,
+        misc::Mentionable,
+    },
     prelude::*,
     voice::{CoreEvent, EventContext},
     Result as SerenityResult,
@@ -92,13 +98,20 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         handler.add_global_event(
             CoreEvent::SpeakingStateUpdate.into(),
             |ctx| {
-                if let EventContext::SpeakingStateUpdate(s) = ctx {
+                if let EventContext::SpeakingStateUpdate(
+                    VoiceSpeaking {speaking, ssrc, user_id, ..}
+                ) = ctx {
                     // You can implement logic here so that you can differentiate users'
                     // SSRCs and map the SSRC to the User ID and maintain this state.
                     // Using this map, you can map the `ssrc` in `voice_packet`
                     // to the user ID and handle their audio packets separately.
 
-                    println!("Speaking state update: {:?}", s);
+                    println!(
+                        "Speaking state update: user {:?} has SSRC {:?}, using {:?}",
+                        user_id,
+                        ssrc,
+                        speaking,
+                    );
                 }
 
                 None
@@ -130,11 +143,11 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                     // An event which fires for every received audio packet,
                     // containing the decoded data.
 
-                    println!("Audio packet's first 5 bytes: {:?}", audio.get(..5.min(audio.len())));
+                    println!("Audio packet's first 5 samples: {:?}", audio.get(..5.min(audio.len())));
                     println!(
                         "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
                         packet.sequence.0,
-                        audio.len(),
+                        audio.len() * std::mem::size_of::<i16>(),
                         packet.payload.len(),
                         packet.ssrc,
                     );
@@ -160,11 +173,18 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         handler.add_global_event(
             CoreEvent::ClientConnect.into(),
             |ctx| {
-                if let EventContext::ClientConnect(s) = ctx {
+                if let EventContext::ClientConnect(
+                    VoiceClientConnect {audio_ssrc, video_ssrc, user_id, ..}
+                ) = ctx {
                     // You can implement your own logic here to handle a user who has joined the
                     // voice channel e.g., allocate structures, map their SSRC to User ID.
 
-                    println!("Client connected: {:?}", s);
+                    println!(
+                        "Client connected: user {:?} has audio SSRC {:?}, video SSRC {:?}",
+                        user_id,
+                        audio_ssrc,
+                        video_ssrc,
+                    );
                 }
 
                 None
@@ -174,13 +194,15 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         handler.add_global_event(
             CoreEvent::ClientDisconnect.into(),
             |ctx| {
-                if let EventContext::ClientDisconnect(s) = ctx {
+                if let EventContext::ClientDisconnect(
+                    VoiceClientDisconnect {user_id, ..}
+                ) = ctx {
                     // You can implement your own logic here to handle a user who has left the
                     // voice channel e.g., finalise processing of statistics etc.
                     // You will typically need to map the User ID to their SSRC; observed when
                     // speaking or connecting.
 
-                    println!("Client disconnected: {:?}", s);
+                    println!("Client disconnected: user {:?}", user_id);
                 }
 
                 None

@@ -33,7 +33,7 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, id::GuildId, gateway::Ready, misc::Mentionable},
+    model::{channel::Message, gateway::Ready, id::GuildId, misc::Mentionable},
     Result as SerenityResult,
     voice::{
         self,
