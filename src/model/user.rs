@@ -164,7 +164,6 @@ impl CurrentUser {
     /// # #[cfg(not(feature = "cache"))]
     /// # fn main() {}
     /// ```
-    #[inline]
     pub fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
         let mut guilds = Vec::new();
         loop {
