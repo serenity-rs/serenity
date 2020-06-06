@@ -101,6 +101,13 @@ fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
                 if let EventContext::SpeakingStateUpdate(
                     VoiceSpeaking {speaking, ssrc, user_id, ..}
                 ) = ctx {
+                    // Discord voice calls use RTP, where every sender uses a randomly allocated
+                    // *Synchronisation Source* (SSRC) to allow receivers to tell which audio
+                    // stream a received packet belongs to. As this number is not derived from
+                    // the sender's user_id, only Discord Voice Gateway messages like this one
+                    // inform us about which random SSRC a user has been allocated. Future voice
+                    // packets will contain *only* the SSRC.
+                    //
                     // You can implement logic here so that you can differentiate users'
                     // SSRCs and map the SSRC to the User ID and maintain this state.
                     // Using this map, you can map the `ssrc` in `voice_packet`
