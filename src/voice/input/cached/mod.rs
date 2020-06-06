@@ -260,7 +260,10 @@ impl Seek for MemorySource {
                 (adj >= 0 || (adj.abs() as u64) <= old_pos, new_pos)
             }
             SeekFrom::End(adj) => {
-                // FIXME: make this check for metadata as the basis?
+                // Slower to load in the whole stream first, but safer.
+                // We could, in theory, use metadata as the basis,
+                // but none of our code takes this path, and incorrect
+                // metadata would be tricky to work around.
                 self.load_file();
 
                 let len = self.cache.core.len() as u64;
@@ -505,7 +508,7 @@ impl Seek for CompressedSource {
                 (adj >= 0 || (adj.abs() as u64) <= old_pos, new_pos)
             }
             SeekFrom::End(adj) => {
-                // FIXME: make this check for metadata as the basis?
+                // See MemorySource for rationale.
                 self.load_file();
 
                 let len = self.cache.core.len() as u64;

@@ -487,7 +487,6 @@ impl Input {
         }
     }
 
-    // fixme: make this relative.
     pub fn seek_time(&mut self, time: Duration) -> Option<Duration> {
         let future_pos = utils::timestamp_to_byte_count(time, self.stereo);
         Seek::seek(&mut self.reader, SeekFrom::Start(future_pos as u64))
