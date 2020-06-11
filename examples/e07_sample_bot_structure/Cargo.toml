@@ -1,5 +1,5 @@
 [package]
-name = "07_sample_bot_structure"
+name = "e07_sample_bot_structure"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"

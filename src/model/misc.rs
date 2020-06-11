@@ -106,7 +106,7 @@ impl fmt::Display for UserParseError {
 impl StdError for UserParseError {}
 
 macro_rules! impl_from_str {
-    (id: $($id:tt, $err:ident;)*) => {
+    (id: $($id:ident, $err:ident, $parse_function:ident;)*) => {
         $(
             #[cfg(all(feature = "model", feature = "utils"))]
             #[derive(Debug)]
@@ -131,10 +131,12 @@ macro_rules! impl_from_str {
                 type Err = $err;
 
                 fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    Ok(match utils::parse_mention(s) {
-                        Some(id) => $id(id),
-                        None => s.parse::<u64>().map($id).map_err(|_| $err::InvalidFormat)?,
-                    })
+                    let id = match utils::$parse_function(s) {
+                        Some(id) => id,
+                        None => s.parse::<u64>().map_err(|_| $err::InvalidFormat)?,
+                    };
+
+                    Ok($id(id))
                 }
             }
         )*
@@ -166,9 +168,9 @@ macro_rules! impl_from_str {
 }
 
 impl_from_str! { id:
-    UserId, UserIdParseError;
-    RoleId, RoleIdParseError;
-    ChannelId, ChannelIdParseError;
+    UserId, UserIdParseError, parse_username;
+    RoleId, RoleIdParseError, parse_role;
+    ChannelId, ChannelIdParseError, parse_channel;
 }
 
 impl_from_str! { struct:
@@ -362,6 +364,17 @@ mod test {
             assert_eq!(role.id.mention(), "<@&2>");
             assert_eq!(user.mention(), "<@6>");
             assert_eq!(user.id.mention(), "<@6>");
+        }
+
+        #[test]
+        fn parse_mentions() {
+            assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId(1234));
+            assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId(1234));
+            assert_eq!("<#1234>".parse::<ChannelId>().unwrap(), ChannelId(1234));
+
+            assert!("<@1234>".parse::<ChannelId>().is_err());
+            assert!("<@&1234>".parse::<UserId>().is_err());
+            assert!("<#1234>".parse::<RoleId>().is_err());
         }
     }
 }

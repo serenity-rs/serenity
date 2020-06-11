@@ -1,5 +1,5 @@
 [package]
-name = "01_basic_ping_bot"
+name = "e13_gateway_intents"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"

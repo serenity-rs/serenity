@@ -1,9 +1,13 @@
 [package]
-name = "05_command_framework"
+name = "e09_shard_manager"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
 
+[dependencies]
+env_logger = "0.6"
+log = "0.4"
+
 [dependencies.serenity]
-features = ["framework", "standard_framework", "rustls_backend"]
+features = ["client", "rustls_backend"]
 path = "../../"
