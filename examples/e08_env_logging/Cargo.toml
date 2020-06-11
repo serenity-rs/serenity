@@ -1,13 +1,13 @@
 [package]
-name = "10_voice_receive"
+name = "e08_env_logging"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies]
-env_logger = "~0.6"
-log = "~0.4"
+env_logger = "0.6"
+log = "0.4"
 
 [dependencies.serenity]
-features = ["client", "standard_framework", "voice", "rustls_backend"]
+features = ["client", "rustls_backend"]
 path = "../../"

@@ -1,5 +1,5 @@
 [package]
-name = "02_transparent_guild_sharding"
+name = "e03_struct_utilities"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
