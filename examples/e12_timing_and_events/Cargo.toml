@@ -1,5 +1,5 @@
 [package]
-name = "12_timing_and_events"
+name = "e12_timing_and_events"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
