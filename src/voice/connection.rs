@@ -26,7 +26,6 @@ use audiopus::{
 use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
-use sodiumoxide::crypto::secretbox::{self, Key, Nonce};
 use std::{
     collections::HashMap,
     io::Write,
@@ -45,6 +44,10 @@ use std::{
         JoinHandle
     },
     time::Duration
+};
+use xsalsa20poly1305::{
+    aead::{Aead, NewAead},
+    Key, Nonce, XSalsa20Poly1305, KEY_SIZE,
 };
 
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
@@ -73,6 +76,7 @@ struct ThreadItems {
 
 pub struct Connection {
     audio_timer: Timer,
+    cipher: XSalsa20Poly1305,
     client: Arc<Mutex<WsClient>>,
     connection_info: ConnectionInfo,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
@@ -80,7 +84,6 @@ pub struct Connection {
     encoder: OpusEncoder,
     encoder_stereo: bool,
     keepalive_timer: Timer,
-    key: Key,
     last_heartbeat_nonce: Option<u64>,
     sequence: u16,
     silence_frames: u8,
@@ -180,7 +183,7 @@ impl Connection {
                 .send_json(&payload::build_select_protocol(addr, port))?;
         }
 
-        let key = encryption_key(&mut client)?;
+        let cipher = init_cipher(&mut client)?;
 
         unset_blocking(&mut client)?;
         let mutexed_client = Arc::new(Mutex::new(client));
@@ -204,13 +207,13 @@ impl Connection {
 
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
+            cipher,
             client: mutexed_client,
             connection_info: info,
             decoder_map: HashMap::new(),
             destination,
             encoder,
             encoder_stereo: false,
-            key,
             keepalive_timer: Timer::new(temp_heartbeat),
             last_heartbeat_nonce: None,
             udp,
@@ -299,11 +302,10 @@ impl Connection {
             let timestamp = handle.read_u32::<BigEndian>()?;
             let ssrc = handle.read_u32::<BigEndian>()?;
 
-            nonce.0[..HEADER_LEN]
+            nonce[..HEADER_LEN]
                 .clone_from_slice(&packet[..HEADER_LEN]);
 
-            if let Ok(mut decrypted) =
-                secretbox::open(&packet[HEADER_LEN..], &nonce, &self.key) {
+            if let Ok(mut decrypted) = self.cipher.decrypt(&nonce, &packet[HEADER_LEN..]) {
                 let channels = opus_packet::nb_channels(&decrypted)?;
 
                 let entry =
@@ -477,7 +479,7 @@ impl Connection {
         let mut buffer = [0i16; 960 * 2];
         let mut mix_buffer = [0f32; 960 * 2];
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
-        let mut nonce = secretbox::Nonce([0; 24]);
+        let mut nonce = Nonce::default();
 
         while let Ok(status) = self.thread_items.rx.try_recv() {
             match status {
@@ -584,7 +586,7 @@ impl Connection {
             cursor.write_u32::<BigEndian>(self.ssrc)?;
         }
 
-        nonce.0[..HEADER_LEN]
+        nonce[..HEADER_LEN]
             .clone_from_slice(&packet[..HEADER_LEN]);
 
         let sl_index = packet.len() - 16;
@@ -602,7 +604,8 @@ impl Connection {
 
         let crypted = {
             let slice = &packet[HEADER_LEN..HEADER_LEN + len];
-            secretbox::seal(slice, &nonce, &self.key)
+            self.cipher.encrypt(&nonce, slice)
+                .expect("[Voice] Couldn't encrypt packet.")
         };
         let index = HEADER_LEN + crypted.len();
         packet[HEADER_LEN..index].clone_from_slice(&crypted);
@@ -663,7 +666,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn encryption_key(client: &mut WsClient) -> Result<Key> {
+fn init_cipher(client: &mut WsClient) -> Result<XSalsa20Poly1305> {
     loop {
         let value = match client.recv_json()? {
             Some(value) => value,
@@ -676,8 +679,14 @@ fn encryption_key(client: &mut WsClient) -> Result<Key> {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                return Key::from_slice(&desc.secret_key)
-                    .ok_or(Error::Voice(VoiceError::KeyGen));
+                // TODO: use `XSalsa20Poly1305::new_varkey`. See:
+                // <https://github.com/RustCrypto/traits/pull/191>
+                if desc.secret_key.len() == KEY_SIZE {
+                    let key = Key::from_slice(&desc.secret_key);
+                    return Ok(XSalsa20Poly1305::new(key));
+                } else {
+                    return Err(Error::Voice(VoiceError::KeyGen));
+                }
             },
             VoiceEvent::Unknown(op, value) => {
                 debug!(
