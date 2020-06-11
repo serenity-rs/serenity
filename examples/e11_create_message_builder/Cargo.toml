@@ -1,5 +1,5 @@
 [package]
-name = "03_struct_utilities"
+name = "e11_create_message_builder"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
