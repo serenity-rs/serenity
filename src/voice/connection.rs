@@ -318,8 +318,8 @@ impl Connection {
         // Slice which mix tracks may use to passthrough direct Opus frames.
         let mut opus_space = &mut opus_frame_backing[..];
 
-        // Walk over all the audio files, removing those which have finished.
-        // For this purpose, we need a while loop in Rust.
+        // Walk over all the audio files, combining into one audio frame according
+        // to volume, play state, etc.
         let (len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
