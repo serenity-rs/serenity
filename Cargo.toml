@@ -68,12 +68,6 @@ version = "0.7"
 optional = true
 version = "0.16"
 
-[dependencies.sodiumoxide]
-default-features = false
-features = ["std"]
-optional = true
-version = "0.2"
-
 [dependencies.threadpool]
 optional = true
 version = "1"
@@ -98,6 +92,10 @@ version = "0.21"
 [dependencies.webpki-roots]
 optional = true
 version = "0.18"
+
+[dependencies.xsalsa20poly1305]
+optional = true
+version = "0.4.2"
 
 [dev-dependencies.http_crate]
 version = "0.2"
@@ -154,7 +152,7 @@ native_tls_backend = ["reqwest/native-tls", "tungstenite/tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
-voice = ["byteorder", "gateway", "audiopus", "rand", "sodiumoxide"]
+voice = ["byteorder", "gateway", "audiopus", "rand", "xsalsa20poly1305"]
 
 [package.metadata.docs.rs]
 all-features = true
