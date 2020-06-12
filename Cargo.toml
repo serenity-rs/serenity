@@ -41,7 +41,7 @@ version = "0.4"
 [dependencies.discortp]
 features = ["discord-full"]
 optional = true
-version = "0.2.0"
+version = "0.2"
 
 [dependencies.flate2]
 optional = true
@@ -64,12 +64,6 @@ version = "0.16"
 [dependencies.serde]
 version = "1"
 features = ["derive"]
-
-[dependencies.sodiumoxide]
-default-features = false
-features = ["std"]
-optional = true
-version = "0.2"
 
 [dependencies.static_assertions]
 optional = true
@@ -99,6 +93,10 @@ version = "0.21"
 [dependencies.webpki-roots]
 optional = true
 version = "0.18"
+
+[dependencies.xsalsa20poly1305]
+optional = true
+version = "0.4.2"
 
 [dev-dependencies.http_crate]
 version = "0.2"
@@ -157,7 +155,7 @@ voice = [
     "discortp",
     "gateway",
     "rand",
-    "sodiumoxide",
+    "xsalsa20poly1305",
 ]
 
 [package.metadata.docs.rs]

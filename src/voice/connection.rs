@@ -38,7 +38,6 @@ use discortp::{
     rtp::{
         MutableRtpPacket,
         RtpPacket,
-        RtpType,
     },
     MutablePacket,
     Packet,
@@ -46,23 +45,25 @@ use discortp::{
 use log::{debug, info, warn};
 use rand::random;
 use serde::Deserialize;
-use sodiumoxide::crypto::secretbox::{
-    self,
-    MACBYTES,
-    NONCEBYTES,
-    Key,
-};
 use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
 use url::Url;
+use xsalsa20poly1305::{
+    aead::{AeadInPlace, NewAead},
+    KEY_SIZE,
+    TAG_SIZE,
+    Key,
+    Nonce, 
+    XSalsa20Poly1305 as Cipher,
+};
 
 #[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
 
 pub(crate) struct Connection {
+    cipher: Cipher,
     pub(crate) connection_info: ConnectionInfo,
     destination: SocketAddr,
     encoder: OpusEncoder,
-    key: Key,
     packet: [u8; VOICE_PACKET_MAX],
     silence_frames: u8,
     soft_clip: SoftClip,
@@ -151,7 +152,7 @@ impl Connection {
             client.send_json(&payload::build_select_protocol(addr, view.get_port()))?;
         }
 
-        let key = encryption_key(&mut client)?;
+        let cipher = init_cipher(&mut client)?;
 
         unset_blocking(&mut client)?;
 
@@ -181,7 +182,7 @@ impl Connection {
         rtp.set_ssrc(ready.ssrc);
 
         interconnect.aux_packets.send(AuxPacketMessage::UdpDestination(destination))?;
-        interconnect.aux_packets.send(AuxPacketMessage::UdpKey(key.clone()))?;
+        interconnect.aux_packets.send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
         interconnect.aux_packets.send(AuxPacketMessage::Udp(
@@ -191,10 +192,10 @@ impl Connection {
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         Ok(Connection {
+            cipher,
             connection_info: info,
             destination,
             encoder,
-            key,
             packet,
             silence_frames: 0,
             soft_clip,
@@ -358,7 +359,7 @@ impl Connection {
     }
 
     fn prep_and_send_packet(&mut self, buffer: [f32; 1920], opus_frame: &[u8]) -> Result<()> {
-        let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
+        let mut nonce = Nonce::default();
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
                 .expect(
@@ -368,25 +369,26 @@ impl Connection {
 
             let pkt = rtp.packet();
             let rtp_len = RtpPacket::minimum_packet_size();
-            nonce.0[..rtp_len]
+            nonce[..rtp_len]
                 .copy_from_slice(&pkt[..rtp_len]);
 
             let payload = rtp.payload_mut();
 
             let payload_len = if opus_frame.is_empty() {
                 self.encoder
-                    .encode_float(&buffer[..STEREO_FRAME_SIZE], &mut payload[MACBYTES..])?
+                    .encode_float(&buffer[..STEREO_FRAME_SIZE], &mut payload[TAG_SIZE..])?
             } else {
                 let len = opus_frame.len();
-                payload[MACBYTES..MACBYTES + len]
+                payload[TAG_SIZE..TAG_SIZE + len]
                     .clone_from_slice(opus_frame);
                 len
             };
 
-            let final_payload_size = MACBYTES + payload_len;
+            let final_payload_size = TAG_SIZE + payload_len;
 
-            let tag = secretbox::seal_detached(&mut payload[MACBYTES..final_payload_size], &nonce, &self.key);
-            payload[..MACBYTES].copy_from_slice(&tag.0[..]);
+            let tag = self.cipher.encrypt_in_place_detached(&nonce, b"", &mut payload[TAG_SIZE..final_payload_size])
+                .expect("[Voice] Encryption failed?");
+            payload[..TAG_SIZE].copy_from_slice(&tag[..]);
 
             rtp_len + final_payload_size
         };
@@ -423,7 +425,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn encryption_key(client: &mut WsClient) -> Result<Key> {
+fn init_cipher(client: &mut WsClient) -> Result<Cipher> {
     loop {
         let value = match client.recv_json()? {
             Some(value) => value,
@@ -436,8 +438,14 @@ fn encryption_key(client: &mut WsClient) -> Result<Key> {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                return Key::from_slice(&desc.secret_key)
-                    .ok_or(Error::Voice(VoiceError::KeyGen));
+                // TODO: use `XSalsa20Poly1305::new_varkey`. See:
+                // <https://github.com/RustCrypto/traits/pull/191>
+                if desc.secret_key.len() == KEY_SIZE {
+                    let key = Key::from_slice(&desc.secret_key);
+                    return Ok(Cipher::new(key));
+                } else {
+                    return Err(Error::Voice(VoiceError::KeyGen));
+                }
             },
             VoiceEvent::Unknown(op, value) => {
                 debug!(

@@ -24,7 +24,6 @@ use crate::{
     },
 };
 use log::{error, info, warn};
-use sodiumoxide::crypto::secretbox::Key;
 use std::{
     net::{
         SocketAddr,
@@ -39,6 +38,7 @@ use std::{
     thread::Builder as ThreadBuilder,
     time::Duration,
 };
+use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Interconnect {
@@ -87,7 +87,7 @@ pub(crate) enum TrackStateChange {
 pub(crate) enum AuxPacketMessage {
     Udp(UdpSocket),
     UdpDestination(SocketAddr),
-    UdpKey(Key),
+    UdpCipher(Cipher),
     Ws(Box<WsClient>),
 
     SetSsrc(u32),

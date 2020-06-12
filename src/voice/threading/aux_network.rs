@@ -43,13 +43,6 @@ use discortp::{
 use log::{debug, error, info, warn};
 use rand::random;
 use serde::Deserialize;
-use sodiumoxide::crypto::secretbox::{
-    self,
-    MACBYTES,
-    NONCEBYTES,
-    Key,
-    Tag,
-};
 use std::{
     collections::HashMap,
     net::{
@@ -60,6 +53,13 @@ use std::{
         Receiver as MpscReceiver,
         TryRecvError,
     },
+};
+use xsalsa20poly1305::{
+    aead::AeadInPlace,
+    TAG_SIZE,
+    Nonce,
+    Tag,
+    XSalsa20Poly1305 as Cipher,
 };
 
 #[derive(Debug)]
@@ -162,7 +162,7 @@ struct AuxNetwork {
     udp_socket: Option<UdpSocket>,
     ws_client: Option<WsClient>,
     destination: Option<SocketAddr>,
-    key: Option<Key>,
+    cipher: Option<Cipher>,
     packet_buffer: [u8; VOICE_PACKET_MAX],
 
     ssrc: u32,
@@ -185,7 +185,7 @@ impl AuxNetwork {
             udp_socket: None,
             ws_client: None,
             destination: None,
-            key: None,
+            cipher: None,
             packet_buffer: [0u8; VOICE_PACKET_MAX],
 
             ssrc: 0,
@@ -223,8 +223,8 @@ impl AuxNetwork {
                         self.udp_socket = Some(udp);
                         self.udp_keepalive_time.reset();
                     },
-                    Ok(UdpKey(new_key)) => {
-                        self.key = Some(new_key);
+                    Ok(UdpCipher(new_key)) => {
+                        self.cipher = Some(new_key);
                     },
                     Ok(UdpDestination(addr)) => {
                         self.destination = Some(addr);
@@ -348,7 +348,7 @@ impl AuxNetwork {
                 }
 
                 let packet = &mut self.packet_buffer[..len];
-                let key = self.key.as_ref().expect("[Voice] Tried to decrypt without a valid key.");
+                let cipher = self.cipher.as_ref().expect("[Voice] Tried to decrypt without a valid key.");
 
                 match demux::demux_mut(packet) {
                     DemuxedMut::Rtp(mut rtp) => {
@@ -359,7 +359,7 @@ impl AuxNetwork {
 
                         let rtp_body_start = decrypt_in_place(
                             &mut rtp,
-                            key,
+                            cipher,
                         ).expect("[Voice] RTP decryption failed.");
 
                         let entry = self.decoder_map.entry(rtp.get_ssrc())
@@ -402,7 +402,7 @@ impl AuxNetwork {
                     DemuxedMut::Rtcp(mut rtcp) => {
                         let rtcp_body_start = decrypt_in_place(
                             &mut rtcp,
-                            key,
+                            cipher,
                         );
 
                         if let Ok(start) = rtcp_body_start {
@@ -435,24 +435,20 @@ pub(crate) fn runner(interconnect: Interconnect, evt_rx: MpscReceiver<AuxPacketM
 }
 
 #[inline]
-fn decrypt_in_place(packet: &mut impl MutablePacket, key: &Key) -> Result<usize> {
+fn decrypt_in_place(packet: &mut impl MutablePacket, cipher: &Cipher) -> Result<usize> {
     // Applies discord's cheapest.
     // In future, might want to make a choice...
     let header_len = packet.packet().len() - packet.payload().len();
-    let mut nonce = secretbox::Nonce([0; NONCEBYTES]);
-    nonce.0[..header_len]
+    let mut nonce = Nonce::default();
+    nonce[..header_len]
         .copy_from_slice(&packet.packet()[..header_len]);
 
     let data = packet.payload_mut();
-    let (tag_bytes, data_bytes) = data.split_at_mut(MACBYTES);
-    let tag = Tag::from_slice(tag_bytes)
-        .ok_or_else(|| {
-            error!("[Voice] failed to extract enough bytes for encryption tag.");
-            VoiceError::Decryption
-        })?;
+    let (tag_bytes, data_bytes) = data.split_at_mut(TAG_SIZE);
+    let tag = Tag::from_slice(tag_bytes);
 
-    secretbox::open_detached(data_bytes, &tag, &nonce, key)
-        .map(|_| MACBYTES)
+    cipher.decrypt_in_place_detached(&nonce, b"", data_bytes, tag)
+        .map(|_| TAG_SIZE)
         .map_err(|_| VoiceError::Decryption.into())
 }
 
