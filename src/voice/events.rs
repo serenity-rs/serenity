@@ -58,7 +58,7 @@ pub enum EventContext<'a> {
     },
 
     /// Opus audio packet, received from another stream (detailed in `packet`).
-    /// `payload_offset` contains the true payload location within the raw packet,
+    /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
     /// if extensions or raw packet data are required.
     /// if `audio.len() == 0`, then this packet arrived out-of-order.
     VoicePacket {
@@ -68,8 +68,8 @@ pub enum EventContext<'a> {
     },
 
     /// Telemetry/statistics packet, received from another stream (detailed in `packet`).
-    /// `payload_offset` contains the true payload location within the raw packet,
-    /// if to allow manual decoding of Rtcp packet bodies.
+    /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
+    /// to allow manual decoding of `Rtcp` packet bodies.
     RtcpPacket {
         packet: &'a Rtcp,
         payload_offset: usize,

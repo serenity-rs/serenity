@@ -447,6 +447,6 @@ fn decrypt_in_place(packet: &mut impl MutablePacket, key: &Key) -> Result<usize>
         })?;
 
     secretbox::open_detached(data_bytes, &tag, &nonce, key)
-        .map(|_| header_len + MACBYTES)
+        .map(|_| MACBYTES)
         .map_err(|_| VoiceError::Decryption.into())
 }
