@@ -2,7 +2,7 @@
 
 mod connection;
 mod connection_info;
-mod constants;
+pub mod constants;
 mod error;
 pub mod events;
 mod handler;

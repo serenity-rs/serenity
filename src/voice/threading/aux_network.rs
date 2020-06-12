@@ -97,7 +97,7 @@ impl SsrcState {
         } else {
             self.last_seq = new_seq;
             let missed_packets = seq_delta.saturating_sub(1);
-            let (audio, pkt_size) = self.scan_and_decode(&pkt.packet()[data_offset..], extensions, missed_packets)?;
+            let (audio, pkt_size) = self.scan_and_decode(&pkt.payload()[data_offset..], extensions, missed_packets)?;
 
             let delta = if pkt_size == SILENT_FRAME.len() {
                 // Frame is silent.
@@ -352,6 +352,11 @@ impl AuxNetwork {
 
                 match demux::demux_mut(packet) {
                     DemuxedMut::Rtp(mut rtp) => {
+                        if !rtp_valid(rtp.to_immutable()) {
+                            error!("[Voice] Illegal RTP message received.");
+                            continue;
+                        }
+
                         let rtp_body_start = decrypt_in_place(
                             &mut rtp,
                             key,
@@ -449,4 +454,10 @@ fn decrypt_in_place(packet: &mut impl MutablePacket, key: &Key) -> Result<usize>
     secretbox::open_detached(data_bytes, &tag, &nonce, key)
         .map(|_| MACBYTES)
         .map_err(|_| VoiceError::Decryption.into())
+}
+
+#[inline]
+fn rtp_valid(packet: RtpPacket<'_>) -> bool {
+    packet.get_version() == RTP_VERSION
+        && packet.get_payload_type() == RTP_PROFILE_TYPE
 }

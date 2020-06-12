@@ -174,8 +174,8 @@ impl Connection {
                 "[Voice] Too few bytes in self.packet for RTP header.\
                 (Blame: VOICE_PACKET_MAX?)"
             );
-        rtp.set_version(2);
-        rtp.set_payload_type(RtpType::Dynamic(120));
+        rtp.set_version(RTP_VERSION);
+        rtp.set_payload_type(RTP_PROFILE_TYPE);
         rtp.set_sequence(random::<u16>().into());
         rtp.set_timestamp(random::<u32>().into());
         rtp.set_ssrc(ready.ssrc);

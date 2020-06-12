@@ -63,10 +63,10 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
                 use TrackStateChange::*;
 
                 let max_states = states.len();
+                debug!("[Voice] Changing state for track {} of {}: {:?}", i, max_states, change);
+
                 let state = states.get_mut(i)
                     .expect("[Voice] Event thread was given an illegal state index for ChangeState.");
-
-                debug!("[Voice] Changing state for track {} of {}: {:?}", i, max_states, change);
 
                 match change {
                     Mode(mode) => {

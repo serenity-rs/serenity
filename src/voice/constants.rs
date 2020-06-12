@@ -1,4 +1,5 @@
 use audiopus::{Bitrate, SampleRate};
+use discortp::rtp::RtpType;
 use std::time::Duration;
 
 /// Sample rate of audio to be sent to Discord.
@@ -47,3 +48,9 @@ pub const UDP_KEEPALIVE_GAP_MS: u64 = 5_000;
 
 /// Opus silent frame, used to signal speech start and end (and prevent audio glitching).
 pub const SILENT_FRAME: [u8; 3] = [0xf8, 0xff, 0xfe];
+
+/// The one (and only) RTP version.
+pub const RTP_VERSION: u8 = 2;
+
+/// Profile type used by Discord's Opus audio traffic.
+pub const RTP_PROFILE_TYPE: RtpType = RtpType::Dynamic(120);
