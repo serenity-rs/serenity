@@ -375,8 +375,6 @@ pub type TrackQueryResult = Result<Receiver<Box<TrackState>>, SendError<TrackCom
 /// [`TrackHandle::get_info_blocking`]: struct.TrackHandle.html#method.get_info_blocking
 pub type BlockingTrackQueryResult = Result<Box<TrackState>, SendError<TrackCommand>>;
 
-pub type TrackFn = fn(&mut Track) -> ();
-
 #[derive(Clone, Debug)]
 /// Handle for safe control of a [`Track`] track from other threads, outside
 /// of the audio mixing and voice handling context.
@@ -475,8 +473,10 @@ impl TrackHandle {
     /// timely sending of packets, causing audio glitches and delays*.
     ///
     /// [`Track`]: struct.Track.html
-    pub fn action(&self, action: TrackFn) -> TrackResult {
-        self.send(TrackCommand::Do(action))
+    pub fn action<F>(&self, action: F) -> TrackResult
+        where F: FnOnce(&mut Track) -> () + Send + Sync + 'static
+    {
+        self.send(TrackCommand::Do(Box::new(action)))
     }
 
     /// Request playback information and state from the audio context.
@@ -571,7 +571,7 @@ pub enum TrackCommand {
     Volume(f32),
     Seek(Duration),
     AddEvent(EventData),
-    Do(TrackFn),
+    Do(Box<dyn FnOnce(&mut Track) -> () + Send + Sync + 'static>),
     Request(Sender<Box<TrackState>>),
     Loop(LoopState),
 }
