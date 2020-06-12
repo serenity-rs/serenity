@@ -19,6 +19,7 @@ use discortp::{
     rtcp::Rtcp,
     rtp::Rtp,
 };
+use log::info;
 use std::{
     cmp::Ordering,
     collections::{
@@ -525,6 +526,10 @@ impl GlobalEvents {
 
         for (evt, indices) in self.awaiting_tick.iter() {
             let untimed = (*evt).into();
+
+            if !indices.is_empty() {
+                info!("Firing {:?} for {:?}", evt, indices);
+            }
 
             // Local untimed track events.
             for &i in indices.iter() {
