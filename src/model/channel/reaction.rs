@@ -154,7 +154,6 @@ impl Reaction {
     /// If the cache is enabled, this will search for the already-cached user.
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
-    #[inline]
     pub fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
         match self.user_id {
             Some(id) => id.to_user(cache_http),
