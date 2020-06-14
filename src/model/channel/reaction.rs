@@ -37,8 +37,11 @@ pub struct Reaction {
     pub message_id: MessageId,
     /// The Id of the [`User`] that sent the reaction.
     ///
+    /// Set to `None` by [`Message::react`] when cache is not available.
+    ///
     /// [`User`]: ../user/struct.User.html
-    pub user_id: UserId,
+    /// [`Message::react`]: struct.Message.html#method.react
+    pub user_id: Option<UserId>,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
@@ -81,13 +84,13 @@ impl Reaction {
     pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         // Silences a warning when compiling without the `cache` feature.
         #[allow(unused_mut)]
-        let mut user_id = Some(self.user_id.0);
+        let mut user_id = self.user_id.map(|id| id.0);
 
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
 
-                if self.user_id == cache.read().user.id {
+                if self.user_id.is_some() && self.user_id == Some(cache.read().user.id) {
                     user_id = None;
                 }
 
@@ -151,9 +154,22 @@ impl Reaction {
     /// If the cache is enabled, this will search for the already-cached user.
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
-    #[inline]
     pub fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
-        self.user_id.to_user(cache_http)
+        match self.user_id {
+            Some(id) => id.to_user(cache_http),
+            None => {
+                // This can happen if only Http was passed to Message::react, even though
+                // "cache" was enabled.
+                #[cfg(feature = "cache")]
+                {
+                    if let Some(cache) = cache_http.cache() {
+                        return Ok(User::from(&cache.read().user));
+                    }
+                }
+
+                Ok(cache_http.http().get_current_user()?.into())
+            }
+        }
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a

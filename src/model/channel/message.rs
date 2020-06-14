@@ -471,11 +471,14 @@ impl Message {
     /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
     /// [permissions]: ../permissions/index.html
     #[inline]
-    pub fn react<R: Into<ReactionType>>(&self, cache_http: impl CacheHttp, reaction_type: R) -> Result<()> {
+    pub fn react<R: Into<ReactionType>>(&self, cache_http: impl CacheHttp, reaction_type: R) -> Result<Reaction> {
         self._react(cache_http, &reaction_type.into())
     }
 
-    fn _react(&self, cache_http: impl CacheHttp, reaction_type: &ReactionType) -> Result<()> {
+    fn _react(&self, cache_http: impl CacheHttp, reaction_type: &ReactionType) -> Result<Reaction> {
+        #[allow(unused_mut)]
+        let mut user_id = None;
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -487,10 +490,21 @@ impl Message {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
+
+                user_id = Some(cache.read().user.id);
             }
         }
 
-        cache_http.http().create_reaction(self.channel_id.0, self.id.0, reaction_type)
+        cache_http.http().create_reaction(self.channel_id.0, self.id.0, reaction_type)?;
+
+        Ok(Reaction {
+            channel_id: self.channel_id,
+            emoji: reaction_type.clone(),
+            message_id: self.id,
+            user_id,
+            guild_id: self.guild_id,
+            _nonexhaustive: (),
+        })
     }
 
     /// Replies to the user, mentioning them prior to the content in the form

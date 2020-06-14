@@ -85,8 +85,10 @@ impl EventHandler for Handler {
             context.get_mut::<DispatcherKey>().expect("Expected Dispatcher.").clone()
         };
 
+        // We may safely unwrap the user_id as the Reaction comes from an event and not
+        // Message::react.
         dispatcher.write().dispatch_event(
-            &DispatchEvent::ReactEvent(reaction.message_id, reaction.user_id));
+            &DispatchEvent::ReactEvent(reaction.message_id, reaction.user_id.unwrap()));
     }
 }
 
