@@ -661,6 +661,16 @@ impl Message {
         self.guild_id.as_ref().and_then(|guild_id| self.author.nick_in(cache_http, *guild_id))
     }
 
+    /// Returns a link referencing this message. When clicked, users will jump to the message.
+    /// The link will be valid for messages in either private channels or guilds.
+    #[inline]
+    pub fn link(&self) -> String {
+        match self.guild_id {
+            Some(guild_id) => format!("https://discord.com/channels/{}/{}/{}", guild_id.0, self.channel_id.0, self.id.0),
+            None => format!("https://discord.com/channels/@me/{}/{}", self.channel_id.0, self.id.0),
+        }
+    }
+
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {
