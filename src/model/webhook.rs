@@ -234,6 +234,15 @@ impl Webhook {
             Err(why) => Err(why),
         }
     }
+
+    /// Returns the url of the webhook.
+    ///
+    /// ```rust,ignore
+    /// assert_eq!(hook.url(), "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV")
+    /// ```
+    pub fn url(&self) -> String {
+        format!("https://discord.com/api/webhooks/{}/{}", self.id, self.token)
+    }
 }
 
 #[cfg(feature = "model")]
