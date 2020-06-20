@@ -238,7 +238,7 @@ impl Webhook {
     /// Returns the url of the webhook.
     ///
     /// ```rust,no_run
-    /// assert_eq!(hook.url(), "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV".to_string())
+    /// assert_eq!(hook.url(), "https://discord.com/api/webhooks/245037420704169985/ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV")
     /// ```
     pub fn url(&self) -> String {
         format!("https://discord.com/api/webhooks/{}/{}", self.id, self.token)
