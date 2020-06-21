@@ -29,72 +29,72 @@ jobs:
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/01_basic_ping_bot
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e01_basic_ping_bot
     displayName: 'Build example 1'
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/02_transparent_guild_sharding
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e02_transparent_guild_sharding
     displayName: 'Build example 2'
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/03_struct_utilities
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e03_struct_utilities
     displayName: 'Build example 3'
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/04_message_builder
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e04_message_builder
     displayName: 'Build example 4'
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/05_command_framework
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e05_command_framework
     displayName: 'Build example 5'
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/06_voice
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e06_voice
     displayName: 'Build example 6'
 
   - bash: |
       source $HOME/.cargo/env
-      cd examples/07_sample_bot_structure
-      CARGO_TARGET_DIR='..' cargo build
+      cd examples/
+      cargo build -p e07_sample_bot_structure
     displayName: 'Build example 7'
 
   - bash: |
       source $HOME/.cargo/env
-      CARGO_TARGET_DIR='..' cd examples/08_env_logging
-      cargo build
+      cd examples/
+      cargo build -p e08_env_logging
     displayName: 'Build example 8'
 
   - bash: |
       source $HOME/.cargo/env
-      CARGO_TARGET_DIR='..' cd examples/09_shard_manager
-      cargo build
+      cd examples/
+      cargo build -p e09_shard_manager
     displayName: 'Build example 9'
 
   - bash: |
       source $HOME/.cargo/env
-      CARGO_TARGET_DIR='..' cd examples/10_voice_receive
-      cargo build
+      cd examples/
+      cargo build -p e10_voice_receive
     displayName: 'Build example 10'
 
   - bash: |
       source $HOME/.cargo/env
-      CARGO_TARGET_DIR='..' cd examples/11_crate_message_builder
-      cargo build
+      cd examples/
+      cargo build -p e11_create_message_builder
     displayName: 'Build example 11'
 
   - bash: |
       source $HOME/.cargo/env
-      CARGO_TARGET_DIR='..' cd examples/12_timing_and_events
-      cargo build
+      cd examples/
+      cargo build -p e12_timing_and_events
     displayName: 'Build example 12'

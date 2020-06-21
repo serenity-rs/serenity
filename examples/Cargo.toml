@@ -1,0 +1,15 @@
+[workspace]
+members = [
+    "e01_basic_ping_bot",
+    "e02_transparent_guild_sharding",
+    "e03_struct_utilities",
+    "e04_message_builder",
+    "e05_command_framework",
+    "e06_voice",
+    "e07_sample_bot_structure",
+    "e08_env_logging",
+    "e09_shard_manager",
+    "e10_voice_receive",
+    "e11_create_message_builder",
+    "e12_timing_and_events",
+]
