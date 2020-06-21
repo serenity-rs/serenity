@@ -90,7 +90,7 @@ jobs:
   - bash: |
       source $HOME/.cargo/env
       cd examples/
-      cargo build -p e11_crate_message_builder
+      cargo build -p e11_create_message_builder
     displayName: 'Build example 11'
 
   - bash: |
