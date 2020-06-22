@@ -221,7 +221,8 @@ impl Display for Emoji {
     /// Formats the emoji into a string that will cause Discord clients to
     /// render the emoji.
     ///
-    /// This is in the format of: `<:NAME:EMOJI_ID>`.
+    /// This is in the format of either `<:NAME:EMOJI_ID>` for normal emojis, 
+    /// or `<a:NAME:EMOJI_ID>` for animated emojis.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         if self.animated {
             f.write_str("<a:")?;
