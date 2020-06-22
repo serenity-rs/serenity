@@ -223,7 +223,11 @@ impl Display for Emoji {
     ///
     /// This is in the format of: `<:NAME:EMOJI_ID>`.
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        f.write_str("<:")?;
+        if self.animated {
+            f.write_str("<a:");
+        } else {
+            f.write_str("<:");
+        }
         f.write_str(&self.name)?;
         FmtWrite::write_char(f, ':')?;
         Display::fmt(&self.id, f)?;
