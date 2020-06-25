@@ -121,7 +121,8 @@ fn my_help(
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>
 ) -> CommandResult {
-    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+    let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners);
+    Ok(())
 }
 
 fn main() {

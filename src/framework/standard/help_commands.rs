@@ -35,7 +35,8 @@
 //! ) -> CommandResult {
 //! #  #[cfg(all(feature = "cache", feature = "http"))]
 //! # {
-//!    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+//!    let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners);
+//!    Ok(())
 //! # }
 //! #
 //! # #[cfg(not(all(feature = "cache", feature = "http")))]
@@ -56,9 +57,8 @@
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
-    Args, CommandGroup, CommandOptions,
-    CheckResult,
-    CommandResult, has_correct_roles, HelpBehaviour, HelpOptions,
+    Args, CommandGroup, CommandOptions, CheckResult,
+    has_correct_roles, HelpBehaviour, HelpOptions,
     has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
@@ -1216,7 +1216,8 @@ fn send_error_embed(
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     with_embeds(context, msg, args, &help_options, groups, owners)
+///     let _ = with_embeds(context, msg, args, &help_options, groups, owners);
+///     Ok(())
 /// }
 ///
 /// client.with_framework(StandardFramework::new()
@@ -1231,11 +1232,11 @@ pub fn with_embeds(
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>,
-) -> CommandResult {
+) -> Option<Message> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options);
 
-    if let Err(why) = match formatted_help {
+    let response_result = match formatted_help {
         CustomisedHelpData::SuggestedCommands {
             ref help_description,
             ref suggestions,
@@ -1273,11 +1274,15 @@ pub fn with_embeds(
             help_options.embed_success_colour,
         ),
         CustomisedHelpData::__Nonexhaustive => unreachable!(),
-    } {
-        warn_about_failed_send!(&formatted_help, why);
-    }
+    };
 
-    Ok(())
+    match response_result {
+        Ok(response) => Some(response),
+        Err(why) => {
+            warn_about_failed_send!(&formatted_help, why);
+            None
+        },
+    }
 }
 
 /// Turns grouped commands into a `String` taking plain help format into account.
@@ -1413,7 +1418,8 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     plain(context, msg, args, &help_options, groups, owners)
+///     let _ = plain(context, msg, args, &help_options, groups, owners);
+///     Ok(())
 /// }
 ///
 /// client.with_framework(StandardFramework::new()
@@ -1428,7 +1434,7 @@ pub fn plain(
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>,
-) -> CommandResult {
+) -> Option<Message> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options);
 
@@ -1450,11 +1456,13 @@ pub fn plain(
         CustomisedHelpData::__Nonexhaustive => unreachable!(),
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx, result) {
-        warn_about_failed_send!(&formatted_help, why);
-    };
-
-    Ok(())
+    match msg.channel_id.say(&ctx, result) {
+        Ok(response) => Some(response),
+        Err(why) => {
+            warn_about_failed_send!(&formatted_help, why);
+            None
+        }
+    }
 }
 
 #[cfg(test)]
