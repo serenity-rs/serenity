@@ -58,7 +58,7 @@
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
     Args, CommandGroup, CommandOptions, CheckResult,
-    CommandError, has_correct_roles, HelpBehaviour, HelpOptions,
+    has_correct_roles, HelpBehaviour, HelpOptions,
     has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
