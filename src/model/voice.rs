@@ -33,6 +33,7 @@ pub struct VoiceState {
     pub mute: bool,
     pub self_deaf: bool,
     pub self_mute: bool,
+    pub self_stream: Option<bool>,
     pub session_id: String,
     pub suppress: bool,
     pub token: Option<String>,
