@@ -401,7 +401,7 @@ impl Connection {
                 (Blame: VOICE_PACKET_MAX?)"
             );
         rtp.set_sequence(rtp.get_sequence() + 1);
-        rtp.set_timestamp(rtp.get_timestamp() + 960);
+        rtp.set_timestamp(rtp.get_timestamp() + MONO_FRAME_SIZE as u32);
 
         Ok(())
     }

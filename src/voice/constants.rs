@@ -18,9 +18,11 @@ pub const TIMESTEP_LENGTH: Duration = Duration::from_millis(1000 / AUDIO_FRAME_R
 pub const DEFAULT_BITRATE: Bitrate = Bitrate::BitsPerSecond(128_000);
 
 /// Number of samples in one complete frame of audio per channel.
+///
+/// This is equally the number of stereo (joint) samples in an audio frame.
 pub const MONO_FRAME_SIZE: usize = SAMPLE_RATE_RAW / AUDIO_FRAME_RATE;
 
-/// Number of samples in one complete frame of stereo audio.
+/// Number of individual samples in one complete frame of stereo audio.
 pub const STEREO_FRAME_SIZE: usize = 2 * MONO_FRAME_SIZE;
 
 /// Number of bytes in one complete frame of raw `f32`-encoded mono audio.
