@@ -91,7 +91,7 @@ version = "0.21"
 
 [dependencies.webpki-roots]
 optional = true
-version = "0.18"
+version = "0.19"
 
 [dependencies.xsalsa20poly1305]
 optional = true
