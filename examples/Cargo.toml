@@ -11,6 +11,6 @@ members = [
     "e09_shard_manager",
     "e10_voice_receive",
     "e11_create_message_builder",
-    "e12_timing_and_events",
+    "e12_collectors",
     "e13_gateway_intents",
 ]
