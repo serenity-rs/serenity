@@ -185,12 +185,15 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let res = parse_quote!(serenity::framework::standard::CommandResult);
     create_return_type_validation(&mut fun, res);
 
+    let visibility = fun.visibility;
     let name = fun.name.clone();
     let options = name.with_suffix(COMMAND_OPTIONS);
     let sub_commands = sub_commands
         .into_iter()
         .map(|i| i.with_suffix(COMMAND))
         .collect::<Vec<_>>();
+    let body = fun.body;
+    let ret = fun.ret;
 
     let n = name.with_suffix(COMMAND);
 
@@ -199,6 +202,9 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let options_path = quote!(serenity::framework::standard::CommandOptions);
     let command_path = quote!(serenity::framework::standard::Command);
+
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
 
     (quote! {
         #(#cooked)*
@@ -227,7 +233,11 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             options: &#options,
         };
 
-        #fun
+        #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
     })
     .into()
 }
@@ -248,6 +258,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[usage_sample_label(s)]` </br> `#[usage_sample_label = s]`                                                                                  | Actual sample label.                                                                                                                                                                                                                             | `s` is a string                                                                                            |
 /// | `#[ungrouped_label(s)]` </br> `#[ungrouped_label = s]`                                                                                        | Ungrouped commands label.                                                                                                                                                                                                                        | `s` is a string                                                                                            |
 /// | `#[grouped_label(s)]` </br> `#[grouped_label = s]`                                                                                            | Grouped commands label.                                                                                                                                                                                                                          | `s` is a string                                                                                            |
+/// | `#[sub_commands_label(s)]` </br> `#[sub_commands_label = s]`                                                                                  | Sub commands label.                                                                                                          | `s` is a string
 /// | `#[description_label(s)]` </br> `#[description_label = s]`                                                                                    | Label at the start of the description.                                                                                                                                                                                                           | `s` is a string                                                                                            |
 /// | `#[aliases_label(s)]` </br> `#[aliases_label= s]`                                                                                             | Label for a command's aliases.                                                                                                                                                                                                                   | `s` is a string                                                                                            |
 /// | `#[guild_only_text(s)]` </br> `#[guild_only_text = s]`                                                                                        | When a command is specific to guilds only.                                                                                                                                                                                                       | `s` is a string                                                                                            |
@@ -324,6 +335,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             embed_success_colour;
             strikethrough_commands_tip_in_dm;
             strikethrough_commands_tip_in_guild;
+            sub_commands_label;
             max_levenshtein_distance;
             indention_prefix
         ]);
@@ -406,6 +418,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         description_label,
         guild_only_text,
         checks_label,
+        sub_commands_label,
         dm_only_text,
         dm_and_guild_text,
         available_text,
@@ -444,6 +457,11 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let options_path = quote!(serenity::framework::standard::HelpOptions);
     let command_path = quote!(serenity::framework::standard::HelpCommand);
 
+    let body = fun.body;
+    let ret = fun.ret;
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
+
     (quote! {
         #(#cooked)*
         pub static #options: #options_path = #options_path {
@@ -458,6 +476,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             description_label: #description_label,
             guild_only_text: #guild_only_text,
             checks_label: #checks_label,
+            sub_commands_label: #sub_commands_label,
             dm_only_text: #dm_only_text,
             dm_and_guild_text: #dm_and_guild_text,
             available_text: #available_text,
@@ -483,7 +502,11 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             options: &#options,
         };
 
-        #fun
+        pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
     })
     .into()
 }
@@ -725,6 +748,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     let n = fun.name.clone();
     let n2 = name.clone();
+    let visibility = fun.visibility;
     let name = if name.is_empty() {
         fun.name.clone()
     } else {
@@ -733,6 +757,10 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);
+    let body = fun.body;
+    let ret = fun.ret;
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
 
     (quote! {
         pub static #name: #check = #check {
@@ -742,7 +770,33 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
             check_in_help: #check_in_help
         };
 
-        #fun
+        #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
+    })
+    .into()
+}
+
+#[proc_macro_attribute]
+pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
+    let mut fun = parse_macro_input!(input as Hook);
+
+    let visibility = fun.visibility;
+    let fun_name = fun.name;
+    let body = fun.body;
+    let ret = fun.ret;
+
+    populate_fut_lifetimes_on_refs(&mut fun.args);
+    let args = fun.args;
+
+    (quote! {
+        #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
+            use ::serenity::futures::future::FutureExt;
+
+            async move { #(#body)* }.boxed()
+        }
     })
     .into()
 }
