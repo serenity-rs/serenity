@@ -217,7 +217,7 @@ Voice + youtube-dl:
 [docs-badge]: https://img.shields.io/badge/docs-online-5023dd.svg?style=flat-square
 [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
-[guild]: https://discord.gg/WBdGJCc
+[guild]: https://discord.gg/9X7vCus
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [project:serenity-lavalink]: https://gitlab.com/nitsuga5124/serenity-lavalink/
 [repo:lavalink]: https://github.com/Frederikam/Lavalink
