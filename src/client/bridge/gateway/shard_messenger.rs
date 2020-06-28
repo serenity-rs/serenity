@@ -1,8 +1,10 @@
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
 use super::{ShardClientMessage, ShardRunnerMessage};
-use std::sync::mpsc::{SendError, Sender};
-use tungstenite::Message;
+use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
+use async_tungstenite::tungstenite::Message;
+#[cfg(feature = "collector")]
+use crate::collector::{ReactionFilter, MessageFilter};
 
 /// A lightweight wrapper around an mpsc sender.
 ///
@@ -16,6 +18,7 @@ use tungstenite::Message;
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
     tx: Sender<InterMessage>,
+    pub(crate) tx: Sender<InterMessage>,
 }
 
 impl ShardMessenger {
@@ -50,15 +53,14 @@ impl ShardMessenger {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -67,25 +69,20 @@ impl ShardMessenger {
     /// shard.chunk_guilds(guild_ids, Some(2000), None);
     /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
     /// ```
     ///
     /// Chunk a single guild by Id, limiting to 20 members, and specifying a
     /// query parameter of `"do"`:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -93,10 +90,6 @@ impl ShardMessenger {
     ///
     /// shard.chunk_guilds(guild_ids, Some(20), Some("do"));
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -111,7 +104,7 @@ impl ShardMessenger {
     ) where It: IntoIterator<Item=GuildId> {
         let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
 
-        let _ = self.send(ShardRunnerMessage::ChunkGuilds {
+        let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuilds {
             guild_ids: guilds,
             limit,
             query,
@@ -127,27 +120,22 @@ impl ShardMessenger {
     /// Setting the current activity to playing `"Heroes of the Storm"`:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// use serenity::model::gateway::Activity;
     ///
     /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
     /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
     /// ```
     pub fn set_activity(&self, activity: Option<Activity>) {
-        let _ = self.send(ShardRunnerMessage::SetActivity(activity));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetActivity(activity));
     }
 
     /// Sets the user's full presence information.
@@ -161,24 +149,21 @@ impl ShardMessenger {
     /// online:
     ///
     /// ```rust,ignore
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// #
-    /// use serenity::model::{Activity, OnlineStatus};
+    /// use serenity::model::gateway::Activity;
+    /// use serenity::model::user::OnlineStatus;
     ///
-    /// shard.set_presence(Some(Activity::playing("Heroes of the Storm")), OnlineStatus::Online);
+    /// let activity = Activity::playing("Heroes of the Storm");
+    /// shard.set_presence(Some(activity), OnlineStatus::Online);
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     pub fn set_presence(&self, activity: Option<Activity>, mut status: OnlineStatus) {
@@ -186,7 +171,7 @@ impl ShardMessenger {
             status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send(ShardRunnerMessage::SetPresence(status, activity));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetPresence(status, activity));
     }
 
     /// Sets the user's current online status.
@@ -201,24 +186,19 @@ impl ShardMessenger {
     /// Setting the current online status for the shard to [`DoNotDisturb`].
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
     /// #
     /// use serenity::model::user::OnlineStatus;
     ///
     /// shard.set_status(OnlineStatus::DoNotDisturb);
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -230,13 +210,13 @@ impl ShardMessenger {
             online_status = OnlineStatus::Invisible;
         }
 
-        let _ = self.send(ShardRunnerMessage::SetStatus(online_status));
+        let _ = self.send_to_shard(ShardRunnerMessage::SetStatus(online_status));
     }
 
     /// Shuts down the websocket by attempting to cleanly close the
     /// connection.
     pub fn shutdown_clean(&self) {
-        let _ = self.send(ShardRunnerMessage::Close(1000, None));
+        let _ = self.send_to_shard(ShardRunnerMessage::Close(1000, None));
     }
 
     /// Sends a raw message over the WebSocket.
@@ -249,12 +229,26 @@ impl ShardMessenger {
     ///
     /// [`set_presence`]: #method.set_presence
     pub fn websocket_message(&self, message: Message) {
-        let _ = self.send(ShardRunnerMessage::Message(message));
+        let _ = self.send_to_shard(ShardRunnerMessage::Message(message));
     }
 
+    /// Sends a message to the shard.
     #[inline]
-    fn send(&self, msg: ShardRunnerMessage)
-        -> Result<(), SendError<InterMessage>> {
-        self.tx.send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+    pub fn send_to_shard(&self, msg: ShardRunnerMessage)
+        -> Result<(), TrySendError<InterMessage>> {
+        self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
+    }
+
+    /// Sets a new filter for a message collector.
+    #[inline]
+    #[cfg(feature = "collector")]
+    pub fn set_message_filter(&self, collector: MessageFilter) {
+        let _ = self.send_to_shard(ShardRunnerMessage::SetMessageFilter(collector));
+    }
+
+    /// Sets a new filter for a message collector.
+    #[cfg(feature = "collector")]
+    pub fn set_reaction_filter(&self, collector: ReactionFilter) {
+        let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
     }
 }

@@ -1,31 +1,28 @@
-use crate::gateway::Shard;
+use crate::gateway::{InterMessage, Shard};
 use crate::internal::prelude::*;
 use crate::CacheAndHttp;
-use parking_lot::Mutex;
-use parking_lot::RwLock;
+use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::{HashMap, VecDeque},
-    sync::{
-        mpsc::{
-            Receiver,
-            RecvTimeoutError,
-            Sender},
-        Arc
-    },
-    thread,
-    time::{Duration, Instant}
+    sync::Arc,
 };
+use futures::{
+    StreamExt,
+    channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
+};
+use tokio::time::{delay_for, timeout, Duration, Instant};
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
     GatewayIntents,
     ShardId,
+    ShardClientMessage,
     ShardManagerMessage,
+    ShardMessenger,
     ShardQueuerMessage,
     ShardRunner,
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
-use threadpool::ThreadPool;
 use crate::gateway::ConnectionStage;
 use log::{debug, info, warn};
 
@@ -61,7 +58,7 @@ pub struct ShardQueuer {
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
+    pub framework: Arc<Box<dyn Framework + Send + Sync>>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.
@@ -79,14 +76,6 @@ pub struct ShardQueuer {
     pub runners: Arc<Mutex<HashMap<ShardId, ShardRunnerInfo>>>,
     /// A receiver channel for the shard queuer to be told to start shards.
     pub rx: Receiver<ShardQueuerMessage>,
-    /// A copy of a threadpool to give shard runners.
-    ///
-    /// For example, when using the [`Client`], this will be a copy of
-    /// [`Client::threadpool`].
-    ///
-    /// [`Client`]: ../../struct.Client.html
-    /// [`Client::threadpool`]: ../../struct.Client.html#structfield.threadpool
-    pub threadpool: ThreadPool,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
     pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
@@ -94,7 +83,8 @@ pub struct ShardQueuer {
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
-    pub intents: Option<GatewayIntents>
+    pub intents: Option<GatewayIntents>,
+    pub shard_shutdown: Receiver<ShardId>,
 }
 
 impl ShardQueuer {
@@ -120,33 +110,39 @@ impl ShardQueuer {
     /// [`ShardQueuerMessage::Shutdown`]: enum.ShardQueuerMessage.html#variant.Shutdown
     /// [`ShardQueuerMessage::Start`]: enum.ShardQueuerMessage.html#variant.Start
     /// [`rx`]: #structfield.rx
-    pub fn run(&mut self) {
+    pub async fn run(&mut self) {
         // The duration to timeout from reads over the Rx channel. This can be
         // done in a loop, and if the read times out then a shard can be
         // started if one is presently waiting in the queue.
-        let wait_duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
+        const TIMEOUT = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
         loop {
-            match self.rx.recv_timeout(wait_duration) {
-                Ok(ShardQueuerMessage::Shutdown) => break,
-                Ok(ShardQueuerMessage::Start(id, total)) => {
-                    self.checked_start(id.0, total.0);
+            match timeout(TIMEOUT, self.rx.next()).await {
+                Ok(Some(ShardQueuerMessage::Shutdown)) => {
+                    debug!("[Shard Queuer] Received to shutdown.");
+                    self.shutdown_runners().await;
+
+                    break
                 },
-                Err(RecvTimeoutError::Disconnected) => {
-                    // If the sender half has disconnected then the queuer's
-                    // lifespan has passed and can shutdown.
-                    break;
+                Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
+                    debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
+                    self.shutdown(shard, code).await;
                 },
-                Err(RecvTimeoutError::Timeout) => {
+                Ok(Some(ShardQueuerMessage::Start(id, total))) => {
+                    debug!("[Shard Queuer] Received to start shard {} of {}.", id.0, total.0);
+                    self.checked_start(id.0, total.0).await;
+                },
+                Ok(None) => break,
+                Err(_) => {
                     if let Some((id, total)) = self.queue.pop_front() {
-                        self.checked_start(id, total);
+                        self.checked_start(id, total).await;
                     }
-                }
+                },
             }
         }
     }
 
-    fn check_last_start(&mut self) {
+    fn async check_last_start(&mut self) {
         let instant = match self.last_start {
             Some(instant) => instant,
             None => return,
@@ -163,15 +159,16 @@ impl ShardQueuer {
 
         let to_sleep = duration - elapsed;
 
-        thread::sleep(to_sleep);
+        delay_for(to_sleep).await;
     }
 
-    fn checked_start(&mut self, id: u64, total: u64) {
-        self.check_last_start();
+    async fn checked_start(&mut self, id: u64, total: u64) {
+        debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
+        self.check_last_start().await;
 
-        if let Err(why) = self.start(id, total) {
-            warn!("Err starting shard {}: {:?}", id, why);
-            info!("Re-queueing start of shard {}", id);
+        if let Err(why) = self.start(id, total).await {
+            warn!("[Shard Queuer] Err starting shard {}: {:?}", id, why);
+            info!("[Shard Queuer] Re-queueing start of shard {}", id);
 
             self.queue.push_back((id, total));
         }
@@ -179,7 +176,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
-    fn start(&mut self, shard_id: u64, shard_total: u64) -> Result<()> {
+    async fn start(&mut self, shard_id: u64, shard_total: u64) -> Result<()> {
         let shard_info = [shard_id, shard_total];
 
         let shard = Shard::new(
@@ -188,7 +185,7 @@ impl ShardQueuer {
             shard_info,
             self.guild_subscriptions,
             self.intents,
-        )?;
+        ).await?;
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),
@@ -197,7 +194,6 @@ impl ShardQueuer {
             #[cfg(feature = "framework")]
             framework: Arc::clone(&self.framework),
             manager_tx: self.manager_tx.clone(),
-            threadpool: self.threadpool.clone(),
             #[cfg(feature = "voice")]
             voice_manager: Arc::clone(&self.voice_manager),
             shard,
@@ -206,17 +202,83 @@ impl ShardQueuer {
 
         let runner_info = ShardRunnerInfo {
             latency: None,
-            runner_tx: runner.runner_tx(),
+            runner_tx: ShardMessenger::new(runner.runner_tx()),
             stage: ConnectionStage::Disconnected,
         };
 
-        thread::spawn(move || {
-            let _ = runner.run();
+        tokio::spawn(async move || {
+            let _ = runner.run().await;
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });
 
-        self.runners.lock().insert(ShardId(shard_id), runner_info);
+        self.runners.lock().await.insert(ShardId(shard_id), runner_info);
 
         Ok(())
+    }
+
+    async fn shutdown_runners(&mut self) {
+        let keys = {
+            let runners = self.runners.lock().await;
+
+            if runners.is_empty() {
+                return;
+            }
+
+            runners.keys().cloned().collect::<Vec<_>>()
+        };
+
+        info!("Shutting down all shards");
+
+        for shard_id in keys {
+            self.shutdown(shard_id, 1000).await;
+        }
+    }
+
+    /// Attempts to shut down the shard runner by Id.
+    ///
+    /// Returns a boolean indicating whether a shard runner was present. This is
+    /// _not_ necessary an indicator of whether the shard runner was
+    /// successfully shut down.
+    ///
+    /// **Note**: If the receiving end of an mpsc channel - theoretically owned
+    /// by the shard runner - no longer exists, then the shard runner will not
+    /// know it should shut down. This _should never happen_. It may already be
+    /// stopped.
+    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) -> bool {
+        info!("Shutting down shard {}", shard_id);
+
+        if let Some(runner) = self.runners.lock().await.get(&shard_id) {
+            let shutdown = ShardManagerMessage::Shutdown(shard_id, code);
+            let client_msg = ShardClientMessage::Manager(shutdown);
+            let msg = InterMessage::Client(Box::new(client_msg));
+
+            if let Err(why) = runner.runner_tx.tx.unbounded_send(msg) {
+                warn!(
+                    "Failed to cleanly shutdown shard {} when sending message to shard runner: {:?}",
+                    shard_id,
+                    why,
+                );
+            }
+
+            const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
+
+            match timeout(TIMEOUT, self.shard_shutdown.next()).await {
+                Ok(Some(shutdown_shard_id)) =>
+                    if shutdown_shard_id != shard_id {
+                        warn!(
+                            "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
+                            shard_id,
+                        );
+                    },
+                Ok(None) => (),
+                Err(why) => warn!(
+                    "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
+                    shard_id,
+                    why,
+                ),
+            }
+        }
+
+        self.runners.lock().await.remove(&shard_id).is_some()
     }
 }

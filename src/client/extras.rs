@@ -7,6 +7,9 @@ use std::sync::Arc;
 #[cfg(feature = "cache")]
 use std::time::Duration;
 
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
+
 /// A builder to extra things for altering the [`Client`].
 ///
 /// [`Client`]: ../struct.Client.html
@@ -14,6 +17,8 @@ use std::time::Duration;
 pub struct Extras {
     pub(crate) event_handler: Option<Arc<dyn EventHandler>>,
     pub(crate) raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    #[cfg(feature = "framework")]
+    pub(crate) framework: Arc<Option<Box<dyn Framework + Send + Sync + 'static>>>,
     #[cfg(feature = "cache")]
     pub(crate) timeout: Option<Duration>,
     pub(crate) guild_subscriptions: bool,
@@ -42,10 +47,17 @@ impl Extras {
         self
     }
 
+    /// Set the framework.
+    #[cfg(feature = "framework")]
+    pub fn framework<F: Framework + Send + Sync + 'static>(&mut self, framework: F) -> &mut Self {
+        self.framework = Arc::new(Some(Box::new(framework)));
+        self
+    }
+
     /// Set the duration the library is permitted to update the cache
     /// before giving up acquiring a write-lock.
     ///
-    /// This can be useful for avoiding deadlocks.
+    /// This can be useful for avoiding deadlocks, but it also may invalidate your cache.
     #[cfg(feature = "cache")]
     pub fn cache_update_timeout(&mut self, duration: Duration) -> &mut Self {
         self.timeout = Some(duration);
@@ -74,6 +86,8 @@ impl Default for Extras {
         Extras {
             event_handler: None,
             raw_event_handler: None,
+            #[cfg(feature = "framework")]
+            framework: Arc::new(None),
             #[cfg(feature = "cache")]
             timeout: None,
             guild_subscriptions: true,
