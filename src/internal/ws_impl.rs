@@ -20,6 +20,7 @@ use std::{
     net::TcpStream,
     sync::Arc,
 };
+
 #[cfg(not(feature = "native_tls_backend"))]
 use url::Url;
 
