@@ -1,31 +1,22 @@
-use parking_lot::RwLock as ParkingLotRwLock;
-use std::sync::{Arc, RwLock};
+use tokio::sync::RwLock;
+use std::sync::Arc;
+use async_trait::async_trait;
 
-pub trait RwLockExt<T> {
-    fn with<Y, F: Fn(&T) -> Y>(&self, f: F) -> Y;
-    fn with_mut<Y, F: FnMut(&mut T) -> Y>(&self, f: F) -> Y;
+#[async_trait]
+pub trait RwLockExt<T: Send + Sync> {
+    async fn with<Y, F: Fn(&T) -> Y + Send>(&self, f: F) -> Y;
+    async fn with_mut<Y, F: FnMut(&mut T) -> Y + Send>(&self, f: F) -> Y;
 }
 
-impl<T> RwLockExt<T> for Arc<RwLock<T>> {
-    fn with<Y, F: Fn(&T) -> Y>(&self, f: F) -> Y {
-        let r = self.read().unwrap();
+#[async_trait]
+impl<T: Send + Sync> RwLockExt<T> for Arc<RwLock<T>> {
+    async fn with<Y, F: Fn(&T) -> Y + Send>(&self, f: F) -> Y {
+        let r = self.read().await;
         f(&r)
     }
 
-    fn with_mut<Y, F: FnMut(&mut T) -> Y>(&self, mut f: F) -> Y {
-        let mut w = self.write().unwrap();
-        f(&mut w)
-    }
-}
-
-impl<T> RwLockExt<T> for Arc<ParkingLotRwLock<T>> {
-    fn with<Y, F: Fn(&T) -> Y>(&self, f: F) -> Y {
-        let r = self.read();
-        f(&r)
-    }
-
-    fn with_mut<Y, F: FnMut(&mut T) -> Y>(&self, mut f: F) -> Y {
-        let mut w = self.write();
+    async fn with_mut<Y, F: FnMut(&mut T) -> Y>(&self, mut f: F) -> Y {
+        let mut w = self.write().await;
         f(&mut w)
     }
 }
