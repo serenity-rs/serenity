@@ -20,13 +20,10 @@ use std::{
 /// value:
 ///
 /// ```rust,no_run
-/// # extern crate serde_json;
-/// # extern crate serenity;
-/// #
 /// # use serde_json::json;
 /// # use serenity::model::prelude::*;
 /// #
-/// # fn main() {
+/// # async fn run() {
 /// # let user = UserId(1);
 /// # let emoji = serde_json::from_value::<Emoji>(json!({
 /// #     "animated": false,
@@ -157,9 +154,6 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::model::guild::Role;
     /// #
