@@ -44,7 +44,7 @@
 //! [`Client::start_shard`]: ../client/struct.Client.html#method.start_shard
 //! [`Client::start_shard_range`]: ../client/struct.Client.html#method.start_shard_range
 //! [`Client::start_shards`]: ../client/struct.Client.html#method.start_shards
-//! [docs]: https://discord.com/developers/docs/topics/gateway#sharding
+//! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod error;
 mod shard;
@@ -62,21 +62,30 @@ use crate::model::{
 };
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use tungstenite::protocol::WebSocket;
-
-#[cfg(feature = "native_tls_backend")]
-use tungstenite::client::AutoStream;
 
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
-#[cfg(not(feature = "native_tls_backend"))]
-pub type WsClient = WebSocket<rustls::StreamOwned<rustls::ClientSession, std::net::TcpStream>>;
+use async_tungstenite::{WebSocketStream, stream::Stream, tokio::TokioAdapter};
+use tokio::net::TcpStream;
 
 #[cfg(feature = "native_tls_backend")]
-pub type WsClient = WebSocket<AutoStream>;
+use tokio_tls::TlsStream;
+
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+use async_tls::client::TlsStream;
+
+pub type MaybeTlsStream<S> = Stream<S, TokioAdapter<TlsStream<TokioAdapter<S>>>>;
+
+#[cfg(feature = "native_tls_backend")]
+pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
+    TokioAdapter<TlsStream<TokioAdapter<TokioAdapter<TcpStream>>>>>>;
+
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
+    TlsStream<TokioAdapter<TcpStream>>>>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
