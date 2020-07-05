@@ -395,15 +395,17 @@ fn check_command_behaviour(
     let b = check_common_behaviour(&ctx, msg, &options, owners, help_options);
 
     if b == HelpBehaviour::Nothing {
-       for check in options.checks {
-           if !check.check_in_help {
-               break;
-           }
+       if !options.owner_privilege || !owners.contains(&msg.author.id) {
+           for check in options.checks {
+               if !check.check_in_help {
+                   continue;
+               }
 
-           let mut args = Args::new("", &[]);
+               let mut args = Args::new("", &[]);
 
-           if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options) {
-               return help_options.lacking_conditions;
+               if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options) {
+                   return help_options.lacking_conditions;
+               }
            }
        }
     }
