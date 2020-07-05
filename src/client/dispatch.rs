@@ -495,7 +495,7 @@ fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             threadpool.execute(move || {
-                event_handler.guild_members_chunk(context, event.guild_id, event.members);
+                event_handler.guild_members_chunk(context, event.guild_id, event.members, event.nonce);
             });
         },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {

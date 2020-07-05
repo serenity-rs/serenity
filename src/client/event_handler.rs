@@ -154,7 +154,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when the data for offline members was requested.
     ///
     /// Provides the guild's id and the data.
-    fn guild_members_chunk(&self, _ctx: Context, _guild_id: GuildId, _offline_members: HashMap<UserId, Member>) {}
+    fn guild_members_chunk(&self, _ctx: Context, _guild_id: GuildId, _offline_members: HashMap<UserId, Member>, _nonce: Option<String>) {}
 
     /// Dispatched when a role is created.
     ///
