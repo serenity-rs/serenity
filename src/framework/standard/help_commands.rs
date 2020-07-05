@@ -110,38 +110,39 @@ macro_rules! warn_about_failed_send {
 /// in relation of help-settings measured to the user.
 #[derive(Clone, Debug, Default)]
 pub struct GroupCommandsPair {
-    name: &'static str,
-    prefixes: Vec<&'static str>,
-    command_names: Vec<String>,
-    sub_groups: Vec<GroupCommandsPair>,
+    pub name: &'static str,
+    pub prefixes: Vec<&'static str>,
+    pub command_names: Vec<String>,
+    pub sub_groups: Vec<GroupCommandsPair>,
 }
 
 /// A single suggested command containing its name and Levenshtein distance
 /// to the actual user's searched command name.
 #[derive(Clone, Debug, Default)]
-struct SuggestedCommandName {
-    name: String,
-    levenshtein_distance: usize,
+pub struct SuggestedCommandName {
+    pub name: String,
+    pub levenshtein_distance: usize,
 }
 
 /// A single command containing all related pieces of information.
 #[derive(Clone, Debug)]
 pub struct Command<'a> {
-    name: &'static str,
-    group_name: &'static str,
-    group_prefixes: &'a [&'static str],
-    aliases: Vec<&'static str>,
-    availability: &'a str,
-    description: Option<&'static str>,
-    usage: Option<&'static str>,
-    usage_sample: Vec<&'static str>,
-    checks: Vec<String>,
+    pub name: &'static str,
+    pub group_name: &'static str,
+    pub group_prefixes: &'a [&'static str],
+    pub aliases: Vec<&'static str>,
+    pub availability: &'a str,
+    pub description: Option<&'static str>,
+    pub usage: Option<&'static str>,
+    pub usage_sample: Vec<&'static str>,
+    pub checks: Vec<String>,
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Contains possible suggestions in case a command could not be found
 /// but are similar enough.
 #[derive(Clone, Debug, Default)]
-pub struct Suggestions(Vec<SuggestedCommandName>);
+pub struct Suggestions(pub Vec<SuggestedCommandName>);
 
 #[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
@@ -552,6 +553,7 @@ fn nested_group_command_search<'a>(
                     availability: available_text,
                     usage: options.usage,
                     usage_sample: options.examples.to_vec(),
+                    _nonexhaustive: (),
                 },
             });
         }
