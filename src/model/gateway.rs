@@ -1,10 +1,8 @@
 //! Models pertaining to the gateway.
 
-use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
 use serde_json;
-use std::sync::Arc;
 use super::utils::*;
 use super::prelude::*;
 use bitflags::bitflags;
@@ -86,14 +84,12 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    /// async fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::playing(&name));
+    ///     ctx.set_activity(Activity::playing(&name)).await;
     ///
     ///     Ok(())
     /// }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn playing(name: &str) -> Activity {
         Activity {
@@ -133,16 +129,14 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    /// async fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     const STREAM_URL: &str = "...";
     ///
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL));
+    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL)).await;
     ///
     ///     Ok(())
     /// }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn streaming(name: &str, url: &str) -> Activity {
         Activity {
@@ -181,14 +175,12 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    /// async fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::listening(&name));
+    ///     ctx.set_activity(Activity::listening(&name)).await;
     ///
     ///     Ok(())
     /// }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn listening(name: &str) -> Activity {
         Activity {
@@ -439,7 +431,7 @@ pub struct Presence {
     /// date.
     pub user_id: UserId,
     /// The associated user instance.
-    pub user: Option<Arc<RwLock<User>>>,
+    pub user: Option<User>,
     pub(crate) _nonexhaustive: (),
 }
 
@@ -455,7 +447,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user = User::deserialize(Value::Object(user_map))
                 .map_err(DeError::custom)?;
 
-            (user.id, Some(Arc::new(RwLock::new(user))))
+            (user.id, Some(user))
         } else {
             let user_id = user_map
                 .remove("id")
@@ -525,13 +517,13 @@ impl Serialize for Presence {
         state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
 
-        if let Some(ref user) = self.user {
-            state.serialize_field("user", &*user.read())?;
+        if let Some(user) = self.user {
+            state.serialize_field("user", &user)?;
         } else {
             state.serialize_field(
                 "user",
                 &UserId {
-                    id: *self.user_id.as_u64(),
+                    id: self.user_id.0,
                 },
             )?;
         }
