@@ -897,9 +897,9 @@ pub fn create_customised_help_data<'a>(
     }
 
     let strikethrough_command_tip = if msg.is_private() {
-        &help_options.strikethrough_commands_tip_in_guild
-    } else {
         &help_options.strikethrough_commands_tip_in_dm
+    } else {
+        &help_options.strikethrough_commands_tip_in_guild
     };
 
     let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
