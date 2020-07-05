@@ -1,33 +1,36 @@
-use parking_lot::Mutex;
+use tokio::sync::Mutex;
 use audiopus::{Bitrate, SampleRate};
 use std::{
     sync::Arc,
     time::Duration,
 };
+use async_trait::async_trait;
 
 pub const HEADER_LEN: usize = 12;
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
 pub const DEFAULT_BITRATE: Bitrate = Bitrate::BitsPerSecond(128_000);
 
 /// A readable audio source.
-pub trait AudioSource: Send {
-    fn is_stereo(&mut self) -> bool;
+#[async_trait]
+pub trait AudioSource: Send + Sync {
+    async fn is_stereo(&mut self) -> bool;
 
-    fn get_type(&self) -> AudioType;
+    async fn get_type(&self) -> AudioType;
 
-    fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
+    async fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize>;
 
-    fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
+    async fn read_opus_frame(&mut self) -> Option<Vec<u8>>;
 
-    fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
+    async fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize>;
 }
 
 /// A receiver for incoming audio.
-pub trait AudioReceiver: Send {
-    fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) { }
+#[async_trait]
+pub trait AudioReceiver: Send + Sync {
+    async fn speaking_update(&self, _ssrc: u32, _user_id: u64, _speaking: bool) { }
 
     #[allow(clippy::too_many_arguments)]
-    fn voice_packet(&mut self,
+    async fn voice_packet(&self,
                     _ssrc: u32,
                     _sequence: u16,
                     _timestamp: u32,
@@ -35,9 +38,9 @@ pub trait AudioReceiver: Send {
                     _data: &[i16],
                     _compressed_size: usize) { }
 
-    fn client_connect(&mut self, _ssrc: u32, _user_id: u64) { }
+    async fn client_connect(&self, _ssrc: u32, _user_id: u64) { }
 
-    fn client_disconnect(&mut self, _user_id: u64) { }
+    async fn client_disconnect(&self, _user_id: u64) { }
 }
 
 #[derive(Clone, Copy)]
@@ -65,7 +68,7 @@ pub enum AudioType {
 /// let safe_audio: LockedAudio = handler.play_only(source);
 /// {
 ///     let audio_lock = safe_audio_control.clone();
-///     let mut audio = audio_lock.lock();
+///     let mut audio = audio_lock.lock().await;
 ///
 ///     audio.volume(0.5);
 /// }

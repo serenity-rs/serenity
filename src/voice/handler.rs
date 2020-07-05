@@ -8,13 +8,14 @@ use crate::model::{
     },
     voice::VoiceState
 };
-use parking_lot::Mutex;
-use std::sync::{
-    mpsc::{self, Sender as MpscSender},
-    Arc
+use tokio::sync::Mutex;
+use std::sync::Arc;
+use futures::channel::mpsc::{
+    unbounded,
+    UnboundedSender as Sender,
 };
 use super::connection_info::ConnectionInfo;
-use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, threading, LockedAudio};
+use super::{Audio, AudioReceiver, AudioSource, Bitrate, Status as VoiceStatus, tasks, LockedAudio};
 use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting
@@ -45,7 +46,7 @@ use serde_json::json;
 ///
 /// [`Manager`]: struct.Manager.html
 /// [`Shard`]: ../gateway/struct.Shard.html
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Handler {
     /// The ChannelId to be connected to, if any.
     ///
@@ -74,7 +75,7 @@ pub struct Handler {
     /// [`mute`]: #method.mute
     pub self_mute: bool,
     /// The internal sender to the voice connection monitor thread.
-    sender: MpscSender<VoiceStatus>,
+    sender: Sender<VoiceStatus>,
     /// The session Id of the current voice connection, if any.
     ///
     /// **Note**: This _should_ be set through an [`update_state`] call.
@@ -99,7 +100,7 @@ pub struct Handler {
     ///
     /// When set via [`standalone`][`Handler::standalone`], it will not be
     /// present.
-    ws: Option<MpscSender<InterMessage>>,
+    ws: Option<Sender<InterMessage>>,
 }
 
 impl Handler {
@@ -107,7 +108,7 @@ impl Handler {
     #[inline]
     pub(crate) fn new(
         guild_id: GuildId,
-        ws: MpscSender<InterMessage>,
+        ws: Sender<InterMessage>,
         user_id: UserId,
     ) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
@@ -225,7 +226,7 @@ impl Handler {
     /// can pass in just a boxed receiver, and do not need to specify `Some`.
     ///
     /// Pass `None` to drop the current receiver, if one exists.
-    pub fn listen(&mut self, receiver: Option<Box<dyn AudioReceiver>>) {
+    pub fn listen(&mut self, receiver: Option<Arc<dyn AudioReceiver>>) {
         self.send(VoiceStatus::SetReceiver(receiver))
     }
 
@@ -383,12 +384,11 @@ impl Handler {
 
     fn new_raw(
         guild_id: GuildId,
-        ws: Option<MpscSender<InterMessage>>,
+        ws: Option<Sender<InterMessage>>,
         user_id: UserId,
     ) -> Self {
-        let (tx, rx) = mpsc::channel();
-
-        threading::start(guild_id, rx);
+        let (tx, rx) = unbounded();
+        tasks::start(guild_id, rx);
 
         Handler {
             channel_id: None,
@@ -404,17 +404,15 @@ impl Handler {
         }
     }
 
-    /// Sends a message to the thread.
+    /// Sends a message to the task.
     fn send(&mut self, status: VoiceStatus) {
-        // Restart thread if it errored.
-        if let Err(mpsc::SendError(status)) = self.sender.send(status) {
-            let (tx, rx) = mpsc::channel();
+        // Restart task if it errored.
+        if let Err(error) = self.sender.unbounded_send(status) {
+            let (tx, rx) = unbounded();
 
             self.sender = tx;
-            self.sender.send(status).unwrap();
-
-            threading::start(self.guild_id, rx);
-
+            self.sender.unbounded_send(status).unwrap();
+            tasks::start(self.guild_id, rx);
             self.update();
         }
     }
@@ -446,7 +444,7 @@ impl Handler {
                 }
             });
 
-            let _ = ws.send(InterMessage::Json(map));
+            let _ = ws.unbounded_send(InterMessage::Json(map));
         }
     }
 }
