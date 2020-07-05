@@ -405,8 +405,8 @@ impl Default for HelpOptions {
                                      name as an argument to this command."
                 .to_string(),
             group_prefix: "Prefix".to_string(),
-            strikethrough_commands_tip_in_dm: Some(String::new()),
-            strikethrough_commands_tip_in_guild: Some(String::new()),
+            strikethrough_commands_tip_in_dm: None,
+            strikethrough_commands_tip_in_guild: None,
             lacking_role: HelpBehaviour::Strike,
             lacking_permissions: HelpBehaviour::Strike,
             lacking_ownership: HelpBehaviour::Hide,
