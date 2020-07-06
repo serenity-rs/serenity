@@ -218,8 +218,8 @@ impl<'a> From<&'a Role> for RoleId {
 impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
-    async fn from_str<Cache>(cache: Cache, s: &str) -> StdResult<Self, Self::Err>
-    where Cache: AsRef<Cache> + Send + Sync
+    async fn from_str<CRL>(cache: CRL, s: &str) -> StdResult<Self, Self::Err>
+    where CRL: AsRef<Cache> + Send + Sync
     {
         match parse_role(s) {
             Some(x) => match RoleId(x).to_role_cached(&cache).await {

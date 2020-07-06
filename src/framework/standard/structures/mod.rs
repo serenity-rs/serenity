@@ -69,7 +69,7 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-pub type CommandError = Box<dyn StdError>;
+pub type CommandError = Box<dyn StdError + Send + Sync>;
 pub type CommandResult = std::result::Result<(), CommandError>;
 pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 

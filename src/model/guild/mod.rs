@@ -165,8 +165,8 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
-    async fn check_hierarchy(&self, cache: impl AsRef<CacheRwLock>, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().current_user.read().await.id;
+    async fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
+        let current_id = cache.as_ref().current_user().await.id;
 
         if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id).await {
             if higher != current_id {
@@ -182,7 +182,7 @@ impl Guild {
     /// returns `None`)
     pub async fn default_channel<'a>(&'a self, uid: UserId) -> Option<&'a GuildChannel> {
         for (cid, channel) in &self.channels {
-            if self.user_permissions_in(*cid, uid).await.read_messages() {
+            if self.user_permissions_in(*cid, uid).read_messages() {
                 return Some(channel);
             }
         }
@@ -195,10 +195,10 @@ impl Guild {
     /// returns `None`)
     /// Note however that this is very costy if used in a server with lots of channels,
     /// members, or both.
-    pub async fn default_channel_guaranteed<'a>(&self) -> Option<&'a GuildChannel> {
+    pub async fn default_channel_guaranteed<'a>(&'a self) -> Option<&'a GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
-                if self.user_permissions_in(*cid, *memid).await.read_messages() {
+                if self.user_permissions_in(*cid, *memid).read_messages() {
                     return Some(channel);
                 }
             }
@@ -209,9 +209,9 @@ impl Guild {
 
     #[cfg(feature = "cache")]
     async fn has_perms(&self, cache: impl AsRef<Cache>, mut permissions: Permissions) -> bool {
-        let user_id = cache.as_ref().current_user.read().await.id;
+        let user_id = cache.as_ref().current_user().await.id;
 
-        let perms = self.member_permissions(user_id).await;
+        let perms = self.member_permissions(user_id);
         permissions.remove(perms);
 
         permissions.is_empty()
@@ -512,7 +512,7 @@ impl Guild {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.owner_id != cache.current_user.read().await.id {
+                if self.owner_id != cache.current_user().await.id {
                     let req = Permissions::MANAGE_GUILD;
 
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -766,7 +766,7 @@ impl Guild {
     #[cfg(feature = "cache")]
     async fn _greater_member_hierarchy(
         &self,
-        cache: impl AsRef<CacheRwLock>,
+        cache: impl AsRef<Cache>,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -1239,7 +1239,7 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     #[inline]
     pub fn member_permissions(&self, user_id: impl Into<UserId>) -> Permissions {
-        self._member_permissions(user_id.into()).await
+        self._member_permissions(user_id.into())
     }
 
     fn _member_permissions(&self, user_id: UserId) -> Permissions {
@@ -1277,7 +1277,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().id,
+                    member.user.id,
                     self.id,
                     role,
                 );
@@ -2230,7 +2230,7 @@ pub enum VerificationLevel {
 enum_number!(
     VerificationLevel {
         None,
-        ,
+        Low,
         Medium,
         High,
         Higher,
@@ -2349,7 +2349,6 @@ mod test {
             let guild = gen();
             let lhs = guild
                 .member_named("test#1432")
-                .await
                 .unwrap()
                 .display_name();
 
@@ -2359,7 +2358,7 @@ mod test {
         #[tokio::test]
         async fn member_named_nickname() {
             let guild = gen();
-            let lhs = guild.member_named("aaaa").await.unwrap().display_name();
+            let lhs = guild.member_named("aaaa").unwrap().display_name();
 
             assert_eq!(lhs, gen_member().display_name());
         }

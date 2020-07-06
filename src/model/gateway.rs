@@ -517,7 +517,7 @@ impl Serialize for Presence {
         state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
 
-        if let Some(user) = self.user {
+        if let Some(user) = &self.user {
             state.serialize_field("user", &user)?;
         } else {
             state.serialize_field(

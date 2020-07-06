@@ -17,7 +17,6 @@ use crate::collector::{ReactionFilter, MessageFilter};
 /// [`shutdown`]: #method.shutdown
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
-    tx: Sender<InterMessage>,
     pub(crate) tx: Sender<InterMessage>,
 }
 

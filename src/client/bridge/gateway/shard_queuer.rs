@@ -114,7 +114,7 @@ impl ShardQueuer {
         // The duration to timeout from reads over the Rx channel. This can be
         // done in a loop, and if the read times out then a shard can be
         // started if one is presently waiting in the queue.
-        const TIMEOUT = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
+        const TIMEOUT: Duration = Duration::from_secs(WAIT_BETWEEN_BOOTS_IN_SECONDS);
 
         loop {
             match timeout(TIMEOUT, self.rx.next()).await {
@@ -142,7 +142,7 @@ impl ShardQueuer {
         }
     }
 
-    fn async check_last_start(&mut self) {
+    async fn check_last_start(&mut self) {
         let instant = match self.last_start {
             Some(instant) => instant,
             None => return,
@@ -206,7 +206,7 @@ impl ShardQueuer {
             stage: ConnectionStage::Disconnected,
         };
 
-        tokio::spawn(async move || {
+        tokio::spawn(async move {
             let _ = runner.run().await;
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });

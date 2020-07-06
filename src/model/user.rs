@@ -618,7 +618,7 @@ impl User {
         guild: impl Into<GuildContainer>,
         role: impl Into<RoleId>
     ) -> Result<bool> {
-        self._has_role(cache_http, guild.into(), role.into()).await
+        self._has_role(&cache_http, guild.into(), role.into()).await
     }
 
     fn _has_role<'a>(
@@ -658,7 +658,7 @@ impl User {
                 },
                 GuildContainer::__Nonexhaustive => unreachable!(),
             }
-        }
+        }.boxed()
     }
 
     /// Refreshes the information about the user.
@@ -731,7 +731,7 @@ impl User {
         {
             if let Some(cache) = cache_http.cache() {
                 if let Some(guild) = guild_id.to_guild_cached(cache).await {
-                    return guild.members.get(&self.id).map(|m| m.nick.clone());
+                    return guild.members.get(&self.id).and_then(|m| m.nick.clone());
                 }
             }
         }
@@ -783,7 +783,7 @@ impl UserId {
         {
             if let Some(cache) = cache_http.cache() {
                 for channel in cache.private_channels().await.values() {
-                    if channel.recipient.id == self.id {
+                    if channel.recipient.id == self {
                         return Ok(channel.clone());
                     }
                 }

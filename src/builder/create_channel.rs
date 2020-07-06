@@ -114,8 +114,7 @@ impl CreateChannel {
     ///
     /// guild.create_channel(http, |c| {
     ///     c.name("my_new_cool_channel")
-    ///     .permissions(channel.permissions.clone()))
-    ///         .permissions(permissions)
+    ///     .permissions(permissions)
     /// })
     /// .await?;
     /// #    Ok(())

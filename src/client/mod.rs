@@ -58,7 +58,7 @@ use std::{
     pin::Pin,
     task::{Context as FutContext, Poll},
 };
-#[cfg(any(feature = "framework", feature = "gateway"))]
+#[cfg(all(feature = "cache", feature = "gateway"))]
 use std::time::Duration;
 use log::{error, debug, info};
 

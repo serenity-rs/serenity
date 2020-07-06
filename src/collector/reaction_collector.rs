@@ -21,6 +21,7 @@ use futures::{
 use crate::{
     client::bridge::gateway::ShardMessenger,
     model::channel::Reaction,
+    model::id::UserId,
 };
 
 macro_rules! impl_reaction_collector {
@@ -212,7 +213,7 @@ impl ReactionFilter {
         self.options.guild_id.map_or(true, |id| { Some(id) == reaction.guild_id.map(|g| g.0) })
         && self.options.message_id.map_or(true, |id| { id == reaction.message_id.0 })
         && self.options.channel_id.map_or(true, |id| { id == reaction.channel_id.0 })
-        && self.options.author_id.map_or(true, |id| { id == reaction.user_id.0 })
+        && self.options.author_id.map_or(true, |id| { id == reaction.user_id.unwrap_or(UserId(0)).0 })
         && self.options.filter.as_ref().map_or(true, |f| f(&reaction))
     }
 

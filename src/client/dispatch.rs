@@ -145,7 +145,7 @@ impl DispatchEvent {
 
 #[allow(clippy::too_many_arguments)]
 pub(crate) fn dispatch<'rec>(
-    #[allow(unusuged_variables)]
+    // #[allow(unused_variables)]
     mut event: DispatchEvent,
     #[cfg(feature = "framework")]
     framework: &'rec Arc<Box<dyn Framework + Send + Sync>>,
@@ -180,14 +180,12 @@ pub(crate) fn dispatch<'rec>(
             (Some(ref h), None) => {
                 match event {
                     DispatchEvent::Model(Event::MessageCreate(mut event)) => {
-                        event.update(&cache_and_http).await;
+                        update(&cache_and_http, &mut event).await;
 
                         #[cfg(not(feature = "cache"))]
                         let context = context(data, runner_tx, shard_id, &cache_and_http.http);
                         #[cfg(feature = "cache")]
                         let context = context(data, runner_tx, shard_id, &cache_and_http.http, &cache_and_http.cache);
-
-                        let framework = Arc::clone(&framework);
 
                         dispatch_message(
                             context.clone(),
@@ -397,7 +395,7 @@ async fn handle_event(
 
             tokio::spawn(async move {
                 feature_cache! {{
-                    let old_channel = cache_and_http.cache.as_ref().read().channel(event.channel.id());
+                    let old_channel = cache_and_http.cache.as_ref().channel(event.channel.id()).await;
                     update(&cache_and_http, &mut event).await;
 
                     event_handler.channel_update(context, old_channel, event.channel).await;
@@ -426,7 +424,7 @@ async fn handle_event(
         DispatchEvent::Model(Event::GuildCreate(mut event)) => {
             #[cfg(feature = "cache")]
             let _is_new = {
-                !cache_and_http.cache.unavailable_guilds.read().await.contains(&event.guild_id)
+                !cache_and_http.cache.unavailable_guilds.read().await.contains(&event.guild.id)
             };
 
             update(&cache_and_http, &mut event).await;
@@ -462,7 +460,7 @@ async fn handle_event(
             });
         },
         DispatchEvent::Model(Event::GuildDelete(mut event)) => {
-            let _full = update(&cache_and_http, &mut event);
+            let _full = update(&cache_and_http, &mut event).await;
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
@@ -614,7 +612,7 @@ async fn handle_event(
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
             let _before = update(&cache_and_http, &mut event).await;
-            let event_handler = Arc::clone(event_handler).await;
+            let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
                 feature_cache! {{

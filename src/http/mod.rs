@@ -113,8 +113,8 @@ impl CacheHttp for Arc<Http> {
 
 #[cfg(feature = "cache")]
 impl AsRef<Cache> for (&Arc<Cache>, &Http) {
-    fn as_ref(&self) -> &Arc<Cache> {
-        self.0
+    fn as_ref(&self) -> &Cache {
+        &**self.0
     }
 }
 

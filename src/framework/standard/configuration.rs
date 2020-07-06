@@ -110,7 +110,7 @@ pub struct Configuration {
     #[doc(hidden)]
     pub disabled_commands: HashSet<String>,
     #[doc(hidden)]
-    pub dynamic_prefixes: Vec<Box<DynamicPrefixHook>>,
+    pub dynamic_prefixes: Vec<DynamicPrefixHook>,
     #[doc(hidden)]
     pub ignore_bots: bool,
     #[doc(hidden)]

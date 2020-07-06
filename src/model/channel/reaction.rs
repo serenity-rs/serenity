@@ -89,7 +89,7 @@ impl Reaction {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.user_id.is_some() && self.user_id == Some(cache.current_user.read().await.id) {
+                if self.user_id.is_some() && self.user_id == Some(cache.current_user().await.id) {
                     user_id = None;
                 }
 
@@ -169,7 +169,7 @@ impl Reaction {
                 #[cfg(feature = "cache")]
                 {
                     if let Some(cache) = cache_http.cache() {
-                        return Ok(User::from(&cache.current_user.read()));
+                        return Ok(User::from(&cache.current_user().await));
                     }
                 }
 

@@ -578,7 +578,7 @@ async fn clean_roles(cache: impl AsRef<Cache>, s: &mut String) {
             if let Ok(id) = RoleId::from_str(&s[mention_start..mention_end]) {
                 let to_replace = format!("<@&{}>", &s[mention_start..mention_end]);
 
-                *s = if let Some(role) = id._to_role_cached(&cache).await {
+                *s = if let Some(role) = id.to_role_cached(&cache).await {
                     s.replace(&to_replace, &format!("@{}", &role.name))
                 } else {
                     s.replace(&to_replace, &"@deleted-role")
@@ -616,7 +616,7 @@ async fn clean_channels(cache: &impl AsRef<Cache>, s: &mut String) {
                 let to_replace = format!("<#{}>", &s[mention_start..mention_end]);
 
                 *s = if let Some(Channel::Guild(channel)) = id.to_channel_cached(&cache).await {
-                    let replacement = format!("#{}", &channel.read().name);
+                    let replacement = format!("#{}", &channel.name);
                     s.replace(&to_replace, &replacement)
                 } else {
                     s.replace(&to_replace, &"#deleted-channel")
@@ -669,7 +669,7 @@ async fn clean_users(
                     if let Some(guild) = cache.guild(&guild_id).await {
                         if let Some(member) = guild.members.get(&id) {
                             if show_discriminator {
-                                format!("@{}", member.distinct().await)
+                                format!("@{}", member.distinct())
                             } else {
                                 format!("@{}", member.display_name())
                             }
@@ -782,9 +782,9 @@ mod test {
         assert_eq!(parse_invite("http://discord.gg/abc"), "abc");
         assert_eq!(parse_invite("discord.gg/abc"), "abc");
         assert_eq!(parse_invite("DISCORD.GG/ABC"), "ABC");
-        assert_eq!(parse_invite("https://discordapp.com/invite/abc"), "abc");
-        assert_eq!(parse_invite("http://discordapp.com/invite/abc"), "abc");
-        assert_eq!(parse_invite("discordapp.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("https://discord.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("http://discord.com/invite/abc"), "abc");
+        assert_eq!(parse_invite("discord.com/invite/abc"), "abc");
     }
 
     #[test]

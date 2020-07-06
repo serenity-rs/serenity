@@ -51,7 +51,7 @@ impl Receiver {
 
 #[async_trait]
 impl AudioReceiver for Receiver {
-    async fn speaking_update(&mut self, _ssrc: u32, _user_id: u64, _speaking: bool) {
+    async fn speaking_update(&self, _ssrc: u32, _user_id: u64, _speaking: bool) {
         // You can implement logic here so that you can differentiate users'
         // SSRCs and map the SSRC to the User ID and maintain a state in
         // `Receiver`. Using this map, you can map the `ssrc` in `voice_packet`
@@ -59,7 +59,7 @@ impl AudioReceiver for Receiver {
     }
 
     async fn voice_packet(
-        &mut self,
+        &self,
         ssrc: u32,
         sequence: u16,
         _timestamp: u32,
@@ -77,12 +77,12 @@ impl AudioReceiver for Receiver {
         );
     }
 
-    async fn client_connect(&mut self, _ssrc: u32, _user_id: u64) {
+    async fn client_connect(&self, _ssrc: u32, _user_id: u64) {
         // You can implement your own logic here to handle a user who has joined the
         // voice channel e.g., allocate structures, map their SSRC to User ID.
     }
 
-    async fn client_disconnect(&mut self, _user_id: u64) {
+    async fn client_disconnect(&self, _user_id: u64) {
         // You can implement your own logic here to handle a user who has left the
         // voice channel e.g., finalise processing of statistics etc.
         // You will typically need to map the User ID to their SSRC; observed when
@@ -136,7 +136,7 @@ async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
         Some(id) => id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
 
             return Ok(());
         },

@@ -403,7 +403,7 @@ impl GuildChannel {
         message_id: impl Into<MessageId>,
         f: F
     ) -> Result<Message>
-    where F: FnOnce(&mut EditMessage) -> &mut EditMessage, M: Into<MessageId>
+    where F: FnOnce(&mut EditMessage) -> &mut EditMessage
     {
         self.id.edit_message(&http, message_id, f).await
     }
@@ -572,7 +572,7 @@ impl GuildChannel {
     #[inline]
     pub async fn permissions_for_user(&self, cache: impl AsRef<Cache>, user_id: impl Into<UserId>) -> Result<Permissions> {
         let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
-        guild.user_permissions_in(self.id, user_id).await.ok_or(Error::Model(ModelError::GuildNotFound))
+        Ok(guild.user_permissions_in(self.id, user_id))
     }
 
     /// Calculates the permissions of a role.
@@ -597,7 +597,7 @@ impl GuildChannel {
     #[inline]
     pub async fn permissions_for_role(&self, cache: impl AsRef<Cache>, role_id: impl Into<RoleId>) -> Result<Permissions> {
         let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
-        guild.role_permissions_in(self.id, role_id).await.ok_or(Error::Model(ModelError::GuildNotFound))
+        guild.role_permissions_in(self.id, role_id).ok_or(Error::Model(ModelError::GuildNotFound))
     }
 
     /// Pins a [`Message`] to the channel.
@@ -750,7 +750,7 @@ impl GuildChannel {
     /// [`ModelError::InvalidChannelType`]: ../error/enum.Error.html#variant.InvalidChannelType
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn members(&self, cache: impl AsRef<CacheRwLock>) -> Result<Vec<Member>> {
+    pub async fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
         let guild = cache
             .guild(self.guild_id)

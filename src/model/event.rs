@@ -1219,7 +1219,7 @@ impl CacheUpdate for ReadyEvent {
 
         cache.presences.write().await.extend(ready.presences);
         *cache.shard_count.write().await = ready.shard.map_or(1, |s| s[1]);
-        *cache.current_user.write().await = ready.user;
+        *cache.user.write().await = ready.user;
 
         None
     }
@@ -1278,7 +1278,7 @@ impl CacheUpdate for UserUpdateEvent {
     type Output = CurrentUser;
 
     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
-        let mut user = cache.current_user.write().await;
+        let mut user = cache.user.write().await;
         Some(mem::replace(&mut user, self.current_user.clone()))
     }
 }

@@ -56,11 +56,7 @@ pub struct Invite {
     ///
     /// This can be `None` for invites created by Discord such as invite-widgets
     /// or vanity invite links.
-    //
-
-
-
-/
+    ///
     /// [`User`]: ../user/struct.User.html
     pub inviter: Option<InviteUser>,
     #[serde(skip)]
@@ -95,12 +91,14 @@ impl Invite {
     ) -> Result<RichInvite>
     where F: FnOnce(CreateInvite) -> CreateInvite
     {
+        let channel_id = channel_id.into();
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::CREATE_INVITE;
 
-                if !model_utils::user_has_perms(cache, channel_id, None, req).awit? {
+                if !model_utils::user_has_perms(cache, channel_id, None, req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -282,7 +280,9 @@ impl InviteGuild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
+    pub async fn shard_id(&self, shard_count: u64) -> u64 {
+        self.id.shard_id(shard_count).await
+    }
 }
 
 /// Detailed information about an invite.

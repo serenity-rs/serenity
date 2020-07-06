@@ -119,17 +119,17 @@ impl Member {
     /// [`ban`]: #method.ban
     #[inline]
     pub async fn ban_with_reason(&self, http: impl AsRef<Http>, dmd: u8, reason: impl AsRef<str>) -> Result<()> {
-        self.guild_id.ban_with_reason(http, self.user.read().id, dmd, reason).await
+        self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
     }
 
     /// Determines the member's colour.
     #[cfg(feature = "cache")]
     pub async fn colour(&self, cache: impl AsRef<Cache>) -> Option<Colour> {
-        let guild_roles = cache.guild_field(self.guild_id, |g| g.roles.clone()).await?;
+        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone()).await?;
 
         let mut roles = self.roles
             .iter()
-            .filter_map(|role_id| guild.roles.get(role_id))
+            .filter_map(|role_id| guild_roles.get(role_id))
             .collect::<Vec<&Role>>();
 
         roles.sort_by(|a, b| b.cmp(a));
@@ -149,9 +149,9 @@ impl Member {
     pub async fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
         let guild = self.guild_id.to_guild_cached(cache).await?;
 
-        for (cid, channel) in guild.channels {
-            if guild.user_permissions_in(cid, self.user.id).await.read_messages() {
-                return Some(channel);
+        for (cid, channel) in &guild.channels {
+            if guild.user_permissions_in(*cid, self.user.id).read_messages() {
+                return Some(channel.clone());
             }
         }
 
@@ -174,7 +174,7 @@ impl Member {
         format!(
             "{}#{:04}",
             self.display_name(),
-            self.user.read().discriminator
+            self.user.discriminator
         )
     }
 
@@ -210,7 +210,7 @@ impl Member {
     /// role with the lowest ID is the highest.
     #[cfg(feature = "cache")]
     pub async fn highest_role_info(&self, cache: impl AsRef<Cache>) -> Option<(RoleId, i64)> {
-        let guild_roles = cache.guild_field(self.guild_id, |g| g.roles.clone()).await;
+        let guild_roles = cache.as_ref().guild_field(self.guild_id, |g| g.roles.clone()).await?;
 
         let mut highest = None;
 
@@ -304,7 +304,7 @@ impl Member {
                 if let Some(guild) = cache.guilds.read().await.get(&self.guild_id) {
                     let req = Permissions::KICK_MEMBERS;
 
-                    if !guild.has_perms(cache, req) {
+                    if !guild.has_perms(cache, req).await {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
 
@@ -361,7 +361,7 @@ impl Member {
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
     pub async fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
-        let guild = match cache.as_ref().guilds.read().await.get(&self.guild_id) {
+        let guild = match cache.as_ref().guild(self.guild_id).await {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
@@ -406,7 +406,7 @@ impl Member {
         builder.roles(&self.roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
-        match http.as_ref().edit_member(self.guild_id.0, self.user.read().id.0, &map).await {
+        match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
             Ok(()) => Ok(()),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
@@ -423,13 +423,14 @@ impl Member {
     /// If role data can not be found for the member, then `None` is returned.
     #[cfg(feature = "cache")]
     pub async fn roles(&self, cache: impl AsRef<Cache>) -> Option<Vec<Role>> {
-        cache
-            .as_ref()
-            .guild_field(self.guild_id, |g| g.roles)
-            .await
-            .values()
-            .filter(|role| self.roles.contains(&role.id))
-            .collect()
+        Some(cache
+             .as_ref()
+             .guild_field(self.guild_id, |g| g.roles.clone())
+             .await?
+             .into_iter()
+             .map(|(_, v)| v)
+             .filter(|role| self.roles.contains(&role.id))
+             .collect())
     }
 
     /// Unbans the [`User`] from the guild.
@@ -459,7 +460,7 @@ impl Member {
     /// This function can deadlock while retrieving a read guard to the user
     /// object if your application infinitely holds a write lock elsewhere.
     #[inline]
-    #[deprecated(reason = "The user is no longer put behind a RwLock, making this method pointless")]
+    #[deprecated(note = "The user is no longer put behind a RwLock, making this method pointless", since = "0.9.0")]
     pub fn user_id(&self) -> UserId {
         self.user.id
     }

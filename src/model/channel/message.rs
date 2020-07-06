@@ -130,7 +130,7 @@ impl Message {
     /// bot.
     #[cfg(all(feature = "cache", feature = "utils"))]
     pub async fn is_own(&self, cache: impl AsRef<Cache>) -> bool {
-        self.author.id == cache.as_ref().current_user().user.id
+        self.author.id == cache.as_ref().current_user().await.id
     }
 
     /// Deletes the message.
@@ -394,7 +394,7 @@ impl Message {
     ///
     /// [`guild_id`]: #method.guild_id
     #[cfg(feature = "cache")]
-    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Arc<RwLock<Guild>>> {
+    pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
        cache.as_ref().guild(self.guild_id?).await
     }
 
@@ -474,7 +474,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !crate::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await? {
+                    if !utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -515,7 +515,7 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::ADD_REACTIONS;
 
-                    if !crate::utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
+                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -634,6 +634,7 @@ impl Message {
     /// [`UserId`]: ../id/struct.UserId.html
     #[inline]
     pub fn mentions_user_id(&self, id: impl Into<UserId>) -> bool {
+        let id = id.into();
         self.mentions.iter().any(|mentioned_user| mentioned_user.id.0 == id.0)
     }
 
@@ -681,10 +682,7 @@ impl Message {
     /// `None`.
     #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
-        match self.guild_id {
-            Some(id) => self.author.nick_in(cache_http, *id).await,
-            None => None,
-        }
+        self.author.nick_in(cache_http, self.guild_id?).await
     }
 
     /// Returns a link referencing this message. When clicked, users will jump to the message.

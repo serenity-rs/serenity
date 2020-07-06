@@ -9,7 +9,6 @@ use futures::channel::mpsc::{self, UnboundedSender as Sender};
 use super::super::super::{EventHandler, RawEventHandler};
 use super::{
     GatewayIntents,
-    ShardClientMessage,
     ShardId,
     ShardManagerMessage,
     ShardManagerMonitor,
@@ -142,7 +141,7 @@ impl ShardManager {
             shard_shutdown: shutdown_recv,
         };
 
-        tokio::spawn(async move || {
+        tokio::spawn(async move {
             shard_queuer.run().await;
         });
 

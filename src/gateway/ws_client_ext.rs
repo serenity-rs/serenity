@@ -10,6 +10,7 @@ use std::env::consts;
 use log::{debug, trace};
 use async_trait::async_trait;
 
+#[async_trait]
 pub trait WebSocketGatewayClientExt {
     async fn send_chunk_guilds<It>(
         &mut self,
@@ -41,7 +42,7 @@ pub trait WebSocketGatewayClientExt {
 }
 
 #[async_trait]
-impl WebSocketGatewayClientExt for WsClient {
+impl WebSocketGatewayClientExt for WsStream {
     async fn send_chunk_guilds<It>(
         &mut self,
         guild_ids: It,

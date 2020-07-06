@@ -150,41 +150,6 @@ impl StdError for RustlsError {
     }
 }
 
-// Create a tungstenite client with a rustls stream.
-#[cfg(not(feature = "native_tls_backend"))]
-pub(crate) fn create_rustls_client(url: Url) -> Result<WsClient> {
-    let mut config = rustls::ClientConfig::new();
-    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
-
-    let base_host = if let Some(h) = url.host_str() {
-        let (dot, _) = h.rmatch_indices('.').nth(1).unwrap_or((0, ""));
-        // We do not want the leading '.', but if there is no leading '.' we do
-        // not want to remove the leading character.
-        let split_at_index = if dot == 0 { 0 } else { dot + 1 };
-        let (_, base) = h.split_at(split_at_index);
-        base.to_owned()
-    } else { "discord.gg".to_owned() };
-
-    let dns_name = webpki::DNSNameRef::try_from_ascii_str(&base_host)
-        .map_err(|_| RustlsError::WebPKI)?;
-
-    let session = rustls::ClientSession::new(&Arc::new(config), dns_name);
-
-    let port = url.port_or_known_default()
-        .ok_or_else(|| Error::Url("No port number in the URL.".into()))?;
-
-    let addrs = url.socket_addrs(|| Some(port))?;
-
-    let socket = TcpStream::connect(addrs.as_slice())?;
-    let tls = rustls::StreamOwned::new(session, socket);
-
-    let client = tungstenite::client(url, tls)
-        .map_err(|_| RustlsError::HandshakeError)?;
-
-    Ok(client.0)
-}
-
-
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(

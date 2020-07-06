@@ -45,7 +45,7 @@ use std::collections::{
     HashSet,
     VecDeque,
 };
-use std: default::Default;
+use std::default::Default;
 use async_trait::async_trait;
 
 mod cache_update;
@@ -66,12 +66,12 @@ pub trait FromStrAndCache: Sized {
 
 #[async_trait]
 pub trait StrExt: Sized {
-    fn parse_cached<CRL, F: FromStrAndCache>(&self, cache: CRL) -> Result<F, F::Err>
+    async fn parse_cached<CRL, F: FromStrAndCache>(&self, cache: CRL) -> Result<F, F::Err>
         where CRL: AsRef<Cache> + Send + Sync;
 }
 
 #[async_trait]
-impl<'a> StrExt for &'a str {
+impl StrExt for &str {
     async fn parse_cached<CRL, F: FromStrAndCache>(&self, cache: CRL) -> Result<F, F::Err>
         where CRL: AsRef<Cache> + Send + Sync
     {
@@ -891,13 +891,13 @@ impl Cache {
     /// This method clones and returns the user used by the bot.
     #[inline]
     pub async fn current_user(&self) -> CurrentUser {
-        self.current_user.read().await.clone()
+        self.user.read().await.clone()
     }
 
     /// This method returns the bot's ID.
     #[inline]
     pub async fn current_user_id(&self) -> UserId {
-        self.current_user.read().await.id
+        self.user.read().await.id
     }
 
     /// This method allows to only clone a field of the current user instead of
@@ -919,7 +919,7 @@ impl Cache {
     pub async fn current_user_field<Ret: Clone, Fun>(&self,
         field_selector: Fun) -> Ret
     where Fun: FnOnce(&CurrentUser) -> Ret {
-        let user = self.current_user.read().await;
+        let user = self.user.read().await;
 
         field_selector(&user).clone()
     }
@@ -963,7 +963,7 @@ impl Default for Cache {
             settings: RwLock::new(Settings::default()),
             shard_count: RwLock::new(1),
             unavailable_guilds: RwLock::new(HashSet::default()),
-            current_user: RwLock::new(CurrentUser::default()),
+            user: RwLock::new(CurrentUser::default()),
             users: RwLock::new(HashMap::default()),
             message_queue: RwLock::new(HashMap::default()),
             __nonexhaustive: (),

@@ -201,6 +201,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub async fn create_integration(self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>, kind: &str) -> Result<()> {
+        let integration_id = integration_id.into();
         let map = json!({
             "id": integration_id.0,
             "type": kind,
@@ -254,7 +255,7 @@ impl GuildId {
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
     pub async fn delete_emoji(self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>) -> Result<()> {
-        http.as_ref().delete_emoji(self.0, emoji_id.0).await
+        http.as_ref().delete_emoji(self.0, emoji_id.into().0).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -264,7 +265,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub async fn delete_integration(self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
-        http.as_ref().delete_guild_integration(self.0, integration_id.0).await
+        http.as_ref().delete_guild_integration(self.0, integration_id.into().0).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -278,8 +279,8 @@ impl GuildId {
     /// [`Role::delete`]: ../guild/struct.Role.html#method.delete
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
-    pub async fn delete_role<R: Into<RoleId>>(self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
-        http.as_ref().delete_role(self.0, role_id.0).await
+    pub async fn delete_role(self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
+        http.as_ref().delete_role(self.0, role_id.into().0).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -313,12 +314,12 @@ impl GuildId {
     /// [`Emoji::edit`]: ../guild/struct.Emoji.html#method.edit
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
-    pub async fn edit_emoji(self, http: impl AsRef<Http>, emoji_id: impl Into<EmojId>, name: &str) -> Result<Emoji> {
+    pub async fn edit_emoji(self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>, name: &str) -> Result<Emoji> {
         let map = json!({
             "name": name,
         });
 
-        http.as_ref().edit_emoji(self.0, emoji_id.0, &map).await
+        http.as_ref().edit_emoji(self.0, emoji_id.into().0, &map).await
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -341,7 +342,7 @@ impl GuildId {
         f(&mut edit_member);
         let map = utils::hashmap_to_json_map(edit_member.0);
 
-        http.as_ref().edit_member(self.0, user_id.0, &map).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &map).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -380,7 +381,7 @@ impl GuildId {
         f(&mut edit_role);
         let map = utils::hashmap_to_json_map(edit_role.0);
 
-        http.as_ref().edit_role(self.0, role_id.0, &map).await
+        http.as_ref().edit_role(self.0, role_id.into().0, &map).await
     }
 
     /// Edits the order of [`Role`]s
@@ -399,7 +400,7 @@ impl GuildId {
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
     pub async fn edit_role_position(self, http: impl AsRef<Http>, role_id: impl Into<RoleId>, position: u64) -> Result<Vec<Role>> {
-        http.as_ref().edit_role_position(self.0, role_id.0, position).await
+        http.as_ref().edit_role_position(self.0, role_id.into().0, position).await
     }
 
     /// Tries to find the [`Guild`] by its Id in the cache.
@@ -472,6 +473,8 @@ impl GuildId {
     /// [`Member`]: ../guild/struct.Member.html
     #[inline]
     pub async fn member(self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Member> {
+        let user_id = user_id.into();
+
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -493,7 +496,7 @@ impl GuildId {
     /// [`User`]: ../user/struct.User.html
     #[inline]
     pub async fn members(self, http: impl AsRef<Http>, limit: Option<u64>, after: impl Into<Option<UserId>>) -> Result<Vec<Member>> {
-        http.as_ref().get_guild_members(self.0, limit, after.map(|x| x.0)).await
+        http.as_ref().get_guild_members(self.0, limit, after.into().map(|x| x.0)).await
     }
 
     /// Streams over all the members in a guild.
@@ -546,10 +549,10 @@ impl GuildId {
         let mut map = Map::new();
         map.insert(
             "channel_id".to_string(),
-            Value::Number(Number::from(channel_id.0)),
+            Value::Number(Number::from(channel_id.into().0)),
         );
 
-        http.as_ref().edit_member(self.0, user_id.0, &map).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &map).await
     }
 
     /// Returns the name of whatever guild this id holds.
@@ -571,7 +574,7 @@ impl GuildId {
             "channel_id".to_string(),
             Value::Null
         );
-        http.as_ref().edit_member(self.0, user_id.0, &map).await
+        http.as_ref().edit_member(self.0, user_id.into().0, &map).await
     }
 
     /// Gets the number of [`Member`]s that would be pruned with the given
@@ -645,9 +648,11 @@ impl GuildId {
     /// use serenity::model::id::GuildId;
     /// use serenity::utils;
     ///
+    /// # async fn run() {
     /// let guild_id = GuildId(81384788765712384);
     ///
-    /// assert_eq!(guild_id.shard_id(17), 7);
+    /// assert_eq!(guild_id.shard_id(17).await, 7);
+    /// # }
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
@@ -660,7 +665,7 @@ impl GuildId {
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
     pub async fn start_integration_sync(self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
-        http.as_ref().start_integration_sync(self.0, integration_id.0).await
+        http.as_ref().start_integration_sync(self.0, integration_id.into().0).await
     }
 
     /// Starts a prune of [`Member`]s.
@@ -689,7 +694,7 @@ impl GuildId {
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
     pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
-        http.as_ref().remove_ban(self.0, user_id.0)
+        http.as_ref().remove_ban(self.0, user_id.into().0).await
     }
 
     /// Retrieve's the guild's vanity URL.
@@ -819,7 +824,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
          //Get the last member.  If shorter than 1000, there are no more results anyway
         self.after = self.buffer.get(grab_size as usize - 1)
-            .map(|member| member.user.id());
+            .map(|member| member.user.id);
 
         // Reverse to optimize pop()
         self.buffer.reverse();
@@ -828,7 +833,6 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
         Ok(())
     }
-}
 
     /// Streams over all the members in a guild.
     ///

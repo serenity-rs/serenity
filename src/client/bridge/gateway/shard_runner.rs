@@ -127,7 +127,7 @@ impl ShardRunner {
             }
 
             let pre = self.shard.stage();
-            let (event, action, successful) = self.recv_event().await;
+            let (event, action, successful) = self.recv_event().await?;
             let post = self.shard.stage();
 
             if post != pre {

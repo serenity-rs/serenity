@@ -501,6 +501,7 @@ async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // We could also use
 // #[required_permissions(ADMINISTRATOR)]
 // but that would not let us reply when it fails.
+#[command]
 async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
     if let Some(member) = &msg.member {
 
@@ -533,7 +534,7 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
     } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await {
-        format!("Current slow mode rate is `{}` seconds.", channel.read().slow_mode_rate.unwrap_or(0))
+        format!("Current slow mode rate is `{}` seconds.", channel.slow_mode_rate.unwrap_or(0))
     } else {
         "Failed to find channel in cache.".to_string()
     };

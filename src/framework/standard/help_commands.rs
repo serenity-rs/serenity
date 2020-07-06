@@ -35,7 +35,8 @@
 //! ) -> CommandResult {
 //! #  #[cfg(all(feature = "cache", feature = "http"))]
 //! # {
-//!     help_commands::with_embeds(context, msg, args, help_options, groups, owners).await
+//!     let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners).await;
+//!     Ok(())
 //! # }
 //! #
 //! # #[cfg(not(all(feature = "cache", feature = "http")))]
@@ -375,10 +376,8 @@ async fn check_common_behaviour(
     }
 
     if let Some(guild) = msg.guild(&cache).await {
-        let guild = guild.read();
-
         if let Some(member) = guild.members.get(&msg.author.id) {
-            if !has_correct_roles(options, &guild, &member).await {
+            if !has_correct_roles(options, &guild.roles, &member) {
                 return help_options.lacking_role;
             }
         }
@@ -726,7 +725,7 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
             &group,
             &mut group_with_cmds,
             &mut highest_formatter,
-        );
+        ).await;
 
         for sub_group in group.options.sub_groups {
             if HelpBehaviour::Hide == highest_formatter {
@@ -743,13 +742,13 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
                 &help_options,
                 &sub_group,
                 highest_formatter,
-            );
+            ).await;
 
             group_with_cmds.sub_groups.push(grouped_cmd);
         }
 
         group_with_cmds
-    }
+    }.boxed()
 }
 
 
@@ -827,7 +826,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
     group: &'rec CommandGroup,
     owners: &'rec HashSet<UserId>,
     help_options: &'a HelpOptions,
-    searched_named_lowercase: &mut String,
+    searched_named_lowercase: &'rec mut String,
 ) -> BoxFuture<'rec, Option<CustomisedHelpData<'a>>> {
     async move {
         let is_prefixless_group = {
@@ -853,7 +852,7 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
 
         if is_prefixless_group || is_word_prefix {
             let single_group =
-                create_single_group(ctx, msg, &group, owners, &help_options);
+                create_single_group(ctx, msg, &group, owners, &help_options).await;
 
             if !single_group.command_names.is_empty() {
                 return Some(CustomisedHelpData::GroupedCommands {
@@ -875,14 +874,14 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
                     owners,
                     help_options,
                     searched_named_lowercase,
-                ) {
+                ).await {
                     return Some(found_set);
                 }
             }
         }
 
         None
-    }
+    }.boxed()
 }
 
 /// Iterates over all commands and forges them into a `CustomisedHelpData`,
@@ -907,11 +906,9 @@ pub async fn create_customised_help_data<'a>(
                 let mut searched_named_lowercase = name.to_lowercase();
 
                 for group in groups {
-
                     if let Some(found_command) = searched_lowercase(
                         ctx,
                         msg,
-                        args,
                         group,
                         owners,
                         help_options,
@@ -1258,7 +1255,8 @@ async fn send_error_embed(
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     with_embeds(context, msg, args, &help_options, groups, owners).await
+///     let _ = with_embeds(context, msg, args, &help_options, groups, owners).await;
+///     Ok(())
 /// }
 ///
 /// let framwork = StandardFramework::new()
@@ -1454,7 +1452,8 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     plain(context, msg, args, &help_options, groups, owners).await
+///     let _ = plain(context, msg, args, &help_options, groups, owners).await;
+///     Ok(())
 /// }
 ///
 /// let framework = StandardFramework::new()

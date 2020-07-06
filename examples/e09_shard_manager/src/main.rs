@@ -22,7 +22,7 @@
 //!
 //! Note that it may take a minute or more for a latency to be recorded or to
 //! update, depending on how often Discord tells the client to send a heartbeat.
-use std::{env, thread, time::Duration};
+use std::{env, time::Duration};
 
 use serenity::{
     async_trait,
@@ -66,7 +66,7 @@ async fn main() {
     // loop.
     let manager = client.shard_manager.clone();
 
-    tokio::spawn(async move || {
+    tokio::spawn(async move {
         loop {
             delay_for(Duration::from_secs(30)).await;
 

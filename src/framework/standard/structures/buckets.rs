@@ -59,7 +59,7 @@ pub struct BucketBuilder {
     pub(crate) delay: i64,
     pub(crate) time_span: i64,
     pub(crate) limit: i32,
-    pub(crate) check: Option<Box<Check>>,
+    pub(crate) check: Option<Check>,
 }
 
 impl BucketBuilder {

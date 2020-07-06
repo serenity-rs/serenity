@@ -82,8 +82,6 @@ async fn main() {
         data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
     }
 
-    client.with_framework();
-
     let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
 }
 
@@ -92,7 +90,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
     let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
         Some(channel) => channel.guild_id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
 
             return Ok(());
         },
@@ -123,7 +121,7 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = match msg.guild(&ctx.cache) {
+    let guild = match msg.guild(&ctx.cache).await {
         Some(guild) => guild,
         None => {
             check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
@@ -161,7 +159,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 
 #[command]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel channel.guild_id).await {
+    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
         Some(id) => id,
         None => {
             check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
@@ -244,8 +242,8 @@ async fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         return Ok(());
     }
 
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
+        Some(channel) => channel.guild_id,
         None => {
             check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
 

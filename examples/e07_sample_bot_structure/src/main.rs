@@ -22,6 +22,7 @@ use serenity::{
         StandardFramework,
         standard::macros::group,
     },
+    http::Http,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };

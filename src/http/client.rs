@@ -27,7 +27,6 @@ use log::{debug, trace};
 use std::{
     collections::BTreeMap,
     sync::Arc,
-    borrow::Cow,
 };
 use tokio::{
     io::AsyncReadExt,
@@ -61,7 +60,7 @@ impl Http {
             format!("Bot {}", token)
         };
 
-        Self::new(Arc::new(built), token)
+        Self::new(Arc::new(built), &token)
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].

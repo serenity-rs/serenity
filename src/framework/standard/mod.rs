@@ -36,9 +36,7 @@ use async_trait::async_trait;
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
-use crate::model::guild::{Guild, Member};
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
 use crate::model::guild::Member;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
@@ -831,8 +829,8 @@ pub(crate) async fn has_correct_permissions(
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
-    } else if let Some(guild) = message.guild(&cache) {
-        let perms = guild.user_permissions_in(message.channel_id, message.author.id).await;
+    } else if let Some(guild) = message.guild(&cache).await {
+        let perms = guild.user_permissions_in(message.channel_id, message.author.id);
 
         perms.contains(*options.required_permissions())
     } else {
@@ -851,7 +849,7 @@ pub(crate) fn has_correct_roles(
     } else {
         options.allowed_roles()
             .iter()
-            .flat_map(|r| roles.values().find(|role| *r = role.name))
+            .flat_map(|r| roles.values().find(|role| *r == &role.name))
             .any(|g| member.roles.contains(&g.id))
     }
 }

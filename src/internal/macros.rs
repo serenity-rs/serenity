@@ -37,7 +37,7 @@ macro_rules! feature_cache {
     }
 }
 
-#[cfg(all(not(feature = "cache"), feature = "cache"))]
+#[cfg(all(not(feature = "cache"), feature = "client"))]
 macro_rules! feature_cache {
     ($enabled:block else $disabled:block) => {
         {

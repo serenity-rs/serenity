@@ -87,7 +87,7 @@ struct TaskItems {
 pub struct Connection {
     audio_timer: Timer,
     cipher: XSalsa20Poly1305,
-    client: SplitSink<WsStream, Message>,
+    stream: SplitSink<WsStream, Message>,
     connection_info: ConnectionInfo,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
@@ -194,10 +194,10 @@ impl Connection {
                 .send_json(&payload::build_select_protocol(addr, port)).await?;
         }
 
-        let cipher = init_cipher(&mut client)?;
+        let cipher = init_cipher(&mut stream).await?;
 
         let (sink, stream) = stream.split();
-        let (udp_recv_half, udp_send_half) = udl.split();
+        let (udp_recv_half, udp_send_half) = udp.split();
         let task_items = start_udp_task(stream, udp_recv_half).await?;
 
         info!("[Voice] Connected to: {}", info.endpoint);
@@ -219,7 +219,7 @@ impl Connection {
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             cipher,
-            client: sink,
+            stream: sink,
             connection_info: info,
             decoder_map: HashMap::new(),
             destination,
@@ -431,7 +431,7 @@ impl Connection {
                 }
 
                 let temp_len = match stream.get_type().await {
-                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some().await {
+                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).await.is_some() {
                             opus_frame.len()
                         } else {
                             0
@@ -589,7 +589,7 @@ impl Connection {
         let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
         audio_timer.hold().await;
 
-        self.udp.send_to(&packet[..index], self.destination).await?;
+        self.udp.send_to(&packet[..index], &self.destination).await?;
         self.audio_timer.reset();
 
         Ok(())
@@ -780,7 +780,7 @@ async fn start_udp_task(stream: SplitStream<WsStream>, mut udp: RecvHalf) -> Res
 }
 
 #[inline]
-async fn start_ws_task(mut stream: SplitStream<WsClient>, tx: &Sneder<ReceiverStatus>) -> Result<(Sender<i32>, JoinHandle<()>)> {
+async fn start_ws_task(mut stream: SplitStream<WsStream>, tx: &Sender<ReceiverStatus>) -> Result<(Sender<i32>, JoinHandle<()>)> {
     let tx_ws = tx.clone();
     let (ws_close_sender, mut ws_close_reader) = unbounded();
 

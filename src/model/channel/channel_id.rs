@@ -106,7 +106,7 @@ impl ChannelId {
         message_id: impl Into<MessageId>,
         reaction_type: impl Into<ReactionType>
     ) -> Result<()> {
-        http.as_ref().create_reaction(self.0, message_id.into().0, reaction_type.into()).await
+        http.as_ref().create_reaction(self.0, message_id.into().0, &reaction_type.into()).await
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
@@ -127,7 +127,7 @@ impl ChannelId {
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
     pub async fn delete_message(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().delete_message(self.0, message_id.into().0)
+        http.as_ref().delete_message(self.0, message_id.into().0).await
     }
 
     /// Deletes all messages by Ids from the given vector in the given channel.
@@ -199,7 +199,7 @@ impl ChannelId {
     /// [`Reaction`]: ../channel/struct.Reaction.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
-    pub fn delete_reaction(
+    pub async fn delete_reaction(
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
@@ -208,9 +208,9 @@ impl ChannelId {
     ) -> Result<()> {
         http.as_ref().delete_reaction(
             self.0,
-            message_id.0,
+            message_id.into().0,
             user_id.map(|uid| uid.0),
-            reaction_type,
+            &reaction_type.into(),
         ).await
     }
 
@@ -230,8 +230,8 @@ impl ChannelId {
     ) -> Result<()> {
         http.as_ref().delete_message_reaction_emoji(
             self.0,
-            message_id.0,
-            reaction_type
+            message_id.into().0,
+            &reaction_type.into()
         ).await
     }
 
@@ -293,7 +293,7 @@ impl ChannelId {
     /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
     #[cfg(feature = "utils")]
     #[inline]
-    pub fn edit_message<F>(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>, f: F) -> Result<Message>
+    pub async fn edit_message<F>(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>, f: F) -> Result<Message>
     where F: FnOnce(&mut EditMessage) -> &mut EditMessage
     {
         let mut msg = EditMessage::default();
@@ -309,7 +309,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(msg.0);
 
-        http.as_ref().edit_message(self.0, message_id.0, &Value::Object(map)).await
+        http.as_ref().edit_message(self.0, message_id.into().0, &Value::Object(map)).await
     }
 
     /// Attempts to find a [`Channel`] by its Id in the cache.
@@ -361,7 +361,8 @@ impl ChannelId {
     pub async fn message(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<Message> {
         http
             .as_ref()
-            .get_message(self.0, message_id.0)
+            .get_message(self.0, message_id.into().0)
+            .await
             .map(|mut msg| {
                 msg.transform_content();
 
@@ -426,7 +427,7 @@ impl ChannelId {
     /// [`Message`]: ../channel/struct.Message.html
     #[inline]
     pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().pin_message(self.0, message_id.0).await
+        http.as_ref().pin_message(self.0, message_id.into().0).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
@@ -460,10 +461,10 @@ impl ChannelId {
 
         http.as_ref().get_reaction_users(
             self.0,
-            message_id.0,
-            reaction_type,
+            message_id.into().0,
+            &reaction_type.into(),
             limit,
-            after.map(|x| x.0),
+            after.into().map(|x| x.0),
         ).await
     }
 
@@ -642,8 +643,8 @@ impl ChannelId {
     /// [`Message`]: ../channel/struct.Message.html
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
-    pub async fn unpin<M: Into<MessageId>>(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
-        http.as_ref().unpin_message(self.0, message_id.0).await
+    pub async fn unpin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+        http.as_ref().unpin_message(self.0, message_id.into().0).await
     }
 
     /// Retrieves the channel's webhooks.

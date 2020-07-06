@@ -102,7 +102,7 @@ pub trait EventHandler: Send + Sync {
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
     #[cfg(feature = "cache")]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Arc<RwLock<Guild>>>) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Guild>) {}
 
     /// Dispatched when a guild is deleted.
     ///
@@ -314,6 +314,7 @@ pub trait EventHandler: Send + Sync {
 }
 
 /// This core trait for handling raw events
+#[async_trait]
 pub trait RawEventHandler: Send + Sync {
     /// Dispatched when any event occurs
     async fn raw_event(&self, _ctx: Context, _ev: Event) {}

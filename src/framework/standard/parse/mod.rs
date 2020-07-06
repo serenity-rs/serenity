@@ -122,6 +122,7 @@ pub async fn prefix<'a>(
 
 /// Checked per valid group or command in the message.
 async fn check_discrepancy(
+    #[allow(unused_variables)]
     ctx: &Context,
     msg: &Message,
     config: &Configuration,
@@ -147,9 +148,7 @@ async fn check_discrepancy(
                 None => return Ok(()),
             };
 
-            let guild = guild.read();
-
-            let perms = guild.user_permissions_in(msg.channel_id, msg.author.id).await;
+            let perms = guild.user_permissions_in(msg.channel_id, msg.author.id);
 
             if !perms.contains(*options.required_permissions())
                 && !(options.owner_privilege() && config.owners.contains(&msg.author.id))
@@ -273,12 +272,12 @@ fn parse_group<'a>(
 }
 
 #[inline]
-async fn handle_command(
-    stream: &mut Stream<'_>,
-    ctx: &Context,
-    msg: &Message,
-    config: &Configuration,
-    map: &CommandMap,
+async fn handle_command<'a>(
+    stream: &'a mut Stream<'_>,
+    ctx: &'a Context,
+    msg: &'a Message,
+    config: &'a Configuration,
+    map: &'a CommandMap,
     group: &'static CommandGroup,
 ) -> Result<Invoke, ParseError> {
     match parse_cmd(stream, ctx, msg, config, map).await {
@@ -291,12 +290,12 @@ async fn handle_command(
 }
 
 #[inline]
-async fn handle_group(
+async fn handle_group<'a>(
     stream: &mut Stream<'_>,
-    ctx: &Context,
-    msg: &Message,
-    config: &Configuration,
-    map: &GroupMap,
+    ctx: &'a Context,
+    msg: &'a Message,
+    config: &'a Configuration,
+    map: &'a GroupMap,
 ) -> Result<Invoke, ParseError> {
     match parse_group(stream, ctx, msg, config, map).await {
         Ok((group, map)) => handle_command(stream, ctx, msg, config, &map, group).await,

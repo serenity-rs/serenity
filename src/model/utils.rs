@@ -46,7 +46,7 @@ pub fn serialize_emojis<S: Serializer>(
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     deserializer: D)
-    -> StdResult<HashMap<ChannelId, GuildChannel>>, D::Error> {
+    -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
@@ -262,10 +262,7 @@ pub async fn user_has_perms(
         None => return Err(Error::Model(ModelError::ItemMissing)),
     };
 
-    let perms = guild
-        .read()
-        .user_permissions_in(channel_id, cache.current_user.read().await.id)
-        .await;
+    let perms = guild.user_permissions_in(channel_id, cache.current_user().await.id);
 
     permissions.remove(perms);
 

@@ -12,7 +12,6 @@ use tokio::sync::Mutex;
 use serde_json;
 use std::{
     ffi::OsStr,
-    fs::File,
     io::ErrorKind as IoErrorKind,
     marker::Unpin,
     pin::Pin,
@@ -192,7 +191,7 @@ async fn _ffmpeg(path: &OsStr) -> Result<Box<dyn AudioSource>> {
 ///     "-acodec",
 ///     "pcm_s16le",
 ///     "-",
-/// ]);
+/// ];
 ///
 /// let streamer = voice::ffmpeg_optioned("./some_file.mp3", options).await;
 /// # }
@@ -230,9 +229,7 @@ pub async fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Box<dyn AudioSource>, Dc
 }
 
 async fn _dca(path: &OsStr) -> StdResult<Box<dyn AudioSource>, DcaError> {
-    let file = File::open(path).await.map_err(DcaError::IoError)?;
-
-    let mut reader = BufReader::new(file);
+    let mut reader = File::open(path).await.map_err(DcaError::IoError)?;
 
     let mut header = [0u8; 4];
 
@@ -275,7 +272,7 @@ async fn _dca(path: &OsStr) -> StdResult<Box<dyn AudioSource>, DcaError> {
 /// If you want to decode a `.opus` file, use [`ffmpeg`]
 ///
 /// [`ffmpeg`]: fn.ffmpeg.html
-pub async fn opus<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
+pub fn opus<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader,
@@ -290,7 +287,7 @@ pub async fn opus<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool,
 }
 
 /// Creates a PCM audio source.
-pub async fn pcm<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
+pub fn pcm<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
         reader,

@@ -152,7 +152,7 @@ mod test {
         let response = builder.body(body_string.into_bytes()).unwrap();
 
         let reqwest_response: reqwest::Response = response.into();
-        let error_response = ErrorResponse::from_response(request_response).await;
+        let error_response = ErrorResponse::from_response(reqwest_response).await;
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),

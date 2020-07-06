@@ -263,6 +263,6 @@ impl WebhookId {
     /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
     pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
-        http.as_ref().get_webhook(self.0)
+        http.as_ref().get_webhook(self.0).await
     }
 }

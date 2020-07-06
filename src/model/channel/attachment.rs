@@ -100,6 +100,7 @@ impl Attachment {
     /// client.start().await?;
     /// #     Ok(())
     /// # }
+    /// ```
     ///
     /// # Errors
     ///
@@ -116,7 +117,7 @@ impl Attachment {
         let reqwest = ReqwestClient::new();
 
         Ok(reqwest
-           .get(&self.ur)
+           .get(&self.url)
            .send()
            .await?
            .bytes()

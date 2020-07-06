@@ -411,7 +411,7 @@ impl Handler {
             let (tx, rx) = unbounded();
 
             self.sender = tx;
-            self.sender.unbounded_send(status).unwrap();
+            self.sender.unbounded_send(error.into_inner()).unwrap();
             tasks::start(self.guild_id, rx);
             self.update();
         }

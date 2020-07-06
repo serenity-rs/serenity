@@ -194,7 +194,7 @@ impl Channel {
     /// Determines if the channel is NSFW.
     #[inline]
     pub fn is_nsfw(&self) -> bool {
-        match *self {
+        match self {
             Channel::Guild(channel) => channel.is_nsfw(),
             Channel::Category(category) => category.is_nsfw(),
             Channel::Private(_) => false,
@@ -209,7 +209,7 @@ impl Channel {
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     #[inline]
     pub fn id(&self) -> ChannelId {
-        match *self {
+        match self {
             Channel::Guild(ch) => ch.id,
             Channel::Private(ch) => ch.id,
             Channel::Category(ch) => ch.id,
@@ -282,15 +282,10 @@ impl Display for Channel {
     /// [`GuildChannel`]: struct.GuildChannel.html
     /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        match *self {
-            Channel::Guild(ref ch) => Display::fmt(&ch.read().id.mention(), f),
-            Channel::Private(ref ch) => {
-                let channel = ch.read();
-                let recipient = channel.recipient.read();
-
-                Display::fmt(&recipient.name, f)
-            },
-            Channel::Category(ref category) => Display::fmt(&category.read().name, f),
+        match self {
+            Channel::Guild(ch) => Display::fmt(&ch.id.mention(), f),
+            Channel::Private(ch) => Display::fmt(&ch.recipient.name, f),
+            Channel::Category(ch) => Display::fmt(&ch.name, f),
             Channel::__Nonexhaustive => unreachable!(),
         }
     }
@@ -521,7 +516,7 @@ impl FromStrAndCache for Channel {
     type Err = ChannelParseError;
 
     async fn from_str<C>(cache: C, s: &str) -> StdResult<Self, Self::Err>
-        where Cache: AsRef<C> + Send + Sync
+        where C: AsRef<Cache> + Send + Sync
     {
         match parse_channel(s) {
             Some(x) => match ChannelId(x).to_channel_cached(&cache).await {

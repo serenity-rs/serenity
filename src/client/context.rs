@@ -53,14 +53,14 @@ impl Context {
         runner_tx: Sender<InterMessage>,
         shard_id: u64,
         http: Arc<Http>,
-        cache: Arc<RwLock<Cache>>,
+        cache: Arc<Cache>,
     ) -> Context {
         Context {
             shard: ShardMessenger::new(runner_tx),
             shard_id,
             data,
             http,
-            cache: cache.into(),
+            cache,
         }
     }
 
@@ -256,15 +256,19 @@ impl Context {
     /// #
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn resume(&self, ctx: Context, _: ResumedEvent) {
-    ///         ctx.reset_presence();
+    ///     async fn resume(&self, ctx: Context, _: ResumedEvent) {
+    ///         ctx.reset_presence().await;
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client = Client::new("token").event_handler(Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed

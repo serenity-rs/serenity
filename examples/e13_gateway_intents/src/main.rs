@@ -32,18 +32,13 @@ async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
-    if let Err(why) = Client::new(token)
+    // Build our client.
+    let mut client = Client::new(token)
         .event_handler(Handler)
         .add_intent(GatewayIntents::GUILDS)
         .add_intent(GatewayIntents::GUILD_MESSAGES)
-    // Build our client.
         .await
-        .expect("Error creating client")
-    // Finally, start a single shard, and start listening to events.
-        .start()
-        .await {
-            println!("Client error: {:?}", why);
-        }
+        .expect("Error creating client");
 
     // Finally, start a single shard, and start listening to events.
     //
