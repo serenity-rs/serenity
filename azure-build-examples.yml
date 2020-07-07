@@ -96,7 +96,7 @@ jobs:
   - bash: |
       source $HOME/.cargo/env
       cd examples/
-      cargo build -p e12_timing_and_events
+      cargo build -p e12_collectors
     displayName: 'Build example 12'
 
   - bash: |
