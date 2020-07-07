@@ -1,7 +1,6 @@
 use std::{
     collections::HashSet,
     fmt,
-    error::Error as StdError,
 };
 use crate::client::Context;
 use crate::model::{
@@ -10,7 +9,8 @@ use crate::model::{
     id::UserId,
 };
 use crate::utils::Colour;
-use super::Args;
+use super::{Args, CommandResult};
+//use super::shared::{CommandError, CommandResult};
 use futures::future::BoxFuture;
 
 mod check;
@@ -69,8 +69,7 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-pub type CommandError = Box<dyn StdError + Send + Sync>;
-pub type CommandResult = std::result::Result<(), CommandError>;
+
 pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {

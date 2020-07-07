@@ -3,12 +3,12 @@ pub mod macros {
     pub use command_attr::{command, group, help, check, hook};
 }
 
-mod args;
 mod configuration;
 mod parse;
 mod structures;
 
-pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
+pub use super::shared::args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
+pub use super::shared::{CommandError, CommandResult};
 pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
