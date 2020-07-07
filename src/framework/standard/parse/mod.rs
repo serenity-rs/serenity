@@ -374,7 +374,6 @@ pub fn command(
                     check_discrepancy(ctx, msg, config, &group.options)?;
 
                     is_prefixless = true;
-                    return res;
                 }
 
                 last = res;
