@@ -3,6 +3,7 @@
 use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 use serde_json::Value;
+use std::fmt::Display;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
@@ -529,10 +530,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    pub fn reply(&self, cache_http: impl CacheHttp, content: impl AsRef<str>) -> Result<Message> {
-        let content = content.as_ref();
-
-        if let Some(length_over) = Message::overflow_length(content) {
+    pub fn reply(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+        if let Some(length_over) = Message::overflow_length(&content.to_string()) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
         }
 
@@ -550,9 +549,7 @@ impl Message {
             }
         }
 
-        let mut gen = self.author.mention();
-        gen.push_str(": ");
-        gen.push_str(content);
+        let gen = format!("{}: {}", self.author.mention(), content);
 
         let map = json!({
             "content": gen,
