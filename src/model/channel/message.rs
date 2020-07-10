@@ -618,6 +618,19 @@ impl Message {
         self.mentions_user_id(user.id)
     }
 
+    /// Checks whether the message mentions the current user.
+    pub fn mentions_me(&self, cache_http: impl CacheHttp) -> Result<bool> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                return Ok(self.mentions_user_id(cache.read().user.id));
+            }
+        }
+
+        let current_user = cache_http.http().get_current_user()?;
+        Ok(self.mentions_user_id(current_user.id))
+    }
+
     /// Unpins the message from its channel.
     ///
     /// **Note**: Requires the [Manage Messages] permission.
