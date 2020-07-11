@@ -28,7 +28,7 @@ use tungstenite::{
     protocol::frame::CloseFrame,
 };
 
-use crate::utils::TypeMap;
+use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]

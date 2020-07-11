@@ -27,6 +27,6 @@ pub use crate::http::HttpError;
 #[cfg(feature = "model")]
 pub use crate::model::ModelError;
 #[cfg(feature = "utils")]
-pub use crate::utils::{TypeMap, TypeMapKey};
+pub use typemap_rev::{TypeMap, TypeMapKey};
 #[cfg(feature = "voice")]
 pub use crate::voice::VoiceError;
