@@ -244,10 +244,15 @@ impl SimpleFramework {
         }
     }
 
-    async fn run_after_cmd(&self, ctx: &Context, msg: &Message, cmd_name: &str, res: CommandResult) {
+    // should be the following signature
+    //`async fn run_after_cmd(&self, ctx: &Context, msg: &Message, cmd_name: &str, res: Command Result)`
+    // however, see rustc issue #63033. For now, this is a valid workaround
+    fn run_after_cmd<'a>(&'a self, ctx: &'a Context, msg: &'a Message, cmd_name: &'a str, res: CommandResult) -> impl std::future::Future<Output = ()> + 'a {
         // runs the after fn if it's set, no-op if there isn't one
-        if let Some(after) = &self.after_cmd {
-            after(ctx, msg, cmd_name, res).await;
+        async move {
+            if let Some(after) = &self.after_cmd {
+                after(ctx, msg, cmd_name, res).await;
+            }
         }
     }
 
