@@ -3,7 +3,7 @@
 use super::{
     id::UserId,
     user::User,
-    utils::default_true
+    utils::*,
 };
 
 /// Information about a user's application. An application does not necessarily
@@ -42,6 +42,8 @@ pub struct ApplicationInfo {
     pub redirect_uris: Vec<String>,
     /// A list of RPC Origins assigned to the application.
     pub rpc_origins: Vec<String>,
+    /// The application team group.
+    pub team: Option<Vec<Team>>,
     /// The given secret to the application.
     ///
     /// This is not equivalent to the application's bot user's token.
@@ -89,6 +91,38 @@ pub struct CurrentApplicationInfo {
     #[serde(default)] pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
+    pub team: Option<Team>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+/// Information about the Team group of the application.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Team {
+    /// The icon of the TEam.
+    pub icon: Option<String>,
+    /// The snowflake ID of the team.
+    #[serde(deserialize_with = "deserialize_u64")]
+    pub id: u64,
+    /// The members of the team
+    pub members: Vec<TeamMember>,
+    /// The user id of the team owner.
+    pub owner_user_id: UserId,
+}
+
+/// Infromation about a Member on a Team.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct TeamMember {
+    /// The member's membership state.
+    ///
+    /// 1: Invited
+    /// 2: Accepted
+    pub membership_state: u8,
+    /// NOTE: Will always be ["*"] for now.
+    pub permissions: Vec<String>,
+    /// The ID of the team they are a member of.
+    #[serde(deserialize_with = "deserialize_u64")]
+    pub team_id: u64,
+    /// The user type of the team member.
+    pub user: User,
 }
