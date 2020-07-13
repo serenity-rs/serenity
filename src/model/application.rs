@@ -114,10 +114,9 @@ pub struct Team {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct TeamMember {
     /// The member's membership state.
+    pub membership_state: MembershipState,
+    /// The list of permissions of the member on the team.
     ///
-    /// 1: Invited
-    /// 2: Accepted
-    pub membership_state: u8,
     /// NOTE: Will always be ["*"] for now.
     pub permissions: Vec<String>,
     /// The ID of the team they are a member of.
@@ -126,3 +125,16 @@ pub struct TeamMember {
     /// The user type of the team member.
     pub user: User,
 }
+
+#[derive(Clone, Debug, Copy, PartialEq)]
+pub enum MembershipState {
+    Invited = 1,
+    Accepted = 2,
+}
+
+enum_number!(
+    MembershipState {
+        Invited,
+        Accepted,
+    }
+);
