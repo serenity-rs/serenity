@@ -77,6 +77,10 @@ default-features = false
 optional = true
 version = "0.11"
 
+[dependencies.typemap_rev]
+optional = true
+version = "0.1.2"
+
 [dependencies.url]
 optional = true
 version = "^2.1"
@@ -128,6 +132,7 @@ client = [
     "gateway",
     "http",
     "threadpool",
+    "typemap_rev"
 ]
 extras = []
 framework = ["client", "model", "utils"]

@@ -29,7 +29,7 @@ use threadpool::ThreadPool;
 use crate::gateway::ConnectionStage;
 use log::{debug, info, warn};
 
-use crate::utils::TypeMap;
+use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::ClientVoiceManager;
 #[cfg(feature = "framework")]

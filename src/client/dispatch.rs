@@ -15,7 +15,7 @@ use threadpool::ThreadPool;
 
 use crate::http::Http;
 use crate::CacheAndHttp;
-use crate::utils::TypeMap;
+use typemap_rev::TypeMap;
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;

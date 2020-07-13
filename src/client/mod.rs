@@ -56,7 +56,7 @@ use crate::model::id::UserId;
 #[cfg(feature = "voice")]
 use self::bridge::voice::ClientVoiceManager;
 use crate::http::Http;
-use crate::utils::TypeMap;
+use typemap_rev::TypeMap;
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
