@@ -99,7 +99,7 @@ pub struct CurrentApplicationInfo {
 /// Information about the Team group of the application.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Team {
-    /// The icon of the TEam.
+    /// The icon of the team.
     pub icon: Option<String>,
     /// The snowflake ID of the team.
     #[serde(deserialize_with = "deserialize_u64")]
