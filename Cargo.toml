@@ -78,7 +78,7 @@ optional = true
 version = "0.11"
 
 [dependencies.typemap_rev]
-git = "https://github.com/bdashore3/typemap_rev"
+version = "0.1.2"
 
 [dependencies.url]
 optional = true
