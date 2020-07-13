@@ -20,6 +20,7 @@ pub use parking_lot::{Mutex, RwLock};
 
 #[cfg(feature = "client")]
 pub use crate::client::{Client, ClientError, Context, EventHandler, RawEventHandler};
+#[cfg(feature = "client")]
 pub use typemap_rev::{TypeMap, TypeMapKey};
 #[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
