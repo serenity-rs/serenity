@@ -419,6 +419,10 @@ pub struct Presence {
     ///
     /// [`User`]: struct.User.html
     pub activity: Option<Activity>,
+    /// [`User`]'s current activities
+    ///
+    /// [`User`]: struct.User.html
+    pub activities: Vec<Activity>,
     /// The devices a user are currently active on, if available.
     pub client_status: Option<ClientStatus>,
     /// The date of the last presence update.
@@ -464,6 +468,12 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
 
+        let activities = match map.remove("activities") {
+            Some(v) => serde_json::from_value::<Vec<Activity>>(v)
+                .map_err(DeError::custom)?,
+            None => Vec::new(),
+        };
+
         let client_status = match map.remove("client_status") {
             Some(v) => {
                 serde_json::from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?
@@ -491,6 +501,7 @@ impl<'de> Deserialize<'de> for Presence {
 
         Ok(Presence {
             activity,
+            activities,
             client_status,
             last_modified,
             nick,
