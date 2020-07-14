@@ -89,11 +89,51 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
     }
 }
 
+/// Test if the attribute is cooked.
+fn is_cooked(attr: &Attribute) -> bool {
+    const COOKED_ATTRIBUTE_NAMES: &[&str] = &[
+        "cfg",
+        "cfg_attr",
+        "doc",
+        "derive",
+        "inline",
+        "allow",
+        "warn",
+        "deny",
+        "forbid",
+    ];
+
+    COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
+}
+
+/// Removes cooked attributes from a vector of attributes. Uncooked attributes are left in the vector.
+///
+/// # Return
+///
+/// Returns a vector of cooked attributes that have been removed from the input vector.
+fn remove_cooked(attrs: &mut Vec<Attribute>) -> Vec<Attribute> {
+    let mut cooked = Vec::new();
+
+    // FIXME: Replace with `Vec::drain_filter` once it is stable.
+    let mut i = 0;
+    while i < attrs.len() {
+        if !is_cooked(&attrs[i]) {
+            i += 1;
+            continue;
+        }
+
+        cooked.push(attrs.remove(i));
+    }
+
+    cooked
+}
+
 #[derive(Debug)]
 pub struct CommandFun {
     /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by `#[cfg(...)]` type attributes.
+    /// Populated cooked attributes. These are attributes outside of the realm of this crate's procedural macros
+    /// and will appear in generated output.
     pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
@@ -104,11 +144,9 @@ pub struct CommandFun {
 
 impl Parse for CommandFun {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let attributes = input.call(Attribute::parse_outer)?;
+        let mut attributes = input.call(Attribute::parse_outer)?;
 
-        let (cooked, mut attributes): (Vec<_>, Vec<_>) =
-            attributes.into_iter().partition(|a| a.path.is_ident("cfg"));
-
+        // `#[doc = "..."]` is a cooked attribute but it is special-cased for commands.
         for attr in &mut attributes {
             // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
             if attr.path.is_ident("doc") {
@@ -118,6 +156,8 @@ impl Parse for CommandFun {
                 )));
             }
         }
+
+        let cooked = remove_cooked(&mut attributes);
 
         let visibility = input.parse::<Visibility>()?;
 
@@ -184,7 +224,8 @@ impl ToTokens for CommandFun {
 pub struct Hook {
     /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
-    /// Populated by `#[cfg(...)]` type attributes.
+    /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
+    /// and will appear in generated output.
     pub cooked: Vec<Attribute>,
     pub visibility: Visibility,
     pub name: Ident,
@@ -195,12 +236,11 @@ pub struct Hook {
 
 impl Parse for Hook {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let attributes = input.call(Attribute::parse_outer)?;
+        let mut attributes = input.call(Attribute::parse_outer)?;
 
-        let (cooked, attributes): (Vec<_>, Vec<_>) =
-            attributes.into_iter().partition(|a| a.path.is_ident("cfg"));
+        let cooked = remove_cooked(&mut attributes);
 
-        let visibility = input.parse::< >()?;
+        let visibility = input.parse::<Visibility>()?;
 
         input.parse::<Token![async]>()?;
 
@@ -514,11 +554,9 @@ pub struct GroupStruct {
 
 impl Parse for GroupStruct {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
-        let attributes = input.call(Attribute::parse_outer)?;
+        let mut attributes = input.call(Attribute::parse_outer)?;
 
-        let (cooked, attributes): (Vec<_>, Vec<_>) = attributes
-            .into_iter()
-            .partition(|a| a.path.is_ident("cfg") || a.path.is_ident("doc"));
+        let cooked = remove_cooked(&mut attributes);
 
         let visibility = input.parse()?;
 
