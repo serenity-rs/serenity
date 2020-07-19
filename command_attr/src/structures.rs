@@ -7,8 +7,9 @@ use syn::{
     braced,
     parse::{Error, Parse, ParseStream, Result},
     spanned::Spanned,
-    Attribute, Block, FnArg, Ident, Pat, Path, PathSegment, ReturnType, Stmt, Token, Type,
-    Visibility,
+    punctuated::Punctuated,
+    Attribute, Block, FnArg, Ident, Pat, Path, PathSegment, ReturnType, Stmt, Expr, ExprClosure,
+    Token, Type, Visibility,
 };
 use std::str::FromStr;
 
@@ -221,7 +222,7 @@ impl ToTokens for CommandFun {
 }
 
 #[derive(Debug)]
-pub struct Hook {
+pub struct FunctionHook {
     /// `#[...]`-style attributes.
     pub attributes: Vec<Attribute>,
     /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
@@ -234,69 +235,100 @@ pub struct Hook {
     pub body: Vec<Stmt>,
 }
 
+#[derive(Debug)]
+pub struct ClosureHook {
+    /// `#[...]`-style attributes.
+    pub attributes: Vec<Attribute>,
+    /// Populated by cooked attributes. These are attributes outside of the realm of this crate's procedural macros
+    /// and will appear in generated output.
+    pub cooked: Vec<Attribute>,
+    pub args: Punctuated<Pat, Token![,]>,
+    pub ret: ReturnType,
+    pub body: Box<Expr>,
+}
+
+#[derive(Debug)]
+pub enum Hook {
+    Function(FunctionHook),
+    Closure(ClosureHook),
+}
+
 impl Parse for Hook {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut attributes = input.call(Attribute::parse_outer)?;
-
         let cooked = remove_cooked(&mut attributes);
 
-        let visibility = input.parse::<Visibility>()?;
-
-        input.parse::<Token![async]>()?;
-
-        input.parse::<Token![fn]>()?;
-        let name = input.parse()?;
-
-        // (...)
-        let Parenthesised(args) = input.parse::<Parenthesised<FnArg>>()?;
-
-        let ret = match input.parse::<ReturnType>()? {
-            ReturnType::Type(_, t) => (*t).clone(),
-            ReturnType::Default => Type::Verbatim(TokenStream2::from_str("()")
-                .expect("Invalid str to create `()`-type")),
-        };
-
-        // { ... }
-        let bcont;
-        braced!(bcont in input);
-        let body = bcont.call(Block::parse_within)?;
-
-        let args = args
-            .into_iter()
-            .map(parse_argument)
-            .collect::<Result<Vec<_>>>()?;
-
-        Ok(Self {
-            attributes,
-            cooked,
-            visibility,
-            name,
-            args,
-            ret,
-            body,
-        })
+        if is_function(input) {
+            parse_function_hook(input, attributes, cooked).map(Self::Function)
+        } else {
+            parse_closure_hook(input, attributes, cooked).map(Self::Closure)
+        }
     }
 }
 
-impl ToTokens for Hook {
-    fn to_tokens(&self, stream: &mut TokenStream2) {
-        let Self {
-            attributes: _,
-            cooked,
-            visibility,
-            name,
-            args,
-            ret,
-            body,
-        } = self;
+fn is_function(input: ParseStream<'_>) -> bool {
+    input.peek(Token![pub]) ||
+        (input.peek(Token![async]) && input.peek2(Token![fn]))
+}
 
-        stream.extend(quote! {
-            #(#cooked)*
-            #visibility async fn #name (#(#args),*) -> #ret {
-                #(#body)*
-            }
-        });
-    }
+fn parse_function_hook(
+    input: ParseStream<'_>,
+    attributes: Vec<Attribute>,
+    cooked: Vec<Attribute>
+) -> Result<FunctionHook> {
+    let visibility = input.parse::<Visibility>()?;
+
+    input.parse::<Token![async]>()?;
+    input.parse::<Token![fn]>()?;
+
+    let name = input.parse()?;
+
+    // (...)
+    let Parenthesised(args) = input.parse::<Parenthesised<FnArg>>()?;
+
+    let ret = match input.parse::<ReturnType>()? {
+        ReturnType::Type(_, t) => (*t).clone(),
+        ReturnType::Default => Type::Verbatim(
+            TokenStream2::from_str("()")
+                .expect("Invalid str to create `()`-type")),
+    };
+
+    // { ... }
+    let bcont;
+    braced!(bcont in input);
+    let body = bcont.call(Block::parse_within)?;
+
+    let args = args
+        .into_iter()
+        .map(parse_argument)
+        .collect::<Result<Vec<_>>>()?;
+
+    Ok(FunctionHook {
+        attributes,
+        cooked,
+        visibility,
+        name,
+        args,
+        ret,
+        body,
+    })
+}
+
+fn parse_closure_hook(
+    input: ParseStream<'_>,
+    attributes: Vec<Attribute>,
+    cooked: Vec<Attribute>
+) -> Result<ClosureHook> {
+    input.parse::<Token![async]>()?;
+    let closure = input.parse::<ExprClosure>()?;
+
+    Ok(ClosureHook {
+        attributes,
+        cooked,
+        args: closure.inputs,
+        ret: closure.output,
+        body: closure.body,
+    })
 }
 
 #[derive(Debug, Default)]
