@@ -40,4 +40,5 @@ pub(crate) enum Status {
     SetSender(Option<LockedAudio>),
     AddSender(LockedAudio),
     SetBitrate(Bitrate),
+    Mute(bool),
 }
