@@ -363,7 +363,7 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     ///
-    /// [`guild_id`]: #method.guild_id
+    /// [`guild_id`]: #structfield.guild_id
     #[cfg(feature = "cache")]
     pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
        cache.as_ref().read().guild(self.guild_id?)
