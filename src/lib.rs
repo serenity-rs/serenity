@@ -112,11 +112,6 @@ pub struct CacheAndHttp {
     __nonexhaustive: (),
 }
 
-// For the procedural macros defined in `command_attr`; do not remove!
-#[allow(clippy::useless_attribute)]
-#[allow(rust_2018_idioms)]
-extern crate self as serenity;
-
 // For the procedural macros in `command_attr`.
 #[cfg(feature = "standard_framework")]
 #[doc(hidden)]
