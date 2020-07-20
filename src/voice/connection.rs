@@ -464,7 +464,8 @@ impl Connection {
                 mut sources: &mut Vec<LockedAudio>,
                 mut receiver: &mut Option<Box<dyn AudioReceiver>>,
                 audio_timer: &mut Timer,
-                bitrate: Bitrate)
+                bitrate: Bitrate,
+                muted: bool)
                  -> Result<()> {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
@@ -533,9 +534,13 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer,&mut mix_buffer)?;
+        let mut len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
+
+        if muted {
+            len = 0;
+        }
 
         if len == 0 {
             if self.silence_frames > 0 {
