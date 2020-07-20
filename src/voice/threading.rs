@@ -26,6 +26,7 @@ fn runner(rx: &MpscReceiver<Status>) {
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = audio::DEFAULT_BITRATE;
+    let mut mute = false;
 
     'runner: loop {
         loop {
@@ -59,6 +60,9 @@ fn runner(rx: &MpscReceiver<Status>) {
                 Ok(Status::SetBitrate(b)) => {
                     bitrate = b;
                 },
+                Ok(Status::Mute(m)) => {
+                    mute = m;
+                },
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
                     break;
@@ -79,7 +83,7 @@ fn runner(rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut senders, &mut receiver, &mut timer, bitrate);
+                let cycle = connection.cycle(&mut senders, &mut receiver, &mut timer, bitrate, mute);
 
                 match cycle {
                     Ok(()) => false,
