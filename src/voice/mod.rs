@@ -40,4 +40,5 @@ pub(crate) enum Status {
     AddTrack(Track),
     SetBitrate(Bitrate),
     AddEvent(EventData),
+    Mute(bool),
 }

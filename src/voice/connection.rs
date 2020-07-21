@@ -311,8 +311,9 @@ impl Connection {
                 mut tracks: &mut Vec<Track>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate,
-                interconnect: &Interconnect)
-                 -> Result<()> {
+                interconnect: &Interconnect,
+                muted: bool
+            ) -> Result<()> {
         let mut opus_frame_backing = [0u8; STEREO_FRAME_SIZE];
         let mut mix_buffer = [0f32; STEREO_FRAME_SIZE];
 
@@ -321,9 +322,13 @@ impl Connection {
 
         // Walk over all the audio files, combining into one audio frame according
         // to volume, play state, etc.
-        let (len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect)?;
+        let (mut len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
+
+        if muted {
+            len = 0;
+        }
 
         if len == 0 {
             if self.silence_frames > 0 {

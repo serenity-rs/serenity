@@ -360,6 +360,8 @@ pub fn command(
                 }
             }
             Map::Prefixless(subgroups, commands) => {
+                is_prefixless = true;
+
                 let res = handle_group(stream, ctx, msg, config, subgroups);
 
                 if res.is_ok() {
@@ -372,8 +374,7 @@ pub fn command(
 
                 if res.is_ok() {
                     check_discrepancy(ctx, msg, config, &group.options)?;
-
-                    is_prefixless = true;
+                    
                     return res;
                 }
 

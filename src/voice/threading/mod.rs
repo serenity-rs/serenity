@@ -142,6 +142,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = DEFAULT_BITRATE;
+    let mut mute = false;
 
     let (reconnect_tx, reconnect_rx) = mpsc::channel();
 
@@ -191,6 +192,9 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 Ok(Status::AddEvent(evt)) => {
                     let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
                 }
+                Ok(Status::Mute(m)) => {
+                    mute = m;
+                },
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
                     break;
@@ -211,7 +215,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut tracks, &mut timer, bitrate, &interconnect);
+                let cycle = connection.cycle(&mut tracks, &mut timer, bitrate, &interconnect, mute);
 
                 match cycle {
                     Ok(()) => {

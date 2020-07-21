@@ -31,9 +31,6 @@ use log::{error, debug, info, trace, warn};
 #[cfg(not(feature = "native_tls_backend"))]
 use crate::internal::ws_impl::create_rustls_client;
 
-#[cfg(feature = "native_tls_backend")]
-use tungstenite::handshake::client::Request;
-
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
 /// websocket, such as setting the active activity, reconnecting, syncing
@@ -847,7 +844,7 @@ fn connect(base_url: &str) -> Result<WsClient> {
 #[cfg(feature = "native_tls_backend")]
 fn connect(base_url: &str) -> Result<WsClient> {
     let url = build_gateway_url(base_url)?;
-    let client = tungstenite::connect(Request::from(url))?;
+    let client = tungstenite::connect(url)?;
 
     Ok(client.0)
 }

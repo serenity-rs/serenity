@@ -8,7 +8,7 @@ use std::sync::{
 };
 
 use crate::http::Http;
-use crate::utils::TypeMap;
+use typemap_rev::TypeMap;
 
 #[cfg(feature = "cache")]
 pub use crate::cache::{Cache, CacheRwLock};

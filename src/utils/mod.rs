@@ -4,7 +4,6 @@
 mod colour;
 mod message_builder;
 mod custom_message;
-mod typemap;
 
 pub use self::{
     colour::Colour,
@@ -14,8 +13,7 @@ pub use self::{
         EmbedMessageBuilding,
         MessageBuilder,
     },
-	custom_message::CustomMessage,
-    typemap::{TypeMap, TypeMapKey},
+	custom_message::CustomMessage
 };
 pub type Color = Colour;
 

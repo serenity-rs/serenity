@@ -1,5 +1,5 @@
 [package]
-authors = ["alex <acdenissk69@gmail.com>", "Zeyla Hellyer <hi@zeyla.me>"]
+authors = ["Alex M. M. <acdenissk69@gmail.com>"]
 description = "A Rust library for the Discord API."
 documentation = "https://docs.rs/serenity"
 homepage = "https://github.com/serenity-rs/serenity"
@@ -14,7 +14,7 @@ edition = "2018"
 [dependencies]
 bitflags = "1"
 log = "0.4"
-parking_lot = "0.9"
+parking_lot = "0.11"
 serde_json = "1"
 
 [dependencies.audiopus]
@@ -23,7 +23,7 @@ version = "0.2"
 
 [dependencies.base64]
 optional = true
-version = "0.11"
+version = "0.12"
 
 [dependencies.byteorder]
 optional = true
@@ -59,7 +59,7 @@ version = "0.7"
 
 [dependencies.rustls]
 optional = true
-version = "0.16"
+version = "0.17"
 
 [dependencies.serde]
 version = "1"
@@ -76,7 +76,11 @@ version = "1"
 [dependencies.tungstenite]
 default-features = false
 optional = true
-version = "0.9"
+version = "0.11"
+
+[dependencies.typemap_rev]
+optional = true
+version = "0.1.2"
 
 [dependencies.url]
 optional = true
@@ -92,7 +96,7 @@ version = "0.21"
 
 [dependencies.webpki-roots]
 optional = true
-version = "0.18"
+version = "0.19"
 
 [dependencies.xsalsa20poly1305]
 optional = true
@@ -133,6 +137,7 @@ client = [
     "gateway",
     "http",
     "threadpool",
+    "typemap_rev"
 ]
 extras = []
 framework = ["client", "model", "utils"]

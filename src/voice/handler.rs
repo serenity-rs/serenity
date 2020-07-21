@@ -242,6 +242,7 @@ impl Handler {
 
         if self.channel_id.is_some() {
             self.update();
+            self.send(VoiceStatus::Mute(mute));
         }
     }
 

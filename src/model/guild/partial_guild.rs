@@ -285,8 +285,8 @@ impl PartialGuild {
     /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
-    pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
+    pub fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<()>
+        where F: FnOnce(&mut EditMember) -> &mut EditMember {
         self.id.edit_member(&http, user_id, f)
     }
 

@@ -35,7 +35,8 @@
 //! ) -> CommandResult {
 //! #  #[cfg(all(feature = "cache", feature = "http"))]
 //! # {
-//!    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+//!    let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners);
+//!    Ok(())
 //! # }
 //! #
 //! # #[cfg(not(all(feature = "cache", feature = "http")))]
@@ -56,9 +57,8 @@
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
-    Args, CommandGroup, CommandOptions,
-    CheckResult,
-    CommandResult, has_correct_roles, HelpBehaviour, HelpOptions,
+    Args, CommandGroup, CommandOptions, CheckResult,
+    has_correct_roles, HelpBehaviour, HelpOptions,
     has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
@@ -110,38 +110,39 @@ macro_rules! warn_about_failed_send {
 /// in relation of help-settings measured to the user.
 #[derive(Clone, Debug, Default)]
 pub struct GroupCommandsPair {
-    name: &'static str,
-    prefixes: Vec<&'static str>,
-    command_names: Vec<String>,
-    sub_groups: Vec<GroupCommandsPair>,
+    pub name: &'static str,
+    pub prefixes: Vec<&'static str>,
+    pub command_names: Vec<String>,
+    pub sub_groups: Vec<GroupCommandsPair>,
 }
 
 /// A single suggested command containing its name and Levenshtein distance
 /// to the actual user's searched command name.
 #[derive(Clone, Debug, Default)]
-struct SuggestedCommandName {
-    name: String,
-    levenshtein_distance: usize,
+pub struct SuggestedCommandName {
+    pub name: String,
+    pub levenshtein_distance: usize,
 }
 
 /// A single command containing all related pieces of information.
 #[derive(Clone, Debug)]
 pub struct Command<'a> {
-    name: &'static str,
-    group_name: &'static str,
-    group_prefixes: &'a [&'static str],
-    aliases: Vec<&'static str>,
-    availability: &'a str,
-    description: Option<&'static str>,
-    usage: Option<&'static str>,
-    usage_sample: Vec<&'static str>,
-    checks: Vec<String>,
+    pub name: &'static str,
+    pub group_name: &'static str,
+    pub group_prefixes: &'a [&'static str],
+    pub aliases: Vec<&'static str>,
+    pub availability: &'a str,
+    pub description: Option<&'static str>,
+    pub usage: Option<&'static str>,
+    pub usage_sample: Vec<&'static str>,
+    pub checks: Vec<String>,
+    pub(crate) _nonexhaustive: (),
 }
 
 /// Contains possible suggestions in case a command could not be found
 /// but are similar enough.
 #[derive(Clone, Debug, Default)]
-pub struct Suggestions(Vec<SuggestedCommandName>);
+pub struct Suggestions(pub Vec<SuggestedCommandName>);
 
 #[cfg(all(feature = "cache", feature = "http"))]
 impl Suggestions {
@@ -395,15 +396,17 @@ fn check_command_behaviour(
     let b = check_common_behaviour(&ctx, msg, &options, owners, help_options);
 
     if b == HelpBehaviour::Nothing {
-       for check in options.checks {
-           if !check.check_in_help {
-               break;
-           }
+       if !options.owner_privilege || !owners.contains(&msg.author.id) {
+           for check in options.checks {
+               if !check.check_in_help {
+                   continue;
+               }
 
-           let mut args = Args::new("", &[]);
+               let mut args = Args::new("", &[]);
 
-           if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options) {
-               return help_options.lacking_conditions;
+               if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options) {
+                   return help_options.lacking_conditions;
+               }
            }
        }
     }
@@ -550,6 +553,7 @@ fn nested_group_command_search<'a>(
                     availability: available_text,
                     usage: options.usage,
                     usage_sample: options.examples.to_vec(),
+                    _nonexhaustive: (),
                 },
             });
         }
@@ -897,9 +901,9 @@ pub fn create_customised_help_data<'a>(
     }
 
     let strikethrough_command_tip = if msg.is_private() {
-        &help_options.strikethrough_commands_tip_in_guild
-    } else {
         &help_options.strikethrough_commands_tip_in_dm
+    } else {
+        &help_options.strikethrough_commands_tip_in_guild
     };
 
     let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
@@ -1216,7 +1220,8 @@ fn send_error_embed(
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     with_embeds(context, msg, args, &help_options, groups, owners)
+///     let _ = with_embeds(context, msg, args, &help_options, groups, owners);
+///     Ok(())
 /// }
 ///
 /// client.with_framework(StandardFramework::new()
@@ -1231,11 +1236,11 @@ pub fn with_embeds(
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>,
-) -> CommandResult {
+) -> Option<Message> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options);
 
-    if let Err(why) = match formatted_help {
+    let response_result = match formatted_help {
         CustomisedHelpData::SuggestedCommands {
             ref help_description,
             ref suggestions,
@@ -1273,11 +1278,15 @@ pub fn with_embeds(
             help_options.embed_success_colour,
         ),
         CustomisedHelpData::__Nonexhaustive => unreachable!(),
-    } {
-        warn_about_failed_send!(&formatted_help, why);
-    }
+    };
 
-    Ok(())
+    match response_result {
+        Ok(response) => Some(response),
+        Err(why) => {
+            warn_about_failed_send!(&formatted_help, why);
+            None
+        },
+    }
 }
 
 /// Turns grouped commands into a `String` taking plain help format into account.
@@ -1413,7 +1422,8 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 ///     groups: &[&'static CommandGroup],
 ///     owners: HashSet<UserId>
 /// ) -> CommandResult {
-///     plain(context, msg, args, &help_options, groups, owners)
+///     let _ = plain(context, msg, args, &help_options, groups, owners);
+///     Ok(())
 /// }
 ///
 /// client.with_framework(StandardFramework::new()
@@ -1428,7 +1438,7 @@ pub fn plain(
     help_options: &HelpOptions,
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>,
-) -> CommandResult {
+) -> Option<Message> {
     let formatted_help =
         create_customised_help_data(ctx, msg, &args, &groups, &owners, help_options);
 
@@ -1450,11 +1460,13 @@ pub fn plain(
         CustomisedHelpData::__Nonexhaustive => unreachable!(),
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx, result) {
-        warn_about_failed_send!(&formatted_help, why);
-    };
-
-    Ok(())
+    match msg.channel_id.say(&ctx, result) {
+        Ok(response) => Some(response),
+        Err(why) => {
+            warn_about_failed_send!(&formatted_help, why);
+            None
+        }
+    }
 }
 
 #[cfg(test)]

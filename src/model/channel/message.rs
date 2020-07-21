@@ -3,6 +3,7 @@
 use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 use serde_json::Value;
+use std::fmt::Display;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
@@ -381,7 +382,7 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     ///
-    /// [`guild_id`]: #method.guild_id
+    /// [`guild_id`]: #structfield.guild_id
     #[cfg(feature = "cache")]
     pub fn guild(&self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<Guild>>> {
        cache.as_ref().read().guild(self.guild_id?)
@@ -529,10 +530,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
-    pub fn reply(&self, cache_http: impl CacheHttp, content: impl AsRef<str>) -> Result<Message> {
-        let content = content.as_ref();
-
-        if let Some(length_over) = Message::overflow_length(content) {
+    pub fn reply(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+        if let Some(length_over) = Message::overflow_length(&content.to_string()) {
             return Err(Error::Model(ModelError::MessageTooLong(length_over)));
         }
 
@@ -550,9 +549,7 @@ impl Message {
             }
         }
 
-        let mut gen = self.author.mention();
-        gen.push_str(": ");
-        gen.push_str(content);
+        let gen = format!("{}: {}", self.author.mention(), content);
 
         let map = json!({
             "content": gen,
@@ -619,6 +616,19 @@ impl Message {
     #[inline]
     pub fn mentions_user(&self, user: &User) -> bool {
         self.mentions_user_id(user.id)
+    }
+
+    /// Checks whether the message mentions the current user.
+    pub fn mentions_me(&self, cache_http: impl CacheHttp) -> Result<bool> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                return Ok(self.mentions_user_id(cache.read().user.id));
+            }
+        }
+
+        let current_user = cache_http.http().get_current_user()?;
+        Ok(self.mentions_user_id(current_user.id))
     }
 
     /// Unpins the message from its channel.

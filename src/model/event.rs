@@ -537,6 +537,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 pub struct GuildMembersChunkEvent {
     pub guild_id: GuildId,
     pub members: HashMap<UserId, Member>,
+    pub nonce: Option<String>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -592,9 +593,14 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
                 }))
             .map_err(DeError::custom)?;
 
+        let nonce = map.get("nonce")
+            .and_then(|nonce| nonce.as_str())
+            .map(|nonce| nonce.to_string());
+
         Ok(GuildMembersChunkEvent {
             guild_id,
             members,
+            nonce,
             _nonexhaustive: (),
         })
     }

@@ -110,9 +110,8 @@ If you want more information about a specific command, just pass the command as 
 #[wrong_channel = "Strike"]
 // Serenity will automatically analyse and generate a hint/tip explaining the possible
 // cases of ~~strikethrough-commands~~, but only if
-// `strikethrough_commands_tip(Some(""))` keeps `Some()` wrapping an empty `String`, which is the default value.
-// If the `String` is not empty, your given `String` will be used instead.
-// If you pass in a `None`, no hint will be displayed at all.
+// `strikethrough_commands_tip_{dm, guild}` aren't specified.
+// If you pass in a value, it will be displayed instead.
 fn my_help(
     context: &Context,
     msg: &Message,
@@ -121,7 +120,8 @@ fn my_help(
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>
 ) -> CommandResult {
-    help_commands::with_embeds(context, msg, args, help_options, groups, owners)
+    let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners);
+    Ok(())
 }
 
 fn main() {
