@@ -520,6 +520,10 @@ pub struct PartialMember {
     pub joined_at: Option<DateTime<FixedOffset>>,
     /// Indicator of whether the member can speak in voice channels.
     pub mute: bool,
+    /// The member's nickname, if present.
+    ///
+    /// Can't be longer than 32 characters.
+    pub nick: Option<String>,
     /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     #[serde(skip)]
