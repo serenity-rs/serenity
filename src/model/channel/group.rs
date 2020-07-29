@@ -236,7 +236,7 @@ impl Group {
         match self.name {
             Some(ref name) => Cow::Borrowed(name),
             None => {
-                let mut name = match self.recipients.values().nth(0) {
+                let mut name = match self.recipients.values().next() {
                     Some(recipient) => recipient.with(|c| c.name.clone()),
                     None => return Cow::Borrowed("Empty Group"),
                 };
