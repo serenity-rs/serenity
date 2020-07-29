@@ -24,7 +24,7 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
 ///
 /// [`Configuration::on_mention`]: ../struct.Configuration.html#method.on_mention
 pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'a str> {
-    let on_mention = config.on_mention.as_ref().map(String::as_str)?;
+    let on_mention = config.on_mention.as_deref()?;
 
     let start = stream.offset();
 
