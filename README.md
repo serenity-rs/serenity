@@ -194,7 +194,7 @@ Voice + youtube-dl:
 
 # Projects extending Serenity
 
-- [serenity-lavalink][project:serenity-lavalink]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
@@ -219,7 +219,7 @@ Voice + youtube-dl:
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/9X7vCus
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
-[project:serenity-lavalink]: https://gitlab.com/nitsuga5124/serenity-lavalink/
+[project:lavalink-rs]: https://gitlab.com/nitsuga5124/lavalink-rs/
 [repo:lavalink]: https://github.com/Frederikam/Lavalink
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
