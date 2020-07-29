@@ -1,9 +1,7 @@
 use crate::gateway::InterMessage;
 use crate::model::id::{ChannelId, GuildId, UserId};
-use std::{
-    collections::HashMap,
-    sync::mpsc::Sender as MpscSender
-};
+use std::collections::HashMap;
+use futures::channel::mpsc::UnboundedSender as Sender;
 use super::Handler;
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
@@ -21,15 +19,15 @@ use super::Handler;
 /// [`Handler`]: struct.Handler.html
 /// [guild's channel]: ../../model/channel/enum.ChannelType.html#variant.Voice
 /// [`Shard`]: ../gateway/struct.Shard.html
-#[derive(Clone, Debug)]
+#[derive(Clone)]
 pub struct Manager {
     handlers: HashMap<GuildId, Handler>,
     user_id: UserId,
-    ws: MpscSender<InterMessage>,
+    ws: Sender<InterMessage>,
 }
 
 impl Manager {
-    pub(crate) fn new(ws: MpscSender<InterMessage>, user_id: UserId) -> Manager {
+    pub(crate) fn new(ws: Sender<InterMessage>, user_id: UserId) -> Manager {
         Manager {
             handlers: HashMap::new(),
             user_id,

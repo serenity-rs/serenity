@@ -19,12 +19,11 @@ use std::collections::HashMap;
 /// use serenity::model::channel::Embed;
 /// use serenity::utils::Colour;
 ///
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let http = Http::default();
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-/// # use std::sync::Arc;
-/// # let http = Arc::new(Http::default());
-/// let webhook = http.as_ref().get_webhook_with_token(id, token)
-///     .expect("valid webhook");
+/// let webhook = http.get_webhook_with_token(id, token).await?;
 ///
 /// let website = Embed::fake(|e| {
 ///     e.title("The Rust Language Website")
@@ -39,9 +38,12 @@ use std::collections::HashMap;
 ///         .field("Rust by Example", "A collection of Rust examples", false)
 /// });
 ///
-/// let _ = webhook.execute(&http, false, |w| {
+/// webhook.execute(&http, false, |w| {
 ///     w.content("Here's some information on Rust:").embeds(vec![website, resources])
-/// });
+/// })
+/// .await?;
+/// #     Ok(())
+/// # }
 /// ```
 ///
 /// [`Webhook`]: ../model/webhook/struct.Webhook.html
@@ -59,16 +61,19 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
-    /// let _ = webhook.execute(&http, false, |w| {
+    /// webhook.execute(&http, false, |w| {
     ///     w.avatar_url(avatar_url).content("Here's a webhook")
-    /// });
+    /// })
+    /// .await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
         self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
@@ -86,18 +91,21 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("foo")
-    /// });
+    /// })
+    /// .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`embeds`]: #method.embeds
@@ -132,18 +140,21 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").tts(true)
-    /// });
+    /// })
+    /// .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
         self.0.insert("tts", Value::Bool(tts));
@@ -158,18 +169,21 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").username("hakase")
-    /// });
+    /// })
+    /// .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));

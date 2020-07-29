@@ -10,17 +10,25 @@
 //! ```
 use std::{collections::{HashMap, HashSet}, env, fmt::Write, sync::Arc};
 use serenity::{
+    async_trait,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
         Args, CheckResult, CommandOptions, CommandResult, CommandGroup,
         DispatchError, HelpOptions, help_commands, StandardFramework,
-        macros::{command, group, help, check},
+        macros::{command, group, help, check, hook},
     },
-    model::{channel::{Channel, Message}, gateway::Ready, id::UserId},
+    http::Http,
+    model::{
+        channel::{Channel, Message},
+        gateway::Ready,
+        id::UserId,
+        permissions::Permissions,
+    },
     utils::{content_safe, ContentSafeOptions},
 };
 
 use serenity::prelude::*;
+use tokio::sync::Mutex;
 
 // A container type is created for inserting into the Client's `data`, which
 // allows for data to be accessible across all events and framework commands, or
@@ -39,14 +47,15 @@ impl TypeMapKey for CommandCounter {
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
     }
 }
 
 #[group]
-#[commands(about, say, commands, ping, some_long_command)]
+#[commands(about, am_i_admin, say, commands, ping, some_long_command)]
 struct General;
 
 #[group]
@@ -74,9 +83,7 @@ struct Math;
 #[owners_only]
 // Limit all commands to be guild-restricted.
 #[only_in(guilds)]
-// Adds checks that need to be passed.
-#[checks(Admin)]
-#[commands(am_i_admin, slow_mode)]
+#[commands(slow_mode)]
 struct Owner;
 
 // The framework provides two built-in help commands for you to use.
@@ -112,7 +119,7 @@ If you want more information about a specific command, just pass the command as 
 // cases of ~~strikethrough-commands~~, but only if
 // `strikethrough_commands_tip_{dm, guild}` aren't specified.
 // If you pass in a value, it will be displayed instead.
-fn my_help(
+async fn my_help(
     context: &Context,
     msg: &Message,
     args: Args,
@@ -120,25 +127,78 @@ fn my_help(
     groups: &[&'static CommandGroup],
     owners: HashSet<UserId>
 ) -> CommandResult {
-    let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners);
+    let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners).await;
     Ok(())
 }
+#[hook]
+async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
+    println!("Got command '{}' by user '{}'", command_name, msg.author.name);
 
-fn main() {
+    // Increment the number of times this command has been run once. If
+    // the command's name does not exist in the counter, add a default
+    // value of 0.
+    let mut data = ctx.data.write().await;
+    let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
+    let entry = counter.entry(command_name.to_string()).or_insert(0);
+    *entry += 1;
+
+    true // if `before` returns false, command processing doesn't happen.
+}
+
+#[hook]
+async fn after(_ctx: &Context, _msg: &Message, command_name: &str, command_result: CommandResult) {
+    match command_result {
+        Ok(()) => println!("Processed command '{}'", command_name),
+        Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
+    }
+}
+
+#[hook]
+async fn unknown_command(_ctx: &Context, _msg: &Message, unknown_command_name: &str) {
+    println!("Could not find command named '{}'", unknown_command_name);
+}
+
+#[hook]
+async fn normal_message(_ctx: &Context, msg: &Message) {
+    println!("Message is not a command '{}'", msg.content);
+}
+
+
+#[hook]
+async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
+    if let DispatchError::Ratelimited(seconds) = error {
+        let _ = msg
+            .channel_id
+            .say(&ctx.http, &format!("Try this again in {} seconds.", seconds))
+            .await;
+    }
+}
+
+// You can construct a hook without the use of a macro, too.
+// This requires some boilerplate though and the following additional import.
+use serenity::{futures::future::BoxFuture, FutureExt};
+fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, error: DispatchError) -> BoxFuture<'fut, ()> {
+    async move {
+        if let DispatchError::Ratelimited(seconds) = error {
+            let _ = msg
+                .channel_id
+                .say(&ctx.http, &format!("Try this again in {} seconds.", seconds))
+                .await;
+        };
+    }.boxed()
+}
+
+#[tokio::main]
+async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN").expect(
         "Expected a token in the environment",
     );
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
 
-    {
-        let mut data = client.data.write();
-        data.insert::<CommandCounter>(HashMap::default());
-        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
-    }
+    let http = Http::new_with_token(&token);
 
     // We will fetch your bot's owners and id
-    let (owners, bot_id) = match client.cache_and_http.http.get_current_application_info() {
+    let (owners, bot_id) = match http.get_current_application_info().await {
         Ok(info) => {
             let mut owners = HashSet::new();
             owners.insert(info.owner.id);
@@ -148,100 +208,69 @@ fn main() {
         Err(why) => panic!("Could not access application info: {:?}", why),
     };
 
-
-    // Commands are equivalent to:
-    // "~about"
-    // "~emoji cat"
-    // "~emoji dog"
-    // "~multiply"
-    // "~ping"
-    // "~some long command"
-    client.with_framework(
-        // Configures the client, allowing for options to mutate how the
-        // framework functions.
-        //
-        // Refer to the documentation for
-        // `serenity::ext::framework::Configuration` for all available
-        // configurations.
-        StandardFramework::new()
+    let framework = StandardFramework::new()
         .configure(|c| c
-            .with_whitespace(true)
-            .on_mention(Some(bot_id))
-            .prefix("~")
-            // You can set multiple delimiters via delimiters()
-            // or just one via delimiter(",")
-            // If you set multiple delimiters, the order you list them
-            // decides their priority (from first to last).
-            //
-            // In this case, if "," would be first, a message would never
-            // be delimited at ", ", forcing you to trim your arguments if you
-            // want to avoid whitespaces at the start of each.
-            .delimiters(vec![", ", ","])
-            // Sets the bot's owners. These will be used for commands that
-            // are owners only.
-            .owners(owners))
+                   .with_whitespace(true)
+                   .on_mention(Some(bot_id))
+                   .prefix("~")
+                   // In this case, if "," would be first, a message would never
+                   // be delimited at ", ", forcing you to trim your arguments if you
+                   // want to avoid whitespaces at the start of each.
+                   .delimiters(vec![", ", ","])
+                   // Sets the bot's owners. These will be used for commands that
+                   // are owners only.
+                   .owners(owners))
 
-        // Set a function to be called prior to each command execution. This
-        // provides the context of the command, the message that was received,
-        // and the full name of the command that will be called.
-        //
-        // You can not use this to determine whether a command should be
-        // executed. Instead, the `#[check]` macro gives you this functionality.
-        .before(|ctx, msg, command_name| {
-            println!("Got command '{}' by user '{}'",
-                     command_name,
-                     msg.author.name);
-
-            // Increment the number of times this command has been run once. If
-            // the command's name does not exist in the counter, add a default
-            // value of 0.
-            let mut data = ctx.data.write();
-            let counter = data.get_mut::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
-            let entry = counter.entry(command_name.to_string()).or_insert(0);
-            *entry += 1;
-
-            true // if `before` returns false, command processing doesn't happen.
-        })
-        // Similar to `before`, except will be called directly _after_
-        // command execution.
-        .after(|_, _, command_name, error| {
-            match error {
-                Ok(()) => println!("Processed command '{}'", command_name),
-                Err(why) => println!("Command '{}' returned error {:?}", command_name, why),
-            }
-        })
-        // Set a function that's called whenever an attempted command-call's
-        // command could not be found.
-        .unrecognised_command(|_, _, unknown_command_name| {
-            println!("Could not find command named '{}'", unknown_command_name);
-        })
-        // Set a function that's called whenever a message is not a command.
-        .normal_message(|_, message| {
-            println!("Message is not a command '{}'", message.content);
-        })
-        // Set a function that's called whenever a command's execution didn't complete for one
-        // reason or another. For example, when a user has exceeded a rate-limit or a command
-        // can only be performed by the bot owner.
-        .on_dispatch_error(|ctx, msg, error| {
-            if let DispatchError::Ratelimited(seconds) = error {
-                let _ = msg.channel_id.say(&ctx.http, &format!("Try this again in {} seconds.", seconds));
-            }
-        })
+    // Set a function to be called prior to each command execution. This
+    // provides the context of the command, the message that was received,
+    // and the full name of the command that will be called.
+    //
+    // You can not use this to determine whether a command should be
+    // executed. Instead, the `#[check]` macro gives you this functionality.
+    //
+    // **Note**: Async closures are unstable, you may use them in your
+    // application if you are fine using nightly Rust.
+    // If not, we need to provide the function identifiers to the
+    // hook-functions (before, after, normal, ...).
+        .before(before)
+    // Similar to `before`, except will be called directly _after_
+    // command execution.
+        .after(after)
+    // Set a function that's called whenever an attempted command-call's
+    // command could not be found.
+        .unrecognised_command(unknown_command)
+    // Set a function that's called whenever a message is not a command.
+        .normal_message(normal_message)
+    // Set a function that's called whenever a command's execution didn't complete for one
+    // reason or another. For example, when a user has exceeded a rate-limit or a command
+    // can only be performed by the bot owner.
+        .on_dispatch_error(dispatch_error)
+    // Can't be used more than once per 5 seconds:
+        .bucket("emoji", |b| b.delay(5)).await
+    // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
+        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2)).await
+    // The `#[group]` macro generates `static` instances of the options set for the group.
+    // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
+    // #name is turned all uppercase
         .help(&MY_HELP)
-        // Can't be used more than once per 5 seconds:
-        .bucket("emoji", |b| b.delay(5))
-        // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
-        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2))
-        // The `#[group]` macro generates `static` instances of the options set for the group.
-        // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
-        // #name is turned all uppercase
         .group(&GENERAL_GROUP)
         .group(&EMOJI_GROUP)
         .group(&MATH_GROUP)
-        .group(&OWNER_GROUP)
-    );
+        .group(&OWNER_GROUP);
 
-    if let Err(why) = client.start() {
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .framework(framework)
+        .await
+        .expect("Err creating client");
+
+    {
+        let mut data = client.data.write().await;
+        data.insert::<CommandCounter>(HashMap::default());
+        data.insert::<ShardManagerContainer>(Arc::clone(&client.shard_manager));
+    }
+
+    if let Err(why) = client.start().await {
         println!("Client error: {:?}", why);
     }
 }
@@ -251,17 +280,17 @@ fn main() {
 // Options are passed via subsequent attributes.
 // Make this command use the "complicated" bucket.
 #[bucket = "complicated"]
-fn commands(ctx: &Context, msg: &Message) -> CommandResult {
+async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
     let mut contents = "Commands used:\n".to_string();
 
-    let data = ctx.data.read();
+    let data = ctx.data.read().await;
     let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
 
     for (k, v) in counter {
         let _ = write!(contents, "- {name}: {amount}\n", name=k, amount=v);
     }
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &contents) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &contents).await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -272,7 +301,7 @@ fn commands(ctx: &Context, msg: &Message) -> CommandResult {
 // mentions are replaced with a safe textual alternative.
 // In this example channel mentions are excluded via the `ContentSafeOptions`.
 #[command]
-fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let settings = if let Some(guild_id) = msg.guild_id {
        // By default roles, users, and channel mentions are cleaned.
        ContentSafeOptions::default()
@@ -288,9 +317,9 @@ fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
             .clean_role(false)
     };
 
-    let content = content_safe(&ctx.cache, &args.rest(), &settings);
+    let content = content_safe(&ctx.cache, &args.rest(), &settings).await;
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &content) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &content).await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -304,7 +333,7 @@ fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // not called.
 #[check]
 #[name = "Owner"]
-fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
     // Replace 7 with your ID to make this check pass.
     //
     // `true` will convert into `CheckResult::Success`,
@@ -322,30 +351,9 @@ fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> 
     (msg.author.id == 7).into()
 }
 
-// A function which acts as a "check", to determine whether to call a command.
-//
-// This check analyses whether a guild member permissions has
-// administrator-permissions.
-#[check]
-#[name = "Admin"]
-// Whether the check shall be tested in the help-system.
-#[check_in_help(true)]
-// Whether the check shall be displayed in the help-system.
-#[display_in_help(true)]
-fn admin_check(ctx: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
-    if let Some(member) = msg.member(&ctx.cache) {
-
-        if let Ok(permissions) = member.permissions(&ctx.cache) {
-            return permissions.administrator().into();
-        }
-    }
-
-    false.into()
-}
-
 #[command]
-fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())) {
+async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())).await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -355,14 +363,14 @@ fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult 
 #[command]
 // Limits the usage of this command to roles named:
 #[allowed_roles("mods", "ultimate neko")]
-fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let potential_role_name = args.rest();
 
-    if let Some(guild) = msg.guild(&ctx.cache) {
+    if let Some(guild) = msg.guild(&ctx.cache).await {
         // `role_by_name()` allows us to attempt attaining a reference to a role
         // via its name.
-        if let Some(role) = guild.read().role_by_name(&potential_role_name) {
-            if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Role-ID: {}", role.id)) {
+        if let Some(role) = guild.role_by_name(&potential_role_name) {
+            if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Role-ID: {}", role.id)).await {
                 println!("Error sending message: {:?}", why);
             }
 
@@ -370,7 +378,7 @@ fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         }
     }
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)).await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -380,13 +388,13 @@ fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 #[command]
 // Lets us also call `~math *` instead of just `~math multiply`.
 #[aliases("*")]
-fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let first = args.single::<f64>()?;
     let second = args.single::<f64>()?;
 
     let res = first * second;
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &res.to_string()) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, &res.to_string()).await {
         println!("Err sending product of {} and {}: {:?}", first, second, why);
     }
 
@@ -394,8 +402,8 @@ fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
-fn about(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )") {
+async fn about(ctx: &Context, msg: &Message) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )").await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -403,22 +411,22 @@ fn about(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn latency(ctx: &Context, msg: &Message) -> CommandResult {
+async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     // The shard manager is an interface for mutating, stopping, restarting, and
     // retrieving information about shards.
-    let data = ctx.data.read();
+    let data = ctx.data.read().await;
 
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
         None => {
-            let _ = msg.reply(ctx, "There was a problem getting the shard manager");
+            let _ = msg.reply(ctx, "There was a problem getting the shard manager").await;
 
             return Ok(());
         },
     };
 
-    let manager = shard_manager.lock();
-    let runners = manager.runners.lock();
+    let manager = shard_manager.lock().await;
+    let runners = manager.runners.lock().await;
 
     // Shards are backed by a "shard runner" responsible for processing events
     // over the shard, so we'll get the information about the shard runner for
@@ -432,7 +440,7 @@ fn latency(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let _ = msg.reply(ctx, &format!("The shard latency is {:?}", runner.latency));
+    let _ = msg.reply(ctx, &format!("The shard latency is {:?}", runner.latency)).await;
 
     Ok(())
 }
@@ -441,8 +449,8 @@ fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 // Limit command usage to guilds.
 #[only_in(guilds)]
 #[checks(Owner)]
-fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )") {
+async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )").await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -456,8 +464,8 @@ fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 #[bucket = "emoji"]
 // Allow only administrators to call this:
 #[required_permissions("ADMINISTRATOR")]
-fn cat(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, ":cat:") {
+async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, ":cat:").await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -467,8 +475,8 @@ fn cat(ctx: &Context, msg: &Message) -> CommandResult {
 #[command]
 #[description = "Sends an emoji with a dog."]
 #[bucket = "emoji"]
-fn dog(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:") {
+async fn dog(ctx: &Context, msg: &Message) -> CommandResult {
+    if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:").await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -476,14 +484,39 @@ fn dog(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
-fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
+async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
     let say_content = if args.is_empty() {
         ":bird: can find animals for you.".to_string()
     } else {
         format!(":bird: could not find animal named: `{}`.", args.rest())
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, say_content).await {
+        println!("Error sending message: {:?}", why);
+    }
+
+    Ok(())
+}
+
+// We could also use
+// #[required_permissions(ADMINISTRATOR)]
+// but that would not let us reply when it fails.
+#[command]
+async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    if let Some(member) = &msg.member {
+
+        for role in &member.roles {
+            if role.to_role_cached(&ctx.cache).await.map_or(false, |r| r.has_permission(Permissions::ADMINISTRATOR)) {
+                if let Err(why) = msg.channel_id.say(&ctx.http, "Yes, you are.").await {
+                    println!("Error sending message: {:?}", why);
+                }
+
+                return Ok(());
+            }
+        }
+    }
+
+    if let Err(why) = msg.channel_id.say(&ctx.http, "No, you are not.").await {
         println!("Error sending message: {:?}", why);
     }
 
@@ -491,31 +524,22 @@ fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 }
 
 #[command]
-fn am_i_admin(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "Yes you are.") {
-        println!("Error sending message: {:?}", why);
-    }
-
-    Ok(())
-}
-
-#[command]
-fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let say_content = if let Ok(slow_mode_rate_seconds) = args.single::<u64>() {
-        if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)) {
+        if let Err(why) = msg.channel_id.edit(&ctx.http, |c| c.slow_mode_rate(slow_mode_rate_seconds)).await {
             println!("Error setting channel's slow mode rate: {:?}", why);
 
             format!("Failed to set slow mode to `{}` seconds.", slow_mode_rate_seconds)
         } else {
             format!("Successfully set slow mode rate to `{}` seconds.", slow_mode_rate_seconds)
         }
-    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache) {
-        format!("Current slow mode rate is `{}` seconds.", channel.read().slow_mode_rate.unwrap_or(0))
+    } else if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx.cache).await {
+        format!("Current slow mode rate is `{}` seconds.", channel.slow_mode_rate.unwrap_or(0))
     } else {
         "Failed to find channel in cache.".to_string()
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, say_content) {
+    if let Err(why) = msg.channel_id.say(&ctx.http, say_content).await {
         println!("Error sending message: {:?}", why);
     }
 

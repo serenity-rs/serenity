@@ -20,34 +20,30 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "cache"))]
-    /// # fn main() {
+    /// # #[cfg(all(feature = "client", feature = "cache", feature = "gateway"))]
+    /// # {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
     /// # struct Handler;
-    ///
+    /// #
+    /// # #[serenity::async_trait]
     /// # impl EventHandler for Handler {
-    ///    # fn message(&self, context: Context, _: Message) {
-    ///         use serenity::utils;
+    /// #     async fn message(&self, context: Context, _: Message) {
+    /// use serenity::utils;
     ///
-    ///         // assuming a `context` has been bound
+    /// // assuming a `context` has been bound
     ///
-    ///         let base64 = utils::read_image("./my_image.jpg")
-    ///         .expect("Failed to read image");
+    /// let base64 = utils::read_image("./my_image.jpg")
+    ///     .expect("Failed to read image");
     ///
-    ///         let _ = context.cache.write().user.edit(&context, |p|
-    ///             p.avatar(Some(&base64)));
-    ///    # }
+    /// let mut user = context.cache.current_user().await;
+    /// let _ = user.edit(&context, |p| {
+    ///     p.avatar(Some(&base64))
+    /// }).await;
+    /// #     }
     /// # }
-    /// #
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
-    /// # client.start().unwrap();
     /// # }
-    /// #
-    /// # #[cfg(any(not(feature = "client"), not(feature = "cache")))]
-    /// # fn main() {}
     /// ```
     ///
     /// [`utils::read_image`]: ../utils/fn.read_image.html

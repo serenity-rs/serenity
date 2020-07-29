@@ -220,14 +220,15 @@ impl CreateEmbed {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::prelude::*;
     /// use serenity::model::channel::Message;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, mut msg: Message) {
+    ///     async fn message(&self, context: Context, mut msg: Message) {
     ///         if msg.content == "~embed" {
     ///             let _ = msg.channel_id.send_message(&context.http, |m| {
     ///                 m.embed(|e| {
@@ -235,18 +236,17 @@ impl CreateEmbed {
     ///                 });
     ///
     ///                 m
-    ///             });
+    ///             })
+    ///             .await;
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client = Client::new("token").event_handler(Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() {}
     /// ```
     ///
     /// Creating a join-log:
@@ -255,26 +255,26 @@ impl CreateEmbed {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "cache", feature = "client"))]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::prelude::*;
     /// use serenity::model::guild::Member;
     /// use serenity::model::id::GuildId;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
-    ///         let cache = context.cache.read();
-    ///
-    ///         if let Ok(guild) = guild_id.to_partial_guild(&context) {
+    ///     async fn guild_member_addition(&self, context: Context, guild_id: GuildId, member: Member) {
+    ///         if let Ok(guild) = guild_id.to_partial_guild(&context).await {
     ///             let channels = guild.channels(&context)
+    ///                 .await
     ///                 .unwrap();
     ///
     ///             let channel_search = channels.values()
     ///                 .find(|c| c.name == "join-log");
     ///
     ///             if let Some(channel) = channel_search {
-    ///                 let user = member.user.read();
+    ///                 let user = &member.user;
     ///
     ///                 let _ = channel.send_message(&context, |m| {
     ///                     m.embed(|e| {
@@ -289,19 +289,18 @@ impl CreateEmbed {
     ///
     ///                         e
     ///                     })
-    ///                 });
+    ///                 })
+    ///                 .await;
     ///             }
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client =Client::new("token").event_handler(Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "cache", feature = "client")))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn timestamp<T: Into<Timestamp>>(&mut self, timestamp: T) -> &mut Self {

@@ -5,7 +5,7 @@ use byteorder::{
     WriteBytesExt
 };
 use crate::constants::VOICE_GATEWAY_VERSION;
-use crate::gateway::WsClient;
+use crate::gateway::WsStream;
 use crate::internal::prelude::*;
 use crate::internal::{
     ws_impl::{ReceiverExt, SenderExt},
@@ -22,32 +22,40 @@ use audiopus::{
     coder::Encoder as OpusEncoder,
     softclip::SoftClip,
 };
-use parking_lot::Mutex;
 use rand::random;
 use serde::Deserialize;
 use std::{
     collections::HashMap,
     io::Write,
-    net::{SocketAddr, ToSocketAddrs, UdpSocket},
-    sync::{
-        mpsc::{
-            self,
-            Receiver as MpscReceiver,
-            Sender as MpscSender
-        },
-        Arc,
+    net::{SocketAddr, ToSocketAddrs},
+    sync::Arc,
+    time::Duration,
+};
+use tokio::{
+    task::JoinHandle,
+    time::{delay_for, timeout},
+    net::{
+        UdpSocket,
+        udp::{RecvHalf, SendHalf},
     },
-    thread::{
-        self,
-        Builder as ThreadBuilder,
-        JoinHandle
+};
+use futures::{
+    stream::{
+        SplitStream,
+        SplitSink,
+        StreamExt,
     },
-    time::Duration
+    channel::mpsc::{
+        unbounded,
+        UnboundedReceiver as Receiver,
+        UnboundedSender as Sender,
+    },
 };
 use xsalsa20poly1305::{
     aead::{Aead, NewAead},
     Key, Nonce, XSalsa20Poly1305, KEY_SIZE,
 };
+use async_tungstenite::tungstenite::protocol::Message;
 
 use super::audio::{AudioReceiver, AudioType, HEADER_LEN, SAMPLE_RATE, DEFAULT_BITRATE, LockedAudio};
 use super::connection_info::ConnectionInfo;
@@ -55,8 +63,11 @@ use super::{payload, VoiceError, CRYPTO_MODE};
 use url::Url;
 use log::{debug, info, warn};
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
+
+#[cfg(feature = "native_tls_backend")]
+use crate::internal::ws_impl::create_native_tls_client;
 
 enum ReceiverStatus {
     Udp(Vec<u8>),
@@ -64,19 +75,19 @@ enum ReceiverStatus {
 }
 
 #[allow(dead_code)]
-struct ThreadItems {
-    rx: MpscReceiver<ReceiverStatus>,
-    tx: MpscSender<ReceiverStatus>,
-    udp_close_sender: MpscSender<i32>,
-    udp_thread: JoinHandle<()>,
-    ws_close_sender: MpscSender<i32>,
-    ws_thread: JoinHandle<()>,
+struct TaskItems {
+    rx: Receiver<ReceiverStatus>,
+    tx: Sender<ReceiverStatus>,
+    udp_close_sender: Sender<i32>,
+    udp_task: JoinHandle<()>,
+    ws_close_sender: Sender<i32>,
+    ws_task: JoinHandle<()>,
 }
 
 pub struct Connection {
     audio_timer: Timer,
     cipher: XSalsa20Poly1305,
-    client: Arc<Mutex<WsClient>>,
+    stream: SplitSink<WsStream, Message>,
     connection_info: ConnectionInfo,
     decoder_map: HashMap<(u32, Channels), OpusDecoder>,
     destination: SocketAddr,
@@ -89,26 +100,27 @@ pub struct Connection {
     soft_clip: SoftClip,
     speaking: bool,
     ssrc: u32,
-    thread_items: ThreadItems,
+    task_items: TaskItems,
     timestamp: u32,
-    udp: UdpSocket,
+    udp: SendHalf,
 }
 
 impl Connection {
-    pub fn new(mut info: ConnectionInfo) -> Result<Connection> {
+    pub async fn new(mut info: ConnectionInfo) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
-        #[cfg(not(feature = "native_tls_backend"))]
-        let mut client = create_rustls_client(url)?;
+        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+        let mut stream = create_rustls_client(url).await?;
 
         #[cfg(feature = "native_tls_backend")]
-        let mut client = tungstenite::connect(url)?.0;
+        let mut stream = create_native_tls_client(url).await?;
+
         let mut hello = None;
         let mut ready = None;
-        client.send_json(&payload::build_identify(&info))?;
+        stream.send_json(&payload::build_identify(&info)).await?;
 
         loop {
-            let value = match client.recv_json()? {
+            let value = match stream.recv_json().await? {
                 Some(value) => value,
                 None => continue,
             };
@@ -154,16 +166,16 @@ impl Connection {
         //
         // The returned packet will be a null-terminated string of the IP, and
         // the port encoded in LE in the last two bytes of the packet.
-        let udp = UdpSocket::bind("0.0.0.0:0")?;
+        let mut udp = UdpSocket::bind("0.0.0.0:0").await?;
 
         {
             let mut bytes = [0; 70];
 
             (&mut bytes[..]).write_u32::<BigEndian>(ready.ssrc)?;
-            udp.send_to(&bytes, destination)?;
+            udp.send_to(&bytes, destination).await?;
 
             let mut bytes = [0; 256];
-            let (len, _addr) = udp.recv_from(&mut bytes)?;
+            let (len, _addr) = udp.recv_from(&mut bytes).await?;
 
             // Find the position in the bytes that contains the first byte of 0,
             // indicating the "end of the address".
@@ -178,15 +190,15 @@ impl Connection {
             let port_pos = len - 2;
             let port = (&bytes[port_pos..]).read_u16::<BigEndian>()?;
 
-            client
-                .send_json(&payload::build_select_protocol(addr, port))?;
+            stream
+                .send_json(&payload::build_select_protocol(addr, port)).await?;
         }
 
-        let cipher = init_cipher(&mut client)?;
+        let cipher = init_cipher(&mut stream).await?;
 
-        unset_blocking(&mut client)?;
-        let mutexed_client = Arc::new(Mutex::new(client));
-        let thread_items = start_threads(Arc::clone(&mutexed_client), &udp)?;
+        let (sink, stream) = stream.split();
+        let (udp_recv_half, udp_send_half) = udp.split();
+        let task_items = start_udp_task(stream, udp_recv_half).await?;
 
         info!("[Voice] Connected to: {}", info.endpoint);
 
@@ -207,7 +219,7 @@ impl Connection {
         Ok(Connection {
             audio_timer: Timer::new(1000 * 60 * 4),
             cipher,
-            client: mutexed_client,
+            stream: sink,
             connection_info: info,
             decoder_map: HashMap::new(),
             destination,
@@ -215,37 +227,38 @@ impl Connection {
             encoder_stereo: false,
             keepalive_timer: Timer::new(temp_heartbeat),
             last_heartbeat_nonce: None,
-            udp,
+            udp: udp_send_half,
             sequence: 0,
             silence_frames: 0,
             soft_clip,
             speaking: false,
             ssrc: ready.ssrc,
-            thread_items,
+            task_items,
             timestamp: 0,
         })
     }
 
-    pub fn reconnect(&mut self) -> Result<()> {
+    pub async fn reconnect(&mut self) -> Result<()> {
         let url = generate_url(&mut self.connection_info.endpoint)?;
 
-        // Thread may have died, we want to send to prompt a clean exit
+        // Task may have died, we want to send to prompt a clean exit
         // (if at all possible) and then proceed as normal.
-        let _ = self.thread_items.ws_close_sender.send(0);
+        info!("[VOICE] Sending signal to close WebSocket Stream.");
+        let _ = self.task_items.ws_close_sender.unbounded_send(0);
 
-        #[cfg(not(feature = "native_tls_backend"))]
-        let mut client = create_rustls_client(url)?;
+        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+        let mut stream = create_rustls_client(url).await?;
 
         #[cfg(feature = "native_tls_backend")]
-        let mut client = tungstenite::connect(url)?.0;
+        let mut stream = create_native_tls_client(url).await?;
 
-        client.send_json(&payload::build_resume(&self.connection_info))?;
+        stream.send_json(&payload::build_resume(&self.connection_info)).await?;
 
         let mut hello = None;
         let mut resumed = None;
 
         loop {
-            let value = match client.recv_json()? {
+            let value = match stream.recv_json().await? {
                 Some(value) => value,
                 None => continue,
             };
@@ -275,21 +288,20 @@ impl Connection {
 
         self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
 
-        unset_blocking(&mut client)?;
-        let mutexed_client = Arc::new(Mutex::new(client));
-        let (ws_close_sender, ws_thread) = start_ws_thread(mutexed_client, &self.thread_items.tx)?;
+        let (_, stream) = stream.split();
+        let (ws_close_sender, ws_task) = start_ws_task(stream, &self.task_items.tx).await?;
 
-        self.thread_items.ws_close_sender = ws_close_sender;
-        self.thread_items.ws_thread = ws_thread;
+        self.task_items.ws_close_sender = ws_close_sender;
+        self.task_items.ws_task = ws_task;
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
     }
 
     #[inline]
-    fn handle_received_udp(
+    async fn handle_received_udp(
         &mut self,
-        receiver: &mut Option<Box<dyn AudioReceiver>>,
+        receiver: &mut Option<Arc<dyn AudioReceiver>>,
         buffer: &mut [i16; 1920],
         packet: &[u8],
         nonce: &mut Nonce,
@@ -340,7 +352,7 @@ impl Connection {
                 let b = if is_stereo { len * 2 } else { len };
 
                 receiver
-                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len());
+                    .voice_packet(ssrc, seq, timestamp, is_stereo, &buffer[..b], decrypted.len()).await;
             }
         }
 
@@ -348,12 +360,12 @@ impl Connection {
     }
 
     #[inline]
-    fn check_audio_timer(&mut self) -> Result<()> {
+    async fn check_audio_timer(&mut self) -> Result<()> {
         if self.audio_timer.check() {
             info!("[Voice] UDP keepalive");
             let mut bytes = [0; 4];
             (&mut bytes[..]).write_u32::<BigEndian>(self.ssrc)?;
-            self.udp.send_to(&bytes, self.destination)?;
+            self.udp.send_to(&bytes, &self.destination).await?;
             info!("[Voice] UDP keepalive sent");
         }
 
@@ -361,12 +373,12 @@ impl Connection {
     }
 
     #[inline]
-    fn check_keepalive_timer(&mut self) -> Result<()> {
+    async fn check_keepalive_timer(&mut self) -> Result<()> {
         if self.keepalive_timer.check() {
             info!("[Voice] WS keepalive");
             let nonce = random::<u64>();
             self.last_heartbeat_nonce = Some(nonce);
-            self.client.lock().send_json(&payload::build_heartbeat(nonce))?;
+            self.stream.send_json(&payload::build_heartbeat(nonce)).await?;
             info!("[Voice] WS keepalive sent");
         }
 
@@ -374,7 +386,7 @@ impl Connection {
     }
 
     #[inline]
-    fn remove_unfinished_files(
+    async fn remove_unfinished_files(
         &mut self,
         sources: &mut Vec<LockedAudio>,
         opus_frame: &[u8],
@@ -388,7 +400,7 @@ impl Connection {
             let mut finished = false;
 
             let aud_lock = (&sources[i]).clone();
-            let mut aud = aud_lock.lock();
+            let mut aud = aud_lock.lock().await;
 
             let vol = aud.volume;
             let skip = !aud.playing;
@@ -406,7 +418,7 @@ impl Connection {
                 // We'll be fusing streams, so we can either keep
                 // as stereo or downmix to mono.
                 let is_stereo = true;
-                let source_stereo = stream.is_stereo();
+                let source_stereo = stream.is_stereo().await;
 
                 if is_stereo != self.encoder_stereo {
                     let channels = if is_stereo {
@@ -418,8 +430,8 @@ impl Connection {
                     self.encoder_stereo = is_stereo;
                 }
 
-                let temp_len = match stream.get_type() {
-                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).is_some() {
+                let temp_len = match stream.get_type().await {
+                    AudioType::Opus => if stream.decode_and_add_opus_frame(&mut mix_buffer, vol).await.is_some() {
                             opus_frame.len()
                         } else {
                             0
@@ -427,7 +439,7 @@ impl Connection {
                     AudioType::Pcm => {
                         let buffer_len = if source_stereo { 960 * 2 } else { 960 };
 
-                        match stream.read_pcm_frame(&mut buffer[..buffer_len]) {
+                        match stream.read_pcm_frame(&mut buffer[..buffer_len]).await {
                             Some(len) => len,
                             None => 0,
                         }
@@ -460,13 +472,14 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub fn cycle(&mut self,
-                mut sources: &mut Vec<LockedAudio>,
-                mut receiver: &mut Option<Box<dyn AudioReceiver>>,
-                audio_timer: &mut Timer,
-                bitrate: Bitrate,
-                muted: bool)
-                 -> Result<()> {
+    pub async fn cycle(
+        &mut self,
+        mut sources: &mut Vec<LockedAudio>,
+        mut receiver: &mut Option<Arc<dyn AudioReceiver>>,
+        audio_timer: &mut Timer,
+        bitrate: Bitrate,
+        muted: bool,
+    ) -> Result<()> {
         // We need to actually reserve enough space for the desired bitrate.
         let size = match bitrate {
             // If user specified, we can calculate. 20ms means 50fps.
@@ -480,24 +493,36 @@ impl Connection {
         let mut packet = vec![0u8; size as usize].into_boxed_slice();
         let mut nonce = Nonce::default();
 
-        while let Ok(status) = self.thread_items.rx.try_recv() {
+        while let Ok(Some(status)) = self.task_items.rx.try_next() {
             match status {
                 ReceiverStatus::Udp(packet) => {
-                    self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce)?;
+                    self.handle_received_udp(&mut receiver, &mut buffer, &packet[..], &mut nonce).await?;
                 },
                 ReceiverStatus::Websocket(VoiceEvent::Speaking(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking);
+                    if let Some(receiver) = receiver {
+                        let receiver = Arc::clone(receiver);
+
+                        tokio::spawn(async move {
+                            receiver.speaking_update(ev.ssrc, ev.user_id.0, ev.speaking).await;
+                        });
                     }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::ClientConnect(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.client_connect(ev.audio_ssrc, ev.user_id.0);
+                    if let Some(receiver) = receiver {
+                        let receiver = Arc::clone(receiver);
+
+                        tokio::spawn(async move {
+                            receiver.client_connect(ev.audio_ssrc, ev.user_id.0).await;
+                        });
                     }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::ClientDisconnect(ev)) => {
-                    if let Some(receiver) = receiver.as_mut() {
-                        receiver.client_disconnect(ev.user_id.0);
+                    if let Some(receiver) = receiver {
+                        let receiver = Arc::clone(receiver);
+
+                        tokio::spawn(async move {
+                            receiver.client_disconnect(ev.user_id.0).await;
+                        });
                     }
                 },
                 ReceiverStatus::Websocket(VoiceEvent::HeartbeatAck(ev)) => {
@@ -519,10 +544,10 @@ impl Connection {
         }
 
         // Send the voice websocket keepalive if it's time
-        self.check_keepalive_timer()?;
+        self.check_keepalive_timer().await?;
 
         // Send UDP keepalive if it's time
-        self.check_audio_timer()?;
+        self.check_audio_timer().await?;
 
         // Reconfigure encoder bitrate.
         // From my testing, it seemed like this needed to be set every cycle.
@@ -534,7 +559,7 @@ impl Connection {
 
         // Walk over all the audio files, removing those which have finished.
         // For this purpose, we need a while loop in Rust.
-        let mut len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer)?;
+        let mut len = self.remove_unfinished_files(&mut sources, &opus_frame, &mut buffer, &mut mix_buffer).await?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -550,9 +575,9 @@ impl Connection {
                 opus_frame.extend_from_slice(&[0xf8, 0xff, 0xfe]);
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                self.set_speaking(false)?;
+                self.set_speaking(false).await?;
 
-                audio_timer.r#await();
+                audio_timer.hold().await;
 
                 return Ok(());
             }
@@ -564,12 +589,12 @@ impl Connection {
             }
         }
 
-        self.set_speaking(true)?;
+        self.set_speaking(true).await?;
 
         let index = self.prep_packet(&mut packet, mix_buffer, &opus_frame, nonce)?;
-        audio_timer.r#await();
+        audio_timer.hold().await;
 
-        self.udp.send_to(&packet[..index], self.destination)?;
+        self.udp.send_to(&packet[..index], &self.destination).await?;
         self.audio_timer.reset();
 
         Ok(())
@@ -619,7 +644,7 @@ impl Connection {
         Ok(HEADER_LEN + crypted.len())
     }
 
-    fn set_speaking(&mut self, speaking: bool) -> Result<()> {
+    async fn set_speaking(&mut self, speaking: bool) -> Result<()> {
         if self.speaking == speaking {
             return Ok(());
         }
@@ -627,7 +652,10 @@ impl Connection {
         self.speaking = speaking;
 
         info!("[Voice] Speaking update: {}", speaking);
-        let o = self.client.lock().send_json(&payload::build_speaking(speaking));
+        let o = self
+            .stream
+            .send_json(&payload::build_speaking(speaking))
+            .await;
         info!("[Voice] Speaking update confirmed.");
         o
     }
@@ -635,8 +663,8 @@ impl Connection {
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        let _ = self.thread_items.udp_close_sender.send(0);
-        let _ = self.thread_items.ws_close_sender.send(0);
+        let _ = self.task_items.udp_close_sender.unbounded_send(0);
+        let _ = self.task_items.ws_close_sender.unbounded_send(0);
 
         info!("[Voice] Disconnected");
     }
@@ -669,9 +697,9 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn init_cipher(client: &mut WsClient) -> Result<XSalsa20Poly1305> {
+async fn init_cipher(stream: &mut WsStream) -> Result<XSalsa20Poly1305> {
     loop {
-        let value = match client.recv_json()? {
+        let value = match stream.recv_json().await? {
             Some(value) => value,
             None => continue,
         };
@@ -712,97 +740,82 @@ where T: for<'a> PartialEq<&'a str>,
 }
 
 #[inline]
-fn start_threads(client: Arc<Mutex<WsClient>>, udp: &UdpSocket) -> Result<ThreadItems> {
-    let (udp_close_sender, udp_close_reader) = mpsc::channel();
-
-    let current_thread = thread::current();
-    let thread_name = current_thread.name().unwrap_or("serenity voice");
-
-    let (tx, rx) = mpsc::channel();
+async fn start_udp_task(stream: SplitStream<WsStream>, mut udp: RecvHalf) -> Result<TaskItems> {
+    let (udp_close_sender, mut udp_close_reader) = unbounded();
+    let (tx, rx) = unbounded();
     let tx_udp = tx.clone();
-    let udp_clone = udp.try_clone()?;
 
-    let udp_thread = ThreadBuilder::new()
-        .name(format!("{} UDP", thread_name))
-        .spawn(move || {
-            let _ = udp_clone.set_read_timeout(Some(Duration::from_millis(250)));
+    let udp_task = tokio::spawn(async move {
+        info!("[Voice] UDP task started.");
 
-            let mut buffer = [0; 512];
+        const UDP_READ_TIMEOUT: Duration = Duration::from_millis(250);
+        let mut buffer = [0; 512];
 
-            'outer: loop {
-                if let Ok((len, _)) = udp_clone.recv_from(&mut buffer) {
+        loop {
+            match timeout(UDP_READ_TIMEOUT, udp.recv_from(&mut buffer)).await {
+                Ok(Ok((len, _))) => {
                     let piece = buffer[..len].to_vec();
-                    let send = tx_udp.send(ReceiverStatus::Udp(piece));
+                    let send = tx_udp.unbounded_send(ReceiverStatus::Udp(piece));
 
                     if send.is_err() {
-                        break 'outer;
+                        break;
                     }
-                } else if udp_close_reader.try_recv().is_ok() {
-                    break 'outer;
+                },
+                _ => {
+                    if let Ok(Some(_)) = udp_close_reader.try_next() {
+                        break;
+                    }
                 }
             }
+        }
 
-            info!("[Voice] UDP thread exited.");
-        })?;
+        info!("[Voice] UDP task exited.");
+    });
 
-    let (ws_close_sender, ws_thread) = start_ws_thread(client, &tx)?;
+    let (ws_close_sender, ws_task) = start_ws_task(stream, &tx).await?;
 
-    Ok(ThreadItems {
+    Ok(TaskItems {
         rx,
         tx,
         udp_close_sender,
-        udp_thread,
+        udp_task,
         ws_close_sender,
-        ws_thread,
+        ws_task,
     })
 }
 
 #[inline]
-fn start_ws_thread(client: Arc<Mutex<WsClient>>, tx: &MpscSender<ReceiverStatus>) -> Result<(MpscSender<i32>, JoinHandle<()>)> {
-    let current_thread = thread::current();
-    let thread_name = current_thread.name().unwrap_or("serenity voice");
-
+async fn start_ws_task(mut stream: SplitStream<WsStream>, tx: &Sender<ReceiverStatus>) -> Result<(Sender<i32>, JoinHandle<()>)> {
     let tx_ws = tx.clone();
-    let (ws_close_sender, ws_close_reader) = mpsc::channel();
+    let (ws_close_sender, mut ws_close_reader) = unbounded();
 
-    let ws_thread = ThreadBuilder::new()
-        .name(format!("{} WS", thread_name))
-        .spawn(move || {
-            'outer: loop {
-                while let Ok(Some(value)) = client.lock().try_recv_json() {
-                    let msg = match VoiceEvent::deserialize(value) {
-                        Ok(msg) => msg,
-                        Err(_) => break,
-                    };
+    let ws_task = tokio::spawn(async move {
+        'outer: loop {
+            use crate::internal::ws_impl::convert_ws_message;
+            use futures::stream::TryStreamExt;
 
-                    if tx_ws.send(ReceiverStatus::Websocket(msg)).is_err() {
-                        break 'outer;
-                    }
-                }
+            while let Ok(Some(value)) = convert_ws_message(stream.try_next().await.ok().flatten()) {
+                let msg = match VoiceEvent::deserialize(value) {
+                    Ok(msg) => msg,
+                    Err(_) => break,
+                };
 
-                if ws_close_reader.try_recv().is_ok() {
+                if tx_ws.unbounded_send(ReceiverStatus::Websocket(msg)).is_err() {
+                    tx_ws.close_channel();
                     break 'outer;
                 }
-
-                thread::sleep(Duration::from_millis(25));
             }
-            info!("[Voice] WS thread exited.");
-        })?;
 
-    Ok((ws_close_sender, ws_thread))
-}
+            if let Ok(Some(_)) = ws_close_reader.try_next() {
+                break 'outer;
+            }
 
-#[inline]
-fn unset_blocking(client: &mut WsClient) -> Result<()> {
-    #[cfg(not(feature = "native_tls_backend"))]
-    let stream = &client.get_mut().sock;
+            const TO_SLEEP: Duration = Duration::from_millis(25);
+            delay_for(TO_SLEEP).await;
+        }
 
-    #[cfg(feature = "native_tls_backend")]
-    let stream = match client.get_mut() {
-        tungstenite::stream::Stream::Plain(stream) => stream,
-        tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
-    };
+        info!("[Voice] WebSocket task exited.");
+    });
 
-    stream.set_nonblocking(true)
-        .map_err(Into::into)
+    Ok((ws_close_sender, ws_task))
 }

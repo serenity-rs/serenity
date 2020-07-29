@@ -22,23 +22,18 @@ use chrono::{DateTime, FixedOffset};
 use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use super::utils::*;
+use futures::stream::StreamExt;
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
-#[cfg(all(feature = "cache", feature = "model"))]
-use parking_lot::RwLock;
+use crate::cache::Cache;
 #[cfg(all(feature = "http", feature = "model"))]
 use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
 use log::{error, warn};
-#[cfg(feature = "model")]
-use std::borrow::Cow;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 
@@ -65,8 +60,8 @@ pub struct Guild {
     ///
     /// This contains all channels regardless of permissions (i.e. the ability
     /// of the bot to read from or connect to them).
-    #[serde(serialize_with = "serialize_gen_locked_map")]
-    pub channels: HashMap<ChannelId, Arc<RwLock<GuildChannel>>>,
+    #[serde(serialize_with = "serialize_gen_map")]
+    pub channels: HashMap<ChannelId, GuildChannel>,
     /// Indicator of whether notifications for all messages are enabled by
     /// default in the guild.
     pub default_message_notifications: DefaultMessageNotificationLevel,
@@ -170,10 +165,10 @@ pub struct Guild {
 #[cfg(feature = "model")]
 impl Guild {
     #[cfg(feature = "cache")]
-    fn check_hierarchy(&self, cache: impl AsRef<CacheRwLock>, other_user: UserId) -> Result<()> {
-        let current_id = cache.as_ref().read().user.id;
+    async fn check_hierarchy(&self, cache: impl AsRef<Cache>, other_user: UserId) -> Result<()> {
+        let current_id = cache.as_ref().current_user().await.id;
 
-        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id) {
+        if let Some(higher) = self.greater_member_hierarchy(&cache, other_user, current_id).await {
             if higher != current_id {
                 return Err(Error::Model(ModelError::Hierarchy));
             }
@@ -185,10 +180,10 @@ impl Guild {
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
-    pub fn default_channel(&self, uid: UserId) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub async fn default_channel<'a>(&'a self, uid: UserId) -> Option<&'a GuildChannel> {
         for (cid, channel) in &self.channels {
             if self.user_permissions_in(*cid, uid).read_messages() {
-                return Some(Arc::clone(channel));
+                return Some(channel);
             }
         }
 
@@ -200,11 +195,11 @@ impl Guild {
     /// returns `None`)
     /// Note however that this is very costy if used in a server with lots of channels,
     /// members, or both.
-    pub fn default_channel_guaranteed(&self) -> Option<Arc<RwLock<GuildChannel>>> {
+    pub async fn default_channel_guaranteed<'a>(&'a self) -> Option<&'a GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.user_permissions_in(*cid, *memid).read_messages() {
-                    return Some(Arc::clone(channel));
+                    return Some(channel);
                 }
             }
         }
@@ -213,8 +208,8 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    fn has_perms(&self, cache: impl AsRef<CacheRwLock>, mut permissions: Permissions) -> bool {
-        let user_id = cache.as_ref().read().user.id;
+    async fn has_perms(&self, cache: impl AsRef<Cache>, mut permissions: Permissions) -> bool {
+        let user_id = cache.as_ref().current_user().await.id;
 
         let perms = self.member_permissions(user_id);
         permissions.remove(perms);
@@ -223,20 +218,21 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    pub fn channel_id_from_name(&self, cache: impl AsRef<CacheRwLock>, name: impl AsRef<str>) -> Option<ChannelId> {
+    pub async fn channel_id_from_name(&self, cache: impl AsRef<Cache>, name: impl AsRef<str>) -> Option<ChannelId> {
         let name = name.as_ref();
-        let cache = cache.as_ref().read();
-        let guild = cache.guilds.get(&self.id)?.read();
+        let guild_channels = cache
+            .as_ref()
+            .guild_channels(&self.id)
+            .await?;
 
-        guild.channels
-            .iter()
-            .find_map(|(id, c)| {
-                if c.read().name == name {
-                    Some(*id)
-                } else {
-                    None
-                }
-            })
+        for (id, channel) in guild_channels.iter() {
+
+            if channel.name == name {
+                return Some(*id)
+            }
+        }
+
+        None
     }
 
     /// Ban a [`User`] from the guild, deleting a number of
@@ -269,8 +265,8 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
     #[inline]
-    pub fn ban(&self, cache_http: impl CacheHttp, user: impl Into<UserId>, dmd: u8) -> Result<()> {
-        self._ban_with_reason(cache_http, user.into(), dmd, "")
+    pub async fn ban(&self, cache_http: impl CacheHttp, user: impl Into<UserId>, dmd: u8) -> Result<()> {
+        self._ban_with_reason(cache_http, user.into(), dmd, "").await
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
@@ -278,28 +274,30 @@ impl Guild {
     /// [`User`]: ../user/struct.User.html
     /// [`ban`]: #method.ban
     #[inline]
-    pub fn ban_with_reason(&self, cache_http: impl CacheHttp,
-                                  user: impl Into<UserId>,
-                                  dmd: u8,
-                                  reason: impl AsRef<str>) -> Result<()> {
-        self._ban_with_reason(cache_http, user.into(), dmd, reason.as_ref())
+    pub async fn ban_with_reason(
+        &self,
+        cache_http: impl CacheHttp,
+        user: impl Into<UserId>,
+        dmd: u8,
+        reason: impl AsRef<str>) -> Result<()> {
+        self._ban_with_reason(cache_http, user.into(), dmd, reason.as_ref()).await
     }
 
-    fn _ban_with_reason(&self, cache_http: impl CacheHttp, user: UserId, dmd: u8, reason: &str) -> Result<()> {
+    async fn _ban_with_reason(&self, cache_http: impl CacheHttp, user: UserId, dmd: u8, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::BAN_MEMBERS;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
 
-                self.check_hierarchy(cache, user)?;
+                self.check_hierarchy(cache, user).await?;
             }
         }
 
-        self.id.ban_with_reason(cache_http.http(), user, dmd, reason)
+        self.id.ban_with_reason(cache_http.http(), user, dmd, reason).await
     }
 
     /// Retrieves a list of [`Ban`]s for the guild.
@@ -314,38 +312,43 @@ impl Guild {
     /// [`Ban`]: struct.Ban.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    pub fn bans(&self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
+    pub async fn bans(&self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::BAN_MEMBERS;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.bans(cache_http.http())
+        self.id.bans(cache_http.http()).await
     }
 
     /// Retrieves a list of [`AuditLogs`] for the guild.
     ///
     /// [`AuditLogs`]: audit_log/struct.AuditLogs.html
     #[inline]
-    pub fn audit_logs(&self, http: impl AsRef<Http>,
-                             action_type: Option<u8>,
-                             user_id: Option<UserId>,
-                             before: Option<AuditLogEntryId>,
-                             limit: Option<u8>) -> Result<AuditLogs> {
-        self.id.audit_logs(&http, action_type, user_id, before, limit)
+    pub async fn audit_logs(
+        &self,
+        http: impl AsRef<Http>,
+        action_type: Option<u8>,
+        user_id: Option<UserId>,
+        before: Option<AuditLogEntryId>,
+        limit: Option<u8>
+    ) -> Result<AuditLogs> {
+        self.id.audit_logs(&http, action_type, user_id, before, limit).await
     }
 
     /// Gets all of the guild's channels over the REST API.
     ///
     /// [`Guild`]: struct.Guild.html
     #[inline]
-    pub fn channels(&self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> { self.id.channels(&http) }
+    pub async fn channels(&self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
+        self.id.channels(&http).await
+    }
 
     /// Creates a guild with the data provided.
     ///
@@ -364,7 +367,7 @@ impl Guild {
     /// ```rust,ignore
     /// use serenity::model::{Guild, Region};
     ///
-    /// let _guild = Guild::create_guild("test", Region::UsWest, None);
+    /// let _guild = Guild::create_guild(&http, "test", Region::UsWest, None).await;
     /// ```
     ///
     /// [`Guild`]: struct.Guild.html
@@ -372,14 +375,14 @@ impl Guild {
     /// [`Shard`]: ../../gateway/struct.Shard.html
     /// [US West region]: enum.Region.html#variant.UsWest
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
-    pub fn create(http: impl AsRef<Http>, name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
+    pub async fn create(http: impl AsRef<Http>, name: &str, region: Region, icon: Option<&str>) -> Result<PartialGuild> {
         let map = json!({
             "icon": icon,
             "name": name,
             "region": region.name(),
         });
 
-        http.as_ref().create_guild(&map)
+        http.as_ref().create_guild(&map).await
     }
 
     /// Creates a new [`Channel`] in the guild.
@@ -393,7 +396,9 @@ impl Guild {
     ///
     /// // assuming a `guild` has already been bound
     ///
-    /// let _ = guild.create_channel(|c| c.name("my-test-channel").kind(ChannelType::Text));
+    /// let _ = guild
+    ///     .create_channel(&http, |c| c.name("my-test-channel").kind(ChannelType::Text))
+    ///     .await;
     /// ```
     ///
     /// # Errors
@@ -404,19 +409,19 @@ impl Guild {
     /// [`Channel`]: ../channel/enum.Channel.html
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    pub fn create_channel(&self, cache_http: impl CacheHttp, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+    pub async fn create_channel(&self, cache_http: impl CacheHttp, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_CHANNELS;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.create_channel(cache_http.http(), f)
+        self.id.create_channel(cache_http.http(), f).await
     }
 
     /// Creates an emoji in the guild with a name and base64-encoded image. The
@@ -439,8 +444,8 @@ impl Guild {
     /// [`utils::read_image`]: ../../utils/fn.read_image.html
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
-    pub fn create_emoji(&self, http: impl AsRef<Http>, name: &str, image: &str) -> Result<Emoji> {
-        self.id.create_emoji(&http, name, image)
+    pub async fn create_emoji(&self, http: impl AsRef<Http>, name: &str, image: &str) -> Result<Emoji> {
+        self.id.create_emoji(&http, name, image).await
     }
 
     /// Creates an integration for the guild.
@@ -449,9 +454,8 @@ impl Guild {
     ///
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
-    pub fn create_integration<I>(&self, http: impl AsRef<Http>, integration_id: I, kind: &str) -> Result<()>
-        where I: Into<IntegrationId> {
-        self.id.create_integration(&http, integration_id, kind)
+    pub async fn create_integration<I>(&self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>, kind: &str) -> Result<()> {
+        self.id.create_integration(&http, integration_id, kind).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
@@ -465,7 +469,7 @@ impl Guild {
     /// ```rust,ignore
     /// // assuming a `guild` has been bound
     ///
-    /// let role = guild.create_role(|r| r.hoist(true).name("role"));
+    /// let role = guild.create_role(&http, |r| r.hoist(true).name("role")).await;
     /// ```
     ///
     /// # Errors
@@ -476,20 +480,21 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    pub fn create_role<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Role>
-        where F: FnOnce(&mut EditRole) -> &mut EditRole {
+    pub async fn create_role<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Role>
+    where F: FnOnce(&mut EditRole) -> &mut EditRole
+    {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_ROLES;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.create_role(cache_http.http(), f)
+        self.id.create_role(cache_http.http(), f).await
     }
 
     /// Deletes the current guild if the current user is the owner of the
@@ -503,12 +508,11 @@ impl Guild {
     /// if the current user is not the guild owner.
     ///
     /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<PartialGuild> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
-                if self.owner_id != cache.read().user.id {
+                if self.owner_id != cache.current_user().await.id {
                     let req = Permissions::MANAGE_GUILD;
 
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -516,7 +520,7 @@ impl Guild {
             }
         }
 
-        self.id.delete(cache_http.http())
+        self.id.delete(cache_http.http()).await
     }
 
     /// Deletes an [`Emoji`] from the guild.
@@ -526,8 +530,8 @@ impl Guild {
     /// [`Emoji`]: struct.Emoji.html
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
-    pub fn delete_emoji<E: Into<EmojiId>>(&self, http: impl AsRef<Http>, emoji_id: E) -> Result<()> {
-        self.id.delete_emoji(&http, emoji_id)
+    pub async fn delete_emoji(&self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>) -> Result<()> {
+        self.id.delete_emoji(&http, emoji_id).await
     }
 
     /// Deletes an integration by Id from the guild.
@@ -536,8 +540,8 @@ impl Guild {
     ///
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
-    pub fn delete_integration<I: Into<IntegrationId>>(&self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
-        self.id.delete_integration(&http, integration_id)
+    pub async fn delete_integration(&self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
+        self.id.delete_integration(&http, integration_id).await
     }
 
     /// Deletes a [`Role`] by Id from the guild.
@@ -551,8 +555,8 @@ impl Guild {
     /// [`Role::delete`]: struct.Role.html#method.delete
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
-    pub fn delete_role<R: Into<RoleId>>(&self, http: impl AsRef<Http>, role_id: R) -> Result<()> {
-        self.id.delete_role(&http, role_id)
+    pub async fn delete_role(&self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
+        self.id.delete_role(&http, role_id).await
     }
 
     /// Edits the current guild with new data where specified.
@@ -583,20 +587,21 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-        where F: FnOnce(&mut EditGuild) -> &mut EditGuild {
+    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    where F: FnOnce(&mut EditGuild) -> &mut EditGuild
+    {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_GUILD;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        match self.id.edit(cache_http.http(), f) {
+        match self.id.edit(cache_http.http(), f).await {
             Ok(guild) => {
                 self.afk_channel_id = guild.afk_channel_id;
                 self.afk_timeout = guild.afk_timeout;
@@ -629,8 +634,8 @@ impl Guild {
     /// [`Emoji::edit`]: struct.Emoji.html#method.edit
     /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
     #[inline]
-    pub fn edit_emoji<E: Into<EmojiId>>(&self, http: impl AsRef<Http>, emoji_id: E, name: &str) -> Result<Emoji> {
-        self.id.edit_emoji(&http, emoji_id, name)
+    pub async fn edit_emoji(&self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>, name: &str) -> Result<Emoji> {
+        self.id.edit_emoji(&http, emoji_id, name).await
     }
 
     /// Edits the properties of member of the guild, such as muting or
@@ -647,9 +652,10 @@ impl Guild {
     /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
-    pub fn edit_member<F, U>(&self, http: impl AsRef<Http>, user_id: U, f: F) -> Result<()>
-        where F: FnOnce(&mut EditMember) -> &mut EditMember, U: Into<UserId> {
-        self.id.edit_member(&http, user_id, f)
+    pub async fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<()>
+    where F: FnOnce(&mut EditMember) -> &mut EditMember
+    {
+        self.id.edit_member(&http, user_id, f).await
     }
 
     /// Edits the current user's nickname for the guild.
@@ -666,19 +672,19 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
-    pub fn edit_nickname(&self, cache_http: impl CacheHttp, new_nickname: Option<&str>) -> Result<()> {
+    pub async fn edit_nickname(&self, cache_http: impl CacheHttp, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::CHANGE_NICKNAME;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.edit_nickname(cache_http.http(), new_nickname)
+        self.id.edit_nickname(cache_http.http(), new_nickname).await
     }
 
     /// Edits a role, optionally setting its fields.
@@ -695,9 +701,10 @@ impl Guild {
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
-    pub fn edit_role<F, R>(&self, http: impl AsRef<Http>, role_id: R, f: F) -> Result<Role>
-        where F: FnOnce(&mut EditRole) -> &mut EditRole, R: Into<RoleId> {
-        self.id.edit_role(&http, role_id, f)
+    pub async fn edit_role<F>(&self, http: impl AsRef<Http>, role_id: impl Into<RoleId>, f: F) -> Result<Role>
+    where F: FnOnce(&mut EditRole) -> &mut EditRole
+    {
+        self.id.edit_role(&http, role_id, f).await
     }
 
     /// Edits the order of [`Role`]s
@@ -715,16 +722,22 @@ impl Guild {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     #[inline]
-    pub fn edit_role_position<R>(&self, http: impl AsRef<Http>, role_id: R, position: u64) -> Result<Vec<Role>>
-        where R: Into<RoleId> {
-        self.id.edit_role_position(&http, role_id, position)
+    pub async fn edit_role_position(
+        &self,
+        http: impl AsRef<Http>,
+        role_id: impl Into<RoleId>,
+        position: u64
+    ) -> Result<Vec<Role>> {
+        self.id.edit_role_position(&http, role_id, position).await
     }
 
     /// Gets a partial amount of guild data by its Id.
     ///
     /// Requires that the current user be in the guild.
     #[inline]
-    pub fn get<G: Into<GuildId>>(http: impl AsRef<Http>, guild_id: G) -> Result<PartialGuild> { guild_id.into().to_partial_guild(&http) }
+    pub async fn get(http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<PartialGuild> {
+        guild_id.into().to_partial_guild(&http).await
+    }
 
     /// Returns which of two [`User`]s has a higher [`Member`] hierarchy.
     ///
@@ -741,15 +754,19 @@ impl Guild {
     /// [`position`]: struct.Role.html#structfield.position
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn greater_member_hierarchy<T, U>(&self, cache: impl AsRef<CacheRwLock>, lhs_id: T, rhs_id: U)
-        -> Option<UserId> where T: Into<UserId>, U: Into<UserId> {
-        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into())
+    pub async fn greater_member_hierarchy(
+        &self,
+        cache: impl AsRef<Cache>,
+        lhs_id: impl Into<UserId>,
+        rhs_id: impl Into<UserId>
+    ) -> Option<UserId> {
+        self._greater_member_hierarchy(&cache, lhs_id.into(), rhs_id.into()).await
     }
 
     #[cfg(feature = "cache")]
-    fn _greater_member_hierarchy(
+    async fn _greater_member_hierarchy(
         &self,
-        cache: impl AsRef<CacheRwLock>,
+        cache: impl AsRef<Cache>,
         lhs_id: UserId,
         rhs_id: UserId,
     ) -> Option<UserId> {
@@ -767,9 +784,11 @@ impl Guild {
 
         let lhs = self.members.get(&lhs_id)?
             .highest_role_info(&cache)
+            .await
             .unwrap_or((RoleId(0), 0));
         let rhs = self.members.get(&rhs_id)?
             .highest_role_info(&cache)
+            .await
             .unwrap_or((RoleId(0), 0));
 
         // If LHS and RHS both have no top position or have the same role ID,
@@ -810,7 +829,9 @@ impl Guild {
     ///
     /// This performs a request over the REST API.
     #[inline]
-    pub fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> { self.id.integrations(&http) }
+    pub async fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
+        self.id.integrations(&http).await
+    }
 
     /// Retrieves the active invites for the guild.
     ///
@@ -823,19 +844,19 @@ impl Guild {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
-    pub fn invites(&self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
+    pub async fn invites(&self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_GUILD;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.invites(cache_http.http())
+        self.id.invites(cache_http.http()).await
     }
 
     /// Checks if the guild is 'large'. A guild is considered large if it has
@@ -850,26 +871,33 @@ impl Guild {
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
     #[inline]
-    pub fn kick<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U) -> Result<()> {
-        self.id.kick(&http, user_id)
+    pub async fn kick(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+        self.id.kick(&http, user_id).await
     }
 
     #[inline]
-    pub fn kick_with_reason<U: Into<UserId>>(&self, http: impl AsRef<Http>, user_id: U, reason: &str) -> Result<()> {
-        self.id.kick_with_reason(&http, user_id, reason)
+    pub async fn kick_with_reason(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        reason: &str
+    ) -> Result<()> {
+        self.id.kick_with_reason(&http, user_id, reason).await
     }
 
     /// Leaves the guild.
     #[inline]
-    pub fn leave(&self, http: impl AsRef<Http>) -> Result<()> { self.id.leave(&http) }
+    pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
+        self.id.leave(&http).await
+    }
 
     /// Gets a user's [`Member`] for the guild by Id.
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     /// [`Member`]: struct.Member.html
     #[inline]
-    pub fn member<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<Member> {
-        self.id.member(cache_http, user_id)
+    pub async fn member(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Member> {
+        self.id.member(cache_http, user_id).await
     }
 
     /// Gets a list of the guild's members.
@@ -880,9 +908,13 @@ impl Guild {
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
-    pub fn members<U>(&self, http: impl AsRef<Http>, limit: Option<u64>, after: U) -> Result<Vec<Member>>
-        where U: Into<Option<UserId>> {
-        self.id.members(&http, limit, after)
+    pub async fn members(
+        &self,
+        http: impl AsRef<Http>,
+        limit: Option<u64>,
+        after: impl Into<Option<UserId>>
+    ) -> Result<Vec<Member>> {
+        self.id.members(&http, limit, after).await
     }
 
     /// Gets a list of all the members (satisfying the status provided to the function) in this
@@ -891,11 +923,10 @@ impl Guild {
         let mut members = vec![];
 
         for (&id, member) in &self.members {
-            match self.presences.get(&id) {
-                Some(presence) => if status == presence.status {
+            if let Some(presence) = self.presences.get(&id) {
+                if status == presence.status {
                     members.push(member);
-                },
-                None => continue,
+                }
             }
         }
 
@@ -938,22 +969,22 @@ impl Guild {
             (&name[..], None)
         };
 
+        for member in self.members.values() {
+            let name_matches = member.user.name == name;
+
+            let discrim_matches = match discrim {
+                Some(discrim) => member.user.discriminator == discrim,
+                None => true,
+            };
+
+            if name_matches && discrim_matches {
+                return Some(member);
+            }
+        }
+
         self.members
             .values()
-            .find(|member| {
-                let name_matches = member.user.read().name == name;
-                let discrim_matches = match discrim {
-                    Some(discrim) => member.user.read().discriminator == discrim,
-                    None => true,
-                };
-
-                name_matches && discrim_matches
-            })
-            .or_else(|| {
-                self.members
-                    .values()
-                    .find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
-            })
+            .find(|member| member.nick.as_ref().map_or(false, |nick| nick == name))
     }
 
     /// Retrieves all [`Member`] that start with a given `String`.
@@ -965,53 +996,47 @@ impl Guild {
     /// It would be sorted:
     /// - "zeya", "zeyaa", "zeyla", "zeyzey", "zeyzeyzey"
     ///
+    /// **Locking**:
+    /// First collects a [`Member`]'s [`User`]-name by read-locking all inner
+    /// [`User`]s, and then sorts. This ensures that no name is being changed
+    /// after being sorted in the originally correct position.
+    /// However, since the read-locks are dropped after borrowing the name,
+    /// the names might have been changed by the user, the sorted list cannot
+    /// account for this.
+    ///
+    /// [`User`]: ../user/struct.User.html
     /// [`Member`]: struct.Member.html
-    pub fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
-        let mut members: Vec<&Member> = self.members
-            .values()
-            .filter(|member|
+    pub async fn members_starting_with(&self, prefix: &str, case_sensitive: bool, sorted: bool) -> Vec<(&Member, String)> {
+        fn starts_with(prefix: &str, case_sensitive: bool, name: &str) -> bool {
+            case_sensitive && name.starts_with(prefix)
+            || !case_sensitive && starts_with_case_insensitive(name, prefix)
+        }
 
-                if case_sensitive {
-                    member.user.read().name.starts_with(prefix)
+        let mut members = futures::stream::iter(self.members.values())
+            .filter_map(|member| async move {
+                let username = &member.user.name;
+
+                if starts_with(prefix, case_sensitive, username) {
+                    Some((member, username.to_string()))
                 } else {
-                    starts_with_case_insensitive(&member.user.read().name, prefix)
+                    match member.nick {
+                        Some(ref nick) => {
+                            if starts_with(prefix, case_sensitive, nick) {
+                                Some((member, nick.to_string()))
+                            } else {
+                                None
+                            }
+                        },
+                        None => None,
+                    }
                 }
-
-                || member.nick.as_ref()
-                    .map_or(false, |nick|
-
-                    if case_sensitive {
-                        nick.starts_with(prefix)
-                    } else {
-                        starts_with_case_insensitive(nick, prefix)
-                    })).collect();
+            }).collect::<Vec<(&Member, String)>>()
+            .await;
 
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let name_a = match a.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.read().name[..], prefix) {
-                                Cow::Owned(a.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(a.user.read().name.clone()),
-                    };
-
-                    let name_b = match b.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.read().name[..], prefix) {
-                                Cow::Owned(b.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(b.user.read().name.clone()),
-                    };
-
-                    closest_to_origin(prefix, &name_a[..], &name_b[..])
+                    closest_to_origin(prefix, &a.1[..], &b.1[..])
                 });
             members
         } else {
@@ -1040,54 +1065,48 @@ impl Guild {
     /// the searched field, setting `sorted` to `true` will result in an overhead,
     /// as both fields have to be considered again for sorting.
     ///
+    /// **Locking**:
+    /// First collects a [`Member`]'s [`User`]-name by read-locking all inner
+    /// [`User`]s, and then sorts. This ensures that no name is being changed
+    /// after being sorted in the originally correct position.
+    /// However, since the read-locks are dropped after borrowing the name,
+    /// the names might have been changed by the user, the sorted list cannot
+    /// account for this.
+    ///
+    /// [`User`]: ../user/struct.User.html
     /// [`Member`]: struct.Member.html
-    pub fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
-        let mut members: Vec<&Member> = self.members
-            .values()
-            .filter(|member|
+    pub async fn members_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<(&Member, String)> {
+        fn contains(substring: &str, case_sensitive: bool, name: &str) -> bool {
+            case_sensitive && name.contains(substring)
+            || !case_sensitive && contains_case_insensitive(name, substring)
+        }
 
-                if case_sensitive {
-                    member.user.read().name.contains(substring)
+        let mut members = futures::stream::iter(self.members
+            .values())
+            .filter_map(|member| async move {
+                let username = &member.user.name;
+
+                if contains(substring, case_sensitive, username) {
+                    Some((member, username.to_string()))
                 } else {
-                    contains_case_insensitive(&member.user.read().name, substring)
+                    match member.nick {
+                        Some(ref nick) => {
+                            if contains(substring, case_sensitive, nick) {
+                                Some((member, nick.to_string()))
+                            } else {
+                                None
+                            }
+                        },
+                        None => None
+                    }
                 }
-
-                || member.nick.as_ref()
-                    .map_or(false, |nick| {
-
-                        if case_sensitive {
-                            nick.contains(substring)
-                        } else {
-                            contains_case_insensitive(nick, substring)
-                        }
-                    })).collect();
+        }).collect::<Vec<(&Member, String)>>()
+        .await;
 
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let name_a = match a.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&a.user.read().name[..], substring) {
-                                Cow::Owned(a.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(a.user.read().name.clone()),
-                    };
-
-                    let name_b = match b.nick {
-                        Some(ref nick) => {
-                            if contains_case_insensitive(&b.user.read().name[..], substring) {
-                                Cow::Owned(b.user.read().name.clone())
-                            } else {
-                                Cow::Borrowed(nick)
-                            }
-                        },
-                        None => Cow::Owned(b.user.read().name.clone()),
-                    };
-
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &a.1[..], &b.1[..])
                 });
             members
         } else {
@@ -1095,8 +1114,9 @@ impl Guild {
         }
     }
 
-    /// Retrieves all [`Member`] containing a given `String` in
-    /// their username.
+    /// Retrieves a tuple of [`Member`]s containing a given `String` in
+    /// their username as the first field and the name used for sorting
+    /// as the second field.
     ///
     /// If the substring is "yla", following results are possible:
     /// - "zeyla", "meiyla", "yladenisyla"
@@ -1110,24 +1130,44 @@ impl Guild {
     /// It would be sorted:
     /// - "zey", "azey", "zeyla", "zeylaa", "zeyzeyzey"
     ///
+    /// **Locking**:
+    /// First collects a [`Member`]'s [`User`]-name by read-locking all inner
+    /// [`User`]s, and then sorts. This ensures that no name is being changed
+    /// after being sorted in the originally correct position.
+    /// However, since the read-locks are dropped after borrowing the name,
+    /// the names might have been changed by the user, the sorted list cannot
+    /// account for this.
+    ///
+    /// [`User`]: ../user/struct.User.html
     /// [`Member`]: struct.Member.html
-    pub fn members_username_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
-        let mut members: Vec<&Member> = self.members
-            .values()
-            .filter(|member| {
+    pub async fn members_username_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<(&Member, String)> {
+        let mut members = futures::stream::iter(self.members
+            .values())
+            .filter_map(|member| async move {
                 if case_sensitive {
-                    member.user.read().name.contains(substring)
+                    let name = &member.user.name;
+
+                    if name.contains(substring) {
+                        Some((member, name.to_string()))
+                    } else {
+                        None
+                    }
                 } else {
-                    contains_case_insensitive(&member.user.read().name, substring)
+                    let name = &member.user.name;
+
+                    if contains_case_insensitive(name, substring) {
+                        Some((member, name.to_string()))
+                    } else {
+                        None
+                    }
                 }
-            }).collect();
+            }).collect::<Vec<(&Member, String)>>()
+            .await;
 
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let name_a = &a.user.read().name;
-                    let name_b = &b.user.read().name;
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &a.1[..], &b.1[..])
                 });
             members
         } else {
@@ -1153,39 +1193,40 @@ impl Guild {
     /// **Note**: Instead of panicing, when sorting does not find
     /// a nick, the username will be used (this should never happen).
     ///
+    /// **Locking**:
+    /// First collects a [`Member`]'s nick directly or by read-locking all inner
+    /// [`User`]s (in case of no nick, see note above), and then sorts.
+    /// This ensures that no name is being changed after being sorted in the
+    /// originally correct position.
+    /// However, since the read-locks are dropped after borrowing the name,
+    /// the names might have been changed by the user, the sorted list cannot
+    /// account for this.
+    ///
+    /// [`User`]: ../user/struct.User.html
     /// [`Member`]: struct.Member.html
-    pub fn members_nick_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<&Member> {
-        let mut members: Vec<&Member> = self.members
-            .values()
-            .filter(|member|
-                member.nick.as_ref()
-                    .map_or(false, |nick| {
+    pub async fn members_nick_containing(&self, substring: &str, case_sensitive: bool, sorted: bool) -> Vec<(&Member, String)> {
+        let mut members = futures::stream::iter(self.members
+            .values())
+            .filter_map(|member| async move {
+                let nick = match member.nick {
+                    Some(ref nick) => nick.to_string(),
+                    None => member.user.name.to_string(),
+                };
 
-                        if case_sensitive {
-                            nick.contains(substring)
-                        } else {
-                            contains_case_insensitive(nick, substring)
-                        }
-                    })).collect();
+                if case_sensitive && nick.contains(substring)
+                || !case_sensitive && contains_case_insensitive(&nick, substring) {
+
+                    Some((member, nick))
+                } else {
+                    None
+                }
+            }).collect::<Vec<(&Member, String)>>()
+            .await;
 
         if sorted {
             members
                 .sort_by(|a, b| {
-                    let name_a = match a.nick {
-                        Some(ref nick) => {
-                            Cow::Borrowed(nick)
-                        },
-                        None => Cow::Owned(a.user.read().name.clone()),
-                    };
-
-                    let name_b = match b.nick {
-                        Some(ref nick) => {
-                                Cow::Borrowed(nick)
-                            },
-                        None => Cow::Owned(b.user.read().name.clone()),
-                    };
-
-                    closest_to_origin(substring, &name_a[..], &name_b[..])
+                    closest_to_origin(substring, &a.1[..], &b.1[..])
                 });
             members
         } else {
@@ -1197,8 +1238,7 @@ impl Guild {
     ///
     /// [`Member`]: struct.Member.html
     #[inline]
-    pub fn member_permissions<U>(&self, user_id: U) -> Permissions
-        where U: Into<UserId> {
+    pub fn member_permissions(&self, user_id: impl Into<UserId>) -> Permissions {
         self._member_permissions(user_id.into())
     }
 
@@ -1237,7 +1277,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().id,
+                    member.user.id,
                     self.id,
                     role,
                 );
@@ -1253,27 +1293,15 @@ impl Guild {
     ///
     /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
     #[inline]
-    pub fn move_member<C, U>(&self, http: impl AsRef<Http>, user_id: U, channel_id: C) -> Result<()>
-        where C: Into<ChannelId>, U: Into<UserId> {
-        self.id.move_member(&http, user_id, channel_id)
+    pub async fn move_member(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, channel_id: impl Into<ChannelId>) -> Result<()> {
+        self.id.move_member(&http, user_id, channel_id).await
     }
 
     /// Calculate a [`User`]'s permissions in a given channel in the guild.
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
-    #[deprecated(since="0.6.4", note="Please use `user_permissions_in` instead.")]
-    pub fn permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
-        where C: Into<ChannelId>, U: Into<UserId> {
-        self.user_permissions_in(channel_id.into(), user_id.into())
-    }
-
-    /// Calculate a [`User`]'s permissions in a given channel in the guild.
-    ///
-    /// [`User`]: ../user/struct.User.html
-    #[inline]
-    pub fn user_permissions_in<C, U>(&self, channel_id: C, user_id: U) -> Permissions
-        where C: Into<ChannelId>, U: Into<UserId> {
+    pub fn user_permissions_in(&self, channel_id: impl Into<ChannelId>, user_id: impl Into<UserId>) -> Permissions {
         self._user_permissions_in(channel_id.into(), user_id.into())
     }
 
@@ -1315,7 +1343,7 @@ impl Guild {
             } else {
                 warn!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.read().id,
+                    member.user.id,
                     self.id,
                     role
                 );
@@ -1328,8 +1356,6 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
-            let channel = channel.read();
-
             // If this is a text channel, then throw out voice permissions.
             if channel.kind == ChannelType::Text {
                 permissions &= !(Permissions::CONNECT
@@ -1400,8 +1426,7 @@ impl Guild {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     #[inline]
-    pub fn role_permissions_in<C, R>(&self, channel_id: C, role_id: R) -> Option<Permissions>
-        where C: Into<ChannelId>, R: Into<RoleId> {
+    pub fn role_permissions_in(&self, channel_id: impl Into<ChannelId>, role_id: impl Into<RoleId>) -> Option<Permissions> {
         self._role_permissions_in(channel_id.into(), role_id.into())
     }
 
@@ -1420,12 +1445,8 @@ impl Guild {
         }
 
         if let Some(channel) = self.channels.get(&channel_id) {
-            let channel = channel.read();
-
             for overwrite in &channel.permission_overwrites {
-
                 if let PermissionOverwriteType::Role(permissions_role_id) = overwrite.kind {
-
                     if permissions_role_id == role_id {
                         permissions = (permissions & !overwrite.deny) | overwrite.allow;
 
@@ -1464,19 +1485,19 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    pub fn prune_count(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+    pub async fn prune_count(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::KICK_MEMBERS;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.prune_count(cache_http.http(), days)
+        self.id.prune_count(cache_http.http(), days).await
     }
 
     fn remove_unusable_permissions(&self, permissions: &mut Permissions) {
@@ -1508,9 +1529,10 @@ impl Guild {
     /// regardless of whether they were updated. Otherwise, positioning can
     /// sometimes get weird.
     #[inline]
-    pub fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
-        where It: IntoIterator<Item = (ChannelId, u64)> {
-        self.id.reorder_channels(&http, channels)
+    pub async fn reorder_channels<It>(&self, http: impl AsRef<Http>, channels: It) -> Result<()>
+    where It: IntoIterator<Item = (ChannelId, u64)>
+    {
+        self.id.reorder_channels(&http, channels).await
     }
 
     /// Returns the Id of the shard associated with the guild.
@@ -1525,7 +1547,9 @@ impl Guild {
     /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
-    pub fn shard_id(&self, cache: impl AsRef<CacheRwLock>) -> u64 { self.id.shard_id(&cache) }
+    pub async fn shard_id(&self, cache: impl AsRef<Cache>) -> u64 {
+        self.id.shard_id(&cache).await
+    }
 
     /// Returns the Id of the shard associated with the guild.
     ///
@@ -1549,7 +1573,7 @@ impl Guild {
     /// ```
     #[cfg(all(feature = "utils", not(feature = "cache")))]
     #[inline]
-    pub fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count) }
+    pub async fn shard_id(&self, shard_count: u64) -> u64 { self.id.shard_id(shard_count).await }
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
@@ -1564,8 +1588,8 @@ impl Guild {
     ///
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
-    pub fn start_integration_sync<I: Into<IntegrationId>>(&self, http: impl AsRef<Http>, integration_id: I) -> Result<()> {
-        self.id.start_integration_sync(&http, integration_id)
+    pub async fn start_integration_sync(&self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
+        self.id.start_integration_sync(&http, integration_id).await
     }
 
     /// Starts a prune of [`Member`]s.
@@ -1583,19 +1607,19 @@ impl Guild {
     /// [`GuildPrune`]: struct.GuildPrune.html
     /// [`Member`]: struct.Member.html
     /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
-    pub fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
+    pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::KICK_MEMBERS;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.start_prune(cache_http.http(), days)
+        self.id.start_prune(cache_http.http(), days).await
     }
 
     /// Unbans the given [`User`] from the guild.
@@ -1610,19 +1634,19 @@ impl Guild {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`User`]: ../user/struct.User.html
     /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
-    pub fn unban<U: Into<UserId>>(&self, cache_http: impl CacheHttp, user_id: U) -> Result<()> {
+    pub async fn unban(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::BAN_MEMBERS;
 
-                if !self.has_perms(cache, req) {
+                if !self.has_perms(cache, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
 
-        self.id.unban(&cache_http.http(), user_id)
+        self.id.unban(&cache_http.http(), user_id).await
     }
 
     /// Retrieve's the guild's vanity URL.
@@ -1631,8 +1655,8 @@ impl Guild {
     ///
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
     #[inline]
-    pub fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
-        self.id.vanity_url(&http)
+    pub async fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
+        self.id.vanity_url(&http).await
     }
 
     /// Retrieves the guild's webhooks.
@@ -1641,7 +1665,9 @@ impl Guild {
     ///
     /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
     #[inline]
-    pub fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> { self.id.webhooks(&http) }
+    pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
+        self.id.webhooks(&http).await
+    }
 
     /// Obtain a reference to a role by its name.
     ///
@@ -1654,29 +1680,30 @@ impl Guild {
     ///
     /// ```rust,no_run
     /// # #[cfg(all(feature = "cache", feature = "client"))]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, msg: Message) {
-    ///         if let Some(arc) = msg.guild_id.unwrap().to_guild_cached(&ctx.cache) {
-    ///             if let Some(role) = arc.read().role_by_name("role_name") {
-    ///                 println!("{:?}", role);
+    ///     async fn message(&self, ctx: Context, msg: Message) {
+    ///         if let Some(guild_id) = msg.guild_id {
+    ///             if let Some(guild) = guild_id.to_guild_cached(&ctx).await {
+    ///                 if let Some(role) = guild.role_by_name("role_name") {
+    ///                     println!("{:?}", role);
+    ///                 }
     ///             }
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client = Client::new("token").event_handler(Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #    Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(all(feature = "cache", feature = "client")))]
-    /// # fn main() {}
     /// ```
     ///
     /// [`Role`]: ../guild/struct.Role.html
@@ -2230,7 +2257,7 @@ mod test {
         use chrono::prelude::*;
         use crate::model::prelude::*;
         use std::collections::*;
-        use std::sync::Arc;
+
 
         fn gen_user() -> User {
             User {
@@ -2248,7 +2275,7 @@ mod test {
                 .ymd(2016, 11, 08)
                 .and_hms(0, 0, 0);
             let vec1 = Vec::new();
-            let u = Arc::new(RwLock::new(gen_user()));
+            let u = gen_user();
 
             Member {
                 deaf: false,
@@ -2317,8 +2344,8 @@ mod test {
         }
 
 
-        #[test]
-        fn member_named_username() {
+        #[tokio::test]
+        async fn member_named_username() {
             let guild = gen();
             let lhs = guild
                 .member_named("test#1432")
@@ -2328,8 +2355,8 @@ mod test {
             assert_eq!(lhs, gen_member().display_name());
         }
 
-        #[test]
-        fn member_named_nickname() {
+        #[tokio::test]
+        async fn member_named_nickname() {
             let guild = gen();
             let lhs = guild.member_named("aaaa").unwrap().display_name();
 

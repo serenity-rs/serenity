@@ -1,11 +1,9 @@
 use super::super::id::AttachmentId;
 
 #[cfg(feature = "model")]
-use reqwest::blocking::Client as ReqwestClient;
+use reqwest::Client as ReqwestClient;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use std::io::Read;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
@@ -48,61 +46,60 @@ impl Attachment {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::model::prelude::*;
     /// use serenity::prelude::*;
-    /// use std::env;
-    /// use std::fs::File;
+    /// use tokio::fs::File;
+    /// use tokio::io::AsyncWriteExt;
     /// use std::io::Write;
     /// use std::path::Path;
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, mut message: Message) {
+    ///     async fn message(&self, context: Context, mut message: Message) {
     ///         for attachment in message.attachments {
-    ///             let content = match attachment.download() {
+    ///             let content = match attachment.download().await {
     ///                 Ok(content) => content,
     ///                 Err(why) => {
     ///                     println!("Error downloading attachment: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context.http, "Error downloading attachment");
+    ///                     let _ = message.channel_id.say(&context, "Error downloading attachment").await;
     ///
     ///                     return;
     ///                 },
     ///             };
     ///
-    ///             let mut file = match File::create(&attachment.filename) {
+    ///             let mut file = match File::create(&attachment.filename).await {
     ///                 Ok(file) => file,
     ///                 Err(why) => {
     ///                     println!("Error creating file: {:?}", why);
-    ///                     let _ = message.channel_id.say(&context.http, "Error creating file");
+    ///                     let _ = message.channel_id.say(&context, "Error creating file").await;
     ///
     ///                     return;
     ///                 },
     ///             };
     ///
-    ///             if let Err(why) = file.write(&content) {
+    ///             if let Err(why) = file.write(&content).await {
     ///                 println!("Error writing to file: {:?}", why);
     ///
     ///                 return;
     ///             }
     ///
-    ///             let _ = message.channel_id.say(&context.http, &format!("Saved {:?}", attachment.filename));
+    ///             let _ = message.channel_id.say(&context, &format!("Saved {:?}", attachment.filename)).await;
     ///         }
     ///     }
     ///
-    ///     fn ready(&self, _: Context, ready: Ready) {
+    ///     async fn ready(&self, _: Context, ready: Ready) {
     ///         println!("{} is connected!", ready.user.name);
     ///     }
     /// }
-    /// let token = env::var("DISCORD_TOKEN").expect("token in environment");
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::new(&token).event_handler(Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() {}
     /// ```
     ///
     /// # Errors
@@ -116,13 +113,16 @@ impl Attachment {
     /// [`Error::Http`]: ../../enum.Error.html#variant.Http
     /// [`Error::Io`]: ../../enum.Error.html#variant.Io
     /// [`Message`]: struct.Message.html
-    pub fn download(&self) -> Result<Vec<u8>> {
+    pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
-        let mut response = reqwest.get(&self.url).send()?;
 
-        let mut bytes = vec![];
-        response.read_to_end(&mut bytes)?;
-
-        Ok(bytes)
+        Ok(reqwest
+           .get(&self.url)
+           .send()
+           .await?
+           .bytes()
+           .await?
+           .into_iter()
+           .collect::<Vec<u8>>())
     }
 }
