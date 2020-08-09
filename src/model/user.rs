@@ -789,9 +789,11 @@ impl User {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                return guild_id.to_guild_cached(cache).and_then(|guild| {
-                    guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
-                });
+                if let Some(guild) = guild_id.to_guild_cached(cache) {
+                    if let Some(member) = guild.read().members.get(&self.id) {
+                        return member.nick.clone();
+                    }
+                }
             }
         }
 
