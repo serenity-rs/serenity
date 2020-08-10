@@ -413,6 +413,10 @@ impl AsRef<Http> for Arc<Context> {
     fn as_ref(&self) -> &Http { &self.http }
 }
 
+impl AsRef<Arc<Http>> for Context {
+    fn as_ref(&self) -> &Arc<Http> { &self.http }
+}
+
 #[cfg(feature = "cache")]
 impl AsRef<Cache> for Context {
     fn as_ref(&self) -> &Cache {
@@ -424,6 +428,13 @@ impl AsRef<Cache> for Context {
 impl AsRef<Cache> for Arc<Context> {
     fn as_ref(&self) -> &Cache {
         &*self.cache
+    }
+}
+
+#[cfg(feature = "cache")]
+impl AsRef<Arc<Cache>> for Context {
+    fn as_ref(&self) -> &Arc<Cache> {
+        &self.cache
     }
 }
 
