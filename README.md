@@ -104,7 +104,7 @@ Add the following to your `Cargo.toml` file:
 serenity = "0.9.0-rc.0"
 ```
 
-Serenity supports a minimum of Rust 1.37.
+Serenity supports a minimum of Rust 1.39.
 
 # Features
 
