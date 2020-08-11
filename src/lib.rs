@@ -36,7 +36,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.8"
+//! serenity = "0.9.0-rc.0"
 //! ```
 //!
 //! [`Cache`]: cache/struct.Cache.html
