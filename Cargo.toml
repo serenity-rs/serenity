@@ -64,10 +64,6 @@ version = "0.10"
 optional = true
 version = "0.7"
 
-[dependencies.rustls]
-optional = true
-version = "0.18"
-
 [dependencies.async-tungstenite]
 default-features = false
 features = ["tokio-runtime"]
@@ -85,14 +81,6 @@ version = "^2.1"
 [dependencies.bytes]
 optional = true
 version = "0.5"
-
-[dependencies.webpki]
-optional = true
-version = "0.21"
-
-[dependencies.webpki-roots]
-optional = true
-version = "0.19"
 
 [dependencies.xsalsa20poly1305]
 optional = true
@@ -152,7 +140,7 @@ gateway = [
 ]
 http = ["url", "bytes"]
 absolute_ratelimits = ["http"]
-rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls", "rustls", "webpki", "webpki-roots"]
+rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls"]
 native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
