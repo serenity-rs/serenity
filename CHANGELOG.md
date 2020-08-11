@@ -3,6 +3,48 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.7] - 2020-08-11
+
+This is a small release to publish a bunch of fixes the `current` branch has accumulated.
+
+Thanks to the following for their contributions:
+
+- [@7596ff]
+- [@acdenisSK]
+- [@dmarcoux]
+- [@FelixMcFelix]
+- [@fenhl]
+- [@jmgao]
+- [@johnchildren]
+- [@ks129]
+- [@s0lst1ce]
+- [@SOF3]
+- [@tarcieri]
+- [@tweirtx]
+- [@zack37]
+
+### Changed
+
+- [misc] Use a cargo workspace to compile the examples efficiently ([@acdenisSK]) [c:6b1021f]
+- [misc] Prepend 'e' to all example names ([@acdenisSK]) [c:9f848af]
+- [misc] Update dependencies rustls, tungstenite, webpki-roots, parking_lot, and base64 ([@johnchildren]) [c:912d759]
+- [misc] Update the Discord invite link ([@acdenisSK]) [c:1b195d7]
+- [model] Support animated emojis in Emoji's Display impl ([@zack37]) [c:08d0608]
+- [voice] Use the `xsalsa20poly1305` crate for encryption in voice ([@tarcieri]) [c:3965e00]
+- [model] Consider nickname mentions in `Message::content_safe` ([@ks129]) [c:46db84a]
+- [misc] Update almost all instances of discordapp.com to discord.com ([@s0lst1ce]) [c:f98e61e]
+
+### Fixed
+
+- [model] Fix `User::nick_in` unconditionally returning if the cache is passed ([@acdenisSK]) [c:9c198ed]
+- [CI] Fix the Linux CI job by adding the missing system dependency ([@tweirtx]) [c:550a63c]
+- [misc] Address some clippy warnings ([@dmarcoux]) [c:2a54410]
+- [utils] Preserve hostname when escaping invite links ([@fenhl]) [c:7dd01eb]
+- [voice] Fix `.mute(...)` not preventing the bot from sending frames. ([@FelixMcFelix]) [c:638780e]
+- [nidek] Fix doc-link to the `Message::guild_id` field in the `Message::guild` method ([@SOF3]) [c:84b04ba]
+- [framework] Fix check behaviour in the help command ([@jmgao]) [c:e000833]
+- [model] Fix the documentation order of `permissions_for_role` and `permissions_for_user` ([@7596ff]) [c:9356a5c]
+
 ## [0.8.6] - 2020-04-26
 
 This release prevents a loop when requesting a restart of a Shard, resulting in the Shard hanging forever.
@@ -3452,6 +3494,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.8.7]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/serenity-rs/serenity/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/serenity-rs/serenity/compare/v0.8.4...v0.8.5
 [0.8.4]: https://github.com/serenity-rs/serenity/compare/v0.8.3...v0.8.4
@@ -3512,6 +3555,7 @@ Initial commit.
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
 
+[@7596ff]: https://github.com/7596ff
 [@Alch-Emi]: https://github.com/Alch-Emi
 [@Arcterus]: https://github.com/Arcterus
 [@AregevDev]: https://github.com/AregevDev
@@ -3531,6 +3575,7 @@ Initial commit.
 [@DarkKirb]: https://github.com/DarkKirb
 [@DeltaEvo]: https://github.com/DeltaEvo
 [@DoumanAsh]: https://github.com/DoumanAsh
+[@dmarcoux]: https://github.com/dmarcoux
 [@drklee3]: https://github.com/drklee3
 [@Elinvynia]: https://github.com/Elinvynia
 [@Erk-]: https://github.com/Erk-
@@ -3558,9 +3603,12 @@ Initial commit.
 [@Jerald]: https://github.com/Jerald
 [@jhelwig]: https://github.com/jhelwig
 [@jkcclemens]: https://github.com/jkcclemens
+[@jmgao]: https://github.com/jmgao
 [@joek13]: https://github.com/joek13
+[@johnchildren]: https://github.com/johnchildren
 [@KamranMackey]: https://github.com/KamranMackey
 [@Kroisse]: https://github.com/Kroisse
+[@ks129]: https://github.com/ks129
 [@kyranet]: https://github.com/kyranet
 [@Lakelezz]: https://github.com/Lakelezz
 [@LeSeulArtichaut]: https://github.com/LeSeulArtichaut
@@ -3589,7 +3637,9 @@ Initial commit.
 [@PvdBerg1998]: https://github.com/PvdBerg1998
 [@Roughsketch]: https://github.com/Roughsketch
 [@rsaihe]: https://github.com/rsaihe
+[@SOF3]: https://github.com/SOF3
 [@Scetch]: https://github.com/Scetch
+[@s0lst1ce]: https://github.com/s0lst1ce
 [@shnarazk]: https://github.com/shnarazk
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@sschroe]: https://github.com/sschroe
@@ -3599,15 +3649,35 @@ Initial commit.
 [@TheUnitedStatesOfAmerica]: https://github.com/TheUnitedStatesOfAmerica
 [@thelearnerofcode]: https://github.com/thelearnerofcode
 [@TitusEntertainment]: https://github.com/TitusEntertainment
+[@tarcieri]: https://github.com/tarcieri
 [@timotree3]: https://github.com/timotree3
+[@tweirtx]: https://github.com/tweirtx
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
 [@xentec]: https://github.com/xentec
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
 [@Zalaxx]: https://github.com/Zalaxx
+[@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+[c:6b1021f]: https://github.com/acdenisSK/serenity/commit/6b1021f85ea8590b2aa50e4ea986b598575c6abb
+[c:9f848af]: https://github.com/acdenisSK/serenity/commit/9f848aff0fda841d7ca827447ac115bcb0d18d1a
+[c:912d759]: https://github.com/acdenisSK/serenity/commit/912d759c31bf6ba69697fe5dac451b1f3b299a91
+[c:1b195d7]: https://github.com/acdenisSK/serenity/commit/1b195d73870e7561b869aaf9ff795a85ccdc6b6f
+[c:08d0608]: https://github.com/acdenisSK/serenity/commit/08d06082f4df7c6897aa5fe3e481819bca47aa7f
+[c:3965e00]: https://github.com/acdenisSK/serenity/commit/3965e003040a385124c5809bd2df85533db4b801
+[c:46db84a]: https://github.com/acdenisSK/serenity/commit/46db84a64364b20f1276db9b7909f3fbd318a87d
+[c:f98e61e]: https://github.com/acdenisSK/serenity/commit/f98e61eed83f7c51c26c41ea84f0712888cc7dcd
+[c:9c198ed]: https://github.com/acdenisSK/serenity/commit/9c198ed7b36d9a808a3e477d2450d5a8b5ae8409
+[c:550a63c]: https://github.com/acdenisSK/serenity/commit/550a63c0209ca5b6d01312fa4cf7f3c171932938
+[c:2a54410]: https://github.com/acdenisSK/serenity/commit/2a54410f79d0918925fa0ca02607e5b073f0e247
+[c:7dd01eb]: https://github.com/acdenisSK/serenity/commit/7dd01eb95754dcdc71cea8e744e2fedacd3ab9dd
+[c:638780e]: https://github.com/acdenisSK/serenity/commit/638780e35c8b21688c2c9dec87e92906251ef1fa
+[c:84b04ba]: https://github.com/acdenisSK/serenity/commit/84b04ba8ca0e3ff4cef3a52775beaadb0af5bd94
+[c:e000833]: https://github.com/acdenisSK/serenity/commit/e0008330ff5a706a1fc0ac827e52623517e2387a
+[c:9356a5c]: https://github.com/acdenisSK/serenity/commit/9356a5c9b44aef0aee1185634a8f60f25ae09a16
 
 [c:b8e2a7d]: https://github.com/serenity-rs/serenity/commit/b8e2a7d14bd3abca3fb8ae0dcf5e1889180ff037
 
