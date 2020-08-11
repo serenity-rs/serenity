@@ -3,6 +3,78 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.0-rc.0] - 2020-08-11
+
+# Asynchronous Serenity
+
+It has long been `.await`ed for, but it's finally here! Serenity now leverages `async` functions, thanks to the `tokio` runtime.
+
+# Release candidate
+
+As that is a huge change, among other changes, this is actually a *testing release*. It is encouraged to consumers of this release to provide feedback for any warts you might encounter, be it missing features, or bugs. One important bug is the OOM bug. After a period of time has passed since the bot connected, there might be a big random spike in memory usage, prompting the OOM killer to shutdown the bot's process. It is unknown where the spike comes from, or when exactly does it occur. It doesn't happen to every bot either. If you find your bot suddenly using a lot of memory, or being killed, please let us know by opening an Issue.
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@asherkin]
+- [@bdashore3]
+- [@DimiDimit]
+- [@jmgao]
+- [@MaxOhn]
+- [@mendess]
+- [@mjsir911]
+- [@mysteriouspants]
+- [@NieDzejkob]
+- [@NilsIrl]
+- [@nitsuga5124]
+- [@Th3-M4jor]
+- [@tverghis]
+
+### Added
+
+- [model] Add `nick` field to `PartialMember` ([@asherkin]) [c:28f9f8a]
+- [model] Add teams support ([@nitsuga5124]) [c:5a6979a]
+- [model] Add `mentions_current_user` helper ([@mysteriouspants]) [c:e049bc1]
+- [model/client] Add the `nonce` field to `GuildMembersChunk` and the event handler ([@mjsir911]) [c:614f99a]
+- [voice] Add `self_stream` field to `VoiceState` ([@DimiDimit]) [c:c60f397]
+- [model] Add a method to retrieve a webhook's URL ([@nitsuga5124]) [c:5931d1c]
+- [model] Add a method to retrieve a link to a message ([@acdenisSK]) [c:a92ca08]
+- [command_attr] Add the delimiters option to the documentation ([@acdenisSK]) [c:1594a3e]
+- [model] Add pagination for CurrentUser::guilds ([@NilsIrl]) [c:9eadffa]
+- [model] Add methods to disconnect a member from a voice channel ([@mendess]) [c:4e8e40b]
+- [model] Add `GuildId::name()` ([@tverghis]) [c:d99bee9]
+
+### Changed
+
+- [misc] Update rustls dependency to 0.18 ([@acdenisSK]) [c:3dda20d]
+- [all] Serenity.await ([@acdenisSK]) [c:5df4c6d]
+- [misc] Address the renaming of the lavalink project ([@acdenisSK]) [c:802df92]
+- [utils] Replace the in-house typemap implementation with `typemap_rev` ([@bdashore3]) [c:c1c7300]
+- [misc] Apply copyright to all people who have contributed to Serenity ([@acdenisSK]) [c:287245a]
+- [model] Make `Message::reply` take a content implementing `std::fmt::Display` ([@nitsuga5124]) [c:00683ef]
+- [framework] Expose CustomisedHelpData fields, improve help strikethrough message attributes. ([@jmgao]) [c:0d72b6e]
+- [framework] Return `Option<Message>` in help command functions ([@MaxOhn]) [c:4472dec]
+- [model] Make `Message::react` return its `Reaction` ([@NieDzejkob]) [c:e7eb52d]
+- [model] Check the cache for an existing private channel when creating a new one ([@NieDzejkob]) [c:94d22c3]
+- [framework] Replace `CommandError` with an alias to `Box<dyn Error>` ([@acdenisSK]) [c:a406d48]
+- [misc] Mention projects that extend the functionality of the library instead ([@acdenisSK]) [c:9f75c09]
+- [model] Adjust the ban methods to be consistent with the kick methods ([@acdenisSK]) [c:8628b2a]
+- [http] Inject the guild id into the roles returned by the http client ([@acdenisSK]) [c:5edd11d]
+- [client] Replace `&mut Context` with `&Context` ([@Th3-M4jor]) [c:3e4294b]
+
+### Fixed
+
+- [model] Restrict mention parsing to be specific to the type of id ([@acdenisSK]) [c:dd580fb]
+- [framework] Fix `unrecognised_command()` not working if the last added group has prefixes ([@nitsuga5124]) [c:8040fa5] [c:760ed71] [c:21a5d8e]
+- [misc] Remove unnecessary feature gates and fix incorrect ones ([@acdenisSK]) [c:ed61459]
+
+### Removed
+
+- [model] Remove `U: Into<UserId>` type parameter for `partial_guild::edit_member()` ([@nitsuga5124]) [c:4227a52]
+- [misc] Remove Zeyla Hellyer as an author of Serenity ([@acdenisSK]) [c:9cfc410]
+- [misc] Remove the matches developmental dependency ([@acdenisSK]) [c:2418edd]
+- [misc] Remove usages of mem::replace where its return value is unused ([@acdenisSK]) [c:3135e0f]
+
 ## [0.8.7] - 2020-08-11
 
 This is a small release to publish a bunch of fixes the `current` branch has accumulated.
@@ -3494,6 +3566,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.9.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.8.7...v0.9.0-rc.0
 [0.8.7]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/serenity-rs/serenity/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/serenity-rs/serenity/compare/v0.8.4...v0.8.5
@@ -3562,9 +3635,11 @@ Initial commit.
 [@abalabahaha]: https://github.com/abalabahaha
 [@acdenisSK]: https://github.com/acdenisSK
 [@andreasots]: https://github.com/andreasots
+[@asherkin]: https://github.com/asherkin
 [@benjaminrsherman]: https://github.com/benjaminrsherman
 [@Bond-009]: https://github.com/Bond-009
 [@barzamin]: https://github.com/barzamin
+[@bdashore3]: https://github.com/bdashore3
 [@bikeshedder]: https://github.com/bikeshedder
 [@bippum]: https://github.com/bippum
 [@blaenk]: https://github.com/blaenk
@@ -3574,6 +3649,7 @@ Initial commit.
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@DarkKirb]: https://github.com/DarkKirb
 [@DeltaEvo]: https://github.com/DeltaEvo
+[@DimiDimit]: https://github.com/DimiDimit
 [@DoumanAsh]: https://github.com/DoumanAsh
 [@dmarcoux]: https://github.com/dmarcoux
 [@drklee3]: https://github.com/drklee3
@@ -3618,13 +3694,17 @@ Initial commit.
 [@khazhyk]: https://github.com/khazhyk
 [@MaxOhn]: https://github.com/MaxOhn
 [@Mendess2526]: https://github.com/Mendess2526
-[@mattico]: https://github.com/mattico
-[@molenzwiebel]: https://github.com/molenzwiebel
-[@megumisonoda]: https://github.com/megumisonoda
 [@Mishio595]: https://github.com/Mishio595
+[@mattico]: https://github.com/mattico
+[@megumisonoda]: https://github.com/megumisonoda
+[@mendess]: https://github.com/mendess
+[@mjsir911]: https://github.com/mjsir911
+[@molenzwiebel]: https://github.com/molenzwiebel
+[@mysteriouspants]: https://github.com/mysteriouspants
 [@mshenrick]: https://github.com/mshenrick
 [@MOZGIII]: https://github.com/MOZGIII
 [@NieDzejkob]: https://github.com/NieDzejkob
+[@NilsIrl]: https://github.com/NilsIrl
 [@Noituri]: https://github.com/Noituri
 [@NovusTheory]: https://github.com/NovusTheory
 [@nabijaczleweli]: https://github.com/nabijaczleweli
@@ -3646,11 +3726,13 @@ Initial commit.
 [@SunDwarf]: https://github.com/SunDwarf
 [@tahahawa]: https://github.com/tahahawa
 [@ThatsNoMoon]: https://github.com/ThatsNoMoon
+[@Th3-M4jor]: https://github.com/Th3-M4jor
 [@TheUnitedStatesOfAmerica]: https://github.com/TheUnitedStatesOfAmerica
 [@thelearnerofcode]: https://github.com/thelearnerofcode
 [@TitusEntertainment]: https://github.com/TitusEntertainment
 [@tarcieri]: https://github.com/tarcieri
 [@timotree3]: https://github.com/timotree3
+[@tverghis]: https://github.com/tverghis
 [@tweirtx]: https://github.com/tweirtx
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
@@ -3660,6 +3742,43 @@ Initial commit.
 [@Zalaxx]: https://github.com/Zalaxx
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
+
+
+[c:28f9f8a]: https://github.com/serenity-rs/serenity/commit/28f9f8addea5aae5d0c59f6682e47a49c534d5ed
+[c:5a6979a]: https://github.com/serenity-rs/serenity/commit/5a6979a27745f2c8ae7d981ae1249dc3dc7add4e
+[c:e049bc1]: https://github.com/serenity-rs/serenity/commit/e049bc1b9bdb2b0a7bd37f1d5ebac29e70415e9a
+[c:614f99a]: https://github.com/serenity-rs/serenity/commit/614f99a72b5c206d4f5c8379ad41ae084d4350d5
+[c:c60f397]: https://github.com/serenity-rs/serenity/commit/c60f39740afc8df2df29cfad25890ad5d05641f7
+[c:5931d1c]: https://github.com/serenity-rs/serenity/commit/5931d1c6a940b61908f591c49337d065223ab374
+[c:a92ca08]: https://github.com/serenity-rs/serenity/commit/a92ca08d45609b137a6bebba3e527dd0b7027016
+[c:1594a3e]: https://github.com/serenity-rs/serenity/commit/1594a3e9aed2f4f51079d87d853e6c794c573c19
+[c:9eadffa]: https://github.com/serenity-rs/serenity/commit/9eadffae6ec6009d1c65196d3bf8289dc6443c20
+[c:4e8e40b]: https://github.com/serenity-rs/serenity/commit/4e8e40b4d7694a0d0cbe0d0f84b74248aa402191
+[c:d99bee9]: https://github.com/serenity-rs/serenity/commit/d99bee900e2d5a61a218f7107a3ce3d8642e8ee0
+[c:3dda20d]: https://github.com/serenity-rs/serenity/commit/3dda20d0ec5dc2c68be572e52b71e7c07e918d24
+[c:5df4c6d]: https://github.com/serenity-rs/serenity/commit/5df4c6d1d82ad1de14442b468de8f989c2459c3c
+[c:802df92]: https://github.com/serenity-rs/serenity/commit/802df92dcd33610789af678d54136591dd1b1e04
+[c:c1c7300]: https://github.com/serenity-rs/serenity/commit/c1c730038d49b1e3e46356ed8a26557bf9d6eb7c
+[c:287245a]: https://github.com/serenity-rs/serenity/commit/287245a6d0c693ed059ee463034db28180e105fa
+[c:00683ef]: https://github.com/serenity-rs/serenity/commit/00683ef1a5f311ac3c007d0941eff0f84f5b5dab
+[c:0d72b6e]: https://github.com/serenity-rs/serenity/commit/0d72b6e2f517624d59c2eae69032bdc1d8ad2d53
+[c:4472dec]: https://github.com/serenity-rs/serenity/commit/4472dec8bf3544776552029ed555ab3f04f23f9d
+[c:e7eb52d]: https://github.com/serenity-rs/serenity/commit/e7eb52dc96a8ee23505160a7de80e5baf09ffe66
+[c:94d22c3]: https://github.com/serenity-rs/serenity/commit/94d22c3ac338a5b68c942b7a3e71d90d291d7f27
+[c:a406d48]: https://github.com/serenity-rs/serenity/commit/a406d48533330e1f875225c1d1e47ce9265f2c55
+[c:9f75c09]: https://github.com/serenity-rs/serenity/commit/9f75c09f6616cd61fd3f26500d1e114a5a0fe448
+[c:8628b2a]: https://github.com/serenity-rs/serenity/commit/8628b2ae80e0b74030afbcd80fc5b1f87599e977
+[c:5edd11d]: https://github.com/serenity-rs/serenity/commit/5edd11daea250d887fe6cf323c7e6776509fdb70
+[c:3e4294b]: https://github.com/serenity-rs/serenity/commit/3e4294b5e20296526e55bca82aac92eccda13d74
+[c:dd580fb]: https://github.com/serenity-rs/serenity/commit/dd580fb9881e1025b1d11c0e3bd817e8b63806f3
+[c:8040fa5]: https://github.com/serenity-rs/serenity/commit/8040fa5912d488b56addc6f2ec60d12a8540f8c1
+[c:760ed71]: https://github.com/serenity-rs/serenity/commit/760ed7173cb87622cecb52c53a0f95d41560b02a
+[c:21a5d8e]: https://github.com/serenity-rs/serenity/commit/21a5d8e98a09a7b4db8d906618b90687baad44e8
+[c:ed61459]: https://github.com/serenity-rs/serenity/commit/ed6145979c0d428937925b27bd832ef9787e8581
+[c:4227a52]: https://github.com/serenity-rs/serenity/commit/4227a527e749133758bb84d4c18c73d6351946da
+[c:9cfc410]: https://github.com/serenity-rs/serenity/commit/9cfc410b232f75f0b0663b06fc6e3497892949ce
+[c:2418edd]: https://github.com/serenity-rs/serenity/commit/2418edd02ca7bcf4f0763216cc7e986a77b6aede
+[c:3135e0f]: https://github.com/serenity-rs/serenity/commit/3135e0f3ccaf80d4ac8eabbed4040ed10e8a7863
 
 
 [c:6b1021f]: https://github.com/acdenisSK/serenity/commit/6b1021f85ea8590b2aa50e4ea986b598575c6abb
