@@ -68,24 +68,9 @@ use crate::client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
-use async_tungstenite::{WebSocketStream, stream::Stream, tokio::TokioAdapter};
-use tokio::net::TcpStream;
+use async_tungstenite::{WebSocketStream, tokio::ConnectStream};
 
-#[cfg(feature = "native_tls_backend")]
-use tokio_tls::TlsStream;
-
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-use async_tls::client::TlsStream;
-
-pub type MaybeTlsStream<S> = Stream<S, TokioAdapter<TlsStream<TokioAdapter<S>>>>;
-
-#[cfg(feature = "native_tls_backend")]
-pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
-    TokioAdapter<TlsStream<TokioAdapter<TokioAdapter<TcpStream>>>>>>;
-
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-pub type WsStream = WebSocketStream<Stream<TokioAdapter<TcpStream>,
-    TlsStream<TokioAdapter<TcpStream>>>>;
+pub type WsStream = WebSocketStream<ConnectStream>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
