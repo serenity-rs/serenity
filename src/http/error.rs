@@ -1,6 +1,6 @@
 use reqwest::{
     Error as ReqwestError,
-    blocking::Response,
+    Response,
     header::InvalidHeaderValue,
     StatusCode,
     Url,
@@ -36,12 +36,14 @@ pub struct ErrorResponse {
     pub error: DiscordJsonError,
 }
 
-impl From<Response> for ErrorResponse {
-    fn from(r: Response) -> Self {
+impl ErrorResponse {
+    // We need a freestanding from-function since we cannot implement an async
+    // From-trait.
+    pub async fn from_response(r: Response) -> Self {
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
-            error: r.json().unwrap_or_else(|_| DiscordJsonError {
+            error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
                 message: "[Serenity] No correct json was received!".to_string(),
                 non_exhaustive: (),
@@ -69,6 +71,22 @@ pub enum Error {
     Request(ReqwestError),
     #[doc(hidden)]
     __Nonexhaustive,
+}
+
+impl Error {
+    // We need a freestanding from-function since we cannot implement an async
+    // From-trait.
+    pub async fn from_response(r: Response) -> Self {
+        ErrorResponse::from_response(r)
+            .await
+            .into()
+    }
+}
+
+impl From<ErrorResponse> for Error {
+    fn from(error: ErrorResponse) -> Error {
+        Error::UnsuccessfulRequest(error)
+    }
 }
 
 impl From<ReqwestError> for Error {
@@ -119,8 +137,8 @@ mod test {
     use http_crate::response::Builder;
     use reqwest::ResponseBuilderExt;
 
-    #[test]
-    fn test_error_response_into() {
+    #[tokio::test]
+    async fn test_error_response_into() {
         let error = DiscordJsonError {
             code: 43121215,
             message: String::from("This is a Ferris error"),
@@ -133,8 +151,8 @@ mod test {
         let body_string = serde_json::to_string(&error).unwrap();
         let response = builder.body(body_string.into_bytes()).unwrap();
 
-        let reqwest_response: reqwest::blocking::Response = response.into();
-        let error_response: ErrorResponse = reqwest_response.into();
+        let reqwest_response: reqwest::Response = response.into();
+        let error_response = ErrorResponse::from_response(reqwest_response).await;
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),

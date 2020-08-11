@@ -244,4 +244,8 @@ pub mod close_codes {
     ///
     /// Cannot reconnect.
     pub const SHARDING_REQUIRED: u16 = 4011;
+    /// Undocumented gateway intents have been provided.
+    pub const INVALID_GATEWAY_INTENTS: u16 = 4013;
+    /// Disallowed gateway intents have been provided.
+    pub const DISALLOWED_GATEWAY_INTENTS: u16 = 4014;
 }

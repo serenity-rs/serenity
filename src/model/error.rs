@@ -22,26 +22,23 @@ use super::Permissions;
 ///
 /// ```rust,no_run
 /// # #[cfg(all(feature = "client", feature = "model"))]
-/// # use std::error::Error;
-/// #
-/// # #[cfg(all(feature = "client", feature = "model"))]
-/// # fn try_main() -> Result<(), Box<Error>> {
+/// # async fn run() -> Result<(), Box<std::error::Error>> {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
 /// use serenity::Error;
 /// use serenity::model::ModelError;
-/// use std::env;
 ///
 /// struct Handler;
 ///
+/// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
+///     async fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
 ///         // If the user has an even discriminator, don't re-ban them.
 ///         if user.discriminator % 2 == 0 {
 ///             return;
 ///         }
 ///
-///      match guild_id.ban(&context.http, user, 7) {
+///         match guild_id.ban(&context, user, 8).await {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },
@@ -54,20 +51,12 @@ use super::Permissions;
 ///         }
 ///     }
 /// }
-/// let token = env::var("DISCORD_BOT_TOKEN")?;
-/// let mut client = Client::new(&token, Handler).unwrap();
+/// let token = std::env::var("DISCORD_BOT_TOKEN")?;
+/// let mut client = Client::new(&token).event_handler(Handler).await?;
 ///
-/// client.start()?;
+/// client.start().await?;
 /// #     Ok(())
 /// # }
-/// #
-/// # #[cfg(all(feature = "client", feature = "model"))]
-/// # fn main() {
-/// #     try_main().unwrap();
-/// # }
-/// #
-/// # #[cfg(not(all(feature="client", feature = "model")))]
-/// # fn main() { }
 /// ```
 ///
 /// [`Error`]: ../../enum.Error.html

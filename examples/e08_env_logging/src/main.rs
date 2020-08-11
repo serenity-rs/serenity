@@ -1,6 +1,7 @@
 use std::env;
 
 use serenity::{
+    async_trait,
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
@@ -9,13 +10,14 @@ use log::{debug, error, info};
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         // Log at the INFO level. This is a macro from the `log` crate.
         info!("{} is connected!", ready.user.name);
     }
 
-    fn resume(&self, _: Context, resume: ResumedEvent) {
+    async fn resume(&self, _: Context, resume: ResumedEvent) {
         // Log at the DEBUG level.
         //
         // In this example, this will not show up in the logs because DEBUG is
@@ -24,7 +26,8 @@ impl EventHandler for Handler {
     }
 }
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Call env_logger's initialize function, which configures `log` via
     // environment variables.
     //
@@ -36,9 +39,12 @@ fn main() {
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
 
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .await
+        .expect("Err creating client");
 
-    if let Err(why) = client.start() {
+    if let Err(why) = client.start().await {
         error!("Client error: {:?}", why);
     }
 }

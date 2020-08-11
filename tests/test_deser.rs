@@ -26,6 +26,7 @@ macro_rules! p {
 fn activity() {
     p!(Activity, "activity_1");
     p!(Activity, "activity_2");
+    p!(Activity, "activity_3");
 }
 
 #[test]

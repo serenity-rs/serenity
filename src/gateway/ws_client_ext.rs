@@ -1,6 +1,6 @@
 use chrono::Utc;
 use crate::constants::{self, OpCode};
-use crate::gateway::{CurrentPresence, WsClient};
+use crate::gateway::{CurrentPresence, WsStream};
 use crate::client::bridge::gateway::GatewayIntents;
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
@@ -8,29 +8,31 @@ use crate::model::id::GuildId;
 use serde_json::json;
 use std::env::consts;
 use log::{debug, trace};
+use async_trait::async_trait;
 
+#[async_trait]
 pub trait WebSocketGatewayClientExt {
-    fn send_chunk_guilds<It>(
+    async fn send_chunk_guilds<It>(
         &mut self,
         guild_ids: It,
         shard_info: &[u64; 2],
         limit: Option<u16>,
         query: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId>;
+    ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send;
 
-    fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
+    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()>;
 
-    fn send_presence_update(
+    async fn send_presence_update(
         &mut self,
         shard_info: &[u64; 2],
         current_presence: &CurrentPresence,
     ) -> Result<()>;
 
-    fn send_resume(
+    async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],
         session_id: &str,
@@ -39,14 +41,15 @@ pub trait WebSocketGatewayClientExt {
     ) -> Result<()>;
 }
 
-impl WebSocketGatewayClientExt for WsClient {
-    fn send_chunk_guilds<It>(
+#[async_trait]
+impl WebSocketGatewayClientExt for WsStream {
+    async fn send_chunk_guilds<It>(
         &mut self,
         guild_ids: It,
         shard_info: &[u64; 2],
         limit: Option<u16>,
         query: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId> {
+    ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send {
         debug!("[Shard {:?}] Requesting member chunks", shard_info);
 
         self.send_json(&json!({
@@ -56,20 +59,20 @@ impl WebSocketGatewayClientExt for WsClient {
                 "limit": limit.unwrap_or(0),
                 "query": query.unwrap_or(""),
             },
-        })).map_err(From::from)
+        })).await.map_err(From::from)
     }
 
-    fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
+    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&json!({
             "d": seq,
             "op": OpCode::Heartbeat.num(),
-        })).map_err(From::from)
+        })).await.map_err(From::from)
     }
 
-    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -89,10 +92,10 @@ impl WebSocketGatewayClientExt for WsClient {
                     "$os": consts::OS,
                 },
             },
-        }))
+        })).await
     }
 
-    fn send_presence_update(
+    async fn send_presence_update(
         &mut self,
         shard_info: &[u64; 2],
         current_presence: &CurrentPresence,
@@ -114,10 +117,10 @@ impl WebSocketGatewayClientExt for WsClient {
                     "url": x.url,
                 })),
             },
-        }))
+        })).await
     }
 
-    fn send_resume(
+    async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],
         session_id: &str,
@@ -133,6 +136,6 @@ impl WebSocketGatewayClientExt for WsClient {
                 "seq": seq,
                 "token": token,
             },
-        })).map_err(From::from)
+        })).await.map_err(From::from)
     }
 }
