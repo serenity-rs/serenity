@@ -15,7 +15,7 @@ pub enum ParseValue {
     Roles,
 }
 
-/// A builder to manage the allowed mentiones on a message, 
+/// A builder to manage the allowed mentions on a message, 
 /// used by the [`ChannelId::send_message`] method.
 ///
 /// # Examples
