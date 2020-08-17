@@ -2,6 +2,7 @@ use crate::internal::prelude::*;
 use crate::http::AttachmentType;
 use crate::model::channel::ReactionType;
 use super::CreateEmbed;
+use super::CreateAllowedMentions;
 use crate::utils;
 
 use std::collections::HashMap;
@@ -120,6 +121,18 @@ impl<'a> CreateMessage<'a> {
     /// To append files, call `add_file` or `add_files` instead.
     pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
         self.2 = files.into_iter().map(|f| f.into()).collect();
+        self
+    }
+
+    /// Set the allowed mentions for the message.
+    pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
+    where F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions {
+        let mut allowed_mentions = CreateAllowedMentions::default();
+        f(&mut allowed_mentions);
+        let map = utils::hashmap_to_json_map(allowed_mentions.0);
+        let allowed_mentions = Value::Object(map);
+
+        self.0.insert("allowed_mentions", allowed_mentions);
         self
     }
 }
