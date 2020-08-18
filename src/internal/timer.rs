@@ -1,51 +1,45 @@
-use chrono::{DateTime, Duration, Utc};
-use std::time::Duration as StdDuration;
-use tokio::time::delay_for;
+use tokio::time::{delay_until, Duration, Instant};
 
 #[derive(Debug)]
 pub struct Timer {
-    due: DateTime<Utc>,
+    due: Instant,
     duration: Duration,
 }
 
 impl Timer {
+    /// construct timer, initially set and due `duration_in_ms` in the future
     pub fn new(duration_in_ms: u64) -> Timer {
-        let duration = Duration::milliseconds(duration_in_ms as i64);
+        let duration = Duration::from_millis(duration_in_ms);
 
         Timer {
-            due: Utc::now() + duration,
+            due: Instant::now() + duration,
             duration,
         }
     }
 
+    /// block until next due time resetting afterwards
     pub async fn hold(&mut self) {
-        let due_time = (self.due.timestamp() * 1000) + i64::from(self.due.timestamp_subsec_millis());
-        let now_time = {
-            let now = Utc::now();
-
-            (now.timestamp() * 1000) + i64::from(now.timestamp_subsec_millis())
-        };
-
-        if due_time > now_time {
-            let sleep_time = due_time - now_time;
-
-            if sleep_time > 0 {
-                delay_for(StdDuration::from_millis(sleep_time as u64)).await;
-            }
-        }
-
-        self.due = self.due + self.duration;
+        delay_until(self.due).await;
+        self.increment();
     }
 
+    /// returns true and resets the timer if due
     pub fn check(&mut self) -> bool {
-        if Utc::now() >= self.due {
-            self.due = self.due + self.duration;
-
+        if Instant::now() >= self.due {
+            self.increment();
             true
         } else {
             false
         }
     }
 
-    pub fn reset(&mut self) { self.due = Utc::now() + self.duration; }
+    /// reset timer to be 1 duration after previous due time
+    fn increment(&mut self) {
+        self.due += self.duration
+    }
+
+    /// reset timer to be 1 duration from **now**
+    pub fn reset(&mut self) {
+        self.due = Instant::now() + self.duration;
+    }
 }
