@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use crate::model::prelude::*;
 use std::fmt::{
     Display,
@@ -29,7 +29,7 @@ pub struct PrivateChannel {
     /// Timestamp of the last time a [`Message`] was pinned.
     ///
     /// [`Message`]: struct.Message.html
-    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
+    pub last_pin_timestamp: Option<DateTime<Utc>>,
     /// Indicator of the type of channel this is.
     ///
     /// This should always be [`ChannelType::Private`].

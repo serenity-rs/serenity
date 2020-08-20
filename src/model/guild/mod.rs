@@ -18,7 +18,7 @@ pub use self::role::*;
 pub use self::audit_log::*;
 pub use self::premium_tier::*;
 
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use super::utils::*;
@@ -92,7 +92,7 @@ pub struct Guild {
     /// that of the default channel (typically `#general`).
     pub id: GuildId,
     /// The date that the current user joined the guild.
-    pub joined_at: DateTime<FixedOffset>,
+    pub joined_at: DateTime<Utc>,
     /// Indicator of whether the guild is considered "large" by Discord.
     pub large: bool,
     /// The number of members in the guild.
@@ -2271,9 +2271,10 @@ mod test {
         }
 
         fn gen_member() -> Member {
-            let dt: DateTime<FixedOffset> = FixedOffset::east(5 * 3600)
+            let dt: DateTime<Utc> = FixedOffset::east(5 * 3600)
                 .ymd(2016, 11, 08)
-                .and_hms(0, 0, 0);
+                .and_hms(0, 0, 0)
+                .with_timezone(&Utc);
             let vec1 = Vec::new();
             let u = gen_user();
 
@@ -2296,9 +2297,10 @@ mod test {
             let hm1 = HashMap::new();
             let hm2 = HashMap::new();
             let vec1 = Vec::new();
-            let dt: DateTime<FixedOffset> = FixedOffset::east(5 * 3600)
+            let dt: DateTime<Utc> = FixedOffset::east(5 * 3600)
                 .ymd(2016, 11, 08)
-                .and_hms(0, 0, 0);
+                .and_hms(0, 0, 0)
+                .with_timezone(&Utc);
             let mut hm3 = HashMap::new();
             let hm4 = HashMap::new();
             let hm5 = HashMap::new();

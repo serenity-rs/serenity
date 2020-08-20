@@ -822,7 +822,7 @@ mod test {
             Permissions,
             prelude::*,
         };
-        use chrono::DateTime;
+        use chrono::{DateTime, Utc};
         use std::{
             collections::HashMap,
             sync::Arc,
@@ -850,7 +850,8 @@ mod test {
             id: GuildId(381880193251409931),
             joined_at: DateTime::parse_from_str(
                 "1983 Apr 13 12:09:14.274 +0000",
-                "%Y %b %d %H:%M:%S%.3f %z").unwrap(),
+                "%Y %b %d %H:%M:%S%.3f %z").unwrap()
+                .with_timezone(&Utc),
             large: false,
             member_count: 1,
             members: HashMap::new(),
