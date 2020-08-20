@@ -70,7 +70,7 @@ pub struct CommandOptions {
 }
 
 pub type CommandError = Box<dyn StdError + Send + Sync>;
-pub type CommandResult = std::result::Result<(), CommandError>;
+pub type CommandResult<T = ()> = std::result::Result<T, CommandError>;
 pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
