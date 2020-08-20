@@ -27,7 +27,7 @@ pub(crate) struct Bucket {
 
 impl Bucket {
     pub fn take(&mut self, user_id: u64) -> Option<Duration> {
-        let time = Instant::now();
+        let now = Instant::now();
         let Self {
             users, ratelimit, ..
         } = self;
@@ -35,32 +35,26 @@ impl Bucket {
 
         if let Some((timespan, limit)) = ratelimit.limit {
             if (user.tickets + 1) > limit {
-                if let Some(res) = user.set_time.map(|x| x + timespan).and_then(|x| {
-                    if time < x {
-                        Some(x - time)
-                    } else {
-                        None
-                    }
-                }) {
+                if let Some(res) = user
+                    .set_time
+                    .and_then(|x| now.checked_duration_since(x + timespan))
+                {
                     return Some(res);
                 } else {
                     user.tickets = 0;
-                    user.set_time = Some(time);
+                    user.set_time = Some(now);
                 }
             }
         }
 
-        if let Some(res) = user.last_time.map(|x| x + ratelimit.delay).and_then(|x| {
-            if time < x {
-                Some(x - time)
-            } else {
-                None
-            }
-        }) {
+        if let Some(res) = user
+            .last_time
+            .and_then(|x| now.checked_duration_since(x + ratelimit.delay))
+        {
             return Some(res);
         } else {
             user.tickets += 1;
-            user.last_time = Some(time);
+            user.last_time = Some(now);
         }
 
         None
