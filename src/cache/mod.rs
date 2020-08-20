@@ -973,7 +973,7 @@ impl Default for Cache {
 
 #[cfg(test)]
 mod test {
-    use chrono::DateTime;
+    use chrono::{DateTime, Utc};
     use serde_json::{Number, Value};
     use std::{
         collections::HashMap,
@@ -994,7 +994,8 @@ mod test {
         let datetime = DateTime::parse_from_str(
             "1983 Apr 13 12:09:14.274 +0000",
             "%Y %b %d %H:%M:%S%.3f %z",
-        ).unwrap();
+        ).unwrap()
+        .with_timezone(&Utc);
         let mut event = MessageCreateEvent {
             message: Message {
                 id: MessageId(3),

@@ -1,4 +1,4 @@
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use crate::model::prelude::*;
 
 #[cfg(feature = "cache")]
@@ -70,7 +70,7 @@ pub struct GuildChannel {
     /// The timestamp of the time a pin was most recently made.
     ///
     /// **Note**: This is only available for text channels.
-    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
+    pub last_pin_timestamp: Option<DateTime<Utc>>,
     /// The name of the channel.
     pub name: String,
     /// Permission overwrites for [`Member`]s and for [`Role`]s.

@@ -27,6 +27,7 @@ use crate::model::{
 
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 
 use tokio::sync::Mutex;
 use futures::future::BoxFuture;
@@ -50,7 +51,7 @@ pub enum DispatchError {
     CheckFailed(&'static str, Reason),
     /// When the command requester has exceeded a ratelimit bucket. The attached
     /// value is the time a requester has to wait to run the command again.
-    Ratelimited(i64),
+    Ratelimited(Duration),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -309,8 +310,10 @@ impl StandardFramework {
                     None => true,
                 };
 
-                if apply && rate_limit > 0 {
-                    return Some(DispatchError::Ratelimited(rate_limit));
+                if let Some(rate_limit)= rate_limit {
+                    if apply {
+                        return Some(DispatchError::Ratelimited(rate_limit))
+                    }
                 }
             }
         }

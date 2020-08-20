@@ -1,6 +1,6 @@
 //! Models relating to Discord channels.
 
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use crate::model::prelude::*;
 use serde_json::Value;
 use std::fmt::Display;
@@ -62,7 +62,7 @@ pub struct Message {
     /// The content of the message.
     pub content: String,
     /// The timestamp of the last time the message was updated, if it was.
-    pub edited_timestamp: Option<DateTime<FixedOffset>>,
+    pub edited_timestamp: Option<DateTime<Utc>>,
     /// Array of embeds sent with the message.
     pub embeds: Vec<Embed>,
     /// The Id of the [`Guild`] that the message was sent in. This value will
@@ -96,7 +96,7 @@ pub struct Message {
     #[serde(default)]
     pub reactions: Vec<MessageReaction>,
     /// Initial message creation timestamp, calculated from its Id.
-    pub timestamp: DateTime<FixedOffset>,
+    pub timestamp: DateTime<Utc>,
     /// Indicator of whether the command is to be played back via
     /// text-to-speech.
     ///

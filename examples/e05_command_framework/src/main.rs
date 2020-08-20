@@ -166,10 +166,10 @@ async fn normal_message(_ctx: &Context, msg: &Message) {
 
 #[hook]
 async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
-    if let DispatchError::Ratelimited(seconds) = error {
+    if let DispatchError::Ratelimited(duration) = error {
         let _ = msg
             .channel_id
-            .say(&ctx.http, &format!("Try this again in {} seconds.", seconds))
+            .say(&ctx.http, &format!("Try this again in {} seconds.", duration.as_secs()))
             .await;
     }
 }
@@ -179,10 +179,10 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
 use serenity::{futures::future::BoxFuture, FutureExt};
 fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, error: DispatchError) -> BoxFuture<'fut, ()> {
     async move {
-        if let DispatchError::Ratelimited(seconds) = error {
+        if let DispatchError::Ratelimited(duration) = error {
             let _ = msg
                 .channel_id
-                .say(&ctx.http, &format!("Try this again in {} seconds.", seconds))
+                .say(&ctx.http, &format!("Try this again in {} seconds.", duration.as_secs()))
                 .await;
         };
     }.boxed()

@@ -1,5 +1,5 @@
 use crate::model::prelude::*;
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use std::fmt::{
     Display,
     Formatter,
@@ -29,7 +29,7 @@ pub struct Member {
     /// The unique Id of the guild that the member is a part of.
     pub guild_id: GuildId,
     /// Timestamp representing the date when the member joined.
-    pub joined_at: Option<DateTime<FixedOffset>>,
+    pub joined_at: Option<DateTime<Utc>>,
     /// Indicator of whether the member can speak in voice channels.
     pub mute: bool,
     /// The member's nickname, if present.
@@ -493,7 +493,7 @@ pub struct PartialMember {
     /// Indicator of whether the member can hear in voice channels.
     pub deaf: bool,
     /// Timestamp representing the date when the member joined.
-    pub joined_at: Option<DateTime<FixedOffset>>,
+    pub joined_at: Option<DateTime<Utc>>,
     /// Indicator of whether the member can speak in voice channels.
     pub mute: bool,
     /// The member's nickname, if present.

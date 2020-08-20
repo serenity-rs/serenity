@@ -1,4 +1,3 @@
-use chrono::Utc;
 use crate::constants::{self, OpCode};
 use crate::gateway::{CurrentPresence, WsStream};
 use crate::client::bridge::gateway::GatewayIntents;
@@ -7,6 +6,7 @@ use crate::internal::ws_impl::SenderExt;
 use crate::model::id::GuildId;
 use serde_json::json;
 use std::env::consts;
+use std::time::SystemTime;
 use log::{debug, trace};
 use async_trait::async_trait;
 
@@ -101,7 +101,7 @@ impl WebSocketGatewayClientExt for WsStream {
         current_presence: &CurrentPresence,
     ) -> Result<()> {
         let &(ref activity, ref status) = current_presence;
-        let now = Utc::now().timestamp() as u64;
+        let now = SystemTime::now();
 
         debug!("[Shard {:?}] Sending presence update", shard_info);
 

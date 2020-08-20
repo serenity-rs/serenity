@@ -1,22 +1,22 @@
-use chrono::Utc;
 use crate::client::Context;
 use crate::model::id::{ChannelId, GuildId, UserId};
-use std::collections::HashMap;
 use futures::future::BoxFuture;
+use std::collections::HashMap;
+use std::time::{Duration, Instant};
 
-type Check = for<'fut> fn(&'fut Context, Option<GuildId>, ChannelId, UserId)
-                          -> BoxFuture<'fut, bool>;
+type Check =
+    for<'fut> fn(&'fut Context, Option<GuildId>, ChannelId, UserId) -> BoxFuture<'fut, bool>;
 
 pub(crate) struct Ratelimit {
-    pub delay: i64,
-    pub limit: Option<(i64, i32)>,
+    pub delay: Duration,
+    pub limit: Option<(Duration, u32)>,
 }
 
 #[derive(Default)]
 pub(crate) struct MemberRatelimit {
-    pub last_time: i64,
-    pub set_time: i64,
-    pub tickets: i32,
+    pub last_time: Option<Instant>,
+    pub set_time: Option<Instant>,
+    pub tickets: u32,
 }
 
 pub(crate) struct Bucket {
@@ -26,39 +26,46 @@ pub(crate) struct Bucket {
 }
 
 impl Bucket {
-    pub fn take(&mut self, user_id: u64) -> i64 {
-        let time = Utc::now().timestamp();
-        let user = self.users
-            .entry(user_id)
-            .or_insert_with(MemberRatelimit::default);
+    pub fn take(&mut self, user_id: u64) -> Option<Duration> {
+        let now = Instant::now();
+        let Self {
+            users, ratelimit, ..
+        } = self;
+        let user = users.entry(user_id).or_default();
 
-        if let Some((timespan, limit)) = self.ratelimit.limit {
+        if let Some((timespan, limit)) = ratelimit.limit {
             if (user.tickets + 1) > limit {
-                if time < (user.set_time + timespan) {
-                    return (user.set_time + timespan) - time;
+                if let Some(res) = user
+                    .set_time
+                    .and_then(|x| now.checked_duration_since(x + timespan))
+                {
+                    return Some(res);
                 } else {
                     user.tickets = 0;
-                    user.set_time = time;
+                    user.set_time = Some(now);
                 }
             }
         }
 
-        if time < user.last_time + self.ratelimit.delay {
-            (user.last_time + self.ratelimit.delay) - time
+        if let Some(res) = user
+            .last_time
+            .and_then(|x| now.checked_duration_since(x + ratelimit.delay))
+        {
+            return Some(res);
         } else {
             user.tickets += 1;
-            user.last_time = time;
-
-            0
+            user.last_time = Some(now);
         }
+
+        None
     }
 }
 
 #[derive(Default)]
 pub struct BucketBuilder {
-    pub(crate) delay: i64,
-    pub(crate) time_span: i64,
-    pub(crate) limit: i32,
+    pub(crate) delay: Duration,
+    pub(crate) time_span: Duration,
+    pub(crate) limit: u32,
     pub(crate) check: Option<Check>,
 }
 
@@ -67,8 +74,8 @@ impl BucketBuilder {
     ///
     /// Expressed in seconds.
     #[inline]
-    pub fn delay(&mut self, n: i64) -> &mut Self {
-        self.delay = n;
+    pub fn delay(&mut self, secs: u64) -> &mut Self {
+        self.delay = Duration::from_secs(secs);
 
         self
     }
@@ -77,8 +84,8 @@ impl BucketBuilder {
     ///
     /// Expressed in seconds.
     #[inline]
-    pub fn time_span(&mut self, n: i64) -> &mut Self {
-        self.time_span = n;
+    pub fn time_span(&mut self, secs: u64) -> &mut Self {
+        self.time_span = Duration::from_secs(secs);
 
         self
     }
@@ -89,7 +96,7 @@ impl BucketBuilder {
     ///
     /// [`time_span`]: #method.time_span
     #[inline]
-    pub fn limit(&mut self, n: i32) -> &mut Self {
+    pub fn limit(&mut self, n: u32) -> &mut Self {
         self.limit = n;
 
         self

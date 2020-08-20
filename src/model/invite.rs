@@ -2,7 +2,7 @@
 
 use std::ops::Deref;
 
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 
 use super::prelude::*;
 
@@ -300,7 +300,7 @@ pub struct RichInvite {
     /// The unique code for the invite.
     pub code: String,
     /// When the invite was created.
-    pub created_at: DateTime<FixedOffset>,
+    pub created_at: DateTime<Utc>,
     /// A representation of the minimal amount of information needed about the
     /// [`Guild`] being invited to.
     ///

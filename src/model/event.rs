@@ -1,6 +1,6 @@
 //! All the events this library handles.
 
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use serde::de::Error as DeError;
 use serde::ser::{
     Serialize,
@@ -191,7 +191,7 @@ impl Serialize for ChannelDeleteEvent {
 pub struct ChannelPinsUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
-    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
+    pub last_pin_timestamp: Option<DateTime<Utc>>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -918,8 +918,8 @@ pub struct MessageUpdateEvent {
     pub nonce: Option<String>,
     pub tts: Option<bool>,
     pub pinned: Option<bool>,
-    pub timestamp: Option<DateTime<FixedOffset>>,
-    pub edited_timestamp: Option<DateTime<FixedOffset>>,
+    pub timestamp: Option<DateTime<Utc>>,
+    pub edited_timestamp: Option<DateTime<Utc>>,
     pub author: Option<User>,
     pub mention_everyone: Option<bool>,
     pub mentions: Option<Vec<User>>,

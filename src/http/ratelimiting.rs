@@ -52,10 +52,11 @@ use std::{
         self,
         FromStr,
     },
+    time::SystemTime,
     i64,
     u64,
 };
-use tokio::time::{Duration, delay_for};
+use tokio::time::{delay_for, Duration};
 use super::{HttpError, Request};
 use log::debug;
 
@@ -122,7 +123,9 @@ impl Ratelimiter {
     /// let reader = routes.read().await;
     ///
     /// if let Some(route) = reader.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().await.reset());
+    ///     if let Some(reset) = route.lock().await.reset() {
+    ///         println!("Reset time at: {:?}", reset);
+    ///     }
     /// }
     /// #     Ok(())
     /// # }
@@ -231,23 +234,20 @@ pub struct Ratelimit {
     limit: i64,
     /// The number of requests remaining in the period of time.
     remaining: i64,
-    /// The absolute time in milliseconds when the interval resets.
-    reset: i64,
-    /// The total time in milliseconds when the interval resets.
-    reset_after: i64,
+    /// The absolute time when the interval resets.
+    reset: Option<SystemTime>,
+    /// The total time when the interval resets.
+    reset_after: Option<Duration>,
 }
 
 impl Ratelimit {
     #[cfg(feature = "absolute_ratelimits")]
-    fn get_delay(&self) -> i64 {
-        use chrono::Utc;
-
-        let now = Utc::now().timestamp_millis();
-        self.reset - now
+    fn get_delay(&self) -> Option<Duration> {
+        self.reset?.duration_since(SystemTime::now()).ok()
     }
 
     #[cfg(not(feature = "absolute_ratelimits"))]
-    fn get_delay(&self) -> i64 {
+    fn get_delay(&self) -> Option<Duration> {
         self.reset_after
     }
 
@@ -256,25 +256,25 @@ impl Ratelimit {
             return;
         }
 
-		let delay = self.get_delay();
+		let delay = match self.get_delay() {
+            Some(delay) => delay,
+            None => {
+                // We're probably in the past.
+                self.remaining = self.limit;
 
-		if delay < 0 {
-			// We're probably in the past.
-			self.remaining = self.limit;
-
-			return;
-		}
-
+                return;
+            }
+        };
+        
         if self.remaining() == 0 {
-            let delay = delay as u64;
 
             debug!(
-                "Pre-emptive ratelimit on route {:?} for {:?}ms",
+                "Pre-emptive ratelimit on route {:?} for {}ms",
                 route,
-                delay,
+                delay.as_millis(),
             );
 
-            delay_for(Duration::from_millis(delay)).await;
+            delay_for(delay).await;
 
             return;
         }
@@ -292,11 +292,11 @@ impl Ratelimit {
         }
 
         if let Some(reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
-            self.reset = (reset * 1000f64) as i64;
+            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
         }
 
         if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
-            self.reset_after = (reset_after * 1000f64) as i64;
+            self.reset_after = Some(Duration::from_secs_f64(reset_after));
         }
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
@@ -325,13 +325,13 @@ impl Ratelimit {
 
     /// The absolute time in milliseconds when the interval resets.
     #[inline]
-    pub fn reset(&self) -> i64 {
+    pub fn reset(&self) -> Option<SystemTime> {
         self.reset
     }
 
     /// The total time in milliseconds when the interval resets.
     #[inline]
-    pub fn reset_after(&self) -> i64 {
+    pub fn reset_after(&self) -> Option<Duration> {
         self.reset_after
     }
 }
@@ -341,8 +341,8 @@ impl Default for Ratelimit {
         Self {
             limit: i64::MAX,
             remaining: i64::MAX,
-            reset: i64::MAX,
-            reset_after: i64::MAX,
+            reset:  None,
+            reset_after:  None,
         }
     }
 }
