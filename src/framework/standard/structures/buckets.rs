@@ -9,14 +9,14 @@ type Check =
 
 pub(crate) struct Ratelimit {
     pub delay: Duration,
-    pub limit: Option<(Duration, i32)>,
+    pub limit: Option<(Duration, u32)>,
 }
 
 #[derive(Default)]
 pub(crate) struct MemberRatelimit {
     pub last_time: Option<Instant>,
     pub set_time: Option<Instant>,
-    pub tickets: i32,
+    pub tickets: u32,
 }
 
 pub(crate) struct Bucket {
@@ -71,7 +71,7 @@ impl Bucket {
 pub struct BucketBuilder {
     pub(crate) delay: Duration,
     pub(crate) time_span: Duration,
-    pub(crate) limit: i32,
+    pub(crate) limit: u32,
     pub(crate) check: Option<Check>,
 }
 
@@ -102,7 +102,7 @@ impl BucketBuilder {
     ///
     /// [`time_span`]: #method.time_span
     #[inline]
-    pub fn limit(&mut self, n: i32) -> &mut Self {
+    pub fn limit(&mut self, n: u32) -> &mut Self {
         self.limit = n;
 
         self
