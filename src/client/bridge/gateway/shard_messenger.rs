@@ -251,3 +251,9 @@ impl ShardMessenger {
         let _ = self.send_to_shard(ShardRunnerMessage::SetReactionFilter(collector));
     }
 }
+
+impl AsRef<ShardMessenger> for ShardMessenger {
+    fn as_ref(&self) -> &ShardMessenger {
+        self
+    }
+}
