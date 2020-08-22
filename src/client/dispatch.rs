@@ -594,6 +594,20 @@ async fn handle_event(
                 }}
             });
         },
+        DispatchEvent::Model(Event::InviteCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.invite_create(context, event).await;
+            });
+        },
+        DispatchEvent::Model(Event::InviteDelete(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.invite_delete(context, event).await;
+            });
+        },
         // Already handled by the framework check macro
         DispatchEvent::Model(Event::MessageCreate(_)) => {},
         DispatchEvent::Model(Event::MessageDeleteBulk(event)) => {
