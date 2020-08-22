@@ -825,6 +825,22 @@ impl Guild {
             .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
+    /// Gets all [`Emoji`]s of this guild via HTTP.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    #[inline]
+    pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
+        self.id.emojis(http).await
+    }
+
+    /// Gets an [`Emoji`] of this guild by its ID via HTTP.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    #[inline]
+    pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
+        self.id.emoji(http, emoji_id).await
+    }
+
     /// Gets all integration of the guild.
     ///
     /// This performs a request over the REST API.
