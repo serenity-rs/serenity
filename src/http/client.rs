@@ -1009,6 +1009,24 @@ impl Http {
         }).await
     }
 
+    /// Gets all emojis of a guild.
+    pub async fn get_emojis(&self, guild_id: u64) -> Result<Vec<Emoji>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetEmojis { guild_id },
+        }).await
+    }
+
+    /// Gets information about an emoji in a guild.
+    pub async fn get_emoji(&self, guild_id: u64, emoji_id: u64) -> Result<Emoji> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetEmoji { guild_id, emoji_id },
+        }).await
+    }
+
     /// Gets current gateway.
     pub async fn get_gateway(&self) -> Result<Gateway> {
         self.fire(Request {

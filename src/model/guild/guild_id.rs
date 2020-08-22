@@ -424,6 +424,22 @@ impl GuildId {
         http.as_ref().get_guild(self.0).await
     }
 
+    /// Gets all [`Emoji`]s of this guild via HTTP.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    #[inline]
+    pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
+        http.as_ref().get_emojis(self.0).await
+    }
+
+    /// Gets an [`Emoji`] of this guild by its ID via HTTP.
+    ///
+    /// [`Emoji`]: struct.Emoji.html
+    #[inline]
+    pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
+        http.as_ref().get_emoji(self.0, emoji_id.0).await
+    }
+
     /// Gets all integration of the guild.
     ///
     /// This performs a request over the REST API.
