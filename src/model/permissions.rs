@@ -60,7 +60,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 /// Using this macro
 ///
 /// ```rust,no_run
-/// generate_get_permission_names!{
+/// generate_get_permission_names! {
 ///     add_reactions: "Add Reactions",
 ///     administrator: "Administrator"
 /// };
