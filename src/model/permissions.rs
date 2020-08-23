@@ -50,6 +50,61 @@ use super::utils::U64Visitor;
 use bitflags::__impl_bitflags;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
+/// This macro generates the [`Permissions::get_permission_names`] method.
+///
+/// It is invoked by passing the names of all methods used to check for
+/// permissions along with their names displayed inside Discord.
+///
+/// ## Examples
+///
+/// Using this macro
+///
+/// ```rust,no_run
+/// generate_get_permission_names!{
+///     add_reactions: "Add Reactions",
+///     administrator: "Administrator"
+/// };
+/// ```
+///
+/// Generates this implementation:
+///
+/// ```
+/// impl Permissions {
+///     fn get_permission_names(self) -> Vec<&'static str> {
+///         let mut names = Vec::new();
+///
+///         if self.add_reactions() {
+///             names.push("Add Reactions");
+///         }
+///         if self.administrator() {
+///             names.push("Administrator");
+///         }
+///
+///         names
+///     }
+/// }
+/// ```
+///
+/// [`Permissions::get_permission_names`]: struct.Permissions.html#method.get_permission_names
+macro_rules! generate_get_permission_names {
+    {$ ($perm:ident: $name:expr),*} => {
+        impl Permissions {
+            /// Returns a list of names of all contained permissions.
+            pub fn get_permission_names(self) -> Vec<&'static str> {
+                let mut names = Vec::new();
+
+                $(
+                    if self.$perm() {
+                        names.push($name);
+                    }
+                )*
+
+                names
+            }
+        }
+    }
+}
+
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.
 ///
@@ -271,6 +326,40 @@ __impl_bitflags! {
     }
 }
 
+generate_get_permission_names! {
+    add_reactions: "Add Reactions",
+    administrator: "Administrator",
+    attach_files: "Attach Files",
+    ban_members: "Ban Members",
+    change_nickname: "Change Nickname",
+    connect: "Connect",
+    create_invite: "Create Invite",
+    deafen_members: "Deafen Members",
+    embed_links: "Embed Links",
+    external_emojis: "Use External Emojis",
+    kick_members: "Kick Members",
+    manage_channels: "Manage Channels",
+    manage_emojis: "Manage Emojis",
+    manage_guild: "Manage Guilds",
+    manage_messages: "Manage Messages",
+    manage_nicknames: "Manage Nicknames",
+    manage_roles: "Manage Roles",
+    manage_webhooks: "Manage Webhooks",
+    mention_everyone: "Mention Everyone",
+    move_members: "Move Members",
+    mute_members: "Mute Members",
+    priority_speaker: "Priority Speaker",
+    read_message_history: "Read Message History",
+    read_messages: "Read Messages",
+    send_messages: "Send Messages",
+    send_tts_messages: "Send TTS Messages",
+    speak: "Speak",
+    stream: "Stream",
+    use_external_emojis: "Use External Emojis",
+    use_vad: "Use Voice Activity",
+    view_audit_log: "View Audit Log"
+}
+
 #[cfg(feature = "model")]
 impl Permissions {
     /// Shorthand for checking that the set of permissions contains the
@@ -458,107 +547,6 @@ impl Permissions {
     ///
     /// [Use VAD]: #associatedconstant.USE_VAD
     pub fn use_vad(self) -> bool { self.contains(Self::USE_VAD) }
-
-    /// Returns a list of names of all contained permissions.
-    fn get_permissions_names(self) -> Vec<&'static str> {
-        let mut permissions = Vec::new();
-
-        if self.add_reactions() {
-            permissions.push("Add Reactions");
-        }
-        if self.administrator() {
-            permissions.push("Administrator");
-        }
-        if self.attach_files() {
-            permissions.push("Attach Files");
-        }
-        if self.ban_members() {
-            permissions.push("Ban Members");
-        }
-        if self.change_nickname() {
-            permissions.push("Change Nickname");
-        }
-        if self.connect() {
-            permissions.push("Connect");
-        }
-        if self.create_invite() {
-            permissions.push("Create Invite");
-        }
-        if self.deafen_members() {
-            permissions.push("Deafen Members");
-        }
-        if self.embed_links() {
-            permissions.push("Embed Links");
-        }
-        if self.external_emojis() {
-            permissions.push("Use External Emojis");
-        }
-        if self.kick_members() {
-            permissions.push("Kick Members");
-        }
-        if self.manage_channels() {
-            permissions.push("Manage Channels");
-        }
-        if self.manage_emojis() {
-            permissions.push("Manage Emojis");
-        }
-        if self.manage_guild() {
-            permissions.push("Manage Guilds");
-        }
-        if self.manage_messages() {
-            permissions.push("Manage Messages");
-        }
-        if self.manage_nicknames() {
-            permissions.push("Manage Nicknames");
-        }
-        if self.manage_roles() {
-            permissions.push("Manage Roles");
-        }
-        if self.manage_webhooks() {
-            permissions.push("Manage Webhooks");
-        }
-        if self.mention_everyone() {
-            permissions.push("Mention Everyone");
-        }
-        if self.move_members() {
-            permissions.push("Move Members");
-        }
-        if self.mute_members() {
-            permissions.push("Mute Members");
-        }
-        if self.priority_speaker() {
-            permissions.push("Priority Speaker");
-        }
-        if self.read_message_history() {
-            permissions.push("Read Message History");
-        }
-        if self.read_messages() {
-            permissions.push("Read Messages");
-        }
-        if self.send_messages() {
-            permissions.push("Send Messages");
-        }
-        if self.send_tts_messages() {
-            permissions.push("Send TTS Messages");
-        }
-        if self.speak() {
-            permissions.push("Speak");
-        }
-        if self.stream() {
-            permissions.push("Stream")
-        }
-        if self.use_external_emojis() {
-            permissions.push("Use External Emojis")
-        }
-        if self.use_vad() {
-            permissions.push("Use Voice Activity")
-        }
-        if self.view_audit_log() {
-            permissions.push("View Audit Log")
-        }
-
-        permissions
-    }
 }
 
 impl Default for Permissions {
@@ -582,7 +570,7 @@ impl Serialize for Permissions {
 
 impl Display for Permissions {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
-        let names = self.get_permissions_names();
+        let names = self.get_permission_names();
 
         let total = names.len();
         for (i, &name) in names.iter().enumerate() {
