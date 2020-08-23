@@ -587,14 +587,14 @@ impl Display for Permissions {
         let total = names.len();
         for (i, &name) in names.iter().enumerate() {
             if i > 0 && i != total - 1 {
-                let _ = write!(f, ",");
+                let _ = write!(f, ", ");
             }
 
             if total > 1 && i == total - 1 {
-                let _ = write!(f, " and");
+                let _ = write!(f, " and ");
             }
 
-            let _ = write!(f, " {}", name);
+            let _ = write!(f, "{}", name);
         }
 
         Ok(())
