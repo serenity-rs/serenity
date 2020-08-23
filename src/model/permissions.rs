@@ -48,6 +48,7 @@ use serde::de::{Deserialize, Deserializer};
 use serde::ser::{Serialize, Serializer};
 use super::utils::U64Visitor;
 use bitflags::__impl_bitflags;
+use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.
@@ -457,6 +458,107 @@ impl Permissions {
     ///
     /// [Use VAD]: #associatedconstant.USE_VAD
     pub fn use_vad(self) -> bool { self.contains(Self::USE_VAD) }
+
+    /// Returns a list of names of all contained permissions.
+    fn get_permissions_names(self) -> Vec<&'static str> {
+        let mut permissions = Vec::new();
+
+        if self.add_reactions() {
+            permissions.push("Add Reactions");
+        }
+        if self.administrator() {
+            permissions.push("Administrator");
+        }
+        if self.attach_files() {
+            permissions.push("Attach Files");
+        }
+        if self.ban_members() {
+            permissions.push("Ban Members");
+        }
+        if self.change_nickname() {
+            permissions.push("Change Nickname");
+        }
+        if self.connect() {
+            permissions.push("Connect");
+        }
+        if self.create_invite() {
+            permissions.push("Create Invite");
+        }
+        if self.deafen_members() {
+            permissions.push("Deafen Members");
+        }
+        if self.embed_links() {
+            permissions.push("Embed Links");
+        }
+        if self.external_emojis() {
+            permissions.push("Use External Emojis");
+        }
+        if self.kick_members() {
+            permissions.push("Kick Members");
+        }
+        if self.manage_channels() {
+            permissions.push("Manage Channels");
+        }
+        if self.manage_emojis() {
+            permissions.push("Manage Emojis");
+        }
+        if self.manage_guild() {
+            permissions.push("Manage Guilds");
+        }
+        if self.manage_messages() {
+            permissions.push("Manage Messages");
+        }
+        if self.manage_nicknames() {
+            permissions.push("Manage Nicknames");
+        }
+        if self.manage_roles() {
+            permissions.push("Manage Roles");
+        }
+        if self.manage_webhooks() {
+            permissions.push("Manage Webhooks");
+        }
+        if self.mention_everyone() {
+            permissions.push("Mention Everyone");
+        }
+        if self.move_members() {
+            permissions.push("Move Members");
+        }
+        if self.mute_members() {
+            permissions.push("Mute Members");
+        }
+        if self.priority_speaker() {
+            permissions.push("Priority Speaker");
+        }
+        if self.read_message_history() {
+            permissions.push("Read Message History");
+        }
+        if self.read_messages() {
+            permissions.push("Read Messages");
+        }
+        if self.send_messages() {
+            permissions.push("Send Messages");
+        }
+        if self.send_tts_messages() {
+            permissions.push("Send TTS Messages");
+        }
+        if self.speak() {
+            permissions.push("Speak");
+        }
+        if self.stream() {
+            permissions.push("Stream")
+        }
+        if self.use_external_emojis() {
+            permissions.push("Use External Emojis")
+        }
+        if self.use_vad() {
+            permissions.push("Use Voice Activity")
+        }
+        if self.view_audit_log() {
+            permissions.push("View Audit Log")
+        }
+
+        permissions
+    }
 }
 
 impl Default for Permissions {
@@ -475,5 +577,26 @@ impl Serialize for Permissions {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where S: Serializer {
         serializer.serialize_u64(self.bits())
+    }
+}
+
+impl Display for Permissions {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        let names = self.get_permissions_names();
+
+        let total = names.len();
+        for (i, &name) in names.iter().enumerate() {
+            if i > 0 && i != total - 1 {
+                let _ = write!(f, ",");
+            }
+
+            if total > 1 && i == total - 1 {
+                let _ = write!(f, " and");
+            }
+
+            let _ = write!(f, " {}", name);
+        }
+
+        Ok(())
     }
 }
