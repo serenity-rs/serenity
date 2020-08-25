@@ -19,7 +19,6 @@ use crate::utils;
 use crate::http::{Http, CacheHttp};
 #[cfg(feature = "model")]
 use serde_json::json;
-#[cfg(feature = "cache")]
 use futures::stream::Stream;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
@@ -446,7 +445,6 @@ impl ChannelId {
     /// ```
     ///
     /// [`messages`]: ../id/struct.ChannelId.html#method.messages
-    #[cfg(feature = "cache")]
     pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item=Result<Message>> {
         MessagesIter::<H>::stream(http, self)
     }
@@ -762,7 +760,7 @@ impl<'a> From<&'a GuildChannel> for ChannelId {
 ///
 /// [`ChannelId::messages_iter`]: ../id/struct.ChannelId.html#method.messages_iter
 #[derive(Clone, Debug)]
-#[cfg(all(feature = "model", feature = "cache"))]
+#[cfg(feature = "model")]
 pub struct MessagesIter<H: AsRef<Http>> {
     channel_id: ChannelId,
     http: H,
@@ -771,7 +769,7 @@ pub struct MessagesIter<H: AsRef<Http>> {
     tried_fetch: bool,
 }
 
-#[cfg(all(feature = "model", feature = "cache"))]
+#[cfg(feature = "model")]
 impl<H: AsRef<Http>> MessagesIter<H> {
     fn new(channel_id: ChannelId, http: H) -> MessagesIter<H> {
         MessagesIter {
