@@ -840,15 +840,15 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// # async fn run() {
     /// # let channel_id = ChannelId::default();
     /// # let ctx = Http::default();
-    /// use serenity::model::guild::MessagesIter;
+    /// use serenity::model::channel::MessagesIter;
     /// use serenity::futures::StreamExt;
     ///
     /// let mut messages = MessagesIter::<Http>::stream(&ctx, channel_id).boxed();
     /// while let Some(message_result) = messages.next().await {
     ///     match message_result {
     ///         Ok(message) => println!(
-    ///             "{} is {}",
-    ///             message,
+    ///             "{} said \"{}\"",
+    ///             message.author.name,
     ///             message.content,
     ///         ),
     ///         Err(error) => eprintln!("Uh oh! Error: {}", error),
