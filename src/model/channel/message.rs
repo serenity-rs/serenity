@@ -578,7 +578,7 @@ impl Message {
             }
         }
 
-        let gen = format!("{}: {}", self.author.mention(), content);
+        let gen = format!("{} {}", self.author.mention(), content);
 
         let map = json!({
             "content": gen,
