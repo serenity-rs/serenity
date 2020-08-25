@@ -810,8 +810,6 @@ impl<H: AsRef<Http>> MessagesIter<H> {
             )
             .await?;
 
-        println!("{:?}", &self.buffer[0]);
-
         // The messages received are in reverse order, that is, newest first
         // and oldest last. Therefore, the "last" message is actually the first
         // one in the buffer.
