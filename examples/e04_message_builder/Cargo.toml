@@ -6,3 +6,4 @@ edition = "2018"
 
 [dependencies]
 serenity = { path = "../../" }
+tokio = { version = "0.2", features = ["macros"] }

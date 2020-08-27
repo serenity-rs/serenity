@@ -9,6 +9,7 @@
 use std::{env, sync::Arc};
 
 use serenity::{
+    async_trait,
     client::{bridge::voice::ClientVoiceManager, Client, Context, EventHandler},
     framework::{
         StandardFramework,
@@ -17,15 +18,9 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{
-        channel::Message,
-        event::{VoiceClientConnect, VoiceClientDisconnect, VoiceSpeaking},
-        gateway::Ready,
-        id::ChannelId,
-        misc::Mentionable,
-    },
+    model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
     prelude::*,
-    voice::{CoreEvent, EventContext},
+    voice::AudioReceiver,
     Result as SerenityResult,
 };
 
@@ -37,9 +32,61 @@ impl TypeMapKey for VoiceManager {
 
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {
-    fn ready(&self, _: Context, ready: Ready) {
+    async fn ready(&self, _: Context, ready: Ready) {
         println!("{} is connected!", ready.user.name);
+    }
+}
+
+struct Receiver;
+
+impl Receiver {
+    pub fn new() -> Self {
+        // You can manage state here, such as a buffer of audio packet bytes so
+        // you can later store them in intervals.
+        Self { }
+    }
+}
+
+#[async_trait]
+impl AudioReceiver for Receiver {
+    async fn speaking_update(&self, _ssrc: u32, _user_id: u64, _speaking: bool) {
+        // You can implement logic here so that you can differentiate users'
+        // SSRCs and map the SSRC to the User ID and maintain a state in
+        // `Receiver`. Using this map, you can map the `ssrc` in `voice_packet`
+        // to the user ID and handle their audio packets separately.
+    }
+
+    async fn voice_packet(
+        &self,
+        ssrc: u32,
+        sequence: u16,
+        _timestamp: u32,
+        _stereo: bool,
+        data: &[i16],
+        compressed_size: usize,
+    ) {
+        println!("Audio packet's first 5 bytes: {:?}", data.get(..5));
+        println!(
+            "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
+            sequence,
+            data.len(),
+            compressed_size,
+            ssrc,
+        );
+    }
+
+    async fn client_connect(&self, _ssrc: u32, _user_id: u64) {
+        // You can implement your own logic here to handle a user who has joined the
+        // voice channel e.g., allocate structures, map their SSRC to User ID.
+    }
+
+    async fn client_disconnect(&self, _user_id: u64) {
+        // You can implement your own logic here to handle a user who has left the
+        // voice channel e.g., finalise processing of statistics etc.
+        // You will typically need to map the User ID to their SSRC; observed when
+        // speaking or connecting.
     }
 }
 
@@ -47,212 +94,98 @@ impl EventHandler for Handler {
 #[commands(join, leave, ping)]
 struct General;
 
-fn main() {
+#[tokio::main]
+async fn main() {
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
-    let mut client = Client::new(&token, Handler).expect("Err creating client");
+
+    let framework = StandardFramework::new()
+        .configure(|c| c
+            .prefix("~"))
+        .group(&GENERAL_GROUP);
+
+    let mut client = Client::new(&token)
+        .event_handler(Handler)
+        .framework(framework)
+        .await
+        .expect("Err creating client");
 
     // Obtain a lock to the data owned by the client, and insert the client's
     // voice manager into it. This allows the voice manager to be accessible by
     // event handlers and framework commands.
     {
-        let mut data = client.data.write();
+        let mut data = client.data.write().await;
         data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
     }
 
-    client.with_framework(StandardFramework::new()
-        .configure(|c| c
-            .prefix("~"))
-        .group(&GENERAL_GROUP));
-
-    let _ = client.start().map_err(|why| println!("Client ended: {:?}", why));
+    let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
 }
 
 #[command]
-fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
+async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
         Err(_) => {
-            check_msg(msg.reply(ctx, "Requires a valid voice channel ID be given"));
+            check_msg(msg.reply(ctx, "Requires a valid voice channel ID be given").await);
 
             return Ok(());
         },
     };
 
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
+        Some(id) => id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.join(guild_id, connect_to) {
-        // Receiving audio (and similar tasks) are achieved
-        // by creating a global event handler.
-        handler.add_global_event(
-            CoreEvent::SpeakingStateUpdate.into(),
-            |ctx| {
-                if let EventContext::SpeakingStateUpdate(
-                    VoiceSpeaking {speaking, ssrc, user_id, ..}
-                ) = ctx {
-                    // Discord voice calls use RTP, where every sender uses a randomly allocated
-                    // *Synchronisation Source* (SSRC) to allow receivers to tell which audio
-                    // stream a received packet belongs to. As this number is not derived from
-                    // the sender's user_id, only Discord Voice Gateway messages like this one
-                    // inform us about which random SSRC a user has been allocated. Future voice
-                    // packets will contain *only* the SSRC.
-                    //
-                    // You can implement logic here so that you can differentiate users'
-                    // SSRCs and map the SSRC to the User ID and maintain this state.
-                    // Using this map, you can map the `ssrc` in `voice_packet`
-                    // to the user ID and handle their audio packets separately.
-
-                    println!(
-                        "Speaking state update: user {:?} has SSRC {:?}, using {:?}",
-                        user_id,
-                        ssrc,
-                        speaking,
-                    );
-                }
-
-                None
-            }
-        );
-
-        handler.add_global_event(
-            CoreEvent::SpeakingUpdate.into(),
-            |ctx| {
-                if let EventContext::SpeakingUpdate {ssrc, speaking} = ctx {
-                    // You can implement logic here which reacts to a user starting
-                    // or stopping speaking.
-
-                    println!(
-                        "Source {} has {} speaking.",
-                        ssrc,
-                        if *speaking {"started"} else {"stopped"},
-                    );
-                }
-
-                None
-            }
-        );
-
-        handler.add_global_event(
-            CoreEvent::VoicePacket.into(),
-            |ctx| {
-                if let EventContext::VoicePacket {audio, packet, payload_offset} = ctx {
-                    // An event which fires for every received audio packet,
-                    // containing the decoded data.
-
-                    println!("Audio packet's first 5 samples: {:?}", audio.get(..5.min(audio.len())));
-                    println!(
-                        "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
-                        packet.sequence.0,
-                        audio.len() * std::mem::size_of::<i16>(),
-                        packet.payload.len(),
-                        packet.ssrc,
-                    );
-                }
-
-                None
-            }
-        );
-
-        handler.add_global_event(
-            CoreEvent::RtcpPacket.into(),
-            |ctx| {
-                if let EventContext::RtcpPacket {packet, payload_offset} = ctx {
-                    // An event which fires for every received rtcp packet,
-                    // containing the call statistics and reporting information.
-                    println!("RTCP packet received: {:?}", packet);
-                }
-
-                None
-            }
-        );
-
-        handler.add_global_event(
-            CoreEvent::ClientConnect.into(),
-            |ctx| {
-                if let EventContext::ClientConnect(
-                    VoiceClientConnect {audio_ssrc, video_ssrc, user_id, ..}
-                ) = ctx {
-                    // You can implement your own logic here to handle a user who has joined the
-                    // voice channel e.g., allocate structures, map their SSRC to User ID.
-
-                    println!(
-                        "Client connected: user {:?} has audio SSRC {:?}, video SSRC {:?}",
-                        user_id,
-                        audio_ssrc,
-                        video_ssrc,
-                    );
-                }
-
-                None
-            }
-        );
-
-        handler.add_global_event(
-            CoreEvent::ClientDisconnect.into(),
-            |ctx| {
-                if let EventContext::ClientDisconnect(
-                    VoiceClientDisconnect {user_id, ..}
-                ) = ctx {
-                    // You can implement your own logic here to handle a user who has left the
-                    // voice channel e.g., finalise processing of statistics etc.
-                    // You will typically need to map the User ID to their SSRC; observed when
-                    // speaking or connecting.
-
-                    println!("Client disconnected: user {:?}", user_id);
-                }
-
-                None
-            }
-        );
-
-        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())));
+        handler.listen(Some(Arc::new(Receiver::new())));
+        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())).await);
     } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel"));
+        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn leave(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.read().guild_channel(msg.channel_id) {
-        Some(channel) => channel.read().guild_id,
+async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
+    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
+        Some(id) => id,
         None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported"));
+            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
 
             return Ok(());
         },
     };
 
-    let manager_lock = ctx.data.read().get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
-    let mut manager = manager_lock.lock();
+    let manager_lock = ctx.data.read().await
+        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
         manager.remove(guild_id);
 
-        check_msg(msg.channel_id.say(&ctx.http,"Left voice channel"));
+        check_msg(msg.channel_id.say(&ctx.http,"Left voice channel").await);
     } else {
-        check_msg(msg.reply(ctx, "Not in a voice channel"));
+        check_msg(msg.reply(ctx, "Not in a voice channel").await);
     }
 
     Ok(())
 }
 
 #[command]
-fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    check_msg(msg.channel_id.say(&ctx.http,"Pong!"));
+async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+    check_msg(msg.channel_id.say(&ctx.http,"Pong!").await);
 
     Ok(())
 }

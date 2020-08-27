@@ -817,6 +817,13 @@ pub enum RouteInfo<'a> {
     },
     GetCurrentApplicationInfo,
     GetCurrentUser,
+    GetEmojis {
+        guild_id: u64,
+    },
+    GetEmoji {
+        guild_id: u64,
+        emoji_id: u64,
+    },
     GetGateway,
     GetGuild {
         guild_id: u64,
@@ -1250,6 +1257,16 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Get,
                 Route::UsersMe,
                 Cow::from(Route::user("@me")),
+            ),
+            RouteInfo::GetEmojis { guild_id } => (
+                LightMethod::Get,
+                Route::GuildsIdEmojis(guild_id),
+                Cow::from(Route::guild_emojis(guild_id)),
+            ),
+            RouteInfo::GetEmoji { guild_id, emoji_id } => (
+                LightMethod::Get,
+                Route::GuildsIdEmojisId(guild_id),
+                Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
             RouteInfo::GetGateway => (
                 LightMethod::Get,

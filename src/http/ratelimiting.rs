@@ -41,10 +41,10 @@
 
 pub use super::routing::Route;
 
-use reqwest::blocking::{Client, Response};
+use reqwest::{Client, Response};
 use reqwest::{header::HeaderMap, StatusCode};
 use crate::internal::prelude::*;
-use parking_lot::{Mutex, RwLock};
+use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::HashMap,
     sync::Arc,
@@ -52,11 +52,11 @@ use std::{
         self,
         FromStr,
     },
-    time::Duration,
-    thread,
+    time::SystemTime,
     i64,
     u64,
 };
+use tokio::time::{delay_for, Duration};
 use super::{HttpError, Request};
 use log::debug;
 
@@ -114,15 +114,21 @@ impl Ratelimiter {
     /// View the `reset` time of the route for `ChannelsId(7)`:
     ///
     /// ```rust,no_run
-    /// use serenity::http::{ratelimiting::{Route}};
+    /// use serenity::http::ratelimiting::Route;
     /// # use serenity::http::Http;
-    /// # let http = Http::default();
+    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
     /// let routes = http.ratelimiter.routes();
-    /// let reader = routes.read();
+    /// let reader = routes.read().await;
     ///
     /// if let Some(route) = reader.get(&Route::ChannelsId(7)) {
-    ///     println!("Reset time at: {}", route.lock().reset());
+    ///     if let Some(reset) = route.lock().await.reset() {
+    ///         println!("Reset time at: {:?}", reset);
+    ///     }
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Ratelimit`]: struct.Ratelimit.html
@@ -131,12 +137,12 @@ impl Ratelimiter {
         Arc::clone(&self.routes)
     }
 
-    pub fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
+    pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
         let RatelimitedRequest { req } = req;
 
         loop {
             // This will block if another thread hit the global ratelimit.
-            let _ = self.global.lock();
+            let _ = self.global.lock().await;
 
             // Destructure the tuple instead of retrieving the third value to
             // take advantage of the type system. If `RouteInfo::deconstruct`
@@ -157,15 +163,18 @@ impl Ratelimiter {
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
-            let bucket = Arc::clone(&self.routes
-                .write()
-                .entry(route)
-                .or_default());
+            let bucket = Arc::clone(
+                &self.routes
+                    .write()
+                    .await
+                    .entry(route)
+                    .or_default()
+            );
 
-            bucket.lock().pre_hook(&route);
+            bucket.lock().await.pre_hook(&route).await;
 
-            let request = req.build(&self.client, &self.token)?;
-            let response = request.send()?;
+            let request = req.build(&self.client, &self.token)?.build()?;
+            let response = self.client.execute(request).await?;
 
             // Check if the request got ratelimited by checking for status 429,
             // and if so, sleep for the value of the header 'retry-after' -
@@ -184,12 +193,12 @@ impl Ratelimiter {
                 return Ok(response);
             } else {
                 let redo = if response.headers().get("x-ratelimit-global").is_some() {
-                    let _ = self.global.lock();
+                    let _ = self.global.lock().await;
 
                     Ok(
                         if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
                             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                            thread::sleep(Duration::from_millis(retry_after));
+                            delay_for(Duration::from_millis(retry_after)).await;
 
                             true
                         } else {
@@ -197,7 +206,7 @@ impl Ratelimiter {
                         },
                     )
                 } else {
-                    bucket.lock().post_hook(&response, &route)
+                    bucket.lock().await.post_hook(&response, &route).await
                 };
 
                 if !redo.unwrap_or(true) {
@@ -225,50 +234,47 @@ pub struct Ratelimit {
     limit: i64,
     /// The number of requests remaining in the period of time.
     remaining: i64,
-    /// The absolute time in milliseconds when the interval resets.
-    reset: i64,
-    /// The total time in milliseconds when the interval resets.
-    reset_after: i64,
+    /// The absolute time when the interval resets.
+    reset: Option<SystemTime>,
+    /// The total time when the interval resets.
+    reset_after: Option<Duration>,
 }
 
 impl Ratelimit {
     #[cfg(feature = "absolute_ratelimits")]
-    fn get_delay(&self) -> i64 {
-        use chrono::Utc;
-
-        let now = Utc::now().timestamp_millis();
-        self.reset - now
+    fn get_delay(&self) -> Option<Duration> {
+        self.reset?.duration_since(SystemTime::now()).ok()
     }
 
     #[cfg(not(feature = "absolute_ratelimits"))]
-    fn get_delay(&self) -> i64 {
+    fn get_delay(&self) -> Option<Duration> {
         self.reset_after
     }
 
-    pub fn pre_hook(&mut self, route: &Route) {
+    pub async fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
         }
 
-		let delay = self.get_delay();
+		let delay = match self.get_delay() {
+            Some(delay) => delay,
+            None => {
+                // We're probably in the past.
+                self.remaining = self.limit;
 
-		if delay < 0 {
-			// We're probably in the past.
-			self.remaining = self.limit;
-
-			return;
-		}
-
+                return;
+            }
+        };
+        
         if self.remaining() == 0 {
-            let delay = delay as u64;
 
             debug!(
-                "Pre-emptive ratelimit on route {:?} for {:?}ms",
+                "Pre-emptive ratelimit on route {:?} for {}ms",
                 route,
-                delay,
+                delay.as_millis(),
             );
 
-            thread::sleep(Duration::from_millis(delay));
+            delay_for(delay).await;
 
             return;
         }
@@ -276,7 +282,7 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
-    pub fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
+    pub async fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
         }
@@ -286,18 +292,18 @@ impl Ratelimit {
         }
 
         if let Some(reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
-            self.reset = (reset * 1000f64) as i64;
+            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
         }
 
         if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
-            self.reset_after = (reset_after * 1000f64) as i64;
+            self.reset_after = Some(Duration::from_secs_f64(reset_after));
         }
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
         } else if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            thread::sleep(Duration::from_millis(retry_after));
+            delay_for(Duration::from_millis(retry_after)).await;
 
             true
         } else {
@@ -319,13 +325,13 @@ impl Ratelimit {
 
     /// The absolute time in milliseconds when the interval resets.
     #[inline]
-    pub fn reset(&self) -> i64 {
+    pub fn reset(&self) -> Option<SystemTime> {
         self.reset
     }
 
     /// The total time in milliseconds when the interval resets.
     #[inline]
-    pub fn reset_after(&self) -> i64 {
+    pub fn reset_after(&self) -> Option<Duration> {
         self.reset_after
     }
 }
@@ -335,8 +341,8 @@ impl Default for Ratelimit {
         Self {
             limit: i64::MAX,
             remaining: i64::MAX,
-            reset: i64::MAX,
-            reset_after: i64::MAX,
+            reset:  None,
+            reset_after:  None,
         }
     }
 }

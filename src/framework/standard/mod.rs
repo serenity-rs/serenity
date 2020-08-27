@@ -1,6 +1,6 @@
 pub mod help_commands;
 pub mod macros {
-    pub use command_attr::{command, group, help, check};
+    pub use command_attr::{command, group, help, check, hook};
 }
 
 mod args;
@@ -27,18 +27,21 @@ use crate::model::{
 
 use std::collections::HashMap;
 use std::sync::Arc;
+use std::time::Duration;
 
-use threadpool::ThreadPool;
+use tokio::sync::Mutex;
+use futures::future::BoxFuture;
 use uwl::Stream;
+use async_trait::async_trait;
 
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "cache")]
-use crate::model::guild::{Guild, Member};
-#[cfg(feature = "cache")]
-use crate::internal::RwLockExt;
+use crate::model::guild::Member;
+#[cfg(all(feature = "cache", feature = "http", feature = "model"))]
+use crate::model::{guild::Role, id::RoleId};
 
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
@@ -48,7 +51,7 @@ pub enum DispatchError {
     CheckFailed(&'static str, Reason),
     /// When the command requester has exceeded a ratelimit bucket. The attached
     /// value is the time a requester has to wait to run the command again.
-    Ratelimited(i64),
+    Ratelimited(Duration),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -82,12 +85,12 @@ pub enum DispatchError {
     __Nonexhaustive,
 }
 
-pub type DispatchHook = dyn Fn(&Context, &Message, DispatchError) + Send + Sync + 'static;
-type BeforeHook = dyn Fn(&Context, &Message, &str) -> bool + Send + Sync + 'static;
-type AfterHook = dyn Fn(&Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static;
-type UnrecognisedHook = dyn Fn(&Context, &Message, &str) + Send + Sync + 'static;
-type NormalMessageHook = dyn Fn(&Context, &Message) + Send + Sync + 'static;
-type PrefixOnlyHook = dyn Fn(&Context, &Message) + Send + Sync + 'static;
+type DispatchHook = for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;
+type BeforeHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, bool>;
+type AfterHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str, Result<(), CommandError>) -> BoxFuture<'fut, ()>;
+type UnrecognisedHook = for<'fut> fn(&'fut Context, &'fut Message, &'fut str) -> BoxFuture<'fut, ()>;
+type NormalMessageHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
+type PrefixOnlyHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
 
 /// A utility for easily managing dispatches to commands.
 ///
@@ -97,13 +100,13 @@ type PrefixOnlyHook = dyn Fn(&Context, &Message) + Send + Sync + 'static;
 #[derive(Default)]
 pub struct StandardFramework {
     groups: Vec<(&'static CommandGroup, Map)>,
-    buckets: HashMap<String, Bucket>,
-    before: Option<Arc<BeforeHook>>,
-    after: Option<Arc<AfterHook>>,
-    dispatch: Option<Arc<DispatchHook>>,
-    unrecognised_command: Option<Arc<UnrecognisedHook>>,
-    normal_message: Option<Arc<NormalMessageHook>>,
-    prefix_only: Option<Arc<PrefixOnlyHook>>,
+    buckets: Mutex<HashMap<String, Bucket>>,
+    before: Option<BeforeHook>,
+    after: Option<AfterHook>,
+    dispatch: Option<DispatchHook>,
+    unrecognised_command: Option<UnrecognisedHook>,
+    normal_message: Option<NormalMessageHook>,
+    prefix_only: Option<PrefixOnlyHook>,
     config: Configuration,
     help: Option<&'static HelpCommand>,
     /// Whether the framework has been "initialized".
@@ -144,14 +147,17 @@ impl StandardFramework {
     /// # impl EventHandler for Handler {}
     /// use serenity::Client;
     /// use serenity::framework::StandardFramework;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN").unwrap();
-    /// let mut client = Client::new(&token, Handler).unwrap();
-    /// client.with_framework(StandardFramework::new()
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let framework = StandardFramework::new()
     ///     .configure(|c| c
     ///         .with_whitespace(true)
-    ///         .prefix("~")));
+    ///         .prefix("~"));
+    ///
+    /// let mut client = Client::new(&token).event_handler(Handler).framework(framework).await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
     /// [`Client`]: ../../client/struct.Client.html
@@ -176,27 +182,24 @@ impl StandardFramework {
     /// a 2 second delay inbetween invocations:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
     /// use serenity::framework::standard::macros::command;
     /// use serenity::framework::standard::{StandardFramework, CommandResult};
     ///
     /// #[command]
     /// // Registers the bucket `basic` to this command.
     /// #[bucket = "basic"]
-    /// fn nothing() -> CommandResult {
+    /// async fn nothing() -> CommandResult {
     ///     Ok(())
     /// }
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .bucket("basic", |b| b.delay(2).time_span(10).limit(3)));
+    /// # async fn run() {
+    /// let framework = StandardFramework::new()
+    ///     .bucket("basic", |b| b.delay(2).time_span(10).limit(3))
+    ///     .await;
+    /// # }
     /// ```
     #[inline]
-    pub fn bucket<F>(mut self, name: &str, f: F) -> Self
+    pub async fn bucket<F>(self, name: &str, f: F) -> Self
     where
         F: FnOnce(&mut BucketBuilder) -> &mut BucketBuilder
     {
@@ -211,7 +214,7 @@ impl StandardFramework {
             check,
         } = builder;
 
-        self.buckets.insert(
+        self.buckets.lock().await.insert(
             name.to_string(),
             Bucket {
                 ratelimit: Ratelimit {
@@ -238,11 +241,11 @@ impl StandardFramework {
         None
     }
 
-    fn should_fail(
-        &mut self,
-        ctx: &Context,
-        msg: &Message,
-        args: &mut Args,
+    async fn should_fail<'a>(
+        &'a self,
+        ctx: &'a Context,
+        msg: &'a Message,
+        args: &'a mut Args,
         command: &'static CommandOptions,
         group: &'static GroupOptions,
     ) -> Option<DispatchError> {
@@ -276,15 +279,15 @@ impl StandardFramework {
 
         #[cfg(feature = "cache")]
         {
-            if let Some(Channel::Guild(chan)) = msg.channel_id.to_channel_cached(&ctx.cache) {
-                let guild_id = chan.with(|c| c.guild_id);
+            if let Some(Channel::Guild(channel)) = msg.channel_id.to_channel_cached(&ctx).await {
+                let guild_id = channel.guild_id;
 
                 if self.config.blocked_guilds.contains(&guild_id) {
                     return Some(DispatchError::BlockedGuild);
                 }
 
-                if let Some(guild) = guild_id.to_guild_cached(&ctx.cache) {
-                    if self.config.blocked_users.contains(&guild.with(|g| g.owner_id)) {
+                if let Some(guild) = guild_id.to_guild_cached(&ctx.cache).await {
+                    if self.config.blocked_users.contains(&guild.owner_id) {
                         return Some(DispatchError::BlockedGuild);
                     }
                 }
@@ -296,20 +299,27 @@ impl StandardFramework {
             return Some(DispatchError::BlockedChannel);
         }
 
-        if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| self.buckets.get_mut(*b)) {
-            let rate_limit = bucket.take(msg.author.id.0);
+        {
+            let mut buckets = self.buckets.lock().await;
 
-            let apply = bucket.check.as_ref().map_or(true, |check| {
-                (check)(ctx, msg.guild_id, msg.channel_id, msg.author.id)
-            });
+            if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
+                let rate_limit = bucket.take(msg.author.id.0);
 
-            if apply && rate_limit > 0 {
-                return Some(DispatchError::Ratelimited(rate_limit));
+                let apply = match bucket.check.as_ref() {
+                    Some(check) => (check)(ctx, msg.guild_id, msg.channel_id, msg.author.id).await,
+                    None => true,
+                };
+
+                if let Some(rate_limit)= rate_limit {
+                    if apply {
+                        return Some(DispatchError::Ratelimited(rate_limit))
+                    }
+                }
             }
         }
 
         for check in group.checks.iter().chain(command.checks.iter()) {
-            let res = (check.function)(ctx, msg, args, command);
+            let res = (check.function)(ctx, msg, args, command).await;
 
             if let CheckResult::Failure(r) = res {
                 return Some(DispatchError::CheckFailed(check.name, r));
@@ -344,15 +354,15 @@ impl StandardFramework {
     ///
     /// // For information regarding this macro, learn more about it in its documentation in `command_attr`.
     /// #[command]
-    /// fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "pong!")?;
+    /// async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "pong!").await?;
     ///
     ///     Ok(())
     /// }
     ///
     /// #[command]
-    /// fn pong(ctx: &Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "ping!")?;
+    /// async fn pong(ctx: &Context, msg: &Message) -> CommandResult {
+    ///     msg.channel_id.say(&ctx.http, "ping!").await?;
     ///
     ///     Ok(())
     /// }
@@ -361,13 +371,9 @@ impl StandardFramework {
     /// #[commands(ping, pong)]
     /// struct BingBong;
     ///
-    /// # fn main() -> Result<(), Box<dyn StdError>> {
-    /// #   let mut client = Client::new("token", Handler)?;
-    /// client.with_framework(StandardFramework::new()
+    /// let framework = StandardFramework::new()
     ///     // Groups' names are changed to all uppercase, plus appended with `_GROUP`.
-    ///     .group(&BINGBONG_GROUP));
-    /// #   Ok(())
-    /// # }
+    ///     .group(&BINGBONG_GROUP);
     /// ```
     pub fn group(mut self, group: &'static CommandGroup) -> Self {
         self.group_add(group);
@@ -418,46 +424,40 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// use serenity::framework::standard::DispatchError::{NotEnoughArguments,
-    /// TooManyArguments};
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::standard::DispatchError;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .on_dispatch_error(|context, msg, error| {
-    ///         match error {
-    ///             NotEnoughArguments { min, given } => {
-    ///                 let s = format!("Need {} arguments, but only got {}.", min, given);
+    /// #[hook]
+    /// async fn dispatch_error_hook(context: &Context, msg: &Message, error: DispatchError) {
+    ///     match error {
+    ///         DispatchError::NotEnoughArguments { min, given } => {
+    ///             let s = format!("Need {} arguments, but only got {}.", min, given);
     ///
-    ///                 let _ = msg.channel_id.say(&context.http, &s);
-    ///             },
-    ///             TooManyArguments { max, given } => {
-    ///                 let s = format!("Max arguments allowed is {}, but got {}.", max, given);
+    ///             let _ = msg.channel_id.say(&context, &s).await;
+    ///         },
+    ///         DispatchError::TooManyArguments { max, given } => {
+    ///             let s = format!("Max arguments allowed is {}, but got {}.", max, given);
     ///
-    ///                 let _ = msg.channel_id.say(&context.http, &s);
-    ///             },
-    ///             _ => println!("Unhandled dispatch error."),
-    ///         }
-    ///     }));
+    ///             let _ = msg.channel_id.say(&context, &s).await;
+    ///         },
+    ///         _ => println!("Unhandled dispatch error."),
+    ///     }
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .on_dispatch_error(dispatch_error_hook);
     /// ```
-    pub fn on_dispatch_error<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&Context, &Message, DispatchError) + Send + Sync + 'static,
-    {
-        self.dispatch = Some(Arc::new(f));
+    pub fn on_dispatch_error(mut self, f: DispatchHook) -> Self {
+        self.dispatch = Some(f);
 
         self
     }
 
     /// Specify the function to be called on messages comprised of only the prefix.
-    pub fn prefix_only<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&Context, &Message) + Send + Sync + 'static
-    {
-        self.prefix_only = Some(Arc::new(f));
+    pub fn prefix_only(mut self, f: PrefixOnlyHook) -> Self {
+        self.prefix_only = Some(f);
 
         self
     }
@@ -471,51 +471,46 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .before(|ctx, msg, cmd_name| {
-    ///         println!("Running command {}", cmd_name);
-    ///         true
-    ///     }));
+    /// #[hook]
+    /// async fn before_hook(_: &Context, _: &Message, cmd_name: &str) -> bool {
+    ///     println!("Running command {}", cmd_name);
+    ///     true
+    /// }
+    /// let framework = StandardFramework::new()
+    ///     .before(before_hook);
     /// ```
     ///
     /// Using before to prevent command usage:
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .before(|ctx, msg, cmd_name| {
-    ///         if let Ok(channel) = msg.channel_id.to_channel(ctx) {
-    ///             //  Don't run unless in nsfw channel
-    ///             if !channel.is_nsfw() {
-    ///                 return false;
-    ///             }
+    /// #[hook]
+    /// async fn before_hook(ctx: &Context, msg: &Message, cmd_name: &str) -> bool {
+    ///     if let Ok(channel) = msg.channel_id.to_channel(ctx).await {
+    ///         //  Don't run unless in nsfw channel
+    ///         if !channel.is_nsfw() {
+    ///             return false;
     ///         }
+    ///     }
     ///
-    ///         println!("Running command {}", cmd_name);
+    ///     println!("Running command {}", cmd_name);
     ///
-    ///         true
-    ///     }));
+    ///     true
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .before(before_hook);
     /// ```
-    ///
-    pub fn before<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&Context, &Message, &str) -> bool + Send + Sync + 'static,
-    {
-        self.before = Some(Arc::new(f));
+    pub fn before(mut self, f: BeforeHook) -> Self {
+        self.before = Some(f);
 
         self
     }
@@ -529,26 +524,24 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
+    /// use serenity::framework::standard::CommandError;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .after(|ctx, msg, cmd_name, error| {
-    ///         //  Print out an error if it happened
-    ///         if let Err(why) = error {
-    ///             println!("Error in {}: {:?}", cmd_name, why);
-    ///         }
-    ///     }));
+    /// #[hook]
+    /// async fn after_hook(_: &Context, _: &Message, cmd_name: &str, error: Result<(), CommandError>) {
+    ///     //  Print out an error if it happened
+    ///     if let Err(why) = error {
+    ///         println!("Error in {}: {:?}", cmd_name, why);
+    ///     }
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .after(after_hook);
     /// ```
-    pub fn after<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&Context, &Message, &str, Result<(), CommandError>) + Send + Sync + 'static,
-    {
-        self.after = Some(Arc::new(f));
+    pub fn after(mut self, f: AfterHook) -> Self {
+        self.after = Some(f);
 
         self
     }
@@ -561,23 +554,22 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .unrecognised_command(|_ctx, msg, unrecognised_command_name| {
-    ///        println!("A user named {:?} tried to executute an unknown command: {}", msg.author.name, unrecognised_command_name);
-    ///     }));
+    /// #[hook]
+    /// async fn unrecognised_command_hook(_: &Context, msg: &Message, unrecognised_command_name: &str) {
+    ///     println!("A user named {:?} tried to executute an unknown command: {}",
+    ///         msg.author.name, unrecognised_command_name
+    ///     );
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .unrecognised_command(unrecognised_command_hook);
     /// ```
-    pub fn unrecognised_command<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&Context, &Message, &str) + Send + Sync + 'static,
-    {
-        self.unrecognised_command = Some(Arc::new(f));
+    pub fn unrecognised_command(mut self, f: UnrecognisedHook) -> Self {
+        self.unrecognised_command = Some(f);
 
         self
     }
@@ -590,23 +582,20 @@ impl StandardFramework {
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
-    /// # struct Handler;
-    /// #
-    /// # impl EventHandler for Handler {}
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
+    /// # use serenity::model::prelude::*;
+    /// use serenity::framework::standard::macros::hook;
     /// use serenity::framework::StandardFramework;
     ///
-    /// client.with_framework(StandardFramework::new()
-    ///     .normal_message(|ctx, msg| {
-    ///         println!("Received a generic message: {:?}", msg.content);
-    ///     }));
+    /// #[hook]
+    /// async fn normal_message_hook(_: &Context, msg: &Message) {
+    ///     println!("Received a generic message: {:?}", msg.content);
+    /// }
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .normal_message(normal_message_hook);
     /// ```
-    pub fn normal_message<F>(mut self, f: F) -> Self
-    where
-        F: Fn(&Context, &Message) + Send + Sync + 'static,
-    {
-        self.normal_message = Some(Arc::new(f));
+    pub fn normal_message(mut self, f: NormalMessageHook) -> Self {
+        self.normal_message = Some(f);
 
         self
     }
@@ -623,46 +612,34 @@ impl StandardFramework {
     }
 }
 
+#[async_trait]
 impl Framework for StandardFramework {
-    fn dispatch(&mut self, mut ctx: Context, msg: Message, threadpool: &ThreadPool) {
+    async fn dispatch(&self, mut ctx: Context, msg: Message) {
         let mut stream = Stream::new(&msg.content);
 
         stream.take_while_char(|c| c.is_whitespace());
 
-        let prefix = parse::prefix(&mut ctx, &msg, &mut stream, &self.config);
+        let prefix = parse::prefix(&mut ctx, &msg, &mut stream, &self.config).await;
 
         if prefix.is_some() && stream.rest().is_empty() {
-
             if let Some(prefix_only) = &self.prefix_only {
-                let prefix_only = Arc::clone(&prefix_only);
-                let msg = msg.clone();
-
-                threadpool.execute(move || {
-                    prefix_only(&mut ctx, &msg);
-                });
+                prefix_only(&mut ctx, &msg).await;
             }
 
             return;
         }
 
         if prefix.is_none() && !(self.config.no_dm_prefix && msg.is_private()) {
-
             if let Some(normal) = &self.normal_message {
-                let normal = Arc::clone(&normal);
-                let msg = msg.clone();
-
-                threadpool.execute(move || {
-                    normal(&mut ctx, &msg);
-                });
+                normal(&mut ctx, &msg).await;
             }
 
             return;
         }
 
         if let Some(error) = self.should_fail_common(&msg) {
-
             if let Some(dispatch) = &self.dispatch {
-                dispatch(&mut ctx, &msg, error);
+                dispatch(&mut ctx, &msg, error).await;
             }
 
             return;
@@ -675,36 +652,26 @@ impl Framework for StandardFramework {
             &self.groups,
             &self.config,
             self.help.as_ref().map(|h| h.options.names),
-        );
+        ).await;
 
         let invoke = match invocation {
             Ok(i) => i,
             Err(ParseError::UnrecognisedCommand(unreg)) => {
                 if let Some(unreg) = unreg {
                     if let Some(unrecognised_command) = &self.unrecognised_command {
-                        let unrecognised_command = Arc::clone(&unrecognised_command);
-                        let mut ctx = ctx.clone();
-                        let msg = msg.clone();
-                        threadpool.execute(move || {
-                            unrecognised_command(&mut ctx, &msg, &unreg);
-                        });
+                        unrecognised_command(&mut ctx, &msg, &unreg).await;
                     }
                 }
 
                 if let Some(normal) = &self.normal_message {
-                    let normal = Arc::clone(&normal);
-                    let msg = msg.clone();
-
-                    threadpool.execute(move || {
-                        normal(&mut ctx, &msg);
-                    });
+                    normal(&mut ctx, &msg).await;
                 }
 
                 return;
             }
             Err(ParseError::Dispatch(error)) => {
                 if let Some(dispatch) = &self.dispatch {
-                    dispatch(&mut ctx, &msg, error);
+                    dispatch(&mut ctx, &msg, error).await;
                 }
 
                 return;
@@ -715,30 +682,23 @@ impl Framework for StandardFramework {
             Invoke::Help(name) => {
                 let args = Args::new(stream.rest(), &self.config.delimiters);
 
-                let before = self.before.clone();
-                let after = self.after.clone();
                 let owners = self.config.owners.clone();
-
                 let groups = self.groups.iter().map(|(g, _)| *g).collect::<Vec<_>>();
-
-                let msg = msg.clone();
 
                 // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
                 let help = self.help.unwrap();
 
-                threadpool.execute(move || {
-                    if let Some(before) = before {
-                        if !before(&mut ctx, &msg, name) {
-                            return;
-                        }
+                if let Some(before) = &self.before {
+                    if !before(&mut ctx, &msg, name).await {
+                        return;
                     }
+                }
 
-                    let res = (help.fun)(&mut ctx, &msg, args, help.options, &groups, owners);
+                let res = (help.fun)(&mut ctx, &msg, args, help.options, &groups, owners).await;
 
-                    if let Some(after) = after {
-                        after(&mut ctx, &msg, name, res);
-                    }
-                });
+                if let Some(after) = &self.after {
+                    after(&mut ctx, &msg, name, res).await;
+                }
             }
             Invoke::Command { command, group } => {
                 let mut args = {
@@ -767,32 +727,28 @@ impl Framework for StandardFramework {
                 };
 
                 if let Some(error) =
-                    self.should_fail(&mut ctx, &msg, &mut args, &command.options, &group.options)
+                    self.should_fail(&mut ctx, &msg, &mut args, &command.options, &group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
-                        dispatch(&mut ctx, &msg, error);
+                        dispatch(&mut ctx, &msg, error).await;
                     }
 
                     return;
                 }
 
-                let before = self.before.clone();
-                let after = self.after.clone();
-                let msg = msg.clone();
-                let name = &command.options.names[0];
-                threadpool.execute(move || {
-                    if let Some(before) = before {
-                        if !before(&mut ctx, &msg, name) {
-                            return;
-                        }
-                    }
+                let name = command.options.names[0].clone();
 
-                    let res = (command.fun)(&mut ctx, &msg, args);
-
-                    if let Some(after) = after {
-                        after(&mut ctx, &msg, name, res);
+                if let Some(before) = &self.before {
+                    if !before(&mut ctx, &msg, name).await {
+                        return;
                     }
-                });
+                }
+
+                let res = (command.fun)(&mut ctx, &msg, args).await;
+
+                if let Some(after) = &self.after {
+                    after(&mut ctx, &msg, name, res).await;
+                }
             }
         }
     }
@@ -869,15 +825,15 @@ impl CommonOptions for &CommandOptions {
 }
 
 #[cfg(feature = "cache")]
-pub(crate) fn has_correct_permissions(
-    cache: impl AsRef<CacheRwLock>,
+pub(crate) async fn has_correct_permissions(
+    cache: impl AsRef<Cache>,
     options: &impl CommonOptions,
     message: &Message,
 ) -> bool {
     if options.required_permissions().is_empty() {
         true
-    } else if let Some(guild) = message.guild(&cache) {
-        let perms = guild.with(|g| g.user_permissions_in(message.channel_id, message.author.id));
+    } else if let Some(guild) = message.guild(&cache).await {
+        let perms = guild.user_permissions_in(message.channel_id, message.author.id);
 
         perms.contains(*options.required_permissions())
     } else {
@@ -888,7 +844,7 @@ pub(crate) fn has_correct_permissions(
 #[cfg(all(feature = "cache", feature = "http"))]
 pub(crate) fn has_correct_roles(
     options: &impl CommonOptions,
-    guild: &Guild,
+    roles: &HashMap<RoleId, Role>,
     member: &Member)
 -> bool {
     if options.allowed_roles().is_empty() {
@@ -896,7 +852,7 @@ pub(crate) fn has_correct_roles(
     } else {
         options.allowed_roles()
             .iter()
-            .flat_map(|r| guild.role_by_name(r))
+            .flat_map(|r| roles.values().find(|role| *r == &role.name))
             .any(|g| member.roles.contains(&g.id))
     }
 }

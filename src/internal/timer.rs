@@ -1,55 +1,50 @@
-use chrono::{DateTime, Duration, Utc};
-use std::{
-    time::Duration as StdDuration,
-    thread
-};
+use tokio::time::{delay_until, Duration, Instant};
 
+/// A reusable timer that keeps track of its duration/interval/period.
 #[derive(Debug)]
 pub struct Timer {
-    due: DateTime<Utc>,
+    due: Instant,
     duration: Duration,
 }
 
 impl Timer {
+    /// Constructs a `Timer`, initially armed to expire in `duration_in_ms` from the current instant.
     pub fn new(duration_in_ms: u64) -> Timer {
-        let duration = Duration::milliseconds(duration_in_ms as i64);
+        let duration = Duration::from_millis(duration_in_ms);
 
         Timer {
-            due: Utc::now() + duration,
+            due: Instant::now() + duration,
             duration,
         }
     }
 
-    pub fn r#await(&mut self) {
-        let due_time = (self.due.timestamp() * 1000) + i64::from(self.due.timestamp_subsec_millis());
-        let now_time = {
-            let now = Utc::now();
-
-            (now.timestamp() * 1000) + i64::from(now.timestamp_subsec_millis())
-        };
-
-        if due_time > now_time {
-            let sleep_time = due_time - now_time;
-
-            if sleep_time > 0 {
-                thread::sleep(StdDuration::from_millis(sleep_time as u64));
-            }
-        }
-
-        self.reset_from_deadline();
+    /// Blocks until the due time.
+    /// The timer wil be reset afterwards, `duration` later.
+    pub async fn hold(&mut self) {
+        delay_until(self.due).await;
+        self.increment();
     }
 
+    /// Returns true if the timer is expired (current instant past `due` time).
+    /// Resets the timer `duration` later if it is.
     pub fn check(&mut self) -> bool {
-        if Utc::now() >= self.due {
-            self.due = self.due + self.duration;
-
+        if Instant::now() >= self.due {
+            self.increment();
             true
         } else {
             false
         }
     }
 
-    pub fn reset(&mut self) { self.due = Utc::now() + self.duration; }
+    /// Resets the timer to expire 1 `duration` later than it was **previously set to expire**.
+    /// Does not depend on the actual current time.
+    pub fn increment(&mut self) {
+        self.due += self.duration
+    }
 
-    pub fn reset_from_deadline(&mut self) { self.due = self.due + self.duration; }
+    /// Resets timer to expire 1 `duration` from the **current instant**.
+    /// This has the same effect as constructing a new `Timer` with the same `duration`.
+    pub fn reset(&mut self) {
+        self.due = Instant::now() + self.duration;
+    }
 }

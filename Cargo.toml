@@ -8,18 +8,31 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.8.6"
+version = "0.9.0-rc.0"
 edition = "2018"
 
 [dependencies]
 bitflags = "1"
 log = "0.4"
-parking_lot = "0.11"
 serde_json = "1"
+async-trait = "0.1"
 
 [dependencies.audiopus]
 optional = true
 version = "0.2"
+
+[dependencies.command_attr]
+path = "./command_attr"
+version = "0.3.0-rc.0"
+optional = true
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.uwl]
+optional = true
+version = "0.6.0"
 
 [dependencies.base64]
 optional = true
@@ -49,7 +62,7 @@ version = "1"
 
 [dependencies.reqwest]
 default-features = false
-features = ["blocking", "json"]
+features = ["json", "stream"]
 optional = true
 version = "0.10"
 
@@ -57,26 +70,11 @@ version = "0.10"
 optional = true
 version = "0.7"
 
-[dependencies.rustls]
-optional = true
-version = "0.17"
-
-[dependencies.serde]
-version = "1"
-features = ["derive"]
-
-[dependencies.static_assertions]
-optional = true
-version = "1.1"
-
-[dependencies.threadpool]
-optional = true
-version = "1"
-
-[dependencies.tungstenite]
+[dependencies.async-tungstenite]
 default-features = false
+features = ["tokio-runtime"]
 optional = true
-version = "0.11"
+version = "0.8"
 
 [dependencies.typemap_rev]
 optional = true
@@ -86,21 +84,21 @@ version = "0.1.2"
 optional = true
 version = "^2.1"
 
-[dependencies.uwl]
+[dependencies.bytes]
 optional = true
-version = "0.6.0"
-
-[dependencies.webpki]
-optional = true
-version = "0.21"
-
-[dependencies.webpki-roots]
-optional = true
-version = "0.19"
+version = "0.5"
 
 [dependencies.xsalsa20poly1305]
 optional = true
 version = "0.4.2"
+
+[dependencies.tokio]
+version = "0.2"
+default-features = false
+features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process"]
+
+[dependencies.futures]
+version = "0.3"
 
 [dev-dependencies.http_crate]
 version = "0.2"
@@ -133,10 +131,9 @@ default_native_tls = [
 ]
 builder = ["utils"]
 cache = []
+collector = ["gateway", "model", "tokio/stream"]
 client = [
-    "gateway",
     "http",
-    "threadpool",
     "typemap_rev"
 ]
 extras = []
@@ -147,10 +144,10 @@ gateway = [
     "url",
     "utils",
 ]
-http = ["url"]
+http = ["url", "bytes"]
 absolute_ratelimits = ["http"]
-rustls_backend = ["reqwest/rustls-tls", "tungstenite", "rustls", "webpki", "webpki-roots"]
-native_tls_backend = ["reqwest/native-tls", "tungstenite/tls"]
+rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls"]
+native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
@@ -160,6 +157,7 @@ voice = [
     "discortp",
     "gateway",
     "rand",
+    "tokio/process",
     "xsalsa20poly1305",
 ]
 

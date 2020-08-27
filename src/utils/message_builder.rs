@@ -20,13 +20,10 @@ use std::{
 /// value:
 ///
 /// ```rust,no_run
-/// # extern crate serde_json;
-/// # extern crate serenity;
-/// #
 /// # use serde_json::json;
 /// # use serenity::model::prelude::*;
 /// #
-/// # fn main() {
+/// # async fn run() {
 /// # let user = UserId(1);
 /// # let emoji = serde_json::from_value::<Emoji>(json!({
 /// #     "animated": false,
@@ -157,9 +154,6 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::model::guild::Role;
     /// #
@@ -1272,7 +1266,8 @@ fn normalize(text: &str) -> String {
         .replace("discord.me", "discord\u{2024}me")
         .replace("discordlist.net", "discordlist\u{2024}net")
         .replace("discordservers.com", "discordservers\u{2024}com")
-        .replace("discord.com/invite", "discordapp\u{2024}com/invite")
+        .replace("discord.com/invite", "discord\u{2024}com/invite")
+        .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
         // Remove right-to-left override and other similar annoying symbols
         .replace('\u{202E}', " ") // RTL Override
         .replace('\u{200F}', " ") // RTL Mark
@@ -1584,7 +1579,7 @@ mod test {
         assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
         assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
         assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
-        assert_eq!(super::normalize("discord.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(super::normalize("discord.com/invite"), "discord\u{2024}com/invite");
         assert_eq!(super::normalize("\u{202E}"), " ");
         assert_eq!(super::normalize("\u{200F}"), " ");
         assert_eq!(super::normalize("\u{202B}"), " ");

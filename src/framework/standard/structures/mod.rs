@@ -11,6 +11,7 @@ use crate::model::{
 };
 use crate::utils::Colour;
 use super::Args;
+use futures::future::BoxFuture;
 
 mod check;
 pub mod buckets;
@@ -68,10 +69,9 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-pub type CommandError = Box<dyn StdError>;
-pub type CommandResult = ::std::result::Result<(), CommandError>;
-
-pub type CommandFn = fn(&Context, &Message, Args) -> CommandResult;
+pub type CommandError = Box<dyn StdError + Send + Sync>;
+pub type CommandResult<T = ()> = std::result::Result<T, CommandError>;
+pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
     pub fun: CommandFn,
@@ -93,14 +93,14 @@ impl PartialEq for Command {
     }
 }
 
-pub type HelpCommandFn = fn(
-    &Context,
-    &Message,
+pub type HelpCommandFn = for<'fut> fn(
+    &'fut Context,
+    &'fut Message,
     Args,
-    &'static HelpOptions,
-    &[&'static CommandGroup],
+    &'fut HelpOptions,
+    &'fut [&'static CommandGroup],
     HashSet<UserId>,
-) -> CommandResult;
+) -> BoxFuture<'fut, CommandResult>;
 
 pub struct HelpCommand {
     pub fun: HelpCommandFn,
@@ -163,8 +163,10 @@ pub struct HelpOptions {
     pub aliases_label: &'static str,
     /// Text specifying that a command is only usable in a guild.
     pub guild_only_text: &'static str,
-    /// Text labeling a command's names of checks.
+    /// Text labelling a command's names of checks.
     pub checks_label: &'static str,
+    /// Text labelling a command's subcommands
+    pub sub_commands_label: &'static str,
     /// Text specifying that a command is only usable in via DM.
     pub dm_only_text: &'static str,
     /// Text specifying that a command can be used via DM and in guilds.

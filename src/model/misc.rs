@@ -1,7 +1,6 @@
 //! Miscellaneous helper traits, enums, and structs for models.
 
 use super::prelude::*;
-use crate::internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
@@ -27,10 +26,10 @@ impl Mentionable for ChannelId {
 
 impl Mentionable for Channel {
     fn mention(&self) -> String {
-        match *self {
-            Channel::Guild(ref x) => x.with(Mentionable::mention),
-            Channel::Private(ref x) => x.with(Mentionable::mention),
-            Channel::Category(ref x) => x.with(Mentionable::mention),
+        match self {
+            Channel::Guild(channel) => channel.mention(),
+            Channel::Private(channel) => channel.mention(),
+            Channel::Category(channel) => channel.mention(),
             Channel::__Nonexhaustive => unreachable!(),
         }
     }
@@ -49,11 +48,15 @@ impl Mentionable for CurrentUser {
 }
 
 impl Mentionable for Emoji {
-    fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
+    fn mention(&self) -> String {
+        format!("<:{}:{}>", self.name, self.id.0)
+    }
 }
 
 impl Mentionable for Member {
-    fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
+    fn mention(&self) -> String {
+        format!("<@{}>", self.user.id.0)
+    }
 }
 
 impl Mentionable for PrivateChannel {
@@ -293,13 +296,11 @@ mod test {
     #[cfg(feature = "utils")]
     mod utils {
         use crate::model::prelude::*;
-        use parking_lot::RwLock;
-        use std::sync::Arc;
         use crate::utils::Colour;
 
-        #[test]
-        fn test_mention() {
-            let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
+        #[tokio::test]
+        async fn test_mention() {
+            let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
                 category_id: None,
                 guild_id: GuildId(1),
@@ -315,7 +316,7 @@ mod test {
                 nsfw: false,
                 slow_mode_rate: Some(0),
                 _nonexhaustive: (),
-            })));
+            });
             let emoji = Emoji {
                 animated: false,
                 id: EmojiId(5),
@@ -352,7 +353,7 @@ mod test {
                 mute: false,
                 nick: None,
                 roles: vec![],
-                user: Arc::new(RwLock::new(user.clone())),
+                user: user.clone(),
                 _nonexhaustive: (),
             };
 

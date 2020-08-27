@@ -6,7 +6,7 @@ use std::{
         Result as FmtResult
     }
 };
-use tungstenite::protocol::CloseFrame;
+use async_tungstenite::tungstenite::protocol::CloseFrame;
 
 /// An error that occurred while attempting to deal with the gateway.
 ///
@@ -50,6 +50,13 @@ pub enum Error {
     OverloadedShard,
     /// Failed to reconnect after a number of attempts.
     ReconnectFailure,
+    /// When undocumented gateway intents are provided.
+    InvalidGatewayIntents,
+    /// When disallowed gatewax intents are provided.
+    ///
+    /// If an connection has been established but priviliged gateway intents
+    /// were provided without enabling them prior.
+    DisallowedGatewayIntents,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -69,6 +76,8 @@ impl Display for Error {
             Error::NoSessionId => f.write_str("No Session Id present when required"),
             Error::OverloadedShard => f.write_str("Shard has too many guilds"),
             Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
+            Error::InvalidGatewayIntents => f.write_str("Invalid gateway intents were provided"),
+            Error::DisallowedGatewayIntents => f.write_str("Disallowed gateway intents were provided"),
             Error::__Nonexhaustive => unreachable!(),
         }
     }

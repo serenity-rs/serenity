@@ -36,7 +36,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.8"
+//! serenity = "0.9.0-rc.0"
 //! ```
 //!
 //! [`Cache`]: cache/struct.Cache.html
@@ -81,16 +81,18 @@ pub mod http;
 pub mod utils;
 #[cfg(feature = "voice")]
 pub mod voice;
+#[cfg(feature = "collector")]
+pub mod collector;
 
 mod error;
 
 pub use crate::error::{Error, Result};
 
-#[cfg(feature = "client")]
+#[cfg(all(feature = "client", feature = "gateway"))]
 pub use crate::client::Client;
 
 #[cfg(all(feature = "client", feature = "cache"))]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(all(feature = "client", feature = "cache"))]
 use std::time::Duration;
 #[cfg(feature = "client")]
@@ -103,19 +105,18 @@ use crate::http::Http;
 #[derive(Default)]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
-    pub cache: CacheRwLock,
+    pub cache: Arc<Cache>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     pub http: Arc<Http>,
     __nonexhaustive: (),
 }
 
-// For the procedural macros defined in `command_attr`; do not remove!
-#[allow(clippy::useless_attribute)]
-#[allow(rust_2018_idioms)]
-extern crate self as serenity;
-
 // For the procedural macros in `command_attr`.
 #[cfg(feature = "standard_framework")]
 #[doc(hidden)]
 pub use static_assertions;
+
+pub use async_trait::async_trait;
+pub use futures;
+pub use futures::future::FutureExt;

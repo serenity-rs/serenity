@@ -39,9 +39,9 @@ docs.
 A basic ping-pong bot looks like:
 
 ```rust,ignore
-use serenity::client::Client;
+use serenity::async_trait;
+use serenity::client::{Client, Context, EventHandler};
 use serenity::model::channel::Message;
-use serenity::prelude::{EventHandler, Context};
 use serenity::framework::standard::{
     StandardFramework,
     CommandResult,
@@ -51,37 +51,43 @@ use serenity::framework::standard::{
     }
 };
 
+use std::env;
+
 #[group]
 #[commands(ping)]
 struct General;
 
-use std::env;
-
 struct Handler;
 
+#[async_trait]
 impl EventHandler for Handler {}
 
-fn main() {
-    // Login with a bot token from the environment
-    let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("token"), Handler)
-        .expect("Error creating client");
-    client.with_framework(StandardFramework::new()
+#[tokio::main]
+async fn main() {
+    let framework = StandardFramework::new()
         .configure(|c| c.prefix("~")) // set the bot's prefix to "~"
-        .group(&GENERAL_GROUP));
+        .group(&GENERAL_GROUP);
+
+    // Login with a bot token from the environment
+    let token = env::var("DISCORD_TOKEN").expect("token");
+    let mut client = Client::new(token)
+        .event_handler(Handler)
+        .framework(framework)
+        .await
+        .expect("Error creating client");
 
     // start listening for events by starting a single shard
-    if let Err(why) = client.start() {
+    if let Err(why) = client.start().await {
         println!("An error occurred while running the client: {:?}", why);
     }
 }
 
 #[command]
-fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    msg.reply(ctx, "Pong!")?;
+async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+    msg.reply(ctx, "Pong!").await?;
 
     Ok(())
 }
-
 ```
 
 ### Full Examples
@@ -95,10 +101,10 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.8"
+serenity = "0.9.0-rc.0"
 ```
 
-Serenity supports a minimum of Rust 1.37.
+Serenity supports a minimum of Rust 1.39.
 
 # Features
 
@@ -109,7 +115,7 @@ Cargo.toml:
 [dependencies.serenity]
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
-version = "0.8"
+version = "0.9.0-rc.0"
 ```
 
 The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
@@ -121,6 +127,7 @@ The following is a full list of features:
 - **cache**: The cache will store information about guilds, channels, users, and
 other data, to avoid performing REST requests. If you are low on RAM, do not
 enable this.
+- **collector**: A collector awaits events, such as receiving a message from a user or reactions on a message, and allows for responding to the events in a convenient fashion. Collectors can be configured to enforce certain critera the events must meet.
 - **client**: A manager for shards and event handlers, abstracting away the
 work of handling shard events and updating the cache, if enabled.
 - **framework**: Enables the framework, which is a utility to allow simple
@@ -168,7 +175,7 @@ features = [
     "utils",
     "rustls_backend",
 ]
-version = "0.8"
+version = "0.9.0-rc.0"
 ```
 
 # Dependencies
@@ -194,7 +201,7 @@ Voice + youtube-dl:
 
 # Projects extending Serenity
 
-- [serenity-lavalink][project:serenity-lavalink]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
@@ -219,7 +226,7 @@ Voice + youtube-dl:
 [gateway docs]: https://docs.rs/serenity/*/serenity/gateway/index.html
 [guild]: https://discord.gg/9X7vCus
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
-[project:serenity-lavalink]: https://gitlab.com/nitsuga5124/serenity-lavalink/
+[project:lavalink-rs]: https://gitlab.com/nitsuga5124/lavalink-rs/
 [repo:lavalink]: https://github.com/Frederikam/Lavalink
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
