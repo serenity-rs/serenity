@@ -24,8 +24,16 @@ use crate::{
         threading,
     },
 };
+use futures::{
+    channel::mpsc::UnboundedSender as Sender,
+    sink::SinkExt,
+};
+use tokio::sync::mpsc::{
+    error::SendError,
+    self,
+    UnboundedSender as TokioSender,
+};
 use serde_json::json;
-use std::sync::mpsc::{self, Sender as MpscSender};
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -84,7 +92,7 @@ pub struct Handler {
     /// [`mute`]: #method.mute
     pub self_mute: bool,
     /// The internal sender to the voice connection monitor thread.
-    sender: MpscSender<VoiceStatus>,
+    sender: TokioSender<VoiceStatus>,
     /// The session Id of the current voice connection, if any.
     ///
     /// **Note**: This _should_ be set through an [`update_state`] call.
@@ -109,7 +117,7 @@ pub struct Handler {
     ///
     /// When set via [`standalone`][`Handler::standalone`], it will not be
     /// present.
-    ws: Option<MpscSender<InterMessage>>,
+    ws: Option<Sender<InterMessage>>,
 }
 
 impl Handler {
@@ -117,7 +125,7 @@ impl Handler {
     #[inline]
     pub(crate) fn new(
         guild_id: GuildId,
-        ws: MpscSender<InterMessage>,
+        ws: Sender<InterMessage>,
         user_id: UserId,
     ) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
@@ -166,6 +174,7 @@ impl Handler {
         let user_id = self.user_id;
 
         // Safe as all of these being present was already checked.
+        println!("Sent!?");
         self.send(VoiceStatus::Connect(ConnectionInfo {
             endpoint,
             guild_id,
@@ -425,10 +434,10 @@ impl Handler {
 
     fn new_raw(
         guild_id: GuildId,
-        ws: Option<MpscSender<InterMessage>>,
+        ws: Option<Sender<InterMessage>>,
         user_id: UserId,
     ) -> Self {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = mpsc::unbounded_channel();
 
         threading::start(guild_id, rx);
 
@@ -449,8 +458,8 @@ impl Handler {
     /// Sends a message to the thread.
     fn send(&mut self, status: VoiceStatus) {
         // Restart thread if it errored.
-        if let Err(mpsc::SendError(status)) = self.sender.send(status) {
-            let (tx, rx) = mpsc::channel();
+        if let Err(SendError(status)) = self.sender.send(status) {
+            let (tx, rx) = mpsc::unbounded_channel();
 
             self.sender = tx;
             self.sender.send(status).unwrap();
@@ -461,7 +470,7 @@ impl Handler {
         }
     }
 
-    fn send_join(&self) {
+    fn send_join(&mut self) {
         // Do _not_ try connecting if there is not at least a channel. There
         // does not _necessarily_ need to be a guild.
         if self.channel_id.is_none() {
@@ -476,8 +485,8 @@ impl Handler {
     /// Does nothing if initialized via [`standalone`].
     ///
     /// [`standalone`]: #method.standalone
-    fn update(&self) {
-        if let Some(ref ws) = self.ws {
+    fn update(&mut self) {
+        if let Some(ws) = self.ws.as_mut() {
             let map = json!({
                 "op": VoiceOpCode::SessionDescription.num(),
                 "d": {
@@ -488,7 +497,7 @@ impl Handler {
                 }
             });
 
-            let _ = ws.send(InterMessage::Json(map));
+            let _ = ws.unbounded_send(InterMessage::Json(map));
         }
     }
 }

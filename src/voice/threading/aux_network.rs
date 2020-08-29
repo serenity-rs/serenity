@@ -4,7 +4,7 @@ use audiopus::{
 };
 use crate::{
     error::Result,
-    gateway::WsClient,
+    gateway::WsStream,
     internal::{
         ws_impl::{ReceiverExt, SenderExt},
         Timer,
@@ -45,14 +45,18 @@ use rand::random;
 use serde::Deserialize;
 use std::{
     collections::HashMap,
+    net::SocketAddr,
+};
+use tokio::{
+    time::{delay_for, timeout},
     net::{
-        SocketAddr,
         UdpSocket,
+        udp::{RecvHalf, SendHalf},
     },
     sync::mpsc::{
-        Receiver as MpscReceiver,
-        TryRecvError,
-    },
+        error::TryRecvError,
+        UnboundedReceiver,
+    }
 };
 use xsalsa20poly1305::{
     aead::AeadInPlace,
@@ -159,10 +163,10 @@ impl SsrcState {
 }
 
 struct AuxNetwork {
-    rx: MpscReceiver<AuxPacketMessage>,
+    rx: UnboundedReceiver<AuxPacketMessage>,
 
-    udp_socket: Option<UdpSocket>,
-    ws_client: Option<WsClient>,
+    udp_socket: Option<RecvHalf>,
+    ws_client: Option<WsStream>,
     destination: Option<SocketAddr>,
     cipher: Option<Cipher>,
     packet_buffer: [u8; VOICE_PACKET_MAX],
@@ -180,7 +184,7 @@ struct AuxNetwork {
 }
 
 impl AuxNetwork {
-    pub(crate) fn new(evt_rx: MpscReceiver<AuxPacketMessage>) -> Self {
+    pub(crate) fn new(evt_rx: UnboundedReceiver<AuxPacketMessage>) -> Self {
         Self {
             rx: evt_rx,
 
@@ -204,9 +208,10 @@ impl AuxNetwork {
         }
     }
 
-    fn run(&mut self, interconnect: &Interconnect) {
+    async fn run(&mut self, interconnect: &Interconnect) {
         'aux_runner: loop {
-            let mut ws_error = match self.process_ws_messages(interconnect) {
+            info!("[Aux] head of loop");
+            let mut ws_error = match self.process_ws_messages(interconnect).await {
                 Err(e) => {
                     error!("[Voice] Error processing ws {:?}.", e);
                     true
@@ -214,13 +219,17 @@ impl AuxNetwork {
                 _ => false,
             };
 
-            self.process_udp_messages(interconnect);
+            self.process_udp_messages(interconnect).await;
+
+            tokio::time::delay_for(TIMESTEP_LENGTH / 2).await;
 
             loop {
                 use AuxPacketMessage::*;
                 match self.rx.try_recv() {
                     Ok(Udp(udp)) => {
-                        let _ = udp.set_read_timeout(Some(TIMESTEP_LENGTH / 2));
+                        // let _ = udp.set_read_timeout(Some(TIMESTEP_LENGTH / 2));
+
+                        // FIXME: INTEGRATE TIMING INFO HERE
 
                         self.udp_socket = Some(udp);
                         self.udp_keepalive_time.reset();
@@ -248,7 +257,8 @@ impl AuxNetwork {
                         if self.speaking.contains(VoiceSpeakingState::MICROPHONE) != is_speaking {
                             self.speaking.set(VoiceSpeakingState::MICROPHONE, is_speaking);    
                             if let Some(client) = self.ws_client.as_mut() {
-                                ws_error |= match client.send_json(&payload::build_speaking(self.speaking, self.ssrc)) {
+                                info!("[Aux] Changing to {:?}", self.speaking);
+                                ws_error |= match client.send_json(&payload::build_speaking(self.speaking, self.ssrc)).await {
                                     Err(e) => {
                                         error!("[Voice] Issue sending speaking update {:?}.", e);
                                         true
@@ -258,7 +268,7 @@ impl AuxNetwork {
                             }
                         }
                     }
-                    Err(TryRecvError::Disconnected) | Ok(Poison) => {
+                    Err(TryRecvError::Closed) | Ok(Poison) => {
                         break 'aux_runner;
                     },
                     Err(_) => {
@@ -277,18 +287,23 @@ impl AuxNetwork {
         info!("[Voice] Auxiliary network thread exited");
     }
 
-    fn process_ws_messages(&mut self, interconnect: &Interconnect) -> Result<()> {
+    async fn process_ws_messages(&mut self, interconnect: &Interconnect) -> Result<()> {
+        info!("[Aux] ws...");
         if let Some(ws) = self.ws_client.as_mut() {
+            info!("[Aux] have ws");
+
             if self.ws_keepalive_time.check() {
                 let nonce = random::<u64>();
                 self.last_heartbeat_nonce = Some(nonce);
-                ws.send_json(&payload::build_heartbeat(nonce))?;
-                self.ws_keepalive_time.reset_from_deadline();
+                info!("[Aux] Sent heartbeat {:?}", self.speaking);
+                ws.send_json(&payload::build_heartbeat(nonce)).await?;
+                self.ws_keepalive_time.increment();
             }
 
             // FIXME: need to propagate WS disconnection back to main thread to trigger reconnect.
+            // FIXME: makw this one big grand select
 
-            while let Ok(Some(value)) = ws.try_recv_json() {
+            while let Ok(Ok(Some(value))) = tokio::time::timeout(TIMESTEP_LENGTH / 2, ws.try_recv_json()).await {
                 let msg = match VoiceEvent::deserialize(&value) {
                     Ok(m) => m,
                     Err(_) => {
@@ -299,16 +314,19 @@ impl AuxNetwork {
 
                 match msg {
                     VoiceEvent::Speaking(ev) => {
+                        info!("[Aux] speak update");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                             CoreContext::SpeakingStateUpdate(ev)
                         ));
                     },
                     VoiceEvent::ClientConnect(ev) => {
+                        info!("[Aux] connect");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                             CoreContext::ClientConnect(ev)
                         ));
                     },
                     VoiceEvent::ClientDisconnect(ev) => {
+                        info!("[Aux] discon");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                             CoreContext::ClientDisconnect(ev)
                         ));
@@ -331,20 +349,24 @@ impl AuxNetwork {
         Ok(())
     }
 
-    fn process_udp_messages(&mut self, interconnect: &Interconnect) {
+    async fn process_udp_messages(&mut self, interconnect: &Interconnect) {
+        info!("[Aux] udp...");
         // NOTE: errors here (and in general for UDP) are not fatal to the connection.
         // Panics should be avoided due to adversarial nature of rx'd packets,
         // but correct handling should not prompt a reconnect.
         if let Some(udp) = self.udp_socket.as_mut() {
-            if self.udp_keepalive_time.check() {
-                let _ = udp.send_to(
-                    &self.keepalive_bytes,
-                    self.destination.expect("[Voice] Tried to send keepalive without valid destination.")
-                );
-                self.udp_keepalive_time.reset_from_deadline();
-            }
+            info!("[Aux] have udp");
+            // FIXME: either clone and recon from raw FD or do this on main.
+            // if self.udp_keepalive_time.check() {
+            //     // FIXME: Can we change this to send safely?
+            //     let _ = udp.as_ref().send_to(
+            //         &self.keepalive_bytes,
+            //         self.destination.expect("[Voice] Tried to send keepalive without valid destination.")
+            //     ).await;
+            //     self.udp_keepalive_time.increment();
+            // }
 
-            while let Ok((len, _addr)) = udp.recv_from(&mut self.packet_buffer[..]) {
+            while let Ok(Ok((len, _addr))) = tokio::time::timeout(TIMESTEP_LENGTH / 2,udp.recv_from(&mut self.packet_buffer[..])).await {
                 if !self.should_parse {
                     continue;
                 }
@@ -426,14 +448,15 @@ impl AuxNetwork {
                     }
                 }
             }
+            info!("[Aux] udp draie");
         }
     }
 }
 
-pub(crate) fn runner(interconnect: Interconnect, evt_rx: MpscReceiver<AuxPacketMessage>) {
+pub(crate) async fn runner(interconnect: Interconnect, evt_rx: UnboundedReceiver<AuxPacketMessage>) {
     let mut aux = AuxNetwork::new(evt_rx);
 
-    aux.run(&interconnect);
+    aux.run(&interconnect).await;
 }
 
 #[inline]

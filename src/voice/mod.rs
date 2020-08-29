@@ -33,6 +33,7 @@ use tracks::Track;
 const CRYPTO_MODE: &str = "xsalsa20_poly1305";
 
 #[allow(clippy::large_enum_variant)]
+#[derive(Debug)]
 pub(crate) enum Status {
     Connect(ConnectionInfo),
     Disconnect,

@@ -3,7 +3,7 @@ mod events;
 
 use crate::{
     error::Error,
-    gateway::WsClient,
+    gateway::WsStream,
     internal::Timer,
     model::id::GuildId,
     voice::{
@@ -27,24 +27,33 @@ use log::{error, info, warn};
 use std::{
     net::{
         SocketAddr,
-        UdpSocket,
-    },
-    sync::mpsc::{
-        self,
-        Receiver as MpscReceiver,
-        Sender as MpscSender,
-        TryRecvError,
     },
     thread::Builder as ThreadBuilder,
     time::Duration,
+};
+use tokio::{
+    time::{delay_for, timeout},
+    net::{
+        UdpSocket,
+        udp::{RecvHalf, SendHalf},
+    },
+    sync::mpsc::{
+        error::{
+            SendError,
+            TryRecvError,
+        },
+        self,
+        UnboundedReceiver,
+        UnboundedSender,
+    },
 };
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Interconnect {
-    pub(crate) core: MpscSender<CoreMessage>,
-    pub(crate) events: MpscSender<EventMessage>,
-    pub(crate) aux_packets: MpscSender<AuxPacketMessage>,
+    pub(crate) core: UnboundedSender<CoreMessage>,
+    pub(crate) events: UnboundedSender<EventMessage>,
+    pub(crate) aux_packets: UnboundedSender<AuxPacketMessage>,
 }
 
 impl Interconnect {
@@ -85,10 +94,10 @@ pub(crate) enum TrackStateChange {
 }
 
 pub(crate) enum AuxPacketMessage {
-    Udp(UdpSocket),
+    Udp(RecvHalf),
     UdpDestination(SocketAddr),
     UdpCipher(Cipher),
-    Ws(Box<WsClient>),
+    Ws(Box<WsStream>),
 
     SetSsrc(u32),
     SetKeepalive(f64),
@@ -101,18 +110,17 @@ pub(crate) enum CoreMessage {
     Reconnect,
 }
 
-pub(crate) fn start(guild_id: GuildId, rx: MpscReceiver<Status>) {
-    let name = format!("Serenity Voice Iface (G{})", guild_id);
-
-    ThreadBuilder::new()
-        .name(name)
-        .spawn(move || runner(guild_id, &rx))
-        .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
+pub(crate) fn start(guild_id: GuildId, rx: UnboundedReceiver<Status>) {
+    tokio::spawn(async move {
+        info!("[Voice] Core started for guild: {}", guild_id);
+        runner(guild_id, rx).await;
+        info!("[Voice] Core finished for guild: {}", guild_id);
+    });
 }
 
-fn start_internals(guild_id: GuildId, core: MpscSender<CoreMessage>) -> Interconnect {
-    let (evt_tx, evt_rx) = mpsc::channel();
-    let (pkt_aux_tx, pkt_aux_rx) = mpsc::channel();
+fn start_internals(guild_id: GuildId, core: UnboundedSender<CoreMessage>) -> Interconnect {
+    let (evt_tx, evt_rx) = mpsc::unbounded_channel();
+    let (pkt_aux_tx, pkt_aux_rx) = mpsc::unbounded_channel();
 
     let interconnect = Interconnect {
         core,
@@ -120,39 +128,40 @@ fn start_internals(guild_id: GuildId, core: MpscSender<CoreMessage>) -> Intercon
         aux_packets: pkt_aux_tx,
     };
 
-    let name = format!("Serenity Voice Event Dispatcher (G{})", guild_id);
     let ic = interconnect.clone();
-    ThreadBuilder::new()
-        .name(name)
-        .spawn(move || events::runner(ic, evt_rx))
-        .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
+    tokio::spawn(async move {
+        info!("[Voice] Event processor started for guild: {}", guild_id);
+        events::runner(ic, evt_rx).await;
+        info!("[Voice] Event processor finished for guild: {}", guild_id);
+    });
 
-    let name = format!("Serenity Voice Auxiliary Network (G{})", guild_id);
     let ic = interconnect.clone();
-    ThreadBuilder::new()
-        .name(name)
-        .spawn(move || aux_network::runner(ic, pkt_aux_rx))
-        .unwrap_or_else(|_| panic!("[Voice] Error starting guild: {:?}", guild_id));
+    tokio::spawn(async move {
+        info!("[Voice] Network processor started for guild: {}", guild_id);
+        aux_network::runner(ic, pkt_aux_rx).await;
+        info!("[Voice] Network processor finished for guild: {}", guild_id);
+    });
 
     interconnect
 }
 
-fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
+async fn runner(guild_id: GuildId, mut rx: UnboundedReceiver<Status>) {
     let mut tracks = Vec::new();
     let mut connection = None;
     let mut timer = Timer::new(20);
     let mut bitrate = DEFAULT_BITRATE;
     let mut mute = false;
 
-    let (reconnect_tx, reconnect_rx) = mpsc::channel();
+    let (reconnect_tx, mut reconnect_rx) = mpsc::unbounded_channel();
 
     let mut interconnect = start_internals(guild_id, reconnect_tx);
 
     'runner: loop {
         loop {
+            // info!("lop");
             match rx.try_recv() {
                 Ok(Status::Connect(info)) => {
-                    connection = match Connection::new(info, &interconnect, bitrate) {
+                    connection = match Connection::new(info, &interconnect, bitrate).await {
                         Ok(connection) => Some(connection),
                         Err(why) => {
                             warn!("[Voice] Error connecting: {:?}", why);
@@ -197,13 +206,16 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 },
                 Err(TryRecvError::Empty) => {
                     // If we received nothing, then we can perform an update.
+                    // info!("Actually broke");
                     break;
                 },
-                Err(TryRecvError::Disconnected) => {
+                Err(TryRecvError::Closed) => {
                     break 'runner;
                 },
             }
         }
+
+        // info!("Huh");
 
         // Overall here, check if there's an error.
         //
@@ -215,7 +227,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
         // another event.
         let error = match connection.as_mut() {
             Some(connection) => {
-                let cycle = connection.cycle(&mut tracks, &mut timer, bitrate, &interconnect, mute);
+                let cycle = connection.cycle(&mut tracks, &mut timer, bitrate, &interconnect, mute).await;
 
                 match cycle {
                     Ok(()) => {
@@ -261,7 +273,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 }
             },
             None => {
-                timer.r#await();
+                timer.hold().await;
 
                 false
             },
@@ -284,7 +296,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 // if still issue, full connect.
                 let info = conn.connection_info.clone();
 
-                let full_connect = match conn.reconnect(&interconnect) {
+                let full_connect = match conn.reconnect(&interconnect).await {
                     Ok(()) => {
                         connection = Some(conn);
                         false
@@ -292,7 +304,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                     Err(Error::VoiceInterconnectFailure) => {
                         interconnect = interconnect.restart(guild_id);
 
-                        match conn.reconnect(&interconnect) {
+                        match conn.reconnect(&interconnect).await {
                             Ok(()) => {
                                 connection = Some(conn);
                                 false
@@ -304,7 +316,7 @@ fn runner(guild_id: GuildId, rx: &MpscReceiver<Status>) {
                 };
 
                 if full_connect {
-                    connection = Connection::new(info, &interconnect, bitrate)
+                    connection = Connection::new(info, &interconnect, bitrate).await
                         .map_err(|e| {error!("[Voice] Catastrophic connection failure. Stopping. {:?}", e); e})
                         .ok();
                 }

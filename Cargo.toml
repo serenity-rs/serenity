@@ -42,11 +42,6 @@ version = "0.12"
 optional = true
 version = "1"
 
-[dependencies.command_attr]
-path = "./command_attr"
-version = "0.2.0"
-optional = true
-
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"
@@ -60,6 +55,10 @@ version = "0.2"
 optional = true
 version = "1"
 
+[dependencies.parking_lot]
+optional = true
+version = "0.11"
+
 [dependencies.reqwest]
 default-features = false
 features = ["json", "stream"]
@@ -69,6 +68,14 @@ version = "0.10"
 [dependencies.rand]
 optional = true
 version = "0.7"
+
+[dependencies.static_assertions]
+optional = true
+version = "1.1"
+
+[dependencies.streamcatcher]
+optional = true
+version = "0.0.1"
 
 [dependencies.async-tungstenite]
 default-features = false
@@ -156,8 +163,11 @@ voice = [
     "byteorder",
     "discortp",
     "gateway",
+    "parking_lot",
     "rand",
+    "streamcatcher",
     "tokio/process",
+    "tokio/sync",
     "xsalsa20poly1305",
 ]
 

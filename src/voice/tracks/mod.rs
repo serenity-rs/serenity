@@ -19,17 +19,22 @@ use crate::{
         },
     },
 };
-use std::{
-    sync::{
-        mpsc::{
-            self,
-            Receiver,
+use std::time::Duration;
+use tokio::sync::{
+    mpsc::{
+        self,
+        error::{
             SendError,
-            Sender,
             TryRecvError,
         },
+        UnboundedReceiver,
+        UnboundedSender,
     },
-    time::Duration,
+    oneshot::{
+        self,
+        Receiver as OneshotReceiver,
+        Sender as OneshotSender,
+    },
 };
 
 pub use queue::*;
@@ -61,6 +66,7 @@ pub use queue::*;
 /// [`Handler::play`]: ../struct.Handler.html#method.play
 /// [`TrackHandle`]: struct.TrackHandle.html
 /// [`voice::create_player`]: fn.create_player.html
+#[derive(Debug)]
 pub struct Track {
 
     /// Whether or not this sound is currently playing.
@@ -102,7 +108,7 @@ pub struct Track {
     /// Track commands are sent in this manner to ensure that access
     /// occurs in a thread-safe manner, without allowing any external
     /// code to lock access to audio objects and block packet generation.
-    pub(crate) commands: Receiver<TrackCommand>,
+    pub(crate) commands: UnboundedReceiver<TrackCommand>,
 
     /// Handle for safe control of this audio track from other threads.
     ///
@@ -115,7 +121,7 @@ pub struct Track {
 }
 
 impl Track {
-    pub fn new(source: Input, commands: Receiver<TrackCommand>, handle: TrackHandle) -> Self {
+    pub fn new(source: Input, commands: UnboundedReceiver<TrackCommand>, handle: TrackHandle) -> Self {
         Self {
             playing: Default::default(),
             volume: 1.0,
@@ -263,7 +269,7 @@ impl Track {
                         },
                     }
                 },
-                Err(TryRecvError::Disconnected) => {
+                Err(TryRecvError::Closed) => {
                     // TODO: issue with keeping the track handle in the struct...
                     // this branch will never be visited.
                     break;
@@ -315,7 +321,7 @@ impl Track {
 /// [`Track`]: struct.Track.html
 /// [`TrackHandle`]: struct.TrackHandle.html
 pub fn create_player(source: Input) -> (Track, TrackHandle) {
-    let (tx, rx) = mpsc::channel();
+    let (tx, rx) = mpsc::unbounded_channel();
     let can_seek = source.is_seekable();
     let player = Track::new(source, rx, TrackHandle::new(tx.clone(), can_seek));
 
@@ -362,7 +368,7 @@ pub type TrackResult = Result<(), SendError<TrackCommand>>;
 /// removed or deleted by the audio context.
 ///
 /// [`TrackHandle::get_info`]: struct.TrackHandle.html#method.get_info
-pub type TrackQueryResult = Result<Receiver<Box<TrackState>>, SendError<TrackCommand>>;
+pub type TrackQueryResult = Result<OneshotReceiver<Box<TrackState>>, SendError<TrackCommand>>;
 
 /// Alias for return value from calls to [`TrackHandle::get_info_blocking`].
 ///
@@ -385,12 +391,12 @@ pub type BlockingTrackQueryResult = Result<Box<TrackState>, SendError<TrackComma
 ///
 /// [`Track`]: struct.Track.html
 pub struct TrackHandle {
-    command_channel: Sender<TrackCommand>,
+    command_channel: UnboundedSender<TrackCommand>,
     seekable: bool,
 }
 
 impl TrackHandle {
-    pub fn new(command_channel: Sender<TrackCommand>, seekable: bool) -> Self {
+    pub fn new(command_channel: UnboundedSender<TrackCommand>, seekable: bool) -> Self {
         Self {
             command_channel,
             seekable,
@@ -484,20 +490,9 @@ impl TrackHandle {
     /// Crucially, the audio thread will respond *at a later time*:
     /// It is up to the user when or how this should be read from the returned channel.
     pub fn get_info(&self) -> TrackQueryResult {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = oneshot::channel();
         self.send(TrackCommand::Request(tx))
             .map(move |_| rx)
-    }
-
-    /// Request playback information and state from the audio context, blocking the current
-    /// thread until an answer is received.
-    ///
-    /// Crucially, the audio thread will respond *at a later time*:
-    /// in ordinary use, this may block for up to 20ms.
-    pub fn get_info_blocking(&self) -> BlockingTrackQueryResult {
-        // FIXME: combine into audio error type.
-        self.get_info()
-            .map(|c| c.recv().unwrap())
     }
 
     // Set an audio track to loop indefinitely.
@@ -572,7 +567,7 @@ pub enum TrackCommand {
     Seek(Duration),
     AddEvent(EventData),
     Do(Box<dyn FnOnce(&mut Track) -> () + Send + Sync + 'static>),
-    Request(Sender<Box<TrackState>>),
+    Request(OneshotSender<Box<TrackState>>),
     Loop(LoopState),
 }
 

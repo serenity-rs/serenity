@@ -17,9 +17,14 @@ use crate::{
     },
 };
 use log::{debug, error, info, trace, warn};
-use std::sync::mpsc::Receiver as MpscReceiver;
+use tokio::{
+    sync::mpsc::{
+        error::TryRecvError,
+        UnboundedReceiver,
+    }
+};
 
-pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMessage>) {
+pub(crate) async fn runner(_interconnect: Interconnect, mut evt_rx: UnboundedReceiver<EventMessage>) {
     let mut global = GlobalEvents::default();
 
     let mut events: Vec<EventStore> = vec![];
@@ -28,12 +33,12 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
 
     loop {
         use EventMessage::*;
-        match evt_rx.recv() {
-            Ok(AddGlobalEvent(data)) => {
+        match evt_rx.recv().await {
+            Some(AddGlobalEvent(data)) => {
                 info!("[Voice] Global event added.");
                 global.add_event(data);
             },
-            Ok(AddTrackEvent(i, data)) => {
+            Some(AddTrackEvent(i, data)) => {
                 info!("[Voice] Adding event to track {}.", i);
 
                 let event_store = events.get_mut(i)
@@ -43,7 +48,7 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
 
                 event_store.add_event(data, state.position);
             },
-            Ok(FireCoreEvent(ctx)) => {
+            Some(FireCoreEvent(ctx)) => {
                 let ctx = ctx.to_user_context();
                 let evt = ctx.to_core_event()
                     .expect("[Voice] Event thread was passed a non-core event in FireCoreEvent.");
@@ -52,14 +57,14 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
 
                 global.fire_core_event(evt, ctx);
             },
-            Ok(AddTrack(store, state, handle)) => {
+            Some(AddTrack(store, state, handle)) => {
                 events.push(store);
                 states.push(state);
                 handles.push(handle);
 
                 info!("[Voice] Event state for track {} added", events.len());
             },
-            Ok(ChangeState(i, change)) => {
+            Some(ChangeState(i, change)) => {
                 use TrackStateChange::*;
 
                 let max_states = states.len();
@@ -93,18 +98,18 @@ pub(crate) fn runner(_interconnect: Interconnect, evt_rx: MpscReceiver<EventMess
                     },
                 }
             },
-            Ok(RemoveTrack(i)) => {
+            Some(RemoveTrack(i)) => {
                 info!("[Voice] Event state for track {} of {} removed.", i, events.len());
 
                 events.remove(i);
                 states.remove(i);
                 handles.remove(i);
             },
-            Ok(Tick) => {
+            Some(Tick) => {
                 // NOTE: this should fire saved up blocks of state change evts.
                 global.tick(&mut events, &mut states, &mut handles);
             },
-            Err(_) | Ok(Poison) => {
+            None | Some(Poison) => {
                 break;
             },
         }

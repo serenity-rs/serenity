@@ -1,6 +1,6 @@
 //! Raw audio input data streams and sources.
 
-pub mod cached;
+// pub mod cached;
 mod dca;
 pub mod utils;
 
@@ -9,7 +9,7 @@ use audiopus::{
     Channels,
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-use cached::{CompressedSource, MemorySource};
+// use cached::{CompressedSource, MemorySource};
 use crate::{
     internal::prelude::*,
     prelude::SerenityError,
@@ -172,8 +172,8 @@ impl Drop for ChildContainer {
 /// [`ExtensionSeek`]: #variant.ExtensionSeek
 pub enum Reader {
     Pipe(BufReader<ChildContainer>),
-    InMemory(MemorySource),
-    Compressed(CompressedSource),
+    // InMemory(MemorySource),
+    // Compressed(CompressedSource),
     Restartable(RestartableSource),
     File(BufReader<File>),
     Extension(Box<dyn Read + Send>),
@@ -185,7 +185,7 @@ impl Reader {
         use Reader::*;
 
         match self {
-            Restartable(_) | Compressed(_) | InMemory(_) => true,
+            Restartable(_) /*| Compressed(_) | InMemory(_)*/ => true,
             Extension(_) => false,
             ExtensionSeek(_) => true,
             _ => false,
@@ -198,8 +198,8 @@ impl Read for Reader {
         use Reader::*;
         match self {
             Pipe(a) => Read::read(a, buffer),
-            InMemory(a) => Read::read(a, buffer),
-            Compressed(a) => Read::read(a, buffer),
+            // InMemory(a) => Read::read(a, buffer),
+            // Compressed(a) => Read::read(a, buffer),
             Restartable(a) => Read::read(a, buffer),
             File(a) => Read::read(a, buffer),
             Extension(a) => a.read(buffer),
@@ -215,8 +215,8 @@ impl Seek for Reader {
             Pipe(_) | Extension(_) => Err(IoError::new(
                 IoErrorKind::InvalidInput,
                 "Seeking not supported on Reader of this type.")),
-            InMemory(a) => Seek::seek(a, pos),
-            Compressed(a) => Seek::seek(a, pos),
+            // InMemory(a) => Seek::seek(a, pos),
+            // Compressed(a) => Seek::seek(a, pos),
             File(a) => Seek::seek(a, pos),
             Restartable(a) => Seek::seek(a, pos),
             ExtensionSeek(a) => a.seek(pos),
@@ -229,8 +229,8 @@ impl Debug for Reader {
         use Reader::*;
         let field = match self {
             Pipe(a) => format!("{:?}", a),
-            InMemory(a) => format!("{:?}", a),
-            Compressed(a) => format!("{:?}", a),
+            // InMemory(a) => format!("{:?}", a),
+            // Compressed(a) => format!("{:?}", a),
             Restartable(a) => format!("{:?}", a),
             File(a) => format!("{:?}", a),
             Extension(_) => "Extension".to_string(),

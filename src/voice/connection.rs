@@ -1,3 +1,4 @@
+use async_tungstenite::tungstenite::protocol::Message;
 use audiopus::{
     Application as CodingMode,
     Bitrate,
@@ -7,9 +8,9 @@ use audiopus::{
 };
 use crate::{
     constants::VOICE_GATEWAY_VERSION,
-    gateway::WsClient,
-    internal::prelude::*,
+    gateway::WsStream,
     internal::{
+        prelude::*,
         ws_impl::{ReceiverExt, SenderExt},
         Timer,
     },
@@ -42,10 +43,26 @@ use discortp::{
     MutablePacket,
     Packet,
 };
+use futures::{
+    channel::mpsc::{
+        self,
+        Receiver as MpscReceiver,
+        Sender as MpscSender,
+        TryRecvError,
+    },
+    sink::SinkExt,
+};
 use log::{debug, info, warn};
 use rand::random;
 use serde::Deserialize;
-use std::net::{SocketAddr, ToSocketAddrs, UdpSocket};
+use std::net::{SocketAddr, ToSocketAddrs};
+use tokio::{
+    time::{delay_for, timeout},
+    net::{
+        UdpSocket,
+        udp::{RecvHalf, SendHalf},
+    },
+};
 use url::Url;
 use xsalsa20poly1305::{
     aead::{AeadInPlace, NewAead},
@@ -56,8 +73,12 @@ use xsalsa20poly1305::{
     XSalsa20Poly1305 as Cipher,
 };
 
-#[cfg(not(feature = "native_tls_backend"))]
+
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
+
+#[cfg(feature = "native_tls_backend")]
+use crate::internal::ws_impl::create_native_tls_client;
 
 pub(crate) struct Connection {
     cipher: Cipher,
@@ -67,24 +88,29 @@ pub(crate) struct Connection {
     packet: [u8; VOICE_PACKET_MAX],
     silence_frames: u8,
     soft_clip: SoftClip,
-    udp: UdpSocket,
+    udp: SendHalf,
 }
 
 impl Connection {
-    pub(crate) fn new(mut info: ConnectionInfo, interconnect: &Interconnect, bitrate: Bitrate) -> Result<Connection> {
+    pub(crate) async fn new(mut info: ConnectionInfo, interconnect: &Interconnect, bitrate: Bitrate) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
-        #[cfg(not(feature = "native_tls_backend"))]
-        let mut client = create_rustls_client(url)?;
+        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+        let mut client = create_rustls_client(url).await?;
 
         #[cfg(feature = "native_tls_backend")]
-        let mut client = tungstenite::connect(url)?.0;
+        let mut client = create_native_tls_client(url).await?;
+
+        info!("Made thing");
+
         let mut hello = None;
         let mut ready = None;
-        client.send_json(&payload::build_identify(&info))?;
+        client.send_json(&payload::build_identify(&info)).await?;
+
+        info!("Sent thing");
 
         loop {
-            let value = match client.recv_json()? {
+            let value = match client.recv_json().await? {
                 Some(value) => value,
                 None => continue,
             };
@@ -113,6 +139,8 @@ impl Connection {
         let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
         let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
+        info!("visited HR");
+
         if !has_valid_mode(&ready.modes) {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
@@ -122,7 +150,9 @@ impl Connection {
             .next()
             .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
 
-        let udp = UdpSocket::bind("0.0.0.0:0")?;
+        let mut udp = UdpSocket::bind("0.0.0.0:0").await?;
+
+        info!("Made udp");
 
         // Follow Discord's IP Discovery procedures, in case NAT tunnelling is needed.
         let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
@@ -137,9 +167,11 @@ impl Connection {
             view.set_ssrc(ready.ssrc);
         }
 
-        udp.send_to(&bytes, destination)?;
+        udp.send_to(&bytes, &destination).await?;
 
-        let (len, _addr) = udp.recv_from(&mut bytes)?;
+        info!("sent disco");
+
+        let (len, _addr) = udp.recv_from(&mut bytes).await?;
         {
             let view = IpDiscoveryPacket::new(&bytes[..len])
                 .ok_or_else(|| Error::Voice(VoiceError::IllegalDiscoveryResponse))?;
@@ -149,12 +181,14 @@ impl Connection {
             }
 
             let addr = String::from_utf8_lossy(&view.get_address_raw());
-            client.send_json(&payload::build_select_protocol(addr, view.get_port()))?;
+            client.send_json(&payload::build_select_protocol(addr, view.get_port())).await?;
         }
 
-        let cipher = init_cipher(&mut client)?;
+        info!("rx'd disco");
 
-        unset_blocking(&mut client)?;
+        let cipher = init_cipher(&mut client).await?;
+
+        info!("Made cipher");
 
         info!("[Voice] Connected to: {}", info.endpoint);
 
@@ -181,14 +215,13 @@ impl Connection {
         rtp.set_timestamp(random::<u32>().into());
         rtp.set_ssrc(ready.ssrc);
 
+        let(udp_rx, udp_tx) = udp.split();
+
         interconnect.aux_packets.send(AuxPacketMessage::UdpDestination(destination))?;
         interconnect.aux_packets.send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
-        interconnect.aux_packets.send(AuxPacketMessage::Udp(
-            udp.try_clone()
-                .expect("[Voice] Failed to clone UDP")
-        ))?;
+        interconnect.aux_packets.send(AuxPacketMessage::Udp(udp_rx))?;
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         Ok(Connection {
@@ -199,29 +232,29 @@ impl Connection {
             packet,
             silence_frames: 0,
             soft_clip,
-            udp,
+            udp: udp_tx,
         })
     }
 
-    pub fn reconnect(&mut self, interconnect: &Interconnect) -> Result<()> {
+    pub async fn reconnect(&mut self, interconnect: &Interconnect) -> Result<()> {
         let url = generate_url(&mut self.connection_info.endpoint)?;
 
         // Thread may have died, we want to send to prompt a clean exit
         // (if at all possible) and then proceed as normal.
 
-        #[cfg(not(feature = "native_tls_backend"))]
-        let mut client = create_rustls_client(url)?;
+        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+        let mut client = create_rustls_client(url).await?;
 
         #[cfg(feature = "native_tls_backend")]
-        let mut client = tungstenite::connect(url)?.0;
+        let mut client = create_native_tls_client(url).await?;
 
-        client.send_json(&payload::build_resume(&self.connection_info))?;
+        client.send_json(&payload::build_resume(&self.connection_info)).await?;
 
         let mut hello = None;
         let mut resumed = None;
 
         loop {
-            let value = match client.recv_json()? {
+            let value = match client.recv_json().await? {
                 Some(value) => value,
                 None => continue,
             };
@@ -248,8 +281,6 @@ impl Connection {
         };
 
         let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
-
-        unset_blocking(&mut client)?;
 
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
@@ -307,7 +338,7 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    pub(crate) fn cycle(&mut self,
+    pub(crate) async fn cycle(&mut self,
                 mut tracks: &mut Vec<Track>,
                 audio_timer: &mut Timer,
                 bitrate: Bitrate,
@@ -340,7 +371,7 @@ impl Connection {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 interconnect.aux_packets.send(AuxPacketMessage::Speaking(false))?;
 
-                audio_timer.r#await();
+                audio_timer.hold().await;
 
                 return Ok(());
             }
@@ -350,8 +381,8 @@ impl Connection {
 
         interconnect.aux_packets.send(AuxPacketMessage::Speaking(true))?;
 
-        self.prep_and_send_packet(mix_buffer, opus_frame)?;
-        audio_timer.r#await();
+        self.prep_and_send_packet(mix_buffer, opus_frame).await?;
+        audio_timer.hold().await;
 
         self.audio_commands_events(&mut tracks, interconnect);
 
@@ -363,7 +394,7 @@ impl Connection {
             .map_err(Into::into)
     }
 
-    fn prep_and_send_packet(&mut self, buffer: [f32; 1920], opus_frame: &[u8]) -> Result<()> {
+    async fn prep_and_send_packet(&mut self, buffer: [f32; 1920], opus_frame: &[u8]) -> Result<()> {
         let mut nonce = Nonce::default();
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
@@ -398,7 +429,7 @@ impl Connection {
             rtp_len + final_payload_size
         };
 
-        self.udp.send_to(&self.packet[..index], self.destination)?;
+        self.udp.send_to(&self.packet[..index], &self.destination).await?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
             .expect(
@@ -430,9 +461,9 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-fn init_cipher(client: &mut WsClient) -> Result<Cipher> {
+async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
     loop {
-        let value = match client.recv_json()? {
+        let value = match client.recv_json().await? {
             Some(value) => value,
             None => continue,
         };
@@ -470,19 +501,4 @@ where T: for<'a> PartialEq<&'a str>,
       It : IntoIterator<Item=T>
 {
     modes.into_iter().any(|s| s == CRYPTO_MODE)
-}
-
-#[inline]
-fn unset_blocking(client: &mut WsClient) -> Result<()> {
-    #[cfg(not(feature = "native_tls_backend"))]
-    let stream = &client.get_mut().sock;
-
-    #[cfg(feature = "native_tls_backend")]
-    let stream = match client.get_mut() {
-        tungstenite::stream::Stream::Plain(stream) => stream,
-        tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
-    };
-
-    stream.set_nonblocking(true)
-        .map_err(Into::into)
 }

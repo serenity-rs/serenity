@@ -27,9 +27,12 @@ use crate::http::HttpError;
 #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::RustlsError;
 #[cfg(feature = "voice")]
-use crate::voice::VoiceError;
+use crate::voice::{
+    threading::AuxPacketMessage,
+    VoiceError
+};
 #[cfg(feature = "voice")]
-use crate::voice::threading::AuxPacketMessage;
+use tokio::sync::mpsc::error::SendError;
 
 /// The common result type between most library functions.
 ///
@@ -150,6 +153,11 @@ impl From<OpusError> for Error {
 #[cfg(feature = "voice")]
 impl From<VoiceError> for Error {
     fn from(e: VoiceError) -> Error { Error::Voice(e) }
+}
+
+#[cfg(feature = "voice")]
+impl From<SendError<AuxPacketMessage>> for Error {
+    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::VoiceInterconnectFailure }
 }
 
 #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
