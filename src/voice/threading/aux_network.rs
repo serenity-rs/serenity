@@ -237,9 +237,6 @@ impl AuxNetwork {
                     Ok(UdpCipher(new_key)) => {
                         self.cipher = Some(new_key);
                     },
-                    Ok(UdpDestination(addr)) => {
-                        self.destination = Some(addr);
-                    }
                     Ok(Ws(data)) => {
                         self.ws_client = Some(*data);
                         self.ws_keepalive_time.reset();

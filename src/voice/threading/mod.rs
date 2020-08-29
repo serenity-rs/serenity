@@ -95,7 +95,6 @@ pub(crate) enum TrackStateChange {
 
 pub(crate) enum AuxPacketMessage {
     Udp(RecvHalf),
-    UdpDestination(SocketAddr),
     UdpCipher(Cipher),
     Ws(Box<WsStream>),
 

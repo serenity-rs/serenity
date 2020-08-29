@@ -83,7 +83,6 @@ use crate::internal::ws_impl::create_native_tls_client;
 pub(crate) struct Connection {
     cipher: Cipher,
     pub(crate) connection_info: ConnectionInfo,
-    destination: SocketAddr,
     encoder: OpusEncoder,
     packet: [u8; VOICE_PACKET_MAX],
     silence_frames: u8,
@@ -145,12 +144,8 @@ impl Connection {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
 
-        let destination = (&ready.ip[..], ready.port)
-            .to_socket_addrs()?
-            .next()
-            .ok_or(Error::Voice(VoiceError::HostnameResolve))?;
-
         let mut udp = UdpSocket::bind("0.0.0.0:0").await?;
+        udp.connect((&ready.ip[..], ready.port)).await?;
 
         info!("Made udp");
 
@@ -167,7 +162,7 @@ impl Connection {
             view.set_ssrc(ready.ssrc);
         }
 
-        udp.send_to(&bytes, &destination).await?;
+        udp.send(&bytes).await?;
 
         info!("sent disco");
 
@@ -217,7 +212,6 @@ impl Connection {
 
         let(udp_rx, udp_tx) = udp.split();
 
-        interconnect.aux_packets.send(AuxPacketMessage::UdpDestination(destination))?;
         interconnect.aux_packets.send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
@@ -227,7 +221,6 @@ impl Connection {
         Ok(Connection {
             cipher,
             connection_info: info,
-            destination,
             encoder,
             packet,
             silence_frames: 0,
@@ -429,7 +422,7 @@ impl Connection {
             rtp_len + final_payload_size
         };
 
-        self.udp.send_to(&self.packet[..index], &self.destination).await?;
+        self.udp.send(&self.packet[..index]).await?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
             .expect(
