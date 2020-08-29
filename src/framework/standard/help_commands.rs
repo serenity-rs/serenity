@@ -55,9 +55,9 @@
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
-    Args, CommandGroup, CommandOptions, CheckResult,
-    has_correct_roles, HelpBehaviour, HelpOptions,
-    has_correct_permissions, OnlyIn,
+    Args, CommandGroup, CommandOptions, Check,
+    CheckResult, has_correct_roles, HelpBehaviour,
+    HelpOptions, has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
 #[cfg(all(feature = "cache", feature = "http"))]
@@ -391,25 +391,26 @@ async fn check_command_behaviour(
     ctx: &Context,
     msg: &Message,
     options: &CommandOptions,
+    group_checks: &[&Check],
     owners: &HashSet<UserId>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
     let b = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
 
     if b == HelpBehaviour::Nothing {
-       if !options.owner_privilege || !owners.contains(&msg.author.id) {
-           for check in options.checks {
-               if !check.check_in_help {
-                   continue;
-               }
+        if !options.owner_privilege || !owners.contains(&msg.author.id) {
+            for check in group_checks.iter().chain(options.checks) {
+                if !check.check_in_help {
+                    continue;
+                }
 
-               let mut args = Args::new("", &[]);
+                let mut args = Args::new("", &[]);
 
-               if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {
-                   return help_options.lacking_conditions;
-               }
-           }
-       }
+                if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {
+                    return help_options.lacking_conditions;
+                }
+            }
+        }
     }
 
     b
@@ -474,6 +475,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     ctx,
                     msg,
                     &command.options,
+                    group.options.checks,
                     &owners,
                     &help_options,
                 ).await {
@@ -496,6 +498,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                         ctx,
                         msg,
                         &command.options,
+                        group.options.checks,
                         &owners,
                         &help_options,
                     ).await
@@ -690,6 +693,7 @@ async fn fill_eligible_commands<'a>(
             ctx,
             msg,
             &command.options,
+            group.options.checks,
             owners,
             help_options,
         ).await;
