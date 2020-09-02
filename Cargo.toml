@@ -59,6 +59,10 @@ version = "1"
 optional = true
 version = "0.11"
 
+[dependencies.pin-project]
+optional = true
+version = "0.4"
+
 [dependencies.reqwest]
 default-features = false
 features = ["json", "stream"]
@@ -76,6 +80,8 @@ version = "1.1"
 [dependencies.streamcatcher]
 optional = true
 version = "0.0.1"
+features = ["tokio-compat"]
+path = "../streamcatcher"
 
 [dependencies.async-tungstenite]
 default-features = false
@@ -164,6 +170,7 @@ voice = [
     "discortp",
     "gateway",
     "parking_lot",
+    "pin-project",
     "rand",
     "streamcatcher",
     "tokio/process",

@@ -174,7 +174,6 @@ impl Handler {
         let user_id = self.user_id;
 
         // Safe as all of these being present was already checked.
-        println!("Sent!?");
         self.send(VoiceStatus::Connect(ConnectionInfo {
             endpoint,
             guild_id,

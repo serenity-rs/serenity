@@ -59,6 +59,8 @@ struct General;
 
 #[tokio::main]
 async fn main() {
+    env_logger::init();
+    
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");
@@ -267,7 +269,7 @@ async fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
             },
         };
 
-        handler.play(source);
+        handler.play_source(source);
 
         check_msg(msg.channel_id.say(&ctx.http, "Playing song").await);
     } else {

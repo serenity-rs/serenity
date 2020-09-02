@@ -283,7 +283,7 @@ impl Connection {
     }
 
     #[inline]
-    fn mix_tracks<'a>(
+    async fn mix_tracks<'a>(
         &mut self,
         tracks: &mut Vec<Track>,
         opus_frame: &'a mut [u8],
@@ -300,13 +300,13 @@ impl Connection {
                 continue;
             }
 
-            let temp_len = stream.mix(mix_buffer, vol);
+            let temp_len = stream.mix(mix_buffer, vol).await;
 
             len = len.max(temp_len);
             if temp_len > 0 {
                 track.step_frame();
             } else if track.do_loop() {
-                if let Some(time) = track.seek_time(Default::default()) {
+                if let Some(time) = track.seek_time(Default::default()).await {
                     let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
                     let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(track.loops, false)));
                 }
@@ -346,7 +346,7 @@ impl Connection {
 
         // Walk over all the audio files, combining into one audio frame according
         // to volume, play state, etc.
-        let (mut len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect)?;
+        let (mut len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect).await?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 

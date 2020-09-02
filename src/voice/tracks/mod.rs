@@ -300,8 +300,8 @@ impl Track {
     /// Seek to a specific point in the track.
     ///
     /// Returns `None` if unsupported.
-    pub fn seek_time(&mut self, pos: Duration) -> Option<Duration> {
-        let out = self.source.seek_time(pos);
+    pub async fn seek_time(&mut self, pos: Duration) -> Option<Duration> {
+        let out = self.source.seek_time(pos).await;
 
         if let Some(t) = out {
             self.position = t;
@@ -326,6 +326,12 @@ pub fn create_player(source: Input) -> (Track, TrackHandle) {
     let player = Track::new(source, rx, TrackHandle::new(tx.clone(), can_seek));
 
     (player, TrackHandle::new(tx, can_seek))
+}
+
+impl From<Input> for Track {
+    fn from(input: Input) -> Self {
+        create_player(input).0
+    }
 }
 
 /// State of an [`Track`] object, designed to be passed to event handlers
