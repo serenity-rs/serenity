@@ -768,6 +768,28 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InviteCreateEvent {
+    pub channel_id: ChannelId,
+    pub code: String,
+    pub guild_id: Option<GuildId>,
+    pub inviter: Option<User>,
+    pub max_age: u64,
+    pub max_uses: u64,
+    pub temporary: bool,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct InviteDeleteEvent {
+    pub channel_id: ChannelId,
+    pub guild_id: Option<GuildId>,
+    pub code: String,
+    #[serde(skip)]
+    pub(crate) _nonexhaustive: (),
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct GuildUnavailableEvent {
     #[serde(rename = "id")] pub guild_id: GuildId,
     #[serde(skip)]
@@ -1520,6 +1542,20 @@ pub enum Event {
     /// When a guild is unavailable, such as due to a Discord server outage.
     GuildUnavailable(GuildUnavailableEvent),
     GuildUpdate(GuildUpdateEvent),
+    /// An [`Invite`] was created.
+    ///
+    /// Fires the [`EventHandler::invite_create`] event handler.
+    ///
+    /// [`Invite`]: invite/struct.Invite.html
+    /// [`EventHandler::invite_create`]: ../../client/trait.EventHandler.html#method.invite_create
+    InviteCreate(InviteCreateEvent),
+    /// An [`Invite`] was deleted.
+    ///
+    /// Fires the [`EventHandler::invite_delete`] event handler.
+    ///
+    /// [`Invite`]: invite/struct.Invite.html
+    /// [`EventHandler::invite_delete`]: ../../client/trait.EventHandler.html#method.invite_delete
+    InviteDelete(InviteDeleteEvent),
     MessageCreate(MessageCreateEvent),
     MessageDelete(MessageDeleteEvent),
     MessageDeleteBulk(MessageDeleteBulkEvent),
@@ -1656,6 +1692,8 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::GuildRoleUpdate => {
             Event::GuildRoleUpdate(serde_json::from_value(v)?)
         },
+        EventType::InviteCreate => Event::InviteCreate(serde_json::from_value(v)?),
+        EventType::InviteDelete => Event::InviteDelete(serde_json::from_value(v)?),
         EventType::GuildUpdate => Event::GuildUpdate(serde_json::from_value(v)?),
         EventType::MessageCreate => Event::MessageCreate(serde_json::from_value(v)?),
         EventType::MessageDelete => Event::MessageDelete(serde_json::from_value(v)?),
@@ -1821,6 +1859,18 @@ pub enum EventType {
     ///
     /// [`GuildUpdateEvent`]: struct.GuildUpdateEvent.html
     GuildUpdate,
+    /// Indicator that an invite was created.
+    ///
+    /// This maps to [`InviteCreateEvent`].
+    ///
+    /// [`InviteCreateEvent`]: struct.InviteCreateEvent.html
+    InviteCreate,
+    /// Indicator that an invite was deleted.
+    ///
+    /// This maps to [`InviteDeleteEvent`].
+    ///
+    /// [`InviteDeleteEvent`]: struct.InviteDeleteEvent.html
+    InviteDelete,
     /// Indicator that a message create payload was received.
     ///
     /// This maps to [`MessageCreateEvent`].
@@ -1958,6 +2008,8 @@ impl<'de> Deserialize<'de> for EventType {
                     "GUILD_ROLE_CREATE" => EventType::GuildRoleCreate,
                     "GUILD_ROLE_DELETE" => EventType::GuildRoleDelete,
                     "GUILD_ROLE_UPDATE" => EventType::GuildRoleUpdate,
+                    "INVITE_CREATE" => EventType::InviteCreate,
+                    "INVITE_DELETE" => EventType::InviteDelete,
                     "GUILD_UPDATE" => EventType::GuildUpdate,
                     "MESSAGE_CREATE" => EventType::MessageCreate,
                     "MESSAGE_DELETE" => EventType::MessageDelete,
