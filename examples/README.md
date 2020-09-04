@@ -21,15 +21,15 @@ To run an example, you have various options:
 - CD into the serenity folder: `cd serenity`
 - Run `cargo make 1`, where 1 is the number of the example you wish to run; these are:
 ```
- 1 => Basing Ping Bot: A bare minimum serenity application.
+ 1 => Basic Ping Bot: A bare minimum serenity application.
  2 => Transparent Guild Sharding: How to use sharding and shared cache.
- 3 => Structure Utilities: Simple usage of the utils feature flag.
+ 3 => Structure Utilities: Simple usage of the utils feature.
  4 => Message Builder: A demonstration of the message builder utility, to generate messages safely.
  5 => Command Framework: The main example, where it's demonstrated how to use serenity's command framework,
       along with mosts of it's utilities.
-      This example also shows how to share data between events and commands with `Context.data`
- 6 => Voice: Simple example on playing back audio with serenity along with FFMPEG and Youtube-DL.
- 7 => Simple Bot Stucture: An example showing the recommended file structure.
+      This example also shows how to share data between events and commands, using `Context.data`
+ 6 => Voice: Simple example on playing back audio with serenity, along with FFMPEG and Youtube-DL.
+ 7 => Simple Bot Stucture: An example showing the recommended file structure to use.
  8 => Env Logging: How to use the log crate along with serenity.
  9 => Shard Manager: How to get started with using the shard manager.
 10 => Voice Recieve: How to recieve voice audio packets.
