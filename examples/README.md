@@ -24,14 +24,15 @@ To run an example, you have various options:
  2 => Transparent Guild Sharding: How to use sharding and shared cache.
  3 => Structure Utilities: Simple usage of the utils feature flag.
  4 => Message Builder: A demonstration of the message builder utility, to generate messages safely.
- 5 => Command Framework: The main example, where it's demonstrated how to use serenity's command framework, along with mosts of it's utilities.
+ 5 => Command Framework: The main example, where it's demonstrated how to use serenity's command framework,
+ along with mosts of it's utilities.
       This example also shows how to share data between events and commands with `Context.data`
  6 => Voice: Simple example on playing back audio with serenity along with FFMPEG and Youtube-DL.
  7 => Simple Bot Stucture: An example showing the recommended file structure.
  8 => Env Logging: How to use the log crate along with serenity.
  9 => Shard Manager: How to get started with using the shard manager.
 10 => Voice Recieve: How to recieve voice audio packets.
-WARNING: This *may* not work, PR #806 is aiming to fix this.
+      WARNING: This example *may* not work, PR #806 is aiming to fix this.
 11 => Create Message Builder: How to send embeds and files.
 12 => Collectors: How to use the collectors feature to wait for messages and reactions.
 13 => Gateway Intents: How to use intents to limit the events the bot will recieve.
