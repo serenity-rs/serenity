@@ -9,6 +9,7 @@ documentation.
 
 To provide a token for them to use, you need to set the `DISCORD_TOKEN`
 environmental variable to the Bot token.\
+If you don't like environment tokens, you can hardcode your token in instead.\
 TIP: A valid token starts with M, N or O and has 2 dots.
 
 ### Running Examples
@@ -47,12 +48,9 @@ To run an example, you have various options:
 3. Copy Paste:
 - Copy the contents of the example into your local binary project\
 (created via `cargo new test-project --bin`)\
-and ensuring that the contents of the `Cargo.toml` file contains that
-of the example's `[dependencies]` section, and _then_ executing `cargo run`.
-
-Note that all examples - by default - require an environment token of
-`DISCORD_TOKEN` to be set. If you don't like environment tokens, you can
-hardcode your token in.
+and ensuring that the contents of the `Cargo.toml` file
+contains that of the example's `[dependencies]` section,\
+and _then_ executing `cargo run`.
 
 ### Questions
 
