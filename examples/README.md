@@ -43,7 +43,7 @@ WARNING: This *may* not work, PR #806 is aiming to fix this.
 - CD into the example of choice: `cd e01_basic_ping_bot`
 - Run the example: `cargo run --release`
 
-3: Copy Paste:
+3. Copy Paste:
 - Copy the contents of the example into your local binary project\
 (created via `cargo new test-project --bin`)\
 and ensuring that the contents of the `Cargo.toml` file contains that
