@@ -288,11 +288,12 @@ impl Connection {
 
         self.keepalive_timer = Timer::new((hello.heartbeat_interval as f64 * 0.75) as u64);
 
-        let (_, stream) = stream.split();
+        let (sink, stream) = stream.split();
         let (ws_close_sender, ws_task) = start_ws_task(stream, &self.task_items.tx).await?;
 
         self.task_items.ws_close_sender = ws_close_sender;
         self.task_items.ws_task = ws_task;
+        self.stream = sink;
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
         Ok(())
