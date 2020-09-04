@@ -265,7 +265,7 @@ impl ShardRunner {
         let _ = self.shard.client.close(Some(CloseFrame {
             code: close_code.into(),
             reason: Cow::from(""),
-        }));
+        })).await;
 
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
