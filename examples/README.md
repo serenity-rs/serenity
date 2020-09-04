@@ -8,7 +8,7 @@ concepts. Examples should be completed in order, so as not to miss any
 documentation.
 
 To provide a token for them to use, you need to set the `DISCORD_TOKEN`
-environmental variable to the Bot token.
+environmental variable to the Bot token.\
 TIP: A valid token starts with M, N or O and has 2 dots.
 
 ### Running Examples
