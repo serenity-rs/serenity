@@ -181,9 +181,11 @@ impl_from_str! { struct:
     Role, RoleId, RoleParseError, InvalidRole, parse_role, "invalid role";
 }
 
-/// A version of an emoji used only when solely the Id and name are known.
+/// A version of an emoji used only when solely the animated state, Id, and name are known.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct EmojiIdentifier {
+    /// Whether the emoji is animated
+    pub animated: bool,
     /// The Id of the emoji.
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can
