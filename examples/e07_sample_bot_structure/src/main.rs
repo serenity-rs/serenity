@@ -98,6 +98,11 @@ async fn main() {
         .await
         .expect("Err creating client");
 
+    {
+        let mut data = client.data.write().await;
+        data.insert::<ShardManagerContainer>(client.shard_manager.clone());
+    }
+
     if let Err(why) = client.start().await {
         error!("Client error: {:?}", why);
     }
