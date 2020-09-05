@@ -247,7 +247,7 @@ pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
     }
 }
 
-/// Retrieves the name and Id from an emoji mention, in the form of an
+/// Retrieves the animated state, name and Id from an emoji mention, in the form of an
 /// `EmojiIdentifier`.
 ///
 /// If the emoji usage is invalid, then `None` is returned.
@@ -262,6 +262,7 @@ pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
 /// use serenity::utils::parse_emoji;
 ///
 /// let expected = EmojiIdentifier {
+///     animated: false,
 ///     id: EmojiId(302516740095606785),
 ///     name: "smugAnimeFace".to_string(),
 /// };
@@ -287,13 +288,16 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
         return None;
     }
 
-    if mention.starts_with("<:") && mention.ends_with('>') {
+    if (mention.starts_with("<:") || mention.starts_with("<a:")) && mention.ends_with('>') {
         let mut name = String::default();
         let mut id = String::default();
+        let animated = &mention[1..3] == "a:";
 
-        for (i, x) in mention[2..].chars().enumerate() {
+        let start = if animated { 3 } else { 2 };
+
+        for (i, x) in mention[start..].chars().enumerate() {
             if x == ':' {
-                let from = i + 3;
+                let from = i + start + 1;
 
                 for y in mention[from..].chars() {
                     if y == '>' {
@@ -311,6 +315,7 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
 
         match id.parse::<u64>() {
             Ok(x) => Some(EmojiIdentifier {
+                animated,
                 name,
                 id: EmojiId(x),
             }),
