@@ -12,6 +12,8 @@ use std::{
     },
 };
 
+use unic_emoji_char::is_emoji;
+
 use crate::internal::prelude::*;
 
 #[cfg(feature = "model")]
@@ -225,7 +227,7 @@ impl Reaction {
 
         if limit > 100 {
             limit = 100;
-            warn!("Rection users limit clamped to 100! (API Restriction)");
+            warn!("Reaction users limit clamped to 100! (API Restriction)");
         }
 
         http.as_ref().get_reaction_users(
@@ -260,7 +262,7 @@ pub enum ReactionType {
         name: Option<String>,
     },
     /// A reaction with a twemoji.
-    Unicode(String),
+    Unicode(UnicodeEmoji),
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -320,15 +322,19 @@ impl<'de> Deserialize<'de> for ReactionType {
                 let animated = animated.unwrap_or(false);
                 let name = name.ok_or_else(|| DeError::missing_field("name"))?;
 
-                Ok(if let Some(id) = id {
-                    ReactionType::Custom {
+                if let Some(id) = id {
+                    Ok(ReactionType::Custom {
                         animated,
                         id,
                         name,
-                    }
+                    })
                 } else {
-                    ReactionType::Unicode(name.unwrap())
-                })
+                    UnicodeEmoji::try_from(name.unwrap()).map(
+                        |val| ReactionType::Unicode(val)
+                    ).map_err(
+                        |e| DeError::custom(e)  // TODO: Change returned error
+                    )
+                }
             }
         }
 
@@ -377,38 +383,10 @@ impl ReactionType {
                 ref name,
                 ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
-            ReactionType::Unicode(ref unicode) => unicode.clone(),
+            ReactionType::Unicode(ref unicode) => unicode.clone().to_string(),
             ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
-}
-
-impl From<char> for ReactionType {
-    /// Creates a `ReactionType` from a `char`.
-    ///
-    /// # Examples
-    ///
-    /// Reacting to a message with an apple:
-    ///
-    /// ```rust,no_run
-    /// # #[cfg(feature = "client")]
-    /// # use serenity::client::Context;
-    /// # #[cfg(feature = "framework")]
-    /// # use serenity::framework::standard::{CommandResult, macros::command};
-    /// # use serenity::model::id::ChannelId;
-    /// #
-    /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
-    /// # #[command]
-    /// # async fn example(ctx: &Context) -> CommandResult {
-    /// #   let message = ChannelId(0).message(&ctx.http, 0).await?;
-    /// #
-    /// message.react(ctx, '🍎').await?;
-    /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {}
-    /// ```
-    fn from(ch: char) -> ReactionType { ReactionType::Unicode(ch.to_string()) }
 }
 
 impl From<Emoji> for ReactionType {
@@ -452,18 +430,75 @@ impl Display for ReactionConversionError {
 
 impl std::error::Error for ReactionConversionError {}
 
+#[derive(Clone,Serialize,Hash,Eq,PartialEq,Debug)]
+pub struct UnicodeEmoji {
+    pub content: char
+}
+
+impl TryFrom<String> for UnicodeEmoji {
+    type Error = ReactionConversionError;
+    fn try_from(string: String) -> std::result::Result<Self, Self::Error> {
+        return UnicodeEmoji::try_from(string.as_str())
+    }
+}
+
+impl<'a> TryFrom<&'a str> for UnicodeEmoji {
+    type Error = ReactionConversionError;
+    fn try_from(string: &str) -> std::result::Result<Self, Self::Error> {
+        let chars = string.chars().collect::<Vec<char>>();
+        return if chars.len() == 1 && is_emoji(chars[0]) {
+            Ok(UnicodeEmoji { content: chars[0] })
+        } else {
+            Err(ReactionConversionError)
+        }
+    }
+}
+
+impl ToString for UnicodeEmoji {
+    fn to_string(&self) -> String {
+        return self.content.to_string();
+    }
+}
+
+
+
+impl TryFrom<char> for ReactionType {
+    /// Creates a `ReactionType` from a `char`.
+    ///
+    /// # Examples
+    ///
+    /// Reacting to a message with an apple:
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(feature = "client")]
+    /// # use serenity::client::Context;
+    /// # #[cfg(feature = "framework")]
+    /// # use serenity::framework::standard::{CommandResult, macros::command};
+    /// # use serenity::model::id::ChannelId;
+    /// #
+    /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
+    /// # #[command]
+    /// # async fn example(ctx: &Context) -> CommandResult {
+    /// #   let message = ChannelId(0).message(&ctx.http, 0).await?;
+    /// #
+    /// message.react(ctx, '🍎').await?;
+    /// # Ok(())
+    /// # }
+    /// #
+    /// # fn main() {}
+    /// ```
+    type Error = ReactionConversionError;
+
+    fn try_from(ch: char) -> std::result::Result<Self, Self::Error> {
+        UnicodeEmoji::try_from(ch.to_string()).map(|val| ReactionType::Unicode(val))
+    }
+}
+
 impl TryFrom<String> for ReactionType {
     type Error = ReactionConversionError;
 
     fn try_from(emoji_string: String) -> std::result::Result<Self, Self::Error> {
-        if emoji_string.is_empty() {
-            return Err(ReactionConversionError)
-        }
-
-        if !emoji_string.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_string))
-        }
-        ReactionType::try_from(&emoji_string[..])
+        return ReactionType::try_from(&emoji_string[..])
     }
 }
 
@@ -515,7 +550,7 @@ impl<'a> TryFrom<&'a str> for ReactionType {
         }
 
         if !emoji_str.starts_with('<') {
-            return Ok(ReactionType::Unicode(emoji_str.to_string()))
+            return UnicodeEmoji::try_from(emoji_str).map(|val| ReactionType::Unicode(val));
         }
 
         if !emoji_str.ends_with('>') {
@@ -598,7 +633,7 @@ impl Display for ReactionType {
                 Display::fmt(&id, f)?;
                 f.write_char('>')
             },
-            ReactionType::Unicode(ref unicode) => f.write_str(unicode),
+            ReactionType::Unicode(ref unicode) => f.write_str(unicode.to_string().as_str()),
             ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
