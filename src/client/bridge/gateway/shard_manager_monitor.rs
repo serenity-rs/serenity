@@ -2,7 +2,7 @@ use tokio::sync::Mutex;
 use std::sync::Arc;
 use super::{ShardManager, ShardManagerMessage};
 use super::super::gateway::ShardId;
-use log::{debug, warn};
+use tracing::{debug, warn};
 use futures::{
     StreamExt,
     channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},

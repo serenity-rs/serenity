@@ -6,7 +6,7 @@ use super::{
     Status,
     audio,
 };
-use log::{info, error, warn};
+use tracing::{info, error, warn};
 
 pub(crate) fn start(guild_id: GuildId, mut rx: Receiver<Status>) {
     tokio::spawn(async move {

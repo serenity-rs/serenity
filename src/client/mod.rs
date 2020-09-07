@@ -60,7 +60,7 @@ use std::{
 };
 #[cfg(all(feature = "cache", feature = "gateway"))]
 use std::time::Duration;
-use log::{error, debug, info};
+use tracing::{error, debug, info};
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;

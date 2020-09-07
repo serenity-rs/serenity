@@ -31,7 +31,7 @@ use tokio::sync::Mutex;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 
-use log::{error, debug, warn};
+use tracing::{error, debug, warn};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///

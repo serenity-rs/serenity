@@ -24,7 +24,7 @@ use super::{
     ShardRunnerOptions,
 };
 use crate::gateway::ConnectionStage;
-use log::{debug, info, warn};
+use tracing::{debug, info, warn};
 
 use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]

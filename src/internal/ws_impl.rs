@@ -4,7 +4,7 @@ use crate::internal::prelude::*;
 use serde_json;
 use async_tungstenite::tungstenite::Message;
 use async_trait::async_trait;
-use log::warn;
+use tracing::warn;
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 

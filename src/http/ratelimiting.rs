@@ -58,7 +58,7 @@ use std::{
 };
 use tokio::time::{delay_for, Duration};
 use super::{HttpError, Request};
-use log::debug;
+use tracing::debug;
 
 /// Ratelimiter for requests to the Discord API.
 ///

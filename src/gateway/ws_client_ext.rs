@@ -7,7 +7,7 @@ use crate::model::id::GuildId;
 use serde_json::json;
 use std::env::consts;
 use std::time::SystemTime;
-use log::{debug, trace};
+use tracing::{debug, trace};
 use async_trait::async_trait;
 
 #[async_trait]

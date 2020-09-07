@@ -23,7 +23,7 @@ use super::{
 use bytes::buf::Buf;
 use serde::de::DeserializeOwned;
 use serde_json::json;
-use log::{debug, trace};
+use tracing::{debug, trace};
 use std::{
     collections::BTreeMap,
     sync::Arc,

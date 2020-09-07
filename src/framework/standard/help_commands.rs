@@ -79,7 +79,7 @@ use std::{
     ops::{Index, IndexMut},
 };
 #[cfg(all(feature = "cache", feature = "http"))]
-use log::warn;
+use tracing::warn;
 #[cfg(all(feature = "cache", feature = "http"))]
 use futures::future::{BoxFuture, FutureExt};
 

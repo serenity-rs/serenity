@@ -21,7 +21,7 @@ use std::{
     task::{Context, Poll},
 };
 use super::{AudioSource, AudioType, DcaError, DcaMetadata, VoiceError, audio};
-use log::{debug, warn};
+use tracing::{debug, warn};
 use crate::prelude::SerenityError;
 use async_trait::async_trait;
 

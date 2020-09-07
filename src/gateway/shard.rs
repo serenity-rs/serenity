@@ -26,7 +26,7 @@ use async_tungstenite::tungstenite::{
     protocol::frame::CloseFrame,
 };
 use url::Url;
-use log::{error, debug, info, trace, warn};
+use tracing::{error, debug, info, trace, warn};
 
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;

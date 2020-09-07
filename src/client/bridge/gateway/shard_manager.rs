@@ -18,7 +18,7 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
-use log::{info, warn};
+use tracing::{info, warn};
 
 use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
