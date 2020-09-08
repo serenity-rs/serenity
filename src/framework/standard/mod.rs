@@ -33,6 +33,7 @@ use tokio::sync::Mutex;
 use futures::future::BoxFuture;
 use uwl::Stream;
 use async_trait::async_trait;
+use tracing::instrument;
 
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
@@ -614,6 +615,7 @@ impl StandardFramework {
 
 #[async_trait]
 impl Framework for StandardFramework {
+    #[instrument(skip(self, ctx))]
     async fn dispatch(&self, mut ctx: Context, msg: Message) {
         let mut stream = Stream::new(&msg.content);
 

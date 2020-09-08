@@ -8,6 +8,7 @@ use crate::model::{
     },
     voice::VoiceState
 };
+use tracing::instrument;
 use tokio::sync::Mutex;
 use std::sync::Arc;
 use futures::channel::mpsc::{
@@ -145,6 +146,7 @@ impl Handler {
     /// [`token`]: #structfield.token
     /// [`update_server`]: #method.update_server
     /// [`update_state`]: #method.update_state
+    #[instrument]
     pub fn connect(&mut self) -> bool {
         if self.endpoint.is_none() || self.session_id.is_none() || self.token.is_none() {
             return false;
@@ -180,6 +182,7 @@ impl Handler {
     /// will _only_ update whether the connection is internally deafened.
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument]
     pub fn deafen(&mut self, deaf: bool) {
         self.self_deaf = deaf;
 
@@ -193,6 +196,7 @@ impl Handler {
     }
 
     /// Connect - or switch - to the given voice channel by its Id.
+    #[instrument]
     pub fn join(&mut self, channel_id: ChannelId) {
         self.channel_id = Some(channel_id);
 
@@ -209,6 +213,7 @@ impl Handler {
     /// voice channel.
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument]
     pub fn leave(&mut self) {
         // Only send an update if we were in a voice channel.
         if self.channel_id.is_some() {
@@ -226,6 +231,7 @@ impl Handler {
     /// can pass in just a boxed receiver, and do not need to specify `Some`.
     ///
     /// Pass `None` to drop the current receiver, if one exists.
+    #[instrument]
     pub fn listen(&mut self, receiver: Option<Arc<dyn AudioReceiver>>) {
         self.send(VoiceStatus::SetReceiver(receiver))
     }
@@ -239,6 +245,7 @@ impl Handler {
     /// will _only_ update whether the connection is internally muted.
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument]
     pub fn mute(&mut self, mute: bool) {
         self.self_mute = mute;
 
@@ -254,11 +261,13 @@ impl Handler {
     ///
     /// [`voice::ffmpeg`]: fn.ffmpeg.html
     /// [`voice::ytdl`]: fn.ytdl.html
+    #[instrument]
     pub fn play(&mut self, source: Box<dyn AudioSource>) {
         self.play_returning(source);
     }
 
     /// Plays audio from a source, returning the locked audio source.
+    #[instrument]
     pub fn play_returning(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
         let player = Arc::new(Mutex::new(Audio::new(source)));
         self.send(VoiceStatus::AddSender(player.clone()));
@@ -273,6 +282,7 @@ impl Handler {
     ///
     /// [`play`]: #method.play
     /// [`play_returning`]: #method.play_returning
+    #[instrument]
     pub fn play_only(&mut self, source: Box<dyn AudioSource>) -> LockedAudio {
         let player = Arc::new(Mutex::new(Audio::new(source)));
         self.send(VoiceStatus::SetSender(Some(player.clone())));
@@ -287,12 +297,16 @@ impl Handler {
     /// Sensible values range between `Bits(512)` and `Bits(512_000)`
     /// bits per second.
     /// Alternatively, `Auto` and `Max` remain available.
+    #[instrument]
     pub fn set_bitrate(&mut self, bitrate: Bitrate) {
         self.send(VoiceStatus::SetBitrate(bitrate))
     }
 
     /// Stops playing audio from a source, if one is set.
-    pub fn stop(&mut self) { self.send(VoiceStatus::SetSender(None)) }
+    #[instrument]
+    pub fn stop(&mut self) {
+        self.send(VoiceStatus::SetSender(None))
+    }
 
     /// Switches the current connected voice channel to the given `channel_id`.
     ///
@@ -317,6 +331,7 @@ impl Handler {
     ///
     /// [`Manager::remove`]: struct.Manager.html#method.remove
     /// [`standalone`]: #method.standalone
+    #[instrument]
     pub fn switch_to(&mut self, channel_id: ChannelId) {
         match self.channel_id {
             Some(current_id) if current_id == channel_id => {
@@ -341,6 +356,7 @@ impl Handler {
     ///
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
+    #[instrument]
     pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
         self.token = Some(token.to_string());
 
@@ -365,6 +381,7 @@ impl Handler {
     ///
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
+    #[instrument]
     pub fn update_state(&mut self, voice_state: &VoiceState) {
         if self.user_id != voice_state.user_id.0 {
             return;
@@ -406,6 +423,7 @@ impl Handler {
     }
 
     /// Sends a message to the task.
+    #[instrument]
     fn send(&mut self, status: VoiceStatus) {
         // Restart task if it errored.
         if let Err(error) = self.sender.unbounded_send(status) {
@@ -418,6 +436,7 @@ impl Handler {
         }
     }
 
+    #[instrument]
     fn send_join(&self) {
         // Do _not_ try connecting if there is not at least a channel. There
         // does not _necessarily_ need to be a guild.
@@ -433,6 +452,7 @@ impl Handler {
     /// Does nothing if initialized via [`standalone`].
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument]
     fn update(&self) {
         if let Some(ref ws) = self.ws {
             let map = json!({

@@ -10,6 +10,7 @@ use futures::{
     channel::mpsc::UnboundedSender as Sender,
     future::{BoxFuture, FutureExt},
 };
+use tracing::instrument;
 #[cfg(feature = "gateway")]
 use super::{
     bridge::gateway::event::ClientEvent,
@@ -72,6 +73,7 @@ pub(crate) enum DispatchEvent {
 }
 
 impl DispatchEvent {
+    #[instrument(skip(self, cache_and_http))]
     async fn update(&mut self, cache_and_http: &Arc<CacheAndHttp>) {
         match self {
             Self::Model(Event::ChannelCreate(ref mut event)) => {
@@ -144,6 +146,7 @@ impl DispatchEvent {
 }
 
 #[allow(clippy::too_many_arguments)]
+#[instrument(skip(event, cache_and_http, framework, event_handler, data, raw_event_handler))]
 pub(crate) fn dispatch<'rec>(
     // #[allow(unused_variables)]
     mut event: DispatchEvent,
@@ -310,6 +313,7 @@ async fn dispatch_message(
 }
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::too_many_arguments)]
+#[instrument(skip(event, data, event_handler, cache_and_http))]
 async fn handle_event(
     event: DispatchEvent,
     data: &Arc<RwLock<TypeMap>>,

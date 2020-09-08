@@ -11,6 +11,7 @@ use std::{
     io::Error as IoError,
     num::ParseIntError
 };
+use tracing::instrument;
 
 #[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
@@ -203,6 +204,7 @@ impl Display for Error {
 }
 
 impl StdError for Error {
+    #[instrument]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Error::Format(inner) => Some(inner),

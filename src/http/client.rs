@@ -23,7 +23,7 @@ use super::{
 use bytes::buf::Buf;
 use serde::de::DeserializeOwned;
 use serde_json::json;
-use tracing::{debug, trace};
+use tracing::{debug, trace, instrument};
 use std::{
     collections::BTreeMap,
     sync::Arc,
@@ -33,6 +33,7 @@ use tokio::{
     fs::File,
 };
 
+#[derive(Debug)]
 pub struct Http {
     client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
@@ -1744,6 +1745,7 @@ impl Http {
     /// ```
     ///
     /// [`fire`]: fn.fire.html
+    #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let ratelimiting_req = RatelimitedRequest::from(req);
         let response = self

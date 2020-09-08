@@ -2,7 +2,7 @@ use tokio::sync::Mutex;
 use std::sync::Arc;
 use super::{ShardManager, ShardManagerMessage};
 use super::super::gateway::ShardId;
-use tracing::{debug, warn};
+use tracing::{debug, warn, instrument};
 use futures::{
     StreamExt,
     channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
@@ -57,6 +57,7 @@ impl ShardManagerMonitor {
     /// channel (probably indicating that the shard manager should stop anyway)
     ///
     /// [`ShardManagerMessage::ShutdownAll`]: enum.ShardManagerMessage.html#variant.ShutdownAll
+    #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
         debug!("Starting shard manager worker");
 

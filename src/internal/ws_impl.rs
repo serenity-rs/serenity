@@ -4,7 +4,7 @@ use crate::internal::prelude::*;
 use serde_json;
 use async_tungstenite::tungstenite::Message;
 use async_trait::async_trait;
-use tracing::warn;
+use tracing::{warn, instrument};
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 
@@ -151,6 +151,7 @@ impl StdError for RustlsError {
 }
 
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+#[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),
@@ -166,6 +167,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
 }
 
 #[cfg(feature = "native_tls_backend")]
+#[instrument]
 pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),

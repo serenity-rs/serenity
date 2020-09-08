@@ -58,7 +58,7 @@ use std::{
 };
 use tokio::time::{delay_for, Duration};
 use super::{HttpError, Request};
-use tracing::debug;
+use tracing::{debug, instrument};
 
 /// Ratelimiter for requests to the Discord API.
 ///
@@ -75,6 +75,7 @@ use tracing::debug;
 /// regardless of route. The value of this global ratelimit is never given
 /// through the API, so it can't be pre-emptively ratelimited. This only affects
 /// the largest of bots.
+#[derive(Debug)]
 pub struct Ratelimiter {
     client: Arc<Client>,
     global: Arc<Mutex<()>>,
@@ -137,6 +138,7 @@ impl Ratelimiter {
         Arc::clone(&self.routes)
     }
 
+    #[instrument]
     pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
         let RatelimitedRequest { req } = req;
 
@@ -251,6 +253,7 @@ impl Ratelimit {
         self.reset_after
     }
 
+    #[instrument]
     pub async fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
@@ -282,6 +285,7 @@ impl Ratelimit {
         self.remaining -= 1;
     }
 
+    #[instrument]
     pub async fn post_hook(&mut self, response: &Response, route: &Route) -> Result<bool> {
         if let Some(limit) = parse_header(&response.headers(), "x-ratelimit-limit")? {
             self.limit = limit;
@@ -353,6 +357,7 @@ impl Default for Ratelimit {
 /// perform a full cycle of making the request and returning the response.
 ///
 /// Use the `From` implementations for making one of these.
+#[derive(Debug)]
 pub struct RatelimitedRequest<'a> {
     req: Request<'a>,
 }

@@ -9,6 +9,7 @@ use std::env::consts;
 use std::time::SystemTime;
 use tracing::{debug, trace};
 use async_trait::async_trait;
+use tracing::instrument;
 
 #[async_trait]
 pub trait WebSocketGatewayClientExt {
@@ -43,6 +44,7 @@ pub trait WebSocketGatewayClientExt {
 
 #[async_trait]
 impl WebSocketGatewayClientExt for WsStream {
+    #[instrument(skip(self, guild_ids))]
     async fn send_chunk_guilds<It>(
         &mut self,
         guild_ids: It,
@@ -62,6 +64,7 @@ impl WebSocketGatewayClientExt for WsStream {
         })).await.map_err(From::from)
     }
 
+    #[instrument(skip(self))]
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
@@ -72,6 +75,7 @@ impl WebSocketGatewayClientExt for WsStream {
         })).await.map_err(From::from)
     }
 
+    #[instrument(skip(self))]
     async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
@@ -95,6 +99,7 @@ impl WebSocketGatewayClientExt for WsStream {
         })).await
     }
 
+    #[instrument(skip(self))]
     async fn send_presence_update(
         &mut self,
         shard_info: &[u64; 2],
@@ -120,6 +125,7 @@ impl WebSocketGatewayClientExt for WsStream {
         })).await
     }
 
+    #[instrument(skip(self))]
     async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],

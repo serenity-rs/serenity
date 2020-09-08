@@ -18,7 +18,7 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
-use tracing::{info, warn};
+use tracing::{info, warn, instrument};
 
 use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
@@ -182,6 +182,7 @@ impl ShardManager {
     /// are properly queued.
     ///
     /// [`ShardQueuer`]: struct.ShardQueuer.html
+    #[instrument(skip(self))]
     pub fn initialize(&mut self) -> Result<()> {
         let shard_to = self.shard_index + self.shard_init;
 
@@ -199,6 +200,7 @@ impl ShardManager {
     /// This will shutdown all existing shards.
     ///
     /// This will _not_ instantiate the new shards.
+    #[instrument(skip(self))]
     pub async fn set_shards(&mut self, index: u64, init: u64, total: u64) {
         self.shutdown_all().await;
 
@@ -243,6 +245,7 @@ impl ShardManager {
     /// [`ShardQueuer`]: struct.ShardQueuer.html
     /// [`ShardRunner`]: struct.ShardRunner.html
     /// [`initialize`]: #method.initialize
+    #[instrument(skip(self))]
     pub async fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
         self.shutdown(shard_id, 4000).await;
@@ -257,6 +260,7 @@ impl ShardManager {
     ///
     /// [`ShardId`]: struct.ShardId.html
     /// [`ShardRunner`]: struct.ShardRunner.html
+    #[instrument(skip(self))]
     pub async fn shards_instantiated(&self) -> Vec<ShardId> {
         self.runners.lock().await.keys().cloned().collect()
     }
@@ -271,6 +275,7 @@ impl ShardManager {
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
+    #[instrument(skip(self))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
@@ -303,6 +308,7 @@ impl ShardManager {
     /// over the [`shutdown`] method.
     ///
     /// [`shutdown`]: #method.shutdown
+    #[instrument(skip(self))]
     pub async fn shutdown_all(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -324,6 +330,7 @@ impl ShardManager {
         let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);
     }
 
+    #[instrument(skip(self))]
     fn boot(&mut self, shard_info: [ShardId; 2]) {
         info!("Telling shard queuer to start shard {}", shard_info[0]);
 

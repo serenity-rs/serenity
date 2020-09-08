@@ -24,7 +24,7 @@ use super::{
     ShardRunnerOptions,
 };
 use crate::gateway::ConnectionStage;
-use tracing::{debug, info, warn};
+use tracing::{debug, info, warn, instrument};
 
 use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]
@@ -109,6 +109,7 @@ impl ShardQueuer {
     /// [`ShardQueuerMessage::Shutdown`]: enum.ShardQueuerMessage.html#variant.Shutdown
     /// [`ShardQueuerMessage::Start`]: enum.ShardQueuerMessage.html#variant.Start
     /// [`rx`]: #structfield.rx
+    #[instrument(skip(self))]
     pub async fn run(&mut self) {
         // The duration to timeout from reads over the Rx channel. This can be
         // done in a loop, and if the read times out then a shard can be
@@ -141,6 +142,7 @@ impl ShardQueuer {
         }
     }
 
+    #[instrument(skip(self))]
     async fn check_last_start(&mut self) {
         let instant = match self.last_start {
             Some(instant) => instant,
@@ -161,6 +163,7 @@ impl ShardQueuer {
         delay_for(to_sleep).await;
     }
 
+    #[instrument(skip(self))]
     async fn checked_start(&mut self, id: u64, total: u64) {
         debug!("[Shard Queuer] Checked start for shard {} out of {}", id, total);
         self.check_last_start().await;
@@ -175,6 +178,7 @@ impl ShardQueuer {
         self.last_start = Some(Instant::now());
     }
 
+    #[instrument(skip(self))]
     async fn start(&mut self, shard_id: u64, shard_total: u64) -> Result<()> {
         let shard_info = [shard_id, shard_total];
 
@@ -215,6 +219,7 @@ impl ShardQueuer {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     async fn shutdown_runners(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -239,6 +244,7 @@ impl ShardQueuer {
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
+    #[instrument(skip(self))]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
