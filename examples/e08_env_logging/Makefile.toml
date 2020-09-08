@@ -1,5 +1,8 @@
 extend = "../../Makefile.toml"
 
+[env]
+RUST_LOG = "info"
+
 [tasks.examples_build]
 alias = "build"
 

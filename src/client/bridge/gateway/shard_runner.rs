@@ -31,7 +31,7 @@ use tokio::sync::Mutex;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 
-use tracing::{error, debug, warn, instrument};
+use tracing::{trace, error, debug, warn, instrument};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -110,8 +110,10 @@ impl ShardRunner {
     /// [`ShardRunnerMessage`]: enum.ShardRunnerMessage.html
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
+        warn!("[ShardRunner {:?}] Running", self.shard.shard_info());
+
         loop {
-            debug!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
+            trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
             if !self.recv().await? {
                 return Ok(());
             }
@@ -164,7 +166,7 @@ impl ShardRunner {
             if !successful && !self.shard.stage().is_connecting() {
                 return self.request_restart().await;
             }
-            debug!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
+            trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
         }
     }
 

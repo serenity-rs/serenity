@@ -146,7 +146,6 @@ impl DispatchEvent {
 }
 
 #[allow(clippy::too_many_arguments)]
-#[instrument(skip(event, cache_and_http, framework, event_handler, data, raw_event_handler))]
 pub(crate) fn dispatch<'rec>(
     // #[allow(unused_variables)]
     mut event: DispatchEvent,
