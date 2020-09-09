@@ -54,7 +54,7 @@
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![deny(rust_2018_idioms)]
-#![type_length_limit="2256779"] // needed so ShardRunner::run compiles with instrument.
+#![type_length_limit="2504639"] // needed so ShardRunner::run compiles with instrument.
 
 #[macro_use]
 extern crate serde;
