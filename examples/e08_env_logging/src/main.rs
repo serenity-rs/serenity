@@ -88,7 +88,7 @@ async fn main() {
 }
 
 // Currently, the instrument macro doesn't work with commands.
-// if you wish to intrument commands, use it on the before function.
+// if you wish to instrument commands, use it on the before function.
 #[command]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
     if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )").await {
