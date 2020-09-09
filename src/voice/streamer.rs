@@ -28,7 +28,7 @@ use async_trait::async_trait;
 struct ChildContainer(Child);
 
 impl AsyncRead for ChildContainer {
-    #[instrument]
+    #[instrument(skip(self))]
     fn poll_read(
         self: Pin<&mut Self>,
         cx: &mut Context<'_>,
@@ -54,7 +54,7 @@ impl Drop for ChildContainer {
 struct SendDecoder(OpusDecoder);
 
 impl SendDecoder {
-    #[instrument]
+    #[instrument(skip(self))]
     fn decode_float(&mut self, input: &[u8], output: &mut [f32], fec: bool) -> OpusResult<usize> {
         let &mut SendDecoder(ref mut sd) = self;
         sd.decode_float(Some(input), output, fec)
@@ -72,13 +72,17 @@ struct InputSource<R: AsyncRead + Unpin + Send + Sync + 'static> {
 
 #[async_trait]
 impl<R: AsyncRead + Unpin + Send + Sync> AudioSource for InputSource<R> {
-    #[instrument]
-    async fn is_stereo(&mut self) -> bool { self.stereo }
+    #[instrument(skip(self))]
+    async fn is_stereo(&mut self) -> bool {
+        self.stereo
+    }
 
-    #[instrument]
-    async fn get_type(&self) -> AudioType { self.kind }
+    #[instrument(skip(self))]
+    async fn get_type(&self) -> AudioType {
+        self.kind
+    }
 
-    #[instrument]
+    #[instrument(skip(self))]
     async fn read_pcm_frame(&mut self, buffer: &mut [i16]) -> Option<usize> {
         let mut buf: [u8; 2] = [0, 0];
         for (i, v) in buffer.iter_mut().enumerate() {
@@ -98,7 +102,7 @@ impl<R: AsyncRead + Unpin + Send + Sync> AudioSource for InputSource<R> {
         Some(buffer.len())
     }
 
-    #[instrument]
+    #[instrument(skip(self))]
     async fn read_opus_frame(&mut self) -> Option<Vec<u8>> {
         let mut buf: [u8; 2] = [0, 0];
         let result = self.reader.read_exact(&mut buf).await;
@@ -129,7 +133,7 @@ impl<R: AsyncRead + Unpin + Send + Sync> AudioSource for InputSource<R> {
         }
     }
 
-    #[instrument]
+    #[instrument(skip(self, float_buffer))]
     async fn decode_and_add_opus_frame(&mut self, float_buffer: &mut [f32; 1920], volume: f32) -> Option<usize> {
         let decoder_lock = self.decoder.as_mut()?.clone();
         let frame = self.read_opus_frame().await?;
@@ -282,7 +286,7 @@ async fn _dca(path: &OsStr) -> StdResult<Box<dyn AudioSource>, DcaError> {
 /// If you want to decode a `.opus` file, use [`ffmpeg`]
 ///
 /// [`ffmpeg`]: fn.ffmpeg.html
-#[instrument]
+#[instrument(skip(reader))]
 pub fn opus<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,
@@ -298,7 +302,7 @@ pub fn opus<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reade
 }
 
 /// Creates a PCM audio source.
-#[instrument]
+#[instrument(skip(reader))]
 pub fn pcm<R: AsyncRead + Unpin + Send + Sync + 'static>(is_stereo: bool, reader: R) -> Box<dyn AudioSource> {
     Box::new(InputSource {
         stereo: is_stereo,

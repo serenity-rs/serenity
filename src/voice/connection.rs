@@ -238,7 +238,7 @@ impl Connection {
         })
     }
 
-    #[instrument]
+    #[instrument(skip(self))]
     pub async fn reconnect(&mut self) -> Result<()> {
         let url = generate_url(&mut self.connection_info.endpoint)?;
 
@@ -301,7 +301,7 @@ impl Connection {
     }
 
     #[inline]
-    #[instrument]
+    #[instrument(skip(self, receiver, buffer))]
     async fn handle_received_udp(
         &mut self,
         receiver: &mut Option<Arc<dyn AudioReceiver>>,
@@ -363,7 +363,7 @@ impl Connection {
     }
 
     #[inline]
-    #[instrument]
+    #[instrument(skip(self))]
     async fn check_audio_timer(&mut self) -> Result<()> {
         if self.audio_timer.check() {
             info!("[Voice] UDP keepalive");
@@ -377,7 +377,7 @@ impl Connection {
     }
 
     #[inline]
-    #[instrument]
+    #[instrument(skip(self))]
     async fn check_keepalive_timer(&mut self) -> Result<()> {
         if self.keepalive_timer.check() {
             info!("[Voice] WS keepalive");
@@ -391,7 +391,7 @@ impl Connection {
     }
 
     #[inline]
-    #[instrument]
+    #[instrument(skip(self, sources, buffer, mix_buffer))]
     async fn remove_unfinished_files(
         &mut self,
         sources: &mut Vec<LockedAudio>,
@@ -478,7 +478,7 @@ impl Connection {
     }
 
     #[allow(unused_variables)]
-    #[instrument]
+    #[instrument(skip(self, sources, receiver))]
     pub async fn cycle(
         &mut self,
         mut sources: &mut Vec<LockedAudio>,
@@ -607,7 +607,7 @@ impl Connection {
         Ok(())
     }
 
-    #[instrument]
+    #[instrument(skip(self, buffer))]
     fn prep_packet(&mut self,
                    packet: &mut [u8],
                    buffer: [f32; 1920],
@@ -652,7 +652,7 @@ impl Connection {
         Ok(HEADER_LEN + crypted.len())
     }
 
-    #[instrument]
+    #[instrument(skip(self))]
     async fn set_speaking(&mut self, speaking: bool) -> Result<()> {
         if self.speaking == speaking {
             return Ok(());
@@ -706,7 +706,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-#[instrument]
+#[instrument(skip(stream))]
 async fn init_cipher(stream: &mut WsStream) -> Result<XSalsa20Poly1305> {
     loop {
         let value = match stream.recv_json().await? {
@@ -750,7 +750,7 @@ where T: for<'a> PartialEq<&'a str>,
 }
 
 #[inline]
-#[instrument]
+#[instrument(skip(stream, udp))]
 async fn start_udp_task(stream: SplitStream<WsStream>, mut udp: RecvHalf) -> Result<TaskItems> {
     let (udp_close_sender, mut udp_close_reader) = unbounded();
     let (tx, rx) = unbounded();
@@ -796,7 +796,7 @@ async fn start_udp_task(stream: SplitStream<WsStream>, mut udp: RecvHalf) -> Res
 }
 
 #[inline]
-#[instrument]
+#[instrument(skip(stream, tx))]
 async fn start_ws_task(mut stream: SplitStream<WsStream>, tx: &Sender<ReceiverStatus>) -> Result<(Sender<i32>, JoinHandle<()>)> {
     let tx_ws = tx.clone();
     let (ws_close_sender, mut ws_close_reader) = unbounded();
