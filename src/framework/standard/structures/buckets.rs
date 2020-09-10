@@ -37,7 +37,7 @@ impl Bucket {
             if (user.tickets + 1) > limit {
                 if let Some(res) = user
                     .set_time
-                    .and_then(|x| now.checked_duration_since(x + timespan))
+                    .and_then(|x| (x + timespan).checked_duration_since(now))
                 {
                     return Some(res);
                 } else {
@@ -49,7 +49,7 @@ impl Bucket {
 
         if let Some(res) = user
             .last_time
-            .and_then(|x| now.checked_duration_since(x + ratelimit.delay))
+            .and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
             return Some(res);
         } else {
