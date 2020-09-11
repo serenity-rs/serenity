@@ -749,7 +749,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let n = fun.name.clone();
     let n2 = name.clone();
     let visibility = fun.visibility;
-    let name = if name.is_empty() {
+    let name = if name == "<fn>" {
         fun.name.clone()
     } else {
         Ident::new(&name, Span::call_site())

@@ -79,6 +79,18 @@ pub struct Guild {
     /// - `VANITY_URL`
     /// - `VERIFIED`
     /// - `VIP_REGIONS`
+    /// - `PARTNERED`
+    /// - `MORE_EMOJI`
+    /// - `DISCOVERABLE`
+    /// - `FEATURABLE`
+    /// - `COMMERCE`
+    /// - `PUBLIC`
+    /// - `NEWS`
+    /// - `BANNER`
+    /// - `ANIMATED_ICON`
+    /// - `PUBLIC_DISABLED`
+    /// - `COMMUNITY`
+    /// - `WELCOME_SCREEN_ENABLED`
     ///
     /// [Discord Partnership]: https://discord.com/partners
     pub features: Vec<String>,

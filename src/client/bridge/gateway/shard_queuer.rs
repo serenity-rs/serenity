@@ -84,7 +84,6 @@ pub struct ShardQueuer {
     pub cache_and_http: Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,
     pub intents: Option<GatewayIntents>,
-    pub shard_shutdown: Receiver<ShardId>,
 }
 
 impl ShardQueuer {
@@ -236,15 +235,11 @@ impl ShardQueuer {
 
     /// Attempts to shut down the shard runner by Id.
     ///
-    /// Returns a boolean indicating whether a shard runner was present. This is
-    /// _not_ necessary an indicator of whether the shard runner was
-    /// successfully shut down.
-    ///
     /// **Note**: If the receiving end of an mpsc channel - theoretically owned
     /// by the shard runner - no longer exists, then the shard runner will not
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
-    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) -> bool {
+    pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
         if let Some(runner) = self.runners.lock().await.get(&shard_id) {
@@ -259,26 +254,6 @@ impl ShardQueuer {
                     why,
                 );
             }
-
-            const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
-
-            match timeout(TIMEOUT, self.shard_shutdown.next()).await {
-                Ok(Some(shutdown_shard_id)) =>
-                    if shutdown_shard_id != shard_id {
-                        warn!(
-                            "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
-                            shard_id,
-                        );
-                    },
-                Ok(None) => (),
-                Err(why) => warn!(
-                    "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
-                    shard_id,
-                    why,
-                ),
-            }
         }
-
-        self.runners.lock().await.remove(&shard_id).is_some()
     }
 }
