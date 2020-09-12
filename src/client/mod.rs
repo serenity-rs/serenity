@@ -60,7 +60,7 @@ use std::{
 };
 #[cfg(all(feature = "cache", feature = "gateway"))]
 use std::time::Duration;
-use log::{error, debug, info};
+use tracing::{error, debug, info, instrument};
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
@@ -277,6 +277,7 @@ impl<'a> ClientBuilder<'a> {
 impl<'a> Future for ClientBuilder<'a> {
     type Output = Result<Client>;
 
+    #[instrument(skip(self))]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let data = Arc::new(RwLock::new(self.data.take().unwrap()));
@@ -624,6 +625,8 @@ impl Client {
     /// ```
     ///
     /// [gateway docs]: ../gateway/index.html#sharding
+
+    #[instrument(skip(self))]
     pub async fn start(&mut self) -> Result<()> {
         self.start_connection([0, 0, 1]).await
     }
@@ -671,6 +674,7 @@ impl Client {
     ///
     /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     /// [gateway docs]: ../gateway/index.html#sharding
+    #[instrument(skip(self))]
     pub async fn start_autosharded(&mut self) -> Result<()> {
         let (x, y) = {
             let res = self.cache_and_http.http.get_bot_gateway().await?;
@@ -749,6 +753,7 @@ impl Client {
     /// [`start`]: #method.start
     /// [`start_autosharded`]: #method.start_autosharded
     /// [gateway docs]: ../gateway/index.html#sharding
+    #[instrument(skip(self))]
     pub async fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
         self.start_connection([shard, shard, shards]).await
     }
@@ -798,6 +803,7 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shard_range`]: #method.start_shard_range
     /// [Gateway docs]: ../gateway/index.html#sharding
+    #[instrument(skip(self))]
     pub async fn start_shards(&mut self, total_shards: u64) -> Result<()> {
         self.start_connection([0, total_shards - 1, total_shards]).await
     }
@@ -849,6 +855,7 @@ impl Client {
     /// [`start_shard`]: #method.start_shard
     /// [`start_shards`]: #method.start_shards
     /// [Gateway docs]: ../gateway/index.html#sharding
+    #[instrument(skip(self))]
     pub async fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
         self.start_connection([range[0], range[1], total_shards]).await
     }
@@ -866,6 +873,7 @@ impl Client {
     // an error.
     //
     // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
+    #[instrument(skip(self))]
     async fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         #[cfg(feature = "voice")]
         self.voice_manager.lock().await.set_shard_count(shard_data[2]);

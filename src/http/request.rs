@@ -7,6 +7,7 @@ use reqwest::{
     header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
     Url,
 };
+use tracing::instrument;
 use super::{
     HttpError,
     routing::RouteInfo,
@@ -64,6 +65,7 @@ impl<'a> Request<'a> {
         Self { body, headers, route }
     }
 
+    #[instrument]
     pub fn build(&'a self, client: &Client, token: &str) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,

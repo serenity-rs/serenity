@@ -6,8 +6,9 @@ use super::{
     Status,
     audio,
 };
-use log::{info, error, warn};
+use tracing::{info, error, warn, instrument};
 
+#[instrument(skip(rx))]
 pub(crate) fn start(guild_id: GuildId, mut rx: Receiver<Status>) {
     tokio::spawn(async move {
         info!("[Voice] Starts running for guild id: {}", guild_id);
@@ -16,6 +17,7 @@ pub(crate) fn start(guild_id: GuildId, mut rx: Receiver<Status>) {
     });
 }
 
+#[instrument(skip(rx))]
 async fn runner(rx: &mut Receiver<Status>) {
     let mut senders = Vec::new();
     let mut receiver = None;

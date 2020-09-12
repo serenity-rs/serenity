@@ -17,7 +17,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 #[cfg(feature = "model")]
-use log::warn;
+use tracing::warn;
 use std::convert::TryFrom;
 use std::str::FromStr;
 

@@ -33,7 +33,7 @@ use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
 #[cfg(feature = "model")]
 use crate::constants::LARGE_THRESHOLD;
 #[cfg(feature = "model")]
-use log::{error, warn};
+use tracing::{error, warn};
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 

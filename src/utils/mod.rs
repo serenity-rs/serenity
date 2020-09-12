@@ -38,6 +38,7 @@ use std::{
     io::Read,
     path::Path,
 };
+
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
 #[cfg(feature = "cache")]

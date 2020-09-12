@@ -13,7 +13,8 @@ edition = "2018"
 
 [dependencies]
 bitflags = "1"
-log = "0.4"
+tracing = "0.1"
+tracing-futures = "0.2"
 serde_json = "1"
 async-trait = "0.1"
 
