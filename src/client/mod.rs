@@ -302,7 +302,6 @@ impl<'a> Future for ClientBuilder<'a> {
                 #[cfg(feature = "cache")]
                 update_cache_timeout: self.timeout.take(),
                 http: Arc::clone(&http),
-                __nonexhaustive: (),
             });
 
             self.fut = Some(Box::pin(async move {
