@@ -110,7 +110,6 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
             Channel::Private(ref channel) => channel.id,
             Channel::Guild(_) => unreachable!("Guild private channel decode"),
             Channel::Category(_) => unreachable!("Channel category private channel decode"),
-            Channel::__Nonexhaustive => unreachable!(),
         };
 
         private_channels.insert(id, private_channel);
@@ -252,7 +251,6 @@ pub async fn user_has_perms(
                     // just assume that all permissions are granted and return `true`.
                     return Ok(true);
                 },
-                Channel::__Nonexhaustive => unreachable!(),
             }
         }
     };

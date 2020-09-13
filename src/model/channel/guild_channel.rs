@@ -895,7 +895,6 @@ impl GuildChannel {
 
                 "data:image/png;base64,".to_string() + &base64::encode(&picture)
             },
-            AttachmentType::__Nonexhaustive => unreachable!(),
         };
         
         let map = serde_json::json!({

@@ -104,13 +104,13 @@ use crate::http::Http;
 
 #[cfg(feature = "client")]
 #[derive(Default)]
+#[non_exhaustive]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     pub http: Arc<Http>,
-    __nonexhaustive: (),
 }
 
 // For the procedural macros in `command_attr`.

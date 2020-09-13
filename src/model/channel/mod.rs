@@ -42,6 +42,7 @@ use crate::http::CacheHttp;
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum Channel {
     /// A [text] or [voice] channel within a [`Guild`].
     ///
@@ -58,8 +59,6 @@ pub enum Channel {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     Category(ChannelCategory),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(feature = "model")]
@@ -185,7 +184,6 @@ impl Channel {
             Channel::Category(category) => {
                 category.delete(cache_http).await?;
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
 
         Ok(())
@@ -198,7 +196,6 @@ impl Channel {
             Channel::Guild(channel) => channel.is_nsfw(),
             Channel::Category(category) => category.is_nsfw(),
             Channel::Private(_) => false,
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -213,7 +210,6 @@ impl Channel {
             Channel::Guild(ch) => ch.id,
             Channel::Private(ch) => ch.id,
             Channel::Category(ch) => ch.id,
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -265,7 +261,6 @@ impl Serialize for Channel {
             Channel::Category(c) => ChannelCategory::serialize(c, serializer),
             Channel::Guild(c) => GuildChannel::serialize(c, serializer),
             Channel::Private(c) => PrivateChannel::serialize(c, serializer),
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -286,13 +281,13 @@ impl Display for Channel {
             Channel::Guild(ch) => Display::fmt(&ch.id.mention(), f),
             Channel::Private(ch) => Display::fmt(&ch.recipient.name, f),
             Channel::Category(ch) => Display::fmt(&ch.name, f),
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 /// A representation of a type of channel.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum ChannelType {
     /// An indicator that the channel is a text [`GuildChannel`].
     ///
@@ -322,8 +317,6 @@ pub enum ChannelType {
     ///
     /// [`GuildChannel`]: struct.GuildChannel.html
     Store = 6,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -347,7 +340,6 @@ impl ChannelType {
             ChannelType::Category => "category",
             ChannelType::News => "news",
             ChannelType::Store => "store",
-            ChannelType::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -360,7 +352,6 @@ impl ChannelType {
             ChannelType::Category => 4,
             ChannelType::News => 5,
             ChannelType::Store => 6,
-            ChannelType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -406,7 +397,6 @@ impl Serialize for PermissionOverwrite {
         let (id, kind) = match self.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
-            PermissionOverwriteType::__Nonexhaustive => unreachable!(),
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
@@ -425,13 +415,12 @@ impl Serialize for PermissionOverwrite {
 ///
 /// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum PermissionOverwriteType {
     /// A member which is having its permission overwrites edited.
     Member(UserId),
     /// A role which is having its permission overwrites edited.
     Role(RoleId),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(test)]

@@ -92,7 +92,6 @@ macro_rules! format_command_name {
             HelpBehaviour::Strike => format!("~~`{}`~~", $command_name),
             HelpBehaviour::Nothing => format!("`{}`", $command_name),
             HelpBehaviour::Hide => continue,
-            HelpBehaviour::__Nonexhaustive => unreachable!(),
         }
     };
 }
@@ -183,6 +182,7 @@ impl Suggestions {
 /// yields relevant data in customised textual
 /// representation.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum CustomisedHelpData<'a> {
     /// To display suggested commands.
     SuggestedCommands {
@@ -198,8 +198,6 @@ pub enum CustomisedHelpData<'a> {
     SingleCommand { command: Command<'a> },
     /// To display failure in finding a fitting command.
     NoCommandFound { help_error_message: &'a str },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Wraps around a `Vec<Vec<T>>` and provides access
@@ -1316,7 +1314,6 @@ pub async fn with_embeds(
             &command,
             help_options.embed_success_colour,
         ).await,
-        CustomisedHelpData::__Nonexhaustive => unreachable!(),
     };
 
     match response_result {
@@ -1491,7 +1488,6 @@ pub async fn plain(
         CustomisedHelpData::SingleCommand { ref command } => {
             single_command_to_plain_string(&help_options, &command)
         },
-        CustomisedHelpData::__Nonexhaustive => unreachable!(),
     };
 
     match msg.channel_id.say(&ctx, result).await {

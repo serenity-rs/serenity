@@ -156,6 +156,7 @@ impl LightMethod {
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a byte slice with a filename.
     Bytes{ data: Cow<'a, [u8]>, filename: String } ,
@@ -165,8 +166,6 @@ pub enum AttachmentType<'a> {
     Path(&'a Path),
     /// Indicates that the `AttachmentType` is an image URL.
     Image(&'a str),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
@@ -203,13 +202,12 @@ impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
 /// function.
 ///
 /// [`get_guilds`]: fn.get_guilds.html
+#[non_exhaustive]
 pub enum GuildPagination {
     /// The Id to get the guilds after.
     After(GuildId),
     /// The Id to get the guilds before.
     Before(GuildId),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(test)]

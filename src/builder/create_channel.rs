@@ -127,7 +127,6 @@ impl CreateChannel {
             let (id, kind) = match perm.kind {
                 PermissionOverwriteType::Member(id) => (id.0, "member"),
                 PermissionOverwriteType::Role(id) => (id.0, "role"),
-                PermissionOverwriteType::__Nonexhaustive => unreachable!(),
             };
 
             json!({

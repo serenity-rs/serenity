@@ -75,7 +75,6 @@ impl ChannelId {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
-            PermissionOverwriteType::__Nonexhaustive => unreachable!(),
         };
 
         let map = json!({
@@ -187,7 +186,6 @@ impl ChannelId {
             match permission_type {
                 PermissionOverwriteType::Member(id) => id.0,
                 PermissionOverwriteType::Role(id) => id.0,
-                PermissionOverwriteType::__Nonexhaustive => unreachable!(),
             },
         ).await
     }
@@ -458,7 +456,6 @@ impl ChannelId {
             Channel::Guild(channel) => channel.name().to_string(),
             Channel::Category(category) => category.name().to_string(),
             Channel::Private(channel) => channel.name(),
-            Channel::__Nonexhaustive => unreachable!(),
         })
     }
 

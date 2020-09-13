@@ -101,6 +101,7 @@ impl<F: FromStr> FromStrAndCache for F {
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [`http`]: ../http/index.html
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct Cache {
     /// A map of channels in [`Guild`]s that the current user has received data
     /// for.
@@ -182,7 +183,6 @@ pub struct Cache {
     pub(crate) message_queue: RwLock<HashMap<ChannelId, VecDeque<MessageId>>>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
-    __nonexhaustive: (),
 }
 
 impl Cache {
@@ -969,7 +969,6 @@ impl Default for Cache {
             user: RwLock::new(CurrentUser::default()),
             users: RwLock::new(HashMap::default()),
             message_queue: RwLock::new(HashMap::default()),
-            __nonexhaustive: (),
         }
     }
 }
