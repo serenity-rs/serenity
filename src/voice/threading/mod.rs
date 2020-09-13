@@ -1,6 +1,8 @@
 mod aux_network;
 mod events;
+mod mixer;
 
+use audiopus::Bitrate;
 use crate::{
     error::Error,
     gateway::WsStream,
@@ -17,11 +19,18 @@ use crate::{
         tracks::{
             LoopState,
             PlayMode,
+            Track,
             TrackHandle,
             TrackState,
         },
         Status,
     },
+};
+use flume::{
+    Receiver,
+    SendError,
+    Sender,
+    RecvError,
 };
 use log::{error, info, warn};
 use std::{
@@ -37,23 +46,15 @@ use tokio::{
         UdpSocket,
         udp::{RecvHalf, SendHalf},
     },
-    sync::mpsc::{
-        error::{
-            SendError,
-            TryRecvError,
-        },
-        self,
-        UnboundedReceiver,
-        UnboundedSender,
-    },
 };
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
 #[derive(Clone, Debug)]
 pub(crate) struct Interconnect {
-    pub(crate) core: UnboundedSender<CoreMessage>,
-    pub(crate) events: UnboundedSender<EventMessage>,
-    pub(crate) aux_packets: UnboundedSender<AuxPacketMessage>,
+    pub(crate) core: Sender<Status>,
+    pub(crate) events: Sender<EventMessage>,
+    pub(crate) aux_packets: Sender<AuxPacketMessage>,
+    pub(crate) mixer: Sender<MixerMessage>,
 }
 
 impl Interconnect {
@@ -62,10 +63,47 @@ impl Interconnect {
         let _ = self.aux_packets.send(AuxPacketMessage::Poison);
     }
 
+    fn poison_all(&self) {
+        self.poison();
+        let _ = self.mixer.send(MixerMessage::Poison);
+    }
+
     fn restart(self, guild_id: GuildId) -> Self {
         self.poison();
         start_internals(guild_id, self.core)
     }
+
+    fn restart_volatile_internals(&mut self, guild_id: GuildId) {
+        self.poison();
+        
+        let (evt_tx, evt_rx) = flume::unbounded();
+        let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
+
+        self.events = evt_tx;
+        self.aux_packets = pkt_aux_tx;
+
+        let ic = self.clone();
+        tokio::spawn(async move {
+            info!("[Voice] Event processor restarted for guild: {}", guild_id);
+            events::runner(ic, evt_rx).await;
+            info!("[Voice] Event processor finished for guild: {}", guild_id);
+        });
+
+        let ic = self.clone();
+        tokio::spawn(async move {
+            info!("[Voice] Network processor restarted for guild: {}", guild_id);
+            aux_network::runner(ic, pkt_aux_rx).await;
+            info!("[Voice] Network processor finished for guild: {}", guild_id);
+        });
+
+        // Make mixer aware of new targets...
+        let _ = self.mixer.send(MixerMessage::ReplaceInterconnect(self.clone()));
+    }
+}
+
+pub(crate) struct MixerConnection {
+    pub(crate) cipher: Cipher,
+    pub(crate) udp: Sender<UdpMessage>,
 }
 
 pub(crate) enum EventMessage {
@@ -78,6 +116,7 @@ pub(crate) enum EventMessage {
     AddTrack(EventStore, TrackState, TrackHandle),
     ChangeState(usize, TrackStateChange),
     RemoveTrack(usize),
+    RemoveAllTracks,
     Tick,
 
     Poison,
@@ -105,26 +144,40 @@ pub(crate) enum AuxPacketMessage {
     Poison,
 }
 
-pub(crate) enum CoreMessage {
-    Reconnect,
+pub(crate) enum UdpMessage {
+    Packet(Vec<u8>), // FIXME: do something cheaper.
+    Poison,
 }
 
-pub(crate) fn start(guild_id: GuildId, rx: UnboundedReceiver<Status>) {
+pub(crate) enum MixerMessage {
+    AddTrack(Track),
+    SetTrack(Option<Track>),
+    SetBitrate(Bitrate),
+    SetMute(bool),
+    SetConn(MixerConnection, u32),
+    ReplaceInterconnect(Interconnect),
+    RebuildEncoder,
+    Poison,
+}
+
+pub(crate) fn start(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
     tokio::spawn(async move {
         info!("[Voice] Core started for guild: {}", guild_id);
-        runner(guild_id, rx).await;
+        runner(guild_id, rx, tx).await;
         info!("[Voice] Core finished for guild: {}", guild_id);
     });
 }
 
-fn start_internals(guild_id: GuildId, core: UnboundedSender<CoreMessage>) -> Interconnect {
-    let (evt_tx, evt_rx) = mpsc::unbounded_channel();
-    let (pkt_aux_tx, pkt_aux_rx) = mpsc::unbounded_channel();
+fn start_internals(guild_id: GuildId, core: Sender<Status>) -> Interconnect {
+    let (evt_tx, evt_rx) = flume::unbounded();
+    let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
+    let (mix_tx, mix_rx) = flume::unbounded();
 
     let interconnect = Interconnect {
         core,
         events: evt_tx,
         aux_packets: pkt_aux_tx,
+        mixer: mix_tx,
     };
 
     let ic = interconnect.clone();
@@ -141,185 +194,88 @@ fn start_internals(guild_id: GuildId, core: UnboundedSender<CoreMessage>) -> Int
         info!("[Voice] Network processor finished for guild: {}", guild_id);
     });
 
+    let ic = interconnect.clone();
+    std::thread::spawn(move || {
+        info!("[Voice] Mixer started for guild: {}", guild_id);
+        mixer::runner(ic, mix_rx);
+        info!("[Voice] Mixer finished for guild: {}", guild_id);
+    });
+
     interconnect
 }
 
-async fn runner(guild_id: GuildId, mut rx: UnboundedReceiver<Status>) {
-    let mut tracks = Vec::new();
+async fn runner(guild_id: GuildId, mut rx: Receiver<Status>, tx: Sender<Status>) {
     let mut connection = None;
-    let mut timer = Timer::new(20);
-    let mut bitrate = DEFAULT_BITRATE;
-    let mut mute = false;
+    let mut interconnect = start_internals(guild_id, tx);
 
-    let (reconnect_tx, mut reconnect_rx) = mpsc::unbounded_channel();
-
-    let mut interconnect = start_internals(guild_id, reconnect_tx);
-
-    'runner: loop {
-        loop {
-            // info!("lop");
-            match rx.try_recv() {
-                Ok(Status::Connect(info)) => {
-                    connection = match Connection::new(info, &interconnect, bitrate).await {
-                        Ok(connection) => Some(connection),
-                        Err(why) => {
-                            warn!("[Voice] Error connecting: {:?}", why);
-
-                            None
-                        },
-                    };
-                },
-                Ok(Status::Disconnect) => {
-                    connection = None;
-                },
-                Ok(Status::SetTrack(s)) => {
-                    tracks.clear();
-
-                    if let Some(aud) = s {
-                        tracks.push(aud);
-                    }
-                },
-                Ok(Status::AddTrack(mut s)) => {
-                    let evts = s.events.take()
-                        .unwrap_or_default();
-                    let state = s.state();
-                    let handle = s.handle.clone();
-
-                    tracks.push(s);
-
-                    let _ = interconnect.events.send(EventMessage::AddTrack(evts, state, handle));
-                },
-                Ok(Status::SetBitrate(b)) => {
-                    bitrate = b;
-                    if let Some(conn) = connection.as_mut() {
-                        if let Err(e) = conn.set_bitrate(b) {
-                            warn!("[Voice] Bitrate set unsuccessfully: {:?}", e);
-                        }
-                    }
-                },
-                Ok(Status::AddEvent(evt)) => {
-                    let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
-                }
-                Ok(Status::Mute(m)) => {
-                    mute = m;
-                },
-                Err(TryRecvError::Empty) => {
-                    // If we received nothing, then we can perform an update.
-                    // info!("Actually broke");
-                    break;
-                },
-                Err(TryRecvError::Closed) => {
-                    break 'runner;
-                },
-            }
-        }
-
-        // info!("Huh");
-
-        // Overall here, check if there's an error.
-        //
-        // If there is a connection, try to send an update. This should not
-        // error. If there is though for some spurious reason, then set `error`
-        // to `true`.
-        //
-        // Otherwise, wait out the timer and do _not_ error and wait to receive
-        // another event.
-        let error = match connection.as_mut() {
-            Some(connection) => {
-                let cycle = connection.cycle(&mut tracks, &mut timer, bitrate, &interconnect, mute).await;
-
-                match cycle {
-                    Ok(()) => {
-                        // Send state changes
-                        let mut i = 0;
-                        let mut to_remove = Vec::with_capacity(tracks.len());
-                        while i < tracks.len() {
-                            let aud = tracks.get_mut(i)
-                                .expect("[Voice] Tried to remove an illegal track index.");
-
-                            if aud.playing.is_done() {
-                                let p_state = aud.playing();
-                                tracks.remove(i);
-                                to_remove.push(i);
-                                let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Mode(p_state)));
-                            } else {
-                                i += 1;
-                            }
-                        }
-
-                        // Tick
-                        let _ = interconnect.events.send(EventMessage::Tick);
-
-                        // Then do removals.
-                        for i in &to_remove[..] {
-                            let _ = interconnect.events.send(EventMessage::RemoveTrack(*i));
-                        }
-
-                        false
-                    },
+    loop {
+        match rx.recv_async().await {
+            Ok(Status::Connect(info)) => {
+                connection = match Connection::new(info, &interconnect).await {
+                    Ok(connection) => Some(connection),
                     Err(why) => {
-                        if matches!(why, Error::VoiceInterconnectFailure) {
-                            interconnect = interconnect.restart(guild_id);
-                        }
+                        warn!("[Voice] Error connecting: {:?}", why);
 
-                        error!(
-                            "(╯°□°）╯︵ ┻━┻ Error updating connection: {:?}",
-                            why
-                        );
-
-                        true
+                        None
                     },
-                }
-            },
-            None => {
-                timer.hold().await;
-
-                false
-            },
-        };
-
-        let remote_error = match reconnect_rx.try_recv() {
-            Err(TryRecvError::Empty) => {
-                false
-            },
-            _ => {
-                true
-            },
-        };
-
-        // If there was an error, then just reset the connection and try to get
-        // another.
-        if error || remote_error {
-            if let Some(mut conn) = connection.take() {
-                // try once: if interconnect, try again.
-                // if still issue, full connect.
-                let info = conn.connection_info.clone();
-
-                let full_connect = match conn.reconnect(&interconnect).await {
-                    Ok(()) => {
-                        connection = Some(conn);
-                        false
-                    },
-                    Err(Error::VoiceInterconnectFailure) => {
-                        interconnect = interconnect.restart(guild_id);
-
-                        match conn.reconnect(&interconnect).await {
-                            Ok(()) => {
-                                connection = Some(conn);
-                                false
-                            },
-                            _ => true,
-                        }
-                    },
-                    _ => true,
                 };
-
-                if full_connect {
-                    connection = Connection::new(info, &interconnect, bitrate).await
-                        .map_err(|e| {error!("[Voice] Catastrophic connection failure. Stopping. {:?}", e); e})
-                        .ok();
-                }
+            },
+            Ok(Status::Disconnect) => {
+                connection = None;
+            },
+            Ok(Status::SetTrack(s)) => {
+                let _ = interconnect.mixer.send(MixerMessage::SetTrack(s));
+            },
+            Ok(Status::AddTrack(s)) => {
+                let _ = interconnect.mixer.send(MixerMessage::AddTrack(s));
+            },
+            Ok(Status::SetBitrate(b)) => {
+                let _ = interconnect.mixer.send(MixerMessage::SetBitrate(b));
+            },
+            Ok(Status::AddEvent(evt)) => {
+                let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
             }
+            Ok(Status::Mute(m)) => {
+                let _ = interconnect.mixer.send(MixerMessage::SetMute(m));
+            },
+            Ok(Status::Reconnect) => {
+                if let Some(mut conn) = connection.take() {
+                    // try once: if interconnect, try again.
+                    // if still issue, full connect.
+                    let info = conn.connection_info.clone();
+
+                    let full_connect = match conn.reconnect(&interconnect).await {
+                        Ok(()) => {
+                            connection = Some(conn);
+                            false
+                        },
+                        Err(Error::VoiceInterconnectFailure) => {
+                            interconnect.restart_volatile_internals(guild_id);
+
+                            match conn.reconnect(&interconnect).await {
+                                Ok(()) => {
+                                    connection = Some(conn);
+                                    false
+                                },
+                                _ => true,
+                            }
+                        },
+                        _ => true,
+                    };
+
+                    if full_connect {
+                        connection = Connection::new(info, &interconnect).await
+                            .map_err(|e| {error!("[Voice] Catastrophic connection failure. Stopping. {:?}", e); e})
+                            .ok();
+                    }
+                }
+            },
+            Ok(Status::RebuildInterconnect) => {
+                interconnect.restart_volatile_internals(guild_id);
+            },
+            Err(RecvError::Disconnected) => {
+                break;
+            },
         }
     }
 

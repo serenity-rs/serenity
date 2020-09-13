@@ -55,13 +55,13 @@ version = "0.2"
 optional = true
 version = "1"
 
+[dependencies.flume]
+optional = true
+version = "0.9"
+
 [dependencies.parking_lot]
 optional = true
 version = "0.11"
-
-[dependencies.pin-project]
-optional = true
-version = "0.4"
 
 [dependencies.reqwest]
 default-features = false
@@ -72,6 +72,10 @@ version = "0.10"
 [dependencies.rand]
 optional = true
 version = "0.7"
+
+[dependencies.spin_sleep]
+optional = true
+version = "1"
 
 [dependencies.static_assertions]
 optional = true
@@ -167,13 +171,13 @@ voice = [
     "audiopus",
     "byteorder",
     "discortp",
+    "flume",
     "gateway",
     "parking_lot",
-    "pin-project",
     "rand",
+    "spin_sleep",
     "streamcatcher",
     "tokio/process",
-    "tokio/sync",
     "xsalsa20poly1305",
 ]
 

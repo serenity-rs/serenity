@@ -24,14 +24,13 @@ use crate::{
         threading,
     },
 };
+use flume::{
+    SendError,
+    Sender as FlumeSender,
+};
 use futures::{
     channel::mpsc::UnboundedSender as Sender,
     sink::SinkExt,
-};
-use tokio::sync::mpsc::{
-    error::SendError,
-    self,
-    UnboundedSender as TokioSender,
 };
 use serde_json::json;
 
@@ -92,7 +91,7 @@ pub struct Handler {
     /// [`mute`]: #method.mute
     pub self_mute: bool,
     /// The internal sender to the voice connection monitor thread.
-    sender: TokioSender<VoiceStatus>,
+    sender: FlumeSender<VoiceStatus>,
     /// The session Id of the current voice connection, if any.
     ///
     /// **Note**: This _should_ be set through an [`update_state`] call.
@@ -436,9 +435,9 @@ impl Handler {
         ws: Option<Sender<InterMessage>>,
         user_id: UserId,
     ) -> Self {
-        let (tx, rx) = mpsc::unbounded_channel();
+        let (tx, rx) = flume::unbounded();
 
-        threading::start(guild_id, rx);
+        threading::start(guild_id, rx, tx.clone());
 
         Handler {
             channel_id: None,
@@ -458,12 +457,12 @@ impl Handler {
     fn send(&mut self, status: VoiceStatus) {
         // Restart thread if it errored.
         if let Err(SendError(status)) = self.sender.send(status) {
-            let (tx, rx) = mpsc::unbounded_channel();
+            let (tx, rx) = flume::unbounded();
 
-            self.sender = tx;
+            self.sender = tx.clone();
             self.sender.send(status).unwrap();
 
-            threading::start(self.guild_id, rx);
+            threading::start(self.guild_id, rx, tx);
 
             self.update();
         }

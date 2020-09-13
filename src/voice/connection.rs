@@ -23,7 +23,10 @@ use crate::{
             AuxPacketMessage,
             EventMessage,
             Interconnect,
+            MixerConnection,
+            MixerMessage,
             TrackStateChange,
+            UdpMessage,
         },
         tracks::{Track, PlayMode},
         CRYPTO_MODE,
@@ -35,6 +38,7 @@ use discortp::{
         IpDiscoveryPacket,
         IpDiscoveryType,
         MutableIpDiscoveryPacket,
+        MutableKeepalivePacket,
     },
     rtp::{
         MutableRtpPacket,
@@ -57,7 +61,7 @@ use rand::random;
 use serde::Deserialize;
 use std::net::{SocketAddr, ToSocketAddrs};
 use tokio::{
-    time::{delay_for, timeout},
+    time::{delay_for, timeout_at, Elapsed, Instant},
     net::{
         UdpSocket,
         udp::{RecvHalf, SendHalf},
@@ -81,17 +85,11 @@ use crate::internal::ws_impl::create_rustls_client;
 use crate::internal::ws_impl::create_native_tls_client;
 
 pub(crate) struct Connection {
-    cipher: Cipher,
     pub(crate) connection_info: ConnectionInfo,
-    encoder: OpusEncoder,
-    packet: [u8; VOICE_PACKET_MAX],
-    silence_frames: u8,
-    soft_clip: SoftClip,
-    udp: SendHalf,
 }
 
 impl Connection {
-    pub(crate) async fn new(mut info: ConnectionInfo, interconnect: &Interconnect, bitrate: Bitrate) -> Result<Connection> {
+    pub(crate) async fn new(mut info: ConnectionInfo, interconnect: &Interconnect) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
         #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
@@ -100,13 +98,9 @@ impl Connection {
         #[cfg(feature = "native_tls_backend")]
         let mut client = create_native_tls_client(url).await?;
 
-        info!("Made thing");
-
         let mut hello = None;
         let mut ready = None;
         client.send_json(&payload::build_identify(&info)).await?;
-
-        info!("Sent thing");
 
         loop {
             let value = match client.recv_json().await? {
@@ -138,16 +132,12 @@ impl Connection {
         let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
         let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
-        info!("visited HR");
-
         if !has_valid_mode(&ready.modes) {
             return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
         }
 
         let mut udp = UdpSocket::bind("0.0.0.0:0").await?;
         udp.connect((&ready.ip[..], ready.port)).await?;
-
-        info!("Made udp");
 
         // Follow Discord's IP Discovery procedures, in case NAT tunnelling is needed.
         let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
@@ -164,8 +154,6 @@ impl Connection {
 
         udp.send(&bytes).await?;
 
-        info!("sent disco");
-
         let (len, _addr) = udp.recv_from(&mut bytes).await?;
         {
             let view = IpDiscoveryPacket::new(&bytes[..len])
@@ -179,38 +167,49 @@ impl Connection {
             client.send_json(&payload::build_select_protocol(addr, view.get_port())).await?;
         }
 
-        info!("rx'd disco");
-
         let cipher = init_cipher(&mut client).await?;
 
-        info!("Made cipher");
-
         info!("[Voice] Connected to: {}", info.endpoint);
-
-        // Encode for Discord in Stereo, as required.
-        let mut encoder = OpusEncoder::new(SAMPLE_RATE, Channels::Stereo, CodingMode::Audio)?;
-        encoder.set_bitrate(bitrate)?;
-        let soft_clip = SoftClip::new(Channels::Stereo);
 
         info!(
             "[Voice] WS heartbeat duration {}ms.",
             hello.heartbeat_interval,
         );
 
-        let mut packet = [0u8; VOICE_PACKET_MAX];
+        let (udp_rx, mut udp_tx) = udp.split();
 
-        let mut rtp = MutableRtpPacket::new(&mut packet[..])
-            .expect(
-                "[Voice] Too few bytes in self.packet for RTP header.\
-                (Blame: VOICE_PACKET_MAX?)"
-            );
-        rtp.set_version(RTP_VERSION);
-        rtp.set_payload_type(RTP_PROFILE_TYPE);
-        rtp.set_sequence(random::<u16>().into());
-        rtp.set_timestamp(random::<u32>().into());
-        rtp.set_ssrc(ready.ssrc);
+        let (udp_msg_tx, udp_msg_rx) = flume::unbounded();
 
-        let(udp_rx, udp_tx) = udp.split();
+        let ssrc = ready.ssrc;
+        tokio::spawn(async move {
+            info!("[Voice] UDP handle started.");
+
+            let mut keepalive_bytes = [0u8; MutableKeepalivePacket::minimum_packet_size()];
+            let mut ka = MutableKeepalivePacket::new(&mut keepalive_bytes[..])
+                .expect("[Voice] Insufficient bytes given to keepalive packet.");
+            ka.set_ssrc(ssrc);
+
+            let mut ka_time = Instant::now() + UDP_KEEPALIVE_GAP;
+
+            loop {
+                use UdpMessage::*;
+                match timeout_at(ka_time, udp_msg_rx.recv_async()).await {
+                    Err(Elapsed{..}) => {
+                        info!("[Voice] Sending UDP Keepalive.");
+                        let _ = udp_tx.send(&keepalive_bytes[..]).await;
+                        ka_time += UDP_KEEPALIVE_GAP;
+                    },
+                    Ok(Ok(Packet(p))) => {
+                        let _ = udp_tx.send(&p[..]).await;
+                    },
+                    Ok(Err(_)) | Ok(Ok(Poison)) => {
+                        break;
+                    },
+                }
+            }
+
+            info!("[Voice] UDP handle stopped.");
+        });
 
         interconnect.aux_packets.send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
@@ -218,14 +217,15 @@ impl Connection {
         interconnect.aux_packets.send(AuxPacketMessage::Udp(udp_rx))?;
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
-        Ok(Connection {
+        let mix_conn = MixerConnection{
             cipher,
+            udp: udp_msg_tx,
+        };
+
+        interconnect.mixer.send(MixerMessage::SetConn(mix_conn, ready.ssrc))?;
+
+        Ok(Connection {
             connection_info: info,
-            encoder,
-            packet,
-            silence_frames: 0,
-            soft_clip,
-            udp: udp_tx,
         })
     }
 
@@ -279,159 +279,6 @@ impl Connection {
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
-        Ok(())
-    }
-
-    #[inline]
-    async fn mix_tracks<'a>(
-        &mut self,
-        tracks: &mut Vec<Track>,
-        opus_frame: &'a mut [u8],
-        mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
-        interconnect: &Interconnect,
-    ) -> Result<(usize, &'a[u8])> {
-        let mut len = 0;
-
-        for (i, track) in tracks.iter_mut().enumerate() {
-            let vol = track.volume;
-            let stream = &mut track.source;
-
-            if track.playing != PlayMode::Play {
-                continue;
-            }
-
-            let temp_len = stream.mix(mix_buffer, vol).await;
-
-            len = len.max(temp_len);
-            if temp_len > 0 {
-                track.step_frame();
-            } else if track.do_loop() {
-                if let Some(time) = track.seek_time(Default::default()).await {
-                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
-                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(track.loops, false)));
-                }
-            } else {
-                track.end();
-            }
-        };
-
-        // If opus frame passthorugh were supported, we'd do it in this function.
-        // This requires that we have only one track, who has volume 1.0, and an
-        // Opus codec type.
-        //
-        // For now, we make this override possible but don't perform the work itself.
-        Ok((len, &opus_frame[..0]))
-    }
-
-    #[inline]
-    fn audio_commands_events(&mut self, tracks: &mut Vec<Track>, interconnect: &Interconnect) {
-        for (i, audio) in tracks.iter_mut().enumerate() {
-            audio.process_commands(i, interconnect);
-        }
-    }
-
-    #[allow(unused_variables)]
-    pub(crate) async fn cycle(&mut self,
-                mut tracks: &mut Vec<Track>,
-                audio_timer: &mut Timer,
-                bitrate: Bitrate,
-                interconnect: &Interconnect,
-                muted: bool
-            ) -> Result<()> {
-        let mut opus_frame_backing = [0u8; STEREO_FRAME_SIZE];
-        let mut mix_buffer = [0f32; STEREO_FRAME_SIZE];
-
-        // Slice which mix tracks may use to passthrough direct Opus frames.
-        let mut opus_space = &mut opus_frame_backing[..];
-
-        // Walk over all the audio files, combining into one audio frame according
-        // to volume, play state, etc.
-        let (mut len, mut opus_frame) = self.mix_tracks(&mut tracks, &mut opus_space, &mut mix_buffer, interconnect).await?;
-
-        self.soft_clip.apply(&mut mix_buffer[..])?;
-
-        if muted {
-            len = 0;
-        }
-
-        if len == 0 {
-            if self.silence_frames > 0 {
-                self.silence_frames -= 1;
-
-                // Explicit "Silence" frame.
-                opus_frame = &SILENT_FRAME[..];
-            } else {
-                // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                interconnect.aux_packets.send(AuxPacketMessage::Speaking(false))?;
-
-                audio_timer.hold().await;
-
-                return Ok(());
-            }
-        } else {
-            self.silence_frames = 5;
-        }
-
-        interconnect.aux_packets.send(AuxPacketMessage::Speaking(true))?;
-
-        self.prep_and_send_packet(mix_buffer, opus_frame).await?;
-        audio_timer.hold().await;
-
-        self.audio_commands_events(&mut tracks, interconnect);
-
-        Ok(())
-    }
-
-    pub(crate) fn set_bitrate(&mut self, bitrate: Bitrate) -> Result<()> {
-        self.encoder.set_bitrate(bitrate)
-            .map_err(Into::into)
-    }
-
-    async fn prep_and_send_packet(&mut self, buffer: [f32; 1920], opus_frame: &[u8]) -> Result<()> {
-        let mut nonce = Nonce::default();
-        let index = {
-            let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
-                .expect(
-                    "[Voice] Too few bytes in self.packet for RTP header.\
-                    (Blame: VOICE_PACKET_MAX?)"
-                );
-
-            let pkt = rtp.packet();
-            let rtp_len = RtpPacket::minimum_packet_size();
-            nonce[..rtp_len]
-                .copy_from_slice(&pkt[..rtp_len]);
-
-            let payload = rtp.payload_mut();
-
-            let payload_len = if opus_frame.is_empty() {
-                self.encoder
-                    .encode_float(&buffer[..STEREO_FRAME_SIZE], &mut payload[TAG_SIZE..])?
-            } else {
-                let len = opus_frame.len();
-                payload[TAG_SIZE..TAG_SIZE + len]
-                    .clone_from_slice(opus_frame);
-                len
-            };
-
-            let final_payload_size = TAG_SIZE + payload_len;
-
-            let tag = self.cipher.encrypt_in_place_detached(&nonce, b"", &mut payload[TAG_SIZE..final_payload_size])
-                .expect("[Voice] Encryption failed?");
-            payload[..TAG_SIZE].copy_from_slice(&tag[..]);
-
-            rtp_len + final_payload_size
-        };
-
-        self.udp.send(&self.packet[..index]).await?;
-
-        let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
-            .expect(
-                "[Voice] Too few bytes in self.packet for RTP header.\
-                (Blame: VOICE_PACKET_MAX?)"
-            );
-        rtp.set_sequence(rtp.get_sequence() + 1);
-        rtp.set_timestamp(rtp.get_timestamp() + MONO_FRAME_SIZE as u32);
-
         Ok(())
     }
 }

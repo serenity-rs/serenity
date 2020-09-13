@@ -19,10 +19,10 @@ use crate::{
         payload,
         threading::{
             AuxPacketMessage,
-            CoreMessage,
             EventMessage,
             Interconnect,
         },
+        Status,
     },
 };
 use discortp::{
@@ -40,6 +40,12 @@ use discortp::{
     Packet,
     PacketSize,
 };
+use flume::{
+    Receiver,
+    SendError,
+    Sender,
+    TryRecvError,
+};
 use log::{debug, error, info, warn};
 use rand::random;
 use serde::Deserialize;
@@ -53,10 +59,6 @@ use tokio::{
         UdpSocket,
         udp::{RecvHalf, SendHalf},
     },
-    sync::mpsc::{
-        error::TryRecvError,
-        UnboundedReceiver,
-    }
 };
 use xsalsa20poly1305::{
     aead::AeadInPlace,
@@ -163,7 +165,7 @@ impl SsrcState {
 }
 
 struct AuxNetwork {
-    rx: UnboundedReceiver<AuxPacketMessage>,
+    rx: Receiver<AuxPacketMessage>,
 
     udp_socket: Option<RecvHalf>,
     ws_client: Option<WsStream>,
@@ -184,7 +186,7 @@ struct AuxNetwork {
 }
 
 impl AuxNetwork {
-    pub(crate) fn new(evt_rx: UnboundedReceiver<AuxPacketMessage>) -> Self {
+    pub(crate) fn new(evt_rx: Receiver<AuxPacketMessage>) -> Self {
         Self {
             rx: evt_rx,
 
@@ -210,7 +212,6 @@ impl AuxNetwork {
 
     async fn run(&mut self, interconnect: &Interconnect) {
         'aux_runner: loop {
-            info!("[Aux] head of loop");
             let mut ws_error = match self.process_ws_messages(interconnect).await {
                 Err(e) => {
                     error!("[Voice] Error processing ws {:?}.", e);
@@ -265,7 +266,7 @@ impl AuxNetwork {
                             }
                         }
                     }
-                    Err(TryRecvError::Closed) | Ok(Poison) => {
+                    Err(TryRecvError::Disconnected) | Ok(Poison) => {
                         break 'aux_runner;
                     },
                     Err(_) => {
@@ -277,7 +278,7 @@ impl AuxNetwork {
 
             if ws_error {
                 self.ws_client = None;
-                let _ = interconnect.core.send(CoreMessage::Reconnect);
+                let _ = interconnect.core.send(Status::Reconnect);
             }
         }
 
@@ -285,10 +286,7 @@ impl AuxNetwork {
     }
 
     async fn process_ws_messages(&mut self, interconnect: &Interconnect) -> Result<()> {
-        info!("[Aux] ws...");
         if let Some(ws) = self.ws_client.as_mut() {
-            info!("[Aux] have ws");
-
             if self.ws_keepalive_time.check() {
                 let nonce = random::<u64>();
                 self.last_heartbeat_nonce = Some(nonce);
@@ -347,22 +345,10 @@ impl AuxNetwork {
     }
 
     async fn process_udp_messages(&mut self, interconnect: &Interconnect) {
-        info!("[Aux] udp...");
         // NOTE: errors here (and in general for UDP) are not fatal to the connection.
         // Panics should be avoided due to adversarial nature of rx'd packets,
         // but correct handling should not prompt a reconnect.
         if let Some(udp) = self.udp_socket.as_mut() {
-            info!("[Aux] have udp");
-            // FIXME: either clone and recon from raw FD or do this on main.
-            // if self.udp_keepalive_time.check() {
-            //     // FIXME: Can we change this to send safely?
-            //     let _ = udp.as_ref().send_to(
-            //         &self.keepalive_bytes,
-            //         self.destination.expect("[Voice] Tried to send keepalive without valid destination.")
-            //     ).await;
-            //     self.udp_keepalive_time.increment();
-            // }
-
             while let Ok(Ok((len, _addr))) = tokio::time::timeout(TIMESTEP_LENGTH / 2,udp.recv_from(&mut self.packet_buffer[..])).await {
                 if !self.should_parse {
                     continue;
@@ -445,12 +431,11 @@ impl AuxNetwork {
                     }
                 }
             }
-            info!("[Aux] udp draie");
         }
     }
 }
 
-pub(crate) async fn runner(interconnect: Interconnect, evt_rx: UnboundedReceiver<AuxPacketMessage>) {
+pub(crate) async fn runner(interconnect: Interconnect, evt_rx: Receiver<AuxPacketMessage>) {
     let mut aux = AuxNetwork::new(evt_rx);
 
     aux.run(&interconnect).await;

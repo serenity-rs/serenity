@@ -42,4 +42,6 @@ pub(crate) enum Status {
     SetBitrate(Bitrate),
     AddEvent(EventData),
     Mute(bool),
+    Reconnect,
+    RebuildInterconnect,
 }
