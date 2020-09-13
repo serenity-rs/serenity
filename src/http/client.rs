@@ -35,7 +35,7 @@ use tokio::{
 
 #[derive(Debug)]
 pub struct Http {
-    client: Arc<Client>,
+    pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
     pub token: String,
 }
