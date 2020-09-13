@@ -319,6 +319,7 @@ impl CurrentUser {
 ///
 /// [`name`]: #method.name
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[non_exhaustive]
 pub enum DefaultAvatar {
     /// The avatar when the result is `0`.
     #[serde(rename = "6debd47ed13483642cf09e832ed0bc1b")]
@@ -335,8 +336,6 @@ pub enum DefaultAvatar {
     /// The avatar when the result is `4`.
     #[serde(rename = "1cbd08c76f8af6dddce02c5138971129")]
     Red,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl DefaultAvatar {
@@ -354,14 +353,13 @@ impl DefaultAvatar {
 /// [`DoNotDisturb`]: #variant.DoNotDisturb
 /// [`Invisible`]: #variant.Invisible
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+#[non_exhaustive]
 pub enum OnlineStatus {
     #[serde(rename = "dnd")] DoNotDisturb,
     #[serde(rename = "idle")] Idle,
     #[serde(rename = "invisible")] Invisible,
     #[serde(rename = "offline")] Offline,
     #[serde(rename = "online")] Online,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl OnlineStatus {
@@ -372,7 +370,6 @@ impl OnlineStatus {
             OnlineStatus::Invisible => "invisible",
             OnlineStatus::Offline => "offline",
             OnlineStatus::Online => "online",
-            OnlineStatus::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -656,7 +653,6 @@ impl User {
                             .map(|m| m.roles.contains(&role))
                     }
                 },
-                GuildContainer::__Nonexhaustive => unreachable!(),
             }
         }.boxed()
     }

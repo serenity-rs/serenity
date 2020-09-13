@@ -242,10 +242,8 @@ impl ShardRunner {
         match *action {
             ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart().await,
             ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
-            ShardAction::Reconnect(ReconnectType::__Nonexhaustive) => unreachable!(),
             ShardAction::Heartbeat => self.shard.heartbeat().await,
             ShardAction::Identify => self.shard.identify().await,
-            ShardAction::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -427,7 +425,6 @@ impl ShardRunner {
                 // Value must be forwarded over the websocket
                 self.shard.client.send_json(&value).await.is_ok()
             },
-            InterMessage::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -545,7 +542,6 @@ impl ShardRunner {
                             return Ok((None, None, false));
                         }
                     },
-                    ReconnectType::__Nonexhaustive => unreachable!(),
                 }
 
                 return Ok((None, None, true));

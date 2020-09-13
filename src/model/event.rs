@@ -115,7 +115,6 @@ impl CacheUpdate for ChannelCreateEvent {
                     .insert(category.id, category.clone())
                     .map(Channel::Category)
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -161,7 +160,6 @@ impl CacheUpdate for ChannelDeleteEvent {
 
                 cache.private_channels.write().await.remove(&id);
             },
-            Channel::__Nonexhaustive => unreachable!(),
         };
 
         // Remove the cached messages for the channel.
@@ -259,7 +257,6 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .get_mut(&category.id)
                     .map(|c| c.clone_from(category));
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
 
         None
@@ -1221,7 +1218,6 @@ impl CacheUpdate for ReadyEvent {
                     cache.guilds.write().await.insert(guild.id, guild);
                 },
                 GuildStatus::OnlinePartialGuild(_) => {},
-                GuildStatus::__Nonexhaustive => unreachable!(),
             }
         }
 
@@ -1412,6 +1408,7 @@ pub struct WebhookUpdateEvent {
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
+#[non_exhaustive]
 #[serde(untagged)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
@@ -1421,8 +1418,6 @@ pub enum GatewayEvent {
     InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for GatewayEvent {
@@ -1494,6 +1489,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 /// Event received over a websocket connection
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 #[serde(untagged)]
 pub enum Event {
     /// A [`Channel`] was created.
@@ -1607,8 +1603,6 @@ pub enum Event {
     WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Deserializes a `serde_json::Value` into an `Event`.
@@ -1730,7 +1724,6 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             value: v,
             _nonexhaustive: (),
         }),
-        EventType::__Nonexhaustive => unreachable!(),
     })
 }
 
@@ -1744,6 +1737,7 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 ///
 /// [`EventType::ChannelCreate`]: enum.EventType.html#variant.ChannelCreate
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum EventType {
     /// Indicator that a channel create payload was received.
     ///
@@ -1972,8 +1966,6 @@ pub enum EventType {
     /// This should be logged so that support for it can be added in the
     /// library.
     Other(String),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for EventType {
@@ -2121,6 +2113,7 @@ pub struct VoiceClientDisconnect {
 ///
 /// [`voice`]: ../../voice/index.html
 #[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
 #[serde(untagged)]
 pub enum VoiceEvent {
     /// Server's response to the client's Identify operation.
@@ -2150,8 +2143,6 @@ pub enum VoiceEvent {
     ClientDisconnect(VoiceClientDisconnect),
     /// An unknown voice event not registered.
     Unknown(VoiceOpCode, Value),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for VoiceEvent {

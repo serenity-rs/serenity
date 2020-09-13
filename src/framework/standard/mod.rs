@@ -47,6 +47,7 @@ use crate::model::{guild::Role, id::RoleId};
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),
@@ -82,8 +83,6 @@ pub enum DispatchError {
     IgnoredBot,
     /// When the bot ignores webhooks and a command was issued by one.
     WebhookAuthor,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 type DispatchHook = for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;

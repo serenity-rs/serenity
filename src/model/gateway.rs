@@ -347,6 +347,7 @@ pub struct ActivityEmoji {
 
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[non_exhaustive]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.
     Playing = 0,
@@ -356,8 +357,6 @@ pub enum ActivityType {
     Listening = 2,
     /// An indicator that the user uses custum statuses
     Custom = 4,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -378,7 +377,6 @@ impl ActivityType {
             Streaming => 1,
             Listening => 2,
             Custom => 4,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }
