@@ -1,4 +1,4 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.39.0+ badge]][rust 1.39.0+ link]
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.40.0+ badge]][rust 1.40.0+ link]
 
 # serenity
 
@@ -104,7 +104,7 @@ Add the following to your `Cargo.toml` file:
 serenity = "0.9.0-rc.1"
 ```
 
-Serenity supports a minimum of Rust 1.39.
+Serenity supports a minimum of Rust 1.40.
 
 # Features
 
@@ -230,5 +230,5 @@ Voice + youtube-dl:
 [repo:lavalink]: https://github.com/Frederikam/Lavalink
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
-[rust 1.39.0+ badge]: https://img.shields.io/badge/rust-1.39.0+-93450a.svg?style=flat-square
-[rust 1.39.0+ link]: https://blog.rust-lang.org/2019/11/07/Rust-1.39.0.html
+[rust 1.40.0+ badge]: https://img.shields.io/badge/rust-1.40.0+-93450a.svg?style=flat-square
+[rust 1.40.0+ link]: https://blog.rust-lang.org/2019/12/19/Rust-1.40.0.html
