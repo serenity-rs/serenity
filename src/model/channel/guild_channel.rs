@@ -1,6 +1,13 @@
 use chrono::{DateTime, Utc};
 use crate::model::prelude::*;
 
+use tokio::{
+    io::AsyncReadExt,
+    fs::File,
+};
+use reqwest::Url;
+use bytes::buf::Buf;
+
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
 #[cfg(feature = "cache")]
@@ -816,6 +823,87 @@ impl GuildChannel {
     #[cfg(feature = "collector")]
     pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
+    }
+
+    /// Sends a message with just the given message content in the channel.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ModelError::NameTooShort`] if the name of the webhook is
+    /// under the limit of 2 characters.
+    /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
+    /// over the limit of 100 characters.
+    /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
+    ///
+    /// [`ModelError::NameTooShort`]: ../error/enum.Error.html#variant.NameTooShort
+    /// [`ModelError::NameTooLong`]: ../error/enum.Error.html#variant.NameTooLong
+    /// [`ModelError::InvalidChannelType`]: ../error/enum.Error.html#variant.InvalidChannelType
+    pub async fn create_webhook(&self, http: impl AsRef<Http>, name: impl std::fmt::Display) -> Result<Webhook> {
+        let name = name.to_string();
+
+        if name.len() < 2 {
+            return Err(Error::Model(ModelError::NameTooShort))
+        } else if name.len() > 100 {
+            return Err(Error::Model(ModelError::NameTooLong))
+        } else if self.kind.num() != 0 {
+            return Err(Error::Model(ModelError::InvalidChannelType))
+        }
+
+        let map = serde_json::json!({
+            "name": name,
+        });
+
+        http.as_ref().create_webhook(self.id.0, &map).await
+    }
+
+    /// Avatar must be a 128x128 image.
+    pub async fn create_webhook_with_avatar<'a>(&self, http: impl AsRef<Http>, name: impl std::fmt::Display, avatar: impl Into<AttachmentType<'a>>) -> Result<Webhook> {
+        let name = name.to_string();
+        let avatar = avatar.into();
+
+        if name.len() < 2 {
+            return Err(Error::Model(ModelError::NameTooShort))
+        } else if name.len() > 100 {
+            return Err(Error::Model(ModelError::NameTooLong))
+        } else if self.kind.num() != 0 {
+            return Err(Error::Model(ModelError::InvalidChannelType))
+        }
+
+        let avatar = match avatar {
+            AttachmentType::Bytes{ data, filename: _ } => {
+                "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned())
+            },
+            AttachmentType::File{ file, filename: _ } => {
+                let mut buf = Vec::new();
+                file.try_clone().await?.read_to_end(&mut buf).await?;
+
+                "data:image/png;base64,".to_string() + &base64::encode(&buf)
+            },
+            AttachmentType::Path(path) => {
+                let mut file = File::open(path).await?;
+                let mut buf = vec![];
+                file.read_to_end(&mut buf).await?;
+
+                "data:image/png;base64,".to_string() + &base64::encode(&buf)
+            },
+            AttachmentType::Image(url) => {
+                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                let response = http.as_ref().client.get(url).send().await?;
+                let mut bytes = response.bytes().await?;
+                let mut picture: Vec<u8> = vec![0; bytes.len()];
+                bytes.copy_to_slice(&mut picture[..]);
+
+                "data:image/png;base64,".to_string() + &base64::encode(&picture)
+            },
+            AttachmentType::__Nonexhaustive => unreachable!(),
+        };
+        
+        let map = serde_json::json!({
+            "name": name,
+            "avatar": avatar
+        });
+
+        http.as_ref().create_webhook(self.id.0, &map).await
     }
 }
 

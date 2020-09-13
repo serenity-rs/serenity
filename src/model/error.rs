@@ -127,6 +127,10 @@ pub enum Error {
     ///
     /// [`ChannelType`]: ../channel/enum.ChannelType.html
     InvalidChannelType,
+    /// Indicates that the webhook name is under the 2 characters limit.
+    NameTooShort,
+    /// Indicates that the webhook name is over the 100 characters limit.
+    NameTooLong,
     #[doc(hidden)]
     __Nonexhaustive,
 }
@@ -146,6 +150,8 @@ impl Display for Error {
             Error::ItemMissing => f.write_str("The required item is missing from the cache."),
             Error::MessageTooLong(_) => f.write_str("Message too large."),
             Error::MessagingBot => f.write_str("Attempted to message another bot user."),
+            Error::NameTooShort => f.write_str("Name is under the character limit."),
+            Error::NameTooLong => f.write_str("Name is over the character limit."),
             Error::__Nonexhaustive => unreachable!(),
         }
     }
