@@ -316,6 +316,10 @@ impl From<DispatchError> for ParseError {
     }
 }
 
+fn is_unrecognised<T>(res: &Result<T, ParseError>) -> bool {
+    matches!(res, Err(ParseError::UnrecognisedCommand(_)))
+}
+
 /// Parse a command from the message.
 ///
 /// The "command" may be:
@@ -357,7 +361,7 @@ pub async fn command(
             Map::WithPrefixes(map) => {
                 let res = handle_group(stream, ctx, msg, config, map).await;
 
-                if res.is_ok() {
+                if !is_unrecognised(&res) {
                     return res;
                 }
 
@@ -370,17 +374,13 @@ pub async fn command(
 
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
-                if res.is_ok() {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
-
+                if !is_unrecognised(&res) {
                     return res;
                 }
 
                 let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
-                if res.is_ok() {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
-
+                if !is_unrecognised(&res) {
                     return res;
                 }
 
