@@ -616,6 +616,14 @@ impl StandardFramework {
 impl Framework for StandardFramework {
     #[instrument(skip(self, ctx))]
     async fn dispatch(&self, mut ctx: Context, msg: Message) {
+        if let Some(error) = self.should_fail_common(&msg) {
+            if let Some(dispatch) = &self.dispatch {
+                dispatch(&mut ctx, &msg, error).await;
+            }
+
+            return;
+        }
+
         let mut stream = Stream::new(&msg.content);
 
         stream.take_while_char(|c| c.is_whitespace());
@@ -633,14 +641,6 @@ impl Framework for StandardFramework {
         if prefix.is_none() && !(self.config.no_dm_prefix && msg.is_private()) {
             if let Some(normal) = &self.normal_message {
                 normal(&mut ctx, &msg).await;
-            }
-
-            return;
-        }
-
-        if let Some(error) = self.should_fail_common(&msg) {
-            if let Some(dispatch) = &self.dispatch {
-                dispatch(&mut ctx, &msg, error).await;
             }
 
             return;
