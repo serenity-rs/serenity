@@ -43,7 +43,7 @@ use crate::utils::Colour;
 pub struct CreateEmbed(pub HashMap<&'static str, Value>);
 
 impl CreateEmbed {
-    /// Set the author of the embed.
+    /// Build the author of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more
     /// information.
@@ -53,7 +53,11 @@ impl CreateEmbed {
         where F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor {
         let mut author = CreateEmbedAuthor::default();
         f(&mut author);
+        self.set_author(author)
+    }
 
+    /// Set the author of the embed.
+    pub fn set_author(&mut self, author: CreateEmbedAuthor) -> &mut Self {
         let map = utils::hashmap_to_json_map(author.0);
 
         self.0.insert("author", Value::Object(map));
@@ -160,7 +164,7 @@ impl CreateEmbed {
         self
     }
 
-    /// Set the footer of the embed.
+    /// Build the footer of the embed.
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more
     /// information.
@@ -170,6 +174,11 @@ impl CreateEmbed {
         where F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter {
         let mut create_embed_footer = CreateEmbedFooter::default();
         f(&mut create_embed_footer);
+        self.set_footer(create_embed_footer)
+    }
+
+    /// Set the footer of the embed.
+    pub fn set_footer(&mut self, create_embed_footer: CreateEmbedFooter) -> &mut Self {
         let footer = create_embed_footer.0;
         let map = utils::hashmap_to_json_map(footer);
 
