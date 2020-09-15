@@ -4,6 +4,7 @@ use std::{
     io::Error as IoError,
     process::Output
 };
+use streamcatcher::CatcherError;
 
 /// An error returned from the voice module.
 // Errors which are not visible to the end user are hidden.
@@ -21,6 +22,8 @@ pub enum VoiceError {
     #[doc(hidden)] Decryption,
     /// An error occurred while checking if a path is stereo.
     Streams,
+    /// Configuration error for a cached Input.
+    Streamcatcher(CatcherError),
     #[doc(hidden)] VoiceModeInvalid,
     #[doc(hidden)] VoiceModeUnavailable,
     /// An error occurred while running `youtube-dl`.
@@ -33,6 +36,12 @@ pub enum VoiceError {
     ///
     /// The JSON output is given.
     YouTubeDLUrl(Value),
+}
+
+impl From<CatcherError> for VoiceError {
+    fn from(val: CatcherError) -> Self {
+        VoiceError::Streamcatcher(val)
+    }
 }
 
 /// An error returned from the dca method.

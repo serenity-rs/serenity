@@ -42,8 +42,6 @@ use discortp::{
 };
 use flume::{
     Receiver,
-    SendError,
-    Sender,
     TryRecvError,
 };
 use log::{debug, error, info, warn};
@@ -54,11 +52,7 @@ use std::{
     net::SocketAddr,
 };
 use tokio::{
-    time::{delay_for, timeout},
-    net::{
-        UdpSocket,
-        udp::{RecvHalf, SendHalf},
-    },
+    net::udp::RecvHalf,
 };
 use xsalsa20poly1305::{
     aead::AeadInPlace,

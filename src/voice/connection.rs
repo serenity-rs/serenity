@@ -1,18 +1,9 @@
-use async_tungstenite::tungstenite::protocol::Message;
-use audiopus::{
-    Application as CodingMode,
-    Bitrate,
-    Channels,
-    coder::Encoder as OpusEncoder,
-    softclip::SoftClip,
-};
 use crate::{
     constants::VOICE_GATEWAY_VERSION,
     gateway::WsStream,
     internal::{
         prelude::*,
         ws_impl::{ReceiverExt, SenderExt},
-        Timer,
     },
     model::event::VoiceEvent,
     voice::{
@@ -21,59 +12,32 @@ use crate::{
         payload,
         threading::{
             AuxPacketMessage,
-            EventMessage,
             Interconnect,
             MixerConnection,
-            MixerMessage,
-            TrackStateChange,
+            MixerMessage,   
             UdpMessage,
         },
-        tracks::{Track, PlayMode},
         CRYPTO_MODE,
         VoiceError,
     },
 };
-use discortp::{
-    discord::{
-        IpDiscoveryPacket,
-        IpDiscoveryType,
-        MutableIpDiscoveryPacket,
-        MutableKeepalivePacket,
-    },
-    rtp::{
-        MutableRtpPacket,
-        RtpPacket,
-    },
-    MutablePacket,
-    Packet,
+use discortp::discord::{
+    IpDiscoveryPacket,
+    IpDiscoveryType,
+    MutableIpDiscoveryPacket,
+    MutableKeepalivePacket,
 };
-use futures::{
-    channel::mpsc::{
-        self,
-        Receiver as MpscReceiver,
-        Sender as MpscSender,
-        TryRecvError,
-    },
-    sink::SinkExt,
-};
-use log::{debug, info, warn};
-use rand::random;
+use log::{debug, info};
 use serde::Deserialize;
-use std::net::{SocketAddr, ToSocketAddrs};
 use tokio::{
-    time::{delay_for, timeout_at, Elapsed, Instant},
-    net::{
-        UdpSocket,
-        udp::{RecvHalf, SendHalf},
-    },
+    time::{timeout_at, Elapsed, Instant},
+    net::UdpSocket,
 };
 use url::Url;
 use xsalsa20poly1305::{
-    aead::{AeadInPlace, NewAead},
+    aead::NewAead,
     KEY_SIZE,
-    TAG_SIZE,
     Key,
-    Nonce, 
     XSalsa20Poly1305 as Cipher,
 };
 

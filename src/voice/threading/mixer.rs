@@ -1,4 +1,3 @@
-use async_tungstenite::tungstenite::protocol::Message;
 use audiopus::{
     Application as CodingMode,
     Bitrate,
@@ -7,18 +6,9 @@ use audiopus::{
     softclip::SoftClip,
 };
 use crate::{
-    constants::VOICE_GATEWAY_VERSION,
-    gateway::WsStream,
-    internal::{
-        prelude::*,
-        ws_impl::{ReceiverExt, SenderExt},
-        Timer,
-    },
-    model::event::VoiceEvent,
+    internal::prelude::*,
     voice::{
-        connection_info::ConnectionInfo,
         constants::*,
-        payload,
         threading::{
             AuxPacketMessage,
             EventMessage,
@@ -29,17 +19,10 @@ use crate::{
             UdpMessage,
         },
         tracks::{Track, PlayMode},
-        CRYPTO_MODE,
         Status,
-        VoiceError,
     },
 };
 use discortp::{
-    discord::{
-        IpDiscoveryPacket,
-        IpDiscoveryType,
-        MutableIpDiscoveryPacket,
-    },
     rtp::{
         MutableRtpPacket,
         RtpPacket,
@@ -49,25 +32,16 @@ use discortp::{
 };
 use flume::{
     Receiver,
-    SendError,
-    Sender,
     TryRecvError,
 };
-use log::{debug, error, info, trace, warn};
+use log::error;
 use rand::random;
-use serde::Deserialize;
 use spin_sleep::SpinSleeper;
-use std::{
-    time::{Duration, Instant},
-};
-use url::Url;
+use std::time::Instant;
 use xsalsa20poly1305::{
-    aead::{AeadInPlace, NewAead},
-    KEY_SIZE,
+    aead::AeadInPlace,
     TAG_SIZE,
-    Key,
     Nonce, 
-    XSalsa20Poly1305 as Cipher,
 };
 
 struct Mixer {
@@ -131,7 +105,7 @@ impl Mixer {
                 use MixerMessage::*;
 
                 match self.mix_rx.try_recv() {
-                    Ok(AddTrack(mut t)) => {
+                    Ok(AddTrack(t)) => {
                         let _ = self.add_track(t, &interconnect);
                     },
                     Ok(SetTrack(t)) => {

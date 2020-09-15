@@ -16,15 +16,10 @@ use crate::{
         },
     },
 };
-use flume::{
-    Receiver,
-    SendError,
-    Sender,
-    TryRecvError,
-};
+use flume::Receiver;
 use log::{debug, error, info, trace, warn};
 
-pub(crate) async fn runner(_interconnect: Interconnect, mut evt_rx: Receiver<EventMessage>) {
+pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMessage>) {
     let mut global = GlobalEvents::default();
 
     let mut events: Vec<EventStore> = vec![];

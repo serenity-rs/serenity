@@ -6,11 +6,9 @@ use audiopus::Bitrate;
 use crate::{
     error::Error,
     gateway::WsStream,
-    internal::Timer,
     model::id::GuildId,
     voice::{
         connection::Connection,
-        constants::*,
         events::{
             CoreContext,
             EventData,
@@ -28,25 +26,12 @@ use crate::{
 };
 use flume::{
     Receiver,
-    SendError,
     Sender,
     RecvError,
 };
 use log::{error, info, warn};
-use std::{
-    net::{
-        SocketAddr,
-    },
-    thread::Builder as ThreadBuilder,
-    time::Duration,
-};
-use tokio::{
-    time::{delay_for, timeout},
-    net::{
-        UdpSocket,
-        udp::{RecvHalf, SendHalf},
-    },
-};
+use std::time::Duration;
+use tokio::net::udp::RecvHalf;
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
 #[derive(Clone, Debug)]
@@ -204,7 +189,7 @@ fn start_internals(guild_id: GuildId, core: Sender<Status>) -> Interconnect {
     interconnect
 }
 
-async fn runner(guild_id: GuildId, mut rx: Receiver<Status>, tx: Sender<Status>) {
+async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
     let mut connection = None;
     let mut interconnect = start_internals(guild_id, tx);
 

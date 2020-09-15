@@ -1,6 +1,6 @@
 //! Raw audio input data streams and sources.
 
-// pub mod cached;
+pub mod cached;
 mod dca;
 pub mod utils;
 
@@ -9,7 +9,7 @@ use audiopus::{
     Channels,
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-// use cached::{CompressedSource, MemorySource};
+use cached::OpusCompressor;
 use crate::{
     internal::prelude::*,
     prelude::SerenityError,
@@ -23,6 +23,7 @@ use dca::DcaMetadata;
 use log::{debug, warn};
 use parking_lot::Mutex;
 use std::{
+    convert::TryFrom,
     fs::File,
     ffi::OsStr,
     fmt::{
@@ -45,6 +46,7 @@ use std::{
     sync::Arc,
     time::Duration,
 };
+use streamcatcher::{Catcher, TxCatcher};
 
 /// Type of data being passed into an [`Input`].
 ///
@@ -65,6 +67,24 @@ impl CodecType {
             Opus | FloatPcm => mem::size_of::<f32>(),
             Pcm => mem::size_of::<i16>(),
             _ => unimplemented!(),
+        }
+    }
+}
+
+impl TryFrom<CodecType> for Codec {
+    type Error = Error;
+
+    fn try_from(f: CodecType) -> Result<Self> {
+        use CodecType::*;
+
+        match f {
+            Opus => Ok(Codec::Opus(
+                Arc::new(Mutex::new(
+                    OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)?
+                ))
+            )),
+            Pcm => Ok(Codec::Pcm),
+            FloatPcm => Ok(Codec::FloatPcm),
         }
     }
 }
@@ -172,9 +192,9 @@ impl Drop for ChildContainer {
 /// [`ExtensionSeek`]: #variant.ExtensionSeek
 pub enum Reader {
     Pipe(BufReader<ChildContainer>),
-    // InMemory(MemorySource),
-    // Compressed(CompressedSource),
-    Restartable(RestartableSource),
+    Memory(Catcher<Box<Reader>>),
+    Compressed(TxCatcher<Box<Input>, OpusCompressor>),
+    Restartable(Restartable),
     File(BufReader<File>),
     Extension(Box<dyn Read + Send>),
     ExtensionSeek(Box<dyn ReadSeek + Send>),
@@ -185,7 +205,7 @@ impl Reader {
         use Reader::*;
 
         match self {
-            Restartable(_) /*| Compressed(_) | InMemory(_)*/ => true,
+            Restartable(_) | Compressed(_) | Memory(_) => true,
             Extension(_) => false,
             ExtensionSeek(_) => true,
             _ => false,
@@ -198,8 +218,8 @@ impl Read for Reader {
         use Reader::*;
         match self {
             Pipe(a) => Read::read(a, buffer),
-            // InMemory(a) => Read::read(a, buffer),
-            // Compressed(a) => Read::read(a, buffer),
+            Memory(a) => Read::read(a, buffer),
+            Compressed(a) => Read::read(a, buffer),
             Restartable(a) => Read::read(a, buffer),
             File(a) => Read::read(a, buffer),
             Extension(a) => a.read(buffer),
@@ -215,8 +235,8 @@ impl Seek for Reader {
             Pipe(_) | Extension(_) => Err(IoError::new(
                 IoErrorKind::InvalidInput,
                 "Seeking not supported on Reader of this type.")),
-            // InMemory(a) => Seek::seek(a, pos),
-            // Compressed(a) => Seek::seek(a, pos),
+            Memory(a) => Seek::seek(a, pos),
+            Compressed(a) => Seek::seek(a, pos),
             File(a) => Seek::seek(a, pos),
             Restartable(a) => Seek::seek(a, pos),
             ExtensionSeek(a) => a.seek(pos),
@@ -229,8 +249,8 @@ impl Debug for Reader {
         use Reader::*;
         let field = match self {
             Pipe(a) => format!("{:?}", a),
-            // InMemory(a) => format!("{:?}", a),
-            // Compressed(a) => format!("{:?}", a),
+            Memory(a) => format!("{:?}", a),
+            Compressed(a) => format!("{:?}", a),
             Restartable(a) => format!("{:?}", a),
             File(a) => format!("{:?}", a),
             Extension(_) => "Extension".to_string(),
@@ -826,8 +846,8 @@ fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
 ///
 /// The main purpose of this wrapper is to enable seeking on
 /// incompatible sources (i.e., ffmpeg output) and to ease resource
-/// consumption for commonly reused/shared tracks. [`CompressedSource`]
-/// and [`MemorySource`] offer the same functionality with different
+/// consumption for commonly reused/shared tracks. [`Compressed`]
+/// and [`Memory`] offer the same functionality with different
 /// tradeoffs.
 ///
 /// This is intended for use with single-use audio tracks which
@@ -836,15 +856,15 @@ fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
 /// the desired timestamp.
 ///
 /// [`Input`]: struct.Input.html
-/// [`MemorySource`]: cached/struct.MemorySource.html
-/// [`CompressedSource`]: cached/struct.CompressedSource.html
-pub struct RestartableSource {
+/// [`Memory`]: cached/struct.Memory.html
+/// [`Compressed`]: cached/struct.Compressed.html
+pub struct Restartable {
     position: usize,
     recreator: Box<dyn Fn(Option<Duration>) -> Result<Input> + Send + 'static>,
     source: Box<Input>,
 }
 
-impl RestartableSource {
+impl Restartable {
     /// Create a new source, which can be restarted using a `recreator` function.
     pub fn new(recreator: impl Fn(Option<Duration>) -> Result<Input> + Send + 'static) -> Result<Self> {
         recreator(None)
@@ -914,7 +934,7 @@ impl RestartableSource {
     }
 }
 
-impl Debug for RestartableSource {
+impl Debug for Restartable {
     fn fmt(&self, f: &mut Formatter<'_>) -> StdResult<(), FormatError> {
         f.debug_struct("Reader")
             .field("position", &self.position)
@@ -924,8 +944,8 @@ impl Debug for RestartableSource {
     }
 }
 
-impl From<RestartableSource> for Input {
-    fn from(mut src: RestartableSource) -> Self {
+impl From<Restartable> for Input {
+    fn from(mut src: Restartable) -> Self {
         let kind = src.source.kind.clone();
         Self {
             metadata: src.source.metadata.take(),
@@ -938,14 +958,14 @@ impl From<RestartableSource> for Input {
     }
 }
 
-impl Read for RestartableSource {
+impl Read for Restartable {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
         self.source.read(buffer)
             .map(|a| { self.position += a; a })
     }
 }
 
-impl Seek for RestartableSource {
+impl Seek for Restartable {
     fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
         let _local_pos = self.position as u64;
 
@@ -972,7 +992,7 @@ impl Seek for RestartableSource {
             },
             End(_offset) => Err(IoError::new(
                 IoErrorKind::InvalidInput,
-                "End point for RestartableSources is not known.")),
+                "End point for Restartables is not known.")),
             Current(_offset) => unimplemented!(),
         }
     }

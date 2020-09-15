@@ -83,8 +83,9 @@ version = "1.1"
 
 [dependencies.streamcatcher]
 optional = true
-version = "0.0.1"
-features = ["tokio-compat"]
+# version = "0.0.1"
+git = "https://github.com/FelixMcFelix/streamcatcher.git"
+branch = "breaking"
 
 [dependencies.async-tungstenite]
 default-features = false
