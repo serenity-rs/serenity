@@ -200,6 +200,50 @@ impl Activity {
             _nonexhaustive: (),
         }
     }
+
+    /// Creates a `Game` struct that appears as a `Competing in <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current cometing status:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
+    ///
+    /// # #[cfg(feature = "framework")]
+    /// #[command]
+    /// async fn compete(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    ///     let name = args.message();
+    ///     ctx.set_activity(Activity::competing(&name)).await;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn competing(name: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Competing,
+            name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            emoji: None,
+            timestamps: None,
+            url: None,
+            _nonexhaustive: (),
+        }
+    }
 }
 
 impl<'de> Deserialize<'de> for Activity {
@@ -357,6 +401,8 @@ pub enum ActivityType {
     Listening = 2,
     /// An indicator that the user uses custum statuses
     Custom = 4,
+    /// An indicator that the user is competing somewhere.
+    Competing = 5,
 }
 
 enum_number!(
@@ -365,6 +411,7 @@ enum_number!(
         Streaming,
         Listening,
         Custom,
+        Competing,
     }
 );
 
@@ -377,6 +424,7 @@ impl ActivityType {
             Streaming => 1,
             Listening => 2,
             Custom => 4,
+            Competing => 5,
         }
     }
 }
