@@ -7,6 +7,7 @@ pub mod utils;
 use audiopus::{
     coder::Decoder as OpusDecoder,
     Channels,
+    Error as OpusError,
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::OpusCompressor;
@@ -79,9 +80,7 @@ impl TryFrom<CodecType> for Codec {
 
         match f {
             Opus => Ok(Codec::Opus(
-                Arc::new(Mutex::new(
-                    OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)?
-                ))
+                OpusDecoderState::new()?
             )),
             Pcm => Ok(Codec::Pcm),
             FloatPcm => Ok(Codec::FloatPcm),
@@ -95,7 +94,7 @@ impl TryFrom<CodecType> for Codec {
 #[non_exhaustive]
 #[derive(Clone, Debug)]
 pub enum Codec {
-    Opus(Arc<Mutex<OpusDecoder>>),
+    Opus(OpusDecoderState),
     Pcm,
     FloatPcm,
 }
@@ -112,6 +111,27 @@ impl From<&Codec> for CodecType {
     }
 }
 
+#[derive(Clone, Debug)]
+pub struct OpusDecoderState {
+    pub decoder: Arc<Mutex<OpusDecoder>>,
+    current_frame: Vec<f32>,
+    frame_pos: usize,
+}
+
+impl OpusDecoderState {
+    pub fn new() -> StdResult<Self, OpusError> {
+        Ok(Self::from_decoder(OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)?))
+    }
+
+    pub fn from_decoder(decoder: OpusDecoder) -> Self {
+        Self {
+            decoder: Arc::new(Mutex::new(decoder)),
+            current_frame: Vec::with_capacity(STEREO_FRAME_SIZE),
+            frame_pos: 0,
+        }
+    }
+}
+
 /// Information used in audio frame detection.
 pub struct Frame {
     pub header_len: usize,
@@ -123,7 +143,7 @@ pub struct Frame {
 #[derive(Clone, Copy, Debug)]
 pub enum Container {
     Raw,
-    Dca,
+    Dca{ first_frame: usize },
 }
 
 impl Container {
@@ -132,19 +152,28 @@ impl Container {
 
         match self {
             Raw => Ok(Frame{header_len: 0, frame_len: input.sample_len()}),
-            Dca => reader.read_i16::<LittleEndian>().map(|frame_len| Frame {
+            Dca{ .. } => reader.read_i16::<LittleEndian>().map(|frame_len| Frame {
                 header_len: mem::size_of::<i16>(),
                 frame_len: frame_len.min(0) as usize,
             }),
         }
     }
 
-    pub fn is_seek_trivial(&self) -> bool {
+    pub fn try_seek_trivial(&self, input: CodecType) -> Option<usize> {
         use Container::*;
 
         match self {
-            Raw => true,
-            _ => false,
+            Raw => Some(input.sample_len()),
+            _ => None,
+        }
+    }
+
+    pub fn input_start(&self) -> usize {
+        use Container::*;
+
+        match self {
+            Raw => 0,
+            Dca { first_frame } => *first_frame,
         }
     }
 }
@@ -464,6 +493,7 @@ pub struct Input {
     pub reader: Reader,
     pub kind: Codec,
     pub container: Container,
+    pos: usize,
 }
 
 impl Input {
@@ -474,6 +504,7 @@ impl Input {
             reader,
             kind: Codec::FloatPcm,
             container: Container::Raw,
+            pos: 0,
         }
     }
 
@@ -484,6 +515,7 @@ impl Input {
             reader,
             kind,
             container,
+            pos: 0,
         }
     }
 
@@ -501,7 +533,7 @@ impl Input {
 
     #[inline]
     pub fn mix(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> usize {
-        match self.reader.add_float_pcm_frame(float_buffer, self.stereo, volume) {
+        match self.add_float_pcm_frame(float_buffer, self.stereo, volume) {
             Some(len) => len,
             None => 0,
         }
@@ -509,21 +541,22 @@ impl Input {
 
     pub fn seek_time(&mut self, time: Duration) -> Option<Duration> {
         let future_pos = utils::timestamp_to_byte_count(time, self.stereo);
-        Seek::seek(&mut self.reader, SeekFrom::Start(future_pos as u64))
+        Seek::seek(self, SeekFrom::Start(future_pos as u64))
             .ok()
             .map(|a| utils::byte_count_to_timestamp(a as usize, self.stereo))
     }
-}
 
-impl Read for Input {
-    fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
+    fn read_inner(&mut self, buffer: &mut [u8], ignore_decode: bool) -> IoResult<usize> {
         // This implementation of Read converts the input stream
         // to floating point output.
         let float_space = buffer.len() / mem::size_of::<f32>();
         let mut written_floats = 0;
 
-        match &mut self.kind {
-            Codec::Opus(decoder) => {
+        // FIXME: this is a little bit backwards, and assumes the bottom cases are always raw..
+        let out = match &mut self.kind {
+            Codec::Opus(decoder_state) => {
+                let mut opus_data_buffer = [0u8; 4000];
+
                 if matches!(self.container, Container::Raw) {
                     return Err(IoError::new(
                         IoErrorKind::InvalidInput,
@@ -531,22 +564,31 @@ impl Read for Input {
                     );
                 }
 
-                let mut opus_data_buffer = [0u8; 4000];
-                let mut opus_out_buffer = [0f32; STEREO_FRAME_SIZE];
-
                 let frame = self.container.next_frame_length(&mut self.reader, CodecType::Opus)?;
 
-                let seen = Read::read(&mut self.reader, &mut opus_data_buffer[..frame.frame_len])?;
-                let mut decoder = decoder.lock();
-                let samples = decoder.decode_float(Some(&opus_data_buffer[..seen]), &mut opus_out_buffer[..], false)
-                    .unwrap_or(0);
+                if ignore_decode {
+                    // FIXME: regenerate decoder when moving from ignore to real.
+                    self.reader.consume(frame.frame_len);
 
-                let mut buffer = &mut buffer[..];
-                while written_floats < float_space.min(samples) {
-                    buffer.write_f32::<LittleEndian>(opus_out_buffer[written_floats])?;
-                    written_floats += 1;
+                    if self.stereo {
+                        Ok(STEREO_FRAME_BYTE_SIZE)
+                    } else {
+                        Ok(MONO_FRAME_BYTE_SIZE)
+                    }
+                } else {
+                    // FIXME: handle partial reads?
+                    let seen = Read::read(&mut self.reader, &mut opus_data_buffer[..frame.frame_len])?;
+                    let mut decoder = decoder_state.decoder.lock();
+                    let samples = decoder.decode_float(Some(&opus_data_buffer[..seen]), &mut decoder_state.current_frame[..], false)
+                        .unwrap_or(0);
+
+                    let mut buffer = &mut buffer[..];
+                    while written_floats < float_space.min(samples) {
+                        buffer.write_f32::<LittleEndian>(decoder_state.current_frame[written_floats])?;
+                        written_floats += 1;
+                    }
+                    Ok(written_floats * mem::size_of::<f32>())
                 }
-                Ok(written_floats * mem::size_of::<f32>())
             },
             Codec::Pcm => {
                 let mut buffer = &mut buffer[..];
@@ -563,7 +605,62 @@ impl Read for Input {
             Codec::FloatPcm => {
                 Read::read(&mut self.reader, buffer)
             },
+        };
+
+        out.map(|v| {self.pos += v; v})
+    }
+
+    fn cheap_consume(&mut self, count: usize) -> IoResult<usize> {
+        let mut scratch = [0u8; STEREO_FRAME_BYTE_SIZE * 4];
+        let len = scratch.len();
+        let mut done = 0;
+
+        loop {
+            let read = self.read_inner(&mut scratch[..len.min(count - done)], true)?;
+            if read == 0 {
+                break;
+            }
+            done += read;
         }
+
+        Ok(done)
+    }
+}
+
+impl Read for Input {
+    fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
+        self.read_inner(buffer, false)
+    }
+}
+
+impl Seek for Input {
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
+        let mut target = self.pos;
+        match pos {
+            SeekFrom::Start(pos) => {target = pos as usize;},
+            SeekFrom::Current(rel) => {target = target.wrapping_add(rel as usize);},
+            SeekFrom::End(pos) => unimplemented!(),
+        }
+        
+        (if target == self.pos {
+            Ok(0)
+        } else if let Some(conversion) = self.container.try_seek_trivial(self.get_type()) {
+            let inside_target = (target * conversion) / mem::size_of::<f32>();
+            Seek::seek(&mut self.reader, SeekFrom::Start(inside_target as u64))
+                .map(|inner_dest| {
+                    let outer_dest = ((inner_dest as usize) * mem::size_of::<f32>()) / conversion;
+                    self.pos = outer_dest;
+                    outer_dest
+                })
+        } else if target > self.pos {
+            // seek in the next amount, disabling decoding if need be.
+            let shift = target - self.pos;
+            self.cheap_consume(shift)
+        } else {
+            // start from scratch, then seek in...
+            Seek::seek(&mut self.reader, SeekFrom::Start(self.container.input_start() as u64))?;
+            self.cheap_consume(target)
+        }).map(|_| self.pos as u64)
     }
 }
 
@@ -748,15 +845,15 @@ fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
 
     let stereo = metadata.channels == Some(2);
 
-    Ok(Input {
-        metadata,
+    Ok(Input::new(
         stereo,
-        reader: Reader::File(reader),
-        kind: Codec::Opus(
-            Arc::new(Mutex::new(OpusDecoder::new(SAMPLE_RATE, Channels::Stereo).map_err(DcaError::Opus)?))
+        Reader::File(reader),
+        Codec::Opus(
+            OpusDecoderState::new().map_err(DcaError::Opus)?
         ),
-        container: Container::Dca,
-    })
+        Container::Dca{ first_frame: (size as usize) + mem::size_of::<i32>() + header.len() },
+        Some(metadata),
+    ))
 }
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
@@ -947,20 +1044,23 @@ impl Debug for Restartable {
 impl From<Restartable> for Input {
     fn from(mut src: Restartable) -> Self {
         let kind = src.source.kind.clone();
-        Self {
-            metadata: src.source.metadata.take(),
-            stereo: src.source.stereo,
+        let meta = Some(src.source.metadata.take());
+        let stereo = src.source.stereo;
+        let container = src.source.container;
+        let kind = src.source.kind.clone();
+        Input::new(
+            stereo,
+            Reader::Restartable(src),
             kind,
-            container: src.source.container,
-
-            reader: Reader::Restartable(src), 
-        }
+            container,
+            meta,
+        )
     }
 }
 
 impl Read for Restartable {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
-        self.source.read(buffer)
+        Read::read(&mut self.source, buffer)
             .map(|a| { self.position += a; a })
     }
 }

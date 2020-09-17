@@ -9,41 +9,41 @@ use audiopus::{
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::{
-	internal::prelude::*,
-	voice::{constants::*, VoiceError},
+    internal::prelude::*,
+    voice::{constants::*, VoiceError},
 };
 use std::{
-	convert::TryInto,
-	io::{
-		Error as IoError,
-		ErrorKind as IoErrorKind,
-		Read,
-		Result as IoResult,
-	},
-	mem,
-	sync::atomic::{
-		AtomicUsize,
-		Ordering,
-	},
-	time::Duration,
+    convert::TryInto,
+    io::{
+        Error as IoError,
+        ErrorKind as IoErrorKind,
+        Read,
+        Result as IoResult,
+    },
+    mem,
+    sync::atomic::{
+        AtomicUsize,
+        Ordering,
+    },
+    time::Duration,
 };
 use streamcatcher::{
-	Catcher,
-	Config,
-	GrowthStrategy,
-	NeedsBytes,
-	Stateful,
-	Transform,
-	TransformPosition,
-	TxCatcher,
+    Catcher,
+    Config,
+    GrowthStrategy,
+    NeedsBytes,
+    Stateful,
+    Transform,
+    TransformPosition,
+    TxCatcher,
 };
 use super::{
-	utils,
-	CodecType,
-	Container,
-	Input,
-	Metadata,
-	Reader,
+    utils,
+    CodecType,
+    Container,
+    Input,
+    Metadata,
+    Reader,
 };
 
 
@@ -66,13 +66,31 @@ impl From<Duration> for LengthHint {
     }
 }
 
+/// A wrapper around an existing [`Input`] which caches
+/// the decoded and converted audio data locally in memory.
+///
+/// The main purpose of this wrapper is to enable seeking on
+/// incompatible sources (i.e., ffmpeg output) and to ease resource
+/// consumption for commonly reused/shared tracks. [`Restartable`]
+/// and [`Compressed`] offer the same functionality with different
+/// tradeoffs.
+///
+/// This is intended for use with small, repeatedly used audio
+/// tracks shared between sources, and stores the sound data
+/// retrieved in **uncompressed floating point** form to minimise the
+/// cost of audio processing. This is a significant *3 Mbps (375 kiB/s)*,
+/// or 131 MiB of RAM for a 6 minute song.
+///
+/// [`Input`]: ../struct.Input.html
+/// [`Compressed`]: struct.Compressed.html
+/// [`Restartable`]: ../struct.Restartable.html
 #[derive(Clone, Debug)]
 pub struct Memory {
-	pub raw: Catcher<Box<Reader>>,
-	pub metadata: Metadata,
-	pub kind: CodecType,
-	pub stereo: bool,
-	pub container: Container,
+    pub raw: Catcher<Box<Reader>>,
+    pub metadata: Metadata,
+    pub kind: CodecType,
+    pub stereo: bool,
+    pub container: Container,
 }
 
 // work out the froms, intos...
@@ -82,10 +100,10 @@ pub struct Memory {
 // and that memory preserves its input format.
 
 impl Memory {
-	/// Wrap an existing [`Input`] with an in-memory store with the same codec and framing.
+    /// Wrap an existing [`Input`] with an in-memory store with the same codec and framing.
     ///
     /// [`Input`]: ../struct.Input.html
-	pub fn new(source: Input) -> Result<Self> {
+    pub fn new(source: Input) -> Result<Self> {
         Self::with_config(source, None)
     }
 
@@ -109,62 +127,78 @@ impl Memory {
 
         // apply length hint.
         if config.length_hint.is_none() {
-        	if let Some(dur) = metadata.duration {
-        		apply_length_hint(&mut config, dur, cost_per_sec);
-        	}
+            if let Some(dur) = metadata.duration {
+                apply_length_hint(&mut config, dur, cost_per_sec);
+            }
         }
 
         let raw = config.build(Box::new(source.reader))
-        	.map_err(VoiceError::Streamcatcher)?;
+            .map_err(VoiceError::Streamcatcher)?;
 
         Ok(Self {
-        	raw,
-        	metadata,
-        	kind,
-        	stereo,
-        	container,
+            raw,
+            metadata,
+            kind,
+            stereo,
+            container,
         })
     }
 
-	/// Acquire a new handle to this object, creating a new
-	/// view of the existing cached data from the beginning.
-	pub fn new_handle(&self) -> Self {
-		Self {
-			raw: self.raw.new_handle(),
-			metadata: self.metadata.clone(),
-			kind: self.kind,
-			stereo: self.stereo,
-			container: self.container,
-		}
-	}
+    /// Acquire a new handle to this object, creating a new
+    /// view of the existing cached data from the beginning.
+    pub fn new_handle(&self) -> Self {
+        Self {
+            raw: self.raw.new_handle(),
+            metadata: self.metadata.clone(),
+            kind: self.kind,
+            stereo: self.stereo,
+            container: self.container,
+        }
+    }
 }
 
 impl From<Memory> for Input {
     fn from(src: Memory) -> Self {
-        Input {
-            metadata: src.metadata,
-            stereo: src.stereo,
-            kind: src.kind.try_into().expect("FIXME: make this a tryinto"),
-            container: Container::Dca,
-
-            reader: Reader::Memory(src.raw),
-        }   
+        Input::new(
+            src.stereo,
+            Reader::Memory(src.raw),
+            src.kind.try_into().expect("FIXME: make this a tryinto"),
+            src.container,
+            Some(src.metadata),
+        )
     }
 }
 
+/// A wrapper around an existing [`Input`] which compresses
+/// the input using the Opus codec before storing it in memory.
+///
+/// The main purpose of this wrapper is to enable seeking on
+/// incompatible sources (i.e., ffmpeg output) and to ease resource
+/// consumption for commonly reused/shared tracks. [`Restartable`]
+/// and [`Memory`] offer the same functionality with different
+/// tradeoffs.
+///
+/// This is intended for use with larger, repeatedly used audio
+/// tracks shared between sources, and stores the sound data
+/// retrieved as **compressed Opus audio**. There is an associated memory cost,
+/// but this is far smaller than using a [`Memory`].
+///
+/// [`Input`]: ../struct.Input.html
+/// [`Memory`]: struct.Memory.html
+/// [`Restartable`]: ../struct.Restartable.html
 #[derive(Clone, Debug)]
 pub struct Compressed {
-	pub raw: TxCatcher<Box<Input>, OpusCompressor>,
-	pub metadata: Metadata,
-	pub stereo: bool,
+    pub raw: TxCatcher<Box<Input>, OpusCompressor>,
+    pub metadata: Metadata,
+    pub stereo: bool,
 }
 
 impl Compressed {
-	/// Wrap an existing [`Input`] with an in-memory store, compressed using Opus.
+    /// Wrap an existing [`Input`] with an in-memory store, compressed using Opus.
     ///
     /// [`Input`]: ../struct.Input.html
     /// [`Metadata.duration`]: ../struct.Metadata.html#structfield.duration
-	pub fn new(source: Input, bitrate: Bitrate) -> Result<Self> {
+    pub fn new(source: Input, bitrate: Bitrate) -> Result<Self> {
         Self::with_config(source, bitrate, None)
     }
 
@@ -203,75 +237,74 @@ impl Compressed {
 
         // apply length hint.
         if config.length_hint.is_none() {
-        	if let Some(dur) = metadata.duration {
-        		apply_length_hint(&mut config, dur, cost_per_sec);
-        	}
+            if let Some(dur) = metadata.duration {
+                apply_length_hint(&mut config, dur, cost_per_sec);
+            }
         }
 
         let raw = config.build_tx(
-        	Box::new(source),
-        	OpusCompressor::new(encoder, stereo),
+            Box::new(source),
+            OpusCompressor::new(encoder, stereo),
         ).map_err(VoiceError::Streamcatcher)?;
 
         Ok(Self {
-        	raw,
-        	metadata,
-        	stereo,
+            raw,
+            metadata,
+            stereo,
         })
     }
 
-	/// Acquire a new handle to this object, creating a new
-	/// view of the existing cached data from the beginning.
-	pub fn new_handle(&self) -> Self {
-		Self {
-			raw: self.raw.new_handle(),
-			metadata: self.metadata.clone(),
-			stereo: self.stereo,
-		}
-	}
+    /// Acquire a new handle to this object, creating a new
+    /// view of the existing cached data from the beginning.
+    pub fn new_handle(&self) -> Self {
+        Self {
+            raw: self.raw.new_handle(),
+            metadata: self.metadata.clone(),
+            stereo: self.stereo,
+        }
+    }
 }
 
 impl From<Compressed> for Input {
     fn from(src: Compressed) -> Self {
-        Input {
-            metadata: src.metadata,
-            stereo: src.stereo,
-            kind: CodecType::Opus.try_into()
-            	.expect("Default decoder values are known to be valid."),
-            container: Container::Dca,
-
-            reader: Reader::Compressed(src.raw),
-        }   
+        Input::new(
+            src.stereo,
+            Reader::Compressed(src.raw),
+            CodecType::Opus.try_into()
+                .expect("Default decoder values are known to be valid."),
+            Container::Dca{ first_frame: 0 },
+            Some(src.metadata),
+        )
     }
 }
 
 #[derive(Debug)]
 pub struct OpusCompressor {
-	encoder: OpusEncoder,
-	last_frame: Vec<u8>,
-	stereo_input: bool,
-	frame_pos: usize,
-	audio_bytes: AtomicUsize,
+    encoder: OpusEncoder,
+    last_frame: Vec<u8>,
+    stereo_input: bool,
+    frame_pos: usize,
+    audio_bytes: AtomicUsize,
 }
 
 impl OpusCompressor {
-	fn new(encoder: OpusEncoder, stereo_input: bool) -> Self {
-		Self {
-			encoder,
-			last_frame: Vec::with_capacity(4000),
-			stereo_input,
-			frame_pos: 0,
-			audio_bytes: Default::default(),
-		}
-	}
+    fn new(encoder: OpusEncoder, stereo_input: bool) -> Self {
+        Self {
+            encoder,
+            last_frame: Vec::with_capacity(4000),
+            stereo_input,
+            frame_pos: 0,
+            audio_bytes: Default::default(),
+        }
+    }
 }
 
 impl<T> Transform<T> for OpusCompressor
 where
-	T: Read,
+    T: Read,
 {
-	fn transform_read(&mut self, src: &mut T, buf: &mut [u8]) -> IoResult<TransformPosition> {
-		let output_start = mem::size_of::<u16>();
+    fn transform_read(&mut self, src: &mut T, buf: &mut [u8]) -> IoResult<TransformPosition> {
+        let output_start = mem::size_of::<u16>();
         let mut eof = false;
 
         let mut raw_len = 0;
@@ -325,8 +358,8 @@ where
         if out.is_none() {
             // Write from frame we have.
             let start = if self.frame_pos < output_start {
-                (&mut buf[..output_start]).write_u16::<LittleEndian>(self.last_frame.len() as u16)
-                    .expect("Minimum bytes requirement for Opus (2) should mean that a u16 \
+                (&mut buf[..output_start]).write_i16::<LittleEndian>(self.last_frame.len() as i16)
+                    .expect("Minimum bytes requirement for Opus (2) should mean that an i16 \
                              may always be written.");
                 self.frame_pos += output_start;
 
@@ -345,33 +378,33 @@ where
         // stream is extended to 20ms boundary.
         out.unwrap_or_else(|| Err(IoError::new(IoErrorKind::Other, "Unclear.")))
             .map(|compressed_sz| {
-            	self.audio_bytes.fetch_add(raw_len * mem::size_of::<f32>(), Ordering::Release);
+                self.audio_bytes.fetch_add(raw_len * mem::size_of::<f32>(), Ordering::Release);
 
-            	if eof {
-            		TransformPosition::Finished
-            	} else {
-            		TransformPosition::Read(compressed_sz)
-            	}
-	        })
-	}
+                if eof {
+                    TransformPosition::Finished
+                } else {
+                    TransformPosition::Read(compressed_sz)
+                }
+            })
+    }
 }
 
 impl NeedsBytes for OpusCompressor {
-	fn min_bytes_required(&self) -> usize {
-		2
-	}
+    fn min_bytes_required(&self) -> usize {
+        2
+    }
 }
 
 impl Stateful for OpusCompressor {
-	type State = usize;
+    type State = usize;
 
-	fn state(&self) -> Self::State {
-		self.audio_bytes.load(Ordering::Acquire)
-	}
+    fn state(&self) -> Self::State {
+        self.audio_bytes.load(Ordering::Acquire)
+    }
 }
 
 pub fn compressed_cost_per_sec(bitrate: Bitrate) -> usize {
-	let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();
+    let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();
 
     let bitrate_raw = match bitrate {
         Bitrate::BitsPerSecond(i) => i,
@@ -383,23 +416,23 @@ pub fn compressed_cost_per_sec(bitrate: Bitrate) -> usize {
 }
 
 pub fn raw_cost_per_sec(stereo: bool) -> usize {
-	utils::timestamp_to_byte_count(Duration::from_secs(1), stereo)
+    utils::timestamp_to_byte_count(Duration::from_secs(1), stereo)
 }
 
 pub fn apply_length_hint<H>(config: &mut Config, hint: H, cost_per_sec: usize)
 where
-	H: Into<LengthHint>,
+    H: Into<LengthHint>,
 {
-	config.length_hint = Some(match hint.into() {
-	    LengthHint::Bytes(a) => a,
-	    LengthHint::Time(t) => {
-	        let s = t.as_secs() + if t.subsec_millis() > 0 { 1 } else { 0 };
-	        (s as usize) * cost_per_sec
-	    }
+    config.length_hint = Some(match hint.into() {
+        LengthHint::Bytes(a) => a,
+        LengthHint::Time(t) => {
+            let s = t.as_secs() + if t.subsec_millis() > 0 { 1 } else { 0 };
+            (s as usize) * cost_per_sec
+        }
     });
 }
 
 pub fn default_config(cost_per_sec: usize) -> Config {
-	Config::new()
-		.chunk_size(GrowthStrategy::Constant(5 * cost_per_sec))
+    Config::new()
+        .chunk_size(GrowthStrategy::Constant(5 * cost_per_sec))
 }
