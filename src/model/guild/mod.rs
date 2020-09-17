@@ -1528,7 +1528,7 @@ impl Guild {
         self.id.prune_count(cache_http.http(), days).await
     }
 
-    fn remove_unusable_permissions(&self, permissions: &mut Permissions) {
+    pub(crate) fn remove_unusable_permissions(&self, permissions: &mut Permissions) {
         // No SEND_MESSAGES => no message-sending-related actions
         // If the member does not have the `SEND_MESSAGES` permission, then
         // throw out message-able permissions.
