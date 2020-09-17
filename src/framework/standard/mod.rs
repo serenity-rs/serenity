@@ -78,11 +78,6 @@ pub enum DispatchError {
     NotEnoughArguments { min: u16, given: usize },
     /// When there are too many arguments.
     TooManyArguments { max: u16, given: usize },
-    /// When the command was requested by a bot user when they are set to be
-    /// ignored.
-    IgnoredBot,
-    /// When the bot ignores webhooks and a command was issued by one.
-    WebhookAuthor,
 }
 
 type DispatchHook = for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;
@@ -229,16 +224,10 @@ impl StandardFramework {
         self
     }
 
-    fn should_fail_common(&self, msg: &Message) -> Option<DispatchError> {
-        if self.config.ignore_bots && msg.author.bot {
-            return Some(DispatchError::IgnoredBot);
-        }
-
-        if self.config.ignore_webhooks && msg.webhook_id.is_some() {
-            return Some(DispatchError::WebhookAuthor);
-        }
-
-        None
+    /// Whether the message should be ignored because it is from a bot or webhook.
+    fn should_ignore(&self, msg: &Message) -> bool {
+        (self.config.ignore_bots && msg.author.bot) ||
+            (self.config.ignore_webhooks && msg.webhook_id.is_some())
     }
 
     async fn should_fail<'a>(
@@ -616,11 +605,7 @@ impl StandardFramework {
 impl Framework for StandardFramework {
     #[instrument(skip(self, ctx))]
     async fn dispatch(&self, mut ctx: Context, msg: Message) {
-        if let Some(error) = self.should_fail_common(&msg) {
-            if let Some(dispatch) = &self.dispatch {
-                dispatch(&mut ctx, &msg, error).await;
-            }
-
+        if self.should_ignore(&msg) {
             return;
         }
 
