@@ -1,5 +1,5 @@
 //! Events relating to tracks, timing, and other callers.
-
+use async_trait::async_trait;
 use crate::{
     model::event::{
         VoiceSpeaking,
@@ -19,6 +19,7 @@ use discortp::{
     rtcp::Rtcp,
     rtp::Rtp,
 };
+use futures::future::BoxFuture;
 use log::info;
 use std::{
     cmp::Ordering,
@@ -139,6 +140,11 @@ impl EventContext<'_> {
             _ => None,
         }
     }
+}
+
+#[async_trait]
+pub trait EventHandler: Send + Sync {
+    async fn act(&self, ctx: &EventContext<'_>) -> Option<Event>;
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
@@ -297,7 +303,7 @@ pub enum TrackEvent {
 pub struct EventData {
     event: Event,
     fire_time: Option<Duration>,
-    action: Box<dyn FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static>,
+    action: Box<dyn EventHandler>,
 }
 
 impl EventData {
@@ -313,9 +319,7 @@ impl EventData {
     /// [`Event`]: enum.Event.html
     /// [`Delayed`]: enum.Event.html#variant.Delayed
     /// [`Cancel`]: enum.Event.html#variant.Cancel
-    pub fn new<F>(event: Event, action: F) -> Self
-        where F: FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static
-    {
+    pub fn new<F: EventHandler + 'static>(event: Event, action: F) -> Self {
         Self {
             event,
             fire_time: None,
@@ -430,7 +434,7 @@ impl EventStore {
     }
 
     /// Processes all events due up to and including `now`.
-    pub(crate) fn process_timed(&mut self, now: Duration, ctx: EventContext<'_>) {
+    pub(crate) async fn process_timed(&mut self, now: Duration, ctx: EventContext<'_>) {
         while let Some(evt) = self.timed.peek() {
             if evt.fire_time.as_ref().expect("Timed event must have a fire_time.") > &now {
                 break;
@@ -438,7 +442,7 @@ impl EventStore {
             let mut evt = self.timed.pop().expect("Can only succeed due to peek = Some(...).");
 
             let old_evt_type = evt.event;
-            if let Some(new_evt_type) = (evt.action)(&ctx) {
+            if let Some(new_evt_type) = evt.action.act(&ctx).await {
                 evt.event = new_evt_type;
                 self.add_event(evt, now);
             } else if let Event::Periodic(d, _) = old_evt_type {
@@ -449,7 +453,7 @@ impl EventStore {
     }
 
     /// Processes all events attached to the given track event.
-    pub(crate) fn process_untimed(&mut self, now: Duration, untimed_event: UntimedEvent, ctx: EventContext<'_>) {
+    pub(crate) async fn process_untimed(&mut self, now: Duration, untimed_event: UntimedEvent, ctx: EventContext<'_>) {
         // move a Vec in and out: not too expensive, but could be better.
         // Although it's obvious that moving an event out of one vec and into
         // another necessitates that they be different event types, thus entries,
@@ -462,7 +466,7 @@ impl EventStore {
             while i < events.len() {
                 let evt = &mut events[i];
                 // Only remove/readd if the event type changes (i.e., Some AND new != old)
-                if let Some(new_evt_type) = (evt.action)(&ctx) {
+                if let Some(new_evt_type) = evt.action.act(&ctx).await {
                     if evt.event == new_evt_type {
 
                         let mut evt = events.remove(i);
@@ -489,8 +493,8 @@ impl GlobalEvents {
         self.store.add_event(evt, self.time);
     }
 
-    pub(crate) fn fire_core_event(&mut self, evt: CoreEvent, ctx: EventContext<'_>) {
-        self.store.process_untimed(self.time, evt.into(), ctx);
+    pub(crate) async fn fire_core_event(&mut self, evt: CoreEvent, ctx: EventContext<'_>) {
+        self.store.process_untimed(self.time, evt.into(), ctx).await;
     }
 
     pub(crate) fn fire_track_event(&mut self, evt: TrackEvent, index: usize) {
@@ -500,7 +504,7 @@ impl GlobalEvents {
         holder.push(index);
     }
 
-    pub(crate) fn tick(
+    pub(crate) async fn tick(
         &mut self,
         events: &mut Vec<EventStore>,
         states: &mut Vec<TrackState>,
@@ -508,7 +512,7 @@ impl GlobalEvents {
     ) {
         // Global timed events
         self.time += TIMESTEP_LENGTH;
-        self.store.process_timed(self.time, EventContext::Track(&[]));
+        self.store.process_timed(self.time, EventContext::Track(&[])).await;
 
         // Local timed events
         for (i, state) in states.iter_mut().enumerate() {
@@ -520,7 +524,7 @@ impl GlobalEvents {
                 let handle = handles.get_mut(i)
                     .expect("[Voice] Missing handle index for Tick (local timed).");
 
-                event_store.process_timed(state.play_time, EventContext::Track(&[(&state, &handle)]));
+                event_store.process_timed(state.play_time, EventContext::Track(&[(&state, &handle)])).await;
             }
         }
 
@@ -540,7 +544,7 @@ impl GlobalEvents {
                 let state = states.get_mut(i)
                     .expect("[Voice] Missing state index for Tick (local untimed).");
 
-                event_store.process_untimed(state.position, untimed, EventContext::Track(&[(&state, &handle)]));
+                event_store.process_untimed(state.position, untimed, EventContext::Track(&[(&state, &handle)])).await;
             }
 
             // Global untimed track events.
@@ -550,7 +554,7 @@ impl GlobalEvents {
                     handles.get(*i).expect("[Voice] Missing handle index for Tick (global untimed)"),
                 )).collect();
 
-                self.store.process_untimed(self.time, untimed, EventContext::Track(&global_ctx[..]))
+                self.store.process_untimed(self.time, untimed, EventContext::Track(&global_ctx[..])).await
             }
         }
 

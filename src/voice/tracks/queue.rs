@@ -1,8 +1,11 @@
+use async_trait::async_trait;
 use crate::{
     voice::{
         events::{
             Event,
+            EventContext,
             EventData,
+            EventHandler,
             TrackEvent,
         },
         Handler,
@@ -60,6 +63,7 @@ use std::{
 ///
 /// [`TrackEvent`]: ../events/enum.TrackEvent.html
 pub struct TrackQueue {
+    // NOTE: the choice of a parking lot mutex is quite deliberate
     inner: Arc<Mutex<TrackQueueCore>>,
 }
 
@@ -72,6 +76,39 @@ pub struct TrackQueue {
 /// [`TrackQueue`]: struct.TrackQueue.html
 struct TrackQueueCore {
     tracks: VecDeque<TrackHandle>,
+}
+
+struct QueueHandler {
+    remote_lock: Arc<Mutex<TrackQueueCore>>,
+}
+
+#[async_trait]
+impl EventHandler for QueueHandler {
+    async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
+        let mut inner = self.remote_lock.lock();
+        let _old = inner.tracks.pop_front();
+
+        info!("Queued track ended: {:?}.", ctx);
+        info!("{} tracks remain.", inner.tracks.len());
+
+        // If any audio files die unexpectedly, then keep going until we
+        // find one which works, or we run out.
+        let mut keep_looking = true;
+        while keep_looking && !inner.tracks.is_empty() {
+            if let Some(new) = inner.tracks.front() {
+
+                keep_looking = new.play().is_err();
+
+                // Discard files which cannot be used for whatever reason.
+                if keep_looking {
+                    warn!("Track in Queue couldn't be played...");
+                    let _ = inner.tracks.pop_front();
+                }
+            }
+        }
+
+        None
+    }
 }
 
 impl TrackQueue {
@@ -110,31 +147,8 @@ impl TrackQueue {
             .add_event(
                 EventData::new(
                     Event::Track(TrackEvent::End),
-                    move |ctx| {
-                        let mut inner = remote_lock.lock();
-                        let _old = inner.tracks.pop_front();
-
-                        info!("Queued track ended: {:?}.", ctx);
-                        info!("{} tracks remain.", inner.tracks.len());
-
-                        // If any audio files die unexpectedly, then keep going until we
-                        // find one which works, or we run out.
-                        let mut keep_looking = true;
-                        while keep_looking && !inner.tracks.is_empty() {
-                            if let Some(new) = inner.tracks.front() {
-
-                                keep_looking = new.play().is_err();
-
-                                // Discard files which cannot be used for whatever reason.
-                                if keep_looking {
-                                    warn!("Track in Queue couldn't be played...");
-                                    let _ = inner.tracks.pop_front();
-                                }
-                            }
-                        }
-
-                        None
-                    }),
+                    QueueHandler { remote_lock },
+                ),
                 track.position,
             );
 

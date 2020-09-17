@@ -19,6 +19,7 @@ use crate::{
         Event,
         EventContext,
         EventData,
+        EventHandler,
         Status as VoiceStatus,
         connection_info::ConnectionInfo,
         threading,
@@ -28,7 +29,10 @@ use flume::{
     SendError,
     Sender as FlumeSender,
 };
-use futures::channel::mpsc::UnboundedSender as Sender;
+use futures::{
+    channel::mpsc::UnboundedSender as Sender,
+    future::BoxFuture,
+};
 use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting
@@ -333,9 +337,7 @@ impl Handler {
     /// [`Track`]: tracks/struct.Track.html
     /// [`TrackEvent`]: events/enum.TrackEvent.html
     /// [`EventContext`]: events/enum.EventContext.html
-    pub fn add_global_event<F>(&mut self, event: Event, action: F) 
-        where F: FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static
-    {
+    pub fn add_global_event<F: EventHandler + 'static>(&mut self, event: Event, action: F) {
         self.send(VoiceStatus::AddEvent(EventData::new(event, action)));
     }
 

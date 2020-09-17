@@ -16,7 +16,7 @@ pub use audiopus::{self as opus, Bitrate};
 pub use discortp as packet;
 pub use self::{
     error::{DcaError, VoiceError},
-    events::{CoreEvent, Event, EventContext, TrackEvent},
+    events::{CoreEvent, Event, EventContext, EventHandler, TrackEvent},
     handler::Handler,
     input::{
         ffmpeg,

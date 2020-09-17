@@ -9,6 +9,7 @@ use crate::{
             Event,
             EventContext,
             EventData,
+            EventHandler,
             EventStore,
         },
         input::Input,
@@ -19,6 +20,7 @@ use crate::{
         },
     },
 };
+use futures::future::BoxFuture;
 use std::time::Duration;
 use tokio::sync::{
     mpsc::{
@@ -461,9 +463,7 @@ impl TrackHandle {
     ///
     /// [`Track`]: struct.Track.html
     /// [`EventContext::Track`]: ../events/enum.EventContext.html#variant.Track
-    pub fn add_event<F>(&self, event: Event, action: F) -> TrackResult 
-        where F: FnMut(&EventContext<'_>) -> Option<Event> + Send + Sync + 'static
-    {
+    pub fn add_event<F: EventHandler + 'static>(&self, event: Event, action: F) -> TrackResult {
         let cmd = TrackCommand::AddEvent(EventData::new(event, action));
         if event.is_global_only() {
             Err(SendError(cmd))

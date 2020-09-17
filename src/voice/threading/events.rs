@@ -50,7 +50,7 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
 
                 trace!("[Voice] Firing core event {:?}.", evt);
 
-                global.fire_core_event(evt, ctx);
+                global.fire_core_event(evt, ctx).await;
             },
             Ok(AddTrack(store, state, handle)) => {
                 events.push(store);
@@ -109,7 +109,7 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
             },
             Ok(Tick) => {
                 // NOTE: this should fire saved up blocks of state change evts.
-                global.tick(&mut events, &mut states, &mut handles);
+                global.tick(&mut events, &mut states, &mut handles).await;
             },
             Err(_) | Ok(Poison) => {
                 break;
