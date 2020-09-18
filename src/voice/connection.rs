@@ -17,7 +17,6 @@ use crate::{
             MixerMessage,   
             UdpMessage,
         },
-        CRYPTO_MODE,
         VoiceError,
     },
 };

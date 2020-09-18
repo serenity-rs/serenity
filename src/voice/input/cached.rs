@@ -12,6 +12,7 @@ use crate::{
     internal::prelude::*,
     voice::{constants::*, VoiceError},
 };
+use log::debug;
 use std::{
     convert::TryInto,
     io::{
@@ -338,12 +339,14 @@ where
                 loop {
                     match self.encoder.encode_float(&sample_buf[..], &mut self.last_frame[..]) {
                         Ok(pkt_len) => {
+                            debug!("Next packet to write has {:?}", pkt_len);
                             self.frame_pos = 0;
                             self.last_frame.truncate(pkt_len);
                             break;
                         },
                         Err(OpusError::Opus(OpusErrorCode::BufferTooSmall)) => {
                             // If we need more capacity to encode this frame, then take it.
+                            debug!("Resizing inner buffer (+256).");
                             self.last_frame.resize(self.last_frame.len() + 256, 0);
                         },
                         Err(e) => {
@@ -363,6 +366,8 @@ where
                              may always be written.");
                 self.frame_pos += output_start;
 
+                debug!("Wrote frame header.");
+
                 output_start
             } else { 0 };
 
@@ -371,6 +376,7 @@ where
             let write_len = remaining.min(buf.len() - start);
             buf[start..start+write_len].copy_from_slice(&self.last_frame[out_pos..out_pos + write_len]);
             self.frame_pos += write_len;
+            debug!("Appended {} to inner store", write_len);
             out = Some(Ok(write_len + start));
         }
 

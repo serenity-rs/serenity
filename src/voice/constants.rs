@@ -58,3 +58,5 @@ pub const RTP_VERSION: u8 = 2;
 
 /// Profile type used by Discord's Opus audio traffic.
 pub const RTP_PROFILE_TYPE: RtpType = RtpType::Dynamic(120);
+
+pub const CRYPTO_MODE: &str = "xsalsa20_poly1305";

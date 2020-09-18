@@ -3,7 +3,10 @@ use crate::{
     model::event::VoiceSpeakingState,
 };
 use serde_json::{json, Value};
-use super::connection_info::ConnectionInfo;
+use super::{
+    connection_info::ConnectionInfo,
+    constants::CRYPTO_MODE,
+};
 
 #[inline]
 pub fn build_identify(info: &ConnectionInfo) -> Value {
@@ -46,7 +49,7 @@ pub fn build_select_protocol(address: ::std::borrow::Cow<'_, str>, port: u16) ->
             "protocol": "udp",
             "data": {
                 "address": address,
-                "mode": super::CRYPTO_MODE,
+                "mode": CRYPTO_MODE,
                 "port": port,
             }
         }
