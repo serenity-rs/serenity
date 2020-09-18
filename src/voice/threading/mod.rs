@@ -91,6 +91,12 @@ pub(crate) struct MixerConnection {
     pub(crate) udp: Sender<UdpMessage>,
 }
 
+impl Drop for MixerConnection {
+    fn drop(&mut self) {
+        let _ = self.udp.send(UdpMessage::Poison);
+    }
+}
+
 pub(crate) enum EventMessage {
     // Event related.
     // Track events should fire off the back of state changes.
@@ -140,6 +146,7 @@ pub(crate) enum MixerMessage {
     SetBitrate(Bitrate),
     SetMute(bool),
     SetConn(MixerConnection, u32),
+    DropConn,
     ReplaceInterconnect(Interconnect),
     RebuildEncoder,
     Poison,
@@ -207,6 +214,8 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
             },
             Ok(Status::Disconnect) => {
                 connection = None;
+                let _ = interconnect.mixer.send(MixerMessage::DropConn);
+                let _ = interconnect.mixer.send(MixerMessage::RebuildEncoder);
             },
             Ok(Status::SetTrack(s)) => {
                 let _ = interconnect.mixer.send(MixerMessage::SetTrack(s));
@@ -258,12 +267,12 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
             Ok(Status::RebuildInterconnect) => {
                 interconnect.restart_volatile_internals(guild_id);
             },
-            Err(RecvError::Disconnected) => {
+            Err(RecvError::Disconnected) | Ok(Status::Poison) => {
                 break;
             },
         }
     }
 
     info!("[Voice] Main thread exited");
-    interconnect.poison();
+    interconnect.poison_all();
 }

@@ -133,6 +133,9 @@ impl Mixer {
                             );
                         rtp.set_ssrc(ssrc);
                     },
+                    Ok(DropConn) => {
+                        self.conn_active = None;
+                    }
                     Ok(ReplaceInterconnect(i)) => {
                         interconnect = i;
                     },

@@ -42,4 +42,5 @@ pub(crate) enum Status {
     Mute(bool),
     Reconnect,
     RebuildInterconnect,
+    Poison,
 }
