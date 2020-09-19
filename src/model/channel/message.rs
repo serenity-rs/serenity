@@ -434,7 +434,7 @@ impl Message {
     ///
     /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.
     ///
-    /// [`ModelError::ItemMissing`]: ../../error/enum.ModelError.html#variant.ItemMissing
+    /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     /// [`guild_id`]: #structfield.guild_id
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
         let guild_id = match self.guild_id {
