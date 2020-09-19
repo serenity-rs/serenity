@@ -33,6 +33,7 @@ use tokio::sync::Mutex;
 use futures::future::BoxFuture;
 use uwl::Stream;
 use async_trait::async_trait;
+use tracing::instrument;
 
 #[cfg(feature = "cache")]
 use crate::model::channel::Channel;
@@ -46,6 +47,7 @@ use crate::model::{guild::Role, id::RoleId};
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),
@@ -76,13 +78,6 @@ pub enum DispatchError {
     NotEnoughArguments { min: u16, given: usize },
     /// When there are too many arguments.
     TooManyArguments { max: u16, given: usize },
-    /// When the command was requested by a bot user when they are set to be
-    /// ignored.
-    IgnoredBot,
-    /// When the bot ignores webhooks and a command was issued by one.
-    WebhookAuthor,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 type DispatchHook = for<'fut> fn(&'fut Context, &'fut Message, DispatchError) -> BoxFuture<'fut , ()>;
@@ -229,16 +224,10 @@ impl StandardFramework {
         self
     }
 
-    fn should_fail_common(&self, msg: &Message) -> Option<DispatchError> {
-        if self.config.ignore_bots && msg.author.bot {
-            return Some(DispatchError::IgnoredBot);
-        }
-
-        if self.config.ignore_webhooks && msg.webhook_id.is_some() {
-            return Some(DispatchError::WebhookAuthor);
-        }
-
-        None
+    /// Whether the message should be ignored because it is from a bot or webhook.
+    fn should_ignore(&self, msg: &Message) -> bool {
+        (self.config.ignore_bots && msg.author.bot) ||
+            (self.config.ignore_webhooks && msg.webhook_id.is_some())
     }
 
     async fn should_fail<'a>(
@@ -614,7 +603,12 @@ impl StandardFramework {
 
 #[async_trait]
 impl Framework for StandardFramework {
+    #[instrument(skip(self, ctx))]
     async fn dispatch(&self, mut ctx: Context, msg: Message) {
+        if self.should_ignore(&msg) {
+            return;
+        }
+
         let mut stream = Stream::new(&msg.content);
 
         stream.take_while_char(|c| c.is_whitespace());
@@ -632,14 +626,6 @@ impl Framework for StandardFramework {
         if prefix.is_none() && !(self.config.no_dm_prefix && msg.is_private()) {
             if let Some(normal) = &self.normal_message {
                 normal(&mut ctx, &msg).await;
-            }
-
-            return;
-        }
-
-        if let Some(error) = self.should_fail_common(&msg) {
-            if let Some(dispatch) = &self.dispatch {
-                dispatch(&mut ctx, &msg, error).await;
             }
 
             return;

@@ -4,6 +4,11 @@ version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
 
+[dependencies]
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2"
+
 [dependencies.serenity]
 features = ["cache", "framework", "standard_framework", "voice", "http", "rustls_backend"]
 path = "../../"
@@ -11,6 +16,3 @@ path = "../../"
 [dependencies.tokio]
 version = "0.2"
 features = ["macros"]
-
-[dependencies]
-env_logger = "0.7"

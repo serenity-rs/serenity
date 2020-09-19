@@ -29,7 +29,7 @@ use flume::{
     Sender,
     RecvError,
 };
-use log::{error, info, warn};
+use tracing::{error, info, warn};
 use std::time::Duration;
 use tokio::net::udp::RecvHalf;
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;

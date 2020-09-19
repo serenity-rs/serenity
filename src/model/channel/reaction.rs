@@ -17,7 +17,7 @@ use crate::internal::prelude::*;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 #[cfg(feature = "model")]
-use log::warn;
+use tracing::warn;
 use std::convert::TryFrom;
 use std::str::FromStr;
 
@@ -242,6 +242,7 @@ impl Reaction {
 ///
 /// [`Reaction`]: struct.Reaction.html
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[non_exhaustive]
 pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
     /// guild.
@@ -261,8 +262,6 @@ pub enum ReactionType {
     },
     /// A reaction with a twemoji.
     Unicode(String),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
@@ -356,7 +355,6 @@ impl Serialize for ReactionType {
 
                 map.end()
             },
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -378,7 +376,6 @@ impl ReactionType {
                 ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -434,7 +431,7 @@ impl From<EmojiId> for ReactionType {
 impl From<EmojiIdentifier> for ReactionType {
     fn from(emoji_id: EmojiIdentifier) -> ReactionType {
         ReactionType::Custom {
-            animated: false,
+            animated: emoji_id.animated,
             id: emoji_id.id,
             name: Some(emoji_id.name)
         }
@@ -599,7 +596,6 @@ impl Display for ReactionType {
                 f.write_char('>')
             },
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }

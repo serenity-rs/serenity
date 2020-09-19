@@ -30,7 +30,7 @@ To run an example, you have various options:
       This example also shows how to share data between events and commands, using `Context.data`
  6 => Voice: Simple example on playing back audio with serenity, along with FFMPEG and Youtube-DL.
  7 => Simple Bot Stucture: An example showing the recommended file structure to use.
- 8 => Env Logging: How to use the log crate along with serenity.
+ 8 => Env Logging: How to use the tracing crate along with serenity.
  9 => Shard Manager: How to get started with using the shard manager.
 10 => Voice Recieve: How to recieve voice audio packets.
       WARNING: This example *may* not work, PR #806 is aiming to fix this.

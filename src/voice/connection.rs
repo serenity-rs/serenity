@@ -26,7 +26,7 @@ use discortp::discord::{
     MutableIpDiscoveryPacket,
     MutableKeepalivePacket,
 };
-use log::{debug, info};
+use tracing::{debug, info};
 use serde::Deserialize;
 use tokio::{
     time::{timeout_at, Elapsed, Instant},

@@ -26,7 +26,7 @@ use async_tungstenite::tungstenite::{
     protocol::frame::CloseFrame,
 };
 use url::Url;
-use log::{error, debug, info, trace, warn};
+use tracing::{error, debug, info, trace, warn, instrument};
 
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
@@ -218,6 +218,7 @@ impl Shard {
     /// a heartbeat.
     ///
     /// [`GatewayError::HeartbeatFailed`]: enum.GatewayError.html#variant.HeartbeatFailed
+    #[instrument(skip(self))]
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
             Ok(()) => {
@@ -266,17 +267,20 @@ impl Shard {
     }
 
     #[inline]
+    #[instrument(skip(self))]
     pub fn set_activity(&mut self, activity: Option<Activity>) {
         self.current_presence.0 = activity;
     }
 
     #[inline]
+    #[instrument(skip(self))]
     pub fn set_presence(&mut self, status: OnlineStatus, activity: Option<Activity>) {
         self.set_activity(activity);
         self.set_status(status);
     }
 
     #[inline]
+    #[instrument(skip(self))]
     pub fn set_status(&mut self, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
@@ -325,6 +329,7 @@ impl Shard {
         self.stage
     }
 
+    #[instrument(skip(self))]
     fn handle_gateway_dispatch(&mut self, seq: u64, event: &Event) -> Result<Option<ShardAction>> {
         if seq > self.seq + 1 {
             warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
@@ -352,6 +357,7 @@ impl Shard {
         Ok(None)
     }
 
+    #[instrument(skip(self))]
     fn handle_heartbeat_event(&mut self, s: u64) -> Result<Option<ShardAction>> {
         info!("[Shard {:?}] Received shard heartbeat", self.shard_info);
 
@@ -381,6 +387,7 @@ impl Shard {
         Ok(Some(ShardAction::Heartbeat))
     }
 
+    #[instrument(skip(self))]
     fn handle_gateway_closed(&mut self, data: &Option<CloseFrame<'static>>) -> Result<Option<ShardAction>> {
         let num = data.as_ref().map(|d| d.code.into());
         let clean = num == Some(1000);
@@ -494,6 +501,7 @@ impl Shard {
     ///
     /// Returns a `GatewayError::OverloadedShard` if the shard would have too
     /// many guilds assigned to it.
+    #[instrument(skip(self))]
     pub(crate) fn handle_event(&mut self, event: &Result<GatewayEvent>)
         -> Result<Option<ShardAction>> {
         match *event {
@@ -571,6 +579,7 @@ impl Shard {
     ///
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
+    #[instrument(skip(self))]
     pub async fn check_heartbeat(&mut self) -> bool {
         let wait = {
             let heartbeat_interval = match self.heartbeat_interval {
@@ -617,6 +626,7 @@ impl Shard {
     /// Calculates the heartbeat latency between the shard and the gateway.
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
+    #[instrument(skip(self))]
     pub fn latency(&self) -> Option<StdDuration> {
         if let (Some(sent), Some(received)) = self.heartbeat_instants {
             if received > sent {
@@ -718,6 +728,7 @@ impl Shard {
     /// [`Event::GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`Member`]: ../model/guild/struct.Member.html
+    #[instrument(skip(self, guild_ids))]
     pub async fn chunk_guilds<It>(
         &mut self,
         guild_ids: It,
@@ -738,6 +749,7 @@ impl Shard {
     //
     // - the time that the last heartbeat sent as being now
     // - the `stage` to `Identifying`
+    #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions, self.intents).await?;
 
@@ -751,6 +763,7 @@ impl Shard {
     ///
     /// This will set the stage of the shard before and after instantiation of
     /// the client.
+    #[instrument(skip(self))]
     pub async fn initialize(&mut self) -> Result<WsStream> {
         debug!("[Shard {:?}] Initializing.", self.shard_info);
 
@@ -771,6 +784,7 @@ impl Shard {
         Ok(client)
     }
 
+    #[instrument(skip(self))]
     pub async fn reset(&mut self) {
         self.heartbeat_instants = (Some(Instant::now()), None);
         self.heartbeat_interval = None;
@@ -780,6 +794,7 @@ impl Shard {
         self.seq = 0;
     }
 
+    #[instrument(skip(self))]
     pub async fn resume(&mut self) -> Result<()> {
         debug!("[Shard {:?}] Attempting to resume", self.shard_info);
 
@@ -799,6 +814,7 @@ impl Shard {
         }
     }
 
+    #[instrument(skip(self))]
     pub async fn reconnect(&mut self) -> Result<()> {
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info());
 
@@ -808,6 +824,7 @@ impl Shard {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(
             &self.shard_info,

@@ -18,7 +18,7 @@ use crate::{
         },
     },
 };
-use log::{debug, info, warn};
+use tracing::{debug, info, warn};
 use parking_lot::Mutex;
 use std::{
     collections::VecDeque,

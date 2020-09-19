@@ -1,6 +1,8 @@
 use super::*;
 use crate::client::Context;
-use crate::model::channel::Message;
+use crate::model::prelude::*;
+use crate::http::Http;
+
 use uwl::Stream;
 
 pub mod map;
@@ -9,6 +11,112 @@ use map::{CommandMap, GroupMap, ParseMap};
 
 use std::borrow::Cow;
 use futures::future::{BoxFuture, FutureExt};
+use tracing::{error, warn};
+
+// FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
+//
+// Trying to shove the parameter to the original method results in several errors
+// and interface changes to methods using `Guild::user_permissions_in` that are not
+// worthwhile to resolve. As a compromise, the method has been copied with the parameter
+// added in to the place where the *problem* occurs.
+//
+// When a bot's command is invoked in a large guild (e.g., 250k+ members), the method
+// fails to retrieve the member data of the author that invoked the command, and instead
+// defaults to `@everyone`'s permissions. This is because Discord does not send data of
+// all members past 250, resulting in the problem to meet permissions of a command even if
+// the author does possess them. To avoid defaulting to permissions of everyone, we fetch
+// the member from HTTP if it is missing in the guild's members list.
+async fn permissions_in(
+    http: impl AsRef<Http>,
+    guild: &Guild,
+    channel_id: ChannelId,
+    user_id: UserId,
+) -> Permissions {
+    if user_id == guild.owner_id {
+        return Permissions::all();
+    }
+
+    let everyone = match guild.roles.get(&RoleId(guild.id.0)) {
+        Some(everyone) => everyone,
+        None => {
+            error!("@everyone role ({}) missing in '{}'", guild.id, guild.name);
+
+            return Permissions::empty();
+        },
+    };
+
+    let mut permissions = everyone.permissions;
+
+    let member = match guild.members.get(&user_id) {
+        Some(member) => Cow::Borrowed(member),
+        None => match http.as_ref().get_member(guild.id.0, user_id.0).await {
+            Ok(member) => Cow::Owned(member),
+            Err(_) => return everyone.permissions,
+        },
+    };
+
+    for &role in &member.roles {
+        if let Some(role) = guild.roles.get(&role) {
+            permissions |= role.permissions;
+        } else {
+            warn!("{} on {} has non-existent role {:?}", member.user.id, guild.id, role);
+        }
+    }
+
+    if permissions.contains(Permissions::ADMINISTRATOR) {
+        return Permissions::all();
+    }
+
+    if let Some(channel) = guild.channels.get(&channel_id) {
+        if channel.kind == ChannelType::Text {
+            permissions &= !(Permissions::CONNECT
+                             | Permissions::SPEAK
+                             | Permissions::MUTE_MEMBERS
+                             | Permissions::DEAFEN_MEMBERS
+                             | Permissions::MOVE_MEMBERS
+                             | Permissions::USE_VAD
+                             | Permissions::STREAM);
+        }
+
+        let mut data = Vec::with_capacity(member.roles.len());
+
+        for overwrite in &channel.permission_overwrites {
+            if let PermissionOverwriteType::Role(role) = overwrite.kind {
+                if role.0 != guild.id.0 && !member.roles.contains(&role) {
+                    continue;
+                }
+
+                if let Some(role) = guild.roles.get(&role) {
+                    data.push((role.position, overwrite.deny, overwrite.allow));
+                }
+            }
+        }
+
+        data.sort_by(|a, b| a.0.cmp(&b.0));
+
+        for overwrite in data {
+            permissions = (permissions & !overwrite.1) | overwrite.2;
+        }
+
+        for overwrite in &channel.permission_overwrites {
+            if PermissionOverwriteType::Member(user_id) != overwrite.kind {
+                continue;
+            }
+
+            permissions = (permissions & !overwrite.deny) | overwrite.allow;
+        }
+    } else {
+        warn!("Guild {} does not contain channel {}", guild.id, channel_id);
+    }
+
+    if channel_id.0 == guild.id.0 {
+        permissions |= Permissions::READ_MESSAGES;
+    }
+
+    guild.remove_unusable_permissions(&mut permissions);
+
+    permissions
+}
 
 #[inline]
 fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
@@ -148,7 +256,7 @@ async fn check_discrepancy(
                 None => return Ok(()),
             };
 
-            let perms = guild.user_permissions_in(msg.channel_id, msg.author.id);
+            let perms = permissions_in(ctx, &guild, msg.channel_id, msg.author.id).await;
 
             if !perms.contains(*options.required_permissions())
                 && !(options.owner_privilege() && config.owners.contains(&msg.author.id))
@@ -316,6 +424,10 @@ impl From<DispatchError> for ParseError {
     }
 }
 
+fn is_unrecognised<T>(res: &Result<T, ParseError>) -> bool {
+    matches!(res, Err(ParseError::UnrecognisedCommand(_)))
+}
+
 /// Parse a command from the message.
 ///
 /// The "command" may be:
@@ -357,7 +469,7 @@ pub async fn command(
             Map::WithPrefixes(map) => {
                 let res = handle_group(stream, ctx, msg, config, map).await;
 
-                if res.is_ok() {
+                if !is_unrecognised(&res) {
                     return res;
                 }
 
@@ -370,17 +482,13 @@ pub async fn command(
 
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
-                if res.is_ok() {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
-
+                if !is_unrecognised(&res) {
                     return res;
                 }
 
                 let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
-                if res.is_ok() {
-                    check_discrepancy(ctx, msg, config, &group.options).await?;
-
+                if !is_unrecognised(&res) {
                     return res;
                 }
 

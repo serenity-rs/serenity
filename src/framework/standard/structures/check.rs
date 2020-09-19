@@ -17,6 +17,7 @@ use futures::future::BoxFuture;
 /// [`Check`]: struct.Check.html
 /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum Reason {
     /// No information on the failure.
     Unknown,
@@ -26,8 +27,6 @@ pub enum Reason {
     Log(String),
     /// Information for the user but also for logging purposes.
     UserAndLog { user: String, log: String },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Returned from [`Check`]s.

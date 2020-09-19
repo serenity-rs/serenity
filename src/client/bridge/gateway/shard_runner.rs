@@ -31,7 +31,7 @@ use tokio::sync::Mutex;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 
-use log::{error, debug, warn};
+use tracing::{trace, error, debug, warn, instrument};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -108,10 +108,12 @@ impl ShardRunner {
     /// [`Shard`]: ../../../gateway/struct.Shard.html
     /// [`ShardManager`]: struct.ShardManager.html
     /// [`ShardRunnerMessage`]: enum.ShardRunnerMessage.html
+    #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
-        debug!("[ShardRunner {:?}] Running", self.shard.shard_info());
+        warn!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
+            trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
             if !self.recv().await? {
                 return Ok(());
             }
@@ -164,6 +166,7 @@ impl ShardRunner {
             if !successful && !self.shard.stage().is_connecting() {
                 return self.request_restart().await;
             }
+            trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
         }
     }
 
@@ -234,14 +237,13 @@ impl ShardRunner {
     /// # Errors
     ///
     /// Returns
+    #[instrument(skip(self, action))]
     async fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
             ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart().await,
             ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
-            ShardAction::Reconnect(ReconnectType::__Nonexhaustive) => unreachable!(),
             ShardAction::Heartbeat => self.shard.heartbeat().await,
             ShardAction::Identify => self.shard.identify().await,
-            ShardAction::__Nonexhaustive => unreachable!(),
         }
     }
 
@@ -252,6 +254,7 @@ impl ShardRunner {
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
+    #[instrument(skip(self))]
     async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
         // First verify the ID so we know for certain this runner is
         // to shutdown.
@@ -295,6 +298,7 @@ impl ShardRunner {
     }
 
     #[inline]
+    #[instrument(skip(self, event))]
     async fn dispatch(&self, event: DispatchEvent) {
         dispatch(
             event,
@@ -315,6 +319,7 @@ impl ShardRunner {
     //
     // This always returns true, except in the case that the shard manager asked
     // the runner to shutdown.
+    #[instrument(skip(self))]
     async fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
             InterMessage::Client(value) => match *value {
@@ -420,11 +425,11 @@ impl ShardRunner {
                 // Value must be forwarded over the websocket
                 self.shard.client.send_json(&value).await.is_ok()
             },
-            InterMessage::__Nonexhaustive => unreachable!(),
         }
     }
 
     #[cfg(feature = "voice")]
+    #[instrument(skip(self))]
     async fn handle_voice_event(&self, event: &Event) {
         match *event {
             Event::Ready(_) => {
@@ -466,6 +471,7 @@ impl ShardRunner {
     // should _never_ happen, as the sending half is kept on the runner.
 
     // Returns whether the shard runner is in a state that can continue.
+    #[instrument(skip(self))]
     async fn recv(&mut self) -> Result<bool> {
         loop {
             match self.runner_rx.try_next() {
@@ -495,6 +501,7 @@ impl ShardRunner {
 
     /// Returns a received event, as well as whether reading the potentially
     /// present event was successful.
+    #[instrument(skip(self))]
     async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
         let gw_event = match self.shard.client.recv_json().await {
             Ok(Some(value)) => {
@@ -535,7 +542,6 @@ impl ShardRunner {
                             return Ok((None, None, false));
                         }
                     },
-                    ReconnectType::__Nonexhaustive => unreachable!(),
                 }
 
                 return Ok((None, None, true));
@@ -604,6 +610,7 @@ impl ShardRunner {
         Ok((event, action, true))
     }
 
+    #[instrument(skip(self))]
     async fn request_restart(&mut self) -> Result<()> {
         self.update_manager();
 
@@ -626,6 +633,7 @@ impl ShardRunner {
         Ok(())
     }
 
+    #[instrument(skip(self))]
     fn update_manager(&self) {
         let _ = self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
             id: ShardId(self.shard.shard_info()[0]),

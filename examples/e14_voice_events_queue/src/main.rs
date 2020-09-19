@@ -87,7 +87,7 @@ struct General;
 
 #[tokio::main]
 async fn main() {
-    env_logger::init();
+    tracing_subscriber::fmt::init();
 
     // Configure the client with your Discord bot token in the environment.
     let token = env::var("DISCORD_TOKEN")

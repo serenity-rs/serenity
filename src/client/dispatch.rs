@@ -10,6 +10,7 @@ use futures::{
     channel::mpsc::UnboundedSender as Sender,
     future::{BoxFuture, FutureExt},
 };
+use tracing::instrument;
 #[cfg(feature = "gateway")]
 use super::{
     bridge::gateway::event::ClientEvent,
@@ -64,14 +65,14 @@ fn context(
 
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
+#[non_exhaustive]
 pub(crate) enum DispatchEvent {
     Client(ClientEvent),
     Model(Event),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl DispatchEvent {
+    #[instrument(skip(self, cache_and_http))]
     async fn update(&mut self, cache_and_http: &Arc<CacheAndHttp>) {
         match self {
             Self::Model(Event::ChannelCreate(ref mut event)) => {
@@ -136,8 +137,6 @@ impl DispatchEvent {
             Self::Model(Event::VoiceStateUpdate(ref mut event)) => {
                 update(cache_and_http, event).await;
             },
-            Self::Model(Event::__Nonexhaustive) => unreachable!(),
-            Self::__Nonexhaustive => unreachable!(),
             _ => (),
         }
     }
@@ -310,6 +309,7 @@ async fn dispatch_message(
 }
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::too_many_arguments)]
+#[instrument(skip(event, data, event_handler, cache_and_http))]
 async fn handle_event(
     event: DispatchEvent,
     data: &Arc<RwLock<TypeMap>>,
@@ -358,7 +358,6 @@ async fn handle_event(
                         event_handler.category_create(context, &channel).await;
                     });
                 },
-                Channel::__Nonexhaustive => unreachable!(),
             }
         },
         DispatchEvent::Model(Event::ChannelDelete(mut event)) => {
@@ -380,7 +379,6 @@ async fn handle_event(
                         event_handler.category_delete(context, &channel).await;
                     });
                 },
-                Channel::__Nonexhaustive => unreachable!(),
             }
         },
         DispatchEvent::Model(Event::ChannelPinsUpdate(event)) => {
@@ -742,7 +740,5 @@ async fn handle_event(
                 event_handler.webhook_update(context, event.guild_id, event.channel_id).await;
             });
         },
-        DispatchEvent::Model(Event::__Nonexhaustive) => unreachable!(),
-        DispatchEvent::__Nonexhaustive => unreachable!(),
     }
 }

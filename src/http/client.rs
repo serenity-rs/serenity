@@ -23,7 +23,7 @@ use super::{
 use bytes::buf::Buf;
 use serde::de::DeserializeOwned;
 use serde_json::json;
-use log::{debug, trace};
+use tracing::{debug, trace, instrument};
 use std::{
     collections::BTreeMap,
     sync::Arc,
@@ -33,8 +33,9 @@ use tokio::{
     fs::File,
 };
 
+#[derive(Debug)]
 pub struct Http {
-    client: Arc<Client>,
+    pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
     pub token: String,
 }
@@ -1227,7 +1228,6 @@ impl Http {
         let (after, before) = match *target {
             GuildPagination::After(id) => (Some(id.0), None),
             GuildPagination::Before(id) => (None, Some(id.0)),
-            GuildPagination::__Nonexhaustive => unreachable!(),
         };
 
         self.fire(Request {
@@ -1534,7 +1534,6 @@ impl Http {
                         .part(file_num.to_string(), Part::bytes(picture)
                             .file_name(filename.to_string()));
                 },
-                AttachmentType::__Nonexhaustive => unreachable!(),
             }
 
             unsafe {
@@ -1744,6 +1743,7 @@ impl Http {
     /// ```
     ///
     /// [`fire`]: fn.fire.html
+    #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let ratelimiting_req = RatelimitedRequest::from(req);
         let response = self

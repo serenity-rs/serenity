@@ -54,6 +54,7 @@
 //! [gateway docs]: gateway/index.html
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
 #![deny(rust_2018_idioms)]
+#![type_length_limit="2504639"] // needed so ShardRunner::run compiles with instrument.
 
 #[macro_use]
 extern crate serde;
@@ -103,13 +104,13 @@ use crate::http::Http;
 
 #[cfg(feature = "client")]
 #[derive(Default)]
+#[non_exhaustive]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
     pub cache: Arc<Cache>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     pub http: Arc<Http>,
-    __nonexhaustive: (),
 }
 
 // For the procedural macros in `command_attr`.

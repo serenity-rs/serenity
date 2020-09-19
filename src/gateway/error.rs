@@ -13,6 +13,7 @@ use async_tungstenite::tungstenite::protocol::CloseFrame;
 /// Note that - from a user standpoint - there should be no situation in which
 /// you manually handle these.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// There was an error building a URL.
     BuildingUrl,
@@ -57,8 +58,6 @@ pub enum Error {
     /// If an connection has been established but priviliged gateway intents
     /// were provided without enabling them prior.
     DisallowedGatewayIntents,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Display for Error {
@@ -78,7 +77,6 @@ impl Display for Error {
             Error::ReconnectFailure => f.write_str("Failed to Reconnect"),
             Error::InvalidGatewayIntents => f.write_str("Invalid gateway intents were provided"),
             Error::DisallowedGatewayIntents => f.write_str("Disallowed gateway intents were provided"),
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

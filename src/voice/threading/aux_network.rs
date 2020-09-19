@@ -44,7 +44,7 @@ use flume::{
     Receiver,
     TryRecvError,
 };
-use log::{debug, error, info, warn};
+use tracing::{debug, error, info, warn};
 use rand::random;
 use serde::Deserialize;
 use std::{

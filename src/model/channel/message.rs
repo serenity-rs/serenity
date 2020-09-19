@@ -427,14 +427,31 @@ impl Message {
     /// Retrieves a clone of the author's Member instance, if this message was
     /// sent in a guild.
     ///
-    /// Note that since this clones, it is preferable performance-wise to
-    /// manually retrieve the guild from the cache and access
-    /// [`Guild::members`].
+    /// If the instance cannot be found in the cache, or the `cache` feature is
+    /// disabled, a HTTP request is performed to retrieve it from Discord's API.
     ///
-    /// [`Guild::members`]: ../guild/struct.Guild.html#structfield.members
-    #[cfg(feature = "cache")]
-    pub async fn member(&self, cache: impl AsRef<Cache>) -> Option<Member> {
-        cache.as_ref().member(self.guild_id?, self.author.id).await
+    /// # Errors
+    ///
+    /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.
+    ///
+    /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
+    /// [`guild_id`]: #structfield.guild_id
+    pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
+        let guild_id = match self.guild_id {
+            Some(guild_id) => guild_id,
+            None => return Err(Error::Model(ModelError::ItemMissing)),
+        };
+
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                if let Some(member) = cache.member(guild_id, self.author.id).await {
+                    return Ok(member);
+                }
+            }
+        }
+
+        cache_http.http().get_member(guild_id.0, self.author.id.0).await
     }
 
     /// Checks the length of a string to ensure that it is within Discord's
@@ -820,6 +837,7 @@ pub struct MessageReaction {
 
 /// Differentiates between regular and different types of system messages.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum MessageType {
     /// A regular message.
     Regular = 0,
@@ -845,8 +863,6 @@ pub enum MessageType {
     NitroTier2 = 10,
     /// An indicator that the guild has reached nitro tier 3
     NitroTier3 = 11,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -883,20 +899,18 @@ impl MessageType {
             NitroTier1 => 9,
             NitroTier2 => 10,
             NitroTier3 => 11,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum MessageActivityKind {
     JOIN = 1,
     SPECTATE = 2,
     LISTEN = 3,
     #[allow(non_camel_case_types)]
     JOIN_REQUEST = 5,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -917,7 +931,6 @@ impl MessageActivityKind {
             SPECTATE => 2,
             LISTEN => 3,
             JOIN_REQUEST => 5,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }

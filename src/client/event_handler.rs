@@ -1,8 +1,6 @@
 use crate::model::prelude::*;
 use serde_json::Value;
-use std::{
-    collections::HashMap,
-};
+use std::collections::HashMap;
 use super::context::Context;
 use crate::client::bridge::gateway::event::*;
 use async_trait::async_trait;

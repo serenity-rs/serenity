@@ -20,7 +20,7 @@ use discortp::{
     rtp::Rtp,
 };
 use futures::future::BoxFuture;
-use log::info;
+use tracing::info;
 use std::{
     cmp::Ordering,
     collections::{

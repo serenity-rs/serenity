@@ -4,7 +4,7 @@ use crate::internal::prelude::*;
 use serde_json;
 use async_tungstenite::tungstenite::Message;
 use async_trait::async_trait;
-use log::warn;
+use tracing::{warn, instrument};
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 
@@ -109,6 +109,7 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
 
 /// An error that occured while connecting over rustls
 #[derive(Debug)]
+#[non_exhaustive]
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 pub enum RustlsError {
     /// WebPKI X.509 Certificate Validation Error.
@@ -117,8 +118,6 @@ pub enum RustlsError {
     HandshakeError,
     /// Standard IO error happening while creating the tcp stream
     Io(IoError),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
@@ -135,7 +134,6 @@ impl Display for RustlsError {
             RustlsError::WebPKI => f.write_str("Failed to validate X.509 certificate"),
             RustlsError::HandshakeError => f.write_str("TLS handshake failed when making the websocket connection"),
             RustlsError::Io(inner) => Display::fmt(&inner, f),
-            RustlsError::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -151,6 +149,7 @@ impl StdError for RustlsError {
 }
 
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+#[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),
@@ -166,6 +165,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
 }
 
 #[cfg(feature = "native_tls_backend")]
+#[instrument]
 pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),

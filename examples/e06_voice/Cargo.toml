@@ -5,7 +5,9 @@ authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies]
-env_logger = "0.7"
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2"
 
 [dependencies.serenity]
 features = ["cache", "framework", "standard_framework", "voice", "http", "rustls_backend"]

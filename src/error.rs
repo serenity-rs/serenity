@@ -11,6 +11,7 @@ use std::{
     io::Error as IoError,
     num::ParseIntError
 };
+use tracing::instrument;
 
 #[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
@@ -57,6 +58,7 @@ pub type Result<T> = StdResult<T, Error>;
 /// [`GatewayError`]: gateway/enum.GatewayError.html
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// An error while decoding a payload.
     Decode(&'static str, Value),
@@ -116,8 +118,6 @@ pub enum Error {
     /// Voice thread issue, requiring regeneration of child threads.
     #[cfg(feature = "voice")]
     VoiceInterconnectFailure,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl From<FormatError> for Error {
@@ -222,12 +222,12 @@ impl Display for Error {
             Error::Voice(_) => f.write_str("Voice error"),
             #[cfg(feature = "voice")]
             e@Error::VoiceInterconnectFailure => fmt::Display::fmt(&e, f),
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 impl StdError for Error {
+    #[instrument]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Error::Format(inner) => Some(inner),

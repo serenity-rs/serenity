@@ -12,7 +12,7 @@ use crate::{
     internal::prelude::*,
     voice::{constants::*, VoiceError},
 };
-use log::debug;
+use tracing::debug;
 use std::{
     convert::TryInto,
     io::{

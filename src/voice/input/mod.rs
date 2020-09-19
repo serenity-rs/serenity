@@ -25,7 +25,7 @@ use crate::{
 };
 use dca::DcaMetadata;
 use futures::executor;
-use log::{debug, warn};
+use tracing::{debug, warn};
 use parking_lot::Mutex;
 use std::{
     convert::TryFrom,

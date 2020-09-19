@@ -34,7 +34,7 @@ use flume::{
     Receiver,
     TryRecvError,
 };
-use log::error;
+use tracing::error;
 use rand::random;
 use spin_sleep::SpinSleeper;
 use std::time::Instant;

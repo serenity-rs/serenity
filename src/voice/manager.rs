@@ -147,7 +147,6 @@ impl Manager {
 
     fn _remove(&mut self, guild_id: GuildId) {
         self.leave(guild_id);
-
         self.handlers.remove(&guild_id);
     }
 }

@@ -47,6 +47,7 @@ use std::collections::{
 };
 use std::default::Default;
 use async_trait::async_trait;
+use tracing::instrument;
 
 mod cache_update;
 mod settings;
@@ -100,6 +101,7 @@ impl<F: FromStr> FromStrAndCache for F {
 /// [`Shard`]: ../gateway/struct.Shard.html
 /// [`http`]: ../http/index.html
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct Cache {
     /// A map of channels in [`Guild`]s that the current user has received data
     /// for.
@@ -181,7 +183,6 @@ pub struct Cache {
     pub(crate) message_queue: RwLock<HashMap<ChannelId, VecDeque<MessageId>>>,
     /// The settings for the cache.
     settings: RwLock<Settings>,
-    __nonexhaustive: (),
 }
 
 impl Cache {
@@ -203,6 +204,7 @@ impl Cache {
     ///
     /// let cache = Cache::new_with_settings(settings);
     /// ```
+    #[instrument]
     pub fn new_with_settings(settings: Settings) -> Self {
         Self {
             settings: RwLock::new(settings),
@@ -935,6 +937,7 @@ impl Cache {
     ///
     /// [`CacheUpdate`]: trait.CacheUpdate.html
     /// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples
+    #[instrument(skip(self, e))]
     pub async fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
         e.update(self).await
     }
@@ -966,7 +969,6 @@ impl Default for Cache {
             user: RwLock::new(CurrentUser::default()),
             users: RwLock::new(HashMap::default()),
             message_queue: RwLock::new(HashMap::default()),
-            __nonexhaustive: (),
         }
     }
 }
@@ -975,9 +977,7 @@ impl Default for Cache {
 mod test {
     use chrono::{DateTime, Utc};
     use serde_json::{Number, Value};
-    use std::{
-        collections::HashMap,
-    };
+    use std::collections::HashMap;
     use crate::{
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,
