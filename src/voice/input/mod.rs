@@ -24,6 +24,7 @@ use crate::{
     },
 };
 use dca::DcaMetadata;
+use futures::executor;
 use log::{debug, warn};
 use parking_lot::Mutex;
 use std::{
@@ -51,6 +52,11 @@ use std::{
     time::Duration,
 };
 use streamcatcher::{Catcher, TxCatcher};
+use tokio::{
+    fs::File as TokioFile,
+    io::AsyncReadExt,
+    process::Command as TokioCommand,
+};
 
 /// Type of data being passed into an [`Input`].
 ///
@@ -415,14 +421,15 @@ impl Metadata {
     }
 
     /// Use `youtube-dl` to extract metadata for an online resource.
-    pub fn from_ytdl_uri(uri: &str) -> Self {
+    pub async fn from_ytdl_uri(uri: &str) -> Self {
         let args = ["-s", "-j"];
 
-        let out: Option<Value> = Command::new("youtube-dl")
+        let out: Option<Value> = TokioCommand::new("youtube-dl")
             .args(&args)
             .arg(uri)
             .stdin(Stdio::null())
             .output()
+            .await
             .ok()
             .and_then(|r| serde_json::from_reader(&r.stdout[..]).ok());
 
@@ -763,13 +770,13 @@ impl<R: Read + Sized> ReadAudioExt for R {
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source.
-pub fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
-    _ffmpeg(path.as_ref())
+pub async fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
+    _ffmpeg(path.as_ref()).await
 }
 
-fn _ffmpeg(path: &OsStr) -> Result<Input> {
+async fn _ffmpeg(path: &OsStr) -> Result<Input> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
-    let is_stereo = is_stereo(path.as_ref())
+    let is_stereo = is_stereo(path.as_ref()).await
         .unwrap_or_else(|_e| (false, Default::default()));
     let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
@@ -783,7 +790,7 @@ fn _ffmpeg(path: &OsStr) -> Result<Input> {
         "-acodec",
         "pcm_f32le",
         "-",
-    ], Some(is_stereo))
+    ], Some(is_stereo)).await
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source, with
@@ -813,23 +820,28 @@ fn _ffmpeg(path: &OsStr) -> Result<Input> {
 ///     "-",
 /// ]);
 ///```
-pub fn ffmpeg_optioned<P: AsRef<OsStr>>(
+pub async fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,
     pre_input_args: &[&str],
     args: &[&str],
 ) -> Result<Input> {
-    _ffmpeg_optioned(path.as_ref(), pre_input_args, args, None)
+    _ffmpeg_optioned(path.as_ref(), pre_input_args, args, None).await
 }
 
-fn _ffmpeg_optioned(
+async fn _ffmpeg_optioned(
     path: &OsStr,
     pre_input_args: &[&str],
     args: &[&str],
     is_stereo_known: Option<(bool, Metadata)>,
 ) -> Result<Input> {
-    let (is_stereo, metadata) = is_stereo_known
-        .or_else(|| is_stereo(path).ok())
-        .unwrap_or_else(|| (false, Default::default()));
+    let (is_stereo, metadata) = if let Some(vals) = is_stereo_known {
+        vals
+    } else {
+        is_stereo(path)
+            .await
+            .ok()
+            .unwrap_or_else(|| (false, Default::default()))
+    };
 
     let command = Command::new("ffmpeg")
         .args(pre_input_args)
@@ -846,27 +858,28 @@ fn _ffmpeg_optioned(
 
 /// Creates a streamed audio source from a DCA file.
 /// Currently only accepts the [DCA1 format](https://github.com/bwmarrin/dca).
-pub fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Input, DcaError> {
-    _dca(path.as_ref())
+pub async fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Input, DcaError> {
+    _dca(path.as_ref()).await
 }
 
-fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
-    let file = File::open(path).map_err(DcaError::IoError)?;
-
-    let mut reader = BufReader::new(file);
+async fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
+    let mut reader = TokioFile::open(path)
+        .await
+        .map_err(DcaError::IoError)?;
 
     let mut header = [0u8; 4];
 
     // Read in the magic number to verify it's a DCA file.
-    reader.read_exact(&mut header).map_err(DcaError::IoError)?;
+    reader.read_exact(&mut header)
+        .await
+        .map_err(DcaError::IoError)?;
 
     if header != b"DCA1"[..] {
         return Err(DcaError::InvalidHeader);
     }
 
-    reader.read_exact(&mut header).map_err(DcaError::IoError)?;
-
-    let size = (&header[..]).read_i32::<LittleEndian>().unwrap();
+    let size = reader.read_i32_le().await
+        .map_err(|e| DcaError::InvalidHeader)?;
 
     // Sanity check
     if size < 2 {
@@ -875,13 +888,15 @@ fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
 
     let mut raw_json = Vec::with_capacity(size as usize);
 
-    {
-        let json_reader = reader.by_ref();
-        json_reader
-            .take(size as u64)
-            .read_to_end(&mut raw_json)
-            .map_err(DcaError::IoError)?;
-    }
+    let mut json_reader = reader
+        .take(size as u64);
+
+    json_reader
+        .read_to_end(&mut raw_json)
+        .await
+        .map_err(DcaError::IoError)?;
+
+    let reader = BufReader::new(json_reader.into_inner().into_std().await);
 
     let metadata: Metadata = serde_json::from_slice::<DcaMetadata>(raw_json.as_slice())
         .map_err(DcaError::InvalidMetadata)?
@@ -901,11 +916,11 @@ fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
 }
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
-pub fn ytdl(uri: &str) -> Result<Input> {
-    _ytdl(uri, &[])
+pub async fn ytdl(uri: &str) -> Result<Input> {
+    _ytdl(uri, &[]).await
 }
 
-fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
+async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
     let ytdl_args = [
         "-f",
         "webm[abr>0]/bestaudio/best",
@@ -947,7 +962,7 @@ fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    let metadata = Metadata::from_ytdl_uri(uri);
+    let metadata = Metadata::from_ytdl_uri(uri).await;
 
     debug!("[Voice] ytdl metadata {:?}", metadata);
 
@@ -956,18 +971,19 @@ fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
 /// Takes the first video listed from the YouTube search.
-pub fn ytdl_search(name: &str) -> Result<Input> {
-    ytdl(&format!("ytsearch1:{}",name))
+pub async fn ytdl_search(name: &str) -> Result<Input> {
+    ytdl(&format!("ytsearch1:{}",name)).await
 }
 
-fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
+async fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
     let args = ["-v", "quiet", "-of", "json", "-show_format", "-show_streams", "-i"];
 
-    let out = Command::new("ffprobe")
+    let out = TokioCommand::new("ffprobe")
         .args(&args)
         .arg(path)
         .stdin(Stdio::null())
-        .output()?;
+        .output()
+        .await?;
 
     let value: Value = serde_json::from_reader(&out.stdout[..])?;
 
@@ -1020,10 +1036,10 @@ impl Restartable {
 
     /// Create a new restartable ffmpeg source for a local file.
     pub fn ffmpeg<P: AsRef<OsStr> + Send + Clone + Copy + 'static>(path: P) -> Result<Self> {
-        Self::new(move |time: Option<Duration>| {
+        Self::new(move |time: Option<Duration>| executor::block_on(async {
             if let Some(time) = time {
 
-                let is_stereo = is_stereo(path.as_ref())
+                let is_stereo = is_stereo(path.as_ref()).await
                     .unwrap_or_else(|_e| (false, Default::default()));
                 let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
@@ -1043,11 +1059,11 @@ impl Restartable {
                     "-acodec",
                     "pcm_f32le",
                     "-",
-                ], Some(is_stereo))
+                ], Some(is_stereo)).await
             } else {
-                ffmpeg(path)
-            }
-        })
+                ffmpeg(path).await
+            }})
+        )
     }
 
     /// Create a new restartable ytdl source.
@@ -1059,9 +1075,9 @@ impl Restartable {
             if let Some(time) = time {
                 let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
 
-                _ytdl(uri.as_ref(), &["-ss",&ts,])
+                executor::block_on(_ytdl(uri.as_ref(), &["-ss",&ts,]))
             } else {
-                ytdl(uri.as_ref())
+                executor::block_on(ytdl(uri.as_ref()))
             }
         })
     }

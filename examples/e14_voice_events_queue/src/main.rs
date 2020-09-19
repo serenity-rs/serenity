@@ -334,7 +334,7 @@ async fn play_fade(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match input::ytdl(&url) {
+        let source = match input::ytdl(&url).await {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
@@ -446,7 +446,7 @@ async fn queue(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let mut track_queues = queues_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match input::ytdl(&url) {
+        let source = match input::ytdl(&url).await {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);

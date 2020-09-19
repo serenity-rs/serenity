@@ -135,14 +135,14 @@ async fn main() {
         // ahead of time. We do this in both cases to ensure optimal performance for the audio
         // core.
         let ting_src = Memory::new(
-            input::ffmpeg("ting.wav").expect("File should be in root folder."),
+            input::ffmpeg("ting.wav").await.expect("File should be in root folder."),
         ).expect("These parameters are well-defined.");
         let _ = ting_src.raw.spawn_loader();
         audio_map.insert("ting".into(), CachedSound::Uncompressed(ting_src));
 
         // Another short sting, to show where each loop occurs.
         let loop_src = Memory::new(
-            input::ffmpeg("loop.wav").expect("File should be in root folder."),
+            input::ffmpeg("loop.wav").await.expect("File should be in root folder."),
         ).expect("These parameters are well-defined.");
         let _ = loop_src.raw.spawn_loader();
         audio_map.insert("loop".into(), CachedSound::Uncompressed(loop_src));
@@ -153,7 +153,7 @@ async fn main() {
         //
         // Music by Cloudkicker, used under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
         let song_src = Compressed::new(
-                input::ytdl("https://cloudkicker.bandcamp.com/track/2011-07").expect("Link may be dead."),
+                input::ytdl("https://cloudkicker.bandcamp.com/track/2011-07").await.expect("Link may be dead."),
                 Bitrate::BitsPerSecond(128_000),
             ).expect("These parameters are well-defined.");
         let _ = song_src.raw.spawn_loader();
