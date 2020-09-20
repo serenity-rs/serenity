@@ -172,6 +172,8 @@ impl Mixer {
                 error!("[Voice] Mixer thread cycle: {:?}", e);
 
                 let _ = interconnect.core.send(Status::Reconnect);
+            } else {
+                self.audio_commands_events(&interconnect);
             }
         }
     }
@@ -311,12 +313,8 @@ impl Mixer {
 
         interconnect.aux_packets.send(AuxPacketMessage::Speaking(true))?;
 
-        self.prep_and_send_packet(mix_buffer, opus_frame)?;
-
-        // FIXME: move to below?
         self.march_deadline();
-
-        self.audio_commands_events(interconnect);
+        self.prep_and_send_packet(mix_buffer, opus_frame)?;
 
         Ok(())
     }
