@@ -201,35 +201,43 @@ impl Mixer {
     ) -> Result<(usize, &'a[u8])> {
         let mut len = 0;
 
-        for (i, track) in self.tracks.iter_mut().enumerate() {
-            let vol = track.volume;
-            let stream = &mut track.source;
-
-            if track.playing != PlayMode::Play {
-                continue;
-            }
-
-            let temp_len = stream.mix(mix_buffer, vol);
-
-            len = len.max(temp_len);
-            if temp_len > 0 {
-                track.step_frame();
-            } else if track.do_loop() {
-                if let Some(time) = track.seek_time(Default::default()) {
-                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
-                    let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(track.loops, false)));
-                }
-            } else {
-                track.end();
-            }
-        };
-
-        // If opus frame passthrough were supported, we'd do it in this function.
+        // Opus frame passthrough.
         // This requires that we have only one track, who has volume 1.0, and an
         // Opus codec type.
-        //
-        // For now, we make this override possible but don't perform the work itself.
-        Ok((len, &opus_frame[..0]))
+        let do_passthrough = self.tracks.len() == 1 && {
+            let track = &self.tracks[0];
+            track.volume == 1.0 && track.source.supports_passthrough()
+        };
+
+        if do_passthrough {
+            let opus_len = (&mut self.tracks[0]).source.read_opus_frame(opus_frame)?;
+            Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]))
+        } else {
+            for (i, track) in self.tracks.iter_mut().enumerate() {
+                let vol = track.volume;
+                let stream = &mut track.source;
+
+                if track.playing != PlayMode::Play {
+                    continue;
+                }
+
+                let temp_len = stream.mix(mix_buffer, vol);
+
+                len = len.max(temp_len);
+                if temp_len > 0 {
+                    track.step_frame();
+                } else if track.do_loop() {
+                    if let Some(time) = track.seek_time(Default::default()) {
+                        let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Position(time)));
+                        let _ = interconnect.events.send(EventMessage::ChangeState(i, TrackStateChange::Loops(track.loops, false)));
+                    }
+                } else {
+                    track.end();
+                }
+            };
+
+            Ok((len, &opus_frame[..0]))
+        }
     }
 
     #[inline]

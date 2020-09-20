@@ -123,6 +123,14 @@ impl From<&Codec> for CodecType {
 #[derive(Clone, Debug)]
 pub struct OpusDecoderState {
     pub decoder: Arc<Mutex<OpusDecoder>>,
+    /// Controls whether this source allows direct Opus frame passthrough.
+    /// Defaults to `true`.
+    ///
+    /// Enabling this flag is a promise from the programmer to the audio core
+    /// that the source has been encoded at 48kHz, using 20ms long frames.
+    /// If you cannot guarantee this, disable this flag (or else risk nasal demons)
+    /// and bizarre audio behaviour.
+    pub allow_passthrough: bool,
     current_frame: Vec<f32>,
     frame_pos: usize,
     should_reset: bool,
@@ -136,6 +144,7 @@ impl OpusDecoderState {
     pub fn from_decoder(decoder: OpusDecoder) -> Self {
         Self {
             decoder: Arc::new(Mutex::new(decoder)),
+            allow_passthrough: true,
             current_frame: Vec::with_capacity(STEREO_FRAME_SIZE),
             frame_pos: 0,
             should_reset: false,
@@ -671,6 +680,38 @@ impl Input {
 
         Ok(done)
     }
+
+    pub(crate) fn supports_passthrough(&self) -> bool {
+        match &self.kind {
+            Codec::Opus(state) => { state.allow_passthrough },
+            _ => false,
+        }
+    }
+
+    pub(crate) fn read_opus_frame(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
+        // Called in event of opus passthrough.
+        if let Codec::Opus(state) = &mut self.kind {
+            // step 1: align to frame.
+            self.pos += state.current_frame.len() - state.frame_pos;
+
+            state.frame_pos = 0;
+            state.current_frame.truncate(0);
+
+            // step 2: read new header.
+            let frame = self.container.next_frame_length(&mut self.reader, CodecType::Opus)?;
+
+            // step 3: read in bytes.
+            self.reader.read_exact(&mut buffer[..frame.frame_len])
+                .map(|_| {
+                    self.pos += STEREO_FRAME_BYTE_SIZE;
+                    frame.frame_len
+                })
+        } else {
+            Err(IoError::new(
+                IoErrorKind::InvalidInput,
+                "Frame passthrough not supported for this file."))
+        }
+    }
 }
 
 impl Read for Input {
@@ -715,7 +756,7 @@ impl Seek for Input {
 }
 
 /// Extension trait to pull frames of audio from a byte source.
-pub trait ReadAudioExt {
+pub(crate) trait ReadAudioExt {
     fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
 
     fn consume(&mut self, amt: usize) -> usize where Self: Sized;

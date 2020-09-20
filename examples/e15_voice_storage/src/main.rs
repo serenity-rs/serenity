@@ -241,7 +241,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         let source = sources.get("song").expect("Handle placed into cache at startup.");
 
         let song = handler.play_source(source.into());
-        let _ = song.set_volume(0.5);
+        let _ = song.set_volume(1.0);
         let _ = song.enable_loop();
 
         // Play a guitar chord whenever the main backing track loops.
