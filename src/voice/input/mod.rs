@@ -54,7 +54,7 @@ use std::{
 use streamcatcher::{Catcher, TxCatcher};
 use tokio::{
     fs::File as TokioFile,
-    io::AsyncReadExt,
+    io::{AsyncRead, AsyncReadExt},
     process::Command as TokioCommand,
 };
 
@@ -900,7 +900,7 @@ async fn _ffmpeg(path: &OsStr) -> Result<Input> {
 ///
 /// let stereo_val = "2";
 ///
-/// let streamer = input::ffmpeg_optioned("./some_file.mp3", &[], &[
+/// let streamer = futures::executor::block_on(input::ffmpeg_optioned("./some_file.mp3", &[], &[
 ///     "-f",
 ///     "s16le",
 ///     "-ac",
@@ -910,7 +910,7 @@ async fn _ffmpeg(path: &OsStr) -> Result<Input> {
 ///     "-acodec",
 ///     "pcm_s16le",
 ///     "-",
-/// ]);
+/// ]));
 ///```
 pub async fn ffmpeg_optioned<P: AsRef<OsStr>>(
     path: P,

@@ -113,7 +113,7 @@ version = "0.4.2"
 [dependencies.tokio]
 version = "0.2"
 default-features = false
-features = ["fs", "macros", "rt-core", "sync", "time", "udp", "process"]
+features = ["fs", "io-util", "macros", "rt-core", "sync", "time", "udp", "process"]
 
 [dependencies.futures]
 version = "0.3"
@@ -179,6 +179,8 @@ voice = [
     "rand",
     "spin_sleep",
     "streamcatcher",
+    "tokio/fs",
+    "tokio/io-util",
     "tokio/process",
     "xsalsa20poly1305",
 ]
