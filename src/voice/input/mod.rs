@@ -25,7 +25,7 @@ use crate::{
 };
 use dca::DcaMetadata;
 use futures::executor;
-use tracing::{debug, warn};
+use tracing::{debug, error, warn};
 use parking_lot::Mutex;
 use std::{
     convert::TryFrom,
@@ -716,7 +716,6 @@ impl Input {
 
 impl Read for Input {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
-        // debug!("Reading");
         self.read_inner(buffer, false)
     }
 }
@@ -764,41 +763,93 @@ pub(crate) trait ReadAudioExt {
 
 impl<R: Read + Sized> ReadAudioExt for R {
     fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], stereo: bool, volume: f32) -> Option<usize> {
+        // IDEA: Read in 8 floats at a time, then use iterator code
+        // to gently nudge the compiler into vectorising for us.
+        // Max SIMD float32 lanes is 8 on AVX, older archs use a divisor of this
+        // e.g., 4.
+        const sample_len: usize = mem::size_of::<f32>();
+        let mut simd_float_bytes = [0u8; 8 * sample_len];
+        let mut simd_float_buf = [0f32; 8];
+        
+        let mut frame_pos = 0;
+
+        // Code duplication here is because unifying these codepaths
+        // with a dynamic chunk size is not zero-cost.
         if stereo {
-            for (i, float_buffer_element) in float_buffer.iter_mut().enumerate() {
-                let sample = match self.read_f32::<LittleEndian>() {
-                    Ok(v) => v,
+            let mut max_bytes = STEREO_FRAME_BYTE_SIZE;
+
+            while frame_pos < float_buffer.len() {
+                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * sample_len)])
+                    .and_then(|byte_len| {
+                        let target = byte_len/sample_len;
+                        (&simd_float_bytes[..byte_len])
+                            .read_f32_into::<LittleEndian>(
+                                &mut simd_float_buf[..target]
+                            )
+                            .map(|_| target)
+                    })
+                    .map(|f32_len| {
+                        let new_pos = frame_pos + f32_len;
+                        for (el, new_el) in float_buffer[frame_pos..new_pos].iter_mut().zip(&simd_float_buf[..f32_len]) {
+                            *el += volume * new_el;
+                        }
+                        new_pos
+                    });
+
+                match progress {
+                    Ok(v) => {
+                        let delta = v - frame_pos;
+                        frame_pos = v;
+                        max_bytes -= delta * sample_len;
+                    },
                     Err(ref e) => {
-                        debug!("Died: {:?}", e);
                         return if e.kind() == IoErrorKind::UnexpectedEof {
-                            Some(i)
+                            Some(frame_pos)
                         } else {
+                            error!("Input died unexpectedly: {:?}", e);
                             None
                         }
                     },
-                };
-
-                *float_buffer_element += sample * volume;
+                }
             }
         } else {
-            let mut float_index = 0;
-            for i in 0..float_buffer.len() / 2 {
-                let raw = match self.read_f32::<LittleEndian>() {
-                    Ok(v) => v,
+            let mut max_bytes = MONO_FRAME_BYTE_SIZE;
+
+            while frame_pos < float_buffer.len() {
+                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * sample_len)])
+                    .and_then(|byte_len| {
+                        let target = byte_len/sample_len;
+                        (&simd_float_bytes[..byte_len])
+                            .read_f32_into::<LittleEndian>(
+                                &mut simd_float_buf[..target]
+                            )
+                            .map(|_| target)
+                    })
+                    .map(|f32_len| {
+                        let new_pos = frame_pos + (2 * f32_len);
+                        for (els, new_el) in float_buffer[frame_pos..new_pos].chunks_exact_mut(2).zip(&simd_float_buf[..f32_len]) {
+                            let sample = volume * new_el;
+                            els[0] += sample;
+                            els[1] += sample;
+                        }
+                        new_pos
+                    });
+
+                match progress {
+                    Ok(v) => {
+                        let delta = v - frame_pos;
+                        frame_pos = v;
+                        max_bytes -= delta * sample_len / 2;
+                    },
                     Err(ref e) => {
                         return if e.kind() == IoErrorKind::UnexpectedEof {
-                            Some(i)
+                            Some(frame_pos)
                         } else {
+                            error!("Input died unexpectedly: {:?}", e);
                             None
                         }
                     },
-                };
-                let sample = volume * raw;
-
-                float_buffer[float_index] += sample;
-                float_buffer[float_index+1] += sample;
-
-                float_index += 2;
+                }
             }
         }
 
