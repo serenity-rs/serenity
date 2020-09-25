@@ -38,8 +38,9 @@ impl ReceiverExt for WsStream {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_millis(500);
 
         let ws_message = match timeout(TIMEOUT, self.next()).await {
-            Ok(v) => v.map(|v| v.ok()).flatten(),
-            Err(_) => None,
+            Ok(Some(Ok(v))) => Some(v),
+            Ok(Some(Err(e))) => return Err(e.into()),
+            Ok(None) | Err(_) => None,
         };
 
         convert_ws_message(ws_message)
