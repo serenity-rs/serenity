@@ -509,28 +509,6 @@ impl ShardRunner {
             },
             Ok(None) => Ok(None),
             Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
-                // Check that an amount of time at least double the
-                // heartbeat_interval has passed.
-                //
-                // If not, continue on trying to receive messages.
-                //
-                // If it has, attempt to auto-reconnect.
-                {
-                    let last = self.shard.last_heartbeat_ack();
-                    let interval = self.shard.heartbeat_interval();
-
-                    if let (Some(last_heartbeat_ack), Some(interval)) = (last, interval) {
-                        let seconds_passed = last_heartbeat_ack.elapsed().as_secs();
-                        let interval_in_secs = interval / 1000;
-
-                        if seconds_passed <= interval_in_secs * 2 {
-                            return Ok((None, None, true));
-                        }
-                    } else {
-                        return Ok((None, None, true));
-                    }
-                }
-
                 debug!("Attempting to auto-reconnect");
 
                 match self.shard.reconnection_type() {
