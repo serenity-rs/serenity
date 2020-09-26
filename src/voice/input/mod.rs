@@ -25,7 +25,6 @@ use crate::{
 };
 use dca::DcaMetadata;
 use futures::executor;
-use tracing::{debug, error, warn};
 use parking_lot::Mutex;
 use std::{
     convert::TryFrom,
@@ -57,6 +56,7 @@ use tokio::{
     io::{AsyncRead, AsyncReadExt},
     process::Command as TokioCommand,
 };
+use tracing::{debug, error, trace, warn};
 
 /// Type of data being passed into an [`Input`].
 ///
@@ -793,14 +793,17 @@ impl<R: Read + Sized> ReadAudioExt for R {
                         for (el, new_el) in float_buffer[frame_pos..new_pos].iter_mut().zip(&simd_float_buf[..f32_len]) {
                             *el += volume * new_el;
                         }
-                        new_pos
+                        (new_pos, f32_len)
                     });
 
                 match progress {
-                    Ok(v) => {
-                        let delta = v - frame_pos;
-                        frame_pos = v;
+                    Ok((new_pos, delta)) => {
+                        frame_pos = new_pos;
                         max_bytes -= delta * sample_len;
+
+                        if delta == 0 {
+                            break;
+                        }
                     },
                     Err(ref e) => {
                         return if e.kind() == IoErrorKind::UnexpectedEof {
@@ -832,14 +835,17 @@ impl<R: Read + Sized> ReadAudioExt for R {
                             els[0] += sample;
                             els[1] += sample;
                         }
-                        new_pos
+                        (new_pos, f32_len)
                     });
 
                 match progress {
-                    Ok(v) => {
-                        let delta = v - frame_pos;
-                        frame_pos = v;
-                        max_bytes -= delta * sample_len / 2;
+                    Ok((new_pos, delta)) => {
+                        frame_pos = new_pos;
+                        max_bytes -= delta * sample_len;
+
+                        if delta == 0 {
+                            break;
+                        }
                     },
                     Err(ref e) => {
                         return if e.kind() == IoErrorKind::UnexpectedEof {
@@ -853,7 +859,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
             }
         }
 
-        Some(float_buffer.len())
+        Some(frame_pos * sample_len)
     }
 
     fn consume(&mut self, amt: usize) -> usize {

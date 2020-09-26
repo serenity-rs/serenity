@@ -34,10 +34,10 @@ use flume::{
     Receiver,
     TryRecvError,
 };
-use tracing::error;
 use rand::random;
 use spin_sleep::SpinSleeper;
 use std::time::Instant;
+use tracing::{debug, error};
 use xsalsa20poly1305::{
     aead::AeadInPlace,
     TAG_SIZE,
@@ -199,6 +199,7 @@ impl Mixer {
         mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
         interconnect: &Interconnect,
     ) -> Result<(usize, &'a[u8])> {
+        debug!("Mixing {:?} tracks", self.tracks.len());
         let mut len = 0;
 
         // Opus frame passthrough.
@@ -211,6 +212,7 @@ impl Mixer {
 
         if do_passthrough {
             let opus_len = (&mut self.tracks[0]).source.read_opus_frame(opus_frame)?;
+            debug!("Frame passthrough: {:?} bytes", opus_len);
             Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]))
         } else {
             for (i, track) in self.tracks.iter_mut().enumerate() {
@@ -221,6 +223,7 @@ impl Mixer {
                     continue;
                 }
 
+                debug!("Mixing track {}", i);
                 let temp_len = stream.mix(mix_buffer, vol);
 
                 len = len.max(temp_len);
