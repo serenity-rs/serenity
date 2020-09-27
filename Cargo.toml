@@ -84,9 +84,7 @@ version = "1.1"
 
 [dependencies.streamcatcher]
 optional = true
-# version = "0.0.1"
-git = "https://github.com/FelixMcFelix/streamcatcher.git"
-branch = "breaking"
+version = "0.1.0"
 
 [dependencies.async-tungstenite]
 default-features = false
