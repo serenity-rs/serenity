@@ -10,5 +10,6 @@ log = "0.4"
 tokio = { version = "0.2", features = ["macros", "rt-core", "time"] }
 
 [dependencies.serenity]
-features = ["client", "rustls_backend"]
+default-features = false
+features = ["client", "gateway", "rustls_backend", "model"]
 path = "../../"
