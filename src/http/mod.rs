@@ -28,10 +28,12 @@ pub mod error;
 pub mod ratelimiting;
 pub mod request;
 pub mod routing;
+pub mod typing;
 
 pub use reqwest::StatusCode;
 pub use self::client::*;
 pub use self::error::Error as HttpError;
+pub use self::typing::*;
 
 use reqwest::Method;
 use crate::model::prelude::*;

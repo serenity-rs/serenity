@@ -15,7 +15,9 @@ use crate::builder::{
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
 #[cfg(feature = "http")]
-use crate::http::Http;
+use crate::http::{Http, Typing};
+#[cfg(feature = "model")]
+use std::sync::Arc;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -308,6 +310,57 @@ impl PrivateChannel {
     where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>
     {
         self.id.send_message(&http, f).await
+    }
+
+    /// Starts typing in the channel for an indefinite period of time.
+    ///
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
+    /// on the returned struct to stop typing. Note that on some clients, typing may persist
+    /// for a few seconds after `stop` is called.
+    /// Typing is also stopped when the struct is dropped.
+    ///
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
+    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    ///
+    /// This should rarely be used for bots, although it is a good indicator that a
+    /// long-running command is still being processed.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # use serenity::{
+    /// #    cache::Cache,
+    /// #    http::{Http, Typing},
+    /// #    model::{ModelError, channel::PrivateChannel, id::ChannelId},
+    /// #    Result,
+    /// # };
+    /// # use std::sync::Arc;
+    /// #
+    /// # fn long_process() {}
+    /// # async fn run() -> Result<()> {
+    /// # let http = Arc::new(Http::new_with_token(""));
+    /// # let cache = Cache::default();
+    /// # let channel = cache.private_channel(ChannelId(7))
+    /// #    .await
+    /// #    .ok_or(ModelError::ItemMissing)?;
+    /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
+    /// let typing = channel.start_typing(&http)?;
+    ///
+    /// // Run some long-running process
+    /// long_process();
+    ///
+    /// // Stop typing
+    /// typing.stop();
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Typing`]: ../../http/typing/struct.Typing.html
+    /// [`Typing::stop`]: ../../http/typing/struct.Typing.html#method.stop
+    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+        http.start_typing(self.id.0)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

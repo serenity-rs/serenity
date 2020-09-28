@@ -16,9 +16,11 @@ use crate::http::AttachmentType;
 #[cfg(feature = "model")]
 use crate::utils;
 #[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
+use crate::http::{Http, CacheHttp, Typing};
 #[cfg(feature = "model")]
 use serde_json::json;
+#[cfg(feature = "model")]
+use std::sync::Arc;
 use futures::stream::Stream;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
@@ -671,6 +673,47 @@ impl ChannelId {
         }
 
         Ok(message)
+    }
+
+    /// Starts typing in the channel for an indefinite period of time.
+    ///
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
+    /// on the returned struct to stop typing. Note that on some clients, typing may persist
+    /// for a few seconds after `stop` is called.
+    /// Typing is also stopped when the struct is dropped.
+    ///
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
+    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    ///
+    /// This should rarely be used for bots, although it is a good indicator that a
+    /// long-running command is still being processed.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// # use serenity::{http::{Http, Typing}, Result, model::id::ChannelId};
+    /// # use std::sync::Arc;
+    /// #
+    /// # fn long_process() {}
+    /// # fn main() -> Result<()> {
+    /// # let http = Arc::new(Http::default());
+    /// // Initiate typing (assuming http is `Arc<Http>`)
+    /// let typing = ChannelId(7).start_typing(&http)?;
+    ///
+    /// // Run some long-running process
+    /// long_process();
+    ///
+    /// // Stop typing
+    /// typing.stop();
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Typing`]: ../../http/typing/struct.Typing.html
+    /// [`Typing::stop`]: ../../http/typing/struct.Typing.html#method.stop
+    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+        http.start_typing(self.0)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.
