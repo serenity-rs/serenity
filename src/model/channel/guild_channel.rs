@@ -738,6 +738,7 @@ impl GuildChannel {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::{
     /// #    cache::Cache,
     /// #    http::{Http, Typing},
@@ -747,7 +748,6 @@ impl GuildChannel {
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # async fn run() -> Result<()> {
     /// # let http = Arc::new(Http::new_with_token(""));
     /// # let cache = Cache::default();
     /// # let channel = cache
