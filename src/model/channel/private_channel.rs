@@ -339,7 +339,7 @@ impl PrivateChannel {
     /// # use std::sync::Arc;
     /// #
     /// # fn long_process() {}
-    /// # let http = Arc::new(Http::new_with_token(""));
+    /// # let http = Arc::new(Http::default());
     /// # let cache = Cache::default();
     /// # let channel = cache.private_channel(ChannelId(7))
     /// #    .await
