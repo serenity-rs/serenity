@@ -13,6 +13,9 @@ tracing-futures = "0.2"
 features = ["cache", "framework", "standard_framework", "voice", "http", "rustls_backend"]
 path = "../../"
 
+[dependencies.songbird]
+path = "../../songbird"
+
 [dependencies.tokio]
 version = "0.2"
 features = ["macros"]

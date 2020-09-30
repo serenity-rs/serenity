@@ -18,10 +18,6 @@ tracing-futures = "0.2"
 serde_json = "1"
 async-trait = "0.1"
 
-[dependencies.audiopus]
-optional = true
-version = "0.2"
-
 [dependencies.command_attr]
 path = "./command_attr"
 version = "0.3.0-rc.1"
@@ -39,30 +35,13 @@ version = "0.6.0"
 optional = true
 version = "0.12"
 
-[dependencies.byteorder]
-optional = true
-version = "1"
-
 [dependencies.chrono]
 features = ["serde"]
 version = "0.4"
 
-[dependencies.discortp]
-features = ["discord-full"]
-optional = true
-version = "0.2"
-
 [dependencies.flate2]
 optional = true
 version = "1"
-
-[dependencies.flume]
-optional = true
-version = "0.9"
-
-[dependencies.parking_lot]
-optional = true
-version = "0.11"
 
 [dependencies.reqwest]
 default-features = false
@@ -70,21 +49,9 @@ features = ["json", "stream"]
 optional = true
 version = "0.10"
 
-[dependencies.rand]
-optional = true
-version = "0.7"
-
-[dependencies.spin_sleep]
-optional = true
-version = "1"
-
 [dependencies.static_assertions]
 optional = true
 version = "1.1"
-
-[dependencies.streamcatcher]
-optional = true
-version = "0.1.0"
 
 [dependencies.async-tungstenite]
 default-features = false
@@ -103,10 +70,6 @@ version = "^2.1"
 [dependencies.bytes]
 optional = true
 version = "0.5"
-
-[dependencies.xsalsa20poly1305]
-optional = true
-version = "0.4.2"
 
 [dependencies.tokio]
 version = "0.2"
@@ -167,21 +130,7 @@ native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
-voice = [
-    "audiopus",
-    "byteorder",
-    "discortp",
-    "flume",
-    "gateway",
-    "parking_lot",
-    "rand",
-    "spin_sleep",
-    "streamcatcher",
-    "tokio/fs",
-    "tokio/io-util",
-    "tokio/process",
-    "xsalsa20poly1305",
-]
+voice = ["client", "model"]
 
 [package.metadata.docs.rs]
 all-features = true

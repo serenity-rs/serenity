@@ -1,11 +1,11 @@
-use crate::{
+use serenity::{
     constants::VoiceOpCode,
     model::event::VoiceSpeakingState,
 };
 use serde_json::{json, Value};
-use super::{
+use crate::{
     connection_info::ConnectionInfo,
-    constants::CRYPTO_MODE,
+    crypto::Mode,
 };
 
 #[inline]
@@ -42,14 +42,14 @@ pub fn build_resume(info: &ConnectionInfo) -> Value {
 }
 
 #[inline]
-pub fn build_select_protocol(address: ::std::borrow::Cow<'_, str>, port: u16) -> Value {
+pub fn build_select_protocol(address: ::std::borrow::Cow<'_, str>, port: u16, crypto_mode: Mode) -> Value {
     json!({
         "op": VoiceOpCode::SelectProtocol.num(),
         "d": {
             "protocol": "udp",
             "data": {
                 "address": address,
-                "mode": CRYPTO_MODE,
+                "mode": crypto_mode.to_request_str(),
                 "port": port,
             }
         }

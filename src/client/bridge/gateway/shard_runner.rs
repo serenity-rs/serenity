@@ -25,7 +25,7 @@ use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use super::super::voice::ClientVoiceManager;
+use super::super::voice::VoiceGatewayManager;
 #[cfg(feature = "voice")]
 use tokio::sync::Mutex;
 #[cfg(feature = "collector")]
@@ -49,7 +49,7 @@ pub struct ShardRunner {
     runner_tx: Sender<InterMessage>,
     pub(crate) shard: Shard,
     #[cfg(feature = "voice")]
-    voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     cache_and_http: Arc<CacheAndHttp>,
     #[cfg(feature = "collector")]
     message_filters: Vec<MessageFilter>,
@@ -431,34 +431,26 @@ impl ShardRunner {
     #[cfg(feature = "voice")]
     #[instrument(skip(self))]
     async fn handle_voice_event(&self, event: &Event) {
-        match *event {
-            Event::Ready(_) => {
-                self.voice_manager.lock().await.set(
-                    self.shard.shard_info()[0],
-                    self.runner_tx.clone(),
-                );
-            },
-            Event::VoiceServerUpdate(ref event) => {
-                if let Some(guild_id) = event.guild_id {
-                    let mut manager = self.voice_manager.lock().await;
-                    let search = manager.get_mut(guild_id);
-
-                    if let Some(handler) = search {
-                        handler.update_server(&event.endpoint, &event.token);
+        if let Some(voice_manager) = &self.voice_manager {
+            match *event {
+                Event::Ready(_) => {
+                    voice_manager.register_shard(
+                        self.shard.shard_info()[0],
+                        self.runner_tx.clone(),
+                    ).await;
+                },
+                Event::VoiceServerUpdate(ref event) => {
+                    if let Some(guild_id) = event.guild_id {
+                        voice_manager.server_update(guild_id, &event.endpoint, &event.token).await;
                     }
-                }
-            },
-            Event::VoiceStateUpdate(ref event) => {
-                if let Some(guild_id) = event.guild_id {
-                    let mut manager = self.voice_manager.lock().await;
-                    let search = manager.get_mut(guild_id);
-
-                    if let Some(handler) = search {
-                        handler.update_state(&event.voice_state);
+                },
+                Event::VoiceStateUpdate(ref event) => {
+                    if let Some(guild_id) = event.guild_id {
+                        voice_manager.state_update(guild_id, &event.voice_state).await;
                     }
-                }
-            },
-            _ => {},
+                },
+                _ => {},
+            }
         }
     }
 
@@ -604,8 +596,8 @@ impl ShardRunner {
         }
 
         #[cfg(feature = "voice")]
-        {
-            self.voice_manager.lock().await.manager_remove(shard_id.0);
+        if let Some(voice_manager) = &self.voice_manager {
+            voice_manager.deregister_shard(shard_id.0).await;
         }
 
         Ok(())
@@ -633,6 +625,6 @@ pub struct ShardRunnerOptions {
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
     #[cfg(feature = "voice")]
-    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync>>,
     pub cache_and_http: Arc<CacheAndHttp>,
 }

@@ -15,17 +15,15 @@ use audiopus::{
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::OpusCompressor;
 use crate::{
-    internal::prelude::*,
-    prelude::SerenityError,
-    voice::{
-        constants::*,
-        error::DcaError,
-        VoiceError,
-    },
+    constants::*,
+    error::DcaError,
+    Result,
+    Error,
 };
 use dca::DcaMetadata;
 use futures::executor;
 use parking_lot::Mutex;
+use serde_json::Value;
 use std::{
     convert::TryFrom,
     fs::File,
@@ -47,6 +45,7 @@ use std::{
     },
     mem,
     process::{Child, Command, Stdio},
+    result::Result as StdResult,
     sync::Arc,
     time::Duration,
 };
@@ -1055,7 +1054,7 @@ async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         .arg("-i")
         .arg("-")
         .args(&ffmpeg_args)
-        .stdin(youtube_dl.stdout.ok_or(SerenityError::Other("Failed to open youtube-dl stdout"))?)
+        .stdin(youtube_dl.stdout.ok_or(Error::Stdout)?)
         .stderr(Stdio::null())
         .stdout(Stdio::piped())
         .spawn()?;
@@ -1092,7 +1091,7 @@ async fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
     if let Some(count) = metadata.channels {
         Ok((count == 2, metadata))
     } else {
-        Err(Error::Voice(VoiceError::Streams))
+        Err(Error::Streams)
     }
 }
 

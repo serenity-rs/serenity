@@ -6,21 +6,20 @@ use audiopus::{
     softclip::SoftClip,
 };
 use crate::{
-    internal::prelude::*,
-    voice::{
-        constants::*,
-        threading::{
-            AuxPacketMessage,
-            EventMessage,
-            Interconnect,
-            MixerConnection,
-            MixerMessage,
-            TrackStateChange,
-            UdpMessage,
-        },
-        tracks::{Track, PlayMode},
-        Status,
+    constants::*,
+    tasks::{
+        AuxPacketMessage,
+        EventMessage,
+        Interconnect,
+        MixerConnection,
+        MixerMessage,
+        TrackStateChange,
+        UdpMessage,
     },
+    tracks::{Track, PlayMode},
+    Error,
+    Result,
+    Status,
 };
 use discortp::{
     rtp::{
@@ -164,7 +163,7 @@ impl Mixer {
             }
 
             if let Err(e) = self.cycle(&interconnect) {
-                if matches!(e, Error::VoiceInterconnectFailure) {
+                if matches!(e, Error::InterconnectFailure) {
                     let _ = interconnect.core.send(Status::RebuildInterconnect);
 
                 }

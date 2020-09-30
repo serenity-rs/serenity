@@ -2,6 +2,9 @@ use audiopus::{Bitrate, SampleRate};
 use discortp::rtp::RtpType;
 use std::time::Duration;
 
+/// The voice gateway version used by the library.
+pub const VOICE_GATEWAY_VERSION: u8 = 4;
+
 /// Sample rate of audio to be sent to Discord.
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;
 
@@ -58,5 +61,3 @@ pub const RTP_VERSION: u8 = 2;
 
 /// Profile type used by Discord's Opus audio traffic.
 pub const RTP_PROFILE_TYPE: RtpType = RtpType::Dynamic(120);
-
-pub const CRYPTO_MODE: &str = "xsalsa20_poly1305";

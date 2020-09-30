@@ -2,28 +2,25 @@ use audiopus::{
     Channels,
     coder::Decoder as OpusDecoder,
 };
-use crate::{
-    error::Result,
-    gateway::WsStream,
-    internal::{
-        ws_impl::{ReceiverExt, SenderExt},
-        Timer,
-    },
+use serenity::{
     model::event::{VoiceEvent, VoiceSpeakingState},
-    voice::{
-        constants::*,
-        error::VoiceError,
-        events::{
-            CoreContext,
-        },
-        payload,
-        threading::{
-            AuxPacketMessage,
-            EventMessage,
-            Interconnect,
-        },
-        Status,
+};
+use crate::{
+    constants::*,
+    error::Error,
+    events::{
+        CoreContext,
     },
+    payload,
+    tasks::{
+        AuxPacketMessage,
+        EventMessage,
+        Interconnect,
+    },
+    timer::Timer,
+    ws::{ReceiverExt, SenderExt, WsStream},
+    Result,
+    Status,
 };
 use discortp::{
     demux::{
@@ -131,7 +128,7 @@ impl SsrcState {
                 .map(|pkt| pkt.packet_size())
                 .ok_or_else(|| {
                     error!("[Voice] Extension packet indicated, but insufficient space.");
-                    VoiceError::IllegalVoicePacket
+                    Error::IllegalVoicePacket
                 })
         } else {
             Ok(0)
@@ -448,9 +445,8 @@ fn decrypt_in_place(packet: &mut impl MutablePacket, cipher: &Cipher) -> Result<
     let (tag_bytes, data_bytes) = data.split_at_mut(TAG_SIZE);
     let tag = Tag::from_slice(tag_bytes);
 
-    cipher.decrypt_in_place_detached(&nonce, b"", data_bytes, tag)
-        .map(|_| TAG_SIZE)
-        .map_err(|_| VoiceError::Decryption.into())
+    Ok(cipher.decrypt_in_place_detached(&nonce, b"", data_bytes, tag)
+        .map(|_| TAG_SIZE)?)
 }
 
 #[inline]

@@ -9,8 +9,9 @@ use audiopus::{
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use crate::{
-    internal::prelude::*,
-    voice::{constants::*, VoiceError},
+    constants::*,
+    Result,
+    Error,
 };
 use tracing::debug;
 use std::{
@@ -22,6 +23,7 @@ use std::{
         Result as IoResult,
     },
     mem,
+    result::Result as StdResult,
     sync::atomic::{
         AtomicUsize,
         Ordering,
@@ -134,7 +136,7 @@ impl Memory {
         }
 
         let raw = config.build(Box::new(source.reader))
-            .map_err(VoiceError::Streamcatcher)?;
+            .map_err(Error::Streamcatcher)?;
 
         Ok(Self {
             raw,
@@ -246,7 +248,7 @@ impl Compressed {
         let raw = config.build_tx(
             Box::new(source),
             OpusCompressor::new(encoder, stereo),
-        ).map_err(VoiceError::Streamcatcher)?;
+        ).map_err(Error::Streamcatcher)?;
 
         Ok(Self {
             raw,

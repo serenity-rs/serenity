@@ -8,17 +8,12 @@
 //! ```
 use std::{env, sync::Arc};
 
-// Import the client's bridge to the voice manager. Since voice is a standalone
-// feature, it's not as ergonomic to work with as it could be. The client
-// provides a clean bridged integration with voice.
-use serenity::client::bridge::voice::ClientVoiceManager;
+// This trait adds the `register_songbird` and `register_songbird_with` methods
+// to the client builder below, making it easy to install this voice client.
+// The voice client can be retrieved in any command using `songbird::get(ctx).await`.
+use songbird::SerenityInit;
 
-// Import the `Context` from the client and `parking_lot`'s `Mutex`.
-//
-// `parking_lot` offers much more efficient implementations of `std::sync`'s
-// types. You can read more about it here:
-//
-// <https://github.com/Amanieu/parking_lot#features>
+// Import the `Context` and tokio's asynchronous `Mutex` from the client.
 use serenity::{client::Context, prelude::Mutex};
 
 use serenity::{
@@ -33,16 +28,9 @@ use serenity::{
     },
     model::{channel::Message, gateway::Ready, misc::Mentionable},
     Result as SerenityResult,
-    voice,
 };
 
 use serenity::prelude::*;
-
-struct VoiceManager;
-
-impl TypeMapKey for VoiceManager {
-    type Value = Arc<Mutex<ClientVoiceManager>>;
-}
 
 struct Handler;
 
@@ -73,16 +61,9 @@ async fn main() {
     let mut client = Client::new(&token)
         .event_handler(Handler)
         .framework(framework)
+        .register_songbird()
         .await
         .expect("Err creating client");
-
-    // Obtain a lock to the data owned by the client, and insert the client's
-    // voice manager into it. This allows the voice manager to be accessible by
-    // event handlers and framework commands.
-    {
-        let mut data = client.data.write().await;
-        data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
-    }
 
     let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
 }
@@ -98,7 +79,8 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = ctx.data.read().await.get::<VoiceManager>().cloned().unwrap();
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
 
     let handler = match manager.get_mut(guild_id) {
@@ -147,7 +129,8 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         }
     };
 
-    let manager_lock = ctx.data.read().await.get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
 
     if manager.join(guild_id, connect_to).is_some() {
@@ -170,7 +153,8 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = ctx.data.read().await.get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 
@@ -196,8 +180,8 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
 
     let handler = match manager.get_mut(guild_id) {
@@ -253,12 +237,12 @@ async fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         },
     };
 
-    let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
-        let source = match voice::ytdl(&url).await {
+        let source = match songbird::ytdl(&url).await {
             Ok(source) => source,
             Err(why) => {
                 println!("Err starting source: {:?}", why);
@@ -290,8 +274,8 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {
@@ -315,8 +299,8 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         },
     };
-    let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
+    let manager_lock = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let mut manager = manager_lock.lock().await;
 
     if let Some(handler) = manager.get_mut(guild_id) {

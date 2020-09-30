@@ -3,26 +3,28 @@ mod events;
 mod mixer;
 
 use audiopus::Bitrate;
-use crate::{
-    error::Error,
+use serenity::{
+    // error::Error,
     gateway::WsStream,
     model::id::GuildId,
-    voice::{
-        connection::Connection,
-        events::{
-            CoreContext,
-            EventData,
-            EventStore,
-        },
-        tracks::{
-            LoopState,
-            PlayMode,
-            Track,
-            TrackHandle,
-            TrackState,
-        },
-        Status,
+};
+use crate::{
+    connection::Connection,
+    events::{
+        CoreContext,
+        EventData,
+        EventStore,
     },
+    tracks::{
+        LoopState,
+        PlayMode,
+        Track,
+        TrackHandle,
+        TrackState,
+    },
+    Error,
+    Result,
+    Status,
 };
 use flume::{
     Receiver,
@@ -243,7 +245,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
                             connection = Some(conn);
                             false
                         },
-                        Err(Error::VoiceInterconnectFailure) => {
+                        Err(Error::InterconnectFailure) => {
                             interconnect.restart_volatile_internals(guild_id);
 
                             match conn.reconnect(&interconnect).await {

@@ -24,7 +24,7 @@ use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use crate::client::bridge::voice::ClientVoiceManager;
+use crate::client::bridge::voice::VoiceGatewayManager;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -136,7 +136,7 @@ impl ShardManager {
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
             #[cfg(feature = "voice")]
-            voice_manager: Arc::clone(opt.voice_manager),
+            voice_manager: opt.voice_manager.clone(),
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
             guild_subscriptions: opt.guild_subscriptions,
@@ -363,7 +363,7 @@ pub struct ShardManagerOptions<'a> {
     pub shard_init: u64,
     pub shard_total: u64,
     #[cfg(feature = "voice")]
-    pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: &'a Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
     pub guild_subscriptions: bool,

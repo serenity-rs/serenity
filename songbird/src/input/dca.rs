@@ -1,3 +1,4 @@
+use serde::Deserialize;
 use super::Metadata;
 
 #[derive(Debug, Deserialize)]

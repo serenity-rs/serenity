@@ -1,21 +1,19 @@
 use async_trait::async_trait;
 use crate::{
-    voice::{
-        events::{
-            Event,
-            EventContext,
-            EventData,
-            EventHandler,
-            TrackEvent,
-        },
-        Handler,
-        input::Input,
-        tracks::{
-            self,
-            Track,
-            TrackHandle,
-            TrackResult,
-        },
+    events::{
+        Event,
+        EventContext,
+        EventData,
+        EventHandler,
+        TrackEvent,
+    },
+    Handler,
+    input::Input,
+    tracks::{
+        self,
+        Track,
+        TrackHandle,
+        TrackResult,
     },
 };
 use tracing::{debug, info, warn};

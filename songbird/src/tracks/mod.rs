@@ -3,21 +3,19 @@
 mod queue;
 
 use crate::{
-    voice::{
-        constants::*,
-        events::{
-            Event,
-            EventContext,
-            EventData,
-            EventHandler,
-            EventStore,
-        },
-        input::Input,
-        threading::{
-            EventMessage,
-            Interconnect,
-            TrackStateChange,
-        },
+    constants::*,
+    events::{
+        Event,
+        EventContext,
+        EventData,
+        EventHandler,
+        EventStore,
+    },
+    input::Input,
+    tasks::{
+        EventMessage,
+        Interconnect,
+        TrackStateChange,
     },
 };
 use futures::future::BoxFuture;

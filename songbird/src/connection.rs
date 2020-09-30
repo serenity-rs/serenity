@@ -1,24 +1,21 @@
-use crate::{
-    constants::VOICE_GATEWAY_VERSION,
-    gateway::WsStream,
-    internal::{
-        prelude::*,
-        ws_impl::{ReceiverExt, SenderExt},
-    },
+use serenity::{
     model::event::VoiceEvent,
-    voice::{
-        connection_info::ConnectionInfo,
-        constants::*,
-        payload,
-        threading::{
-            AuxPacketMessage,
-            Interconnect,
-            MixerConnection,
-            MixerMessage,   
-            UdpMessage,
-        },
-        VoiceError,
+};
+use crate::{
+    connection_info::ConnectionInfo,
+    constants::*,
+    crypto::Mode as CryptoMode,
+    payload,
+    tasks::{
+        AuxPacketMessage,
+        Interconnect,
+        MixerConnection,
+        MixerMessage,   
+        UdpMessage,
     },
+    ws::{self, ReceiverExt, SenderExt, WsStream},
+    Result,
+    Error,
 };
 use discortp::discord::{
     IpDiscoveryPacket,
@@ -41,11 +38,11 @@ use xsalsa20poly1305::{
 };
 
 
-#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
-use crate::internal::ws_impl::create_rustls_client;
+#[cfg(all(feature = "rustls", not(feature = "native")))]
+use ws::create_rustls_client;
 
-#[cfg(feature = "native_tls_backend")]
-use crate::internal::ws_impl::create_native_tls_client;
+#[cfg(feature = "native")]
+use ws::create_native_tls_client;
 
 pub(crate) struct Connection {
     pub(crate) connection_info: ConnectionInfo,
@@ -55,10 +52,10 @@ impl Connection {
     pub(crate) async fn new(mut info: ConnectionInfo, interconnect: &Interconnect) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
-        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+        #[cfg(all(feature = "rustls", not(feature = "native")))]
         let mut client = create_rustls_client(url).await?;
 
-        #[cfg(feature = "native_tls_backend")]
+        #[cfg(feature = "native")]
         let mut client = create_native_tls_client(url).await?;
 
         let mut hello = None;
@@ -87,7 +84,7 @@ impl Connection {
                 other => {
                     debug!("[Voice] Expected ready/hello; got: {:?}", other);
 
-                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
+                    return Err(Error::ExpectedHandshake);
                 },
             }
         };
@@ -95,8 +92,8 @@ impl Connection {
         let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
         let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
-        if !has_valid_mode(&ready.modes) {
-            return Err(Error::Voice(VoiceError::VoiceModeUnavailable));
+        if !has_valid_mode(&ready.modes, CryptoMode::Normal) {
+            return Err(Error::CryptoModeUnavailable);
         }
 
         let mut udp = UdpSocket::bind("0.0.0.0:0").await?;
@@ -120,14 +117,14 @@ impl Connection {
         let (len, _addr) = udp.recv_from(&mut bytes).await?;
         {
             let view = IpDiscoveryPacket::new(&bytes[..len])
-                .ok_or_else(|| Error::Voice(VoiceError::IllegalDiscoveryResponse))?;
+                .ok_or_else(|| Error::IllegalDiscoveryResponse)?;
 
             if view.get_pkt_type() != IpDiscoveryType::Response {
-                return Err(Error::Voice(VoiceError::IllegalDiscoveryResponse));
+                return Err(Error::IllegalDiscoveryResponse);
             }
 
             let addr = String::from_utf8_lossy(&view.get_address_raw());
-            client.send_json(&payload::build_select_protocol(addr, view.get_port())).await?;
+            client.send_json(&payload::build_select_protocol(addr, view.get_port(), CryptoMode::Normal)).await?;
         }
 
         let cipher = init_cipher(&mut client).await?;
@@ -198,10 +195,10 @@ impl Connection {
         // Thread may have died, we want to send to prompt a clean exit
         // (if at all possible) and then proceed as normal.
 
-        #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+        #[cfg(all(feature = "rustls", not(feature = "native")))]
         let mut client = create_rustls_client(url).await?;
 
-        #[cfg(feature = "native_tls_backend")]
+        #[cfg(feature = "native")]
         let mut client = create_native_tls_client(url).await?;
 
         client.send_json(&payload::build_resume(&self.connection_info)).await?;
@@ -231,7 +228,7 @@ impl Connection {
                 other => {
                     debug!("[Voice] Expected resumed/hello; got: {:?}", other);
 
-                    return Err(Error::Voice(VoiceError::ExpectedHandshake));
+                    return Err(Error::ExpectedHandshake);
                 },
             }
         };
@@ -260,7 +257,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
     }
 
     Url::parse(&format!("wss://{}/?v={}", endpoint, VOICE_GATEWAY_VERSION))
-        .or(Err(Error::Voice(VoiceError::EndpointUrl)))
+        .or(Err(Error::EndpointUrl))
 }
 
 #[inline]
@@ -273,18 +270,12 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
 
         match VoiceEvent::deserialize(value)? {
             VoiceEvent::SessionDescription(desc) => {
-                if desc.mode != CRYPTO_MODE {
-                    return Err(Error::Voice(VoiceError::VoiceModeInvalid));
+                // FIXME: check against config.
+                if desc.mode != CryptoMode::Normal.to_request_str() {
+                    return Err(Error::CryptoModeInvalid);
                 }
 
-                // TODO: use `XSalsa20Poly1305::new_varkey`. See:
-                // <https://github.com/RustCrypto/traits/pull/191>
-                if desc.secret_key.len() == KEY_SIZE {
-                    let key = Key::from_slice(&desc.secret_key);
-                    return Ok(Cipher::new(key));
-                } else {
-                    return Err(Error::Voice(VoiceError::KeyGen));
-                }
+                return Ok(Cipher::new_varkey(&desc.secret_key)?);
             },
             VoiceEvent::Unknown(op, value) => {
                 debug!(
@@ -299,9 +290,9 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
 }
 
 #[inline]
-fn has_valid_mode<T, It> (modes: It) -> bool
+fn has_valid_mode<T, It> (modes: It, mode: CryptoMode) -> bool
 where T: for<'a> PartialEq<&'a str>,
       It : IntoIterator<Item=T>
 {
-    modes.into_iter().any(|s| s == CRYPTO_MODE)
+    modes.into_iter().any(|s| s == mode.to_request_str())
 }

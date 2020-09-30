@@ -1,20 +1,19 @@
 use crate::{
-    voice::{
-        events::{
-            EventStore,
-            GlobalEvents,
-            TrackEvent,
-        },
-        threading::{
-            EventMessage,
-            Interconnect,
-            TrackStateChange,
-        },
-        tracks::{
-            TrackHandle,
-            TrackState,
-        },
+    events::{
+        EventStore,
+        GlobalEvents,
+        TrackEvent,
     },
+    tasks::{
+        EventMessage,
+        Interconnect,
+        TrackStateChange,
+    },
+    tracks::{
+        TrackHandle,
+        TrackState,
+    },
+    Result,
 };
 use flume::Receiver;
 use tracing::{debug, error, info, trace, warn};

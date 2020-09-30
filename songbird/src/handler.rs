@@ -1,5 +1,5 @@
 use audiopus::Bitrate;
-use crate::{
+use serenity::{
     constants::VoiceOpCode,
     gateway::InterMessage,
     model::{
@@ -10,20 +10,20 @@ use crate::{
         },
         voice::VoiceState,
     },
-    voice::{
-        input::Input,
-        tracks::{
-            Track,
-            TrackHandle,
-        },
-        Event,
-        EventContext,
-        EventData,
-        EventHandler,
-        Status as VoiceStatus,
-        connection_info::ConnectionInfo,
-        threading,
+};
+use crate::{
+    input::Input,
+    tracks::{
+        Track,
+        TrackHandle,
     },
+    Event,
+    EventContext,
+    EventData,
+    EventHandler,
+    Status as VoiceStatus,
+    connection_info::ConnectionInfo,
+    tasks,
 };
 use flume::{
     SendError,
@@ -436,7 +436,7 @@ impl Handler {
     ) -> Self {
         let (tx, rx) = flume::unbounded();
 
-        threading::start(guild_id, rx, tx.clone());
+        tasks::start(guild_id, rx, tx.clone());
 
         Handler {
             channel_id: None,
@@ -461,7 +461,7 @@ impl Handler {
             self.sender = tx.clone();
             self.sender.send(status).unwrap();
 
-            threading::start(self.guild_id, rx, tx);
+            tasks::start(self.guild_id, rx, tx);
 
             self.update();
         }

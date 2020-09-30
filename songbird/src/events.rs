@@ -1,18 +1,16 @@
 //! Events relating to tracks, timing, and other callers.
 use async_trait::async_trait;
+use serenity::model::event::{
+    VoiceSpeaking,
+    VoiceClientConnect,
+    VoiceClientDisconnect,
+};
 use crate::{
-    model::event::{
-        VoiceSpeaking,
-        VoiceClientConnect,
-        VoiceClientDisconnect,
-    },
-    voice::{
-        constants::*,
-        tracks::{
-            PlayMode,
-            TrackHandle,
-            TrackState,
-        },
+    constants::*,
+    tracks::{
+        PlayMode,
+        TrackHandle,
+        TrackState,
     },
 };
 use discortp::{

@@ -4,7 +4,7 @@ use audiopus::{
     Result as OpusResult,
     SampleRate,
 };
-use crate::voice::constants::*;
+use crate::constants::*;
 use std::{
     mem,
     time::Duration,
