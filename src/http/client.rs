@@ -16,6 +16,7 @@ use super::{
     ratelimiting::{Ratelimiter, RatelimitedRequest},
     request::Request,
     routing::RouteInfo,
+    typing::Typing,
     AttachmentType,
     GuildPagination,
     HttpError,
@@ -1644,6 +1645,48 @@ impl Http {
             headers: None,
             route: RouteInfo::StartIntegrationSync { guild_id, integration_id },
         }).await
+    }
+
+    /// Starts typing in the specified [`Channel`] for an indefinite period of time.
+    ///
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
+    /// on the returned struct to stop typing. Note that on some clients, typing may persist
+    /// for a few seconds after `stop` is called.
+    /// Typing is also stopped when the struct is dropped.
+    ///
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
+    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    ///
+    /// This should rarely be used for bots, although it is a good indicator that a
+    /// long-running command is still being processed.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// # use serenity::{http::{Http, Typing}, Result};
+    /// # use std::sync::Arc;
+    /// #
+    /// # fn long_process() {}
+    /// # fn main() -> Result<()> {
+    /// # let http = Arc::new(Http::default());
+    /// // Initiate typing (assuming http is `Arc<Http>`)
+    /// let typing = http.start_typing(7)?;
+    ///
+    /// // Run some long-running process
+    /// long_process();
+    ///
+    /// // Stop typing
+    /// typing.stop();
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Channel`]: ../../model/channel/enum.Channel.html
+    /// [`Typing`]: ../typing/struct.Typing.html
+    /// [`Typing::stop`]: ../typing/struct.Typing.html#method.stop
+    pub fn start_typing(self: &Arc<Self>, channel_id: u64) -> Result<Typing> {
+        Typing::start(self.clone(), channel_id)
     }
 
     /// Unpins a message from a channel.
