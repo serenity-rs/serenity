@@ -583,6 +583,7 @@ impl Client {
     ///
     /// [`Client`]: #struct.Client.html
     /// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html
+    #[allow(clippy::new_ret_no_self)] // Remnant of the async transition, but changing it would be breaking
     pub fn new<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
         ClientBuilder::new(token)
     }

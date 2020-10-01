@@ -1,6 +1,5 @@
 //! User information-related models.
 
-use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
@@ -734,7 +733,7 @@ impl User {
             }
         }
 
-        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick.clone())
+        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a future that will await one message by this user.

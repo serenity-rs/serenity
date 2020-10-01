@@ -613,7 +613,7 @@ impl Framework for StandardFramework {
 
         stream.take_while_char(|c| c.is_whitespace());
 
-        let prefix = parse::prefix(&mut ctx, &msg, &mut stream, &self.config).await;
+        let prefix = parse::prefix(&ctx, &msg, &mut stream, &self.config).await;
 
         if prefix.is_some() && stream.rest().is_empty() {
             if let Some(prefix_only) = &self.prefix_only {
@@ -713,7 +713,7 @@ impl Framework for StandardFramework {
                 };
 
                 if let Some(error) =
-                    self.should_fail(&mut ctx, &msg, &mut args, &command.options, &group.options).await
+                    self.should_fail(&ctx, &msg, &mut args, &command.options, &group.options).await
                 {
                     if let Some(dispatch) = &self.dispatch {
                         dispatch(&mut ctx, &msg, error).await;
@@ -722,7 +722,7 @@ impl Framework for StandardFramework {
                     return;
                 }
 
-                let name = command.options.names[0].clone();
+                let name = command.options.names[0];
 
                 if let Some(before) = &self.before {
                     if !before(&mut ctx, &msg, name).await {
@@ -838,7 +838,7 @@ pub(crate) fn has_correct_roles(
     } else {
         options.allowed_roles()
             .iter()
-            .flat_map(|r| roles.values().find(|role| *r == &role.name))
+            .flat_map(|r| roles.values().find(|role| *r == role.name))
             .any(|g| member.roles.contains(&g.id))
     }
 }

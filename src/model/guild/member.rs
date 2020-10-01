@@ -1,5 +1,6 @@
 use crate::model::prelude::*;
 use chrono::{DateTime, Utc};
+use std::cmp::Reverse;
 use std::fmt::{
     Display,
     Formatter,
@@ -132,7 +133,7 @@ impl Member {
             .filter_map(|role_id| guild_roles.get(role_id))
             .collect::<Vec<&Role>>();
 
-        roles.sort_by(|a, b| b.cmp(a));
+        roles.sort_by_key(|&b| Reverse(b));
 
         let default = Colour::default();
 

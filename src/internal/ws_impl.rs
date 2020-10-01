@@ -1,7 +1,6 @@
 use flate2::read::ZlibDecoder;
 use crate::gateway::{GatewayError, WsStream};
 use crate::internal::prelude::*;
-use serde_json;
 use async_tungstenite::tungstenite::Message;
 use async_trait::async_trait;
 use tracing::{warn, instrument};
@@ -57,9 +56,7 @@ impl SenderExt for SplitSink<WsStream, Message> {
         Ok(serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
-            .and_then(|m| {
-                Ok(self.send(m))
-            })?
+            .map(|m| self.send(m))?
             .await?)
     }
 }
@@ -70,9 +67,7 @@ impl SenderExt for WsStream {
         Ok(serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
-            .and_then(|m| {
-                Ok(self.send(m))
-            })?
+            .map(|m| self.send(m))?
             .await?)
     }
 }
@@ -153,7 +148,7 @@ impl StdError for RustlsError {
 #[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
-        url.into(),
+        url,
         Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,

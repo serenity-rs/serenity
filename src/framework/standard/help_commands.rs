@@ -395,18 +395,16 @@ async fn check_command_behaviour(
 ) -> HelpBehaviour {
     let b = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
 
-    if b == HelpBehaviour::Nothing {
-        if !options.owner_privilege || !owners.contains(&msg.author.id) {
-            for check in group_checks.iter().chain(options.checks) {
-                if !check.check_in_help {
-                    continue;
-                }
+    if b == HelpBehaviour::Nothing && (!options.owner_privilege || !owners.contains(&msg.author.id)) {
+        for check in group_checks.iter().chain(options.checks) {
+            if !check.check_in_help {
+                continue;
+            }
 
-                let mut args = Args::new("", &[]);
+            let mut args = Args::new("", &[]);
 
-                if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {
-                    return help_options.lacking_conditions;
-                }
+            if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {
+                return help_options.lacking_conditions;
             }
         }
     }
@@ -1202,9 +1200,7 @@ async fn send_suggestion_embed(
     suggestions: &Suggestions,
     colour: Colour,
 ) -> Result<Message, Error> {
-    let text = help_description
-        .replace("{}", &suggestions.join("`, `"))
-        .to_string();
+    let text = help_description.replace("{}", &suggestions.join("`, `"));
 
     channel_id.send_message(&http, |m| {
         m.embed(|e| {
