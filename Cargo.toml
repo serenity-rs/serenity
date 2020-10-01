@@ -85,7 +85,7 @@ version = "0.5"
 
 [dependencies.xsalsa20poly1305]
 optional = true
-version = "0.4.2"
+version = "0.5"
 
 [dependencies.tokio]
 version = "0.2"

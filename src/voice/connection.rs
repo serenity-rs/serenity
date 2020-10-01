@@ -53,7 +53,7 @@ use futures::{
 };
 use xsalsa20poly1305::{
     aead::{Aead, NewAead},
-    Key, Nonce, XSalsa20Poly1305, KEY_SIZE,
+    Nonce, XSalsa20Poly1305,
 };
 use async_tungstenite::tungstenite::protocol::Message;
 
@@ -719,14 +719,8 @@ async fn init_cipher(stream: &mut WsStream) -> Result<XSalsa20Poly1305> {
                     return Err(Error::Voice(VoiceError::VoiceModeInvalid));
                 }
 
-                // TODO: use `XSalsa20Poly1305::new_varkey`. See:
-                // <https://github.com/RustCrypto/traits/pull/191>
-                if desc.secret_key.len() == KEY_SIZE {
-                    let key = Key::from_slice(&desc.secret_key);
-                    return Ok(XSalsa20Poly1305::new(key));
-                } else {
-                    return Err(Error::Voice(VoiceError::KeyGen));
-                }
+                break XSalsa20Poly1305::new_varkey(&desc.secret_key)
+                    .map_err(|_| Error::Voice(VoiceError::KeyGen));
             },
             VoiceEvent::Unknown(op, value) => {
                 debug!(
