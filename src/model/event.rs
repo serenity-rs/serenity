@@ -7,7 +7,6 @@ use serde::ser::{
     SerializeSeq,
     Serializer
 };
-use serde_json;
 use std::collections::HashMap;
 use super::utils::{deserialize_emojis, deserialize_u64};
 use super::prelude::*;
@@ -90,12 +89,9 @@ impl CacheUpdate for ChannelCreateEvent {
                             channel.recipient.id
                     };
 
-                    cache
-                        .users
-                        .read()
-                        .await
-                        .get(&user_id)
-                        .map(|u| channel.recipient = u.clone());
+                    if let Some(u) = cache.users.read().await.get(&user_id) {
+                        channel.recipient = u.clone();
+                    }
 
                     channel.id
                 };
@@ -242,20 +238,14 @@ impl CacheUpdate for ChannelUpdateEvent {
                     .map(|g| g.channels.insert(channel_id, channel.clone()));
             },
             Channel::Private(ref channel) => {
-                cache
-                    .private_channels
-                    .write()
-                    .await
-                    .get_mut(&channel.id)
-                    .map(|c| c.clone_from(channel));
+                if let Some(c) = cache.private_channels.write().await.get_mut(&channel.id) {
+                    c.clone_from(channel);
+                }
             },
             Channel::Category(ref category) => {
-                cache
-                    .categories
-                    .write()
-                    .await
-                    .get_mut(&category.id)
-                    .map(|c| c.clone_from(category));
+                if let Some(c) = cache.categories.write().await.get_mut(&category.id) {
+                    c.clone_from(category);
+                }
             },
         }
 
@@ -312,7 +302,9 @@ impl CacheUpdate for GuildCreateEvent {
 
         for (user_id, member) in &mut guild.members {
             cache.update_user_entry(&member.user).await;
-            cache.user(user_id).await.map(|u| member.user = u);
+            if let Some(u) = cache.user(user_id).await {
+                member.user = u;
+            }
         }
 
         cache.channels.write().await.extend(guild.channels.clone().into_iter());
@@ -431,7 +423,9 @@ impl CacheUpdate for GuildMemberAddEvent {
     async fn update(&mut self, cache: &Cache) -> Option<()> {
         let user_id = self.member.user.id;
         cache.update_user_entry(&self.member.user).await;
-        cache.user(user_id).await.map(|u| self.member.user = u);
+        if let Some(u) = cache.user(user_id).await {
+            self.member.user = u;
+        }
 
         if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
             guild.member_count += 1;
@@ -575,10 +569,9 @@ impl CacheUpdate for GuildMembersChunkEvent {
             cache.update_user_entry(&member.user).await;
         }
 
-        cache
-            .guild(self.guild_id)
-            .await
-            .map(|mut g| g.members.extend(self.members.clone()));
+        if let Some(mut g) = cache.guild(self.guild_id).await {
+            g.members.extend(self.members.clone());
+        }
 
         None
     }
@@ -665,7 +658,7 @@ impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
             .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
 
-        let id = guild_id.as_u64().clone();
+        let id = *guild_id.as_u64();
 
         if let Some(value) = map.get_mut("role") {
             if let Some(role) = value.as_object_mut() {
@@ -743,7 +736,7 @@ impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
             .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
 
-        let id = guild_id.as_u64().clone();
+        let id = *guild_id.as_u64();
 
         if let Some(value) = map.get_mut("role") {
             if let Some(role) = value.as_object_mut() {
@@ -1015,7 +1008,9 @@ impl CacheUpdate for PresenceUpdateEvent {
 
         if let Some(user) = self.presence.user.as_mut() {
             cache.update_user_entry(&user).await;
-            cache.user(user_id).await.map(|u| *user = u);
+            if let Some(u) = cache.user(user_id).await {
+                *user = u;
+            }
         }
 
         if let Some(guild_id) = self.guild_id {
@@ -1720,7 +1715,7 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         },
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
-            kind: kind.to_owned(),
+            kind,
             value: v,
             _nonexhaustive: (),
         }),

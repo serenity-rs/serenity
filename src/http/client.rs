@@ -1563,7 +1563,7 @@ impl Http {
             .await?;
 
         if !response.status().is_success() {
-            return Err(HttpError::from_response(response).await)?;
+            return Err(HttpError::from_response(response).await.into());
         }
 
         response

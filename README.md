@@ -8,7 +8,7 @@ Serenity is a Rust library for the Discord API.
 
 View the [examples] on how to make and structure a bot.
 
-Serenity supports bot login via the use of [`Client::new`].
+Serenity supports bot login via the use of [`Client::builder`].
 
 You may also check your tokens prior to login via the use of
 [`validate_token`].
@@ -70,7 +70,7 @@ async fn main() {
 
     // Login with a bot token from the environment
     let token = env::var("DISCORD_TOKEN").expect("token");
-    let mut client = Client::new(token)
+    let mut client = Client::builder(token)
         .event_handler(Handler)
         .framework(framework)
         .await
@@ -204,7 +204,7 @@ Voice + youtube-dl:
 - [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
-[`Client::new`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.new
+[`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
 [`EventHandler::message`]: https://docs.rs/serenity/*/serenity/client/trait.EventHandler.html#method.message
 [`Context`]: https://docs.rs/serenity/*/serenity/client/struct.Context.html
 [`Event`]: https://docs.rs/serenity/*/serenity/model/event/enum.Event.html

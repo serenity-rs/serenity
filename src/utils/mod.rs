@@ -17,7 +17,6 @@ pub use self::{
 };
 pub type Color = Colour;
 
-use base64;
 use crate::internal::prelude::*;
 use crate::model::{
     misc::EmojiIdentifier,

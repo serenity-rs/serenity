@@ -21,7 +21,6 @@ pub use self::channel_category::*;
 use crate::model::prelude::*;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
-use serde_json;
 use super::utils::deserialize_u64;
 
 #[cfg(feature = "model")]

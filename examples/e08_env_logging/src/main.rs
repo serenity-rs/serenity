@@ -76,7 +76,7 @@ async fn main() {
         .before(before)
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::new(&token)
+    let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
         .await

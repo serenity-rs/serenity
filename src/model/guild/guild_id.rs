@@ -125,7 +125,7 @@ impl GuildId {
         // consider removing
         // `http.as_ref().get_channels(self.0)?()`:
         // `http.as_ref().get_channels(self.0)?`.
-        #[allow(clippy::identity_conversion)]
+        #[allow(clippy::useless_conversion)]
         for channel in http.as_ref().get_channels(self.0).await? {
             channels.insert(channel.id, channel);
         }
@@ -575,7 +575,7 @@ impl GuildId {
     #[cfg(feature = "cache")]
     pub async fn name(self, cache: impl AsRef<Cache>) -> Option<String> {
         let guild = self.to_guild_cached(&cache).await?;
-        Some(guild.name.clone())
+        Some(guild.name)
     }
 
     /// Disconnects a member from a voice channel in the guild.
