@@ -584,12 +584,15 @@ impl Display for ReactionType {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
             ReactionType::Custom {
+                animated,
                 id,
-                ref name,
-                ..
+                ref name
             } => {
-                f.write_char('<')?;
-                f.write_char(':')?;
+                if animated {
+                    f.write_str("<a:")?;
+                } else {
+                    f.write_str("<:")?;
+                }
                 f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
                 f.write_char(':')?;
                 Display::fmt(&id, f)?;

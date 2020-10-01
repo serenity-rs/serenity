@@ -73,7 +73,7 @@ async fn main() {
         .help(&MY_HELP)
         .group(&COLLECTOR_GROUP);
 
-    let mut client = Client::new(&token)
+    let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
         .await

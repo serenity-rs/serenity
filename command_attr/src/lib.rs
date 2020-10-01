@@ -404,7 +404,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     if options.strikethrough_commands_tip_in_guild == None {
         options.strikethrough_commands_tip_in_guild =
-            produce_strike_text(&options, "guild messages");
+            produce_strike_text(&options, "server messages");
     }
 
     let HelpOptions {

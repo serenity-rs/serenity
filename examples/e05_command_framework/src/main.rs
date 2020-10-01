@@ -206,8 +206,10 @@ async fn main() {
             } else {
                 owners.insert(info.owner.id);
             }
-
-            (owners, info.id)
+            match http.get_current_user().await {
+                Ok(bot_id) => (owners, bot_id.id),
+                Err(why) => panic!("Could not access the bot id: {:?}", why),
+            }
         },
         Err(why) => panic!("Could not access application info: {:?}", why),
     };
@@ -262,7 +264,7 @@ async fn main() {
         .group(&MATH_GROUP)
         .group(&OWNER_GROUP);
 
-    let mut client = Client::new(&token)
+    let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
         .await

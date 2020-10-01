@@ -411,7 +411,7 @@ impl<'a> Future for ClientBuilder<'a> {
 /// }
 ///
 /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-/// let mut client = Client::new("my token here").event_handler(Handler).await?;
+/// let mut client = Client::builder("my token here").event_handler(Handler).await?;
 ///
 /// client.start().await?;
 /// #   Ok(())
@@ -491,7 +491,7 @@ pub struct Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     /// {
     ///     let mut data = client.data.write().await;
     ///     data.insert::<MessageEventCounter>(HashMap::default());
@@ -538,7 +538,7 @@ pub struct Client {
     /// impl EventHandler for Handler { }
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// let shard_manager = client.shard_manager.clone();
     ///
@@ -567,7 +567,7 @@ pub struct Client {
     /// impl EventHandler for Handler { }
     ///
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
@@ -616,7 +616,13 @@ impl Client {
     ///
     /// [`Client`]: #struct.Client.html
     /// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html
+    #[deprecated(since="0.9.0", note="please use `builder` instead")]
+    #[allow(clippy::new_ret_no_self)]
     pub fn new<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
+        Self::builder(token)
+    }
+
+    pub fn builder<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
         ClientBuilder::new(token)
     }
 
@@ -647,7 +653,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start().await {
     ///     println!("Err with client: {:?}", why);
@@ -690,7 +696,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_autosharded().await {
     ///     println!("Err with client: {:?}", why);
@@ -744,7 +750,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shard(3, 5).await {
     ///     println!("Err with client: {:?}", why);
@@ -767,7 +773,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shard(0, 1).await {
     ///     println!("Err with client: {:?}", why);
@@ -817,7 +823,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shards(8).await {
     ///     println!("Err with client: {:?}", why);
@@ -868,7 +874,7 @@ impl Client {
     ///
     /// # async fn run() -> Result<(), Box<dyn Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// if let Err(why) = client.start_shard_range([4, 7], 10).await {
     ///     println!("Err with client: {:?}", why);

@@ -2,7 +2,6 @@
 
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
-use serde_json;
 use super::utils::*;
 use super::prelude::*;
 use bitflags::bitflags;

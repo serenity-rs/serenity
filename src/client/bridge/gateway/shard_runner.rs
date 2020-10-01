@@ -533,24 +533,24 @@ impl ShardRunner {
 
                 match why {
                     Error::Gateway(GatewayError::InvalidAuthentication) => {
-                        if let Err(_) = self.manager_tx.unbounded_send(
-                            ShardManagerMessage::ShardInvalidAuthentication) {
+                        if self.manager_tx.unbounded_send(
+                            ShardManagerMessage::ShardInvalidAuthentication).is_err() {
                             panic!("Failed sending InvalidAuthentication error to the shard manager.");
                         }
 
                         return Err(why);
                     },
                     Error::Gateway(GatewayError::InvalidGatewayIntents) => {
-                        if let Err(_) = self.manager_tx.unbounded_send(
-                            ShardManagerMessage::ShardInvalidGatewayIntents) {
+                        if self.manager_tx.unbounded_send(
+                            ShardManagerMessage::ShardInvalidGatewayIntents).is_err() {
                             panic!("Failed sending InvalidGatewayIntents error to the shard manager.");
                         }
 
                         return Err(why);
                     },
                     Error::Gateway(GatewayError::DisallowedGatewayIntents) => {
-                        if let Err(_) = self.manager_tx.unbounded_send(
-                            ShardManagerMessage::ShardDisallowedGatewayIntents) {
+                        if self.manager_tx.unbounded_send(
+                            ShardManagerMessage::ShardDisallowedGatewayIntents).is_err() {
                             panic!("Failed sending DisallowedGatewayIntents error to the shard manager.");
                         }
 

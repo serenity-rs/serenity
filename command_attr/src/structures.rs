@@ -550,11 +550,11 @@ impl Default for HelpOptions {
             grouped_label: "Group".to_string(),
             aliases_label: "Aliases".to_string(),
             description_label: "Description".to_string(),
-            guild_only_text: "Only in guilds".to_string(),
+            guild_only_text: "Only in servers".to_string(),
             checks_label: "Checks".to_string(),
             sub_commands_label: "Sub Commands".to_string(),
             dm_only_text: "Only in DM".to_string(),
-            dm_and_guild_text: "In DM and guilds".to_string(),
+            dm_and_guild_text: "In DM and servers".to_string(),
             available_text: "Available".to_string(),
             command_not_found_text: "**Error**: Command `{}` not found.".to_string(),
             individual_command_tip: "To get help with an individual command, pass its \

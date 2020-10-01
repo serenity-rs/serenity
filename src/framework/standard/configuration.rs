@@ -86,7 +86,7 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// let framework = StandardFramework::new()
 ///     .configure(|c| c.on_mention(Some(UserId(5))).prefix("~"));
 ///
-/// let mut client = Client::new(&token).event_handler(Handler).framework(framework).await?;
+/// let mut client = Client::builder(&token).event_handler(Handler).framework(framework).await?;
 /// #     Ok(())
 /// # }
 /// ```

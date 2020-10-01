@@ -2,7 +2,7 @@
 //!
 //! View the [examples] on how to make and structure a bot.
 //!
-//! Serenity supports bot user authentication via the use of [`Client::new`].
+//! Serenity supports bot user authentication via the use of [`Client::builder`].
 //!
 //! Once logged in, you may add handlers to your client to dispatch [`Event`]s,
 //! such as [`Client::on_message`]. This will cause your handler to be called
@@ -36,11 +36,11 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.9.0-rc.1"
+//! serenity = "0.9.0-rc.2"
 //! ```
 //!
 //! [`Cache`]: cache/struct.Cache.html
-//! [`Client::new`]: client/struct.Client.html#method.new
+//! [`Client::builder`]: client/struct.Client.html#method.builder
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
 //! [`Context`]: client/struct.Context.html
 //! [`Event`]: model/event/enum.Event.html

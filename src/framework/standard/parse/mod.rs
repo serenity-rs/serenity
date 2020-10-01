@@ -162,6 +162,7 @@ pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'
     }
 }
 
+#[allow(clippy::needless_lifetimes)] // Clippy and the compiler disagree
 async fn find_prefix<'a>(
     ctx: &Context,
     msg: &Message,
@@ -172,7 +173,7 @@ async fn find_prefix<'a>(
         let peeked = stream.peek_for_char(prefix.chars().count());
         let peeked = to_lowercase(config, peeked);
 
-        if prefix == &peeked {
+        if prefix == peeked {
             Some(peeked)
         } else {
             None
@@ -203,6 +204,7 @@ async fn find_prefix<'a>(
 ///
 /// [`Configuration::dynamic_prefix`]: ../struct.Configuration.html#method.dynamic_prefix
 /// [`Configuration::prefix`]: ../struct.Configuration.html#method.prefix
+#[allow(clippy::needless_lifetimes)] // Clippy and the compiler disagree
 pub async fn prefix<'a>(
     ctx: &Context,
     msg: &Message,
@@ -258,8 +260,8 @@ async fn check_discrepancy(
 
             let perms = permissions_in(ctx, &guild, msg.channel_id, msg.author.id).await;
 
-            if !perms.contains(*options.required_permissions())
-                && !(options.owner_privilege() && config.owners.contains(&msg.author.id))
+            if !(perms.contains(*options.required_permissions()) || options.owner_privilege()
+                && config.owners.contains(&msg.author.id))
             {
                 return Err(DispatchError::LackingPermissions(
                     *options.required_permissions(),

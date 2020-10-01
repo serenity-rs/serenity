@@ -41,7 +41,9 @@ use crate::collector::{
     CollectReply, MessageCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
+use crate::http::{Http, CacheHttp, Typing};
+#[cfg(feature = "model")]
+use std::sync::Arc;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
@@ -502,7 +504,7 @@ impl GuildChannel {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -555,7 +557,7 @@ impl GuildChannel {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -717,6 +719,57 @@ impl GuildChannel {
         }
 
         self.id.send_message(&cache_http.http(), f).await
+    }
+
+    /// Starts typing in the channel for an indefinite period of time.
+    ///
+    /// Returns [`Typing`] that is used to trigger the typing. [`Typing::stop`] must be called
+    /// on the returned struct to stop typing. Note that on some clients, typing may persist
+    /// for a few seconds after `stop` is called.
+    /// Typing is also stopped when the struct is dropped.
+    ///
+    /// If a message is sent while typing is triggered, the user will stop typing for a brief period
+    /// of time and then resume again until either `stop` is called or the struct is dropped.
+    ///
+    /// This should rarely be used for bots, although it is a good indicator that a
+    /// long-running command is still being processed.
+    ///
+    /// ## Examples
+    ///
+    /// ```rust,no_run
+    /// # #[cfg(feature = "cache")]
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # use serenity::{
+    /// #    cache::Cache,
+    /// #    http::{Http, Typing},
+    /// #    model::{ModelError, channel::GuildChannel, id::ChannelId},
+    /// #    Result,
+    /// # };
+    /// # use std::sync::Arc;
+    /// #
+    /// # fn long_process() {}
+    /// # let http = Arc::new(Http::default());
+    /// # let cache = Cache::default();
+    /// # let channel = cache
+    /// #    .guild_channel(ChannelId(7))
+    /// #    .await.ok_or(ModelError::ItemMissing)?;
+    /// // Initiate typing (assuming http is `Arc<Http>` and `channel` is bound)
+    /// let typing = channel.start_typing(&http)?;
+    ///
+    /// // Run some long-running process
+    /// long_process();
+    ///
+    /// // Stop typing
+    /// typing.stop();
+    /// #
+    /// # Ok(())
+    /// # }
+    /// ```
+    ///
+    /// [`Typing`]: ../../http/typing/struct.Typing.html
+    /// [`Typing::stop`]: ../../http/typing/struct.Typing.html#method.stop
+    pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
+        http.start_typing(self.id.0)
     }
 
     /// Unpins a [`Message`] in the channel given by its Id.

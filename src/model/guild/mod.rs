@@ -192,7 +192,7 @@ impl Guild {
     /// Returns the "default" channel of the guild for the passed user id.
     /// (This returns the first channel that can be read by the user, if there isn't one,
     /// returns `None`)
-    pub async fn default_channel<'a>(&'a self, uid: UserId) -> Option<&'a GuildChannel> {
+    pub async fn default_channel(&self, uid: UserId) -> Option<&GuildChannel> {
         for (cid, channel) in &self.channels {
             if self.user_permissions_in(*cid, uid).read_messages() {
                 return Some(channel);
@@ -207,7 +207,7 @@ impl Guild {
     /// returns `None`)
     /// Note however that this is very costy if used in a server with lots of channels,
     /// members, or both.
-    pub async fn default_channel_guaranteed<'a>(&'a self) -> Option<&'a GuildChannel> {
+    pub async fn default_channel_guaranteed(&self) -> Option<&GuildChannel> {
         for (cid, channel) in &self.channels {
             for memid in self.members.keys() {
                 if self.user_permissions_in(*cid, *memid).read_messages() {
@@ -1727,7 +1727,7 @@ impl Guild {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #    Ok(())

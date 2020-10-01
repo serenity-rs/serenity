@@ -1,6 +1,5 @@
 //! User information-related models.
 
-use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
@@ -527,7 +526,7 @@ impl User {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     /// #     Ok(())
     /// # }
     /// # }
@@ -707,7 +706,7 @@ impl User {
     ///         }
     ///     }
     /// }
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -734,7 +733,7 @@ impl User {
             }
         }
 
-        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick.clone())
+        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
     }
 
     /// Returns a future that will await one message by this user.

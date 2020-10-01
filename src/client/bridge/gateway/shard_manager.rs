@@ -234,7 +234,7 @@ impl ShardManager {
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// let token = std::env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token).event_handler(Handler).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// // restart shard ID 7
     /// client.shard_manager.lock().await.restart(ShardId(7)).await;

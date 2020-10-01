@@ -250,7 +250,7 @@ impl Cache {
     ///     }
     /// }
     ///
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -332,12 +332,13 @@ impl Cache {
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`Shard`]: ../gateway/struct.Shard.html
     pub async fn guilds(&self) -> Vec<GuildId> {
+        let chain = self.unavailable_guilds.read().await.clone().into_iter();
         self.guilds
             .read()
             .await
             .keys()
             .cloned()
-            .chain(self.unavailable_guilds.read().await.clone().into_iter())
+            .chain(chain)
             .collect()
     }
 
@@ -434,7 +435,7 @@ impl Cache {
     async fn _guild_field<Ret, Fun>(&self, id: GuildId, field_accessor: Fun) -> Option<Ret>
     where Fun: FnOnce(&Guild) -> Ret {
         let guilds = self.guilds.read().await;
-        let guild = guilds.get(&id.into())?;
+        let guild = guilds.get(&id)?;
 
         Some(field_accessor(guild))
     }
@@ -481,7 +482,7 @@ impl Cache {
     ///
     /// # #[cfg(feature = "client")]
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::new("token").event_handler(Handler).await?;
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -530,7 +531,7 @@ impl Cache {
         field_selector: Fun) -> Option<Ret>
     where Fun: FnOnce(&GuildChannel) -> Ret {
         let guild_channels = &self.channels.read().await;
-        let channel = guild_channels.get(&id.into())?;
+        let channel = guild_channels.get(&id)?;
 
         Some(field_selector(channel))
     }
@@ -678,7 +679,7 @@ impl Cache {
     /// Returns the number of shards.
     #[inline]
     pub async fn shard_count(&self) -> u64 {
-        self.shard_count.read().await.clone()
+        *self.shard_count.read().await
     }
 
     /// Retrieves a [`Channel`]'s message from the cache based on the channel's and
@@ -923,7 +924,7 @@ impl Cache {
     where Fun: FnOnce(&CurrentUser) -> Ret {
         let user = self.user.read().await;
 
-        field_selector(&user).clone()
+        field_selector(&user)
     }
 
     /// Updates the cache with the update implementation for an event or other

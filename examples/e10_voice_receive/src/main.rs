@@ -158,7 +158,7 @@ async fn main() {
             .prefix("~"))
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::new(&token)
+    let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
         .register_songbird()
