@@ -838,15 +838,21 @@ impl<H: AsRef<Http>> MessagesIter<H> {
         // Number of messages to fetch.
         let grab_size = 100;
 
-        // If `self.before` is not set yet, we can use the channel ID to fetch
-        // messages sent before the first message. It also includes the first
-        // message sent.
-        self.buffer = self.channel_id
-            .messages(&self.http, |b| 
-                b.before(self.before.map_or(self.channel_id.0, |m| m.0))
-                    .limit(grab_size)
-            )
-            .await?;
+        // If `self.before` is not set yet, we can use `.messages` to fetch
+        // the last message after very first fetch from last.
+        self.buffer = 
+            if let Some(before) = self.before {
+                self.channel_id
+                    .messages(&self.http, |b| 
+                        b.before(before)
+                         .limit(grab_size)
+                    ).await?
+            } else {
+                self.channel_id
+                    .messages(&self.http, |b| 
+                        b.limit(grab_size)
+                    ).await?
+            };
 
         self.before = self.buffer.get(0)
             .map(|message| message.id);
