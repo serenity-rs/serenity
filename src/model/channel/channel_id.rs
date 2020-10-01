@@ -805,7 +805,7 @@ pub struct MessagesIter<H: AsRef<Http>> {
     channel_id: ChannelId,
     http: H,
     buffer: Vec<Message>,
-    after: Option<MessageId>,
+    before: Option<MessageId>,
     tried_fetch: bool,
 }
 
@@ -816,7 +816,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
             channel_id,
             http,
             buffer: Vec::new(),
-            after: None,
+            before: None,
             tried_fetch: false,
         }
     }
@@ -825,33 +825,30 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     ///
     /// This drops any messages that were currently in the buffer, so it should
     /// only be called when `self.buffer` is empty. Additionally, this updates
-    /// `self.after` so that the next call does not return duplicate items. 
+    /// `self.before` so that the next call does not return duplicate items. 
     /// If there are no more messages to be fetched, then this marks
-    /// `self.after` as None, indicating that no more calls ought to be made.
+    /// `self.before` as None, indicating that no more calls ought to be made.
     ///
-    /// If this method is called with `self.after` as None, the first 100
+    /// If this method is called with `self.before` as None, the last 100
     /// (or lower) messages sent in the channel are added in the buffer.
     ///
     /// The messages are sorted such that the  newest message is the first
-    /// element of the buffer and the oldest message is the last.
+    /// element of the buffer and the newest message is the last.
     async fn refresh(&mut self) -> Result<()> {
         // Number of messages to fetch.
         let grab_size = 100;
 
-        // If `self.after` is not set yet, we can use the channel ID to fetch
-        // messages sent after the first message. It also includes the first
+        // If `self.before` is not set yet, we can use the channel ID to fetch
+        // messages sent before the first message. It also includes the first
         // message sent.
         self.buffer = self.channel_id
             .messages(&self.http, |b| 
-                b.after(self.after.map_or(self.channel_id.0, |m| m.0))
+                b.before(self.before.map_or(self.channel_id.0, |m| m.0))
                     .limit(grab_size)
             )
             .await?;
 
-        // The messages received are in reverse order, that is, newest first
-        // and oldest last. Therefore, the "last" message is actually the first
-        // one in the buffer.
-        self.after = self.buffer.get(0)
+        self.before = self.buffer.get(0)
             .map(|message| message.id);
 
         self.tried_fetch = true;
@@ -865,7 +862,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// A buffer of at most 100 messages is used to reduce the number of calls.
     /// necessary.
     ///
-    /// The stream returns the oldest message first, followed by newer messages.
+    /// The stream returns the newest message first, followed by older messages.
     ///
     /// # Examples
     ///
@@ -898,14 +895,13 @@ impl<H: AsRef<Http>> MessagesIter<H> {
         let init_state = MessagesIter::new(channel_id, http);
 
         futures::stream::unfold(init_state, |mut state| async {
-            if state.buffer.is_empty() && state.after.is_some() || !state.tried_fetch {
+            if state.buffer.is_empty() && state.before.is_some() || !state.tried_fetch {
                 if let Err(error) = state.refresh().await {
                     return Some((Err(error), state));
                 }
             }
 
-            // `pop()` returns the last element which is actually the "first"
-            // message. Thus, the resultant stream goes from oldest to newest.
+            // the resultant stream goes from newest to oldest.
             state.buffer.pop().map(|entry| (Ok(entry), state))
         })
     }
