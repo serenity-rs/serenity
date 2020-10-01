@@ -33,7 +33,7 @@ async fn main() {
     let token = env::var("DISCORD_TOKEN").expect("Expected a token in the environment");
 
     // Build our client.
-    let mut client = Client::new(token)
+    let mut client = Client::builder(token)
         .event_handler(Handler)
         .add_intent(GatewayIntents::GUILDS)
         .add_intent(GatewayIntents::GUILD_MESSAGES)

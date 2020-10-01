@@ -1727,7 +1727,7 @@ impl Guild {
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #    Ok(())

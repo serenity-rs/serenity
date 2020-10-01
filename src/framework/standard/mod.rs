@@ -150,7 +150,7 @@ impl StandardFramework {
     ///         .with_whitespace(true)
     ///         .prefix("~"));
     ///
-    /// let mut client = Client::new(&token).event_handler(Handler).framework(framework).await?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).framework(framework).await?;
     /// #     Ok(())
     /// # }
     /// ```
