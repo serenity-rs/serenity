@@ -18,7 +18,6 @@ use crate::{
         TrackHandle,
     },
     Event,
-    EventContext,
     EventData,
     EventHandler,
     Status as VoiceStatus,
@@ -29,10 +28,7 @@ use flume::{
     SendError,
     Sender as FlumeSender,
 };
-use futures::{
-    channel::mpsc::UnboundedSender as Sender,
-    future::BoxFuture,
-};
+use futures::channel::mpsc::UnboundedSender as Sender;
 use serde_json::json;
 
 /// The handler is responsible for "handling" a single voice connection, acting

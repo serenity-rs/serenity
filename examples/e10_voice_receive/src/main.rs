@@ -6,7 +6,7 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["client", "standard_framework", "voice"]
 //! ```
-use std::{env, sync::Arc};
+use std::env;
 
 use serenity::{
     async_trait,
@@ -14,8 +14,8 @@ use serenity::{
     framework::{
         StandardFramework,
         standard::{
-            Args, CommandResult,
             macros::{command, group},
+            Args, CommandResult,
         },
     },
     model::{
@@ -23,8 +23,8 @@ use serenity::{
         event::{VoiceClientConnect, VoiceClientDisconnect, VoiceSpeaking},
         gateway::Ready,
         id::ChannelId,
-        misc::Mentionable},
-    prelude::*,
+        misc::Mentionable
+    },
     Result as SerenityResult,
 };
 

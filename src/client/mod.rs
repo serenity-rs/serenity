@@ -65,8 +65,6 @@ use tracing::{error, debug, info, instrument};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use crate::model::id::UserId;
-#[cfg(feature = "voice")]
 use self::bridge::voice::VoiceGatewayManager;
 use crate::http::Http;
 use typemap_rev::{TypeMap, TypeMapKey};

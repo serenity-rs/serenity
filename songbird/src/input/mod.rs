@@ -49,10 +49,10 @@ use std::{
 use streamcatcher::{Catcher, TxCatcher};
 use tokio::{
     fs::File as TokioFile,
-    io::{AsyncRead, AsyncReadExt},
+    io::AsyncReadExt,
     process::Command as TokioCommand,
 };
-use tracing::{debug, error, trace, warn};
+use tracing::{debug, error};
 
 /// Type of data being passed into an [`Input`].
 ///
@@ -72,7 +72,6 @@ impl CodecType {
         match self {
             Opus | FloatPcm => mem::size_of::<f32>(),
             Pcm => mem::size_of::<i16>(),
-            _ => unimplemented!(),
         }
     }
 }
@@ -395,11 +394,9 @@ impl Metadata {
             .and_then(|m| m.get("streams"))
             .and_then(|v| v.as_array())
             .and_then(|v|
-                v.iter()
-                    .filter(|line|
-                        line.get("codec_type").and_then(Value::as_str) == Some("audio")
-                    )
-                    .nth(0)
+                v.iter().find(|line|
+                    line.get("codec_type").and_then(Value::as_str) == Some("audio")
+                )
             );
 
         let channels = stream
@@ -722,7 +719,7 @@ impl Seek for Input {
         match pos {
             SeekFrom::Start(pos) => {target = pos as usize;},
             SeekFrom::Current(rel) => {target = target.wrapping_add(rel as usize);},
-            SeekFrom::End(pos) => unimplemented!(),
+            SeekFrom::End(_pos) => unimplemented!(),
         }
 
         debug!("Seeking to {:?}", pos);
@@ -743,7 +740,7 @@ impl Seek for Input {
             self.cheap_consume(shift)
         } else {
             // start from scratch, then seek in...
-            let pos = Seek::seek(&mut self.reader, SeekFrom::Start(self.container.input_start() as u64))?;
+            Seek::seek(&mut self.reader, SeekFrom::Start(self.container.input_start() as u64))?;
 
             self.cheap_consume(target)
         }).map(|_| self.pos as u64)
@@ -763,8 +760,8 @@ impl<R: Read + Sized> ReadAudioExt for R {
         // to gently nudge the compiler into vectorising for us.
         // Max SIMD float32 lanes is 8 on AVX, older archs use a divisor of this
         // e.g., 4.
-        const sample_len: usize = mem::size_of::<f32>();
-        let mut simd_float_bytes = [0u8; 8 * sample_len];
+        const SAMPLE_LEN: usize = mem::size_of::<f32>();
+        let mut simd_float_bytes = [0u8; 8 * SAMPLE_LEN];
         let mut simd_float_buf = [0f32; 8];
         
         let mut frame_pos = 0;
@@ -775,9 +772,9 @@ impl<R: Read + Sized> ReadAudioExt for R {
             let mut max_bytes = STEREO_FRAME_BYTE_SIZE;
 
             while frame_pos < float_buffer.len() {
-                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * sample_len)])
+                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
                     .and_then(|byte_len| {
-                        let target = byte_len/sample_len;
+                        let target = byte_len/SAMPLE_LEN;
                         (&simd_float_bytes[..byte_len])
                             .read_f32_into::<LittleEndian>(
                                 &mut simd_float_buf[..target]
@@ -795,7 +792,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 match progress {
                     Ok((new_pos, delta)) => {
                         frame_pos = new_pos;
-                        max_bytes -= delta * sample_len;
+                        max_bytes -= delta * SAMPLE_LEN;
 
                         if delta == 0 {
                             break;
@@ -815,9 +812,9 @@ impl<R: Read + Sized> ReadAudioExt for R {
             let mut max_bytes = MONO_FRAME_BYTE_SIZE;
 
             while frame_pos < float_buffer.len() {
-                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * sample_len)])
+                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
                     .and_then(|byte_len| {
-                        let target = byte_len/sample_len;
+                        let target = byte_len/SAMPLE_LEN;
                         (&simd_float_bytes[..byte_len])
                             .read_f32_into::<LittleEndian>(
                                 &mut simd_float_buf[..target]
@@ -837,7 +834,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                 match progress {
                     Ok((new_pos, delta)) => {
                         frame_pos = new_pos;
-                        max_bytes -= delta * sample_len;
+                        max_bytes -= delta * SAMPLE_LEN;
 
                         if delta == 0 {
                             break;
@@ -855,7 +852,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
             }
         }
 
-        Some(frame_pos * sample_len)
+        Some(frame_pos * SAMPLE_LEN)
     }
 
     fn consume(&mut self, amt: usize) -> usize {
@@ -870,7 +867,7 @@ pub async fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
 
 async fn _ffmpeg(path: &OsStr) -> Result<Input> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
-    let is_stereo = is_stereo(path.as_ref()).await
+    let is_stereo = is_stereo(path).await
         .unwrap_or_else(|_e| (false, Default::default()));
     let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
@@ -973,7 +970,7 @@ async fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
     }
 
     let size = reader.read_i32_le().await
-        .map_err(|e| DcaError::InvalidHeader)?;
+        .map_err(|_| DcaError::InvalidHeader)?;
 
     // Sanity check
     if size < 2 {
@@ -1201,7 +1198,6 @@ impl From<Restartable> for Input {
         let meta = Some(src.source.metadata.take());
         let stereo = src.source.stereo;
         let container = src.source.container;
-        let kind = src.source.kind.clone();
         Input::new(
             stereo,
             Reader::Restartable(src),

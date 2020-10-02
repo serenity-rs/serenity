@@ -26,8 +26,6 @@ use typemap_rev::TypeMap;
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use super::super::voice::VoiceGatewayManager;
-#[cfg(feature = "voice")]
-use tokio::sync::Mutex;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 

@@ -1,20 +1,20 @@
-//! Requires the "cache", "methods", and "voice" features be enabled in your
+//! Requires the "client", "standard_framework", and "voice" features be enabled in your
 //! Cargo.toml, like so:
 //!
 //! ```toml
 //! [dependencies.serenity]
 //! git = "https://github.com/serenity-rs/serenity.git"
-//! features = ["cache", "framework", "standard_framework", "voice"]
+//! features = ["client", standard_framework", "voice"]
 //! ```
-use std::{env, sync::Arc};
+use std::env;
 
 // This trait adds the `register_songbird` and `register_songbird_with` methods
 // to the client builder below, making it easy to install this voice client.
 // The voice client can be retrieved in any command using `songbird::get(ctx).await`.
 use songbird::SerenityInit;
 
-// Import the `Context` and tokio's asynchronous `Mutex` from the client.
-use serenity::{client::Context, prelude::Mutex};
+// Import the `Context` to handle commands.
+use serenity::client::Context;
 
 use serenity::{
     async_trait,
@@ -29,8 +29,6 @@ use serenity::{
     model::{channel::Message, gateway::Ready, misc::Mentionable},
     Result as SerenityResult,
 };
-
-use serenity::prelude::*;
 
 struct Handler;
 

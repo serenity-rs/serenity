@@ -168,7 +168,7 @@ impl ClientVoiceManager {
         }
     }
 
-    pub async fn lock<'a>(&'a self) -> MutexGuard<'a, InnerClientVoiceManager> {
+    pub async fn lock(&self) -> MutexGuard<'_, InnerClientVoiceManager> {
         self.inner.lock().await
     }
 }
@@ -310,7 +310,7 @@ impl VoiceGatewayManager for ClientVoiceManager {
         manager.manager_remove(shard_id);
     }
 
-    async fn server_update(&self, guild_id: GuildId, endpoint: &Option<String>, token: &String) {
+    async fn server_update(&self, guild_id: GuildId, endpoint: &Option<String>, token: &str) {
         let mut manager = self.inner.lock().await;
         let search = manager.get_mut(guild_id);
 

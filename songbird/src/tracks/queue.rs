@@ -16,7 +16,7 @@ use crate::{
         TrackResult,
     },
 };
-use tracing::{debug, info, warn};
+use tracing::{info, warn};
 use parking_lot::Mutex;
 use std::{
     collections::VecDeque,
@@ -205,9 +205,7 @@ impl TrackQueue {
     pub fn skip(&self) -> TrackResult {
         let inner = self.inner.lock();
 
-        let out = inner.stop_current();
-
-        out
+        inner.stop_current()
     }
 }
 

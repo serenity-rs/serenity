@@ -40,13 +40,10 @@ use flume::{
     Receiver,
     TryRecvError,
 };
-use tracing::{debug, error, info, warn};
+use tracing::{error, info, warn};
 use rand::random;
 use serde::Deserialize;
-use std::{
-    collections::HashMap,
-    net::SocketAddr,
-};
+use std::collections::HashMap;
 use tokio::{
     net::udp::RecvHalf,
 };
@@ -159,7 +156,6 @@ struct AuxNetwork {
 
     udp_socket: Option<RecvHalf>,
     ws_client: Option<WsStream>,
-    destination: Option<SocketAddr>,
     cipher: Option<Cipher>,
     packet_buffer: [u8; VOICE_PACKET_MAX],
 
@@ -182,7 +178,6 @@ impl AuxNetwork {
 
             udp_socket: None,
             ws_client: None,
-            destination: None,
             cipher: None,
             packet_buffer: [0u8; VOICE_PACKET_MAX],
 

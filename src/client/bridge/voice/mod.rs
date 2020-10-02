@@ -1,10 +1,11 @@
 use async_trait::async_trait;
-use crate::gateway::InterMessage;
-use std::collections::HashMap;
 use futures::channel::mpsc::UnboundedSender as Sender;
-use crate::model::{
-    id::{ChannelId, GuildId, UserId},
-    voice::VoiceState,
+use crate::{
+	gateway::InterMessage,
+	model::{
+	    id::{GuildId, UserId},
+	    voice::VoiceState,
+	},
 };
 
 /// FIXME: must be documented.
@@ -17,7 +18,7 @@ pub trait VoiceGatewayManager: Send + Sync {
 
     async fn deregister_shard(&self, shard_id: u64);
 
-    async fn server_update(&self, guild_id: GuildId, endpoint: &Option<String>, token: &String);
+    async fn server_update(&self, guild_id: GuildId, endpoint: &Option<String>, token: &str);
 
     async fn state_update(&self, guild_id: GuildId, voice_state: &VoiceState);
 }

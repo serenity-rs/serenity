@@ -1,7 +1,7 @@
 use crate::manager::ClientVoiceManager;
 use serenity::{
 	client::{ClientBuilder, Context},
-	prelude::{TypeMap, TypeMapKey},
+	prelude::TypeMapKey,
 };
 use std::sync::Arc;
 

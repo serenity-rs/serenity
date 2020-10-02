@@ -2,6 +2,7 @@ use super::{
 	AuxPacketMessage,
     EventMessage,
     MixerMessage,
+    UdpMessage,
 };
 use crate::ws::Error as WsError;
 use audiopus::Error as OpusError;
@@ -10,10 +11,11 @@ use std::io::Error as IoError;
 use xsalsa20poly1305::aead::Error as CryptoError;
 
 #[derive(Debug)]
-pub enum Location {
+pub enum Recipient {
 	AuxNetwork,
 	Event,
 	Mixer,
+	Udp,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -23,7 +25,7 @@ pub enum Error {
 	Crypto(CryptoError),
 	/// Received an illegal voice packet on the voice UDP socket.
     IllegalVoicePacket,
-    InterconnectFailure(Location),
+    InterconnectFailure(Recipient),
     Io(IoError),
     Opus(OpusError),
     Ws(WsError),
@@ -42,15 +44,19 @@ impl From<OpusError> for Error {
 }
 
 impl From<SendError<AuxPacketMessage>> for Error {
-    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::InterconnectFailure(Location::AuxNetwork) }
+    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::InterconnectFailure(Recipient::AuxNetwork) }
 }
 
 impl From<SendError<EventMessage>> for Error {
-    fn from(_e: SendError<EventMessage>) -> Error { Error::InterconnectFailure(Location::Event) }
+    fn from(_e: SendError<EventMessage>) -> Error { Error::InterconnectFailure(Recipient::Event) }
 }
 
 impl From<SendError<MixerMessage>> for Error {
-    fn from(_e: SendError<MixerMessage>) -> Error { Error::InterconnectFailure(Location::Mixer) }
+    fn from(_e: SendError<MixerMessage>) -> Error { Error::InterconnectFailure(Recipient::Mixer) }
+}
+
+impl From<SendError<UdpMessage>> for Error {
+    fn from(_e: SendError<UdpMessage>) -> Error { Error::InterconnectFailure(Recipient::Udp) }
 }
 
 impl From<WsError> for Error {

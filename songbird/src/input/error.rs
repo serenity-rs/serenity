@@ -1,5 +1,4 @@
 use audiopus::Error as OpusError;
-use flume::SendError;
 use serde_json::{Error as JsonError, Value};
 use std::{
     io::Error as IoError,

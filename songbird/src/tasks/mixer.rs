@@ -115,7 +115,7 @@ impl Mixer {
                     },
                     Ok(SetBitrate(b)) => {
                         self.bitrate = b;
-                        if let Err(e) = self.encoder.set_bitrate(b) {
+                        if let Err(e) = self.set_bitrate(b) {
                             error!("[Voice] Failed to update bitrate {:?}", e);
                         }
                     },
@@ -205,11 +205,11 @@ impl Mixer {
         // Opus codec type.
         let do_passthrough = self.tracks.len() == 1 && {
             let track = &self.tracks[0];
-            track.volume == 1.0 && track.source.supports_passthrough()
+            (track.volume - 1.0).abs() < f32::EPSILON && track.source.supports_passthrough()
         };
 
         if do_passthrough {
-            let opus_len = (&mut self.tracks[0]).source.read_opus_frame(opus_frame)?;
+            let opus_len = self.tracks[0].source.read_opus_frame(opus_frame)?;
             debug!("Frame passthrough: {:?} bytes", opus_len);
             Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]))
         } else {
@@ -372,7 +372,7 @@ impl Mixer {
         };
 
         // FIXME: This is dog slow, don't do this.
-        conn.udp.send(UdpMessage::Packet(self.packet[..index].to_vec()));
+        conn.udp.send(UdpMessage::Packet(self.packet[..index].to_vec()))?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..])
             .expect(

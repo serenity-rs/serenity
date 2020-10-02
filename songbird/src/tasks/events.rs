@@ -14,9 +14,8 @@ use crate::{
         TrackState,
     },
 };
-use super::error::{Error, Result};
 use flume::Receiver;
-use tracing::{debug, error, info, trace, warn};
+use tracing::{debug, info, trace};
 
 pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMessage>) {
     let mut global = GlobalEvents::default();

@@ -6,7 +6,6 @@ use crate::{
     constants::*,
     events::{
         Event,
-        EventContext,
         EventData,
         EventHandler,
         EventStore,
@@ -18,7 +17,6 @@ use crate::{
         TrackStateChange,
     },
 };
-use futures::future::BoxFuture;
 use std::time::Duration;
 use tokio::sync::{
     mpsc::{
@@ -478,7 +476,7 @@ impl TrackHandle {
     ///
     /// [`Track`]: struct.Track.html
     pub fn action<F>(&self, action: F) -> TrackResult
-        where F: FnOnce(&mut Track) -> () + Send + Sync + 'static
+        where F: FnOnce(&mut Track) + Send + Sync + 'static
     {
         self.send(TrackCommand::Do(Box::new(action)))
     }
@@ -564,7 +562,7 @@ pub enum TrackCommand {
     Volume(f32),
     Seek(Duration),
     AddEvent(EventData),
-    Do(Box<dyn FnOnce(&mut Track) -> () + Send + Sync + 'static>),
+    Do(Box<dyn FnOnce(&mut Track) + Send + Sync + 'static>),
     Request(OneshotSender<Box<TrackState>>),
     Loop(LoopState),
 }

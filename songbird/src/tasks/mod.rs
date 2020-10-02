@@ -24,7 +24,6 @@ use crate::{
     },
     Status,
 };
-use error::{Error, Result};
 use flume::{
     Receiver,
     Sender,

@@ -22,7 +22,6 @@ use std::{
         Result as IoResult,
     },
     mem,
-    result::Result as StdResult,
     sync::atomic::{
         AtomicUsize,
         Ordering,

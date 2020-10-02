@@ -17,7 +17,6 @@ use discortp::{
     rtcp::Rtcp,
     rtp::Rtp,
 };
-use futures::future::BoxFuture;
 use tracing::info;
 use std::{
     cmp::Ordering,
@@ -414,12 +413,12 @@ impl EventStore {
         match evt.event {
             Core(c) => {
                 self.untimed.entry(c.into())
-                    .or_insert_with(|| vec![])
+                    .or_insert_with(Vec::new)
                     .push(evt);
             },
             Track(t) => {
                 self.untimed.entry(t.into())
-                    .or_insert_with(|| vec![])
+                    .or_insert_with(Vec::new)
                     .push(evt);
             },
             Delayed(_) | Periodic(_, _) => {
@@ -497,7 +496,7 @@ impl GlobalEvents {
 
     pub(crate) fn fire_track_event(&mut self, evt: TrackEvent, index: usize) {
         let holder = self.awaiting_tick.entry(evt)
-            .or_insert_with(|| vec![]);
+            .or_insert_with(Vec::new);
 
         holder.push(index);
     }
@@ -546,7 +545,7 @@ impl GlobalEvents {
             }
 
             // Global untimed track events.
-            if self.store.untimed.contains_key(&untimed) && indices.len() > 0 {
+            if self.store.untimed.contains_key(&untimed) && !indices.is_empty() {
                 let global_ctx: Vec<(&TrackState, &TrackHandle)> = indices.iter().map(|i| (
                     states.get(*i).expect("[Voice] Missing state index for Tick (global untimed)"),
                     handles.get(*i).expect("[Voice] Missing handle index for Tick (global untimed)"),

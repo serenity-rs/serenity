@@ -52,10 +52,6 @@ pub(crate) struct Origin {
     pub(crate) url: Option<String>,
 }
 
-impl DcaMetadata {
-    pub(crate) fn is_stereo(&self) -> bool { self.opus.channels == 2 }
-}
-
 impl From<DcaMetadata> for Metadata {
 	fn from(mut d: DcaMetadata) -> Self {
 		let (title, artist) = d.info.take()

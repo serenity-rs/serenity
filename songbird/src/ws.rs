@@ -96,9 +96,7 @@ impl SenderExt for SplitSink<WsStream, Message> {
         Ok(serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
-            .and_then(|m| {
-                Ok(self.send(m))
-            })?
+            .map(|m| self.send(m))?
             .await?)
     }
 }
@@ -109,9 +107,7 @@ impl SenderExt for WsStream {
         Ok(serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
-            .and_then(|m| {
-                Ok(self.send(m))
-            })?
+            .map(|m| self.send(m))?
             .await?)
     }
 }
@@ -152,8 +148,6 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
 #[non_exhaustive]
 #[cfg(all(feature = "rustls", not(feature = "native")))]
 pub enum RustlsError {
-    /// WebPKI X.509 Certificate Validation Error.
-    WebPKI,
     /// An error with the handshake in tungstenite
     HandshakeError,
     /// Standard IO error happening while creating the tcp stream
@@ -171,7 +165,6 @@ impl From<IoError> for RustlsError {
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            RustlsError::WebPKI => f.write_str("Failed to validate X.509 certificate"),
             RustlsError::HandshakeError => f.write_str("TLS handshake failed when making the websocket connection"),
             RustlsError::Io(inner) => Display::fmt(&inner, f),
         }
@@ -192,7 +185,7 @@ impl StdError for RustlsError {
 #[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
-        url.into(),
+        url,
         Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,
@@ -208,7 +201,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
 #[instrument]
 pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
-        url.into(),
+        url,
         Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,

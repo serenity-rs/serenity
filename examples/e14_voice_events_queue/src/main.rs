@@ -16,17 +16,9 @@ use std::{
     sync::{atomic::{AtomicUsize, Ordering}, Arc}
 };
 
-// This trait adds the `register_songbird` and `register_songbird_with` methods
-// to the client builder below, making it easy to install this voice client.
-// The voice client can be retrieved in any command using `songbird::get(ctx).await`.
-use songbird::SerenityInit;
-
-// Import the `Context` and tokio's asynchronous `Mutex` from the client.
-use serenity::{client::Context, prelude::Mutex};
-
 use serenity::{
     async_trait,
-    client::{Client, EventHandler},
+    client::{Client, Context, EventHandler},
     http::Http,
     framework::{
         StandardFramework,
@@ -50,6 +42,7 @@ use songbird::{
     Event,
     EventContext,
     EventHandler as VoiceEventHandler,
+    SerenityInit,
     TrackEvent,
 };
 
@@ -88,7 +81,7 @@ async fn main() {
                    .prefix("~"))
         .group(&GENERAL_GROUP);
 
-    let mut client = Client::new(&token)
+    let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
         .register_songbird()

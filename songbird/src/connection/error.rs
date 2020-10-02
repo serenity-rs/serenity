@@ -1,15 +1,16 @@
-use crate::tasks::{
-    error::Location,
-    AuxPacketMessage,
-    EventMessage,
-    MixerMessage,
+use crate::{
+    tasks::{
+        error::Recipient,
+        AuxPacketMessage,
+        EventMessage,
+        MixerMessage,
+    },
+    ws::Error as WsError,
 };
+use flume::SendError;
 use serde_json::Error as JsonError;
 use std::io::Error as IoError;
-use flume::SendError;
 use xsalsa20poly1305::aead::Error as CryptoError;
-use async_tungstenite::tungstenite::error::Error as TungsteniteError;
-use crate::ws::Error as WsError;
 
 #[derive(Debug)]
 pub enum Error {
@@ -30,7 +31,7 @@ pub enum Error {
 
     Json(JsonError),
 
-    InterconnectFailure(Location),
+    InterconnectFailure(Recipient),
 
     Ws(WsError),
 }
@@ -48,15 +49,15 @@ impl From<JsonError> for Error {
 }
 
 impl From<SendError<AuxPacketMessage>> for Error {
-    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::InterconnectFailure(Location::AuxNetwork) }
+    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::InterconnectFailure(Recipient::AuxNetwork) }
 }
 
 impl From<SendError<EventMessage>> for Error {
-    fn from(_e: SendError<EventMessage>) -> Error { Error::InterconnectFailure(Location::Event) }
+    fn from(_e: SendError<EventMessage>) -> Error { Error::InterconnectFailure(Recipient::Event) }
 }
 
 impl From<SendError<MixerMessage>> for Error {
-    fn from(_e: SendError<MixerMessage>) -> Error { Error::InterconnectFailure(Location::Mixer) }
+    fn from(_e: SendError<MixerMessage>) -> Error { Error::InterconnectFailure(Recipient::Mixer) }
 }
 
 impl From<WsError> for Error {
