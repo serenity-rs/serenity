@@ -1,3 +1,4 @@
+use super::error::{Error, Result};
 use audiopus::{
     Application as CodingMode,
     Bitrate,
@@ -17,8 +18,6 @@ use crate::{
         UdpMessage,
     },
     tracks::{Track, PlayMode},
-    Error,
-    Result,
     Status,
 };
 use discortp::{
@@ -163,7 +162,7 @@ impl Mixer {
             }
 
             if let Err(e) = self.cycle(&interconnect) {
-                if matches!(e, Error::InterconnectFailure) {
+                if matches!(e, Error::InterconnectFailure(_)) {
                     let _ = interconnect.core.send(Status::RebuildInterconnect);
 
                 }

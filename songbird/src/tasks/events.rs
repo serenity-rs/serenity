@@ -13,8 +13,8 @@ use crate::{
         TrackHandle,
         TrackState,
     },
-    Result,
 };
+use super::error::{Error, Result};
 use flume::Receiver;
 use tracing::{debug, error, info, trace, warn};
 

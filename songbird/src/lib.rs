@@ -3,8 +3,6 @@
 #[cfg(feature = "driver")]
 mod connection;
 #[cfg(feature = "driver")]
-mod connection_info;
-#[cfg(feature = "driver")]
 pub mod constants;
 #[cfg(feature = "driver")]
 pub mod crypto;
@@ -37,7 +35,7 @@ pub use audiopus::{self as opus, Bitrate};
 #[cfg(feature = "driver")]
 pub use discortp as packet;
 pub use crate::{
-    error::{DcaError, Result, Error},
+    // error::{DcaError, Result, Error},
     events::{CoreEvent, Event, EventContext, EventHandler, TrackEvent},
     handler::Handler,
     input::{
@@ -50,7 +48,7 @@ pub use crate::{
 #[cfg(feature = "serenity")]
 pub use crate::serenity::*;
 
-use connection_info::ConnectionInfo;
+use connection::info::ConnectionInfo;
 use events::EventData;
 use tracks::Track;
 

@@ -1,15 +1,15 @@
 mod aux_network;
+pub mod error;
 mod events;
 mod mixer;
 
 use audiopus::Bitrate;
 use serenity::{
-    // error::Error,
     gateway::WsStream,
     model::id::GuildId,
 };
 use crate::{
-    connection::Connection,
+    connection::{error::Error as ConnectionError, Connection},
     events::{
         CoreContext,
         EventData,
@@ -22,10 +22,9 @@ use crate::{
         TrackHandle,
         TrackState,
     },
-    Error,
-    Result,
     Status,
 };
+use error::{Error, Result};
 use flume::{
     Receiver,
     Sender,
@@ -245,7 +244,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
                             connection = Some(conn);
                             false
                         },
-                        Err(Error::InterconnectFailure) => {
+                        Err(ConnectionError::InterconnectFailure(_)) => {
                             interconnect.restart_volatile_internals(guild_id);
 
                             match conn.reconnect(&interconnect).await {

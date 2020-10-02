@@ -44,7 +44,7 @@ pub async fn get(ctx: &Context) -> Option<Arc<ClientVoiceManager>> {
 /// `ClientBuilder`.
 ///
 /// These install the client to receive gateway voice events, and
-/// store an easily accessible reference to 
+/// store an easily accessible reference to songbir'd managers.
 pub trait SerenityInit {
 	fn register_songbird(self) -> Self;
 

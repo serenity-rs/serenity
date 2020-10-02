@@ -1,4 +1,5 @@
 use serenity::model::id::{GuildId, UserId};
+// use crate::model::id::{GuildId, UserId};
 
 #[derive(Clone, Debug)]
 pub struct ConnectionInfo {

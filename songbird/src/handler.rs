@@ -22,7 +22,7 @@ use crate::{
     EventData,
     EventHandler,
     Status as VoiceStatus,
-    connection_info::ConnectionInfo,
+    connection::info::ConnectionInfo,
     tasks,
 };
 use flume::{

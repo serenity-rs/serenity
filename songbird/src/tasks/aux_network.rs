@@ -1,3 +1,4 @@
+use super::error::{Error, Result};
 use audiopus::{
     Channels,
     coder::Decoder as OpusDecoder,
@@ -7,7 +8,6 @@ use serenity::{
 };
 use crate::{
     constants::*,
-    error::Error,
     events::{
         CoreContext,
     },
@@ -19,7 +19,6 @@ use crate::{
     },
     timer::Timer,
     ws::{ReceiverExt, SenderExt, WsStream},
-    Result,
     Status,
 };
 use discortp::{

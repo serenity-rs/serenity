@@ -260,7 +260,7 @@ struct LoopPlaySound {
 
 #[async_trait]
 impl VoiceEventHandler for LoopPlaySound {
-    async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
+    async fn act(&self, _ctx: &EventContext<'_>) -> Option<Event> {
         let src = {
             let sources = self.sources.lock().await;
             sources.get("loop").expect("Handle placed into cache at startup.").into()

@@ -1,8 +1,10 @@
+pub mod error;
+pub mod info;
+
 use serenity::{
     model::event::VoiceEvent,
 };
 use crate::{
-    connection_info::ConnectionInfo,
     constants::*,
     crypto::Mode as CryptoMode,
     payload,
@@ -14,8 +16,6 @@ use crate::{
         UdpMessage,
     },
     ws::{self, ReceiverExt, SenderExt, WsStream},
-    Result,
-    Error,
 };
 use discortp::discord::{
     IpDiscoveryPacket,
@@ -23,6 +23,8 @@ use discortp::discord::{
     MutableIpDiscoveryPacket,
     MutableKeepalivePacket,
 };
+use error::{Error, Result};
+use info::ConnectionInfo;
 use tracing::{debug, info};
 use serde::Deserialize;
 use tokio::{
@@ -32,8 +34,6 @@ use tokio::{
 use url::Url;
 use xsalsa20poly1305::{
     aead::NewAead,
-    KEY_SIZE,
-    Key,
     XSalsa20Poly1305 as Cipher,
 };
 

@@ -3,7 +3,6 @@
 // (not desirable) or break the common WS elements into a subcrate.
 // I believe that decisions is outside of the scope of the voice subcrate PR.
 
-use crate::{Error, Result};
 use async_trait::async_trait;
 use async_tungstenite::{
     tokio::ConnectStream,
@@ -11,12 +10,42 @@ use async_tungstenite::{
     WebSocketStream,
 };
 use flate2::read::ZlibDecoder;
-use serde_json::{self, Value};
+use serde_json::{self, Error as JsonError, Value};
 use tracing::{warn, instrument};
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
 
+use async_tungstenite::tungstenite::error::Error as TungsteniteError;
+
+use async_tungstenite::tungstenite::protocol::CloseFrame;
+
 pub type WsStream = WebSocketStream<ConnectStream>;
+
+pub type Result<T> = std::result::Result<T, Error>;
+
+#[derive(Debug)]
+pub enum Error {
+    Json(JsonError),
+    #[cfg(all(feature = "rustls", not(feature = "native")))]
+    Tls(RustlsError),
+
+    Ws(TungsteniteError),
+
+    WsClosed(Option<CloseFrame<'static>>),
+}
+
+impl From<JsonError> for Error {
+    fn from(e: JsonError) -> Error { Error::Json(e) }
+}
+
+#[cfg(all(feature = "rustls", not(feature = "native")))]
+impl From<RustlsError> for Error {
+    fn from(e: RustlsError) -> Error { Error::Tls(e) }
+}
+
+impl From<TungsteniteError> for Error {
+    fn from(e: TungsteniteError) -> Error { Error::Ws(e) }
+}
 
 #[cfg(all(feature = "rustls", not(feature = "native")))]
 use std::{

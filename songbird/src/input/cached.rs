@@ -1,3 +1,7 @@
+use crate::{
+    constants::*,
+};
+use super::error::{Error, Result};
 use audiopus::{
     Application,
     Bitrate,
@@ -8,11 +12,6 @@ use audiopus::{
     SampleRate,
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-use crate::{
-    constants::*,
-    Result,
-    Error,
-};
 use tracing::debug;
 use std::{
     convert::TryInto,

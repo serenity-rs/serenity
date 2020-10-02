@@ -4,7 +4,7 @@ use serenity::{
 };
 use serde_json::{json, Value};
 use crate::{
-    connection_info::ConnectionInfo,
+    connection::info::ConnectionInfo,
     crypto::Mode,
 };
 

@@ -2,8 +2,10 @@
 
 pub mod cached;
 mod dca;
+pub mod error;
 pub mod utils;
 
+use crate::constants::*;
 use audiopus::{
     coder::{
         Decoder as OpusDecoder,
@@ -14,13 +16,8 @@ use audiopus::{
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::OpusCompressor;
-use crate::{
-    constants::*,
-    error::DcaError,
-    Result,
-    Error,
-};
 use dca::DcaMetadata;
+use error::{DcaError, Error, Result};
 use futures::executor;
 use parking_lot::Mutex;
 use serde_json::Value;
