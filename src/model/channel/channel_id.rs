@@ -840,19 +840,12 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
         // If `self.before` is not set yet, we can use `.messages` to fetch
         // the last message after very first fetch from last.
-        self.buffer = 
+        self.buffer = self.channel_id.messages(&self.http, |b| {
             if let Some(before) = self.before {
-                self.channel_id
-                    .messages(&self.http, |b| 
-                        b.before(before)
-                         .limit(grab_size)
-                    ).await?
-            } else {
-                self.channel_id
-                    .messages(&self.http, |b| 
-                        b.limit(grab_size)
-                    ).await?
-            };
+                b.before(before);
+            }
+            b.limit(grab_size)
+        }).await?;
 
         self.before = self.buffer.get(0)
             .map(|message| message.id);
