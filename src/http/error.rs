@@ -1,17 +1,7 @@
-use reqwest::{
-    Error as ReqwestError,
-    Response,
-    header::InvalidHeaderValue,
-    StatusCode,
-    Url,
-};
+use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
+    fmt::{Display, Formatter, Result as FmtResult},
 };
 use url::ParseError as UrlError;
 
@@ -52,7 +42,6 @@ impl ErrorResponse {
     }
 }
 
-
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -76,9 +65,39 @@ impl Error {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
-        ErrorResponse::from_response(r)
-            .await
-            .into()
+        ErrorResponse::from_response(r).await.into()
+    }
+
+    /// Returns true when the error is caused by an unsuccessful request
+    pub fn is_unsuccessful_request(&self) -> bool {
+        match self {
+            Self::UnsuccessfulRequest(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true when the error is caused by the url containing invalid input
+    pub fn is_url_error(&self) -> bool {
+        match self {
+            Self::Url(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true when the error is caused by an invalid header
+    pub fn is_invalid_header(&self) -> bool {
+        match self {
+            Self::InvalidHeader(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns the status code if the error is an unsuccessful request
+    pub fn status_code(&self) -> Option<StatusCode> {
+        match self {
+            Self::UnsuccessfulRequest(res) => Some(res.status_code),
+            _ => None,
+        }
     }
 }
 
