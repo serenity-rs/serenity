@@ -3,14 +3,14 @@ use reqwest::{
     Error as ReqwestError,
     Response,
     StatusCode,
-    Url
+    Url,
 };
 use std::{
     error::Error as StdError,
     fmt::{
         Display,
         Formatter,
-        Result as FmtResult
+        Result as FmtResult,
     },
 };
 use url::ParseError as UrlError;
@@ -45,7 +45,7 @@ impl ErrorResponse {
             url: r.url().clone(),
             error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
-                message: "[Serenity] No correct json was received!".to_string(),
+                message: "[Serenity] Could not decode json when receiving error response from discord!".to_string(),
                 non_exhaustive: (),
             }),
         }
