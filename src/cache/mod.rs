@@ -1030,6 +1030,7 @@ mod test {
                 application: None,
                 message_reference: None,
                 flags: None,
+                referenced_message: None,
                 _nonexhaustive: (),
             },
             _nonexhaustive: (),

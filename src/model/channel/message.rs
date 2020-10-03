@@ -112,6 +112,8 @@ pub struct Message {
     pub message_reference: Option<MessageReference>,
     /// Bit flags describing extra features of the message.
     pub flags: Option<MessageFlags>,
+    /// The message that was replied to using this message.
+    pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
 }
@@ -863,6 +865,8 @@ pub enum MessageType {
     NitroTier2 = 10,
     /// An indicator that the guild has reached nitro tier 3
     NitroTier3 = 11,
+    // /// An message reply.
+    // InlineReply = 19, // TODO Enable this when v8 hits.
 }
 
 enum_number!(
@@ -879,6 +883,7 @@ enum_number!(
         NitroTier1,
         NitroTier2,
         NitroTier3,
+        // InlineReply, // TODO Enable this when v8 hits
     }
 );
 
@@ -975,6 +980,28 @@ pub struct MessageReference {
     pub guild_id: Option<GuildId>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+impl From<&Message> for MessageReference {
+    fn from(m: &Message) -> Self {
+        Self {
+            message_id: Some(m.id),
+            channel_id: m.channel_id,
+            guild_id: m.guild_id,
+            _nonexhaustive: ()
+        }
+    }
+}
+
+impl From<(ChannelId, MessageId)> for MessageReference {
+    fn from(pair: (ChannelId, MessageId)) -> Self {
+        Self {
+            message_id: Some(pair.1),
+            channel_id: pair.0,
+            guild_id: None,
+            _nonexhaustive: ()
+        }
+    }
 }
 
 /// Channel Mention Object
