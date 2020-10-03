@@ -1,7 +1,17 @@
-use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
+use reqwest::{
+    header::InvalidHeaderValue,
+    Error as ReqwestError,
+    Response,
+    StatusCode,
+    Url
+};
 use std::{
     error::Error as StdError,
-    fmt::{Display, Formatter, Result as FmtResult},
+    fmt::{
+        Display,
+        Formatter,
+        Result as FmtResult
+    },
 };
 use url::ParseError as UrlError;
 
@@ -42,6 +52,7 @@ impl ErrorResponse {
     }
 }
 
+
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -65,7 +76,9 @@ impl Error {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
-        ErrorResponse::from_response(r).await.into()
+        ErrorResponse::from_response(r)
+            .await
+            .into()
     }
 
     /// Returns true when the error is caused by an unsuccessful request
