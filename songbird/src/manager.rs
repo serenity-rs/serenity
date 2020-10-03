@@ -1,14 +1,86 @@
-use async_trait::async_trait;
-use serenity::client::bridge::voice::VoiceGatewayManager;
-use serenity::gateway::InterMessage;
-use serenity::model::{
-    id::{ChannelId, GuildId, UserId},
-    voice::VoiceState,
-};
-use std::collections::HashMap;
-use futures::channel::mpsc::UnboundedSender as Sender;
 use super::Handler;
-use tokio::sync::{Mutex, MutexGuard};
+use crate::model::id::{ChannelId, GuildId, UserId};
+
+use async_trait::async_trait;
+#[cfg(feature = "serenity")]
+use serenity::{
+    client::bridge::voice::VoiceGatewayManager,
+    gateway::InterMessage,
+    model::{
+        id::{
+            ChannelId as SerenityChannel,
+            GuildId as SerenityGuild,
+            UserId as SerenityUser,
+        },
+        voice::VoiceState,
+    },
+};
+use std::{
+    collections::HashMap,
+    result::Result as StdResult,
+    sync::Arc,
+};
+use tracing::error;
+#[cfg(feature = "serenity")]
+use futures::channel::mpsc::{
+    TrySendError,
+    UnboundedSender as Sender,
+};
+use tokio::sync::{Mutex, MutexGuard, RwLock};
+
+use parking_lot::{
+    lock_api::RwLockWriteGuard,
+    Mutex as PMutex,
+    RwLock as PRwLock,
+};
+
+#[cfg(feature = "serenity")]
+#[derive(Debug, Default)]
+pub(crate) struct ShardHandle {
+    sender: PRwLock<Option<Sender<InterMessage>>>,
+    queue: PMutex<Vec<InterMessage>>,
+}
+
+impl ShardHandle {
+    fn register(&self, sender: Sender<InterMessage>) {
+        let mut sender_lock = self.sender.write();
+        *sender_lock = Some(sender);
+
+        let sender_lock = RwLockWriteGuard::downgrade(sender_lock);
+        let mut messages_lock = self.queue.lock();
+
+        if let Some(sender) = &*sender_lock {
+            for msg in messages_lock.drain(..) {
+                if let Err(e) = sender.unbounded_send(msg) {
+                    error!("Error while clearing gateway message queue.");
+                    break;
+                }
+            }
+        }
+    }
+
+    fn deregister(&self) {
+        let mut sender_lock = self.sender.write();
+        *sender_lock = None;
+    }
+
+    pub(crate) fn send(&self, message: InterMessage) -> StdResult<(), TrySendError<InterMessage>> {
+        let sender_lock = self.sender.read();
+        if let Some(sender) = &*sender_lock {
+            sender.unbounded_send(message)
+        } else {
+            let mut messages_lock = self.queue.lock();
+            messages_lock.push(message);
+            Ok(())
+        }
+    }
+}
+
+#[derive(Clone, Copy, Debug, Default)]
+struct ClientData {
+    shard_count: u64,
+    user_id: UserId,
+}
 
 /// A manager is a struct responsible for managing [`Handler`]s which belong to
 /// a single [`Shard`]. This is a fairly complex key-value store,
@@ -25,41 +97,79 @@ use tokio::sync::{Mutex, MutexGuard};
 /// [`Handler`]: struct.Handler.html
 /// [guild's channel]: ../../model/channel/enum.ChannelType.html#variant.Voice
 /// [`Shard`]: ../gateway/struct.Shard.html
-#[derive(Clone)]
+#[derive(Debug, Default)]
 pub struct Manager {
-    handlers: HashMap<GuildId, Handler>,
-    user_id: UserId,
-    ws: Sender<InterMessage>,
+    client_data: PRwLock<ClientData>,
+    calls: PRwLock<HashMap<GuildId, Arc<Mutex<Handler>>>>,
+    #[cfg(feature = "serenity")]
+    shard_handles: PRwLock<HashMap<u64, Arc<ShardHandle>>>,
 }
 
 impl Manager {
-    pub(crate) fn new(ws: Sender<InterMessage>, user_id: UserId) -> Manager {
-        Manager {
-            handlers: HashMap::new(),
-            user_id,
-            ws,
-        }
+    pub fn initialise_client_data<U: Into<UserId>>(&self, shard_count: u64, user_id: U) {
+        let mut client_data = self.client_data.write();
+
+        client_data.shard_count = shard_count;
+        client_data.user_id = user_id.into();
     }
 
-    /// Retrieves an immutable handler for the given target, if one exists.
-    #[inline]
-    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<&Handler> {
-        self._get(guild_id.into())
+    #[cfg(feature = "serenity")]
+    fn get_or_insert_shard_handle(&self, shard_id: u64) -> Arc<ShardHandle> {
+        ({
+            let map_read = self.shard_handles.read();
+            map_read.get(&shard_id).cloned()
+        }).unwrap_or_else(|| {
+            let mut map_read = self.shard_handles.write();
+            map_read.entry(shard_id)
+                .or_default()
+                .clone()
+        })
     }
 
-    fn _get(&self, guild_id: GuildId) -> Option<&Handler> {
-        self.handlers.get(&guild_id)
+    #[cfg(feature = "serenity")]
+    pub fn register_shard_handle(&self, shard_id: u64, sender: Sender<InterMessage>) {
+        // Write locks are only used to add new entries to the map.
+        let handle = self.get_or_insert_shard_handle(shard_id);
+
+        handle.register(sender);
     }
 
-    /// Retrieves a mutable handler for the given target, if one exists.
-    #[inline]
-    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
-        -> Option<&mut Handler> {
-        self._get_mut(guild_id.into())
+    #[cfg(feature = "serenity")]
+    pub fn deregister_shard_handle(&self, shard_id: u64) {
+        // Write locks are only used to add new entries to the map.
+        let handle = self.get_or_insert_shard_handle(shard_id);
+
+        handle.deregister();
     }
 
-    fn _get_mut(&mut self, guild_id: GuildId) -> Option<&mut Handler> {
-        self.handlers.get_mut(&guild_id)
+    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<Arc<Mutex<Handler>>> {
+        let map_read = self.calls.read();
+        map_read.get(&guild_id.into()).cloned()
+    }
+
+    fn get_or_insert_call(&self, guild_id: GuildId) -> Arc<Mutex<Handler>> {
+        self.get(guild_id).unwrap_or_else(|| {
+            let mut map_read = self.calls.write();
+
+            map_read.entry(guild_id)
+                .or_insert_with(|| {
+                    let info = self.manager_info();
+                    let shard = shard_id(guild_id.0, info.shard_count);
+
+                    Arc::new(Mutex::new(Handler::new(
+                        guild_id,
+                        self.get_or_insert_shard_handle(shard),
+                        info.user_id,
+                    )))
+                })
+                .clone()
+        })
+    }
+
+    fn manager_info(&self) -> ClientData {
+        let mut client_data = self.client_data.write();
+
+        *client_data
     }
 
     /// Connects to a target by retrieving its relevant [`Handler`] and
@@ -84,38 +194,24 @@ impl Manager {
     /// [`Handler`]: struct.Handler.html
     /// [`get`]: #method.get
     #[inline]
-    pub fn join<C, G>(&mut self, guild_id: G, channel_id: C) -> &mut Handler
+    pub async fn join<C, G>(&self, guild_id: G, channel_id: C) -> Arc<Mutex<Handler>>
         where C: Into<ChannelId>, G: Into<GuildId> {
-        self._join(guild_id.into(), channel_id.into())
+        self._join(guild_id.into(), channel_id.into()).await
     }
 
-    fn _join(
-        &mut self,
+    async fn _join(
+        &self,
         guild_id: GuildId,
         channel_id: ChannelId,
-    ) -> &mut Handler {
+    ) -> Arc<Mutex<Handler>> {
+        let call = self.get_or_insert_call(guild_id);
+
         {
-            let mut found = false;
-
-            if let Some(handler) = self.handlers.get_mut(&guild_id) {
-                handler.switch_to(channel_id);
-
-                found = true;
-            }
-
-            if found {
-                // Actually safe, as the key has already been found above.
-                return self.handlers.get_mut(&guild_id).unwrap();
-            }
+            let mut handler = call.lock().await;
+            handler.join(channel_id)
         }
 
-        let mut handler = Handler::new(guild_id, self.ws.clone(), self.user_id);
-        handler.join(channel_id);
-
-        self.handlers.insert(guild_id, handler);
-
-        // Actually safe, as the key would have been inserted above.
-        self.handlers.get_mut(&guild_id).unwrap()
+        call
     }
 
     /// Retrieves the [handler][`Handler`] for the given target and leaves the
@@ -130,12 +226,13 @@ impl Manager {
     /// [`get`]: #method.get
     /// [`leave`]: struct.Handler.html#method.leave
     #[inline]
-    pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) {
-        self._leave(guild_id.into())
+    pub async fn leave<G: Into<GuildId>>(&self, guild_id: G) {
+        self._leave(guild_id.into()).await;
     }
 
-    fn _leave(&mut self, guild_id: GuildId) {
-        if let Some(handler) = self.handlers.get_mut(&guild_id) {
+    async fn _leave(&self, guild_id: GuildId) {
+        if let Some(call) = self.get(guild_id) {
+            let mut handler = call.lock().await;
             handler.leave();
         }
     }
@@ -147,184 +244,45 @@ impl Manager {
     ///
     /// [`Handler`]: struct.Handler.html
     #[inline]
-    pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) {
-        self._remove(guild_id.into())
+    pub async fn remove<G: Into<GuildId>>(&self, guild_id: G) {
+        self._remove(guild_id.into()).await
     }
 
-    fn _remove(&mut self, guild_id: GuildId) {
-        self.leave(guild_id);
-        self.handlers.remove(&guild_id);
+    async fn _remove(&self, guild_id: GuildId) {
+        self.leave(guild_id).await;
+        let mut calls = self.calls.write();
+        calls.remove(&guild_id);
     }
 }
 
-pub struct ClientVoiceManager {
-    inner: Mutex<InnerClientVoiceManager>,
-}
+#[async_trait]
+impl VoiceGatewayManager for Manager {
+    async fn initialise(&self, shard_count: u64, user_id: SerenityUser) {
+        self.initialise_client_data(shard_count, user_id);
+    }
 
-impl ClientVoiceManager {
-    pub fn new(shard_count: u64, user_id: UserId) -> Self {
-        Self {
-            inner: Mutex::new(InnerClientVoiceManager::new(shard_count, user_id)),
+    async fn register_shard(&self, shard_id: u64, sender: Sender<InterMessage>) {
+        self.register_shard_handle(shard_id, sender);
+    }
+
+    async fn deregister_shard(&self, shard_id: u64) {
+        self.deregister_shard_handle(shard_id);
+    }
+
+    async fn server_update(&self, guild_id: SerenityGuild, endpoint: &Option<String>, token: &str) {
+        if let Some(call) = self.get(guild_id) {
+            let mut handler = call.lock().await;
+            handler.update_server(endpoint, token);
         }
     }
 
-    pub async fn lock(&self) -> MutexGuard<'_, InnerClientVoiceManager> {
-        self.inner.lock().await
-    }
-}
-
-pub struct InnerClientVoiceManager {
-    managers: HashMap<u64, Manager>,
-    shard_count: u64,
-    user_id: UserId,
-}
-
-impl InnerClientVoiceManager {
-    pub fn new(shard_count: u64, user_id: UserId) -> Self {
-        Self {
-            managers: HashMap::default(),
-            shard_count,
-            user_id,
+    async fn state_update(&self, guild_id: SerenityGuild, voice_state: &VoiceState) {
+        if let Some(call) = self.get(guild_id) {
+            let mut handler = call.lock().await;
+            handler.update_state(voice_state);
         }
-    }
-
-    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<&Handler> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get(&sid)?.get(gid)
-    }
-
-    pub fn get_mut<G: Into<GuildId>>(&mut self, guild_id: G)
-        -> Option<&mut Handler> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid)?.get_mut(gid)
-    }
-
-    /// Refer to [`Manager::join`].
-    ///
-    /// This is a shortcut to retrieving the inner [`Manager`] and then calling
-    /// its `join` method.
-    ///
-    /// [`Manager`]: ../../../voice/struct.Manager.html
-    /// [`Manager::join`]: ../../../voice/struct.Manager.html#method.join
-    pub fn join<C, G>(&mut self, guild_id: G, channel_id: C)
-        -> Option<&mut Handler> where C: Into<ChannelId>, G: Into<GuildId> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid).map(|manager| manager.join(gid, channel_id))
-    }
-
-    /// Refer to [`Manager::leave`].
-    ///
-    /// This is a shortcut to retrieving the inner [`Manager`] and then calling
-    /// its `leave` method.
-    ///
-    /// [`Manager`]: ../../../voice/struct.Manager.html
-    /// [`Manager::leave`]: ../../../voice/struct.Manager.html#method.leave
-    pub fn leave<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid).map(|manager| manager.leave(gid))
-    }
-
-    /// Refer to [`Manager::remove`].
-    ///
-    /// This is a shortcut to retrieving the inner [`Manager`] and then calling
-    /// its `remove` method.
-    ///
-    /// [`Manager`]: ../../../voice/struct.Manager.html
-    /// [`Manager::remove`]: ../../../voice/struct.Manager.html#method.remove
-    pub fn remove<G: Into<GuildId>>(&mut self, guild_id: G) -> Option<()> {
-        let (gid, sid) = self.manager_info(guild_id);
-
-        self.managers.get_mut(&sid).map(|manager| manager.remove(gid))
-    }
-
-    pub fn set(&mut self, shard_id: u64, sender: Sender<InterMessage>) {
-        self.managers.insert(shard_id, Manager::new(sender, self.user_id));
-    }
-
-    /// Sets the number of shards for the voice manager to use when calculating
-    /// guilds' shard numbers.
-    ///
-    /// You probably should not call this.
-    #[doc(hidden)]
-    pub fn set_shard_count(&mut self, shard_count: u64) {
-        self.shard_count = shard_count;
-    }
-
-    /// Sets the ID of the user for the voice manager.
-    ///
-    /// You probably _really_ should not call this.
-    ///
-    /// But it's there if you need it. For some reason.
-    #[doc(hidden)]
-    pub fn set_user_id(&mut self, user_id: UserId) {
-        self.user_id = user_id;
-    }
-
-    pub fn manager_get(&self, shard_id: u64) -> Option<&Manager> {
-        self.managers.get(&shard_id)
-    }
-
-    pub fn manager_get_mut(&mut self, shard_id: u64) -> Option<&mut Manager> {
-        self.managers.get_mut(&shard_id)
-    }
-
-    pub fn manager_remove(&mut self, shard_id: u64) -> Option<Manager> {
-        self.managers.remove(&shard_id)
-    }
-
-    fn manager_info<G: Into<GuildId>>(&self, guild_id: G) -> (GuildId, u64) {
-        let guild_id = guild_id.into();
-        let shard_id = shard_id(guild_id.0, self.shard_count);
-
-        (guild_id, shard_id)
     }
 }
 
 #[inline]
 fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }
-
-#[async_trait]
-impl VoiceGatewayManager for ClientVoiceManager {
-    async fn initialise(&self, shard_count: u64, user_id: UserId) {
-        let mut manager = self.inner.lock().await;
-
-        manager.set_shard_count(shard_count);
-        manager.set_user_id(user_id);
-    }
-
-    async fn register_shard(&self, shard_id: u64, sender: Sender<InterMessage>) {
-        let mut manager = self.inner.lock().await;
-
-        manager.set(shard_id, sender);
-    }
-
-    async fn deregister_shard(&self, shard_id: u64) {
-        // FIXME: this is now the culprit of the rebalance voice disconnect bug.
-        // Double check whether the stored channel for a shard is refreshed,
-        // and if so, buffer up messages until it is replaced.
-        let mut manager = self.inner.lock().await;
-        manager.manager_remove(shard_id);
-    }
-
-    async fn server_update(&self, guild_id: GuildId, endpoint: &Option<String>, token: &str) {
-        let mut manager = self.inner.lock().await;
-        let search = manager.get_mut(guild_id);
-
-        if let Some(handler) = search {
-            handler.update_server(endpoint, token);
-        }
-    }
-
-    async fn state_update(&self, guild_id: GuildId, voice_state: &VoiceState) {
-        let mut manager = self.inner.lock().await;
-        let search = manager.get_mut(guild_id);
-
-        if let Some(handler) = search {
-            handler.update_state(voice_state);
-        }
-    }
-}

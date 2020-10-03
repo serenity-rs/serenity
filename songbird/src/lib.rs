@@ -42,7 +42,7 @@ pub use crate::{
         ffmpeg,
         ytdl,
     },
-    manager::{ClientVoiceManager, Manager},
+    manager::Manager,
     tracks::create_player,
 };
 #[cfg(feature = "serenity")]

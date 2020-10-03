@@ -77,11 +77,10 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    let handler = match manager.get_mut(guild_id) {
+    let handler_lock = match manager.get(guild_id) {
         Some(handler) => handler,
         None => {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
@@ -89,6 +88,8 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         },
     };
+
+    let mut handler = handler_lock.lock().await;
 
     if handler.self_deaf {
         check_msg(msg.channel_id.say(&ctx.http, "Already deafened").await);
@@ -127,15 +128,10 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         }
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if manager.join(guild_id, connect_to).is_some() {
-        check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())).await);
-    } else {
-        check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel").await);
-    }
+    let _handler = manager.join(guild_id, connect_to).await;
 
     Ok(())
 }
@@ -151,13 +147,12 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
-    let has_handler = manager.get(guild_id).is_some();
+    let mut has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        manager.remove(guild_id);
+        manager.remove(guild_id).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Left voice channel").await);
     } else {
@@ -178,11 +173,10 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    let handler = match manager.get_mut(guild_id) {
+    let handler_lock = match manager.get(guild_id) {
         Some(handler) => handler,
         None => {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
@@ -190,6 +184,8 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         },
     };
+
+    let mut handler = handler_lock.lock().await;
 
     if handler.self_mute {
         check_msg(msg.channel_id.say(&ctx.http, "Already muted").await);
@@ -235,11 +231,12 @@ async fn play(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.get_mut(guild_id) {
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
+
         let source = match songbird::ytdl(&url).await {
             Ok(source) => source,
             Err(why) => {
@@ -272,11 +269,11 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.get_mut(guild_id) {
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
         handler.deafen(false);
 
         check_msg(msg.channel_id.say(&ctx.http, "Undeafened").await);
@@ -297,11 +294,11 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         },
     };
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.get_mut(guild_id) {
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
         handler.mute(false);
 
         check_msg(msg.channel_id.say(&ctx.http, "Unmuted").await);

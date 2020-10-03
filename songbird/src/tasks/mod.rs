@@ -4,10 +4,6 @@ mod events;
 mod mixer;
 
 use audiopus::Bitrate;
-use serenity::{
-    gateway::WsStream,
-    model::id::GuildId,
-};
 use crate::{
     connection::{error::Error as ConnectionError, Connection},
     events::{
@@ -15,6 +11,7 @@ use crate::{
         EventData,
         EventStore,
     },
+    model::id::GuildId,
     tracks::{
         LoopState,
         PlayMode,
@@ -22,6 +19,7 @@ use crate::{
         TrackHandle,
         TrackState,
     },
+    ws::WsStream,
     Status,
 };
 use flume::{

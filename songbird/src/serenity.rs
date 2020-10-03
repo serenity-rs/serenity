@@ -1,4 +1,4 @@
-use crate::manager::ClientVoiceManager;
+use crate::manager::Manager;
 use serenity::{
 	client::{ClientBuilder, Context},
 	prelude::TypeMapKey,
@@ -10,21 +10,21 @@ use std::sync::Arc;
 pub struct Songbird {}
 
 impl TypeMapKey for Songbird {
-    type Value = Arc<ClientVoiceManager>;
+    type Value = Arc<Manager>;
 }
 
 /// Installs a new songbird instance into the serenity client.
 ///
 /// This should be called after any uses of `ClientBuilder::type_map`.
 pub fn register(client_builder: ClientBuilder) -> ClientBuilder {
-	let voice = ClientVoiceManager::new(0, 0.into());
+	let voice = Manager::default();
 	register_with(client_builder, voice)
 }
 
 /// Installs a given songbird instance into the serenity client.
 ///
 /// This should be called after any uses of `ClientBuilder::type_map`.
-pub fn register_with(client_builder: ClientBuilder, voice: ClientVoiceManager) -> ClientBuilder {
+pub fn register_with(client_builder: ClientBuilder, voice: Manager) -> ClientBuilder {
 	let voice = Arc::new(voice);
 
 	client_builder.voice_manager_arc(voice.clone())
@@ -33,7 +33,7 @@ pub fn register_with(client_builder: ClientBuilder, voice: ClientVoiceManager) -
 
 /// Retrieve the Songbird voice client from a serenity context's
 /// shared key-value store.
-pub async fn get(ctx: &Context) -> Option<Arc<ClientVoiceManager>> {
+pub async fn get(ctx: &Context) -> Option<Arc<Manager>> {
 	let data = ctx.data.read().await;
 
 	data.get::<Songbird>()
@@ -48,7 +48,7 @@ pub async fn get(ctx: &Context) -> Option<Arc<ClientVoiceManager>> {
 pub trait SerenityInit {
 	fn register_songbird(self) -> Self;
 
-	fn register_songbird_with(self, voice: ClientVoiceManager) -> Self;
+	fn register_songbird_with(self, voice: Manager) -> Self;
 }
 
 impl SerenityInit for ClientBuilder<'_> {
@@ -56,7 +56,7 @@ impl SerenityInit for ClientBuilder<'_> {
 		register(self)
 	}
 
-	fn register_songbird_with(self, voice: ClientVoiceManager) -> Self {
+	fn register_songbird_with(self, voice: Manager) -> Self {
 		register_with(self, voice)
 	}
 }

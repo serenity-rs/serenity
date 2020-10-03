@@ -2,17 +2,11 @@ use audiopus::Bitrate;
 use serenity::{
     constants::VoiceOpCode,
     gateway::InterMessage,
-    model::{
-        id::{
-            ChannelId,
-            GuildId,
-            UserId
-        },
-        voice::VoiceState,
-    },
+    model::voice::VoiceState,
 };
 use crate::{
     input::Input,
+    model::id::{ChannelId, GuildId, UserId},
     tracks::{
         Track,
         TrackHandle,
@@ -24,12 +18,15 @@ use crate::{
     connection::info::ConnectionInfo,
     tasks,
 };
+#[cfg(feature = "serenity")]
+use crate::manager::ShardHandle;
 use flume::{
     SendError,
     Sender as FlumeSender,
 };
 use futures::channel::mpsc::UnboundedSender as Sender;
 use serde_json::json;
+use std::sync::Arc;
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -108,12 +105,13 @@ pub struct Handler {
     /// [`new`]: #method.new
     /// [`standalone`]: #method.standalone
     pub user_id: UserId,
+    #[cfg(feature = "serenity")]
     /// Will be set when a `Handler` is made via the [`new`][`Handler::new`]
     /// method.
     ///
     /// When set via [`standalone`][`Handler::standalone`], it will not be
     /// present.
-    ws: Option<Sender<InterMessage>>,
+    ws: Option<Arc<ShardHandle>>,
 }
 
 impl Handler {
@@ -121,7 +119,7 @@ impl Handler {
     #[inline]
     pub(crate) fn new(
         guild_id: GuildId,
-        ws: Sender<InterMessage>,
+        ws: Arc<ShardHandle>,
         user_id: UserId,
     ) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
@@ -172,10 +170,10 @@ impl Handler {
         // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
             endpoint,
-            guild_id,
+            guild_id: guild_id.0.into(),
             session_id,
             token,
-            user_id,
+            user_id: user_id.0.into(),
         }));
 
         true
@@ -408,11 +406,11 @@ impl Handler {
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
     pub fn update_state(&mut self, voice_state: &VoiceState) {
-        if self.user_id != voice_state.user_id.0 {
+        if self.user_id != voice_state.user_id.into() {
             return;
         }
 
-        self.channel_id = voice_state.channel_id;
+        self.channel_id = voice_state.channel_id.map(Into::into);
 
         if voice_state.channel_id.is_some() {
             self.session_id = Some(voice_state.session_id.clone());
@@ -427,7 +425,7 @@ impl Handler {
 
     fn new_raw(
         guild_id: GuildId,
-        ws: Option<Sender<InterMessage>>,
+        ws: Option<Arc<ShardHandle>>,
         user_id: UserId,
     ) -> Self {
         let (tx, rx) = flume::unbounded();
@@ -490,7 +488,7 @@ impl Handler {
                 }
             });
 
-            let _ = ws.unbounded_send(InterMessage::Json(map));
+            let _ = ws.send(InterMessage::Json(map));
         }
     }
 }
