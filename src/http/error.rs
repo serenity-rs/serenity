@@ -1,7 +1,7 @@
 use reqwest::{
+    header::InvalidHeaderValue,
     Error as ReqwestError,
     Response,
-    header::InvalidHeaderValue,
     StatusCode,
     Url,
 };
@@ -10,8 +10,8 @@ use std::{
     fmt::{
         Display,
         Formatter,
-        Result as FmtResult
-    }
+        Result as FmtResult,
+    },
 };
 use url::ParseError as UrlError;
 
@@ -45,7 +45,7 @@ impl ErrorResponse {
             url: r.url().clone(),
             error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
-                message: "[Serenity] No correct json was received!".to_string(),
+                message: "[Serenity] Could not decode json when receiving error response from discord!".to_string(),
                 non_exhaustive: (),
             }),
         }
@@ -79,6 +79,38 @@ impl Error {
         ErrorResponse::from_response(r)
             .await
             .into()
+    }
+
+    /// Returns true when the error is caused by an unsuccessful request
+    pub fn is_unsuccessful_request(&self) -> bool {
+        match self {
+            Self::UnsuccessfulRequest(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true when the error is caused by the url containing invalid input
+    pub fn is_url_error(&self) -> bool {
+        match self {
+            Self::Url(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns true when the error is caused by an invalid header
+    pub fn is_invalid_header(&self) -> bool {
+        match self {
+            Self::InvalidHeader(_) => true,
+            _ => false,
+        }
+    }
+
+    /// Returns the status code if the error is an unsuccessful request
+    pub fn status_code(&self) -> Option<StatusCode> {
+        match self {
+            Self::UnsuccessfulRequest(res) => Some(res.status_code),
+            _ => None,
+        }
     }
 }
 
