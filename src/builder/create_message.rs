@@ -70,11 +70,16 @@ impl<'a> CreateMessage<'a> {
         self
     }
 
-    /// Set an embed for the message.
+    /// Create an embed for the message.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
     where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
+        self.set_embed(embed)
+    }
+
+    /// Set an embed for the message.
+    pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
         let embed = Value::Object(map);
 
