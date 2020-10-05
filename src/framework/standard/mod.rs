@@ -91,7 +91,7 @@ type PrefixOnlyHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'f
 ///
 /// Refer to the [module-level documentation] for more information.
 ///
-/// [module-level documentation]: index.html
+/// [module-level documentation]: self
 #[derive(Default)]
 pub struct StandardFramework {
     groups: Vec<(&'static CommandGroup, Map)>,
@@ -117,8 +117,8 @@ pub struct StandardFramework {
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`EventHandler::message`]: ../../client/trait.EventHandler.html#method.message
-    /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
+    /// [`EventHandler::message`]: crate::client::EventHandler::message
+    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
     pub initialized: bool,
 }
 
@@ -155,10 +155,9 @@ impl StandardFramework {
     /// # }
     /// ```
     ///
-    /// [`Client`]: ../../client/struct.Client.html
-    /// [`Configuration::default`]: struct.Configuration.html#method.default
-    /// [`prefix`]: struct.Configuration.html#method.prefix
-    /// [allowing whitespace between prefixes]: struct.Configuration.html#method.with_whitespace
+    /// [`Client`]: crate::Client
+    /// [`prefix`]: Configuration::prefix
+    /// [allowing whitespace between prefixes]: Configuration::with_whitespace
     pub fn configure<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut Configuration) -> &mut Configuration,
@@ -378,7 +377,7 @@ impl StandardFramework {
     /// Note: does _not_ return `Self` like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
     ///
-    /// [`group`]: #method.group
+    /// [`group`]: Self::group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(

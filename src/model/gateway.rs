@@ -56,8 +56,7 @@ pub struct Activity {
     pub timestamps: Option<ActivityTimestamps>,
     /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
     ///
-    /// [`ActivityType::Streaming`]: enum.ActivityType.html#variant.Streaming
-    /// [`kind`]: #structfield.kind
+    /// [`kind`]: Self::kind
     pub url: Option<String>,
     #[serde(skip_serializing)]
     pub(crate) _nonexhaustive: (),
@@ -435,8 +434,6 @@ impl Default for ActivityType {
 /// A representation of the data retrieved from the gateway endpoint.
 ///
 /// For the bot-specific gateway, refer to [`BotGateway`].
-///
-/// [`BotGateway`]: struct.BotGateway.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct Gateway {
     /// The gateway to connect to.
@@ -446,8 +443,6 @@ pub struct Gateway {
 }
 
 /// Information detailing the current active status of a [`User`].
-///
-/// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ClientStatus {
     pub desktop: Option<OnlineStatus>,
@@ -456,13 +451,9 @@ pub struct ClientStatus {
 }
 
 /// Information detailing the current online status of a [`User`].
-///
-/// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
     /// [`User`]'s current activities.
-    ///
-    /// [`User`]: struct.User.html
     pub activities: Vec<Activity>,
     /// The devices a user are currently active on, if available.
     pub client_status: Option<ClientStatus>,
@@ -470,7 +461,7 @@ pub struct Presence {
     pub last_modified: Option<u64>,
     /// The user's online status.
     pub status: OnlineStatus,
-    /// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user's creation
+    /// The Id of the [`User`]. Can be used to calculate the user's creation
     /// date.
     pub user_id: UserId,
     /// The associated user instance.

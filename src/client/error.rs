@@ -12,10 +12,10 @@ use std::{
 /// This is always wrapped within the library's generic [`Error::Client`]
 /// variant.
 ///
-/// [`Client`]: struct.Client.html
-/// [`Error`]: ../enum.Error.html
-/// [`Error::Client`]: ../enum.Error.html#variant.Client
-/// [`GuildId::ban`]: ../model/id/struct.GuildId.html#method.ban
+/// [`Client`]: super::Client
+/// [`Error`]: crate::Error
+/// [`Error::Client`]: crate::Error::Client
+/// [`GuildId::ban`]: crate::model::id::GuildId::ban
 #[allow(clippy::enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
@@ -23,7 +23,7 @@ pub enum Error {
     /// When the token provided is invalid. This is returned when validating a
     /// token through the [`validate_token`] function.
     ///
-    /// [`validate_token`]: fn.validate_token.html
+    /// [`validate_token`]: super::validate_token
     InvalidToken,
     /// When a shard has completely failed to reboot after resume and/or
     /// reconnect attempts.

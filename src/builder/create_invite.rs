@@ -65,8 +65,8 @@ use serde_json::Value;
 /// # }
 /// ```
 ///
-/// [`GuildChannel::create_invite`]: ../model/channel/struct.GuildChannel.html#method.create_invite
-/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
+/// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite
+/// [`RichInvite`]: crate::model::invite::RichInvite
 #[derive(Clone, Debug)]
 pub struct CreateInvite(pub HashMap<&'static str, Value>);
 

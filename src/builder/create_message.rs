@@ -48,11 +48,11 @@ use std::collections::HashMap;
 /// });
 /// ```
 ///
-/// [`ChannelId::say`]: ../model/id/struct.ChannelId.html#method.say
-/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
-/// [`content`]: #method.content
-/// [`embed`]: #method.embed
-/// [`Http::send_message`]: ../http/client/struct.Http.html#method.send_message
+/// [`ChannelId::say`]: crate::model::id::ChannelId::say
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`content`]: Self::content
+/// [`embed`]: Self::embed
+/// [`Http::send_message`]: crate::http::client::Http::send_message
 #[derive(Clone, Debug)]
 pub struct CreateMessage<'a>(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType<'a>>);
 
@@ -152,8 +152,8 @@ impl<'a> Default for CreateMessage<'a> {
     /// Creates a map for sending a [`Message`], setting [`tts`] to `false` by
     /// default.
     ///
-    /// [`Message`]: ../model/channel/struct.Message.html
-    /// [`tts`]: #method.tts
+    /// [`Message`]: crate::model::channel::Message
+    /// [`tts`]: Self::tts
     fn default() -> CreateMessage<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));

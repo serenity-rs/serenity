@@ -12,7 +12,7 @@
 //! use serenity::prelude::*;
 //! ```
 //!
-//! [`serenity::Error`]: ../enum.Error.html
+//! [`serenity::Error`]: crate::Error
 
 pub use crate::error::Error as SerenityError;
 pub use crate::model::misc::Mentionable;

@@ -1,5 +1,6 @@
 //! Mappings of objects received from Discord's voice gateway API, with implementations
 //! for (de)serialisation.
+#![deny(broken_intra_doc_links)]
 
 mod close_code;
 pub mod constants;

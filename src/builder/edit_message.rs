@@ -29,7 +29,7 @@ use std::collections::HashMap;
 /// # }
 /// ```
 ///
-/// [`Message`]: ../model/channel/struct.Message.html
+/// [`Message`]: crate::model::channel::Message
 #[derive(Clone, Debug, Default)]
 pub struct EditMessage(pub HashMap<&'static str, Value>);
 

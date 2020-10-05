@@ -36,20 +36,16 @@ use std::collections::HashMap;
 /// });
 /// ```
 ///
-/// [`PartialGuild::create_role`]: ../model/guild/struct.PartialGuild.html#method.create_role
-/// [`Guild::create_role`]: ../model/guild/struct.Guild.html#method.create_role
-/// [`Guild::edit_role`]: ../model/guild/struct.Guild.html#method.edit_role
-/// [`GuildId::create_role`]: ../model/id/struct.GuildId.html#method.create_role
-/// [`GuildId::edit_role`]: ../model/id/struct.GuildId.html#method.edit_role
-/// [`Role`]: ../model/guild/struct.Role.html
-/// [`Role::edit`]: ../model/guild/struct.Role.html#method.edit
+/// [`PartialGuild::create_role`]: crate::model::guild::PartialGuild::create_role
+/// [`Guild::create_role`]: crate::model::guild::Guild::create_role
+/// [`Guild::edit_role`]: crate::model::guild::Guild::edit_role
+/// [`GuildId::create_role`]: crate::model::id::GuildId::create_role
+/// [`GuildId::edit_role`]: crate::model::id::GuildId::edit_role
 #[derive(Clone, Debug, Default)]
 pub struct EditRole(pub HashMap<&'static str, Value>);
 
 impl EditRole {
     /// Creates a new builder with the values of the given [`Role`].
-    ///
-    /// [`Role`]: ../model/guild/struct.Role.html
     pub fn new(role: &Role) -> Self {
         let mut map = HashMap::with_capacity(8);
 

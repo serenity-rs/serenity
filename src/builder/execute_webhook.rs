@@ -47,9 +47,9 @@ use crate::http::AttachmentType;
 /// # }
 /// ```
 ///
-/// [`Webhook`]: ../model/webhook/struct.Webhook.html
-/// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook
+/// [`Webhook`]: crate::model::webhook::Webhook
+/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
+/// [`execute_webhook`]: crate::http::client::Http::execute_webhook
 #[derive(Clone, Debug)]
 pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
 
@@ -109,7 +109,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     ///
-    /// [`embeds`]: #method.embeds
+    /// [`embeds`]: Self::embeds
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
         self
@@ -146,8 +146,8 @@ impl<'a> ExecuteWebhook<'a> {
     /// Refer to the [struct-level documentation] for an example on how to use
     /// embeds.
     ///
-    /// [`Embed::fake`]: ../model/channel/struct.Embed.html#method.fake
-    /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
+    /// [`Embed::fake`]: crate::model::channel::Embed::fake
+    /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     /// [struct-level documentation]: #examples
     pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
         self.0.insert("embeds", Value::Array(embeds));
@@ -228,8 +228,8 @@ impl<'a> Default for ExecuteWebhook<'a> {
     /// let executor = ExecuteWebhook::default();
     /// ```
     ///
-    /// [`Webhook`]: ../model/webhook/struct.Webhook.html
-    /// [`tts`]: #method.tts
+    /// [`Webhook`]: crate::model::webhook::Webhook
+    /// [`tts`]: Self::tts
     fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));

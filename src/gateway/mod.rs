@@ -38,12 +38,12 @@
 //! instance. This should be used when you, for example, want to split 10 shards
 //! across 3 instances.
 //!
-//! [`Client`]: ../client/struct.Client.html
-//! [`Client::start`]: ../client/struct.Client.html#method.start
-//! [`Client::start_autosharded`]: ../client/struct.Client.html#method.start_autosharded
-//! [`Client::start_shard`]: ../client/struct.Client.html#method.start_shard
-//! [`Client::start_shard_range`]: ../client/struct.Client.html#method.start_shard_range
-//! [`Client::start_shards`]: ../client/struct.Client.html#method.start_shards
+//! [`Client`]: crate::Client
+//! [`Client::start`]: crate::Client::start
+//! [`Client::start_autosharded`]: crate::Client::start_autosharded
+//! [`Client::start_shard`]: crate::Client::start_shard
+//! [`Client::start_shard_range`]: crate::Client::start_shard_range
+//! [`Client::start_shards`]: crate::Client::start_shards
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod error;
@@ -75,39 +75,25 @@ pub type WsStream = WebSocketStream<ConnectStream>;
 /// Indicates the current connection stage of a [`Shard`].
 ///
 /// This can be useful for knowing which shards are currently "down"/"up".
-///
-/// [`Shard`]: struct.Shard.html
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
     /// a resume phase.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Connected,
     /// Indicator that the [`Shard`] is connecting and is in, e.g., a resume
     /// phase.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Connecting,
     /// Indicator that the [`Shard`] is fully disconnected and is not in a
     /// reconnecting phase.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Disconnected,
     /// Indicator that the [`Shard`] is currently initiating a handshake.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Handshake,
     /// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting
     /// a READY packet.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Identifying,
     /// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a
     /// RESUMED packet.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Resuming,
 }
 
@@ -140,11 +126,6 @@ impl ConnectionStage {
     ///
     /// assert!(!ConnectionStage::Connected.is_connecting());
     /// ```
-    ///
-    /// [`ConnectionStage::Connecting`]: #variant.Connecting
-    /// [`ConnectionStage::Handshake`]: #variant.Handshake
-    /// [`ConnectionStage::Identifying`]: #variant.Identifying
-    /// [`ConnectionStage::Resuming`]: #variant.Resuming
     pub fn is_connecting(self) -> bool {
         use self::ConnectionStage::*;
 

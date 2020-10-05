@@ -8,8 +8,6 @@ use crate::utils as serenity_utils;
 use crate::http::{Http, CacheHttp};
 
 /// A category of [`GuildChannel`]s.
-///
-/// [`GuildChannel`]: struct.GuildChannel.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
 pub struct ChannelCategory {
     /// Id of this category.
@@ -24,8 +22,6 @@ pub struct ChannelCategory {
     /// Indicator of the type of channel this is.
     ///
     /// This should always be [`ChannelType::Category`].
-    ///
-    /// [`ChannelType::Category`]: enum.ChannelType.html#variant.Category
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The name of the category.
@@ -34,8 +30,6 @@ pub struct ChannelCategory {
     #[serde(default)]
     pub nsfw: bool,
     /// Permission overwrites for the [`GuildChannel`]s.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     pub permission_overwrites: Vec<PermissionOverwrite>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
@@ -53,7 +47,7 @@ impl ChannelCategory {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
         self.id.delete_permission(&http, permission_type).await

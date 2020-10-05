@@ -1,4 +1,4 @@
-//! The client gateway bridge is support essential for the [`client`][client] module.
+//! The client gateway bridge is support essential for the [`client`] module.
 //!
 //! This is made available for user use if one wishes to be lower-level or avoid
 //! the higher functionality of the [`Client`].
@@ -38,15 +38,9 @@
 //! For almost every - if not every - use case, you only need to _possibly_ be
 //! concerned about the [`ShardManager`] in this module.
 //!
-//! [client]: ../../index.html
-//! [`Client`]: ../../struct.Client.html
-//! [`Shard`]: ../../../gateway/struct.Shard.html
-//! [`ShardManager`]: struct.ShardManager.html
-//! [`ShardManager::restart`]: struct.ShardManager.html#method.restart
-//! [`ShardManager::shutdown`]: struct.ShardManager.html#method.shutdown
-//! [`ShardManagerMessage`]: enum.ShardManagerMessage.html
-//! [`ShardQueue`]: struct.ShardQueuer.html
-//! [`ShardRunner`]: struct.ShardRunner.html
+//! [`client`]: crate::client
+//! [`Client`]: crate::Client
+//! [`Shard`]: crate::gateway::Shard
 
 pub mod event;
 
@@ -77,31 +71,20 @@ use std::{
 use crate::gateway::ConnectionStage;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
-///
-/// [`ShardManager`]: struct.ShardManager.html
-/// [`ShardRunner`]: struct.ShardRunner.html
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
-    ///
-    /// [`ShardManager`]: struct.ShardManager.html
     Manager(ShardManagerMessage),
     /// A message intended to be worked with by a [`ShardRunner`].
-    ///
-    /// [`ShardRunner`]: struct.ShardRunner.html
     Runner(ShardRunnerMessage),
 }
 
 /// A message for a [`ShardManager`] relating to an operation with a shard.
-///
-/// [`ShardManager`]: struct.ShardManager.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ShardManagerMessage {
     /// Indicator that a [`ShardManagerMonitor`] should restart a shard.
-    ///
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     Restart(ShardId),
     /// An update from a shard runner,
     ShardUpdate {
@@ -111,14 +94,9 @@ pub enum ShardManagerMessage {
     },
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
     /// without bringing it back up.
-    ///
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     Shutdown(ShardId, u16),
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards
     /// and end its monitoring process for the [`ShardManager`].
-    ///
-    /// [`ShardManager`]: struct.ShardManager.html
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     ShutdownAll,
     /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the
     /// component that receives this to also shutdown with no further action
@@ -126,33 +104,28 @@ pub enum ShardManagerMessage {
     ShutdownInitiated,
     /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to
     /// move toward the next one.
-    ///
-    /// [`ShardRunner`]: struct.ShardRunner.html
     ShutdownFinished(ShardId),
     /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.
     /// Emitted when a shard receives an [`InvalidAuthentication`] Error
     ///
-    /// [`InvalidAuthentication`]: ../../../gateway/enum.GatewayError.html#variant.InvalidAuthentication
+    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
     ShardInvalidAuthentication,
     /// Indicator that a shard provided undocumented gateway intents.
     /// Emitted when a shard received an [`InvalidGatewayIntents`] error.
     ///
-    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.InvalidGatewayIntents
+    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
     ShardInvalidGatewayIntents,
     /// If a connection has been established but privileged gateway intents
     /// were provided without enabling them prior.
     /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
     ///
-    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.DisallowedGatewayIntents
+    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
     ShardDisallowedGatewayIntents,
 }
 
 /// A message to be sent to the [`ShardQueuer`].
 ///
 /// This should usually be wrapped in a [`ShardClientMessage`].
-///
-/// [`ShardClientMessage`]: enum.ShardClientMessage.html
-/// [`ShardQueuer`]: struct.ShardQueuer.html
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
     /// Message to start a shard, where the 0-index element is the ID of the
@@ -179,9 +152,6 @@ impl Display for ShardId {
 ///
 /// The [`ShardId`] is not included because, as it stands, you probably already
 /// know the Id if you obtained this.
-///
-/// [`ShardId`]: struct.ShardId.html
-/// [`ShardRunner`]: struct.ShardRunner.html
 #[derive(Debug)]
 pub struct ShardRunnerInfo {
     /// The latency between when a heartbeat was sent and when the

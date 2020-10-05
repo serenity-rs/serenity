@@ -26,15 +26,15 @@ use crate::collector::{MessageFilter, ReactionFilter};
 /// A context will only live for the event it was dispatched for. After the
 /// event handler finished, it is destroyed and will not be re-used.
 ///
-/// [`Shard`]: ../gateway/struct.Shard.html
-/// [`http`]: ../http/index.html
-/// [`set_activity`]: #method.set_activity
+/// [`Shard`]: crate::gateway::Shard
+/// [`http`]: crate::http
+/// [`set_activity`]: Self::set_activity
 #[derive(Clone)]
 pub struct Context {
     /// A clone of [`Client::data`]. Refer to its documentation for more
     /// information.
     ///
-    /// [`Client::data`]: struct.Client.html#structfield.data
+    /// [`Client::data`]: super::Client::data
     pub data: Arc<RwLock<TypeMap>>,
     /// The messenger to communicate with the shard runner.
     pub shard: ShardMessenger,
@@ -123,7 +123,7 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn online(&self) {
@@ -160,7 +160,7 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
+    /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn idle(&self) {
@@ -197,7 +197,7 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn dnd(&self) {
@@ -233,8 +233,8 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible
+    /// [`Event::Ready`]: crate::model::event::Event::Ready
+    /// [`Invisible`]: OnlineStatus::Invisible
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn invisible(&self) {
@@ -271,9 +271,9 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
-    /// [`set_presence`]: #method.set_presence
+    /// [`Event::Resumed`]: crate::model::event::Event::Resumed
+    /// [`Online`]: OnlineStatus::Online
+    /// [`set_presence`]: Self::set_presence
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn reset_presence(&self) {
@@ -314,7 +314,7 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online
+    /// [`Online`]: OnlineStatus::Online
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn set_activity(&self, activity: Activity) {
@@ -380,8 +380,8 @@ impl Context {
     /// # }
     /// ```
     ///
-    /// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb
-    /// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle
+    /// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+    /// [`Idle`]: OnlineStatus::Idle
     #[cfg(feature = "gateway")]
     #[inline]
     pub async fn set_presence(&self, activity: Option<Activity>, status: OnlineStatus) {

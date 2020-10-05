@@ -42,7 +42,7 @@ use std::collections::HashMap;
 /// # }
 /// ```
 ///
-/// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
+/// [`GuildChannel::messages`]: crate::model::channel::GuildChannel::messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub HashMap<&'static str, u64>);
 

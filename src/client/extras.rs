@@ -12,7 +12,7 @@ use crate::framework::Framework;
 
 /// A builder to extra things for altering the [`Client`].
 ///
-/// [`Client`]: ../struct.Client.html
+/// [`Client`]: super::Client
 #[derive(Clone)]
 pub struct Extras {
     pub(crate) event_handler: Option<Arc<dyn EventHandler>>,
@@ -39,7 +39,7 @@ impl Extras {
     /// If you have set the specialised [`event_handler`], all events
     /// will be cloned for use to the raw event handler.
     ///
-    /// [`event_handler`]: #method.event_handler
+    /// [`event_handler`]: Self::event_handler
     pub fn raw_event_handler<H>(&mut self, handler: H) -> &mut Self
     where
         H: RawEventHandler + 'static,

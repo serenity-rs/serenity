@@ -9,9 +9,9 @@ use std::collections::HashMap;
 ///
 /// Except [`name`], all fields are optional.
 ///
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`name`]: #method.name
+/// [`GuildChannel`]: crate::model::channel::GuildChannel
+/// [`Guild`]: crate::model::guild::Guild
+/// [`name`]: Self::name
 #[derive(Debug, Clone)]
 pub struct CreateChannel(pub HashMap<&'static str, Value>);
 

@@ -8,7 +8,7 @@ use super::LightMethod;
 /// and memory-efficient representations of each path that functions exist for
 /// in the [`http`] module.
 ///
-/// [`http`]: ../index.html
+/// [`http`]: crate::http
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 #[non_exhaustive]
 pub enum Route {
@@ -16,31 +16,31 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsId(u64),
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdInvites(u64),
     /// Route for the `/channels/:channel_id/messages` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessages(u64),
     /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesBulkDelete(u64),
     /// Route for the `/channels/:channel_id/messages/:message_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     // This route is a unique case. The ratelimit for message _deletions_ is
     // different than the overall route ratelimit.
     //
@@ -55,14 +55,14 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesIdAck(u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
     /// path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesIdReactions(u64),
     /// Route for the
     /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
@@ -70,37 +70,37 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesIdReactionsUserIdType(u64),
     /// Route for the `/channels/:channel_id/permissions/:target_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPermissionsOverwriteId(u64),
     /// Route for the `/channels/:channel_id/pins` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPins(u64),
     /// Route for the `/channels/:channel_id/pins/:message_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPinsMessageId(u64),
     /// Route for the `/channels/:channel_id/typing` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdTyping(u64),
     /// Route for the `/channels/:channel_id/webhooks` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdWebhooks(u64),
     /// Route for the `/gateway` path.
     Gateway,
@@ -112,133 +112,133 @@ pub enum Route {
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsId(u64),
     /// Route for the `/guilds/:guild_id/bans` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdBans(u64),
     /// Route for the `/guilds/:guild_id/audit-logs` path.
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdAuditLogs(u64),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdBansUserId(u64),
     /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdChannels(u64),
     /// Route for the `/guilds/:guild_id/embed` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdEmbed(u64),
     /// Route for the `/guilds/:guild_id/emojis` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdEmojis(u64),
     /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdEmojisId(u64),
     /// Route for the `/guilds/:guild_id/integrations` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdIntegrations(u64),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdIntegrationsId(u64),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
     /// path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdIntegrationsIdSync(u64),
     /// Route for the `/guilds/:guild_id/invites` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdInvites(u64),
     /// Route for the `/guilds/:guild_id/members` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembers(u64),
     /// Route for the `/guilds/:guild_id/members/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersId(u64),
     /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersIdRolesId(u64),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersMeNick(u64),
     /// Route for the `/guilds/:guild_id/prune` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdPrune(u64),
     /// Route for the `/guilds/:guild_id/regions` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRegions(u64),
     /// Route for the `/guilds/:guild_id/roles` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRoles(u64),
     /// Route for the `/guilds/:guild_id/roles/:role_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRolesId(u64),
     /// Route for the `/guilds/:guild_id/vanity-url` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdVanityUrl(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdWebhooks(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,

@@ -119,7 +119,7 @@ pub struct RoleId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct UserId(pub u64);
 
-/// An identifier for a [`Webhook`](../webhook/struct.Webhook.html).
+/// An identifier for a [`Webhook`][super::webhook::Webhook]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct WebhookId(pub u64);
 

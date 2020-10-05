@@ -10,9 +10,8 @@
 //!
 //! Documentation for embeds can be found [here].
 //!
-//! [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
-//! [`CreateEmbed`]: struct.CreateEmbed.html
-//! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
+//! [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+//! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
 use crate::internal::prelude::*;
@@ -36,9 +35,9 @@ use crate::utils::Colour;
 /// Refer to the documentation for [`ChannelId::send_message`] for a very in-depth
 /// example on how to use this.
 ///
-/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
-/// [`Embed`]: ../model/channel/struct.Embed.html
-/// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
+/// [`Embed`]: crate::model::channel::Embed
+/// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 #[derive(Clone, Debug)]
 pub struct CreateEmbed(pub HashMap<&'static str, Value>);
 
@@ -47,8 +46,6 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more
     /// information.
-    ///
-    /// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html
     pub fn author<F>(&mut self, f: F) -> &mut Self
         where F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor {
         let mut author = CreateEmbedAuthor::default();
@@ -68,7 +65,7 @@ impl CreateEmbed {
     ///
     /// This is an alias of [`colour`].
     ///
-    /// [`colour`]: #method.colour
+    /// [`colour`]: Self::colour
     #[cfg(feature = "utils")]
     #[inline]
     pub fn color<C: Into<Colour>>(&mut self, colour: C) -> &mut Self {
@@ -96,7 +93,7 @@ impl CreateEmbed {
     ///
     /// This is an alias of [`colour`].
     ///
-    /// [`colour`]: #method.colour
+    /// [`colour`]: Self::colour
     #[cfg(not(feature = "utils"))]
     #[inline]
     pub fn color(&mut self, colour: u32) -> &mut Self {
@@ -152,7 +149,7 @@ impl CreateEmbed {
     ///
     /// This is sugar to reduce the need of calling [`field`] manually multiple times.
     ///
-    /// [`field`]: #method.field
+    /// [`field`]: Self::field
     pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
         where It: IntoIterator<Item=(T, U, bool)>,
               T: ToString,
@@ -168,8 +165,6 @@ impl CreateEmbed {
     ///
     /// Refer to the documentation for [`CreateEmbedFooter`] for more
     /// information.
-    ///
-    /// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html
     pub fn footer<F>(&mut self, f: F) -> &mut Self
         where F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter {
         let mut create_embed_footer = CreateEmbedFooter::default();
@@ -340,9 +335,9 @@ impl CreateEmbed {
     /// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])
     /// with the provided filename. Or else this won't work.
     ///
-    /// [`ChannelId::send_files`]: ../model/id/struct.ChannelId.html#send_files
+    /// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files
     ///
-    /// [`image`]: #method.image
+    /// [`image`]: Self::image
     #[inline]
     pub fn attachment<S: ToString>(&mut self, filename: S) -> &mut Self {
         let mut filename = filename.to_string();
@@ -436,9 +431,8 @@ impl From<Embed> for CreateEmbed {
 ///
 /// Requires that you specify a [`name`].
 ///
-/// [`Embed`]: ../model/channel/struct.Embed.html
-/// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author
-/// [`name`]: #method.name
+/// [`Embed`]: crate::model::channel::Embed
+/// [`name`]: Self::name
 #[derive(Clone, Debug, Default)]
 pub struct CreateEmbedAuthor(pub HashMap<&'static str, Value>);
 
@@ -467,8 +461,7 @@ impl CreateEmbedAuthor {
 ///
 /// This does not require any field be set.
 ///
-/// [`Embed`]: ../model/channel/struct.Embed.html
-/// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer
+/// [`Embed`]: crate::model::channel::Embed
 #[derive(Clone, Debug, Default)]
 pub struct CreateEmbedFooter(pub HashMap<&'static str, Value>);
 

@@ -39,9 +39,7 @@ use tokio::{sync::oneshot::{self, Sender, error::TryRecvError}, time::{delay_for
 /// # }
 /// ```
 ///
-/// [`Channel`]: ../../model/channel/enum.Channel.html
-/// [`Typing::start`]: struct.Typing.html#method.start
-/// [`Typing::stop`]: struct.Typing.html#method.stop
+/// [`Channel`]: crate::model::channel::Channel
 #[derive(Debug)]
 pub struct Typing(Sender<()>);
 
@@ -52,9 +50,7 @@ impl Typing {
     /// the returned `Typing` object or wait for it to be dropped. Note that on some
     /// clients, typing may persist for a few seconds after stopped.
     ///
-    /// [`Channel`]: ../../model/channel/enum.Channel.html
-    /// [`Typing`]: struct.Typing.html
-    /// [`Typing::stop`]: struct.Typing.html#method.stop
+    /// [`Channel`]: crate::model::channel::Channel
     pub fn start(http: Arc<Http>, channel_id: u64) -> Result<Self> {
         let (sx, mut rx) = oneshot::channel();
 
@@ -83,8 +79,7 @@ impl Typing {
     /// This should be used to stop typing after it is started using [`Typing::start`].
     /// Typing may persist for a few seconds on some clients after this is called.
     ///
-    /// [`Channel`]: ../../model/channel/enum.Channel.html
-    /// [`Typing::start`]: struct.Typing.html#method.start
+    /// [`Channel`]: crate::model::channel::Channel
     pub fn stop(self) -> Option<()> {
         self.0.send(()).ok()
     }

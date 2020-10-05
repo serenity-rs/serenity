@@ -56,10 +56,7 @@ impl GuildId {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
-    /// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount
-    /// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban
-    /// [`User`]: ../user/struct.User.html
-    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn ban(self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
         self._ban_with_reason(http, user.into(), dmd, "").await
@@ -67,8 +64,7 @@ impl GuildId {
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
     ///
-    /// [`User`]: ../user/struct.User.html
-    /// [`ban`]: #method.ban
+    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(
         self,
@@ -96,7 +92,7 @@ impl GuildId {
     ///
     /// Requires the [Ban Members] permission.
     ///
-    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn bans(self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
         http.as_ref().get_bans(self.0).await
@@ -116,8 +112,6 @@ impl GuildId {
     }
 
     /// Gets all of the guild's channels over the REST API.
-    ///
-    /// [`Guild`]: ../guild/struct.Guild.html
     pub async fn channels(self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
         let mut channels = HashMap::new();
 
@@ -154,9 +148,7 @@ impl GuildId {
     /// # }
     /// ```
     ///
-    /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
-    /// [`Http::create_channel`]: ../../http/client/struct.Http.html#method.create_channel
-    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn create_channel(self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
         let mut builder = CreateChannel::default();
@@ -180,10 +172,8 @@ impl GuildId {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
-    /// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar
-    /// [`Guild::create_emoji`]: ../guild/struct.Guild.html#method.create_emoji
-    /// [`utils::read_image`]: ../../utils/fn.read_image.html
-    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
+    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
     pub async fn create_emoji(self, http: impl AsRef<Http>, name: &str, image: &str) -> Result<Emoji> {
         let map = json!({
@@ -198,7 +188,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn create_integration(self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>, kind: &str) -> Result<()> {
         let integration_id = integration_id.into();
@@ -216,8 +206,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [`Guild::create_role`]: ../guild/struct.Guild.html#method.create_role
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn create_role<F>(self, http: impl AsRef<Http>, f: F) -> Result<Role>
     where F: FnOnce(&mut EditRole) -> &mut EditRole {
@@ -240,8 +229,6 @@ impl GuildId {
     /// Refer to [`Guild::delete`] for more information.
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
-    ///
-    /// [`Guild::delete`]: ../guild/struct.Guild.html#method.delete
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().delete_guild(self.0).await
@@ -251,8 +238,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Emojis] permission.
     ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
     pub async fn delete_emoji(self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>) -> Result<()> {
         http.as_ref().delete_emoji(self.0, emoji_id.into().0).await
@@ -262,7 +248,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn delete_integration(self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
         http.as_ref().delete_guild_integration(self.0, integration_id.into().0).await
@@ -275,9 +261,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Roles] permission.
     ///
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [`Role::delete`]: ../guild/struct.Role.html#method.delete
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn delete_role(self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
         http.as_ref().delete_role(self.0, role_id.into().0).await
@@ -290,8 +274,7 @@ impl GuildId {
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
     ///
-    /// [`Guild::edit`]: ../guild/struct.Guild.html#method.edit
-    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<PartialGuild>
     where F: FnOnce(&mut EditGuild) -> &mut EditGuild
@@ -310,9 +293,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Emojis] permission.
     ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [`Emoji::edit`]: ../guild/struct.Emoji.html#method.edit
-    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
     pub async fn edit_emoji(self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>, name: &str) -> Result<Emoji> {
         let map = json!({
@@ -351,7 +332,7 @@ impl GuildId {
     ///
     /// Requires the [Change Nickname] permission.
     ///
-    /// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME
+    /// [Change Nickname]: Permissions::CHANGE_NICKNAME
     #[inline]
     pub async fn edit_nickname(self, http: impl AsRef<Http>, new_nickname: Option<&str>) -> Result<()> {
         http.as_ref().edit_nickname(self.0, new_nickname).await
@@ -371,8 +352,7 @@ impl GuildId {
     /// GuildId(7).edit_role(&context, RoleId(8), |r| r.hoist(true));
     /// ```
     ///
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn edit_role<F>(self, http: impl AsRef<Http>, role_id: impl Into<RoleId>, f: F) -> Result<Role>
     where F: FnOnce(&mut EditRole) -> &mut EditRole
@@ -396,16 +376,13 @@ impl GuildId {
     /// GuildId(7).edit_role_position(&context, RoleId(8), 2);
     /// ```
     ///
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn edit_role_position(self, http: impl AsRef<Http>, role_id: impl Into<RoleId>, position: u64) -> Result<Vec<Role>> {
         http.as_ref().edit_role_position(self.0, role_id.into().0, position).await
     }
 
     /// Tries to find the [`Guild`] by its Id in the cache.
-    ///
-    /// [`Guild`]: ../guild/struct.Guild.html
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn to_guild_cached(self, cache: impl AsRef<Cache>) -> Option<Guild> {
@@ -416,25 +393,18 @@ impl GuildId {
     ///
     /// **Note**: This will not be a [`Guild`], as the REST API does not send
     /// all data with a guild retrieval.
-    ///
-    /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
-    /// [`Guild`]: ../guild/struct.Guild.html
     #[inline]
     pub async fn to_partial_guild(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().get_guild(self.0).await
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
     #[inline]
     pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
         http.as_ref().get_emojis(self.0).await
     }
 
     /// Gets an [`Emoji`] of this guild by its ID via HTTP.
-    ///
-    /// [`Emoji`]: struct.Emoji.html
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         http.as_ref().get_emoji(self.0, emoji_id.0).await
@@ -452,7 +422,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
         http.as_ref().get_guild_invites(self.0).await
@@ -462,8 +432,7 @@ impl GuildId {
     ///
     /// Requires the [Kick Members] permission.
     ///
-    /// [`Member`]: ../guild/struct.Member.html
-    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
         http.as_ref().kick_member(self.0, user_id.into().0).await
@@ -484,9 +453,6 @@ impl GuildId {
     ///
     /// If the cache feature is enabled the cache will be checked
     /// first. If not found it will resort to an http request.
-    ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`Member`]: ../guild/struct.Member.html
     #[inline]
     pub async fn member(self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Member> {
         let user_id = user_id.into();
@@ -508,8 +474,6 @@ impl GuildId {
     /// Optionally pass in the `limit` to limit the number of results. Maximum
     /// value is 1000. Optionally pass in `after` to offset the results by a
     /// [`User`]'s Id.
-    ///
-    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub async fn members(self, http: impl AsRef<Http>, limit: Option<u64>, after: impl Into<Option<UserId>>) -> Result<Vec<Member>> {
         http.as_ref().get_guild_members(self.0, limit, after.into().map(|x| x.0)).await
@@ -546,7 +510,7 @@ impl GuildId {
     /// # }
     /// ```
     ///
-    /// [`members`]: #method.members
+    /// [`members`]: Self::members
     #[cfg(feature = "cache")]
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item=Result<Member>> {
         MembersIter::<H>::stream(http, self)
@@ -556,7 +520,7 @@ impl GuildId {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
     pub async fn move_member(
         self,
@@ -584,7 +548,7 @@ impl GuildId {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
     pub async fn disconnect_member(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
         let mut map = Map::new();
@@ -600,8 +564,7 @@ impl GuildId {
     ///
     /// Requires the [Kick Members] permission.
     ///
-    /// [`Member`]: ../guild/struct.Member.html
-    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn prune_count(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
         let map = json!({
@@ -641,8 +604,6 @@ impl GuildId {
     /// **Note**: When the cache is enabled, this function unlocks the cache to
     /// retrieve the total number of shards in use. If you already have the
     /// total, consider using [`utils::shard_id`].
-    ///
-    /// [`utils::shard_id`]: ../../utils/fn.shard_id.html
     #[cfg(all(feature = "cache", feature = "utils"))]
     #[inline]
     pub async fn shard_id(self, cache: impl AsRef<Cache>) -> u64 {
@@ -680,7 +641,7 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn start_integration_sync(self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
         http.as_ref().start_integration_sync(self.0, integration_id.into().0).await
@@ -692,9 +653,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Kick Members] permission.
     ///
-    /// [`GuildPrune`]: ../guild/struct.GuildPrune.html
-    /// [`Member`]: ../guild/struct.Member.html
-    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn start_prune(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
         let map = json!({
@@ -708,8 +667,7 @@ impl GuildId {
     ///
     /// Requires the [Ban Members] permission.
     ///
-    /// [`User`]: ../user/struct.User.html
-    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
         http.as_ref().remove_ban(self.0, user_id.into().0).await
@@ -719,7 +677,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn vanity_url(self, http: impl AsRef<Http>) -> Result<String> {
         http.as_ref().get_guild_vanity_url(self.0).await
@@ -729,7 +687,7 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_guild_webhooks(self.0).await
@@ -800,9 +758,7 @@ impl<'a> From<&'a Guild> for GuildId {
     fn from(live_guild: &Guild) -> GuildId { live_guild.id }
 }
 
-/// A helper class returned by [`GuildId.members_iter()`]
-///
-/// [`GuildId.members_iter()`]: #method.members_iter
+/// A helper class returned by [`GuildId::members_iter`]
 #[derive(Clone, Debug)]
 #[cfg(all(feature = "model", feature = "cache"))]
 pub struct MembersIter<H: AsRef<Http>> {
@@ -884,7 +840,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
     /// # }
     /// ```
     ///
-    /// [`members`]: #method.members
+    /// [`members`]: GuildId::members
     pub fn stream(http: impl AsRef<Http>, guild_id: GuildId) -> impl Stream<Item=Result<Member>> {
         let init_state = MembersIter::new(guild_id, http);
 

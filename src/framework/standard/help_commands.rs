@@ -49,9 +49,6 @@
 //!
 //! The same can be accomplished with no embeds by substituting `with_embeds`
 //! with the [`plain`] function.
-//!
-//! [`plain`]: fn.plain.html
-//! [`with_embeds`]: fn.with_embeds.html
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
