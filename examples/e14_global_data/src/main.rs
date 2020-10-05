@@ -170,7 +170,7 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
 
     // Yet again, we want to keep the locks open for the least time possible.
     let amount = {
-        // Since we only want to read the data and not write to it, we open it in read mode;
+        // Since we only want to read the data and not write to it, we open it in read mode,
         // and since this is open in read mode, it means that there can be multiple locks open at
         // the same time, and as mentioned earlier, it's heavily recommended that you only open
         // the data lock in read mode, as it will avoid a lot of possible deadlocks.
