@@ -105,3 +105,8 @@ jobs:
       cargo build -p e13_gateway_intents
     displayName: 'Build example 13'
 
+  - bash: |
+      source $HOME/.cargo/env
+      cd examples/
+      cargo build -p e15_parallel_loops
+    displayName: 'Build example 13'

@@ -37,6 +37,8 @@ To run an example, you have various options:
 11 => Create Message Builder: How to send embeds and files.
 12 => Collectors: How to use the collectors feature to wait for messages and reactions.
 13 => Gateway Intents: How to use intents to limit the events the bot will recieve.
+15 => Parallel Loops: How to run tasks in a loop with context access.
+      Additionally, show how to send a message to a specific channel.
 ```
 
 2. Manualy running:
