@@ -32,7 +32,7 @@ impl EventHandler for Handler {
         println!("Cache built successfully!");
 
         // it's safe to clone Context, but Arc is cheaper for this use case.
-        // untested claim, just theoretically :P
+        // Untested claim, just theoretically. :P
         let ctx = Arc::new(ctx);
 
         // We need to check that the loop is not already running when this event triggers,
