@@ -334,7 +334,7 @@ pub struct RichInvite {
 impl RichInvite {
     /// Deletes the invite.
     ///
-    /// Refer to [`http::delete_invite`] for more information.
+    /// Refer to [`Http::delete_invite`] for more information.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
@@ -346,7 +346,7 @@ impl RichInvite {
     ///
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`Invite::delete`]: struct.Invite.html#method.delete
-    /// [`http::delete_invite`]: ../../http/fn.delete_invite.html
+    /// [`Http::delete_invite`]: ../../http/client/struct.Http.html#method.delete_invite
     /// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD.html
     /// [permission]: ../permissions/index.html
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {

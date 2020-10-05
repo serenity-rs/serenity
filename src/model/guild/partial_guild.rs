@@ -119,7 +119,7 @@ impl PartialGuild {
 
     /// Creates a [`GuildChannel`] in the guild.
     ///
-    /// Refer to [`http::create_channel`] for more information.
+    /// Refer to [`Http::create_channel`] for more information.
     ///
     /// Requires the [Manage Channels] permission.
     ///
@@ -134,7 +134,7 @@ impl PartialGuild {
     /// ```
     ///
     /// [`GuildChannel`]: ../channel/struct.GuildChannel.html
-    /// [`http::create_channel`]: ../../http/fn.create_channel.html
+    /// [`Http::create_channel`]: ../../http/client/struct.Http.html#method.create_channel
     /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
     #[inline]
     pub async fn create_channel(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {

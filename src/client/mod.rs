@@ -139,6 +139,7 @@ impl<'a> ClientBuilder<'a> {
     /// A `TypeMap` must not be constructed manually: [`type_map_insert`]
     /// can be used to insert one type at a time.
     ///
+    /// [`type_map_insert`]: #method.type_map_insert
     /// [`TypeMap`]: ../utils/struct.TypeMap.html
     pub fn type_map(mut self, type_map: TypeMap) -> Self {
         self.data = Some(type_map);
@@ -386,9 +387,9 @@ impl<'a> Future for ClientBuilder<'a> {
 /// ```
 ///
 /// [`Shard`]: ../gateway/struct.Shard.html
-/// [`EventHandler::message`]: trait.EventHandler.html#tymethod.message
+/// [`EventHandler::message`]: trait.EventHandler.html#method.message
 /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
-/// [sharding docs]: ../index.html#sharding
+/// [sharding docs]: ../gateway/index.html#sharding
 #[cfg(feature = "gateway")]
 pub struct Client {
     /// A TypeMap which requires types to be Send + Sync. This is a map that
@@ -412,7 +413,7 @@ pub struct Client {
     /// - [`Event::MessageDeleteBulk`]
     /// - [`Event::MessageUpdate`]
     ///
-     /// ```rust,ignore
+    /// ```rust,ignore
     /// use serenity::prelude::*;
     /// use serenity::model::prelude::*;
     /// use std::collections::HashMap;
@@ -865,19 +866,19 @@ impl Client {
         self.start_connection([range[0], range[1], total_shards]).await
     }
 
-    // Shard data layout is:
-    // 0: first shard number to initialize
-    // 1: shard number to initialize up to and including
-    // 2: total number of shards the bot is sharding for
-    //
-    // Not all shards need to be initialized in this process.
-    //
-    // # Errors
-    //
-    // Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    // an error.
-    //
-    // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
+    /// Shard data layout is:
+    /// 0: first shard number to initialize
+    /// 1: shard number to initialize up to and including
+    /// 2: total number of shards the bot is sharding for
+    ///
+    /// Not all shards need to be initialized in this process.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    ///
+    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
     #[instrument(skip(self))]
     async fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         #[cfg(feature = "voice")]

@@ -86,7 +86,7 @@ pub enum Error {
     /// [Id][`RoleId`] in the [`Cache`].
     ///
     /// [`Role`]: ../guild/struct.Role.html
-    /// [`RoleId`]: ../id/struct.GuildId.html
+    /// [`RoleId`]: ../id/struct.RoleId.html
     /// [`Cache`]: ../../cache/struct.Cache.html
     RoleNotFound,
     /// Indicates that there are hierarchy problems restricting an action.

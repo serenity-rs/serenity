@@ -75,6 +75,10 @@ use tracing::{debug, instrument};
 /// regardless of route. The value of this global ratelimit is never given
 /// through the API, so it can't be pre-emptively ratelimited. This only affects
 /// the largest of bots.
+///
+/// [`limit`]: struct.Ratelimit.html#method.limit
+/// [`remaining`]: struct.Ratelimit.html#method.remaining
+/// [`reset`]: struct.Ratelimit.html#method.reset
 #[derive(Debug)]
 pub struct Ratelimiter {
     client: Arc<Client>,

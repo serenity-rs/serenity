@@ -10,11 +10,11 @@ use crate::collector::{ReactionFilter, MessageFilter};
 ///
 /// This is used to cleanly communicate with a shard's respective
 /// [`ShardRunner`]. This can be used for actions such as setting the activity
-/// via [`set_activity`] or shutting down via [`shutdown`].
+/// via [`set_activity`] or shutting down via [`shutdown_clean`].
 ///
 /// [`ShardRunner`]: struct.ShardRunner.html
 /// [`set_activity`]: #method.set_activity
-/// [`shutdown`]: #method.shutdown
+/// [`shutdown_clean`]: #method.shutdown_clean
 #[derive(Clone, Debug)]
 pub struct ShardMessenger {
     pub(crate) tx: Sender<InterMessage>,

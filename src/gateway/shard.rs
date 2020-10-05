@@ -683,7 +683,7 @@ impl Shard {
     /// Chunk a single guild by Id, limiting to 2000 [`Member`]s, and not
     /// specifying a query parameter:
     ///
-     /// ```rust,no_run
+    /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
@@ -745,10 +745,10 @@ impl Shard {
         ).await
     }
 
-    // Sets the shard as going into identifying stage, which sets:
-    //
-    // - the time that the last heartbeat sent as being now
-    // - the `stage` to `Identifying`
+    /// Sets the shard as going into identifying stage, which sets:
+    ///
+    /// - the time that the last heartbeat sent as being now
+    /// - the `stage` to `Identifying`
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
         self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions, self.intents).await?;

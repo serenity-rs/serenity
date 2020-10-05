@@ -7,7 +7,7 @@ use crate::utils;
 
 use std::collections::HashMap;
 
-/// A builder to specify the contents of an [`http::send_message`] request,
+/// A builder to specify the contents of an [`Http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
 ///
 /// There are two situations where different field requirements are present:
@@ -52,7 +52,7 @@ use std::collections::HashMap;
 /// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
 /// [`content`]: #method.content
 /// [`embed`]: #method.embed
-/// [`http::send_message`]: ../http/fn.send_message.html
+/// [`Http::send_message`]: ../http/client/struct.Http.html#method.send_message
 #[derive(Clone, Debug)]
 pub struct CreateMessage<'a>(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType<'a>>);
 

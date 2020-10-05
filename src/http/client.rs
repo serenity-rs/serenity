@@ -1475,10 +1475,10 @@ impl Http {
     /// # Errors
     ///
     /// Returns an
-    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the file is too large to send.
     ///
-    /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
+    /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn send_files<'a, T, It: IntoIterator<Item=T>>(&self, channel_id: u64, files: It, map: JsonMap) -> Result<Message>
         where T: Into<AttachmentType<'a>> {
         let uri = api!("/channels/{}/messages", channel_id);

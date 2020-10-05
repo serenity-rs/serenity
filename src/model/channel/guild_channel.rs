@@ -180,7 +180,7 @@ impl GuildChannel {
     /// # Examples
     ///
     /// Creating a permission overwrite for a member by specifying the
-    /// [`PermissionOverwrite::Member`] variant, allowing it the [Send Messages]
+    /// [`PermissionOverwriteType::Member`] variant, allowing it the [Send Messages]
     /// permission, but denying the [Send TTS Messages] and [Attach Files]
     /// permissions:
     ///
@@ -219,7 +219,7 @@ impl GuildChannel {
     /// ```
     ///
     /// Creating a permission overwrite for a role by specifying the
-    /// [`PermissionOverwrite::Role`] variant, allowing it the [Manage Webhooks]
+    /// [`PermissionOverwriteType::Role`] variant, allowing it the [Manage Webhooks]
     /// permission, but denying the [Send TTS Messages] and [Attach Files]
     /// permissions:
     ///
@@ -261,8 +261,8 @@ impl GuildChannel {
     /// [`Channel`]: enum.Channel.html
     /// [`Member`]: ../guild/struct.Member.html
     /// [`PermissionOverwrite`]: struct.PermissionOverwrite.html
-    /// [`PermissionOverwrite::Member`]: struct.PermissionOverwrite.html#variant.Member
-    /// [`PermissionOverwrite::Role`]: struct.PermissionOverwrite.html#variant.Role
+    /// [`PermissionOverwriteType::Member`]: struct.PermissionOverwriteType.html#variant.Member
+    /// [`PermissionOverwriteType::Role`]: struct.PermissionOverwriteType.html#variant.Role
     /// [`Role`]: ../guild/struct.Role.html
     /// [Attach Files]:
     /// ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
@@ -672,11 +672,11 @@ impl GuildChannel {
     /// # Errors
     ///
     /// If the content of the message is over the above limit, then a
-    /// [`ClientError::MessageTooLong`] will be returned, containing the number
+    /// [`ModelError::MessageTooLong`] will be returned, containing the number
     /// of unicode code points over the limit.
     ///
     /// [`ChannelId::send_files`]: ../id/struct.ChannelId.html#method.send_files
-    /// [`ClientError::MessageTooLong`]: ../../client/enum.ClientError.html#variant.MessageTooLong
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
     #[inline]

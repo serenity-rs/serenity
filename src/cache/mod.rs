@@ -379,9 +379,9 @@ impl Cache {
 
     /// Clones an entire guild from the cache based on the given `id`.
     ///
-    /// In order to clone only a field of the guild, use [`guild_field´].
+    /// In order to clone only a field of the guild, use [`guild_field`].
     ///
-    /// [`guild_field`]: ../model/id/struct.GuildId.html
+    /// [`guild_field`]: #method.guild_field
     ///
     /// # Examples
     ///
