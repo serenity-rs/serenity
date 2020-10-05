@@ -43,7 +43,7 @@ impl EventHandler for Handler {
         // we don't have one due to self being an immutable reference.
         if !self.is_loop_running.load(Ordering::Relaxed) {
 
-            // We have to clone the arc, as it gets moved into the new thread.
+            // We have to clone the Arc, as it gets moved into the new thread.
             let ctx1 = Arc::clone(&ctx);
             // tokio::spawn creates a new green thread that can run in parallel with the rest of
             // the application.
