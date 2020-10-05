@@ -89,7 +89,7 @@ impl EventHandler for Handler {
             };
 
             // Atomic operations with ordering do not require mut to be modified.
-            // in this case, we want to increase the message count by 1.
+            // In this case, we want to increase the message count by 1.
             // https://doc.rust-lang.org/std/sync/atomic/struct.AtomicUsize.html#method.fetch_add
             count.fetch_add(1, Ordering::SeqCst);
         }
