@@ -261,7 +261,7 @@ fn dummy_message() -> Message {
         member: None,
         mention_everyone: false,
         mention_roles: Vec::new(),
-        mention_channels: None,
+        mention_channels: Vec::new(),
         mentions: Vec::new(),
         nonce: Value::Null,
         pinned: false,

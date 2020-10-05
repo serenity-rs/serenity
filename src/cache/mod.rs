@@ -1018,7 +1018,7 @@ mod test {
                 member: None,
                 mention_everyone: false,
                 mention_roles: vec![],
-                mention_channels: None,
+                mention_channels: vec![],
                 mentions: vec![],
                 nonce: Value::Number(Number::from(1)),
                 pinned: false,

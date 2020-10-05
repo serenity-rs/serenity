@@ -84,7 +84,8 @@ pub struct Message {
     /// [`Role`]: ../guild/struct.Role.html
     pub mention_roles: Vec<RoleId>,
     /// Channels specifically mentioned in this message.
-    pub mention_channels: Option<Vec<ChannelMention>>,
+    #[serde(default = "Vec::new")]
+    pub mention_channels: Vec<ChannelMention>,
     /// Array of users mentioned in the message.
     pub mentions: Vec<User>,
     /// Non-repeating number used for ensuring message order.
