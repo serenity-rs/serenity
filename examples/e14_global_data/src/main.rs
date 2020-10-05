@@ -123,7 +123,7 @@ async fn main() {
     // write mode, but there's a small thing catch:
     // There can only be a single writer to a given lock open in the entire application, this means
     // you can't open a new write lock until the previous write lock has closed.
-    // This is not the case with Read locks, read locks can be open indefinitely, BUT as soon as
+    // This is not the case with read locks, read locks can be open indefinitely, BUT as soon as
     // you need to open the lock in write mode, all the read locks must be closed.
     //
     // You can find more information about deadlocks in the Rust Book, ch16-03:
