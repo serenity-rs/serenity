@@ -31,7 +31,7 @@ impl EventHandler for Handler {
     async fn cache_ready(&self, ctx: Context, _guilds: Vec<GuildId>) {
         println!("Cache built successfully!");
 
-        // it's safe to clone Context, but Arc is cheapper for this use case.
+        // it's safe to clone Context, but Arc is cheaper for this use case.
         // untested claim, just theoretically :P
         let ctx = Arc::new(ctx);
 
