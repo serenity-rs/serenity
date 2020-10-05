@@ -14,4 +14,5 @@ members = [
     "e12_collectors",
     "e13_gateway_intents",
     "e14_global_data",
+    "e15_parallel_loops",
 ]

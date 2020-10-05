@@ -1,0 +1,11 @@
+[package]
+name = "e15_parallel_loops"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies]
+serenity = { path = "../../", default-features = false, features = ["client", "gateway", "rustls_backend", "model", "cache"] }
+tokio = { version = "0.2", features = ["macros"] }
+sys-info = "0.7"
+chrono = "0.4"

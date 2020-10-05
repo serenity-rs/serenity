@@ -302,3 +302,22 @@ args = ["make", "run_example", "e14_global_data"]
 [tasks.dev_build_14]
 command = "cargo"
 args = ["make", "build_example", "e14_global_data"]
+
+[tasks.15]
+alias = "run_15"
+
+[tasks.run_15]
+command = "cargo"
+args = ["make", "run_example_release", "e15_parallel_loops"]
+
+[tasks.build_15]
+command = "cargo"
+args = ["make", "build_example_release", "e15_parallel_loops"]
+
+[tasks.dev_run_15]
+command = "cargo"
+args = ["make", "run_example", "e15_parallel_loops"]
+
+[tasks.dev_build_15]
+command = "cargo"
+args = ["make", "build_example", "e15_parallel_loops"]
