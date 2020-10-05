@@ -56,7 +56,7 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
 
         // Since the CommandCounter Value is wrapped in an Arc, cloning will not duplicate the
         // data, instead the reference is cloned.
-        // We wap every value on an arc, as to keep the data lock open for the least time possible,
+        // We wap every value on in an Arc, as to keep the data lock open for the least time possible,
         // to again, avoid Deadlocking it.
         data_read.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.").clone()
     };
