@@ -50,7 +50,7 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
 
     let counter_lock = {
         // While data is a RwLock, it's recommended that you always open the lock as read.
-        // this is mainly done to avoid Deadlocks for having a possible writer waiting for multiple
+        // This is mainly done to avoid Deadlocks for having a possible writer waiting for multiple
         // readers to close.
         let data_read = ctx.data.read().await;
 
