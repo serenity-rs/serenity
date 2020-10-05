@@ -182,7 +182,7 @@ async fn command_usage(ctx: &Context, msg: &Message, mut args: Args) -> CommandR
         let command_counter_lock = data_read.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.").clone();
 
         let command_counter = command_counter_lock.read().await;
-        // and we return a usable value from it.
+        // And we return a usable value from it.
         // This time, the value is not Arc, so the data will be cloned.
         command_counter.get(&command_name).map_or(0, |x| *x)
     };
