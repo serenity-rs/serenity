@@ -33,7 +33,7 @@ struct MessageCount;
 
 impl TypeMapKey for MessageCount {
     // While you will be using RwLock or Mutex most of the times you want to modify data,
-    // sometimes it's not required; Like for example, with static data, or if you are using other
+    // sometimes it's not required; like for example, with static data, or if you are using other
     // kinds sof atomic operators.
     //
     // Arc should stay, to allow for the data lock to be closed early.
