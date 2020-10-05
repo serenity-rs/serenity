@@ -36,7 +36,7 @@ impl TypeMapKey for MessageCount {
     // sometimes it's not required; Like for example, with static data, or if you are using other
     // kinds sof atomic operators.
     //
-    // Arc shoud stay, to allow for the data lock to be closed early.
+    // Arc should stay, to allow for the data lock to be closed early.
     type Value = Arc<AtomicUsize>;
 }
 
