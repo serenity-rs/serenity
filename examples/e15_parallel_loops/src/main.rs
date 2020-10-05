@@ -56,7 +56,7 @@ impl EventHandler for Handler {
                 }
             });
 
-            // And ofcourse, we can run more than one thread at different timings.
+            // And of course, we can run more than one thread at different timings.
             let ctx2 = Arc::clone(&ctx);
             tokio::spawn(async move {
                 loop {
