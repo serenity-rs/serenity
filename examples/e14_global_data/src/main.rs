@@ -64,7 +64,7 @@ async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
     // Just like with client.data in main, we want to keep write locks open the least time
     // possible, so we wrap them on a block so they get automatically closed at the end.
     {
-        // The HashMap of CommandCounter is wrapped on RwLock; Since we want to write to it, we will
+        // The HashMap of CommandCounter is wrapped in an RwLock; since we want to write to it, we will
         // open the lock in write mode.
         let mut counter = counter_lock.write().await;
 
