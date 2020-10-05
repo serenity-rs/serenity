@@ -76,7 +76,7 @@ async fn log_system_load(ctx: Arc<Context>) {
     let mem_use = sys_info::mem_info().unwrap();
 
     // We can use ChannelId directly to send a message to a specific channel; in this case, the
-    // message would send on #testing on the discord server.
+    // message would be sent to the #testing channel on the discord server.
     if let Err(why) = ChannelId(381926291785383946).send_message(&ctx, |m| m.embed(|e| {
         e.title("System Resource Load");
         e.field(
