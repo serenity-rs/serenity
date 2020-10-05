@@ -37,6 +37,7 @@ To run an example, you have various options:
 11 => Create Message Builder: How to send embeds and files.
 12 => Collectors: How to use the collectors feature to wait for messages and reactions.
 13 => Gateway Intents: How to use intents to limit the events the bot will recieve.
+14 => Global Data: How to use the client data to share data between commands and events safely.
 ```
 
 2. Manualy running:

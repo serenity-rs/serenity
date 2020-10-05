@@ -13,4 +13,5 @@ members = [
     "e11_create_message_builder",
     "e12_collectors",
     "e13_gateway_intents",
+    "e14_global_data",
 ]
