@@ -1,0 +1,9 @@
+[package]
+name = "e14_global_data"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies]
+serenity = { path = "../../" }
+tokio = { version = "0.2", features = ["macros"] }
