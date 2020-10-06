@@ -10,6 +10,7 @@ use std::time::SystemTime;
 use tracing::{debug, trace};
 use async_trait::async_trait;
 use tracing::instrument;
+use secrecy::{SecretString, ExposeSecret};
 
 #[async_trait]
 pub trait WebSocketGatewayClientExt {
@@ -24,7 +25,7 @@ pub trait WebSocketGatewayClientExt {
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &SecretString, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()>;
 
     async fn send_presence_update(
@@ -38,7 +39,7 @@ pub trait WebSocketGatewayClientExt {
         shard_info: &[u64; 2],
         session_id: &str,
         seq: u64,
-        token: &str,
+        token: &SecretString,
     ) -> Result<()>;
 }
 
@@ -76,7 +77,7 @@ impl WebSocketGatewayClientExt for WsStream {
     }
 
     #[instrument(skip(self))]
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &SecretString, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -87,7 +88,7 @@ impl WebSocketGatewayClientExt for WsStream {
                 "large_threshold": constants::LARGE_THRESHOLD,
                 "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,
-                "token": token,
+                "token": token.expose_secret(),
                 "intents": intents,
                 "v": constants::GATEWAY_VERSION,
                 "properties": {
@@ -131,7 +132,7 @@ impl WebSocketGatewayClientExt for WsStream {
         shard_info: &[u64; 2],
         session_id: &str,
         seq: u64,
-        token: &str,
+        token: &SecretString,
     ) -> Result<()> {
         debug!("[Shard {:?}] Sending resume; seq: {}", shard_info, seq);
 
@@ -140,7 +141,7 @@ impl WebSocketGatewayClientExt for WsStream {
             "d": {
                 "session_id": session_id,
                 "seq": seq,
-                "token": token,
+                "token": token.expose_secret(),
             },
         })).await.map_err(From::from)
     }

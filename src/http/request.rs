@@ -12,6 +12,7 @@ use super::{
     HttpError,
     routing::RouteInfo,
 };
+use secrecy::{SecretString, ExposeSecret};
 
 pub struct RequestBuilder<'a> {
     body: Option<&'a [u8]>,
@@ -66,7 +67,7 @@ impl<'a> Request<'a> {
     }
 
     #[instrument]
-    pub fn build(&'a self, client: &Client, token: &str) -> Result<ReqwestRequestBuilder, HttpError> {
+    pub fn build(&'a self, client: &Client, token: &SecretString) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
             headers: ref request_headers,
@@ -87,7 +88,7 @@ impl<'a> Request<'a> {
         let mut headers = Headers::with_capacity(4);
         headers.insert(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT));
         headers.insert(AUTHORIZATION,
-            HeaderValue::from_str(&token).map_err(HttpError::InvalidHeader)?);
+            HeaderValue::from_str(token.expose_secret()).map_err(HttpError::InvalidHeader)?);
 
         // Discord will return a 400: Bad Request response if we set the content type header,
         // but don't give a body.

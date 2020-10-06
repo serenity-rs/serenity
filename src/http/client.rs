@@ -33,22 +33,23 @@ use tokio::{
     io::AsyncReadExt,
     fs::File,
 };
+use secrecy::{SecretString, ExposeSecret};
 
 #[derive(Debug)]
 pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
-    pub token: String,
+    pub token: SecretString,
 }
 
 impl Http {
-    pub fn new(client: Arc<Client>, token: &str) -> Self {
+    pub fn new(client: Arc<Client>, token: SecretString) -> Self {
         let client2 = Arc::clone(&client);
 
         Http {
             client,
-            ratelimiter: Ratelimiter::new(client2, token.to_string()),
-            token: token.to_string(),
+            ratelimiter: Ratelimiter::new(client2, token.clone()),
+            token,
         }
     }
 
@@ -62,7 +63,7 @@ impl Http {
             format!("Bot {}", token)
         };
 
-        Self::new(Arc::new(built), &token)
+        Self::new(Arc::new(built), SecretString::new(token))
     }
 
     /// Adds a single [`Role`] to a [`Member`] in a [`Guild`].
@@ -1556,7 +1557,7 @@ impl Http {
 
         let response = self.client
             .post(url)
-            .header(AUTHORIZATION, HeaderValue::from_str(&self.token)?)
+            .header(AUTHORIZATION, HeaderValue::from_str(self.token.expose_secret())?)
             .header(USER_AGENT, HeaderValue::from_static(&constants::USER_AGENT))
             .multipart(multipart)
             .send()
@@ -1839,11 +1840,12 @@ impl Default for Http {
         let built = Client::builder().build().expect("Cannot build Reqwest::Client.");
         let client = Arc::new(built);
         let client2 = Arc::clone(&client);
+        let token = SecretString::new("".to_string());
 
         Self {
             client,
-            ratelimiter: Ratelimiter::new(client2, ""),
-            token: "".to_string(),
+            ratelimiter: Ratelimiter::new(client2, token.clone()),
+            token,
         }
     }
 }

@@ -27,6 +27,7 @@ use async_tungstenite::tungstenite::{
 };
 use url::Url;
 use tracing::{error, debug, info, trace, warn, instrument};
+use secrecy::SecretString;
 
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
@@ -97,7 +98,7 @@ pub struct Shard {
     // This acts as a timeout to determine if the shard has - for some reason -
     // not started within a decent amount of time.
     pub started: Instant,
-    pub token: String,
+    pub token: SecretString,
     ws_url: Arc<Mutex<String>>,
     pub intents: Option<GatewayIntents>,
 }
@@ -133,7 +134,7 @@ impl Shard {
     /// ```
     pub async fn new(
         ws_url: Arc<Mutex<String>>,
-        token: &str,
+        token: &SecretString,
         shard_info: [u64; 2],
         guild_subscriptions: bool,
         intents: Option<GatewayIntents>,
@@ -159,7 +160,7 @@ impl Shard {
             seq,
             stage,
             started: Instant::now(),
-            token: token.to_string(),
+            token: token.clone(),
             session_id,
             shard_info,
             guild_subscriptions,

@@ -59,6 +59,7 @@ use std::{
 use tokio::time::{delay_for, Duration};
 use super::{HttpError, Request};
 use tracing::{debug, instrument};
+use secrecy::SecretString;
 
 /// Ratelimiter for requests to the Discord API.
 ///
@@ -86,7 +87,7 @@ pub struct Ratelimiter {
     // When futures is implemented, make tasks clear out their respective entry
     // when the 'reset' passes.
     routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
-    token: String,
+    token: SecretString,
 }
 
 impl Ratelimiter {
@@ -95,11 +96,11 @@ impl Ratelimiter {
     ///
     /// The bot token must be prefixed with `"Bot "`. The ratelimiter does not
     /// prefix it.
-    pub fn new(client: Arc<Client>, token: impl Into<String>) -> Self {
-        Self::_new(client, token.into())
+    pub fn new(client: Arc<Client>, token: SecretString) -> Self {
+        Self::_new(client, token)
     }
 
-    fn _new(client: Arc<Client>, token: String) -> Self {
+    fn _new(client: Arc<Client>, token: SecretString) -> Self {
         Self {
             client,
             global: Default::default(),
