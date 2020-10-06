@@ -89,7 +89,7 @@ impl PrivateChannel {
 
     /// Deletes all messages by Ids from the given vector in the channel.
     ///
-    /// Refer to [`Channel::delete_messages`] for more information.
+    /// The minimum amount of messages is 2 and the maximum amount is 100.
     ///
     /// Requires the [Manage Messages] permission.
     ///
@@ -101,7 +101,6 @@ impl PrivateChannel {
     /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
     /// delete either 0 or more than 100 messages.
     ///
-    /// [`Channel::delete_messages`]: enum.Channel.html#method.delete_messages
     /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     #[inline]
@@ -214,11 +213,15 @@ impl PrivateChannel {
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
     /// certain [`Emoji`].
     ///
-    /// Refer to [`Channel::reaction_users`] for more information.
+    /// The default `limit` is `50` - specify otherwise to receive a different
+    /// maximum number of users. The maximum that may be retrieve at a time is
+    /// `100`, if a greater number is provided then it is automatically reduced.
+    ///
+    /// The optional `after` attribute is to retrieve the users after a certain
+    /// user. This is useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Channel::reaction_users`]: enum.Channel.html#method.reaction_users
     /// [`Emoji`]: ../guild/struct.Emoji.html
     /// [`Message`]: struct.Message.html
     /// [`User`]: ../user/struct.User.html
