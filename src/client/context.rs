@@ -116,7 +116,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -153,7 +153,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -190,7 +190,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -226,7 +226,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -307,7 +307,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -327,7 +327,7 @@ impl Context {
     ///
     /// Setting the current user as having no activity and being [`Idle`]:
     ///
-     /// ```rust,no_run
+    /// ```rust,no_run
     /// # use serenity::prelude::*;
     /// # use serenity::model::gateway::Ready;
     /// #
@@ -343,7 +343,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())
@@ -373,7 +373,7 @@ impl Context {
     /// }
     ///
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
-    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// let mut client = Client::builder("token").event_handler(Handler).await?;
     ///
     /// client.start().await?;
     /// #     Ok(())

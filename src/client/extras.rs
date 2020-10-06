@@ -39,6 +39,8 @@ impl Extras {
     ///
     /// If you have set the specialised [`event_handler`], all events
     /// will be cloned for use to the raw event handler.
+    ///
+    /// [`event_handler`]: #method.event_handler
     pub fn raw_event_handler<H>(&mut self, handler: H) -> &mut Self
     where
         H: RawEventHandler + 'static,

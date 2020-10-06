@@ -273,9 +273,9 @@ pub struct AuditLogEntry {
     /// [`action`]: #structfield.action
     #[serde(with = "option_u64_handler")]
     pub target_id: Option<u64>,
-    /// Determines what action was done on a [`target`]
+    /// Determines what action was done on a [`target_id`]
     ///
-    /// [`target`]: #structfield.target
+    /// [`target_id`]: #structfield.target_id
     #[serde(
         with = "action_handler",
         rename = "action_type"

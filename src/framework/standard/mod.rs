@@ -591,9 +591,7 @@ impl StandardFramework {
 
     /// Sets what code should be executed when a user sends `(prefix)help`.
     ///
-    /// If a [`command`] named `help` in a group was set, then this takes precedence first.
-    ///
-    /// [`command`]: #method.command
+    /// If a command named `help` in a group was set, then this takes precedence first.
     pub fn help(mut self, h: &'static HelpCommand) -> Self {
         self.help = Some(h);
 

@@ -567,7 +567,7 @@ impl Args {
     /// Parse the current argument and advance.
     ///
     /// Shorthand for calling [`parse`], storing the result,
-    /// calling [`next`] and returning the result.
+    /// calling [`advance`] and returning the result.
     ///
     /// # Examples
     ///
@@ -584,7 +584,7 @@ impl Args {
     /// ```
     ///
     /// [`parse`]: #method.parse
-    /// [`next`]: #method.next
+    /// [`advance`]: #method.advance
     #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
