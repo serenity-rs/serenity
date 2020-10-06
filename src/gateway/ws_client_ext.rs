@@ -75,7 +75,7 @@ impl WebSocketGatewayClientExt for WsStream {
         })).await.map_err(From::from)
     }
 
-    #[instrument(skip(self))]
+    #[instrument(skip(self, token))]
     async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);

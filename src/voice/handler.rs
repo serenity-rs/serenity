@@ -355,7 +355,7 @@ impl Handler {
     ///
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
-    #[instrument(skip(self))]
+    #[instrument(skip(self, token))]
     pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
         self.token = Some(token.to_string());
 
