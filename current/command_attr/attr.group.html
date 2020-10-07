@@ -1,0 +1,66 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `group` attr in crate `command_attr`."><meta name="keywords" content="rust, rustlang, rust-lang, group"><title>command_attr::group - Rust</title><link rel="stylesheet" type="text/css" href="../normalize.css"><link rel="stylesheet" type="text/css" href="../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../ayu.css" disabled ><script src="../storage.js"></script><noscript><link rel="stylesheet" href="../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../down-arrow.svg");}</style></head><body class="rustdoc attr"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../command_attr/index.html'><div class='logo-container rust-logo'><img src='../rust-logo.png' alt='logo'></div></a><div class="sidebar-elems"><p class='location'><a href='index.html'>command_attr</a></p><script>window.sidebarCurrent = {name: 'group', ty: 'attr', relpath: ''};</script><script defer src="sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class='fqn'><span class='out-of-band'><span id='render-detail'><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class='inner'>&#x2212;</span>]</a></span><a class='srclink' href='../src/command_attr/lib.rs.html#591-706' title='goto source code'>[src]</a></span><span class='in-band'>Attribute Macro <a href='index.html'>command_attr</a>::<wbr><a class="attr" href=''>group</a></span></h1><pre class='rust attr'>#[group]</pre><div class='docblock'><p>Create a grouping of commands.</p>
+<p>It is a prerequisite for all commands to be assigned under a common group,
+before they may be executed by a user.</p>
+<p>A group might have one or more <em>prefixes</em> set. This will necessitate for
+one of the prefixes to appear before the group's command.
+For example, for a general prefix <code>!</code>, a group prefix <code>foo</code> and a command <code>bar</code>,
+the invocation would be <code>!foo bar</code>.</p>
+<p>It might have some options apply to <em>all</em> of its commands. E.g. guild or dm only.</p>
+<p>It may even couple other groups as well.</p>
+<p>This group macro purports all of the said purposes above, applied onto a <code>struct</code>:</p>
+
+<div class="example-wrap"><pre class="rust rust-example-rendered">
+<span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">command</span>, <span class="ident">group</span>};
+
+
+<span class="attribute">#[<span class="ident">command</span>]</span>
+<span class="kw">fn</span> <span class="ident">bar</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
+    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;baz&quot;</span>);
+
+    <span class="prelude-val">Ok</span>(())
+}
+
+<span class="attribute">#[<span class="ident">command</span>]</span>
+<span class="kw">fn</span> <span class="ident">answer_to_life</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
+    <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;42&quot;</span>);
+
+    <span class="prelude-val">Ok</span>(())
+}
+
+<span class="attribute">#[<span class="ident">group</span>]</span>
+<span class="comment">// All sub-groups must own at least one prefix.</span>
+<span class="attribute">#[<span class="ident">prefix</span> <span class="op">=</span> <span class="string">&quot;baz&quot;</span>]</span>
+<span class="attribute">#[<span class="ident">commands</span>(<span class="ident">answer_to_life</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Baz</span>;
+
+<span class="attribute">#[<span class="ident">group</span>]</span>
+<span class="attribute">#[<span class="ident">commands</span>(<span class="ident">bar</span>)]</span>
+<span class="comment">// Case does not matter; the names will be all uppercased.</span>
+<span class="attribute">#[<span class="ident">sub_groups</span>(<span class="ident">baz</span>)]</span>
+<span class="kw">struct</span> <span class="ident">Foo</span>;</pre></div>
+<h2 id="options" class="section-header"><a href="#options">Options</a></h2>
+<p>These appear after <code>#[group]</code> as a series of attributes:</p>
+<table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
+<tr><td><code>#[commands(commands)]</code></td><td>Set of commands belonging to this group.</td><td><code>commands</code> is a comma separated list of identifiers referencing functions marked by the <code>#[command]</code> macro</td></tr>
+<tr><td><code>#[sub_groups(subs)]</code></td><td>Set of sub groups belonging to this group.</td><td><code>subs</code> is a comma separated list of identifiers referencing structs marked by the <code>#[group]</code> macro</td></tr>
+<tr><td><code>#[prefixes(prefs)]</code></td><td>Text that must appear   before an invocation of a command of this group may occur.</td><td><code>prefs</code> is a comma separated list of strings</td></tr>
+<tr><td><code>#[prefix(pref)]</code></td><td>Assign just a single prefix.</td><td><code>pref</code> is a string</td></tr>
+<tr><td><code>#[allowed_roles(roles)]</code></td><td>Set of roles the user must possess</td><td><code>roles</code> is a comma separated list of strings containing role names</td></tr>
+<tr><td><code>#[only_in(ctx)]</code></td><td>Which environment the command can be executed in.</td><td><code>ctx</code> is a string with the accepted values <code>guild</code>/<code>guilds</code> and <code>dm</code>/ <code>dms</code> (Direct Message).</td></tr>
+<tr><td><code>#[owners_only]</code> </br> <code>#[owners_only(b)]</code></td><td>If this command is exclusive to owners.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
+<tr><td><code>#[owner_privilege]</code> </br> <code>#[owner_privilege(b)]</code></td><td>If owners can bypass certain options.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
+<tr><td><code>#[help_available]</code> </br> <code>#[help_available(b)]</code></td><td>If the group should be displayed in the help message.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
+<tr><td><code>#[checks(identifiers)]</code></td><td>Preconditions that must met before the command's execution.</td><td><code>identifiers</code> is a comma separated list of identifiers referencing functions marked by the <code>#[check]</code> macro</td></tr>
+<tr><td><code>#[required_permissions(perms)]</code></td><td>Set of permissions the user must possess.</td><td><code>perms</code> is a comma separated list of permission names.</br> These can be found at <a href="https://discord.com/developers/docs/topics/permissions">Discord's official documentation</a>.</td></tr>
+<tr><td><code>#[default_command(cmd)]</code></td><td>A command to execute if none of the group's prefixes are given.</td><td><code>cmd</code> is an identifier referencing a function marked by the <code>#[command]</code> macro</td></tr>
+<tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The group's description or summary.</td><td><code>desc</code> is a string describing the group.</td></tr>
+</tbody></table>
+<p>Similarly to <a href="#fn.command.html"><code>command</code></a>, this macro generates static instances of the group
+and its options. The identifiers of these instances are based off the name of the struct to differentiate
+this group from others. This name is given as the default value of the group's <code>name</code> field,
+used in the help command for display and browsing of the group.
+It may also be passed as an argument to the macro. For example: <code>#[group(&quot;Banana Phone&quot;)]</code>.</p>
+</div></section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../";window.currentCrate = "command_attr";</script><script src="../main.js"></script><script defer src="../search-index.js"></script></body></html>

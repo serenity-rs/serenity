@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["serenity"] = [{"text":"impl&lt;T:&nbsp;ToString&gt; Add&lt;T&gt; for Content","synthetic":false,"types":[]},{"text":"impl&lt;T:&nbsp;ToString&gt; Add&lt;T&gt; for ContentModifier","synthetic":false,"types":[]},{"text":"impl Add&lt;ContentModifier&gt; for Content","synthetic":false,"types":[]},{"text":"impl Add&lt;ContentModifier&gt; for ContentModifier","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
