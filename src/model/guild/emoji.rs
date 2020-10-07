@@ -4,16 +4,16 @@ use std::fmt::{
     Result as FmtResult,
     Write as FmtWrite
 };
-use super::super::id::{EmojiId, RoleId};
+use crate::model::id::{EmojiId, RoleId};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use super::super::ModelError;
+use crate::model::ModelError;
 #[cfg(all(feature = "cache", feature = "model"))]
-use super::super::id::GuildId;
+use crate::model::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
