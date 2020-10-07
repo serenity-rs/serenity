@@ -22,7 +22,7 @@ use tokio::sync::RwLock;
 // These places are usually where either Context or Client is present.
 //
 // Documentation about TypeMap can be found here:
-// https://docs.rs/serenity/0.9.0-rc.2/serenity/prelude/struct.TypeMap.html
+// https://docs.rs/typemap_rev/0.1/typemap_rev/struct.TypeMap.html
 struct CommandCounter;
 
 impl TypeMapKey for CommandCounter {
