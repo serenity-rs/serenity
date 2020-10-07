@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["serenity"] = [{"text":"impl Binary for MessageFlags","synthetic":false,"types":[]},{"text":"impl Binary for ActivityFlags","synthetic":false,"types":[]},{"text":"impl Binary for Permissions","synthetic":false,"types":[]},{"text":"impl Binary for GatewayIntents","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

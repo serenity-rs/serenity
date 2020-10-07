@@ -1,0 +1,124 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source to the Rust file `src/client/bridge/gateway/shard_runner_message.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>shard_runner_message.rs.html -- source</title><link rel="stylesheet" type="text/css" href="../../../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../../../ayu.css" disabled ><script src="../../../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../../../favicon.svg">
+<link rel="alternate icon" type="image/png" href="../../../../../favicon-16x16.png">
+<link rel="alternate icon" type="image/png" href="../../../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
+                <a id="settings-menu" href="../../../../../settings.html"><img src="../../../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1"> 1</span>
+<span id="2"> 2</span>
+<span id="3"> 3</span>
+<span id="4"> 4</span>
+<span id="5"> 5</span>
+<span id="6"> 6</span>
+<span id="7"> 7</span>
+<span id="8"> 8</span>
+<span id="9"> 9</span>
+<span id="10">10</span>
+<span id="11">11</span>
+<span id="12">12</span>
+<span id="13">13</span>
+<span id="14">14</span>
+<span id="15">15</span>
+<span id="16">16</span>
+<span id="17">17</span>
+<span id="18">18</span>
+<span id="19">19</span>
+<span id="20">20</span>
+<span id="21">21</span>
+<span id="22">22</span>
+<span id="23">23</span>
+<span id="24">24</span>
+<span id="25">25</span>
+<span id="26">26</span>
+<span id="27">27</span>
+<span id="28">28</span>
+<span id="29">29</span>
+<span id="30">30</span>
+<span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
+<span id="35">35</span>
+<span id="36">36</span>
+<span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
+<span id="54">54</span>
+<span id="55">55</span>
+<span id="56">56</span>
+<span id="57">57</span>
+<span id="58">58</span>
+<span id="59">59</span>
+</pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
+    <span class="ident">gateway</span>::<span class="ident">Activity</span>,
+    <span class="ident">id</span>::<span class="ident">GuildId</span>,
+    <span class="ident">user</span>::<span class="ident">OnlineStatus</span>,
+};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
+<span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
+
+<span class="doccomment">/// A message to send from a shard over a WebSocket.</span>
+<span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>)]</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardRunnerMessage</span> {
+    <span class="doccomment">/// Indicates that the client is to send a member chunk message.</span>
+    <span class="ident">ChunkGuilds</span> {
+        <span class="doccomment">/// The IDs of the [`Guild`]s to chunk.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`Guild`]: ../../../model/guild/struct.Guild.html</span>
+        <span class="ident">guild_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// The maximum number of members to receive [`GuildMembersChunkEvent`]s</span>
+        <span class="doccomment">/// for.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html</span>
+        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
+        <span class="doccomment">/// Text to filter members by.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// For example, a query of `&quot;s&quot;` will cause only [`Member`]s whose</span>
+        <span class="doccomment">/// usernames start with `&quot;s&quot;` to be chunked.</span>
+        <span class="doccomment">///</span>
+        <span class="doccomment">/// [`Member`]: ../../../model/guild/struct.Member.html</span>
+        <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    },
+    <span class="doccomment">/// Indicates that the client is to close with the given status code and</span>
+    <span class="doccomment">/// reason.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// You should rarely - if _ever_ - need this, but the option is available.</span>
+    <span class="doccomment">/// Prefer to use the [`ShardManager`] to shutdown WebSocket clients if you</span>
+    <span class="doccomment">/// are intending to send a 1000 close code.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
+    <span class="ident">Close</span>(<span class="ident">u16</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Indicates that the client is to send a custom WebSocket message.</span>
+    <span class="ident">Message</span>(<span class="ident">Message</span>),
+    <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence&#39;s activity.</span>
+    <span class="ident">SetActivity</span>(<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence in its</span>
+    <span class="doccomment">/// entirity.</span>
+    <span class="ident">SetPresence</span>(<span class="ident">OnlineStatus</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>),
+    <span class="doccomment">/// Indicates that the client is to update the shard&#39;s presence&#39;s status.</span>
+    <span class="ident">SetStatus</span>(<span class="ident">OnlineStatus</span>),
+    <span class="doccomment">/// Sends a new filter for messages to the shard.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+    <span class="ident">SetMessageFilter</span>(<span class="ident">MessageFilter</span>),
+    <span class="doccomment">/// Sends a new filter for reactions to the shard.</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+    <span class="ident">SetReactionFilter</span>(<span class="ident">ReactionFilter</span>),
+}
+</pre></div>
+</section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../../../";window.currentCrate = "serenity";</script><script src="../../../../../main.js"></script><script src="../../../../../source-script.js"></script><script src="../../../../../source-files.js"></script><script defer src="../../../../../search-index.js"></script></body></html>

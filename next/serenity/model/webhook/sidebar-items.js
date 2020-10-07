@@ -1,0 +1,1 @@
+initSidebarItems({"struct":[["Webhook","A representation of a webhook, which is a low-effort way to post messages to channels. They do not necessarily require a bot user or authentication to use."]]});
