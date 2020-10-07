@@ -1,0 +1,190 @@
+name: CI
+
+on: [push, pull_request]
+
+jobs:
+  test:
+    name: Test
+    runs-on: ${{ matrix.os || 'ubuntu-latest' }}
+
+    strategy:
+      fail-fast: false
+      matrix:
+        name:
+          - stable
+          - beta
+          - nightly
+          - macOS
+          - Windows
+          - no cache
+          - no gateway
+
+        include:
+          - name: beta
+            toolchain: beta
+          - name: nightly
+            toolchain: nightly
+          - name: macOS
+            os: macOS-latest
+          - name: Windows
+            os: windows-latest
+          - name: no cache
+            features: builder client framework gateway model http standard_framework utils rustls_backend
+          - name: no gateway
+            features: model http rustls_backend
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        id: tc
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: ${{ matrix.toolchain || 'stable' }}
+          profile: minimal
+          override: true
+
+      - name: Install dependencies
+        if: runner.os == 'Linux'
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopus-dev
+
+      - name: Setup cache
+        if: runner.os != 'macOS'
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target
+          key: ${{ runner.os }}-test-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Build all features
+        if: matrix.features == ''
+        run: cargo build --all-features
+
+      - name: Test all features
+        if: matrix.features == ''
+        run: cargo test --all-features
+
+      - name: Build some features
+        if: matrix.features
+        run: cargo build --no-default-features --features "${{ matrix.features }}"
+
+      - name: Test some features
+        if: matrix.features
+        run: cargo test --no-default-features --features "${{ matrix.features }}"
+
+  doc:
+    name: Build docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        id: tc
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          profile: minimal
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopus-dev
+
+      - name: Setup cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+          key: ${{ runner.os }}-docs-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Build docs
+        env:
+          RUSTDOCFLAGS: -D broken_intra_doc_links
+        run: |
+          cargo doc --no-deps --features collector,voice
+          cargo doc --no-deps -p command_attr
+
+  examples:
+    name: Examples
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        id: tc
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: stable
+          profile: minimal
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopus-dev
+
+      - name: Setup cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            examples/target
+          key: ${{ runner.os }}-examples-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: 'Build example 1'
+        working-directory: examples
+        run: cargo build -p e01_basic_ping_bot
+      - name: 'Build example 2'
+        working-directory: examples
+        run: cargo build -p e02_transparent_guild_sharding
+      - name: 'Build example 3'
+        working-directory: examples
+        run: cargo build -p e03_struct_utilities
+      - name: 'Build example 4'
+        working-directory: examples
+        run: cargo build -p e04_message_builder
+      - name: 'Build example 5'
+        working-directory: examples
+        run: cargo build -p e05_command_framework
+      - name: 'Build example 6'
+        working-directory: examples
+        run: cargo build -p e06_voice
+      - name: 'Build example 7'
+        working-directory: examples
+        run: cargo build -p e07_sample_bot_structure
+      - name: 'Build example 8'
+        working-directory: examples
+        run: cargo build -p e08_env_logging
+      - name: 'Build example 9'
+        working-directory: examples
+        run: cargo build -p e09_shard_manager
+      - name: 'Build example 10'
+        working-directory: examples
+        run: cargo build -p e10_voice_receive
+      - name: 'Build example 11'
+        working-directory: examples
+        run: cargo build -p e11_create_message_builder
+      - name: 'Build example 12'
+        working-directory: examples
+        run: cargo build -p e12_collectors
+      - name: 'Build example 13'
+        working-directory: examples
+        run: cargo build -p e13_gateway_intents
+      - name: 'Build example 14'
+        working-directory: examples
+        run: cargo build -p e14_global_data
+      - name: 'Build example 15'
+        working-directory: examples
+        run: cargo build -p e15_parallel_loops
