@@ -9,6 +9,8 @@ use super::{
     user::User
 };
 
+use std::fmt;
+
 #[cfg(feature = "model")]
 use crate::builder::ExecuteWebhook;
 #[cfg(feature = "model")]
@@ -25,7 +27,7 @@ use crate::http::Http;
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
 /// use.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Webhook {
     /// The unique Id.
     ///
@@ -55,6 +57,19 @@ pub struct Webhook {
     pub user: Option<User>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+impl fmt::Debug for Webhook {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Webhook")
+            .field("id", &self.id)
+            .field("avatar", &self.avatar)
+            .field("channel_id", &self.channel_id)
+            .field("guild_id", &self.guild_id)
+            .field("name", &self.name)
+            .field("user", &self.user)
+            .finish()
+    }
 }
 
 #[cfg(feature = "model")]

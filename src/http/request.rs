@@ -65,7 +65,7 @@ impl<'a> Request<'a> {
         Self { body, headers, route }
     }
 
-    #[instrument]
+    #[instrument(skip(token))]
     pub fn build(&'a self, client: &Client, token: &str) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,

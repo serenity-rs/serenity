@@ -7,7 +7,10 @@ use serde::ser::{
     SerializeSeq,
     Serializer
 };
-use std::collections::HashMap;
+use std::{
+    collections::HashMap,
+    fmt
+};
 use super::utils::{deserialize_emojis, deserialize_u64};
 use super::prelude::*;
 use crate::constants::{OpCode, VoiceOpCode};
@@ -1312,7 +1315,7 @@ impl Serialize for UserUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct VoiceServerUpdateEvent {
     pub channel_id: Option<ChannelId>,
     pub endpoint: Option<String>,
@@ -1320,6 +1323,16 @@ pub struct VoiceServerUpdateEvent {
     pub token: String,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+impl fmt::Debug for VoiceServerUpdateEvent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("VoiceServerUpdateEvent")
+            .field("channel_id", &self.channel_id)
+            .field("endpoint", &self.endpoint)
+            .field("guild_id", &self.guild_id)
+            .finish()
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -2079,13 +2092,22 @@ pub struct VoiceSpeaking {
     pub(crate) _nonexhaustive: (),
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct VoiceResume {
     pub server_id: String,
     pub session_id: String,
     pub token: String,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+impl fmt::Debug for VoiceResume {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("VoiceResume")
+            .field("server_id", &self.server_id)
+            .field("session_id", &self.session_id)
+            .finish()
+    }
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]

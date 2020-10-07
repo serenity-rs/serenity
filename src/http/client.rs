@@ -27,6 +27,7 @@ use serde_json::json;
 use tracing::{debug, trace, instrument};
 use std::{
     collections::BTreeMap,
+    fmt,
     sync::Arc,
 };
 use tokio::{
@@ -34,11 +35,19 @@ use tokio::{
     fs::File,
 };
 
-#[derive(Debug)]
 pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
     pub token: String,
+}
+
+impl fmt::Debug for Http {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Http")
+            .field("client", &self.client)
+            .field("ratelimiter", &self.ratelimiter)
+            .finish()
+    }
 }
 
 impl Http {

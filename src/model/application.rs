@@ -5,10 +5,11 @@ use super::{
     user::User,
     utils::*,
 };
+use std::fmt;
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct ApplicationInfo {
     /// The bot user associated with the application. See [`BotApplication`] for
     /// more information.
@@ -52,8 +53,26 @@ pub struct ApplicationInfo {
     pub(crate) _nonexhaustive: (),
 }
 
+impl fmt::Debug for ApplicationInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ApplicationInfo")
+            .field("bot", &self.bot)
+            .field("bot_public", &self.bot_public)
+            .field("bot_require_code_grant", &self.bot_require_code_grant)
+            .field("description", &self.description)
+            .field("flags", &self.flags)
+            .field("icon", &self.icon)
+            .field("id", &self.id)
+            .field("name", &self.name)
+            .field("redirect_uris", &self.redirect_uris)
+            .field("rpc_origins", &self.rpc_origins)
+            .field("team", &self.team)
+            .finish()
+    }
+}
+
 /// Information about an application with an application's bot user.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct BotApplication {
     /// The unique Id of the bot user.
     pub id: UserId,
@@ -78,6 +97,19 @@ pub struct BotApplication {
     pub token: String,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+
+impl fmt::Debug for BotApplication {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BotApplication")
+            .field("id", &self.id)
+            .field("avatar", &self.avatar)
+            .field("bot", &self.bot)
+            .field("discriminator", &self.discriminator)
+            .field("name", &self.name)
+            .finish()
+    }
 }
 
 /// Information about the current application and its owner.

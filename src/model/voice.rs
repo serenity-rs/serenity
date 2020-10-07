@@ -1,6 +1,7 @@
 //! Representations of voice information.
 
 use super::id::{ChannelId, UserId};
+use std::fmt;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -26,7 +27,7 @@ pub struct VoiceRegion {
 }
 
 /// A user's state within a voice channel.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct VoiceState {
     pub channel_id: Option<ChannelId>,
     pub deaf: bool,
@@ -40,4 +41,21 @@ pub struct VoiceState {
     pub user_id: UserId,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
+}
+
+
+impl fmt::Debug for VoiceState {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("VoiceState")
+            .field("channel_id", &self.channel_id)
+            .field("deaf", &self.deaf)
+            .field("mute", &self.mute)
+            .field("self_deaf", &self.self_deaf)
+            .field("self_mute", &self.self_mute)
+            .field("self_stream", &self.self_stream)
+            .field("session_id", &self.session_id)
+            .field("suppress", &self.suppress)
+            .field("user_id", &self.user_id)
+            .finish()
+    }
 }
