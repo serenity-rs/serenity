@@ -37,6 +37,9 @@ pub mod user;
 pub mod voice;
 pub mod webhook;
 
+#[cfg(feature = "voice-model")]
+pub use serenity_voice_model as voice_gateway;
+
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 

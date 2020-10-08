@@ -1,12 +1,7 @@
 use audiopus::Bitrate;
-use serenity::{
-    constants::VoiceOpCode,
-    gateway::InterMessage,
-    model::voice::VoiceState,
-};
 use crate::{
+    id::{ChannelId, GuildId, UserId},
     input::Input,
-    model::id::{ChannelId, GuildId, UserId},
     tracks::{
         Track,
         TrackHandle,
@@ -24,8 +19,13 @@ use flume::{
     SendError,
     Sender as FlumeSender,
 };
-use futures::channel::mpsc::UnboundedSender as Sender;
 use serde_json::json;
+#[cfg(feature = "serenity")]
+use serenity::{
+    constants::OpCode,
+    gateway::InterMessage,
+    model::voice::VoiceState,
+};
 use std::sync::Arc;
 use tracing::instrument;
 
@@ -170,10 +170,10 @@ impl Handler {
         // Safe as all of these being present was already checked.
         self.send(VoiceStatus::Connect(ConnectionInfo {
             endpoint,
-            guild_id: guild_id.0.into(),
+            guild_id: guild_id.into(),
             session_id,
             token,
-            user_id: user_id.0.into(),
+            user_id: user_id.into(),
         }));
 
         true
@@ -431,7 +431,7 @@ impl Handler {
     ) -> Self {
         let (tx, rx) = flume::unbounded();
 
-        tasks::start(guild_id, rx, tx.clone());
+        tasks::start(guild_id.into(), rx, tx.clone());
 
         Handler {
             channel_id: None,
@@ -456,7 +456,7 @@ impl Handler {
             self.sender = tx.clone();
             self.sender.send(status).unwrap();
 
-            tasks::start(self.guild_id, rx, tx);
+            tasks::start(self.guild_id.into(), rx, tx);
 
             self.update();
         }
@@ -472,6 +472,7 @@ impl Handler {
         self.update();
     }
 
+    #[cfg(feature = "serenity")]
     /// Send an update for the current session over WS.
     ///
     /// Does nothing if initialized via [`standalone`].
@@ -479,8 +480,10 @@ impl Handler {
     /// [`standalone`]: #method.standalone
     fn update(&mut self) {
         if let Some(ws) = self.ws.as_mut() {
+            // this is accidentally right.
+            // should be a regular discord voicestateupdate (opcode 4)
             let map = json!({
-                "op": VoiceOpCode::SessionDescription.num(),
+                "op": OpCode::VoiceStateUpdate.num(),
                 "d": {
                     "channel_id": self.channel_id.map(|c| c.0),
                     "guild_id": self.guild_id.0,

@@ -27,6 +27,8 @@ pub enum Error {
 
     IllegalDiscoveryResponse,
 
+    IllegalIp,
+
     Io(IoError),
 
     Json(JsonError),

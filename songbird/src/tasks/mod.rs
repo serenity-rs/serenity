@@ -234,7 +234,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
                 if let Some(mut conn) = connection.take() {
                     // try once: if interconnect, try again.
                     // if still issue, full connect.
-                    let info = conn.connection_info.clone();
+                    let info = conn.info.clone();
 
                     let full_connect = match conn.reconnect(&interconnect).await {
                         Ok(()) => {

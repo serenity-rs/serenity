@@ -3,15 +3,16 @@ use audiopus::{
     Channels,
     coder::Decoder as OpusDecoder,
 };
-use serenity::{
-    model::event::{VoiceEvent, VoiceSpeakingState},
-};
 use crate::{
     constants::*,
     events::{
         CoreContext,
     },
-    payload,
+    model::{
+        payload::{Heartbeat, Speaking},
+        Event as GatewayEvent,
+        SpeakingState
+    },
     tasks::{
         AuxPacketMessage,
         EventMessage,
@@ -40,9 +41,8 @@ use flume::{
     Receiver,
     TryRecvError,
 };
-use tracing::{error, info, warn};
+use tracing::{error, info, trace, warn};
 use rand::random;
-use serde::Deserialize;
 use std::collections::HashMap;
 use tokio::{
     net::udp::RecvHalf,
@@ -164,7 +164,7 @@ struct AuxNetwork {
     ws_keepalive_time: Timer,
     udp_keepalive_time: Timer,
 
-    speaking: VoiceSpeakingState,
+    speaking: SpeakingState,
     last_heartbeat_nonce: Option<u64>,
     decoder_map: HashMap<u32, SsrcState>,
 
@@ -186,7 +186,7 @@ impl AuxNetwork {
             ws_keepalive_time: Timer::new(45_000),
             udp_keepalive_time: Timer::new(UDP_KEEPALIVE_GAP_MS),
 
-            speaking: VoiceSpeakingState::empty(),
+            speaking: SpeakingState::empty(),
             last_heartbeat_nonce: None,
             decoder_map: Default::default(),
 
@@ -210,9 +210,8 @@ impl AuxNetwork {
             tokio::time::delay_for(TIMESTEP_LENGTH / 2).await;
 
             loop {
-                use AuxPacketMessage::*;
                 match self.rx.try_recv() {
-                    Ok(Udp(udp)) => {
+                    Ok(AuxPacketMessage::Udp(udp)) => {
                         // let _ = udp.set_read_timeout(Some(TIMESTEP_LENGTH / 2));
 
                         // FIXME: INTEGRATE TIMING INFO HERE
@@ -220,28 +219,36 @@ impl AuxNetwork {
                         self.udp_socket = Some(udp);
                         self.udp_keepalive_time.reset();
                     },
-                    Ok(UdpCipher(new_key)) => {
+                    Ok(AuxPacketMessage::UdpCipher(new_key)) => {
                         self.cipher = Some(new_key);
                     },
-                    Ok(Ws(data)) => {
+                    Ok(AuxPacketMessage::Ws(data)) => {
                         self.ws_client = Some(*data);
                         self.ws_keepalive_time.reset();
                     },
-                    Ok(SetSsrc(new_ssrc)) => {
+                    Ok(AuxPacketMessage::SetSsrc(new_ssrc)) => {
                         self.ssrc = new_ssrc;
                         let mut ka = MutableKeepalivePacket::new(&mut self.keepalive_bytes[..])
                             .expect("[Voice] Insufficient bytes given to keepalive packet.");
                         ka.set_ssrc(new_ssrc);
                     },
-                    Ok(SetKeepalive(keepalive)) => {
+                    Ok(AuxPacketMessage::SetKeepalive(keepalive)) => {
                         self.ws_keepalive_time = Timer::new(keepalive as u64);
                     }
-                    Ok(Speaking(is_speaking)) => {
-                        if self.speaking.contains(VoiceSpeakingState::MICROPHONE) != is_speaking {
-                            self.speaking.set(VoiceSpeakingState::MICROPHONE, is_speaking);    
+                    Ok(AuxPacketMessage::Speaking(is_speaking)) => {
+                        if self.speaking.contains(SpeakingState::MICROPHONE) != is_speaking {
+                            self.speaking.set(SpeakingState::MICROPHONE, is_speaking);    
                             if let Some(client) = self.ws_client.as_mut() {
                                 info!("[Aux] Changing to {:?}", self.speaking);
-                                ws_error |= match client.send_json(&payload::build_speaking(self.speaking, self.ssrc)).await {
+
+                                let ssu_status = client.send_json(&GatewayEvent::from(Speaking {
+                                    delay: Some(0),
+                                    speaking: self.speaking,
+                                    ssrc: self.ssrc,
+                                    user_id: None,
+                                })).await;
+
+                                ws_error |= match ssu_status {
                                     Err(e) => {
                                         error!("[Voice] Issue sending speaking update {:?}.", e);
                                         true
@@ -251,7 +258,7 @@ impl AuxNetwork {
                             }
                         }
                     }
-                    Err(TryRecvError::Disconnected) | Ok(Poison) => {
+                    Err(TryRecvError::Disconnected) | Ok(AuxPacketMessage::Poison) => {
                         break 'aux_runner;
                     },
                     Err(_) => {
@@ -275,8 +282,8 @@ impl AuxNetwork {
             if self.ws_keepalive_time.check() {
                 let nonce = random::<u64>();
                 self.last_heartbeat_nonce = Some(nonce);
-                info!("[Aux] Sent heartbeat {:?}", self.speaking);
-                ws.send_json(&payload::build_heartbeat(nonce)).await?;
+                trace!("[Aux] Sent heartbeat {:?}", self.speaking);
+                ws.send_json(&GatewayEvent::from(Heartbeat {nonce})).await?;
                 self.ws_keepalive_time.increment();
             }
 
@@ -284,34 +291,26 @@ impl AuxNetwork {
             // FIXME: makw this one big grand select
 
             while let Ok(Ok(Some(value))) = tokio::time::timeout(TIMESTEP_LENGTH / 2, ws.try_recv_json()).await {
-                let msg = match VoiceEvent::deserialize(&value) {
-                    Ok(m) => m,
-                    Err(_) => {
-                        warn!("[Voice] Unexpected Websocket message: {:?}", value);
-                        break
-                    },
-                };
-
-                match msg {
-                    VoiceEvent::Speaking(ev) => {
+                match value {
+                    GatewayEvent::Speaking(ev) => {
                         info!("[Aux] speak update");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                             CoreContext::SpeakingStateUpdate(ev)
                         ));
                     },
-                    VoiceEvent::ClientConnect(ev) => {
+                    GatewayEvent::ClientConnect(ev) => {
                         info!("[Aux] connect");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                             CoreContext::ClientConnect(ev)
                         ));
                     },
-                    VoiceEvent::ClientDisconnect(ev) => {
+                    GatewayEvent::ClientDisconnect(ev) => {
                         info!("[Aux] discon");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                             CoreContext::ClientDisconnect(ev)
                         ));
                     },
-                    VoiceEvent::HeartbeatAck(ev) => {
+                    GatewayEvent::HeartbeatAck(ev) => {
                         if let Some(nonce) = self.last_heartbeat_nonce.take() {
                             if ev.nonce == nonce {
                                 info!("[Voice] Heartbeat ACK received.");

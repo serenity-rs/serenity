@@ -1,12 +1,8 @@
 //! Events relating to tracks, timing, and other callers.
 use async_trait::async_trait;
-use serenity::model::event::{
-    VoiceSpeaking,
-    VoiceClientConnect,
-    VoiceClientDisconnect,
-};
 use crate::{
     constants::*,
+    model::payload::{Speaking, ClientConnect, ClientDisconnect},
     tracks::{
         PlayMode,
         TrackHandle,
@@ -46,7 +42,7 @@ pub enum EventContext<'a> {
     /// Speaking state update, typically describing how another voice
     /// user is transmitting audio data. Clients must send at least one such
     /// packet to allow SSRC/UserID matching.
-    SpeakingStateUpdate(VoiceSpeaking),
+    SpeakingStateUpdate(Speaking),
 
     /// Speaking state transition, describing whether a given source has started/stopped
     /// transmitting. This fires in response to a silent burst, or the first packet
@@ -76,15 +72,15 @@ pub enum EventContext<'a> {
 
     /// Fired whenever a client connects to a call for the first time, allowing SSRC/UserID
     /// matching.
-    ClientConnect(VoiceClientConnect),
+    ClientConnect(ClientConnect),
 
     /// Fired whenever a client disconnects.
-    ClientDisconnect(VoiceClientDisconnect),
+    ClientDisconnect(ClientDisconnect),
 }
 
 #[derive(Clone, Debug)]
 pub(crate) enum CoreContext {
-    SpeakingStateUpdate(VoiceSpeaking),
+    SpeakingStateUpdate(Speaking),
     SpeakingUpdate {
         ssrc: u32,
         speaking: bool,
@@ -98,8 +94,8 @@ pub(crate) enum CoreContext {
         packet: Rtcp,
         payload_offset: usize,
     },
-    ClientConnect(VoiceClientConnect),
-    ClientDisconnect(VoiceClientDisconnect),
+    ClientConnect(ClientConnect),
+    ClientDisconnect(ClientDisconnect),
 }
 
 impl<'a> CoreContext {

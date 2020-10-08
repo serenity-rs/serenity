@@ -1,3 +1,8 @@
+#[cfg(feature = "driver")]
+use crate::model::id::{
+	GuildId as DriverGuild,
+	UserId as DriverUser,
+};
 #[cfg(feature = "serenity")]
 use serenity::model::id::{
 	ChannelId as SerenityChannel,
@@ -53,6 +58,13 @@ impl From<SerenityGuild> for GuildId {
 	}
 }
 
+#[cfg(feature = "driver")]
+impl From<GuildId> for DriverGuild {
+	fn from(id: GuildId) -> Self {
+		Self(id.0)
+	}
+}
+
 impl Display for UserId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         Display::fmt(&self.0, f)
@@ -68,6 +80,13 @@ impl From<u64> for UserId {
 #[cfg(feature = "serenity")]
 impl From<SerenityUser> for UserId {
 	fn from(id: SerenityUser) -> Self {
+		Self(id.0)
+	}
+}
+
+#[cfg(feature = "driver")]
+impl From<UserId> for DriverUser {
+	fn from(id: UserId) -> Self {
 		Self(id.0)
 	}
 }

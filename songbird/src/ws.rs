@@ -3,14 +3,15 @@
 // (not desirable) or break the common WS elements into a subcrate.
 // I believe that decisions is outside of the scope of the voice subcrate PR.
 
+use crate::model::Event;
+
 use async_trait::async_trait;
 use async_tungstenite::{
     tokio::ConnectStream,
     tungstenite::Message,
     WebSocketStream,
 };
-use flate2::read::ZlibDecoder;
-use serde_json::{self, Error as JsonError, Value};
+use serde_json::Error as JsonError;
 use tracing::{warn, instrument};
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use tokio::time::timeout;
@@ -28,6 +29,10 @@ pub enum Error {
     Json(JsonError),
     #[cfg(all(feature = "rustls", not(feature = "native")))]
     Tls(RustlsError),
+
+    /// The discord voice gateway does noe support or offer zlib compression.
+    /// As a result, only text messages are expected.
+    UnexpectedBinaryMessage(Vec<u8>),
 
     Ws(TungsteniteError),
 
@@ -62,18 +67,18 @@ use futures::stream::SplitSink;
 
 #[async_trait]
 pub trait ReceiverExt {
-    async fn recv_json(&mut self) -> Result<Option<Value>>;
-    async fn try_recv_json(&mut self) -> Result<Option<Value>>;
+    async fn recv_json(&mut self) -> Result<Option<Event>>;
+    async fn try_recv_json(&mut self) -> Result<Option<Event>>;
 }
 
 #[async_trait]
 pub trait SenderExt {
-    async fn send_json(&mut self, value: &Value) -> Result<()>;
+    async fn send_json(&mut self, value: &Event) -> Result<()>;
 }
 
 #[async_trait]
 impl ReceiverExt for WsStream {
-    async fn recv_json(&mut self) -> Result<Option<Value>> {
+    async fn recv_json(&mut self) -> Result<Option<Event>> {
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_millis(500);
 
         let ws_message = match timeout(TIMEOUT, self.next()).await {
@@ -85,14 +90,14 @@ impl ReceiverExt for WsStream {
         convert_ws_message(ws_message)
     }
 
-    async fn try_recv_json(&mut self) -> Result<Option<Value>> {
+    async fn try_recv_json(&mut self) -> Result<Option<Event>> {
         convert_ws_message(self.try_next().await.ok().flatten())
     }
 }
 
 #[async_trait]
 impl SenderExt for SplitSink<WsStream, Message> {
-    async fn send_json(&mut self, value: &Value) -> Result<()> {
+    async fn send_json(&mut self, value: &Event) -> Result<()> {
         Ok(serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
@@ -103,7 +108,7 @@ impl SenderExt for SplitSink<WsStream, Message> {
 
 #[async_trait]
 impl SenderExt for WsStream {
-    async fn send_json(&mut self, value: &Value) -> Result<()> {
+    async fn send_json(&mut self, value: &Event) -> Result<()> {
         Ok(serde_json::to_string(value)
             .map(Message::Text)
             .map_err(Error::from)
@@ -113,17 +118,8 @@ impl SenderExt for WsStream {
 }
 
 #[inline]
-pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Value>> {
+pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Event>> {
     Ok(match message {
-        Some(Message::Binary(bytes)) => {
-            serde_json::from_reader(ZlibDecoder::new(&bytes[..]))
-                .map(Some)
-                .map_err(|why| {
-                    warn!("Err deserializing bytes: {:?}; bytes: {:?}", why, bytes);
-
-                    why
-                })?
-        },
         Some(Message::Text(payload)) => {
             serde_json::from_str(&payload).map(Some).map_err(|why| {
                 warn!(
@@ -134,6 +130,9 @@ pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Valu
 
                 why
             })?
+        },
+        Some(Message::Binary(bytes)) => {
+            return Err(Error::UnexpectedBinaryMessage(bytes));
         },
         Some(Message::Close(Some(frame))) => {
             return Err(Error::WsClosed(Some(frame)));

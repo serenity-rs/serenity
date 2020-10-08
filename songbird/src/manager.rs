@@ -1,5 +1,5 @@
 use super::Handler;
-use crate::model::id::{ChannelId, GuildId, UserId};
+use crate::id::{ChannelId, GuildId, UserId};
 
 use async_trait::async_trait;
 #[cfg(feature = "serenity")]
@@ -8,7 +8,6 @@ use serenity::{
     gateway::InterMessage,
     model::{
         id::{
-            ChannelId as SerenityChannel,
             GuildId as SerenityGuild,
             UserId as SerenityUser,
         },
@@ -26,7 +25,7 @@ use futures::channel::mpsc::{
     TrySendError,
     UnboundedSender as Sender,
 };
-use tokio::sync::{Mutex, MutexGuard, RwLock};
+use tokio::sync::Mutex;
 
 use parking_lot::{
     lock_api::RwLockWriteGuard,
@@ -52,7 +51,7 @@ impl ShardHandle {
         if let Some(sender) = &*sender_lock {
             for msg in messages_lock.drain(..) {
                 if let Err(e) = sender.unbounded_send(msg) {
-                    error!("Error while clearing gateway message queue.");
+                    error!("Error while clearing gateway message queue: {:?}", e);
                     break;
                 }
             }
@@ -167,7 +166,7 @@ impl Manager {
     }
 
     fn manager_info(&self) -> ClientData {
-        let mut client_data = self.client_data.write();
+        let client_data = self.client_data.write();
 
         *client_data
     }

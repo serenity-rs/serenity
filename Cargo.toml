@@ -50,6 +50,11 @@ features = ["json", "stream"]
 optional = true
 version = "0.10"
 
+[dependencies.serenity-voice-model]
+path = "./serenity-voice-model"
+version = "0.9.0-rc.2"
+optional = true
+
 [dependencies.static_assertions]
 optional = true
 version = "1.1"
@@ -126,6 +131,7 @@ absolute_ratelimits = ["http"]
 rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/async-tls"]
 native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"]
 model = ["builder", "http"]
+voice-model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 utils = ["base64"]
 voice = ["client", "model"]

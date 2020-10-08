@@ -1,13 +1,14 @@
 pub mod error;
 pub mod info;
 
-use serenity::{
-    model::event::VoiceEvent,
-};
 use crate::{
     constants::*,
     crypto::Mode as CryptoMode,
-    payload,
+    model::{
+        payload::{Identify, Resume, SelectProtocol},
+        Event as GatewayEvent,
+        ProtocolData,
+    },
     tasks::{
         AuxPacketMessage,
         Interconnect,
@@ -26,7 +27,10 @@ use discortp::discord::{
 use error::{Error, Result};
 use info::ConnectionInfo;
 use tracing::{debug, info};
-use serde::Deserialize;
+use std::{
+    net::IpAddr,
+    str::FromStr,
+};
 use tokio::{
     time::{timeout_at, Elapsed, Instant},
     net::UdpSocket,
@@ -45,7 +49,7 @@ use ws::create_rustls_client;
 use ws::create_native_tls_client;
 
 pub(crate) struct Connection {
-    pub(crate) connection_info: ConnectionInfo,
+    pub(crate) info: ConnectionInfo,
 }
 
 impl Connection {
@@ -60,7 +64,13 @@ impl Connection {
 
         let mut hello = None;
         let mut ready = None;
-        client.send_json(&payload::build_identify(&info)).await?;
+
+        client.send_json(&GatewayEvent::from(Identify {
+            server_id: info.guild_id,
+            session_id: info.session_id.clone(),
+            token: info.token.clone(),
+            user_id: info.user_id,
+        })).await?;
 
         loop {
             let value = match client.recv_json().await? {
@@ -68,14 +78,14 @@ impl Connection {
                 None => continue,
             };
 
-            match VoiceEvent::deserialize(value)? {
-                VoiceEvent::Ready(r) => {
+            match value {
+                GatewayEvent::Ready(r) => {
                     ready = Some(r);
                     if hello.is_some(){
                         break;
                     }
                 },
-                VoiceEvent::Hello(h) => {
+                GatewayEvent::Hello(h) => {
                     hello = Some(h);
                     if ready.is_some() {
                         break;
@@ -97,7 +107,7 @@ impl Connection {
         }
 
         let mut udp = UdpSocket::bind("0.0.0.0:0").await?;
-        udp.connect((&ready.ip[..], ready.port)).await?;
+        udp.connect((ready.ip, ready.port)).await?;
 
         // Follow Discord's IP Discovery procedures, in case NAT tunnelling is needed.
         let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
@@ -123,8 +133,32 @@ impl Connection {
                 return Err(Error::IllegalDiscoveryResponse);
             }
 
-            let addr = String::from_utf8_lossy(&view.get_address_raw());
-            client.send_json(&payload::build_select_protocol(addr, view.get_port(), CryptoMode::Normal)).await?;
+            // We could do something clever like binary search,
+            // but possibility of UDP spoofing preclueds us from
+            // making the assumption we can find a "left edge" of '\0's.
+            let nul_byte_index = view.get_address_raw()
+                .iter()
+                .position(|&b| b == 0)
+                .ok_or(Error::IllegalIp)?;
+
+            let address_str = std::str::from_utf8(&view.get_address_raw()[..nul_byte_index])
+                .map_err(|_| Error::IllegalIp)?;
+
+            println!("string was {:?}", address_str);
+            println!("pkt was {:?}", view);
+            println!("byte was {:?}", nul_byte_index);
+
+            let address = IpAddr::from_str(&address_str)
+                .map_err(|e| {println!("{:?}", e); Error::IllegalIp})?;
+
+            client.send_json(&GatewayEvent::from(SelectProtocol {
+                protocol: "udp".into(),
+                data: ProtocolData {
+                    address,
+                    mode: CryptoMode::Normal.to_request_str().into(),
+                    port: view.get_port(),
+                },
+            })).await?;
         }
 
         let cipher = init_cipher(&mut client).await?;
@@ -185,12 +219,12 @@ impl Connection {
         interconnect.mixer.send(MixerMessage::SetConn(mix_conn, ready.ssrc))?;
 
         Ok(Connection {
-            connection_info: info,
+            info,
         })
     }
 
     pub async fn reconnect(&mut self, interconnect: &Interconnect) -> Result<()> {
-        let url = generate_url(&mut self.connection_info.endpoint)?;
+        let url = generate_url(&mut self.info.endpoint)?;
 
         // Thread may have died, we want to send to prompt a clean exit
         // (if at all possible) and then proceed as normal.
@@ -201,7 +235,11 @@ impl Connection {
         #[cfg(feature = "native")]
         let mut client = create_native_tls_client(url).await?;
 
-        client.send_json(&payload::build_resume(&self.connection_info)).await?;
+        client.send_json(&GatewayEvent::from(Resume {
+            server_id: self.info.guild_id,
+            session_id: self.info.session_id.clone(),
+            token: self.info.token.clone(),
+        })).await?;
 
         let mut hello = None;
         let mut resumed = None;
@@ -212,14 +250,14 @@ impl Connection {
                 None => continue,
             };
 
-            match VoiceEvent::deserialize(value)? {
-                VoiceEvent::Resumed => {
+            match value {
+                GatewayEvent::Resumed => {
                     resumed = Some(());
                     if hello.is_some(){
                         break;
                     }
                 },
-                VoiceEvent::Hello(h) => {
+                GatewayEvent::Hello(h) => {
                     hello = Some(h);
                     if resumed.is_some() {
                         break;
@@ -238,7 +276,7 @@ impl Connection {
         interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
         interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
 
-        info!("[Voice] Reconnected to: {}", &self.connection_info.endpoint);
+        info!("[Voice] Reconnected to: {}", &self.info.endpoint);
         Ok(())
     }
 }
@@ -268,8 +306,8 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
             None => continue,
         };
 
-        match VoiceEvent::deserialize(value)? {
-            VoiceEvent::SessionDescription(desc) => {
+        match value {
+            GatewayEvent::SessionDescription(desc) => {
                 // FIXME: check against config.
                 if desc.mode != CryptoMode::Normal.to_request_str() {
                     return Err(Error::CryptoModeInvalid);
@@ -277,14 +315,13 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
 
                 return Ok(Cipher::new_varkey(&desc.secret_key)?);
             },
-            VoiceEvent::Unknown(op, value) => {
+            other => {
                 debug!(
                     "[Voice] Expected ready for key; got: op{}/v{:?}",
-                    op.num(),
-                    value
+                    other.kind() as u8,
+                    other
                 );
             },
-            _ => {},
         }
     }
 }
