@@ -7,7 +7,7 @@ use serde::de::{
     Visitor
 };
 use serde::ser::Serializer;
-use super::super::prelude::*;
+use crate::model::prelude::*;
 use std::{
     collections::HashMap,
     mem::transmute,
