@@ -1,29 +1,18 @@
-//! Mappings of objects received from the API, with optional helper methods for
-//! ease of use.
-//!
-//! Models can optionally have additional helper methods compiled, by enabling
-//! the `model` feature.
-//!
-//! Normally you can import models through the sub-modules:
-//!
-//! ```rust,no_run
-//! use serenity::model::channel::{ChannelType, GuildChannel, Message};
-//! use serenity::model::id::{ChannelId, GuildId};
-//! use serenity::model::user::User;
-//! ```
-//!
-//! This can get a bit tedious - especially with a large number of imports - so
-//! this can be simplified by simply glob importing everything from the prelude:
-//!
-//! ```rust,no_run
-//! use serenity::model::prelude::*;
-//! ```
+//! Mappings of objects received from Discord's voice gateway API, with implementations
+//! for (de)serialisation.
 
 pub mod constants;
-pub mod event;
+mod event;
 pub mod id;
-pub mod opcode;
+mod opcode;
 pub mod payload;
-pub mod protocol_data;
-pub mod speaking_state;
-pub mod util;
+mod protocol_data;
+mod speaking_state;
+mod util;
+
+pub use self::{
+	event::Event,
+	opcode::OpCode,
+	protocol_data::ProtocolData,
+	speaking_state::SpeakingState,
+};

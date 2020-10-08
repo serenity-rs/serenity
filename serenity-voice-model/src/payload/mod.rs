@@ -1,3 +1,5 @@
+//! Message bodies used in gateway event-handling.
+
 mod client_connect;
 mod client_disconnect;
 mod heartbeat;

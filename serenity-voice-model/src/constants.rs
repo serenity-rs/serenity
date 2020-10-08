@@ -1,5 +1,8 @@
 //! A set of constants used by the library.
 
+/// Gateway version of the Voice API which this library encodes.
+pub const GATEWAY_VERSION: u8 = 4;
+
 pub mod voice_close_codes {
     /// Invalid Voice OP Code.
     pub const UNKNOWN_OPCODE: u16 = 4001;
