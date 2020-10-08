@@ -32,7 +32,7 @@ use songbird::{
         Input,
     },
     Bitrate,
-    ClientVoiceManager,
+    PrototypeManager,
     Event,
     EventContext,
     EventHandler as VoiceEventHandler,
@@ -243,7 +243,7 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 struct LoopPlaySound {
-    manager: Arc<ClientVoiceManager>,
+    manager: Arc<PrototypeManager>,
     sources: Arc<Mutex<HashMap<String, CachedSound>>>,
     guild_id: GuildId,
 }

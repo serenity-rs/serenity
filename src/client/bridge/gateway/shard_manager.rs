@@ -168,10 +168,7 @@ impl ShardManager {
     /// a shard runner responsible for the given ID.
     ///
     /// If a shard has been queued but has not yet been initiated, then this
-    /// will return `false`. Consider double-checking [`is_responsible_for`] to
-    /// determine whether this shard manager is responsible for the given shard.
-    ///
-    /// [`is_responsible_for`]: #method.is_responsible_for
+    /// will return `false`.
     pub async fn has(&self, shard_id: ShardId) -> bool {
         self.runners.lock().await.contains_key(&shard_id)
     }

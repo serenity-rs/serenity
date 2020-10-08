@@ -3,6 +3,7 @@ authors = ["Alex M. M. <acdenissk69@gmail.com>"]
 description = "A Rust library for (de)serializing Discord Voice API gateway messages."
 documentation = "https://docs.rs/serenity"
 homepage = "https://github.com/serenity-rs/serenity"
+include = ["src/**/*.rs", "Cargo.toml"]
 keywords = ["discord", "api"]
 license = "ISC"
 name = "serenity-voice-model"

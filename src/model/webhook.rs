@@ -9,6 +9,8 @@ use super::{
     user::User
 };
 
+use std::fmt;
+
 #[cfg(feature = "model")]
 use crate::builder::ExecuteWebhook;
 #[cfg(feature = "model")]
@@ -25,7 +27,7 @@ use crate::http::Http;
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
 /// use.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
 pub struct Webhook {
     /// The unique Id.
     ///
@@ -33,9 +35,9 @@ pub struct Webhook {
     pub id: WebhookId,
     /// The default avatar.
     ///
-    /// This can be modified via [`ExecuteWebhook::avatar`].
+    /// This can be modified via [`ExecuteWebhook::avatar_url`].
     ///
-    /// [`ExecuteWebhook::avatar`]: ../../builder/struct.ExecuteWebhook.html#method.avatar
+    /// [`ExecuteWebhook::avatar_url`]: ../../builder/struct.ExecuteWebhook.html#method.avatar_url
     pub avatar: Option<String>,
     /// The Id of the channel that owns the webhook.
     pub channel_id: ChannelId,
@@ -57,14 +59,27 @@ pub struct Webhook {
     pub(crate) _nonexhaustive: (),
 }
 
+impl fmt::Debug for Webhook {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Webhook")
+            .field("id", &self.id)
+            .field("avatar", &self.avatar)
+            .field("channel_id", &self.channel_id)
+            .field("guild_id", &self.guild_id)
+            .field("name", &self.name)
+            .field("user", &self.user)
+            .finish()
+    }
+}
+
 #[cfg(feature = "model")]
 impl Webhook {
     /// Deletes the webhook.
     ///
-    /// As this calls the [`http::delete_webhook_with_token`] function,
+    /// As this calls the [`Http::delete_webhook_with_token`] function,
     /// authentication is not required.
     ///
-    /// [`http::delete_webhook_with_token`]: ../../http/fn.delete_webhook_with_token.html
+    /// [`Http::delete_webhook_with_token`]: ../../http/client/struct.Http.html#method.delete_webhook_with_token
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_webhook_with_token(self.id.0, &self.token).await
@@ -76,9 +91,9 @@ impl Webhook {
     /// To nullify the avatar, pass `Some("")`. Otherwise, passing `None` will
     /// not modify the avatar.
     ///
-    /// Refer to [`http::edit_webhook`] for httprictions on editing webhooks.
+    /// Refer to [`Http::edit_webhook`] for httprictions on editing webhooks.
     ///
-    /// As this calls the [`http::edit_webhook_with_token`] function,
+    /// As this calls the [`Http::edit_webhook_with_token`] function,
     /// authentication is not required.
     ///
     /// # Examples
@@ -120,8 +135,8 @@ impl Webhook {
     /// # }
     /// ```
     ///
-    /// [`http::edit_webhook`]: ../../http/fn.edit_webhook.html
-    /// [`http::edit_webhook_with_token`]: ../../http/fn.edit_webhook_with_token.html
+    /// [`Http::edit_webhook`]: ../../http/client/struct.Http.html#method.edit_webhook
+    /// [`Http::edit_webhook_with_token`]: ../../http/client/struct.Http.html#method.edit_webhook_with_token
     pub async fn edit(&mut self, http: impl AsRef<Http>, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
@@ -228,10 +243,10 @@ impl Webhook {
     /// Retrieves the latest information about the webhook, editing the
     /// webhook in-place.
     ///
-    /// As this calls the [`http::get_webhook_with_token`] function,
+    /// As this calls the [`Http::get_webhook_with_token`] function,
     /// authentication is not required.
     ///
-    /// [`http::get_webhook_with_token`]: ../../http/fn.get_webhook_with_token.html
+    /// [`Http::get_webhook_with_token`]: ../../http/client/struct.Http.html#method.get_webhook_with_token
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         match http.as_ref().get_webhook_with_token(self.id.0, &self.token).await {
             Ok(replacement) => {

@@ -30,15 +30,15 @@ pub enum ShardManagerError {
     /// Returned when a shard received an [`InvalidAuthentication`] error.
     /// An invalid token has been specified.
     ///
-    /// [`InvalidAuthentication`]: ../../../gateway/enum.Error.html#InvalidAuthentication
+    /// [`InvalidAuthentication`]: ../../../gateway/enum.GatewayError.html#variant.InvalidAuthentication
     InvalidToken,
     /// Returned when a shard received an [`InvalidGatewayIntents`] error.
     ///
-    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.Error.html#InvalidGatewayIntents
+    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.InvalidGatewayIntents
     InvalidGatewayIntents,
     /// Returned when a shard received a [`DisallowedGatewayIntents`] error.
     ///
-    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.Error.html#DisallowedGatewayIntents
+    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.DisallowedGatewayIntents
     DisallowedGatewayIntents,
 }
 

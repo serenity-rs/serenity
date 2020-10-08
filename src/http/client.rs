@@ -27,6 +27,7 @@ use serde_json::json;
 use tracing::{debug, trace, instrument};
 use std::{
     collections::BTreeMap,
+    fmt,
     sync::Arc,
 };
 use tokio::{
@@ -34,11 +35,19 @@ use tokio::{
     fs::File,
 };
 
-#[derive(Debug)]
 pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
     pub token: String,
+}
+
+impl fmt::Debug for Http {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Http")
+            .field("client", &self.client)
+            .field("ratelimiter", &self.ratelimiter)
+            .finish()
+    }
 }
 
 impl Http {
@@ -1475,10 +1484,10 @@ impl Http {
     /// # Errors
     ///
     /// Returns an
-    /// [`HttpError::InvalidRequest(PayloadTooLarge)`][`HttpError::InvalidRequest`]
+    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the file is too large to send.
     ///
-    /// [`HttpError::InvalidRequest`]: enum.HttpError.html#variant.InvalidRequest
+    /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn send_files<'a, T, It: IntoIterator<Item=T>>(&self, channel_id: u64, files: It, map: JsonMap) -> Result<Message>
         where T: Into<AttachmentType<'a>> {
         let uri = api!("/channels/{}/messages", channel_id);

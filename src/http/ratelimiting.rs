@@ -47,6 +47,7 @@ use crate::internal::prelude::*;
 use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::HashMap,
+    fmt,
     sync::Arc,
     str::{
         self,
@@ -75,7 +76,10 @@ use tracing::{debug, instrument};
 /// regardless of route. The value of this global ratelimit is never given
 /// through the API, so it can't be pre-emptively ratelimited. This only affects
 /// the largest of bots.
-#[derive(Debug)]
+///
+/// [`limit`]: struct.Ratelimit.html#method.limit
+/// [`remaining`]: struct.Ratelimit.html#method.remaining
+/// [`reset`]: struct.Ratelimit.html#method.reset
 pub struct Ratelimiter {
     client: Arc<Client>,
     global: Arc<Mutex<()>>,
@@ -83,6 +87,16 @@ pub struct Ratelimiter {
     // when the 'reset' passes.
     routes: Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>>,
     token: String,
+}
+
+impl fmt::Debug for Ratelimiter {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("Ratelimiter")
+            .field("client", &self.client)
+            .field("global", &self.global)
+            .field("routes", &self.routes)
+            .finish()
+    }
 }
 
 impl Ratelimiter {

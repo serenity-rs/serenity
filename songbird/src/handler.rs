@@ -27,6 +27,7 @@ use flume::{
 use futures::channel::mpsc::UnboundedSender as Sender;
 use serde_json::json;
 use std::sync::Arc;
+use tracing::instrument;
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -63,7 +64,6 @@ pub struct Handler {
     /// **Note**: This _must not_ be manually mutated. Call [`switch_to`] to
     /// mutate this value.
     ///
-    /// [`guild`]: #structfield.guild
     /// [`switch_to`]: #method.switch_to
     pub channel_id: Option<ChannelId>,
     /// The voice server endpoint.
@@ -381,6 +381,7 @@ impl Handler {
     ///
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
+    #[instrument(skip(self, token))]
     pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
         self.token = Some(token.to_string());
 

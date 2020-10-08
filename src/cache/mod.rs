@@ -379,9 +379,9 @@ impl Cache {
 
     /// Clones an entire guild from the cache based on the given `id`.
     ///
-    /// In order to clone only a field of the guild, use [`guild_field´].
+    /// In order to clone only a field of the guild, use [`guild_field`].
     ///
-    /// [`guild_field`]: ../model/id/struct.GuildId.html
+    /// [`guild_field`]: #method.guild_field
     ///
     /// # Examples
     ///
@@ -1018,7 +1018,7 @@ mod test {
                 member: None,
                 mention_everyone: false,
                 mention_roles: vec![],
-                mention_channels: None,
+                mention_channels: vec![],
                 mentions: vec![],
                 nonce: Value::Number(Number::from(1)),
                 pinned: false,
