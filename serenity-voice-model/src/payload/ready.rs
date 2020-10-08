@@ -1,6 +1,5 @@
-use std::net::IpAddr;
-
 use serde::{Deserialize, Serialize};
+use std::net::IpAddr;
 
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct Ready {

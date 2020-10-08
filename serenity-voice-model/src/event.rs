@@ -192,16 +192,15 @@ impl<'de> Deserialize<'de> for Event {
 
 #[cfg(test)]
 mod tests {
-        use std::net::Ipv4Addr;
-
-use super::Event;
+    use super::Event;
     use crate::{
         id::*,
         opcode::OpCode,
         payload::*,
+        protocol_data::ProtocolData,
     };
     use serde_test::{Configure, Token};
-
+    use std::net::Ipv4Addr;
 
     #[test]
     fn deserialize_identify_json() {
@@ -227,6 +226,39 @@ use super::Event;
         assert!(
             match event {
                 Ok(Event::Identify(i)) if i == ident => true,
+                _ => false,
+            }
+        );
+    }
+
+    #[test]
+    fn deserialize_select_protocol_json() {
+        let json_data = r#"{
+            "op": 1,
+            "d": {
+                "protocol": "udp",
+                "data": {
+                    "address": "127.0.0.1",
+                    "port": 1337,
+                    "mode": "xsalsa20_poly1305_lite"
+                }
+            }
+        }"#;
+
+        let event = serde_json::from_str(&json_data);
+
+        let proto = SelectProtocol {
+            protocol: "udp".into(),
+            data: ProtocolData {
+                address: Ipv4Addr::new(127,0,0,1).into(),
+                port: 1337,
+                mode: "xsalsa20_poly1305_lite".into(),
+            },
+        };
+
+        assert!(
+            match event {
+                Ok(Event::SelectProtocol(i)) if i == proto => true,
                 _ => false,
             }
         );
@@ -269,6 +301,51 @@ use super::Event;
     }
 
     #[test]
+    fn deserialize_heartbeat_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_session_description_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_speaking_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_heartbeat_ack_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_resume_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_hello_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_resumed_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_client_connect_json() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn deserialize_client_disconnect_json() {
+        unimplemented!()
+    }
+
+    #[test]
     fn serialize_identify() {
         let value = Event::Identify(Identify {
             server_id: GuildId(1),
@@ -305,6 +382,11 @@ use super::Event;
                 Token::StructEnd,
             ]
         );
+    }
+
+    #[test]
+    fn serialize_select_protocol() {
+        unimplemented!()
     }
 
     #[test]
@@ -358,5 +440,50 @@ use super::Event;
                 Token::StructEnd,
             ]
         );
+    }
+
+    #[test]
+    fn serialize_heartbeat() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_session_description() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_speaking() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_heartbeat_ack() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_resume() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_hello() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_resumed() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_client_connect() {
+        unimplemented!()
+    }
+
+    #[test]
+    fn serialize_client_disconnect() {
+        unimplemented!()
     }
 }
