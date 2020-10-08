@@ -1,0 +1,3 @@
+(function() {var implementors = {};
+implementors["serenity"] = [{"text":"impl&lt;'a&gt; Future for ClientBuilder&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Future for MessageCollectorBuilder&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Future for CollectReply&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Future for ReactionCollectorBuilder&lt;'a&gt;","synthetic":false,"types":[]},{"text":"impl&lt;'a&gt; Future for CollectReaction&lt;'a&gt;","synthetic":false,"types":[]}];
+if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
