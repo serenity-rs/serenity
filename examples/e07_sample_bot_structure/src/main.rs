@@ -26,7 +26,13 @@ use serenity::{
     model::{event::ResumedEvent, gateway::Ready},
     prelude::*,
 };
-use log::{error, info};
+
+use tracing::{error, info};
+use tracing_subscriber::{
+    FmtSubscriber,
+    EnvFilter,
+};
+
 
 use commands::{
     math::*,
@@ -61,13 +67,18 @@ struct General;
 async fn main() {
     // This will load the environment variables located at `./.env`, relative to
     // the CWD. See `./.env.example` for an example on how to structure this.
-    kankyo::load().expect("Failed to load .env file");
+    dotenv::dotenv().expect("Failed to load .env file");
 
     // Initialize the logger to use environment variables.
     //
     // In this case, a good default is setting the environment variable
     // `RUST_LOG` to debug`.
-    env_logger::init();
+    let subscriber = FmtSubscriber::builder()
+        .with_env_filter(EnvFilter::from_default_env())
+        .finish();
+
+    tracing::subscriber::set_global_default(subscriber).expect("Failed to start the logger");
+
 
     let token = env::var("DISCORD_TOKEN")
         .expect("Expected a token in the environment");

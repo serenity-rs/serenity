@@ -5,10 +5,14 @@ authors = ["my name <my@email.address>"]
 edition = "2018"
 
 [dependencies]
-env_logger = "0.6"
-kankyo = "0.2"
-log = "0.4"
-tokio = { version = "0.2", features = ["macros"] }
+dotenv = "0.15"
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2" # needed so intrument works with async functions.
+
+[dependencies.tokio]
+version = "0.2"
+features = ["macros"]
 
 [dependencies.serenity]
 features = ["cache", "framework", "standard_framework", "rustls_backend"]
