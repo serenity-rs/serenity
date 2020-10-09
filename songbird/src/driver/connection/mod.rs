@@ -1,22 +1,18 @@
 pub mod error;
-pub mod info;
 
+use super::{
+    tasks::message::*,
+    CryptoMode,
+};
 use crate::{
     constants::*,
-    crypto::Mode as CryptoMode,
     model::{
         payload::{Identify, Resume, SelectProtocol},
         Event as GatewayEvent,
         ProtocolData,
     },
-    tasks::{
-        AuxPacketMessage,
-        Interconnect,
-        MixerConnection,
-        MixerMessage,   
-        UdpMessage,
-    },
     ws::{self, ReceiverExt, SenderExt, WsStream},
+    ConnectionInfo,
 };
 use discortp::discord::{
     IpDiscoveryPacket,
@@ -25,7 +21,6 @@ use discortp::discord::{
     MutableKeepalivePacket,
 };
 use error::{Error, Result};
-use info::ConnectionInfo;
 use tracing::{debug, info};
 use std::{
     net::IpAddr,
@@ -143,10 +138,6 @@ impl Connection {
 
             let address_str = std::str::from_utf8(&view.get_address_raw()[..nul_byte_index])
                 .map_err(|_| Error::IllegalIp)?;
-
-            println!("string was {:?}", address_str);
-            println!("pkt was {:?}", view);
-            println!("byte was {:?}", nul_byte_index);
 
             let address = IpAddr::from_str(&address_str)
                 .map_err(|e| {println!("{:?}", e); Error::IllegalIp})?;

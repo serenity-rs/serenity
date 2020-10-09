@@ -4,6 +4,7 @@ mod queue;
 
 use crate::{
     constants::*,
+    driver::tasks::message::*,
     events::{
         Event,
         EventData,
@@ -11,11 +12,6 @@ use crate::{
         EventStore,
     },
     input::Input,
-    tasks::{
-        EventMessage,
-        Interconnect,
-        TrackStateChange,
-    },
 };
 use std::time::Duration;
 use tokio::sync::{

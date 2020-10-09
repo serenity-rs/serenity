@@ -1,4 +1,10 @@
+//! Compatability and convenience methods for working with [serenity].
+//!
+//! [serenity]: https://crates.io/crates/serenity/0.9.0-rc.2
+
 use crate::manager::Manager;
+#[cfg(feature = "driver")]
+use crate::tracks::TrackQueue;
 use serenity::{
 	client::{ClientBuilder, Context},
 	prelude::TypeMapKey,
@@ -7,9 +13,9 @@ use std::sync::Arc;
 
 /// Key type used to store and retrieve access to the manager from the serenity client's
 /// shared key-value store.
-pub struct Songbird {}
+pub struct SongbirdKey;
 
-impl TypeMapKey for Songbird {
+impl TypeMapKey for SongbirdKey {
     type Value = Arc<Manager>;
 }
 
@@ -28,7 +34,7 @@ pub fn register_with(client_builder: ClientBuilder, voice: Manager) -> ClientBui
 	let voice = Arc::new(voice);
 
 	client_builder.voice_manager_arc(voice.clone())
-		.type_map_insert::<Songbird>(voice)
+		.type_map_insert::<SongbirdKey>(voice)
 }
 
 /// Retrieve the Songbird voice client from a serenity context's
@@ -36,8 +42,16 @@ pub fn register_with(client_builder: ClientBuilder, voice: Manager) -> ClientBui
 pub async fn get(ctx: &Context) -> Option<Arc<Manager>> {
 	let data = ctx.data.read().await;
 
-	data.get::<Songbird>()
+	data.get::<SongbirdKey>()
 		.cloned()
+}
+
+#[cfg(feature = "driver")]
+pub struct SongbirdQueueKey;
+
+#[cfg(feature = "driver")]
+impl TypeMapKey for SongbirdQueueKey {
+    type Value = Arc<TrackQueue>;
 }
 
 /// Helper trait to add installation/creation methods to serenity's
@@ -49,6 +63,12 @@ pub trait SerenityInit {
 	fn register_songbird(self) -> Self;
 
 	fn register_songbird_with(self, voice: Manager) -> Self;
+
+	#[cfg(feature = "driver")]
+	fn register_trackqueue(self) -> Self;
+
+	#[cfg(feature = "driver")]
+	fn register_trackqueue_with(self, queue: TrackQueue) -> Self;
 }
 
 impl SerenityInit for ClientBuilder<'_> {
@@ -58,5 +78,15 @@ impl SerenityInit for ClientBuilder<'_> {
 
 	fn register_songbird_with(self, voice: Manager) -> Self {
 		register_with(self, voice)
+	}
+
+	#[cfg(feature = "driver")]
+	fn register_trackqueue(self) -> Self {
+		unimplemented!()
+	}
+
+	#[cfg(feature = "driver")]
+	fn register_trackqueue_with(self, queue: TrackQueue) -> Self {
+		unimplemented!()
 	}
 }

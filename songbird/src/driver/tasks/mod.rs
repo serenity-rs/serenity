@@ -1,156 +1,22 @@
 mod aux_network;
 pub mod error;
 mod events;
+pub(crate) mod message;
 mod mixer;
 
-use audiopus::Bitrate;
 use crate::{
-    connection::{error::Error as ConnectionError, Connection},
-    events::{
-        CoreContext,
-        EventData,
-        EventStore,
-    },
+    driver::connection::{error::Error as ConnectionError, Connection},
     model::id::GuildId,
-    tracks::{
-        LoopState,
-        PlayMode,
-        Track,
-        TrackHandle,
-        TrackState,
-    },
-    ws::WsStream,
-    Status,
 };
 use flume::{
     Receiver,
     Sender,
     RecvError,
 };
+use message::*;
 use tracing::{error, info, warn};
-use std::time::Duration;
-use tokio::net::udp::RecvHalf;
-use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
-#[derive(Clone, Debug)]
-pub(crate) struct Interconnect {
-    pub(crate) core: Sender<Status>,
-    pub(crate) events: Sender<EventMessage>,
-    pub(crate) aux_packets: Sender<AuxPacketMessage>,
-    pub(crate) mixer: Sender<MixerMessage>,
-}
-
-impl Interconnect {
-    fn poison(&self) {
-        let _ = self.events.send(EventMessage::Poison);
-        let _ = self.aux_packets.send(AuxPacketMessage::Poison);
-    }
-
-    fn poison_all(&self) {
-        self.poison();
-        let _ = self.mixer.send(MixerMessage::Poison);
-    }
-
-    fn restart(self, guild_id: GuildId) -> Self {
-        self.poison();
-        start_internals(guild_id, self.core)
-    }
-
-    fn restart_volatile_internals(&mut self, guild_id: GuildId) {
-        self.poison();
-        
-        let (evt_tx, evt_rx) = flume::unbounded();
-        let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
-
-        self.events = evt_tx;
-        self.aux_packets = pkt_aux_tx;
-
-        let ic = self.clone();
-        tokio::spawn(async move {
-            info!("[Voice] Event processor restarted for guild: {}", guild_id);
-            events::runner(ic, evt_rx).await;
-            info!("[Voice] Event processor finished for guild: {}", guild_id);
-        });
-
-        let ic = self.clone();
-        tokio::spawn(async move {
-            info!("[Voice] Network processor restarted for guild: {}", guild_id);
-            aux_network::runner(ic, pkt_aux_rx).await;
-            info!("[Voice] Network processor finished for guild: {}", guild_id);
-        });
-
-        // Make mixer aware of new targets...
-        let _ = self.mixer.send(MixerMessage::ReplaceInterconnect(self.clone()));
-    }
-}
-
-pub(crate) struct MixerConnection {
-    pub(crate) cipher: Cipher,
-    pub(crate) udp: Sender<UdpMessage>,
-}
-
-impl Drop for MixerConnection {
-    fn drop(&mut self) {
-        let _ = self.udp.send(UdpMessage::Poison);
-    }
-}
-
-pub(crate) enum EventMessage {
-    // Event related.
-    // Track events should fire off the back of state changes.
-    AddGlobalEvent(EventData),
-    AddTrackEvent(usize, EventData),
-    FireCoreEvent(CoreContext),
-
-    AddTrack(EventStore, TrackState, TrackHandle),
-    ChangeState(usize, TrackStateChange),
-    RemoveTrack(usize),
-    RemoveAllTracks,
-    Tick,
-
-    Poison,
-}
-
-#[derive(Debug)]
-pub(crate) enum TrackStateChange {
-    Mode(PlayMode),
-    Volume(f32),
-    Position(Duration),
-    // Bool indicates user-set.
-    Loops(LoopState, bool),
-    Total(TrackState),
-}
-
-pub(crate) enum AuxPacketMessage {
-    Udp(RecvHalf),
-    UdpCipher(Cipher),
-    Ws(Box<WsStream>),
-
-    SetSsrc(u32),
-    SetKeepalive(f64),
-    Speaking(bool),
-
-    Poison,
-}
-
-pub(crate) enum UdpMessage {
-    Packet(Vec<u8>), // FIXME: do something cheaper.
-    Poison,
-}
-
-pub(crate) enum MixerMessage {
-    AddTrack(Track),
-    SetTrack(Option<Track>),
-    SetBitrate(Bitrate),
-    SetMute(bool),
-    SetConn(MixerConnection, u32),
-    DropConn,
-    ReplaceInterconnect(Interconnect),
-    RebuildEncoder,
-    Poison,
-}
-
-pub(crate) fn start(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
+pub(crate) fn start(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     tokio::spawn(async move {
         info!("[Voice] Core started for guild: {}", guild_id);
         runner(guild_id, rx, tx).await;
@@ -158,7 +24,7 @@ pub(crate) fn start(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>)
     });
 }
 
-fn start_internals(guild_id: GuildId, core: Sender<Status>) -> Interconnect {
+fn start_internals(guild_id: GuildId, core: Sender<CoreMessage>) -> Interconnect {
     let (evt_tx, evt_rx) = flume::unbounded();
     let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
     let (mix_tx, mix_rx) = flume::unbounded();
@@ -194,13 +60,13 @@ fn start_internals(guild_id: GuildId, core: Sender<Status>) -> Interconnect {
     interconnect
 }
 
-async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
+async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     let mut connection = None;
     let mut interconnect = start_internals(guild_id, tx);
 
     loop {
         match rx.recv_async().await {
-            Ok(Status::Connect(info)) => {
+            Ok(CoreMessage::Connect(info)) => {
                 connection = match Connection::new(info, &interconnect).await {
                     Ok(connection) => Some(connection),
                     Err(why) => {
@@ -210,27 +76,27 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
                     },
                 };
             },
-            Ok(Status::Disconnect) => {
+            Ok(CoreMessage::Disconnect) => {
                 connection = None;
                 let _ = interconnect.mixer.send(MixerMessage::DropConn);
                 let _ = interconnect.mixer.send(MixerMessage::RebuildEncoder);
             },
-            Ok(Status::SetTrack(s)) => {
+            Ok(CoreMessage::SetTrack(s)) => {
                 let _ = interconnect.mixer.send(MixerMessage::SetTrack(s));
             },
-            Ok(Status::AddTrack(s)) => {
+            Ok(CoreMessage::AddTrack(s)) => {
                 let _ = interconnect.mixer.send(MixerMessage::AddTrack(s));
             },
-            Ok(Status::SetBitrate(b)) => {
+            Ok(CoreMessage::SetBitrate(b)) => {
                 let _ = interconnect.mixer.send(MixerMessage::SetBitrate(b));
             },
-            Ok(Status::AddEvent(evt)) => {
+            Ok(CoreMessage::AddEvent(evt)) => {
                 let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
             }
-            Ok(Status::Mute(m)) => {
+            Ok(CoreMessage::Mute(m)) => {
                 let _ = interconnect.mixer.send(MixerMessage::SetMute(m));
             },
-            Ok(Status::Reconnect) => {
+            Ok(CoreMessage::Reconnect) => {
                 if let Some(mut conn) = connection.take() {
                     // try once: if interconnect, try again.
                     // if still issue, full connect.
@@ -262,10 +128,10 @@ async fn runner(guild_id: GuildId, rx: Receiver<Status>, tx: Sender<Status>) {
                     }
                 }
             },
-            Ok(Status::RebuildInterconnect) => {
+            Ok(CoreMessage::RebuildInterconnect) => {
                 interconnect.restart_volatile_internals(guild_id);
             },
-            Err(RecvError::Disconnected) | Ok(Status::Poison) => {
+            Err(RecvError::Disconnected) | Ok(CoreMessage::Poison) => {
                 break;
             },
         }

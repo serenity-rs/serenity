@@ -1,24 +1,17 @@
-use super::error::{Error, Result};
+use super::{
+    error::{Error, Result},
+    message::*,
+};
+use crate::{
+    constants::*,
+    tracks::{Track, PlayMode},
+};
 use audiopus::{
     Application as CodingMode,
     Bitrate,
     Channels,
     coder::Encoder as OpusEncoder,
     softclip::SoftClip,
-};
-use crate::{
-    constants::*,
-    tasks::{
-        AuxPacketMessage,
-        EventMessage,
-        Interconnect,
-        MixerConnection,
-        MixerMessage,
-        TrackStateChange,
-        UdpMessage,
-    },
-    tracks::{Track, PlayMode},
-    Status,
 };
 use discortp::{
     rtp::{
@@ -163,13 +156,13 @@ impl Mixer {
 
             if let Err(e) = self.cycle(&interconnect) {
                 if matches!(e, Error::InterconnectFailure(_)) {
-                    let _ = interconnect.core.send(Status::RebuildInterconnect);
+                    let _ = interconnect.core.send(CoreMessage::RebuildInterconnect);
 
                 }
 
                 error!("[Voice] Mixer thread cycle: {:?}", e);
 
-                let _ = interconnect.core.send(Status::Reconnect);
+                let _ = interconnect.core.send(CoreMessage::Reconnect);
             } else {
                 self.audio_commands_events(&interconnect);
             }

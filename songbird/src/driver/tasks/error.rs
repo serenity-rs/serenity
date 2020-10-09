@@ -1,4 +1,4 @@
-use super::{
+use super::message::{
 	AuxPacketMessage,
     EventMessage,
     MixerMessage,

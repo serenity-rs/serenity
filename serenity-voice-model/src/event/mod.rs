@@ -22,9 +22,7 @@ use crate::{
     payload::*,
 };
 
-/// A representation of data received for [`voice`] events.
-///
-/// [`voice`]: ../../voice/index.html
+/// A representation of data received for voice gateway events.
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Event {

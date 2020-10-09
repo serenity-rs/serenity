@@ -1,4 +1,7 @@
-use super::error::{Error, Result};
+use super::{
+    error::{Error, Result},
+    message::*,
+};
 use audiopus::{
     Channels,
     coder::Decoder as OpusDecoder,
@@ -13,14 +16,8 @@ use crate::{
         Event as GatewayEvent,
         SpeakingState
     },
-    tasks::{
-        AuxPacketMessage,
-        EventMessage,
-        Interconnect,
-    },
     timer::Timer,
     ws::{ReceiverExt, SenderExt, WsStream},
-    Status,
 };
 use discortp::{
     demux::{
@@ -270,7 +267,7 @@ impl AuxNetwork {
 
             if ws_error {
                 self.ws_client = None;
-                let _ = interconnect.core.send(Status::Reconnect);
+                let _ = interconnect.core.send(CoreMessage::Reconnect);
             }
         }
 

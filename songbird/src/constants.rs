@@ -3,7 +3,7 @@ use discortp::rtp::RtpType;
 use std::time::Duration;
 
 /// The voice gateway version used by the library.
-pub const VOICE_GATEWAY_VERSION: u8 = 4;
+pub const VOICE_GATEWAY_VERSION: u8 = crate::model::constants::GATEWAY_VERSION;
 
 /// Sample rate of audio to be sent to Discord.
 pub const SAMPLE_RATE: SampleRate = SampleRate::Hz48000;

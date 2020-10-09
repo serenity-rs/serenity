@@ -1,26 +1,21 @@
 //! A module for connecting to voice channels.
-
-#[cfg(feature = "driver")]
-mod connection;
-#[cfg(feature = "driver")]
 pub mod constants;
-#[cfg(feature = "driver")]
-pub mod crypto;
 // mod error;
+#[cfg(feature = "driver")]
+pub mod driver;
 #[cfg(feature = "driver")]
 pub mod events;
 #[cfg(feature = "gateway")]
 mod handler;
 #[cfg(feature = "gateway")]
 pub mod id;
+mod info;
 #[cfg(feature = "driver")]
 pub mod input;
 #[cfg(feature = "gateway")]
 mod manager;
 #[cfg(feature = "serenity")]
 pub mod serenity;
-#[cfg(feature = "driver")]
-pub(crate) mod tasks;
 #[cfg(feature = "driver")]
 mod timer;
 #[cfg(feature = "driver")]
@@ -49,21 +44,5 @@ pub use crate::{
 #[cfg(feature = "serenity")]
 pub use crate::serenity::*;
 
-use connection::info::ConnectionInfo;
-use events::EventData;
-use tracks::Track;
+pub use info::ConnectionInfo;
 
-#[allow(clippy::large_enum_variant)]
-#[derive(Debug)]
-pub(crate) enum Status {
-    Connect(ConnectionInfo),
-    Disconnect,
-    SetTrack(Option<Track>),
-    AddTrack(Track),
-    SetBitrate(Bitrate),
-    AddEvent(EventData),
-    Mute(bool),
-    Reconnect,
-    RebuildInterconnect,
-    Poison,
-}

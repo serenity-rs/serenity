@@ -79,11 +79,6 @@ optional = true
 version = "0.2"
 default-features = false
 
-[dependencies.tokio-serde]
-optional = true
-version = "0.6"
-features = ["json"]
-
 [dependencies.url]
 optional = true
 version = "2"
