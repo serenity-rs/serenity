@@ -79,6 +79,16 @@ optional = true
 version = "0.2"
 default-features = false
 
+[dependencies.twilight-gateway]
+optional = true
+version = "0.1"
+default-features = false
+
+[dependencies.twilight-model]
+optional = true
+version = "0.1"
+default-features = false
+
 [dependencies.url]
 optional = true
 version = "2"
@@ -117,7 +127,9 @@ rustls = ["async-tungstenite/async-tls"]
 native = ["async-tungstenite/tokio-native-tls"]
 serenity-rustls = ["serenity/rustls_backend", "rustls"]
 serenity-native = ["serenity/native_tls_backend", "native"]
-twilight = []
+twilight-rustls = ["twilight", "twilight-gateway/rustls", "rustls"]
+twilight-native = ["twilight", "twilight-gateway/native", "native"]
+twilight = ["twilight-model"]
 
 [package.metadata.docs.rs]
 all-features = true

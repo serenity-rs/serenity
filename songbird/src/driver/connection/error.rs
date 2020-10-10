@@ -10,6 +10,7 @@ use serde_json::Error as JsonError;
 use std::io::Error as IoError;
 use xsalsa20poly1305::aead::Error as CryptoError;
 
+/// Errors encountered while connecting to a Discord voice server.
 #[derive(Debug)]
 pub enum Error {
     /// An error occurred during [en/de]cryption of voice packets or key generation.
@@ -22,17 +23,17 @@ pub enum Error {
     EndpointUrl,
     /// Discord hello/ready handshake was violated.
     ExpectedHandshake,
-
+    /// Discord failed to correctly respond to IP discovery.
     IllegalDiscoveryResponse,
-
+    /// Could not parse Discord's view of our IP.
     IllegalIp,
-
+    /// Miscellaneous I/O error..
     Io(IoError),
-
+    /// JSON (de)serialization error.
     Json(JsonError),
-
+    /// Failed to message other background tasks after connection establishment.
     InterconnectFailure(Recipient),
-
+    /// Error communicating with gateway server over WebSocket.
     Ws(WsError),
 }
 

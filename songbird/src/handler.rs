@@ -1,22 +1,29 @@
 use audiopus::Bitrate;
+use async_tungstenite::tungstenite::Message;
 use crate::{
+    error::{JoinError, JoinResult},
     events::EventData,
     id::{ChannelId, GuildId, UserId},
-    driver::tasks::{self, message::CoreMessage},
+    info::{ConnectionInfo, ConnectionProgress},
     input::Input,
+    shards::Shard,
     tracks::{
         Track,
         TrackHandle,
     },
     Event,
     EventHandler,
-    ConnectionInfo,
 };
-#[cfg(feature = "serenity")]
-use crate::manager::ShardHandle;
+#[cfg(feature = "driver")]
+use crate::driver::{
+    tasks::{self, message::CoreMessage},
+    Driver,
+    Error,
+};
 use flume::{
+    Receiver,
     SendError,
-    Sender as FlumeSender,
+    Sender,
 };
 use serde_json::json;
 #[cfg(feature = "serenity")]
@@ -27,6 +34,16 @@ use serenity::{
 };
 use std::sync::Arc;
 use tracing::instrument;
+
+#[cfg(feature = "driver")]
+use std::ops::{Deref, DerefMut};
+
+#[derive(Clone, Debug)]
+enum Return {
+    Info(Sender<ConnectionInfo>),
+    #[cfg(feature = "driver")]
+    Conn(Sender<Result<(), Error>>),
+}
 
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
@@ -58,124 +75,80 @@ use tracing::instrument;
 /// [`Shard`]: ../gateway/struct.Shard.html
 #[derive(Clone, Debug)]
 pub struct Handler {
-    /// The ChannelId to be connected to, if any.
-    ///
-    /// **Note**: This _must not_ be manually mutated. Call [`switch_to`] to
-    /// mutate this value.
-    ///
-    /// [`switch_to`]: #method.switch_to
-    pub channel_id: Option<ChannelId>,
-    /// The voice server endpoint.
-    pub endpoint: Option<String>,
-    /// The Id of the guild to be connected to.
-    pub guild_id: GuildId,
+    connection: Option<(ChannelId, ConnectionProgress, Return)>,
+
+    #[cfg(feature = "driver")]
+    /// The internal controller of the voice connection monitor thread.
+    driver: Driver,
+
+    guild_id: GuildId,
     /// Whether the current handler is set to deafen voice connections.
-    ///
-    /// **Note**: This _must not_ be manually mutated. Call [`deafen`] to
-    /// mutate this value.
-    ///
-    /// [`deafen`]: #method.deafen
-    pub self_deaf: bool,
+    self_deaf: bool,
     /// Whether the current handler is set to mute voice connections.
-    ///
-    /// **Note**: This _must not_ be manually mutated. Call [`mute`] to mutate
-    /// this value.
-    ///
-    /// [`mute`]: #method.mute
-    pub self_mute: bool,
-    /// The internal sender to the voice connection monitor thread.
-    sender: FlumeSender<CoreMessage>,
-    /// The session Id of the current voice connection, if any.
-    ///
-    /// **Note**: This _should_ be set through an [`update_state`] call.
-    ///
-    /// [`update_state`]: #method.update_state
-    pub session_id: Option<String>,
-    /// The token of the current voice connection, if any.
-    ///
-    /// **Note**: This _should_ be set through an [`update_server`] call.
-    ///
-    /// [`update_server`]: #method.update_server
-    pub token: Option<String>,
-    /// The Id of the current user.
-    ///
-    /// This is configured via [`new`] or [`standalone`].
-    ///
-    /// [`new`]: #method.new
-    /// [`standalone`]: #method.standalone
-    pub user_id: UserId,
-    #[cfg(feature = "serenity")]
+    self_mute: bool,
+    user_id: UserId,
     /// Will be set when a `Handler` is made via the [`new`][`Handler::new`]
     /// method.
     ///
     /// When set via [`standalone`][`Handler::standalone`], it will not be
     /// present.
-    ws: Option<Arc<ShardHandle>>,
+    ws: Option<Shard>,
 }
 
 impl Handler {
-    /// Creates a new Handler.
+    /// Creates a new Handler, which will send out WebSocket messages via
+    /// the given shard.
     #[inline]
-    pub(crate) fn new(
+    pub fn new(
         guild_id: GuildId,
-        ws: Arc<ShardHandle>,
+        ws: Shard,
         user_id: UserId,
     ) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 
-    /// Creates a new, standalone Handler which is not connected to the primary
+    /// Creates a new, standalone Handler which is not connected via
     /// WebSocket to the Gateway.
     ///
     /// Actions such as muting, deafening, and switching channels will not
     /// function through this Handler and must be done through some other
     /// method, as the values will only be internally updated.
     ///
-    /// For most use cases you do not want this. Only use it if you are using
-    /// the voice component standalone from the rest of the library.
+    /// For most use cases you do not want this.
     #[inline]
     pub fn standalone(guild_id: GuildId, user_id: UserId) -> Self {
         Self::new_raw(guild_id, None, user_id)
     }
 
-    /// Connects to the voice channel if the following are present:
-    ///
-    /// - [`endpoint`]
-    /// - [`session_id`]
-    /// - [`token`]
-    ///
-    /// If they _are_ all present, then `true` is returned. Otherwise, `false`
-    /// is.
-    ///
-    /// This will automatically be called by [`update_server`] or
-    /// [`update_state`] when all three values become present.
-    ///
-    /// [`endpoint`]: #structfield.endpoint
-    /// [`session_id`]: #structfield.session_id
-    /// [`token`]: #structfield.token
-    /// [`update_server`]: #method.update_server
-    /// [`update_state`]: #method.update_state
-    pub fn connect(&mut self) -> bool {
-        if self.endpoint.is_none() || self.session_id.is_none() || self.token.is_none() {
-            return false;
+    fn new_raw(
+        guild_id: GuildId,
+        ws: Option<Shard>,
+        user_id: UserId,
+    ) -> Self {
+        Handler {
+            connection: None,
+            #[cfg(feature = "driver")]
+            driver: Default::default(),
+            guild_id,
+            self_deaf: false,
+            self_mute: false,
+            user_id,
+            ws,
         }
+    }
 
-        let endpoint = self.endpoint.clone().unwrap();
-        let guild_id = self.guild_id;
-        let session_id = self.session_id.clone().unwrap();
-        let token = self.token.clone().unwrap();
-        let user_id = self.user_id;
-
-        // Safe as all of these being present was already checked.
-        self.send(CoreMessage::Connect(ConnectionInfo {
-            endpoint,
-            guild_id: guild_id.into(),
-            session_id,
-            token,
-            user_id: user_id.into(),
-        }));
-
-        true
+    fn do_connect(&mut self) {
+        match &self.connection {
+            Some((_, ConnectionProgress::Complete(c), Return::Info(tx))) => {
+                // It's okay if the receiver hung up.
+                let _ = tx.send(c.clone());
+            },
+            #[cfg(feature = "driver")]
+            Some((_, ConnectionProgress::Complete(c), Return::Conn(tx))) => {
+                self.driver.raw_connect(c.clone(), tx.clone());
+            },
+            _ => {},
+        }
     }
 
     /// Sets whether the current connection to be deafened.
@@ -190,23 +163,49 @@ impl Handler {
     /// will _only_ update whether the connection is internally deafened.
     ///
     /// [`standalone`]: #method.standalone
-    pub fn deafen(&mut self, deaf: bool) {
+    pub async fn deafen(&mut self, deaf: bool) {
         self.self_deaf = deaf;
 
-        // Only send an update if there is currently a connected channel.
-        //
-        // Otherwise, this can be treated as a "settings" update for a
-        // connection.
-        if self.channel_id.is_some() {
-            self.update();
-        }
+        self.update().await;
     }
 
-    /// Connect - or switch - to the given voice channel by its Id.
-    pub fn join(&mut self, channel_id: ChannelId) {
-        self.channel_id = Some(channel_id);
+    pub fn is_deaf(&self) -> bool {
+        self.self_deaf
+    }
 
-        self.send_join();
+    #[cfg(feature = "driver")]
+    /// Connect or switch to the given voice channel by its Id.
+    pub async fn join(&mut self, channel_id: ChannelId) -> JoinResult<Receiver<Result<(), Error>>> {
+        let (tx, rx) = flume::unbounded();
+
+        self.connection = Some((
+            channel_id,
+            ConnectionProgress::new(self.guild_id.into(), self.user_id.into()),
+            Return::Conn(tx),
+        ));
+
+        self.update()
+            .await
+            .map(|_| rx)
+    }
+
+    /// Join the selected voice channel, *without* running/starting an RTP
+    /// session or running the driver.
+    ///
+    /// Use this if you require connection info for lavalink,
+    /// or some other voice implementation.
+    pub async fn join_gateway(&mut self, channel_id: ChannelId) -> JoinResult<Receiver<ConnectionInfo>> {
+        let (tx, rx) = flume::unbounded();
+
+        self.connection = Some((
+            channel_id,
+            ConnectionProgress::new(self.guild_id.into(), self.user_id.into()),
+            Return::Info(tx),
+        ));
+
+        self.update()
+            .await
+            .map(|_| rx)
     }
 
     /// Leaves the current voice channel, disconnecting from it.
@@ -219,14 +218,14 @@ impl Handler {
     /// voice channel.
     ///
     /// [`standalone`]: #method.standalone
-    pub fn leave(&mut self) {
+    pub async fn leave(&mut self) {
         // Only send an update if we were in a voice channel.
-        if self.channel_id.is_some() {
-            self.channel_id = None;
-            self.send(CoreMessage::Disconnect);
+        self.connection = None;
 
-            self.update();
-        }
+        self.update().await;
+
+        #[cfg(feature = "driver")]
+        self.driver.leave();
     }
 
     /// Sets whether the current connection is to be muted.
@@ -238,136 +237,17 @@ impl Handler {
     /// will _only_ update whether the connection is internally muted.
     ///
     /// [`standalone`]: #method.standalone
-    pub fn mute(&mut self, mute: bool) {
+    pub async fn mute(&mut self, mute: bool) {
         self.self_mute = mute;
 
-        if self.channel_id.is_some() {
-            self.update();
-            self.send(CoreMessage::Mute(mute));
-        }
+        self.update().await;
+
+        #[cfg(feature = "driver")]
+        self.driver.mute(mute);
     }
 
-    /// Plays audio from a source, returning a handle for further control.
-    ///
-    /// This can be a source created via [`voice::ffmpeg`] or [`voice::ytdl`].
-    ///
-    /// [`voice::ffmpeg`]: input/fn.ffmpeg.html
-    /// [`voice::ytdl`]: input/fn.ytdl.html
-    pub fn play_source(&mut self, source: Input) -> TrackHandle {
-        let (player, handle) = super::create_player(source);
-        self.send(CoreMessage::AddTrack(player));
-
-        handle
-    }
-
-    /// Plays audio from a source, returning a handle for further control.
-    ///
-    /// Unlike [`play_only_source`], this stops all other sources attached
-    /// to the channel.
-    ///
-    /// [`play_only_source`]: #method.play_only_source
-    pub fn play_only_source(&mut self, source: Input) -> TrackHandle {
-        let (player, handle) = super::create_player(source);
-        self.send(CoreMessage::SetTrack(Some(player)));
-
-        handle
-    }
-
-    /// Plays audio from a [`Track`] object.
-    ///
-    /// This will be one half of the return value of [`voice::create_player`].
-    /// The main difference between this function and [`play_source`] is
-    /// that this allows for direct manipulation of the [`Track`] object
-    /// before it is passed over to the voice and mixing contexts.
-    ///
-    /// [`voice::create_player`]: tracks/fn.create_player.html
-    /// [`Track`]: tracks/struct.Track.html
-    /// [`play_source`]: #method.play_source
-    pub fn play(&mut self, track: Track) {
-        self.send(CoreMessage::AddTrack(track));
-    }
-
-    /// Exclusively plays audio from a [`Track`] object.
-    ///
-    /// This will be one half of the return value of [`voice::create_player`].
-    /// As in [`play_only_source`], this stops all other sources attached to the
-    /// channel. Like [`play`], however, this allows for direct manipulation of the
-    /// [`Track`] object before it is passed over to the voice and mixing contexts.
-    ///
-    /// [`voice::create_player`]: tracks/fn.create_player.html
-    /// [`Track`]: tracks/struct.Track.html
-    /// [`play_only_source`]: #method.play_only_source
-    /// [`play`]: #method.play
-    pub fn play_only(&mut self, track: Track) {
-        self.send(CoreMessage::SetTrack(Some(track)));
-    }
-
-    /// Sets the bitrate for encoding Opus packets sent along
-    /// the channel being managed.
-    ///
-    /// The default rate is 128 kbps.
-    /// Sensible values range between `Bits(512)` and `Bits(512_000)`
-    /// bits per second.
-    /// Alternatively, `Auto` and `Max` remain available.
-    pub fn set_bitrate(&mut self, bitrate: Bitrate) {
-        self.send(CoreMessage::SetBitrate(bitrate))
-    }
-
-    /// Stops playing audio from all sources, if any are set.
-    pub fn stop(&mut self) { self.send(CoreMessage::SetTrack(None)) }
-
-    /// Attach a global event handler to an audio context. Global events may receive
-    /// any [`EventContext`].
-    ///
-    /// Global timing events will tick regardless of whether audio is playing,
-    /// so long as the bot is connected to a voice channel, and have no tracks.
-    /// [`TrackEvent`]s will respond to all relevant tracks, giving some audio elements.
-    ///
-    /// Users **must** ensure that no costly work or blocking occurs
-    /// within the supplied function or closure. *Taking excess time could prevent
-    /// timely sending of packets, causing audio glitches and delays*.
-    ///
-    /// [`Track`]: tracks/struct.Track.html
-    /// [`TrackEvent`]: events/enum.TrackEvent.html
-    /// [`EventContext`]: events/enum.EventContext.html
-    pub fn add_global_event<F: EventHandler + 'static>(&mut self, event: Event, action: F) {
-        self.send(CoreMessage::AddEvent(EventData::new(event, action)));
-    }
-
-    /// Switches the current connected voice channel to the given `channel_id`.
-    ///
-    /// This has 3 separate behaviors:
-    ///
-    /// - if the given `channel_id` is equivalent to the current connected
-    ///   `channel_id`, then do nothing;
-    /// - if the given `channel_id` is _not_ equivalent to the current connected
-    ///   `channel_id`, then switch to the given `channel_id`;
-    /// - if not currently connected to a voice channel, connect to the given
-    ///   one.
-    ///
-    /// If you are dealing with switching from one group to another, then open
-    /// another handler, and optionally drop this one via [`Manager::remove`].
-    ///
-    /// **Note**: The given `channel_id`, if in a guild, _must_ be in the
-    /// current handler's associated guild.
-    ///
-    /// **Note**: If the `Handler` was created via [`standalone`], then this
-    /// will _only_ update whether the connection is internally switched to a
-    /// different channel.
-    ///
-    /// [`Manager::remove`]: struct.Manager.html#method.remove
-    /// [`standalone`]: #method.standalone
-    pub fn switch_to(&mut self, channel_id: ChannelId) {
-        match self.channel_id {
-            Some(current_id) if current_id == channel_id => {
-                // If already connected to the given channel, do nothing.
-            },
-            _ => {
-                self.channel_id = Some(channel_id);
-
-                self.update();
-            },
-        }
+    pub fn is_mute(&self) -> bool {
+        self.self_mute
     }
 
     /// Updates the voice server data.
@@ -381,17 +261,14 @@ impl Handler {
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
     #[instrument(skip(self, token))]
-    pub fn update_server(&mut self, endpoint: &Option<String>, token: &str) {
-        self.token = Some(token.to_string());
+    pub fn update_server(&mut self, endpoint: String, token: String) {
+        let try_conn = if let Some((_, ref mut progress, return_type)) = self.connection.as_mut() {
+            let ret = return_type.clone();
+            progress.apply_server_update(endpoint, token)
+        } else { false };
 
-        if let Some(endpoint) = endpoint.clone() {
-            self.endpoint = Some(endpoint);
-
-            if self.session_id.is_some() {
-                self.connect();
-            }
-        } else {
-            self.leave();
+        if try_conn {
+            self.do_connect();
         }
     }
 
@@ -405,102 +282,52 @@ impl Handler {
     ///
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
-    pub fn update_state(&mut self, voice_state: &VoiceState) {
-        if self.user_id != voice_state.user_id.into() {
-            return;
-        }
+    pub fn update_state(&mut self, session_id: String) {
+        let try_conn = if let Some((_, ref mut progress, return_type)) = self.connection.as_mut() {
+            progress.apply_state_update(session_id)
+        } else { false };
 
-        self.channel_id = voice_state.channel_id.map(Into::into);
-
-        if voice_state.channel_id.is_some() {
-            self.session_id = Some(voice_state.session_id.clone());
-
-            if self.endpoint.is_some() && self.token.is_some() {
-                self.connect();
-            }
-        } else {
-            self.leave();
+        if try_conn {
+            self.do_connect();
         }
     }
 
-    fn new_raw(
-        guild_id: GuildId,
-        ws: Option<Arc<ShardHandle>>,
-        user_id: UserId,
-    ) -> Self {
-        let (tx, rx) = flume::unbounded();
-
-        tasks::start(guild_id.into(), rx, tx.clone());
-
-        Handler {
-            channel_id: None,
-            endpoint: None,
-            guild_id,
-            self_deaf: false,
-            self_mute: false,
-            sender: tx,
-            session_id: None,
-            token: None,
-            user_id,
-            ws,
-        }
-    }
-
-    /// Sends a message to the thread.
-    fn send(&mut self, status: CoreMessage) {
-        // Restart thread if it errored.
-        if let Err(SendError(status)) = self.sender.send(status) {
-            let (tx, rx) = flume::unbounded();
-
-            self.sender = tx.clone();
-            self.sender.send(status).unwrap();
-
-            tasks::start(self.guild_id.into(), rx, tx);
-
-            self.update();
-        }
-    }
-
-    fn send_join(&mut self) {
-        // Do _not_ try connecting if there is not at least a channel. There
-        // does not _necessarily_ need to be a guild.
-        if self.channel_id.is_none() {
-            return;
-        }
-
-        self.update();
-    }
-
-    #[cfg(feature = "serenity")]
     /// Send an update for the current session over WS.
     ///
     /// Does nothing if initialized via [`standalone`].
     ///
     /// [`standalone`]: #method.standalone
-    fn update(&mut self) {
+    async fn update(&mut self) -> JoinResult<()> {
         if let Some(ws) = self.ws.as_mut() {
-            // this is accidentally right.
-            // should be a regular discord voicestateupdate (opcode 4)
             let map = json!({
-                "op": OpCode::VoiceStateUpdate.num(),
+                "op": 4,
                 "d": {
-                    "channel_id": self.channel_id.map(|c| c.0),
+                    "channel_id": self.connection.as_ref().map(|c| c.0.0),
                     "guild_id": self.guild_id.0,
                     "self_deaf": self.self_deaf,
                     "self_mute": self.self_mute,
                 }
             });
 
-            let _ = ws.send(InterMessage::Json(map));
+            ws.send(map).await
+        } else {
+            Err(JoinError::NoSender)
         }
     }
 }
 
-impl Drop for Handler {
-    /// Leaves the current connected voice channel, if connected to one, and
-    /// forgets all configurations relevant to this Handler.
-    fn drop(&mut self) {
-        self.leave();
-        let _ = self.sender.send(CoreMessage::Poison);
+#[cfg(feature = "driver")]
+impl Deref for Handler {
+    type Target = Driver;
+
+    fn deref(&self) -> &Self::Target {
+        &self.driver
+    }
+}
+
+#[cfg(feature = "driver")]
+impl DerefMut for Handler {
+    fn deref_mut(&mut self) -> &mut Self::Target {
+        &mut self.driver
     }
 }

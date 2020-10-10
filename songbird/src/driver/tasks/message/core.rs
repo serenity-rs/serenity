@@ -1,14 +1,17 @@
 use crate::{
+    driver::connection::error::Error,
     events::EventData,
     tracks::Track,
     Bitrate,
     ConnectionInfo,
 };
+use flume::Sender;
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug)]
 pub enum CoreMessage {
     Connect(ConnectionInfo),
+    ConnectWithResult(ConnectionInfo, Sender<Result<(), Error>>),
     Disconnect,
     SetTrack(Option<Track>),
     AddTrack(Track),

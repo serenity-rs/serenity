@@ -76,6 +76,21 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                     },
                 };
             },
+            Ok(CoreMessage::ConnectWithResult(info, tx)) => {
+                connection = match Connection::new(info, &interconnect).await {
+                    Ok(connection) => {
+                        // Other side may not be listening: this is fine.
+                        let _ = tx.send(Ok(()));
+                        Some(connection)
+                    },
+                    Err(why) => {
+                        // See above.
+                        tx.send(Err(why));
+
+                        None
+                    },
+                };
+            },
             Ok(CoreMessage::Disconnect) => {
                 connection = None;
                 let _ = interconnect.mixer.send(MixerMessage::DropConn);

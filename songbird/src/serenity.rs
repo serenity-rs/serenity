@@ -23,7 +23,7 @@ impl TypeMapKey for SongbirdKey {
 ///
 /// This should be called after any uses of `ClientBuilder::type_map`.
 pub fn register(client_builder: ClientBuilder) -> ClientBuilder {
-	let voice = Manager::default();
+	let voice = Manager::serenity();
 	register_with(client_builder, voice)
 }
 

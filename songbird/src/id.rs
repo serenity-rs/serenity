@@ -10,6 +10,12 @@ use serenity::model::id::{
 	UserId as SerenityUser,
 };
 use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature = "twilight")]
+use twilight_model::id::{
+	ChannelId as TwilightChannel,
+	GuildId as TwilightGuild,
+	UserId as TwilightUser,
+};
 
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
 pub struct ChannelId(pub u64);
@@ -35,6 +41,13 @@ impl From<u64> for ChannelId {
 #[cfg(feature = "serenity")]
 impl From<SerenityChannel> for ChannelId {
 	fn from(id: SerenityChannel) -> Self {
+		Self(id.0)
+	}
+}
+
+#[cfg(feature = "twilight")]
+impl From<TwilightChannel> for ChannelId {
+	fn from(id: TwilightChannel) -> Self {
 		Self(id.0)
 	}
 }
@@ -65,6 +78,13 @@ impl From<GuildId> for DriverGuild {
 	}
 }
 
+#[cfg(feature = "twilight")]
+impl From<TwilightGuild> for GuildId {
+	fn from(id: TwilightGuild) -> Self {
+		Self(id.0)
+	}
+}
+
 impl Display for UserId {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         Display::fmt(&self.0, f)
@@ -87,6 +107,13 @@ impl From<SerenityUser> for UserId {
 #[cfg(feature = "driver")]
 impl From<UserId> for DriverUser {
 	fn from(id: UserId) -> Self {
+		Self(id.0)
+	}
+}
+
+#[cfg(feature = "twilight")]
+impl From<TwilightUser> for UserId {
+	fn from(id: TwilightUser) -> Self {
 		Self(id.0)
 	}
 }

@@ -91,10 +91,10 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 
     let mut handler = handler_lock.lock().await;
 
-    if handler.self_deaf {
+    if handler.is_deaf() {
         check_msg(msg.channel_id.say(&ctx.http, "Already deafened").await);
     } else {
-        handler.deafen(true);
+        handler.deafen(true).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Deafened").await);
     }
@@ -187,10 +187,10 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
 
     let mut handler = handler_lock.lock().await;
 
-    if handler.self_mute {
+    if handler.is_mute() {
         check_msg(msg.channel_id.say(&ctx.http, "Already muted").await);
     } else {
-        handler.mute(true);
+        handler.mute(true).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Now muted").await);
     }
@@ -274,7 +274,7 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
 
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
-        handler.deafen(false);
+        handler.deafen(false).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Undeafened").await);
     } else {
@@ -299,7 +299,7 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
 
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
-        handler.mute(false);
+        handler.mute(false).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Unmuted").await);
     } else {
