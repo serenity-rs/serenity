@@ -127,72 +127,6 @@ impl OpCode {
     }
 }
 
-/// Enum to map voice opcodes.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-pub enum VoiceOpCode {
-    /// Used to begin a voice websocket connection.
-    Identify = 0,
-    /// Used to select the voice protocol.
-    SelectProtocol = 1,
-    /// Used to complete the websocket handshake.
-    Ready = 2,
-    /// Used to keep the websocket connection alive.
-    Heartbeat = 3,
-    /// Used to describe the session.
-    SessionDescription = 4,
-    /// Used to indicate which users are speaking.
-    Speaking = 5,
-    /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
-    HeartbeatAck = 6,
-    /// Sent after a disconnect to attempt to resume a session.
-    Resume = 7,
-    /// Used to determine how often the client must send a heartbeat.
-    Hello = 8,
-    /// Sent by the server if a session coulkd successfully be resumed.
-    Resumed = 9,
-    /// Message indicating that another user has connected to the voice channel.
-    ClientConnect = 12,
-    /// Message indicating that another user has disconnected from the voice channel.
-    ClientDisconnect = 13,
-}
-
-enum_number!(
-    VoiceOpCode {
-        Identify,
-        SelectProtocol,
-        Ready,
-        Heartbeat,
-        SessionDescription,
-        Speaking,
-        HeartbeatAck,
-        Resume,
-        Hello,
-        Resumed,
-        ClientConnect,
-        ClientDisconnect,
-    }
-);
-
-impl VoiceOpCode {
-    pub fn num(self) -> u64 {
-        match self {
-            VoiceOpCode::Identify => 0,
-            VoiceOpCode::SelectProtocol => 1,
-            VoiceOpCode::Ready => 2,
-            VoiceOpCode::Heartbeat => 3,
-            VoiceOpCode::SessionDescription => 4,
-            VoiceOpCode::Speaking => 5,
-            VoiceOpCode::HeartbeatAck => 6,
-            VoiceOpCode::Resume => 7,
-            VoiceOpCode::Hello => 8,
-            VoiceOpCode::Resumed => 9,
-            VoiceOpCode::ClientConnect => 12,
-            VoiceOpCode::ClientDisconnect => 13,
-        }
-    }
-}
-
 pub mod close_codes {
     /// Unknown error; try reconnecting?
     ///
@@ -242,44 +176,4 @@ pub mod close_codes {
     pub const INVALID_GATEWAY_INTENTS: u16 = 4013;
     /// Disallowed gateway intents have been provided.
     pub const DISALLOWED_GATEWAY_INTENTS: u16 = 4014;
-}
-
-pub mod voice_close_codes {
-    /// Invalid Voice OP Code.
-    pub const UNKNOWN_OPCODE: u16 = 4001;
-
-    /// A payload was sent prior to identifying.
-    pub const NOT_AUTHENTICATED: u16 = 4003;
-
-    /// The account token sent with the identify payload was incorrect.
-    pub const AUTHENTICATION_FAILED: u16 = 4004;
-
-    /// More than one identify payload was sent.
-    pub const ALREADY_AUTHENTICATED: u16 = 4005;
-
-    /// The session is no longer valid.
-    pub const SESSION_INVALID: u16 = 4006;
-
-    /// A session timed out.
-    pub const SESSION_TIMEOUT: u16 = 4009;
-
-    /// The server for the last connection attempt could not be found.
-    pub const SERVER_NOT_FOUND: u16 = 4011;
-
-    /// Discord did not recognise the voice protocol chosen.
-    pub const UNKNOWN_PROTOCOL: u16 = 4012;
-
-    /// Disconnected, either due to channel closure/removal
-    /// or kicking.
-    ///
-    /// Should not reconnect.
-    pub const DISCONNECTED: u16 = 4014;
-
-    /// Connected voice server crashed.
-    ///
-    /// Should resume.
-    pub const VOICE_SERVER_CRASH: u16 = 4015;
-
-    /// Discord didn't recognise the encrytpion scheme.
-    pub const UNKNOWN_ENCRYPTION_MODE: u16 = 4016;
 }

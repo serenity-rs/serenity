@@ -13,7 +13,6 @@ repository = "https://github.com/serenity-rs/serenity.git"
 version = "0.1.0"
 
 [dependencies]
-dashmap = "4.0.0-rc6"
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 tracing = "0.1"
@@ -101,11 +100,16 @@ version = "0.5"
 default = [
     "serenity-rustls",
     "driver",
-    "gateway"
+    "gateway",
 ]
-gateway = []
+gateway = [
+    "flume",
+    "parking_lot",
+    "tokio/sync",
+]
 driver = [
     "async-trait",
+    "async-tungstenite",
     "audiopus",
     "byteorder",
     "discortp",
@@ -119,17 +123,22 @@ driver = [
     "tokio/io-util",
     "tokio/net",
     "tokio/rt-core",
+    "tokio/time",
     "tokio/process",
+    "tokio/sync",
     "url",
     "xsalsa20poly1305",
 ]
 rustls = ["async-tungstenite/async-tls"]
 native = ["async-tungstenite/tokio-native-tls"]
-serenity-rustls = ["serenity/rustls_backend", "rustls"]
-serenity-native = ["serenity/native_tls_backend", "native"]
-twilight-rustls = ["twilight", "twilight-gateway/rustls", "rustls"]
-twilight-native = ["twilight", "twilight-gateway/native", "native"]
+serenity-rustls = ["serenity/rustls_backend", "rustls", "gateway", "serenity-deps"]
+serenity-native = ["serenity/native_tls_backend", "native", "gateway", "serenity-deps"]
+twilight-rustls = ["twilight", "twilight-gateway/rustls", "rustls", "gateway"]
+twilight-native = ["twilight", "twilight-gateway/native", "native", "gateway"]
 twilight = ["twilight-model"]
+simd-zlib = ["twilight-gateway/simd-zlib"]
+stock-zlib = ["twilight-gateway/stock-zlib"]
+serenity-deps = ["async-trait"]
 
 [package.metadata.docs.rs]
 all-features = true

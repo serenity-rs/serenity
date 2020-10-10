@@ -10,7 +10,6 @@ pub use crypto::Mode as CryptoMode;
 use audiopus::Bitrate;
 use crate::{
     events::EventData,
-    id::{ChannelId, GuildId, UserId},
     input::Input,
     tracks::{
         Track,

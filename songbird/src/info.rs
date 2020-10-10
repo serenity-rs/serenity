@@ -1,4 +1,4 @@
-use crate::model::id::{GuildId, UserId};
+use crate::id::{GuildId, UserId};
 use std::fmt;
 
 #[derive(Clone, Debug)]

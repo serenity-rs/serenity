@@ -1,5 +1,6 @@
 use async_trait::async_trait;
 use crate::{
+    driver::Driver,
     events::{
         Event,
         EventContext,
@@ -14,7 +15,6 @@ use crate::{
         TrackHandle,
         TrackResult,
     },
-    Call,
 };
 use tracing::{info, warn};
 use parking_lot::Mutex;
@@ -119,7 +119,7 @@ impl TrackQueue {
     }
 
     /// Adds an audio source to the queue, to be played in the channel managed by `handler`.
-    pub fn add_source(&self, source: Input, handler: &mut Call) {
+    pub fn add_source(&self, source: Input, handler: &mut Driver) {
         let (audio, audio_handle) = tracks::create_player(source);
         self.add(audio, audio_handle, handler);
     }
@@ -131,7 +131,7 @@ impl TrackQueue {
     ///
     /// [`Track`]: struct.Track.html
     /// [`voice::create_player`]: fn.create_player.html
-    pub fn add(&self, mut track: Track, track_handle: TrackHandle, handler: &mut Call) {
+    pub fn add(&self, mut track: Track, track_handle: TrackHandle, handler: &mut Driver) {
         info!("Track added to queue.");
         let remote_lock = self.inner.clone();
         let mut inner = self.inner.lock();

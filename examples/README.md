@@ -40,6 +40,8 @@ To run an example, you have various options:
 14 => Global Data: How to use the client data to share data between commands and events safely.
 15 => Parallel Loops: How to run tasks in a loop with context access.
       Additionally, show how to send a message to a specific channel.
+16 => Voice Events and Queue: How to register and access a voice track queue, and how to use track events (e.g., timing).
+17 => Voice Storage: How to use in-memory and compressed sources to cheaply share resources between several calls, compress larger resources, and allow for fast seeking.
 ```
 
 2. Manualy running:

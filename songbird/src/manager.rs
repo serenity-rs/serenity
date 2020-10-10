@@ -7,13 +7,12 @@ use crate::{
 };
 #[cfg(feature = "driver")]
 use crate::driver::Error as DriverError;
+#[cfg(feature = "serenity")]
 use async_trait::async_trait;
-use flume::{Receiver, Sender as FlumeSender};
-use parking_lot::{
-    lock_api::RwLockWriteGuard,
-    Mutex as PMutex,
-    RwLock as PRwLock,
-};
+use flume::Receiver;
+#[cfg(feature = "serenity")]
+use futures::channel::mpsc::UnboundedSender as Sender;
+use parking_lot::RwLock as PRwLock;
 #[cfg(feature = "serenity")]
 use serenity::{
     client::bridge::voice::VoiceGatewayManager,
@@ -26,17 +25,7 @@ use serenity::{
         voice::VoiceState,
     },
 };
-use std::{
-    collections::HashMap,
-    result::Result as StdResult,
-    sync::Arc,
-};
-use tracing::error;
-#[cfg(feature = "serenity")]
-use futures::channel::mpsc::{
-    TrySendError,
-    UnboundedSender as Sender,
-};
+use std::{collections::HashMap, sync::Arc};
 use tokio::sync::Mutex;
 #[cfg(feature = "twilight")]
 use twilight_gateway::Cluster;

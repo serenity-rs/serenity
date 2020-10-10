@@ -1,5 +1,5 @@
 [package]
-name = "e14_voice_events_queue"
+name = "e16_voice_events_queue"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"

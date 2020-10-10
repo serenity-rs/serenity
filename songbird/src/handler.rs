@@ -1,38 +1,16 @@
-use audiopus::Bitrate;
-use async_tungstenite::tungstenite::Message;
 use crate::{
     error::{JoinError, JoinResult},
-    events::EventData,
     id::{ChannelId, GuildId, UserId},
     info::{ConnectionInfo, ConnectionProgress},
-    input::Input,
     shards::Shard,
-    tracks::{
-        Track,
-        TrackHandle,
-    },
-    Event,
-    EventHandler,
 };
 #[cfg(feature = "driver")]
 use crate::driver::{
-    tasks::{self, message::CoreMessage},
     Driver,
     Error,
 };
-use flume::{
-    Receiver,
-    SendError,
-    Sender,
-};
+use flume::{Receiver, Sender};
 use serde_json::json;
-#[cfg(feature = "serenity")]
-use serenity::{
-    constants::OpCode,
-    gateway::InterMessage,
-    model::voice::VoiceState,
-};
-use std::sync::Arc;
 use tracing::instrument;
 
 #[cfg(feature = "driver")]
@@ -48,30 +26,9 @@ enum Return {
 /// The handler is responsible for "handling" a single voice connection, acting
 /// as a clean API above the inner connection.
 ///
-/// Look into the [`Manager`] for a slightly higher-level interface for managing
-/// the existence of handlers.
+/// If the `"driver"` feature is enabled, then 
 ///
-/// **Note**: You should _not_ manually mutate any struct fields. You should
-/// _only_ read them. Use methods to mutate them.
-///
-/// # Examples
-///
-/// Assuming that you already have a `Manager`, most likely retrieved via a
-/// [`Shard`], you can join a guild's voice channel and deafen yourself like so:
-///
-/// ```rust,ignore
-/// // assuming a `manager` has already been bound, hopefully retrieved through
-/// // a websocket's connection.
-/// use serenity::model::{ChannelId, GuildId};
-///
-/// let guild_id = GuildId(81384788765712384);
-/// let channel_id = ChannelId(85482585546833920);
-///
-/// let handler = manager.join(Some(guild_id), channel_id);
-/// handler.deafen(true);
-/// ```
-///
-/// [`Manager`]: struct.Manager.html
+/// [`Driver`]: struct.Dri.html
 /// [`Shard`]: ../gateway/struct.Shard.html
 #[derive(Clone, Debug)]
 pub struct Call {
@@ -262,8 +219,7 @@ impl Call {
     /// [`standalone`]: #method.standalone
     #[instrument(skip(self, token))]
     pub fn update_server(&mut self, endpoint: String, token: String) {
-        let try_conn = if let Some((_, ref mut progress, return_type)) = self.connection.as_mut() {
-            let ret = return_type.clone();
+        let try_conn = if let Some((_, ref mut progress, _)) = self.connection.as_mut() {
             progress.apply_server_update(endpoint, token)
         } else { false };
 
@@ -283,7 +239,7 @@ impl Call {
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
     pub fn update_state(&mut self, session_id: String) {
-        let try_conn = if let Some((_, ref mut progress, return_type)) = self.connection.as_mut() {
+        let try_conn = if let Some((_, ref mut progress, _)) = self.connection.as_mut() {
             progress.apply_state_update(session_id)
         } else { false };
 

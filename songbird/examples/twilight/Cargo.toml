@@ -1,14 +1,13 @@
 [package]
-name = "twilight-lavalink-basic-lavalink-bot"
+name = "basic-twilight-bot"
 version = "0.1.0"
-authors = ["Twilight Contributors"]
+authors = ["Twilight and Serenity Contributors"]
 edition = "2018"
 
 [dependencies]
 futures = "0.3"
 tracing = "0.1"
 tracing-subscriber = "0.2"
-reqwest = { features = ["json"], version = "0.10" }
 serde_json = { version = "1" }
 tokio = { features = ["macros", "rt-threaded", "sync"], version = "0.2" }
 twilight-gateway = "0.1"

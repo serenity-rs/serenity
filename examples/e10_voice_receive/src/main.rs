@@ -20,7 +20,6 @@ use serenity::{
     },
     model::{
         channel::Message,
-        event::{VoiceClientConnect, VoiceClientDisconnect, VoiceSpeaking},
         gateway::Ready,
         id::ChannelId,
         misc::Mentionable
@@ -29,6 +28,7 @@ use serenity::{
 };
 
 use songbird::{
+    model::payload::{ClientConnect, ClientDisconnect, Speaking},
     CoreEvent,
     Event,
     EventContext,
@@ -58,10 +58,10 @@ impl Receiver {
 #[async_trait]
 impl VoiceEventHandler for Receiver {
     async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
-        use EventContext::*;
+        use EventContext as Ctx;
         match ctx {
-            SpeakingStateUpdate(
-                VoiceSpeaking {speaking, ssrc, user_id, ..}
+            Ctx::SpeakingStateUpdate(
+                Speaking {speaking, ssrc, user_id, ..}
             ) => {
                 // Discord voice calls use RTP, where every sender uses a randomly allocated
                 // *Synchronisation Source* (SSRC) to allow receivers to tell which audio
@@ -82,7 +82,7 @@ impl VoiceEventHandler for Receiver {
                     speaking,
                 );
             },
-            SpeakingUpdate {ssrc, speaking} => {
+            Ctx::SpeakingUpdate {ssrc, speaking} => {
                 // You can implement logic here which reacts to a user starting
                 // or stopping speaking.
 
@@ -92,7 +92,7 @@ impl VoiceEventHandler for Receiver {
                     if *speaking {"started"} else {"stopped"},
                 );
             },
-            VoicePacket {audio, packet, payload_offset} => {
+            Ctx::VoicePacket {audio, packet, payload_offset} => {
                 // An event which fires for every received audio packet,
                 // containing the decoded data.
 
@@ -105,13 +105,13 @@ impl VoiceEventHandler for Receiver {
                     packet.ssrc,
                 );
             },
-            RtcpPacket {packet, payload_offset} => {
+            Ctx::RtcpPacket {packet, payload_offset} => {
                 // An event which fires for every received rtcp packet,
                 // containing the call statistics and reporting information.
                 println!("RTCP packet received: {:?}", packet);
             },
-            ClientConnect(
-                VoiceClientConnect {audio_ssrc, video_ssrc, user_id, ..}
+            Ctx::ClientConnect(
+                ClientConnect {audio_ssrc, video_ssrc, user_id, ..}
             ) => {
                 // You can implement your own logic here to handle a user who has joined the
                 // voice channel e.g., allocate structures, map their SSRC to User ID.
@@ -123,8 +123,8 @@ impl VoiceEventHandler for Receiver {
                     video_ssrc,
                 );
             },
-            ClientDisconnect(
-                VoiceClientDisconnect {user_id, ..}
+            Ctx::ClientDisconnect(
+                ClientDisconnect {user_id, ..}
             ) => {
                 // You can implement your own logic here to handle a user who has left the
                 // voice channel e.g., finalise processing of statistics etc.
@@ -188,12 +188,16 @@ async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.join(guild_id, connect_to) {
-         handler.add_global_event(
+    let (handler_lock, conn_result) = manager.join(guild_id, connect_to).await;
+
+    if let Ok(_) = conn_result {
+        // NOTE: this skips listening for the actual connection result.
+        let mut handler = handler_lock.lock().await;
+
+        handler.add_global_event(
             CoreEvent::SpeakingStateUpdate.into(),
             Receiver::new(),
         );
@@ -242,9 +246,8 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {

@@ -22,6 +22,7 @@ use serenity::{
         },
     },
     model::{channel::Message, gateway::Ready, misc::Mentionable, prelude::GuildId},
+    prelude::Mutex,
     Result as SerenityResult,
 };
 
@@ -32,7 +33,7 @@ use songbird::{
         Input,
     },
     Bitrate,
-    PrototypeManager,
+    Call,
     Event,
     EventContext,
     EventHandler as VoiceEventHandler,
@@ -132,14 +133,18 @@ async fn main() {
         // This is a full song, making this a much less memory-heavy choice.
         //
         // Music by Cloudkicker, used under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
-        let song_src = Compressed::new(
+        // let song_src = Compressed::new(
+        let song_src = Memory::new(
                 input::ytdl("https://cloudkicker.bandcamp.com/track/2011-07").await.expect("Link may be dead."),
-                Bitrate::BitsPerSecond(128_000),
+                // Bitrate::BitsPerSecond(128_000),
             ).expect("These parameters are well-defined.");
+
+        println!("{:?}", song_src);
         let _ = song_src.raw.spawn_loader();
         // Compressed cannot be sent between threads, so we need to discard some state using
         // `into_sendable`.
-        audio_map.insert("song".into(), CachedSound::Compressed(song_src));
+        // audio_map.insert("song".into(), CachedSound::Compressed(song_src));
+        audio_map.insert("song".into(), CachedSound::Uncompressed(song_src));
 
         data.insert::<SoundStore>(Arc::new(Mutex::new(audio_map)));
     }
@@ -158,11 +163,10 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    let handler = match manager.get_mut(guild_id) {
+    let handler_lock = match manager.get(guild_id) {
         Some(handler) => handler,
         None => {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
@@ -171,10 +175,12 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    if handler.self_deaf {
+    let mut handler = handler_lock.lock().await;
+
+    if handler.is_deaf() {
         check_msg(msg.channel_id.say(&ctx.http, "Already deafened").await);
     } else {
-        handler.deafen(true);
+        handler.deafen(true).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Deafened").await);
     }
@@ -209,12 +215,15 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         }
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let manager_lock_for_evt = manager_lock.clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.join(guild_id, connect_to) {
+    let (handler_lock, success_reader) = manager.join(guild_id, connect_to).await;
+
+    let call_lock_for_evt = handler_lock.clone();
+
+    if let Ok(_reader) = success_reader {
+        let mut handler = handler_lock.lock().await;
         check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())).await);
 
         let sources_lock = ctx.data.read().await.get::<SoundStore>().cloned().expect("Sound cache was installed at startup.");
@@ -230,9 +239,8 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
         let _ = song.add_event(
             Event::Track(TrackEvent::Loop),
             LoopPlaySound {
-                manager: manager_lock_for_evt,
+                call_lock: call_lock_for_evt,
                 sources: sources_lock_for_evt,
-                guild_id,
             },
         );
     } else {
@@ -243,9 +251,8 @@ async fn join(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 struct LoopPlaySound {
-    manager: Arc<PrototypeManager>,
+    call_lock: Arc<Mutex<Call>>,
     sources: Arc<Mutex<HashMap<String, CachedSound>>>,
-    guild_id: GuildId,
 }
 
 #[async_trait]
@@ -256,11 +263,9 @@ impl VoiceEventHandler for LoopPlaySound {
             sources.get("loop").expect("Handle placed into cache at startup.").into()
         };
 
-        let mut manager = self.manager.lock().await;
-        if let Some(handler) = manager.get_mut(self.guild_id) {
-            let sound = handler.play_source(src);
-            let _ = sound.set_volume(0.5);
-        }
+        let mut handler = self.call_lock.lock().await;
+        let sound = handler.play_source(src);
+        let _ = sound.set_volume(0.5);
 
         None
     }
@@ -277,13 +282,12 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        manager.remove(guild_id);
+        manager.remove(guild_id).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Left voice channel").await);
     } else {
@@ -304,11 +308,10 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    let handler = match manager.get_mut(guild_id) {
+    let handler_lock = match manager.get(guild_id) {
         Some(handler) => handler,
         None => {
             check_msg(msg.reply(ctx, "Not in a voice channel").await);
@@ -317,10 +320,12 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    if handler.self_mute {
+    let mut handler = handler_lock.lock().await;
+
+    if handler.is_mute() {
         check_msg(msg.channel_id.say(&ctx.http, "Already muted").await);
     } else {
-        handler.mute(true);
+        handler.mute(true).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Now muted").await);
     }
@@ -339,11 +344,12 @@ async fn ting(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.get_mut(guild_id) {
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
+
         let sources_lock = ctx.data.read().await.get::<SoundStore>().cloned().expect("Sound cache was installed at startup.");
         let sources = sources_lock.lock().await;
         let source = sources.get("ting").expect("Handle placed into cache at startup.");
@@ -369,12 +375,13 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
         },
     };
 
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.get_mut(guild_id) {
-        handler.deafen(false);
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
+
+        handler.deafen(false).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Undeafened").await);
     } else {
@@ -394,12 +401,13 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
             return Ok(());
         },
     };
-    let manager_lock = songbird::get(ctx).await
+    let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut manager = manager_lock.lock().await;
 
-    if let Some(handler) = manager.get_mut(guild_id) {
-        handler.mute(false);
+    if let Some(handler_lock) = manager.get(guild_id) {
+        let mut handler = handler_lock.lock().await;
+
+        handler.mute(false).await;
 
         check_msg(msg.channel_id.say(&ctx.http, "Unmuted").await);
     } else {

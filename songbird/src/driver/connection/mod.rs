@@ -36,7 +36,6 @@ use xsalsa20poly1305::{
     XSalsa20Poly1305 as Cipher,
 };
 
-
 #[cfg(all(feature = "rustls", not(feature = "native")))]
 use ws::create_rustls_client;
 
@@ -61,10 +60,10 @@ impl Connection {
         let mut ready = None;
 
         client.send_json(&GatewayEvent::from(Identify {
-            server_id: info.guild_id,
+            server_id: info.guild_id.into(),
             session_id: info.session_id.clone(),
             token: info.token.clone(),
-            user_id: info.user_id,
+            user_id: info.user_id.into(),
         })).await?;
 
         loop {
@@ -227,7 +226,7 @@ impl Connection {
         let mut client = create_native_tls_client(url).await?;
 
         client.send_json(&GatewayEvent::from(Resume {
-            server_id: self.info.guild_id,
+            server_id: self.info.guild_id.into(),
             session_id: self.info.session_id.clone(),
             token: self.info.token.clone(),
         })).await?;

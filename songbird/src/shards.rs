@@ -1,39 +1,25 @@
-use crate::{
-	error::JoinResult,
-	id::{ChannelId, GuildId, UserId},
-	Call,
+use crate::error::{JoinError, JoinResult};
+#[cfg(feature = "serenity")]
+use futures::channel::mpsc::{
+    TrySendError,
+    UnboundedSender as Sender,
 };
-
+#[cfg(feature = "serenity")]
+use parking_lot::{
+    lock_api::RwLockWriteGuard,
+    Mutex as PMutex,
+    RwLock as PRwLock,
+};
+use serde_json::Value;
+#[cfg(feature = "serenity")]
+use serenity::gateway::InterMessage;
+#[cfg(feature = "serenity")]
 use std::{
     collections::HashMap,
     result::Result as StdResult,
     sync::Arc,
 };
 use tracing::error;
-#[cfg(feature = "serenity")]
-use futures::channel::mpsc::{
-    TrySendError,
-    UnboundedSender as Sender,
-};
-use tokio::sync::Mutex;
-
-use parking_lot::{
-    lock_api::RwLockWriteGuard,
-    Mutex as PMutex,
-    RwLock as PRwLock,
-};
-
-//
-
-use std::error::Error;
-
-use serde_json::Value;
-
-use futures::sink::Sink;
-
-#[cfg(feature = "serenity")]
-use serenity::gateway::InterMessage;
-
 #[cfg(feature = "twilight")]
 use twilight_gateway::{Cluster, Shard as TwilightShard};
 
@@ -54,6 +40,7 @@ impl Sharder {
 			Sharder::Serenity(s) => Some(Shard::Serenity(s.get_or_insert_shard_handle(shard_id))),
 			#[cfg(feature = "twilight")]
 			Sharder::Twilight(t) => t.shard(shard_id).map(Shard::Twilight),
+			_ => None,
 		}
 	}
 }
@@ -125,6 +112,7 @@ impl Shard {
 			Shard::Serenity(s) => s.send(InterMessage::Json(msg))?,
 			#[cfg(feature = "twilight")]
 			Shard::Twilight(t) => t.command(&msg).await?,
+			_ => Err(JoinError::NoSender)?,
 		})
 	}
 }
