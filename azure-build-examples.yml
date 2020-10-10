@@ -117,13 +117,13 @@ jobs:
       cargo build -p e15_parallel_loops
     displayName: 'Build example 15'
 
-    - bash: |
+  - bash: |
       source $HOME/.cargo/env
       cd examples/
       cargo build -p e16_voice_events_queue
     displayName: 'Build example 16'
 
-    - bash: |
+  - bash: |
       source $HOME/.cargo/env
       cd examples/
       cargo build -p e17_voice_storage
