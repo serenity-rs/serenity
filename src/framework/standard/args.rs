@@ -312,6 +312,11 @@ impl Args {
             let mut stream = Stream::new(message);
 
             while let Some(token) = lex(&mut stream, &delims) {
+                // Ignore empty arguments.
+                if message[token.span.0..token.span.1].is_empty() {
+                    continue;
+                }
+
                 args.push(token);
             }
 
