@@ -41,8 +41,6 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 /// # use std::error::Error;
 /// #
 /// # #[cfg(feature = "voice")]
-/// # use serenity::client::bridge::voice::ClientVoiceManager;
-/// # #[cfg(feature = "voice")]
 /// # use serenity::model::id::UserId;
 /// # #[cfg(feature = "cache")]
 /// # use serenity::cache::Cache;
@@ -84,7 +82,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 ///     // the total number of shards in use
 ///     shard_total: 5,
 ///     # #[cfg(feature = "voice")]
-///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
+///     # voice_manager: &None,
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
 ///     guild_subscriptions: true,
