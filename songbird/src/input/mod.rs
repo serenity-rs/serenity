@@ -1108,14 +1108,14 @@ async fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
 /// [`Compressed`]: cached/struct.Compressed.html
 pub struct Restartable {
     position: usize,
-    recreator: Box<dyn Fn(Option<Duration>) -> Result<Input> + Send + 'static>,
+    recreator: Box<dyn Restart + Send + 'static>,
     source: Box<Input>,
 }
 
 impl Restartable {
     /// Create a new source, which can be restarted using a `recreator` function.
-    pub fn new(recreator: impl Fn(Option<Duration>) -> Result<Input> + Send + 'static) -> Result<Self> {
-        recreator(None)
+    pub fn new(recreator: impl Restart + Send + 'static) -> Result<Self> {
+        recreator.call_restart(None)
             .map(move |source| {
                 Self {
                     position: 0,
@@ -1126,35 +1126,8 @@ impl Restartable {
     }
 
     /// Create a new restartable ffmpeg source for a local file.
-    pub fn ffmpeg<P: AsRef<OsStr> + Send + Clone + Copy + 'static>(path: P) -> Result<Self> {
-        Self::new(move |time: Option<Duration>| executor::block_on(async {
-            if let Some(time) = time {
-
-                let is_stereo = is_stereo(path.as_ref()).await
-                    .unwrap_or_else(|_e| (false, Default::default()));
-                let stereo_val = if is_stereo.0 { "2" } else { "1" };
-
-                let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
-                _ffmpeg_optioned(path.as_ref(), &[
-                    "-ss",
-                    &ts,
-                    ],
-
-                    &[
-                    "-f",
-                    "s16le",
-                    "-ac",
-                    stereo_val,
-                    "-ar",
-                    "48000",
-                    "-acodec",
-                    "pcm_f32le",
-                    "-",
-                ], Some(is_stereo)).await
-            } else {
-                ffmpeg(path).await
-            }})
-        )
+    pub fn ffmpeg<P: AsRef<OsStr> + Send + Clone + 'static>(path: P) -> Result<Self> {
+        Self::new(FfmpegRestarter { path: path.clone() })
     }
 
     /// Create a new restartable ytdl source.
@@ -1179,6 +1152,58 @@ impl Restartable {
     /// expect a pause if you seek backwards.
     pub fn ytdl_search(name: &str) -> Result<Self> {
        Self::ytdl(format!("ytsearch1:{}",name))
+    }
+}
+
+pub trait Restart {
+    fn call_restart(&self, time: Option<Duration>) -> Result<Input>;
+}
+
+struct FfmpegRestarter<P>
+    where P: AsRef<OsStr> + Send,
+{
+    path: P,
+}
+
+impl<P> Restart for FfmpegRestarter<P>
+    where P: AsRef<OsStr> + Send,
+{
+    fn call_restart(&self, time: Option<Duration>) -> Result<Input> {
+        executor::block_on(async {
+        if let Some(time) = time {
+
+            let is_stereo = is_stereo(self.path.as_ref()).await
+                .unwrap_or_else(|_e| (false, Default::default()));
+            let stereo_val = if is_stereo.0 { "2" } else { "1" };
+
+            let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
+            _ffmpeg_optioned(self.path.as_ref(), &[
+                "-ss",
+                &ts,
+                ],
+
+                &[
+                "-f",
+                "s16le",
+                "-ac",
+                stereo_val,
+                "-ar",
+                "48000",
+                "-acodec",
+                "pcm_f32le",
+                "-",
+            ], Some(is_stereo)).await
+        } else {
+            ffmpeg(self.path.as_ref()).await
+        }})
+    }
+}
+
+impl<P> Restart for P
+    where P: Fn(Option<Duration>) -> Result<Input> + Send + 'static
+{
+    fn call_restart(&self, time: Option<Duration>) -> Result<Input> {
+        (&self)(time)
     }
 }
 
@@ -1229,7 +1254,7 @@ impl Seek for Restartable {
                 if offset < self.position {
                     // FIXME: don't unwrap
                     self.source = Box::new(
-                        (self.recreator)(
+                        self.recreator.call_restart(
                             Some(utils::byte_count_to_timestamp(offset, stereo))
                         ).unwrap()
                     );

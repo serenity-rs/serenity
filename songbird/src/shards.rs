@@ -1,7 +1,7 @@
-use super::Handler;
 use crate::{
 	error::JoinResult,
 	id::{ChannelId, GuildId, UserId},
+	Call,
 };
 
 use std::{

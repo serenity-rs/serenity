@@ -1,15 +1,19 @@
-use super::Handler;
 use crate::{
-    error::JoinResult,
+    error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
     shards::Sharder,
+    Call,
     ConnectionInfo,
 };
-
 #[cfg(feature = "driver")]
 use crate::driver::Error as DriverError;
-
 use async_trait::async_trait;
+use flume::{Receiver, Sender as FlumeSender};
+use parking_lot::{
+    lock_api::RwLockWriteGuard,
+    Mutex as PMutex,
+    RwLock as PRwLock,
+};
 #[cfg(feature = "serenity")]
 use serenity::{
     client::bridge::voice::VoiceGatewayManager,
@@ -34,59 +38,54 @@ use futures::channel::mpsc::{
     UnboundedSender as Sender,
 };
 use tokio::sync::Mutex;
-
+#[cfg(feature = "twilight")]
+use twilight_gateway::Cluster;
 #[cfg(feature = "twilight")]
 use twilight_model::gateway::event::Event as TwilightEvent;
-
-use flume::{Receiver, Sender as FlumeSender};
-
-use parking_lot::{
-    lock_api::RwLockWriteGuard,
-    Mutex as PMutex,
-    RwLock as PRwLock,
-};
 
 #[derive(Clone, Copy, Debug, Default)]
 struct ClientData {
     shard_count: u64,
+    initialised: bool,
     user_id: UserId,
 }
 
-/// A manager is a struct responsible for managing [`Handler`]s which belong to
-/// a single [`Shard`]. This is a fairly complex key-value store,
-/// with a bit of extra utility for easily joining a "target".
+/// A struct responsible for managing [`Call`]s.
 ///
-/// The "target" used by the Manager is determined based on the `guild_id` and
-/// `channel_id` provided. If a `guild_id` is _not_ provided to methods that
-/// optionally require it, then the target is a group or 1-on-1 call with a
-/// user. The `channel_id` is then used as the target.
+/// This manager transparently maps guild state and a source of shard information
+/// into individual calls, and forwards state updates which affect call state.
 ///
-/// If a `guild_id` is provided, then the target is the guild, as a user
-/// can not be connected to two channels within one guild simultaneously.
-///
-/// [`Handler`]: struct.Handler.html
-/// [guild's channel]: ../../model/channel/enum.ChannelType.html#variant.Voice
-/// [`Shard`]: ../gateway/struct.Shard.html
+/// [`Call`]: struct.Call.html
 #[derive(Debug)]
-pub struct Manager {
+pub struct Songbird {
     client_data: PRwLock<ClientData>,
-    calls: PRwLock<HashMap<GuildId, Arc<Mutex<Handler>>>>,
+    calls: PRwLock<HashMap<GuildId, Arc<Mutex<Call>>>>,
     sharder: Sharder,
 }
 
-impl Manager {
+impl Songbird {
     #[cfg(feature = "serenity")]
-    pub fn serenity() -> Self {
-        Self {
+    pub fn serenity() -> Arc<Self> {
+        Arc::new(Self {
             client_data: Default::default(),
             calls: Default::default(),
             sharder: Sharder::Serenity(Default::default()),
-        }
+        })
     }
 
     #[cfg(feature = "twilight")]
-    pub fn twilight() -> Self {
-        unimplemented!()
+    pub fn twilight<U>(cluster: Cluster, shard_count: u64, user_id: U) -> Arc<Self>
+        where U: Into<UserId>,
+    {
+        Arc::new(Self {
+            client_data: PRwLock::new(ClientData {
+                shard_count,
+                initialised: true,
+                user_id: user_id.into()
+            }),
+            calls: Default::default(),
+            sharder: Sharder::Twilight(cluster),
+        })
     }
 
     /// Set the bot's user, and the number of shards in use.
@@ -95,16 +94,21 @@ impl Manager {
     pub fn initialise_client_data<U: Into<UserId>>(&self, shard_count: u64, user_id: U) {
         let mut client_data = self.client_data.write();
 
+        if client_data.initialised {
+            return;
+        }
+
         client_data.shard_count = shard_count;
         client_data.user_id = user_id.into();
+        client_data.initialised = true;
     }
 
-    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<Arc<Mutex<Handler>>> {
+    pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<Arc<Mutex<Call>>> {
         let map_read = self.calls.read();
         map_read.get(&guild_id.into()).cloned()
     }
 
-    fn get_or_insert_call(&self, guild_id: GuildId) -> Arc<Mutex<Handler>> {
+    fn get_or_insert_call(&self, guild_id: GuildId) -> Arc<Mutex<Call>> {
         self.get(guild_id).unwrap_or_else(|| {
             let mut map_read = self.calls.write();
 
@@ -115,7 +119,7 @@ impl Manager {
                     let shard_handle = self.sharder.get_shard(shard)
                         .expect("Failed to get shard handle: shard_count incorrect?");
 
-                    Arc::new(Mutex::new(Handler::new(
+                    Arc::new(Mutex::new(Call::new(
                         guild_id,
                         shard_handle,
                         info.user_id,
@@ -132,7 +136,7 @@ impl Manager {
     }
 
     #[cfg(feature = "driver")]
-    /// Connects to a target by retrieving its relevant [`Handler`] and
+    /// Connects to a target by retrieving its relevant [`Call`] and
     /// connecting, or creating the handler if required.
     ///
     /// This can also switch to the given channel, if a handler already exists
@@ -151,10 +155,10 @@ impl Manager {
     /// If you _only_ need to retrieve the handler for a target, then use
     /// [`get`].
     ///
-    /// [`Handler`]: struct.Handler.html
+    /// [`Call`]: struct.Call.html
     /// [`get`]: #method.get
     #[inline]
-    pub async fn join<C, G>(&self, guild_id: G, channel_id: C) -> (Arc<Mutex<Handler>>, JoinResult<Receiver<Result<(), DriverError>>>)
+    pub async fn join<C, G>(&self, guild_id: G, channel_id: C) -> (Arc<Mutex<Call>>, JoinResult<Receiver<Result<(), DriverError>>>)
         where C: Into<ChannelId>, G: Into<GuildId> {
         self._join(guild_id.into(), channel_id.into()).await
     }
@@ -164,7 +168,7 @@ impl Manager {
         &self,
         guild_id: GuildId,
         channel_id: ChannelId,
-    ) -> (Arc<Mutex<Handler>>, JoinResult<Receiver<Result<(), DriverError>>>) {
+    ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<Result<(), DriverError>>>) {
         let call = self.get_or_insert_call(guild_id);
 
         let result = {
@@ -175,13 +179,13 @@ impl Manager {
         (call, result)
     }
 
-    /// Partially connects to a target by retrieving its relevant [`Handler`] and
+    /// Partially connects to a target by retrieving its relevant [`Call`] and
     /// connecting, or creating the handler if required.
     ///
     /// This method returns the handle and the connection info needed for other libraries
     /// or drivers, such as lavalink, and does not actually start or run a voice call.
     #[inline]
-    pub async fn join_gateway<C, G>(&self, guild_id: G, channel_id: C) -> (Arc<Mutex<Handler>>, JoinResult<Receiver<ConnectionInfo>>)
+    pub async fn join_gateway<C, G>(&self, guild_id: G, channel_id: C) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionInfo>>)
         where C: Into<ChannelId>, G: Into<GuildId> {
         self._join_gateway(guild_id.into(), channel_id.into()).await
     }
@@ -190,7 +194,7 @@ impl Manager {
         &self,
         guild_id: GuildId,
         channel_id: ChannelId,
-    ) -> (Arc<Mutex<Handler>>, JoinResult<Receiver<ConnectionInfo>>) {
+    ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionInfo>>) {
         let call = self.get_or_insert_call(guild_id);
 
         let result = {
@@ -201,7 +205,7 @@ impl Manager {
         (call, result)
     }
 
-    /// Retrieves the [handler][`Handler`] for the given target and leaves the
+    /// Retrieves the [handler][`Call`] for the given target and leaves the
     /// associated voice channel, if connected.
     ///
     /// This will _not_ drop the handler, and will preserve it and its settings.
@@ -209,27 +213,29 @@ impl Manager {
     /// This is a wrapper around [getting][`get`] a handler and calling
     /// [`leave`] on it.
     ///
-    /// [`Handler`]: struct.Handler.html
+    /// [`Call`]: struct.Call.html
     /// [`get`]: #method.get
-    /// [`leave`]: struct.Handler.html#method.leave
+    /// [`leave`]: struct.Call.html#method.leave
     #[inline]
-    pub async fn leave<G: Into<GuildId>>(&self, guild_id: G) {
-        self._leave(guild_id.into()).await;
+    pub async fn leave<G: Into<GuildId>>(&self, guild_id: G) -> JoinResult<()> {
+        self._leave(guild_id.into()).await
     }
 
-    async fn _leave(&self, guild_id: GuildId) {
+    async fn _leave(&self, guild_id: GuildId) -> JoinResult<()> {
         if let Some(call) = self.get(guild_id) {
             let mut handler = call.lock().await;
-            handler.leave();
+            handler.leave().await
+        } else {
+            Err(JoinError::NoCall)
         }
     }
 
-    /// Retrieves the [`Handler`] for the given target and leaves the associated
+    /// Retrieves the [`Call`] for the given target and leaves the associated
     /// voice channel, if connected.
     ///
     /// The handler is then dropped, removing settings for the target.
     ///
-    /// [`Handler`]: struct.Handler.html
+    /// [`Call`]: struct.Call.html
     #[inline]
     pub async fn remove<G: Into<GuildId>>(&self, guild_id: G) {
         self._remove(guild_id.into()).await
@@ -243,7 +249,7 @@ impl Manager {
 }
 
 #[cfg(feature = "twilight")]
-impl Manager {
+impl Songbird {
     /// Handle events received on the cluster.
     ///
     /// When using twilight, you are required to call this with all inbound
@@ -283,7 +289,7 @@ impl Manager {
 
 #[cfg(feature = "serenity")]
 #[async_trait]
-impl VoiceGatewayManager for Manager {
+impl VoiceGatewayManager for Songbird {
     async fn initialise(&self, shard_count: u64, user_id: SerenityUser) {
         self.initialise_client_data(shard_count, user_id);
     }

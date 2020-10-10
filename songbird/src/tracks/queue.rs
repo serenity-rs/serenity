@@ -7,7 +7,6 @@ use crate::{
         EventHandler,
         TrackEvent,
     },
-    Handler,
     input::Input,
     tracks::{
         self,
@@ -15,6 +14,7 @@ use crate::{
         TrackHandle,
         TrackResult,
     },
+    Call,
 };
 use tracing::{info, warn};
 use parking_lot::Mutex;
@@ -38,7 +38,7 @@ use std::{
 /// 
 /// ```rust,ignore
 /// use serenity::model::id::GuildId;
-/// use serenity::voice::{Handler, LockedAudio, ffmpeg, create_player};
+/// use serenity::voice::{Call, LockedAudio, ffmpeg, create_player};
 /// use std::collections::HashMap;
 ///
 /// let mut manager: ClientVoiceManager = /* ... */;
@@ -119,7 +119,7 @@ impl TrackQueue {
     }
 
     /// Adds an audio source to the queue, to be played in the channel managed by `handler`.
-    pub fn add_source(&self, source: Input, handler: &mut Handler) {
+    pub fn add_source(&self, source: Input, handler: &mut Call) {
         let (audio, audio_handle) = tracks::create_player(source);
         self.add(audio, audio_handle, handler);
     }
@@ -131,7 +131,7 @@ impl TrackQueue {
     ///
     /// [`Track`]: struct.Track.html
     /// [`voice::create_player`]: fn.create_player.html
-    pub fn add(&self, mut track: Track, track_handle: TrackHandle, handler: &mut Handler) {
+    pub fn add(&self, mut track: Track, track_handle: TrackHandle, handler: &mut Call) {
         info!("Track added to queue.");
         let remote_lock = self.inner.clone();
         let mut inner = self.inner.lock();

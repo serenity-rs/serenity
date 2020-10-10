@@ -74,7 +74,7 @@ enum Return {
 /// [`Manager`]: struct.Manager.html
 /// [`Shard`]: ../gateway/struct.Shard.html
 #[derive(Clone, Debug)]
-pub struct Handler {
+pub struct Call {
     connection: Option<(ChannelId, ConnectionProgress, Return)>,
 
     #[cfg(feature = "driver")]
@@ -87,16 +87,16 @@ pub struct Handler {
     /// Whether the current handler is set to mute voice connections.
     self_mute: bool,
     user_id: UserId,
-    /// Will be set when a `Handler` is made via the [`new`][`Handler::new`]
+    /// Will be set when a `Call` is made via the [`new`][`Call::new`]
     /// method.
     ///
-    /// When set via [`standalone`][`Handler::standalone`], it will not be
+    /// When set via [`standalone`][`Call::standalone`], it will not be
     /// present.
     ws: Option<Shard>,
 }
 
-impl Handler {
-    /// Creates a new Handler, which will send out WebSocket messages via
+impl Call {
+    /// Creates a new Call, which will send out WebSocket messages via
     /// the given shard.
     #[inline]
     pub fn new(
@@ -107,11 +107,11 @@ impl Handler {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 
-    /// Creates a new, standalone Handler which is not connected via
+    /// Creates a new, standalone Call which is not connected via
     /// WebSocket to the Gateway.
     ///
     /// Actions such as muting, deafening, and switching channels will not
-    /// function through this Handler and must be done through some other
+    /// function through this Call and must be done through some other
     /// method, as the values will only be internally updated.
     ///
     /// For most use cases you do not want this.
@@ -125,7 +125,7 @@ impl Handler {
         ws: Option<Shard>,
         user_id: UserId,
     ) -> Self {
-        Handler {
+        Call {
             connection: None,
             #[cfg(feature = "driver")]
             driver: Default::default(),
@@ -159,14 +159,14 @@ impl Handler {
     /// **Note**: Unlike in the official client, you _can_ be deafened while
     /// not being muted.
     ///
-    /// **Note**: If the `Handler` was created via [`standalone`], then this
+    /// **Note**: If the `Call` was created via [`standalone`], then this
     /// will _only_ update whether the connection is internally deafened.
     ///
     /// [`standalone`]: #method.standalone
-    pub async fn deafen(&mut self, deaf: bool) {
+    pub async fn deafen(&mut self, deaf: bool) -> JoinResult<()> {
         self.self_deaf = deaf;
 
-        self.update().await;
+        self.update().await
     }
 
     pub fn is_deaf(&self) -> bool {
@@ -213,19 +213,19 @@ impl Handler {
     /// This does _not_ forget settings, like whether to be self-deafened or
     /// self-muted.
     ///
-    /// **Note**: If the `Handler` was created via [`standalone`], then this
+    /// **Note**: If the `Call` was created via [`standalone`], then this
     /// will _only_ update whether the connection is internally connected to a
     /// voice channel.
     ///
     /// [`standalone`]: #method.standalone
-    pub async fn leave(&mut self) {
+    pub async fn leave(&mut self) -> JoinResult<()> {
         // Only send an update if we were in a voice channel.
         self.connection = None;
 
-        self.update().await;
-
         #[cfg(feature = "driver")]
         self.driver.leave();
+
+        self.update().await
     }
 
     /// Sets whether the current connection is to be muted.
@@ -233,17 +233,17 @@ impl Handler {
     /// If there is no live voice connection, then this only acts as a settings
     /// update for future connections.
     ///
-    /// **Note**: If the `Handler` was created via [`standalone`], then this
+    /// **Note**: If the `Call` was created via [`standalone`], then this
     /// will _only_ update whether the connection is internally muted.
     ///
     /// [`standalone`]: #method.standalone
-    pub async fn mute(&mut self, mute: bool) {
+    pub async fn mute(&mut self, mute: bool) -> JoinResult<()> {
         self.self_mute = mute;
-
-        self.update().await;
 
         #[cfg(feature = "driver")]
         self.driver.mute(mute);
+
+        self.update().await
     }
 
     pub fn is_mute(&self) -> bool {
@@ -252,7 +252,7 @@ impl Handler {
 
     /// Updates the voice server data.
     ///
-    /// You should only need to use this if you initialized the `Handler` via
+    /// You should only need to use this if you initialized the `Call` via
     /// [`standalone`].
     ///
     /// Refer to the documentation for [`connect`] for when this will
@@ -274,7 +274,7 @@ impl Handler {
 
     /// Updates the internal voice state of the current user.
     ///
-    /// You should only need to use this if you initialized the `Handler` via
+    /// You should only need to use this if you initialized the `Call` via
     /// [`standalone`].
     ///
     /// refer to the documentation for [`connect`] for when this will
@@ -317,7 +317,7 @@ impl Handler {
 }
 
 #[cfg(feature = "driver")]
-impl Deref for Handler {
+impl Deref for Call {
     type Target = Driver;
 
     fn deref(&self) -> &Self::Target {
@@ -326,7 +326,7 @@ impl Deref for Handler {
 }
 
 #[cfg(feature = "driver")]
-impl DerefMut for Handler {
+impl DerefMut for Call {
     fn deref_mut(&mut self) -> &mut Self::Target {
         &mut self.driver
     }
