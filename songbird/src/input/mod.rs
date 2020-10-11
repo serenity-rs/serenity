@@ -1,4 +1,13 @@
 //! Raw audio input data streams and sources.
+//!
+//! [`Input`] is handled in songbird by combining metadata with:
+//!  * A 48kHz audio bytestream, via [`Reader`],
+//!  * A [`Container`] describing the framing mechanism of the bytestream,
+//!  * A [`Codec`], defining the format of audio frames.
+//!
+//! [`Input`]: struct.Input.html
+//! [`Container`]: struct.Container.html
+//! [`Codec`]: struct.Codec.html
 
 pub mod cached;
 mod dca;
@@ -938,7 +947,7 @@ async fn _ffmpeg(path: &OsStr) -> Result<Input> {
 /// Pass options to create a custom ffmpeg streamer:
 ///
 /// ```rust,no_run
-/// use serenity::voice::input;
+/// use songbird::input;
 ///
 /// let stereo_val = "2";
 ///
@@ -1177,7 +1186,7 @@ pub struct Restartable {
 
 impl Restartable {
     /// Create a new source, which can be restarted using a `recreator` function.
-    pub fn new(recreator: impl Restart + Send + 'static) -> Result<Self> {
+    pub fn new(mut recreator: impl Restart + Send + 'static) -> Result<Self> {
         recreator.call_restart(None).map(move |source| Self {
             position: 0,
             recreator: Box::new(recreator),
@@ -1216,7 +1225,7 @@ impl Restartable {
 }
 
 pub trait Restart {
-    fn call_restart(&self, time: Option<Duration>) -> Result<Input>;
+    fn call_restart(&mut self, time: Option<Duration>) -> Result<Input>;
 }
 
 struct FfmpegRestarter<P>
@@ -1230,7 +1239,7 @@ impl<P> Restart for FfmpegRestarter<P>
 where
     P: AsRef<OsStr> + Send,
 {
-    fn call_restart(&self, time: Option<Duration>) -> Result<Input> {
+    fn call_restart(&mut self, time: Option<Duration>) -> Result<Input> {
         executor::block_on(async {
             if let Some(time) = time {
                 let is_stereo = is_stereo(self.path.as_ref())
@@ -1265,10 +1274,10 @@ where
 
 impl<P> Restart for P
 where
-    P: Fn(Option<Duration>) -> Result<Input> + Send + 'static,
+    P: FnMut(Option<Duration>) -> Result<Input> + Send + 'static,
 {
-    fn call_restart(&self, time: Option<Duration>) -> Result<Input> {
-        (&self)(time)
+    fn call_restart(&mut self, time: Option<Duration>) -> Result<Input> {
+        (self)(time)
     }
 }
 

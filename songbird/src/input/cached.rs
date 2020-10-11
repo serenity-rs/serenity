@@ -446,3 +446,66 @@ where
 pub fn default_config(cost_per_sec: usize) -> Config {
     Config::new().chunk_size(GrowthStrategy::Constant(5 * cost_per_sec))
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::{
+        constants::*,
+        input::{ffmpeg, Input},
+    };
+    use std::io::Read;
+
+    const TEST_FILE: &str = "test-assets/loop.wav";
+
+    #[tokio::test]
+    async fn memory_cached_matches_input() {
+        let input_reader = ffmpeg(&TEST_FILE).await.unwrap();
+
+        // let mut mem = Input::from(Memory::new(input_reader).unwrap());
+        let mut mem = Memory::new(input_reader).unwrap();
+
+        let mut input_reader_2 = ffmpeg(&TEST_FILE).await.unwrap();
+
+        let mut true_read_buffer = [0u8; 64];
+        let mut mem_read_buffer = [0u8; 64];
+
+        let mut cnt = 0;
+        let mut discrep = 0;
+        loop {
+            let r1 = input_reader_2.read(&mut true_read_buffer[..]).unwrap();
+            let r2 = mem.raw.read(&mut mem_read_buffer[..]).unwrap();
+
+            assert_eq!((cnt, r1), (cnt, r2));
+
+            if (cnt, &true_read_buffer[..r1]) == (cnt, &mem_read_buffer[..r2]) {
+                discrep += 1;
+            }
+            // assert_eq!((cnt, &true_read_buffer[..r1]), (cnt, &mem_read_buffer[..r2]));
+
+            if r1 == 0 {
+                println!("{:?}", r2);
+                break;
+            }
+
+            cnt += 1;
+        }
+        println!("{:?}", cnt);
+        assert_eq!(discrep, 0);
+    }
+
+    #[tokio::test]
+    async fn compressed_scans_frames() {
+        unimplemented!();
+    }
+
+    #[tokio::test]
+    async fn compressed_decodes() {
+        unimplemented!();
+    }
+
+    #[tokio::test]
+    async fn compressed_triggers_passthrough() {
+        unimplemented!();
+    }
+}

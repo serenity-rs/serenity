@@ -1,3 +1,5 @@
+//! TODO: explain how the driver works internally.
+
 mod config;
 mod connection;
 mod crypto;
@@ -20,6 +22,8 @@ use flume::{Receiver, SendError, Sender};
 use tasks::message::CoreMessage;
 use tracing::instrument;
 
+/// The control object for a Discord voice connection, handling connection,
+/// mixing, encoding, en/decryption, and event generation.
 #[derive(Clone, Debug)]
 pub struct Driver {
     config: Config,
