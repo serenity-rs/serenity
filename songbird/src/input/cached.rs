@@ -1,31 +1,21 @@
-use crate::{
-    constants::*,
-};
 use super::error::{Error, Result};
+use super::{utils, CodecType, Container, Input, Metadata, Reader};
+use crate::constants::*;
 use audiopus::{
+    coder::Encoder as OpusEncoder,
     Application,
     Bitrate,
     Channels,
     Error as OpusError,
     ErrorCode as OpusErrorCode,
-    coder::Encoder as OpusEncoder,
     SampleRate,
 };
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
-use tracing::debug;
 use std::{
     convert::TryInto,
-    io::{
-        Error as IoError,
-        ErrorKind as IoErrorKind,
-        Read,
-        Result as IoResult,
-    },
+    io::{Error as IoError, ErrorKind as IoErrorKind, Read, Result as IoResult},
     mem,
-    sync::atomic::{
-        AtomicUsize,
-        Ordering,
-    },
+    sync::atomic::{AtomicUsize, Ordering},
     time::Duration,
 };
 use streamcatcher::{
@@ -38,15 +28,7 @@ use streamcatcher::{
     TransformPosition,
     TxCatcher,
 };
-use super::{
-    utils,
-    CodecType,
-    Container,
-    Input,
-    Metadata,
-    Reader,
-};
-
+use tracing::debug;
 
 /// Expected amount of time that an input should last.
 #[derive(Copy, Clone, Debug)]
@@ -133,7 +115,8 @@ impl Memory {
             }
         }
 
-        let raw = config.build(Box::new(source.reader))
+        let raw = config
+            .build(Box::new(source.reader))
             .map_err(Error::Streamcatcher)?;
 
         Ok(Self {
@@ -212,7 +195,11 @@ impl Compressed {
     /// [`Input`]: ../struct.Input.html
     /// [`Metadata.duration`]: ../struct.Metadata.html#structfield.duration
     pub fn with_config(source: Input, bitrate: Bitrate, config: Option<Config>) -> Result<Self> {
-        let channels = if source.stereo { Channels::Stereo } else { Channels::Mono };
+        let channels = if source.stereo {
+            Channels::Stereo
+        } else {
+            Channels::Mono
+        };
         let mut encoder = OpusEncoder::new(SampleRate::Hz48000, channels, Application::Audio)?;
 
         encoder.set_bitrate(bitrate)?;
@@ -228,7 +215,11 @@ impl Compressed {
     ///
     /// [`Input`]: ../struct.Input.html
     /// [`new`]: #method.new
-    pub fn with_encoder(mut source: Input, encoder: OpusEncoder, config: Option<Config>) -> Result<Self> {
+    pub fn with_encoder(
+        mut source: Input,
+        encoder: OpusEncoder,
+        config: Option<Config>,
+    ) -> Result<Self> {
         let bitrate = encoder.bitrate()?;
         let cost_per_sec = compressed_cost_per_sec(bitrate);
         let stereo = source.stereo;
@@ -243,10 +234,9 @@ impl Compressed {
             }
         }
 
-        let raw = config.build_tx(
-            Box::new(source),
-            OpusCompressor::new(encoder, stereo),
-        ).map_err(Error::Streamcatcher)?;
+        let raw = config
+            .build_tx(Box::new(source), OpusCompressor::new(encoder, stereo))
+            .map_err(Error::Streamcatcher)?;
 
         Ok(Self {
             raw,
@@ -271,9 +261,10 @@ impl From<Compressed> for Input {
         Input::new(
             src.stereo,
             Reader::Compressed(src.raw),
-            CodecType::Opus.try_into()
+            CodecType::Opus
+                .try_into()
                 .expect("Default decoder values are known to be valid."),
-            Container::Dca{ first_frame: 0 },
+            Container::Dca { first_frame: 0 },
             Some(src.metadata),
         )
     }
@@ -311,7 +302,11 @@ where
         let mut raw_len = 0;
         let mut out = None;
         let mut sample_buf = [0f32; STEREO_FRAME_SIZE];
-        let samples_in_frame = if self.stereo_input { STEREO_FRAME_SIZE } else { MONO_FRAME_SIZE };
+        let samples_in_frame = if self.stereo_input {
+            STEREO_FRAME_SIZE
+        } else {
+            MONO_FRAME_SIZE
+        };
 
         // Purge old frame and read new, if needed.
         if self.frame_pos == self.last_frame.len() + output_start || self.last_frame.is_empty() {
@@ -331,13 +326,16 @@ where
                     Err(e) => {
                         out = Some(Err(e));
                         break;
-                    }
+                    },
                 }
             }
 
             if out.is_none() && raw_len > 0 {
                 loop {
-                    match self.encoder.encode_float(&sample_buf[..], &mut self.last_frame[..]) {
+                    match self
+                        .encoder
+                        .encode_float(&sample_buf[..], &mut self.last_frame[..])
+                    {
                         Ok(pkt_len) => {
                             debug!("Next packet to write has {:?}", pkt_len);
                             self.frame_pos = 0;
@@ -361,20 +359,26 @@ where
         if out.is_none() {
             // Write from frame we have.
             let start = if self.frame_pos < output_start {
-                (&mut buf[..output_start]).write_i16::<LittleEndian>(self.last_frame.len() as i16)
-                    .expect("Minimum bytes requirement for Opus (2) should mean that an i16 \
-                             may always be written.");
+                (&mut buf[..output_start])
+                    .write_i16::<LittleEndian>(self.last_frame.len() as i16)
+                    .expect(
+                        "Minimum bytes requirement for Opus (2) should mean that an i16 \
+                             may always be written.",
+                    );
                 self.frame_pos += output_start;
 
                 debug!("Wrote frame header.");
 
                 output_start
-            } else { 0 };
+            } else {
+                0
+            };
 
             let out_pos = self.frame_pos - output_start;
             let remaining = self.last_frame.len() - out_pos;
             let write_len = remaining.min(buf.len() - start);
-            buf[start..start+write_len].copy_from_slice(&self.last_frame[out_pos..out_pos + write_len]);
+            buf[start..start + write_len]
+                .copy_from_slice(&self.last_frame[out_pos..out_pos + write_len]);
             self.frame_pos += write_len;
             debug!("Appended {} to inner store", write_len);
             out = Some(Ok(write_len + start));
@@ -384,7 +388,8 @@ where
         // stream is extended to 20ms boundary.
         out.unwrap_or_else(|| Err(IoError::new(IoErrorKind::Other, "Unclear.")))
             .map(|compressed_sz| {
-                self.audio_bytes.fetch_add(raw_len * mem::size_of::<f32>(), Ordering::Release);
+                self.audio_bytes
+                    .fetch_add(raw_len * mem::size_of::<f32>(), Ordering::Release);
 
                 if eof {
                     TransformPosition::Finished
@@ -434,11 +439,10 @@ where
         LengthHint::Time(t) => {
             let s = t.as_secs() + if t.subsec_millis() > 0 { 1 } else { 0 };
             (s as usize) * cost_per_sec
-        }
+        },
     });
 }
 
 pub fn default_config(cost_per_sec: usize) -> Config {
-    Config::new()
-        .chunk_size(GrowthStrategy::Constant(5 * cost_per_sec))
+    Config::new().chunk_size(GrowthStrategy::Constant(5 * cost_per_sec))
 }

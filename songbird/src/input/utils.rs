@@ -1,14 +1,6 @@
-use audiopus::{
-    coder::Decoder,
-    Channels,
-    Result as OpusResult,
-    SampleRate,
-};
 use crate::constants::*;
-use std::{
-    mem,
-    time::Duration,
-};
+use audiopus::{coder::Decoder, Channels, Result as OpusResult, SampleRate};
+use std::{mem, time::Duration};
 
 pub fn timestamp_to_sample_count(timestamp: Duration, stereo: bool) -> usize {
     ((timestamp.as_millis() as usize) * (MONO_FRAME_SIZE / FRAME_LEN_MS)) << stereo as usize
@@ -30,6 +22,10 @@ pub fn byte_count_to_timestamp(amt: usize, stereo: bool) -> Duration {
 pub fn decoder(stereo: bool) -> OpusResult<Decoder> {
     Decoder::new(
         SampleRate::Hz48000,
-        if stereo { Channels::Stereo } else { Channels::Mono },
+        if stereo {
+            Channels::Stereo
+        } else {
+            Channels::Mono
+        },
     )
 }

@@ -1,13 +1,10 @@
+#[cfg(feature = "driver")]
+use crate::driver::{Driver, Error};
 use crate::{
     error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
     info::{ConnectionInfo, ConnectionProgress},
     shards::Shard,
-};
-#[cfg(feature = "driver")]
-use crate::driver::{
-    Driver,
-    Error,
 };
 use flume::{Receiver, Sender};
 use serde_json::json;
@@ -58,11 +55,7 @@ impl Call {
     /// the given shard.
     #[inline]
     #[instrument]
-    pub fn new(
-        guild_id: GuildId,
-        ws: Shard,
-        user_id: UserId,
-    ) -> Self {
+    pub fn new(guild_id: GuildId, ws: Shard, user_id: UserId) -> Self {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 
@@ -80,11 +73,7 @@ impl Call {
         Self::new_raw(guild_id, None, user_id)
     }
 
-    fn new_raw(
-        guild_id: GuildId,
-        ws: Option<Shard>,
-        user_id: UserId,
-    ) -> Self {
+    fn new_raw(guild_id: GuildId, ws: Option<Shard>, user_id: UserId) -> Self {
         Call {
             connection: None,
             #[cfg(feature = "driver")]
@@ -151,9 +140,7 @@ impl Call {
             Return::Conn(tx),
         ));
 
-        self.update()
-            .await
-            .map(|_| rx)
+        self.update().await.map(|_| rx)
     }
 
     /// Join the selected voice channel, *without* running/starting an RTP
@@ -162,7 +149,10 @@ impl Call {
     /// Use this if you require connection info for lavalink,
     /// some other voice implementation, or don't want to use the driver for a given call.
     #[instrument(skip(self))]
-    pub async fn join_gateway(&mut self, channel_id: ChannelId) -> JoinResult<Receiver<ConnectionInfo>> {
+    pub async fn join_gateway(
+        &mut self,
+        channel_id: ChannelId,
+    ) -> JoinResult<Receiver<ConnectionInfo>> {
         let (tx, rx) = flume::unbounded();
 
         self.connection = Some((
@@ -171,9 +161,7 @@ impl Call {
             Return::Info(tx),
         ));
 
-        self.update()
-            .await
-            .map(|_| rx)
+        self.update().await.map(|_| rx)
     }
 
     /// Leaves the current voice channel, disconnecting from it.
@@ -236,7 +224,9 @@ impl Call {
     pub fn update_server(&mut self, endpoint: String, token: String) {
         let try_conn = if let Some((_, ref mut progress, _)) = self.connection.as_mut() {
             progress.apply_server_update(endpoint, token)
-        } else { false };
+        } else {
+            false
+        };
 
         if try_conn {
             self.do_connect();
@@ -257,7 +247,9 @@ impl Call {
     pub fn update_state(&mut self, session_id: String) {
         let try_conn = if let Some((_, ref mut progress, _)) = self.connection.as_mut() {
             progress.apply_state_update(session_id)
-        } else { false };
+        } else {
+            false
+        };
 
         if try_conn {
             self.do_connect();

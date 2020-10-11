@@ -4,26 +4,19 @@ mod crypto;
 pub(crate) mod tasks;
 
 pub use config::Config;
-pub use connection::error::Error as Error;
+pub use connection::error::Error;
 pub use crypto::Mode as CryptoMode;
 
-use audiopus::Bitrate;
 use crate::{
     events::EventData,
     input::Input,
-    tracks::{
-        Track,
-        TrackHandle,
-    },
+    tracks::{Track, TrackHandle},
     ConnectionInfo,
     Event,
     EventHandler,
 };
-use flume::{
-    SendError,
-    Sender,
-    Receiver,
-};
+use audiopus::Bitrate;
+use flume::{Receiver, SendError, Sender};
 use tasks::message::CoreMessage;
 use tracing::instrument;
 
@@ -168,7 +161,9 @@ impl Driver {
     }
 
     /// Stops playing audio from all sources, if any are set.
-    pub fn stop(&mut self) { self.send(CoreMessage::SetTrack(None)) }
+    pub fn stop(&mut self) {
+        self.send(CoreMessage::SetTrack(None))
+    }
 
     /// Attach a global event handler to an audio context. Global events may receive
     /// any [`EventContext`].

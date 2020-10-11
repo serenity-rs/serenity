@@ -5,30 +5,18 @@ mod queue;
 use crate::{
     constants::*,
     driver::tasks::message::*,
-    events::{
-        Event,
-        EventData,
-        EventHandler,
-        EventStore,
-    },
+    events::{Event, EventData, EventHandler, EventStore},
     input::Input,
 };
 use std::time::Duration;
 use tokio::sync::{
     mpsc::{
         self,
-        error::{
-            SendError,
-            TryRecvError,
-        },
+        error::{SendError, TryRecvError},
         UnboundedReceiver,
         UnboundedSender,
     },
-    oneshot::{
-        self,
-        Receiver as OneshotReceiver,
-        Sender as OneshotSender,
-    },
+    oneshot::{self, Receiver as OneshotReceiver, Sender as OneshotSender},
 };
 
 pub use queue::*;
@@ -49,7 +37,7 @@ pub use queue::*;
 /// let source = ffmpeg("../audio/my-favourite-song.mp3")?;
 /// let (audio, audio_handle) = create_player(source);
 ///
-/// audio.volume(0.5); 
+/// audio.volume(0.5);
 ///
 /// handler.play_only(audio);
 ///
@@ -62,7 +50,6 @@ pub use queue::*;
 /// [`voice::create_player`]: fn.create_player.html
 #[derive(Debug)]
 pub struct Track {
-
     /// Whether or not this sound is currently playing.
     ///
     /// Can be controlled with [`play`] or [`pause`] if chaining is desired.
@@ -115,7 +102,11 @@ pub struct Track {
 }
 
 impl Track {
-    pub fn new(source: Input, commands: UnboundedReceiver<TrackCommand>, handle: TrackHandle) -> Self {
+    pub fn new(
+        source: Input,
+        commands: UnboundedReceiver<TrackCommand>,
+        handle: TrackHandle,
+    ) -> Self {
         Self {
             playing: Default::default(),
             volume: 1.0,
@@ -191,7 +182,7 @@ impl Track {
     /// [`loops`]: #structfield.loops
     pub fn set_loops(&mut self, loops: LoopState) -> &mut Self {
         self.loops = loops;
-        self   
+        self
     }
 
     pub(crate) fn do_loop(&mut self) -> bool {
@@ -231,35 +222,58 @@ impl Track {
                     match cmd {
                         Play => {
                             self.play();
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Mode(self.playing),
+                            ));
                         },
                         Pause => {
                             self.pause();
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Mode(self.playing),
+                            ));
                         },
                         Stop => {
                             self.stop();
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Mode(self.playing)));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Mode(self.playing),
+                            ));
                         },
                         Volume(vol) => {
                             self.set_volume(vol);
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Volume(self.volume)));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Volume(self.volume),
+                            ));
                         },
                         Seek(time) => {
                             self.seek_time(time);
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Position(self.position)));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Position(self.position),
+                            ));
                         },
                         AddEvent(evt) => {
                             let _ = ic.events.send(EventMessage::AddTrackEvent(index, evt));
                         },
                         Do(action) => {
                             action(self);
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Total(self.state())));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Total(self.state()),
+                            ));
                         },
-                        Request(tx) => {let _ = tx.send(Box::new(self.state()));},
+                        Request(tx) => {
+                            let _ = tx.send(Box::new(self.state()));
+                        },
                         Loop(loops) => {
                             self.set_loops(loops);
-                            let _ = ic.events.send(EventMessage::ChangeState(index, TrackStateChange::Loops(self.loops, true)));
+                            let _ = ic.events.send(EventMessage::ChangeState(
+                                index,
+                                TrackStateChange::Loops(self.loops, true),
+                            ));
                         },
                     }
                 },
@@ -472,7 +486,8 @@ impl TrackHandle {
     ///
     /// [`Track`]: struct.Track.html
     pub fn action<F>(&self, action: F) -> TrackResult
-        where F: FnOnce(&mut Track) + Send + Sync + 'static
+    where
+        F: FnOnce(&mut Track) + Send + Sync + 'static,
     {
         self.send(TrackCommand::Do(Box::new(action)))
     }
@@ -483,8 +498,7 @@ impl TrackHandle {
     /// It is up to the user when or how this should be read from the returned channel.
     pub fn get_info(&self) -> TrackQueryResult {
         let (tx, rx) = oneshot::channel();
-        self.send(TrackCommand::Request(tx))
-            .map(move |_| rx)
+        self.send(TrackCommand::Request(tx)).map(move |_| rx)
     }
 
     // Set an audio track to loop indefinitely.
@@ -564,19 +578,23 @@ pub enum TrackCommand {
 }
 
 impl std::fmt::Debug for TrackCommand {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(),std::fmt::Error> {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
         use TrackCommand::*;
-        write!(f, "TrackCommand::{}", match self {
-            Play => "Play".to_string(),
-            Pause => "Pause".to_string(),
-            Stop => "Stop".to_string(),
-            Volume(vol) => format!("Volume({})", vol),
-            Seek(d) => format!("Seek({:?})", d),
-            AddEvent(evt) => format!("AddEvent({:?})", evt),
-            Do(_f) => "Do([function])".to_string(),
-            Request(tx) => format!("Request({:?})", tx),
-            Loop(loops) => format!("Loop({:?})", loops),
-        })
+        write!(
+            f,
+            "TrackCommand::{}",
+            match self {
+                Play => "Play".to_string(),
+                Pause => "Pause".to_string(),
+                Stop => "Stop".to_string(),
+                Volume(vol) => format!("Volume({})", vol),
+                Seek(d) => format!("Seek({:?})", d),
+                AddEvent(evt) => format!("AddEvent({:?})", evt),
+                Do(_f) => "Do([function])".to_string(),
+                Request(tx) => format!("Request({:?})", tx),
+                Loop(loops) => format!("Loop({:?})", loops),
+            }
+        )
     }
 }
 

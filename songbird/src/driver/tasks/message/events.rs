@@ -1,15 +1,6 @@
 use crate::{
-    events::{
-        CoreContext,
-        EventData,
-        EventStore,
-    },
-    tracks::{
-        LoopState,
-        PlayMode,
-        TrackHandle,
-        TrackState,
-    },
+    events::{CoreContext, EventData, EventStore},
+    tracks::{LoopState, PlayMode, TrackHandle, TrackState},
 };
 use std::time::Duration;
 

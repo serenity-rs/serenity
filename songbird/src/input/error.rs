@@ -1,9 +1,6 @@
 use audiopus::Error as OpusError;
 use serde_json::{Error as JsonError, Value};
-use std::{
-    io::Error as IoError,
-    process::Output
-};
+use std::{io::Error as IoError, process::Output};
 use streamcatcher::CatcherError;
 
 /// An error returned from the voice module.
@@ -11,7 +8,7 @@ use streamcatcher::CatcherError;
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
-	Dca(DcaError),
+    Dca(DcaError),
 
     Io(IoError),
 
@@ -41,23 +38,33 @@ pub enum Error {
 }
 
 impl From<CatcherError> for Error {
-    fn from(e: CatcherError) -> Self { Error::Streamcatcher(e) }
+    fn from(e: CatcherError) -> Self {
+        Error::Streamcatcher(e)
+    }
 }
 
 impl From<DcaError> for Error {
-    fn from(e: DcaError) -> Self { Error::Dca(e) }
+    fn from(e: DcaError) -> Self {
+        Error::Dca(e)
+    }
 }
 
 impl From<IoError> for Error {
-    fn from(e: IoError) -> Error { Error::Io(e) }
+    fn from(e: IoError) -> Error {
+        Error::Io(e)
+    }
 }
 
 impl From<JsonError> for Error {
-    fn from(e: JsonError) -> Self { Error::Json(e) }
+    fn from(e: JsonError) -> Self {
+        Error::Json(e)
+    }
 }
 
 impl From<OpusError> for Error {
-    fn from(e: OpusError) -> Error { Error::Opus(e) }
+    fn from(e: OpusError) -> Error {
+        Error::Opus(e)
+    }
 }
 
 /// An error returned from the `dca` method.

@@ -1,27 +1,13 @@
-use async_trait::async_trait;
 use crate::{
     driver::Driver,
-    events::{
-        Event,
-        EventContext,
-        EventData,
-        EventHandler,
-        TrackEvent,
-    },
+    events::{Event, EventContext, EventData, EventHandler, TrackEvent},
     input::Input,
-    tracks::{
-        self,
-        Track,
-        TrackHandle,
-        TrackResult,
-    },
+    tracks::{self, Track, TrackHandle, TrackResult},
 };
-use tracing::{info, warn};
+use async_trait::async_trait;
 use parking_lot::Mutex;
-use std::{
-    collections::VecDeque,
-    sync::Arc,
-};
+use std::{collections::VecDeque, sync::Arc};
+use tracing::{info, warn};
 
 #[derive(Default)]
 /// A simple queue for several audio sources, designed to
@@ -35,7 +21,7 @@ use std::{
 /// This code is trivial to extend if extra functionality is needed.
 ///
 /// # Example
-/// 
+///
 /// ```rust,ignore
 /// use serenity::model::id::GuildId;
 /// use serenity::voice::{Call, LockedAudio, ffmpeg, create_player};
@@ -94,7 +80,6 @@ impl EventHandler for QueueHandler {
         let mut keep_looking = true;
         while keep_looking && !inner.tracks.is_empty() {
             if let Some(new) = inner.tracks.front() {
-
                 keep_looking = new.play().is_err();
 
                 // Discard files which cannot be used for whatever reason.
@@ -114,7 +99,7 @@ impl TrackQueue {
         Self {
             inner: Arc::new(Mutex::new(TrackQueueCore {
                 tracks: VecDeque::new(),
-            }))
+            })),
         }
     }
 
@@ -140,13 +125,12 @@ impl TrackQueue {
             track.pause();
         }
 
-        track.events.as_mut()
+        track
+            .events
+            .as_mut()
             .expect("[Voice] Queue inspecting EventStore on new Track: did not exist.")
             .add_event(
-                EventData::new(
-                    Event::Track(TrackEvent::End),
-                    QueueHandler { remote_lock },
-                ),
+                EventData::new(Event::Track(TrackEvent::End), QueueHandler { remote_lock }),
                 track.position,
             );
 
@@ -214,6 +198,8 @@ impl TrackQueueCore {
     fn stop_current(&self) -> TrackResult {
         if let Some(handle) = self.tracks.front() {
             handle.stop()
-        } else { Ok(()) }
+        } else {
+            Ok(())
+        }
     }
 }

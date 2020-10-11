@@ -2,55 +2,33 @@ use super::{
     error::{Error, Result},
     message::*,
 };
-use audiopus::{
-    Channels,
-    coder::Decoder as OpusDecoder,
-};
 use crate::{
     constants::*,
-    events::{
-        CoreContext,
-    },
+    events::CoreContext,
     model::{
         payload::{Heartbeat, Speaking},
         Event as GatewayEvent,
-        SpeakingState
+        SpeakingState,
     },
     timer::Timer,
     ws::{ReceiverExt, SenderExt, WsStream},
 };
+use audiopus::{coder::Decoder as OpusDecoder, Channels};
 use discortp::{
-    demux::{
-        self,
-        DemuxedMut,
-    },
+    demux::{self, DemuxedMut},
     discord::MutableKeepalivePacket,
-    rtp::{
-        RtpExtensionPacket,
-        RtpPacket,
-    },
+    rtp::{RtpExtensionPacket, RtpPacket},
     FromPacket,
     MutablePacket,
     Packet,
     PacketSize,
 };
-use flume::{
-    Receiver,
-    TryRecvError,
-};
-use tracing::{error, info, trace, warn};
+use flume::{Receiver, TryRecvError};
 use rand::random;
 use std::collections::HashMap;
-use tokio::{
-    net::udp::RecvHalf,
-};
-use xsalsa20poly1305::{
-    aead::AeadInPlace,
-    TAG_SIZE,
-    Nonce,
-    Tag,
-    XSalsa20Poly1305 as Cipher,
-};
+use tokio::net::udp::RecvHalf;
+use tracing::{error, info, trace, warn};
+use xsalsa20poly1305::{aead::AeadInPlace, Nonce, Tag, XSalsa20Poly1305 as Cipher, TAG_SIZE};
 
 #[derive(Debug)]
 struct SsrcState {
@@ -71,12 +49,16 @@ impl SsrcState {
         Self {
             silent_frame_count: 5, // We do this to make the first speech packet fire an event.
             decoder: OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)
-                .expect("[Voice] Failed to create new Opus decoder for source.",),
+                .expect("[Voice] Failed to create new Opus decoder for source."),
             last_seq: pkt.get_sequence().into(),
         }
     }
 
-    fn process(&mut self, pkt: RtpPacket<'_>, data_offset: usize) -> Result<(SpeakingDelta, Vec<i16>)> {
+    fn process(
+        &mut self,
+        pkt: RtpPacket<'_>,
+        data_offset: usize,
+    ) -> Result<(SpeakingDelta, Vec<i16>)> {
         let new_seq: u16 = pkt.get_sequence().into();
 
         let extensions = pkt.get_extension() != 0;
@@ -87,12 +69,14 @@ impl SsrcState {
         } else {
             self.last_seq = new_seq;
             let missed_packets = seq_delta.saturating_sub(1);
-            let (audio, pkt_size) = self.scan_and_decode(&pkt.payload()[data_offset..], extensions, missed_packets)?;
+            let (audio, pkt_size) =
+                self.scan_and_decode(&pkt.payload()[data_offset..], extensions, missed_packets)?;
 
             let delta = if pkt_size == SILENT_FRAME.len() {
                 // Frame is silent.
                 let old = self.silent_frame_count;
-                self.silent_frame_count = self.silent_frame_count.saturating_add(1 + missed_packets);
+                self.silent_frame_count =
+                    self.silent_frame_count.saturating_add(1 + missed_packets);
 
                 if self.silent_frame_count >= 5 && old < 5 {
                     SpeakingDelta::Stop
@@ -114,7 +98,12 @@ impl SsrcState {
         })
     }
 
-    fn scan_and_decode(&mut self, data: &[u8], extension: bool, missed_packets: u16) -> Result<(Vec<i16>, usize)> {
+    fn scan_and_decode(
+        &mut self,
+        data: &[u8],
+        extension: bool,
+        missed_packets: u16,
+    ) -> Result<(Vec<i16>, usize)> {
         let mut out = vec![0; STEREO_FRAME_SIZE];
         let start = if extension {
             RtpExtensionPacket::new(data)
@@ -134,7 +123,9 @@ impl SsrcState {
             }
         }
 
-        let audio_len = self.decoder.decode(Some(&data[start..]), &mut out[..], false)
+        let audio_len = self
+            .decoder
+            .decode(Some(&data[start..]), &mut out[..], false)
             .map_err(|e| {
                 error!("[Voice] Failed to decode received packet: {:?}.", e);
                 e
@@ -231,19 +222,21 @@ impl AuxNetwork {
                     },
                     Ok(AuxPacketMessage::SetKeepalive(keepalive)) => {
                         self.ws_keepalive_time = Timer::new(keepalive as u64);
-                    }
+                    },
                     Ok(AuxPacketMessage::Speaking(is_speaking)) => {
                         if self.speaking.contains(SpeakingState::MICROPHONE) != is_speaking {
-                            self.speaking.set(SpeakingState::MICROPHONE, is_speaking);    
+                            self.speaking.set(SpeakingState::MICROPHONE, is_speaking);
                             if let Some(client) = self.ws_client.as_mut() {
                                 info!("[Aux] Changing to {:?}", self.speaking);
 
-                                let ssu_status = client.send_json(&GatewayEvent::from(Speaking {
-                                    delay: Some(0),
-                                    speaking: self.speaking,
-                                    ssrc: self.ssrc,
-                                    user_id: None,
-                                })).await;
+                                let ssu_status = client
+                                    .send_json(&GatewayEvent::from(Speaking {
+                                        delay: Some(0),
+                                        speaking: self.speaking,
+                                        ssrc: self.ssrc,
+                                        user_id: None,
+                                    }))
+                                    .await;
 
                                 ws_error |= match ssu_status {
                                     Err(e) => {
@@ -254,14 +247,14 @@ impl AuxNetwork {
                                 }
                             }
                         }
-                    }
+                    },
                     Err(TryRecvError::Disconnected) | Ok(AuxPacketMessage::Poison) => {
                         break 'aux_runner;
                     },
                     Err(_) => {
                         // No message.
                         break;
-                    }
+                    },
                 }
             }
 
@@ -280,31 +273,34 @@ impl AuxNetwork {
                 let nonce = random::<u64>();
                 self.last_heartbeat_nonce = Some(nonce);
                 trace!("[Aux] Sent heartbeat {:?}", self.speaking);
-                ws.send_json(&GatewayEvent::from(Heartbeat {nonce})).await?;
+                ws.send_json(&GatewayEvent::from(Heartbeat { nonce }))
+                    .await?;
                 self.ws_keepalive_time.increment();
             }
 
             // FIXME: need to propagate WS disconnection back to main thread to trigger reconnect.
             // FIXME: makw this one big grand select
 
-            while let Ok(Ok(Some(value))) = tokio::time::timeout(TIMESTEP_LENGTH / 2, ws.try_recv_json()).await {
+            while let Ok(Ok(Some(value))) =
+                tokio::time::timeout(TIMESTEP_LENGTH / 2, ws.try_recv_json()).await
+            {
                 match value {
                     GatewayEvent::Speaking(ev) => {
                         info!("[Aux] speak update");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
-                            CoreContext::SpeakingStateUpdate(ev)
+                            CoreContext::SpeakingStateUpdate(ev),
                         ));
                     },
                     GatewayEvent::ClientConnect(ev) => {
                         info!("[Aux] connect");
-                        let _ = interconnect.events.send(EventMessage::FireCoreEvent(
-                            CoreContext::ClientConnect(ev)
-                        ));
+                        let _ = interconnect
+                            .events
+                            .send(EventMessage::FireCoreEvent(CoreContext::ClientConnect(ev)));
                     },
                     GatewayEvent::ClientDisconnect(ev) => {
                         info!("[Aux] discon");
                         let _ = interconnect.events.send(EventMessage::FireCoreEvent(
-                            CoreContext::ClientDisconnect(ev)
+                            CoreContext::ClientDisconnect(ev),
                         ));
                     },
                     GatewayEvent::HeartbeatAck(ev) => {
@@ -312,7 +308,10 @@ impl AuxNetwork {
                             if ev.nonce == nonce {
                                 info!("[Voice] Heartbeat ACK received.");
                             } else {
-                                warn!("[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.", nonce, ev.nonce);
+                                warn!(
+                                    "[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.",
+                                    nonce, ev.nonce
+                                );
                             }
                         }
                     },
@@ -330,13 +329,21 @@ impl AuxNetwork {
         // Panics should be avoided due to adversarial nature of rx'd packets,
         // but correct handling should not prompt a reconnect.
         if let Some(udp) = self.udp_socket.as_mut() {
-            while let Ok(Ok((len, _addr))) = tokio::time::timeout(TIMESTEP_LENGTH / 2,udp.recv_from(&mut self.packet_buffer[..])).await {
+            while let Ok(Ok((len, _addr))) = tokio::time::timeout(
+                TIMESTEP_LENGTH / 2,
+                udp.recv_from(&mut self.packet_buffer[..]),
+            )
+            .await
+            {
                 if !self.should_parse {
                     continue;
                 }
 
                 let packet = &mut self.packet_buffer[..len];
-                let cipher = self.cipher.as_ref().expect("[Voice] Tried to decrypt without a valid key.");
+                let cipher = self
+                    .cipher
+                    .as_ref()
+                    .expect("[Voice] Tried to decrypt without a valid key.");
 
                 match demux::demux_mut(packet) {
                     DemuxedMut::Rtp(mut rtp) => {
@@ -345,17 +352,17 @@ impl AuxNetwork {
                             continue;
                         }
 
-                        let rtp_body_start = decrypt_in_place(
-                            &mut rtp,
-                            cipher,
-                        ).expect("[Voice] RTP decryption failed.");
+                        let rtp_body_start = decrypt_in_place(&mut rtp, cipher)
+                            .expect("[Voice] RTP decryption failed.");
 
-                        let entry = self.decoder_map.entry(rtp.get_ssrc())
-                            .or_insert_with(
-                                || SsrcState::new(rtp.to_immutable()),
-                            );
+                        let entry = self
+                            .decoder_map
+                            .entry(rtp.get_ssrc())
+                            .or_insert_with(|| SsrcState::new(rtp.to_immutable()));
 
-                        if let Ok((delta, audio)) = entry.process(rtp.to_immutable(), rtp_body_start) {
+                        if let Ok((delta, audio)) =
+                            entry.process(rtp.to_immutable(), rtp_body_start)
+                        {
                             match delta {
                                 SpeakingDelta::Start => {
                                     let _ = interconnect.events.send(EventMessage::FireCoreEvent(
@@ -388,10 +395,7 @@ impl AuxNetwork {
                         }
                     },
                     DemuxedMut::Rtcp(mut rtcp) => {
-                        let rtcp_body_start = decrypt_in_place(
-                            &mut rtcp,
-                            cipher,
-                        );
+                        let rtcp_body_start = decrypt_in_place(&mut rtcp, cipher);
 
                         if let Ok(start) = rtcp_body_start {
                             let _ = interconnect.events.send(EventMessage::FireCoreEvent(
@@ -406,10 +410,10 @@ impl AuxNetwork {
                     },
                     DemuxedMut::FailedParse(t) => {
                         warn!("[Voice] Failed to parse message of type {:?}.", t);
-                    }
+                    },
                     _ => {
                         warn!("[Voice] Illegal UDP packet from voice server.");
-                    }
+                    },
                 }
             }
         }
@@ -428,19 +432,18 @@ fn decrypt_in_place(packet: &mut impl MutablePacket, cipher: &Cipher) -> Result<
     // In future, might want to make a choice...
     let header_len = packet.packet().len() - packet.payload().len();
     let mut nonce = Nonce::default();
-    nonce[..header_len]
-        .copy_from_slice(&packet.packet()[..header_len]);
+    nonce[..header_len].copy_from_slice(&packet.packet()[..header_len]);
 
     let data = packet.payload_mut();
     let (tag_bytes, data_bytes) = data.split_at_mut(TAG_SIZE);
     let tag = Tag::from_slice(tag_bytes);
 
-    Ok(cipher.decrypt_in_place_detached(&nonce, b"", data_bytes, tag)
+    Ok(cipher
+        .decrypt_in_place_detached(&nonce, b"", data_bytes, tag)
         .map(|_| TAG_SIZE)?)
 }
 
 #[inline]
 fn rtp_valid(packet: RtpPacket<'_>) -> bool {
-    packet.get_version() == RTP_VERSION
-        && packet.get_payload_type() == RTP_PROFILE_TYPE
+    packet.get_version() == RTP_VERSION && packet.get_payload_type() == RTP_PROFILE_TYPE
 }

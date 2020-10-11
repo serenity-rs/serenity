@@ -1,9 +1,6 @@
 pub mod error;
 
-use super::{
-    tasks::message::*,
-    CryptoMode,
-};
+use super::{tasks::message::*, CryptoMode};
 use crate::{
     constants::*,
     model::{
@@ -21,20 +18,14 @@ use discortp::discord::{
     MutableKeepalivePacket,
 };
 use error::{Error, Result};
-use tracing::{debug, info};
-use std::{
-    net::IpAddr,
-    str::FromStr,
-};
+use std::{net::IpAddr, str::FromStr};
 use tokio::{
-    time::{timeout_at, Elapsed, Instant},
     net::UdpSocket,
+    time::{timeout_at, Elapsed, Instant},
 };
+use tracing::{debug, info};
 use url::Url;
-use xsalsa20poly1305::{
-    aead::NewAead,
-    XSalsa20Poly1305 as Cipher,
-};
+use xsalsa20poly1305::{aead::NewAead, XSalsa20Poly1305 as Cipher};
 
 #[cfg(all(feature = "rustls", not(feature = "native")))]
 use ws::create_rustls_client;
@@ -47,7 +38,10 @@ pub(crate) struct Connection {
 }
 
 impl Connection {
-    pub(crate) async fn new(mut info: ConnectionInfo, interconnect: &Interconnect) -> Result<Connection> {
+    pub(crate) async fn new(
+        mut info: ConnectionInfo,
+        interconnect: &Interconnect,
+    ) -> Result<Connection> {
         let url = generate_url(&mut info.endpoint)?;
 
         #[cfg(all(feature = "rustls", not(feature = "native")))]
@@ -59,12 +53,14 @@ impl Connection {
         let mut hello = None;
         let mut ready = None;
 
-        client.send_json(&GatewayEvent::from(Identify {
-            server_id: info.guild_id.into(),
-            session_id: info.session_id.clone(),
-            token: info.token.clone(),
-            user_id: info.user_id.into(),
-        })).await?;
+        client
+            .send_json(&GatewayEvent::from(Identify {
+                server_id: info.guild_id.into(),
+                session_id: info.session_id.clone(),
+                token: info.token.clone(),
+                user_id: info.user_id.into(),
+            }))
+            .await?;
 
         loop {
             let value = match client.recv_json().await? {
@@ -75,7 +71,7 @@ impl Connection {
             match value {
                 GatewayEvent::Ready(r) => {
                     ready = Some(r);
-                    if hello.is_some(){
+                    if hello.is_some() {
                         break;
                     }
                 },
@@ -91,10 +87,12 @@ impl Connection {
                     return Err(Error::ExpectedHandshake);
                 },
             }
-        };
+        }
 
-        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
-        let ready = ready.expect("[Voice] Ready packet expected in connection initialisation, but not found.");
+        let hello = hello
+            .expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+        let ready = ready
+            .expect("[Voice] Ready packet expected in connection initialisation, but not found.");
 
         if !has_valid_mode(&ready.modes, CryptoMode::Normal) {
             return Err(Error::CryptoModeUnavailable);
@@ -106,11 +104,10 @@ impl Connection {
         // Follow Discord's IP Discovery procedures, in case NAT tunnelling is needed.
         let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
         {
-            let mut view = MutableIpDiscoveryPacket::new(&mut bytes[..])
-                .expect(
-                    "[Voice] Too few bytes in 'bytes' for IPDiscovery packet.\
-                    (Blame: IpDiscoveryPacket::const_packet_size()?)"
-                );
+            let mut view = MutableIpDiscoveryPacket::new(&mut bytes[..]).expect(
+                "[Voice] Too few bytes in 'bytes' for IPDiscovery packet.\
+                    (Blame: IpDiscoveryPacket::const_packet_size()?)",
+            );
             view.set_pkt_type(IpDiscoveryType::Request);
             view.set_length(70);
             view.set_ssrc(ready.ssrc);
@@ -130,7 +127,8 @@ impl Connection {
             // We could do something clever like binary search,
             // but possibility of UDP spoofing preclueds us from
             // making the assumption we can find a "left edge" of '\0's.
-            let nul_byte_index = view.get_address_raw()
+            let nul_byte_index = view
+                .get_address_raw()
                 .iter()
                 .position(|&b| b == 0)
                 .ok_or(Error::IllegalIp)?;
@@ -138,17 +136,21 @@ impl Connection {
             let address_str = std::str::from_utf8(&view.get_address_raw()[..nul_byte_index])
                 .map_err(|_| Error::IllegalIp)?;
 
-            let address = IpAddr::from_str(&address_str)
-                .map_err(|e| {println!("{:?}", e); Error::IllegalIp})?;
+            let address = IpAddr::from_str(&address_str).map_err(|e| {
+                println!("{:?}", e);
+                Error::IllegalIp
+            })?;
 
-            client.send_json(&GatewayEvent::from(SelectProtocol {
-                protocol: "udp".into(),
-                data: ProtocolData {
-                    address,
-                    mode: CryptoMode::Normal.to_request_str().into(),
-                    port: view.get_port(),
-                },
-            })).await?;
+            client
+                .send_json(&GatewayEvent::from(SelectProtocol {
+                    protocol: "udp".into(),
+                    data: ProtocolData {
+                        address,
+                        mode: CryptoMode::Normal.to_request_str().into(),
+                        port: view.get_port(),
+                    },
+                }))
+                .await?;
         }
 
         let cipher = init_cipher(&mut client).await?;
@@ -178,7 +180,7 @@ impl Connection {
             loop {
                 use UdpMessage::*;
                 match timeout_at(ka_time, udp_msg_rx.recv_async()).await {
-                    Err(Elapsed{..}) => {
+                    Err(Elapsed { .. }) => {
                         info!("[Voice] Sending UDP Keepalive.");
                         let _ = udp_tx.send(&keepalive_bytes[..]).await;
                         ka_time += UDP_KEEPALIVE_GAP;
@@ -195,22 +197,32 @@ impl Connection {
             info!("[Voice] UDP handle stopped.");
         });
 
-        interconnect.aux_packets.send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
-        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
-        interconnect.aux_packets.send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
-        interconnect.aux_packets.send(AuxPacketMessage::Udp(udp_rx))?;
-        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::Udp(udp_rx))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::Ws(Box::new(client)))?;
 
-        let mix_conn = MixerConnection{
+        let mix_conn = MixerConnection {
             cipher,
             udp: udp_msg_tx,
         };
 
-        interconnect.mixer.send(MixerMessage::SetConn(mix_conn, ready.ssrc))?;
+        interconnect
+            .mixer
+            .send(MixerMessage::SetConn(mix_conn, ready.ssrc))?;
 
-        Ok(Connection {
-            info,
-        })
+        Ok(Connection { info })
     }
 
     pub async fn reconnect(&mut self, interconnect: &Interconnect) -> Result<()> {
@@ -225,11 +237,13 @@ impl Connection {
         #[cfg(feature = "native")]
         let mut client = create_native_tls_client(url).await?;
 
-        client.send_json(&GatewayEvent::from(Resume {
-            server_id: self.info.guild_id.into(),
-            session_id: self.info.session_id.clone(),
-            token: self.info.token.clone(),
-        })).await?;
+        client
+            .send_json(&GatewayEvent::from(Resume {
+                server_id: self.info.guild_id.into(),
+                session_id: self.info.session_id.clone(),
+                token: self.info.token.clone(),
+            }))
+            .await?;
 
         let mut hello = None;
         let mut resumed = None;
@@ -243,7 +257,7 @@ impl Connection {
             match value {
                 GatewayEvent::Resumed => {
                     resumed = Some(());
-                    if hello.is_some(){
+                    if hello.is_some() {
                         break;
                     }
                 },
@@ -259,12 +273,17 @@ impl Connection {
                     return Err(Error::ExpectedHandshake);
                 },
             }
-        };
+        }
 
-        let hello = hello.expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+        let hello = hello
+            .expect("[Voice] Hello packet expected in connection initialisation, but not found.");
 
-        interconnect.aux_packets.send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
-        interconnect.aux_packets.send(AuxPacketMessage::Ws(Box::new(client)))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
+        interconnect
+            .aux_packets
+            .send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         info!("[Voice] Reconnected to: {}", &self.info.endpoint);
         Ok(())
@@ -317,9 +336,10 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
 }
 
 #[inline]
-fn has_valid_mode<T, It> (modes: It, mode: CryptoMode) -> bool
-where T: for<'a> PartialEq<&'a str>,
-      It : IntoIterator<Item=T>
+fn has_valid_mode<T, It>(modes: It, mode: CryptoMode) -> bool
+where
+    T: for<'a> PartialEq<&'a str>,
+    It: IntoIterator<Item = T>,
 {
     modes.into_iter().any(|s| s == mode.to_request_str())
 }

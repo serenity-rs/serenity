@@ -1,27 +1,17 @@
 //! Events relating to tracks, timing, and other callers.
-use async_trait::async_trait;
 use crate::{
     constants::*,
-    model::payload::{Speaking, ClientConnect, ClientDisconnect},
-    tracks::{
-        PlayMode,
-        TrackHandle,
-        TrackState,
-    },
+    model::payload::{ClientConnect, ClientDisconnect, Speaking},
+    tracks::{PlayMode, TrackHandle, TrackState},
 };
-use discortp::{
-    rtcp::Rtcp,
-    rtp::Rtp,
-};
-use tracing::info;
+use async_trait::async_trait;
+use discortp::{rtcp::Rtcp, rtp::Rtp};
 use std::{
     cmp::Ordering,
-    collections::{
-        BinaryHeap,
-        HashMap,
-    },
+    collections::{BinaryHeap, HashMap},
     time::Duration,
 };
+use tracing::info;
 
 /// Information about which tracks or data fired an event.
 ///
@@ -47,10 +37,7 @@ pub enum EventContext<'a> {
     /// Speaking state transition, describing whether a given source has started/stopped
     /// transmitting. This fires in response to a silent burst, or the first packet
     /// breaking such a burst.
-    SpeakingUpdate {
-        ssrc: u32,
-        speaking: bool,
-    },
+    SpeakingUpdate { ssrc: u32, speaking: bool },
 
     /// Opus audio packet, received from another stream (detailed in `packet`).
     /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
@@ -104,14 +91,25 @@ impl<'a> CoreContext {
 
         match self {
             SpeakingStateUpdate(evt) => EventContext::SpeakingStateUpdate(*evt),
-            SpeakingUpdate {ssrc, speaking} => EventContext::SpeakingUpdate {
-                ssrc: *ssrc, speaking: *speaking
+            SpeakingUpdate { ssrc, speaking } => EventContext::SpeakingUpdate {
+                ssrc: *ssrc,
+                speaking: *speaking,
             },
-            VoicePacket {audio, packet, payload_offset} => EventContext::VoicePacket {
-                audio, packet, payload_offset: *payload_offset
+            VoicePacket {
+                audio,
+                packet,
+                payload_offset,
+            } => EventContext::VoicePacket {
+                audio,
+                packet,
+                payload_offset: *payload_offset,
             },
-            RtcpPacket {packet, payload_offset} => EventContext::RtcpPacket {
-                packet, payload_offset: *payload_offset
+            RtcpPacket {
+                packet,
+                payload_offset,
+            } => EventContext::RtcpPacket {
+                packet,
+                payload_offset: *payload_offset,
             },
             ClientConnect(evt) => EventContext::ClientConnect(*evt),
             ClientDisconnect(evt) => EventContext::ClientDisconnect(*evt),
@@ -124,12 +122,12 @@ impl EventContext<'_> {
         use EventContext::*;
 
         match self {
-            SpeakingStateUpdate{ .. } => Some(CoreEvent::SpeakingStateUpdate),
-            SpeakingUpdate{ .. } => Some(CoreEvent::SpeakingUpdate),
-            VoicePacket{ .. } => Some(CoreEvent::VoicePacket),
-            RtcpPacket{ .. } => Some(CoreEvent::RtcpPacket),
-            ClientConnect{ .. } => Some(CoreEvent::ClientConnect),
-            ClientDisconnect{ .. } => Some(CoreEvent::ClientDisconnect),
+            SpeakingStateUpdate { .. } => Some(CoreEvent::SpeakingStateUpdate),
+            SpeakingUpdate { .. } => Some(CoreEvent::SpeakingUpdate),
+            VoicePacket { .. } => Some(CoreEvent::VoicePacket),
+            RtcpPacket { .. } => Some(CoreEvent::RtcpPacket),
+            ClientConnect { .. } => Some(CoreEvent::ClientConnect),
+            ClientDisconnect { .. } => Some(CoreEvent::ClientDisconnect),
             _ => None,
         }
     }
@@ -213,7 +211,7 @@ pub enum CoreEvent {
     /// Fired on receipt of a speaking state update from another host.
     ///
     /// Note: this will fire when a user starts speaking for the first time,
-    /// or changes their capabilities. 
+    /// or changes their capabilities.
     SpeakingStateUpdate,
 
     /// Fires when a source starts speaking, or stops speaking
@@ -335,8 +333,12 @@ impl EventData {
 }
 
 impl std::fmt::Debug for EventData {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(),std::fmt::Error> {
-        write!(f, "Event {{ event: {:?}, fire_time: {:?}, action: <fn> }}", self.event, self.fire_time)
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
+        write!(
+            f,
+            "Event {{ event: {:?}, fire_time: {:?}, action: <fn> }}",
+            self.event, self.fire_time
+        )
     }
 }
 
@@ -344,8 +346,14 @@ impl std::fmt::Debug for EventData {
 impl Ord for EventData {
     fn cmp(&self, other: &Self) -> Ordering {
         if self.fire_time.is_some() && other.fire_time.is_some() {
-            let t1 = self.fire_time.as_ref().expect("T1 known to be well-defined by above.");
-            let t2 = other.fire_time.as_ref().expect("T2 known to be well-defined by above.");
+            let t1 = self
+                .fire_time
+                .as_ref()
+                .expect("T1 known to be well-defined by above.");
+            let t2 = other
+                .fire_time
+                .as_ref()
+                .expect("T2 known to be well-defined by above.");
 
             t1.cmp(&t2)
         } else {
@@ -408,12 +416,14 @@ impl EventStore {
         use Event::*;
         match evt.event {
             Core(c) => {
-                self.untimed.entry(c.into())
+                self.untimed
+                    .entry(c.into())
                     .or_insert_with(Vec::new)
                     .push(evt);
             },
             Track(t) => {
-                self.untimed.entry(t.into())
+                self.untimed
+                    .entry(t.into())
                     .or_insert_with(Vec::new)
                     .push(evt);
             },
@@ -429,10 +439,18 @@ impl EventStore {
     /// Processes all events due up to and including `now`.
     pub(crate) async fn process_timed(&mut self, now: Duration, ctx: EventContext<'_>) {
         while let Some(evt) = self.timed.peek() {
-            if evt.fire_time.as_ref().expect("Timed event must have a fire_time.") > &now {
+            if evt
+                .fire_time
+                .as_ref()
+                .expect("Timed event must have a fire_time.")
+                > &now
+            {
                 break;
             }
-            let mut evt = self.timed.pop().expect("Can only succeed due to peek = Some(...).");
+            let mut evt = self
+                .timed
+                .pop()
+                .expect("Can only succeed due to peek = Some(...).");
 
             let old_evt_type = evt.event;
             if let Some(new_evt_type) = evt.action.act(&ctx).await {
@@ -446,7 +464,12 @@ impl EventStore {
     }
 
     /// Processes all events attached to the given track event.
-    pub(crate) async fn process_untimed(&mut self, now: Duration, untimed_event: UntimedEvent, ctx: EventContext<'_>) {
+    pub(crate) async fn process_untimed(
+        &mut self,
+        now: Duration,
+        untimed_event: UntimedEvent,
+        ctx: EventContext<'_>,
+    ) {
         // move a Vec in and out: not too expensive, but could be better.
         // Although it's obvious that moving an event out of one vec and into
         // another necessitates that they be different event types, thus entries,
@@ -461,13 +484,16 @@ impl EventStore {
                 // Only remove/readd if the event type changes (i.e., Some AND new != old)
                 if let Some(new_evt_type) = evt.action.act(&ctx).await {
                     if evt.event == new_evt_type {
-
                         let mut evt = events.remove(i);
 
                         evt.event = new_evt_type;
                         self.add_event(evt, now);
-                    } else { i += 1; }
-                } else { i += 1; };
+                    } else {
+                        i += 1;
+                    }
+                } else {
+                    i += 1;
+                };
             }
             self.untimed.insert(untimed_event, events);
         }
@@ -491,8 +517,7 @@ impl GlobalEvents {
     }
 
     pub(crate) fn fire_track_event(&mut self, evt: TrackEvent, index: usize) {
-        let holder = self.awaiting_tick.entry(evt)
-            .or_insert_with(Vec::new);
+        let holder = self.awaiting_tick.entry(evt).or_insert_with(Vec::new);
 
         holder.push(index);
     }
@@ -505,19 +530,25 @@ impl GlobalEvents {
     ) {
         // Global timed events
         self.time += TIMESTEP_LENGTH;
-        self.store.process_timed(self.time, EventContext::Track(&[])).await;
+        self.store
+            .process_timed(self.time, EventContext::Track(&[]))
+            .await;
 
         // Local timed events
         for (i, state) in states.iter_mut().enumerate() {
             if state.playing == PlayMode::Play {
                 state.step_frame();
 
-                let event_store = events.get_mut(i)
+                let event_store = events
+                    .get_mut(i)
                     .expect("[Voice] Missing store index for Tick (local timed).");
-                let handle = handles.get_mut(i)
+                let handle = handles
+                    .get_mut(i)
                     .expect("[Voice] Missing handle index for Tick (local timed).");
 
-                event_store.process_timed(state.play_time, EventContext::Track(&[(&state, &handle)])).await;
+                event_store
+                    .process_timed(state.play_time, EventContext::Track(&[(&state, &handle)]))
+                    .await;
             }
         }
 
@@ -530,24 +561,44 @@ impl GlobalEvents {
 
             // Local untimed track events.
             for &i in indices.iter() {
-                let event_store = events.get_mut(i)
+                let event_store = events
+                    .get_mut(i)
                     .expect("[Voice] Missing store index for Tick (local untimed).");
-                let handle = handles.get_mut(i)
+                let handle = handles
+                    .get_mut(i)
                     .expect("[Voice] Missing handle index for Tick (local untimed).");
-                let state = states.get_mut(i)
+                let state = states
+                    .get_mut(i)
                     .expect("[Voice] Missing state index for Tick (local untimed).");
 
-                event_store.process_untimed(state.position, untimed, EventContext::Track(&[(&state, &handle)])).await;
+                event_store
+                    .process_untimed(
+                        state.position,
+                        untimed,
+                        EventContext::Track(&[(&state, &handle)]),
+                    )
+                    .await;
             }
 
             // Global untimed track events.
             if self.store.untimed.contains_key(&untimed) && !indices.is_empty() {
-                let global_ctx: Vec<(&TrackState, &TrackHandle)> = indices.iter().map(|i| (
-                    states.get(*i).expect("[Voice] Missing state index for Tick (global untimed)"),
-                    handles.get(*i).expect("[Voice] Missing handle index for Tick (global untimed)"),
-                )).collect();
+                let global_ctx: Vec<(&TrackState, &TrackHandle)> = indices
+                    .iter()
+                    .map(|i| {
+                        (
+                            states
+                                .get(*i)
+                                .expect("[Voice] Missing state index for Tick (global untimed)"),
+                            handles
+                                .get(*i)
+                                .expect("[Voice] Missing handle index for Tick (global untimed)"),
+                        )
+                    })
+                    .collect();
 
-                self.store.process_untimed(self.time, untimed, EventContext::Track(&global_ctx[..])).await
+                self.store
+                    .process_untimed(self.time, untimed, EventContext::Track(&global_ctx[..]))
+                    .await
             }
         }
 

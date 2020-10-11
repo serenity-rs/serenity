@@ -1,14 +1,7 @@
 use super::message::*;
 use crate::{
-    events::{
-        EventStore,
-        GlobalEvents,
-        TrackEvent,
-    },
-    tracks::{
-        TrackHandle,
-        TrackState,
-    },
+    events::{EventStore, GlobalEvents, TrackEvent},
+    tracks::{TrackHandle, TrackState},
 };
 use flume::Receiver;
 use tracing::{debug, info, trace};
@@ -30,16 +23,19 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
             Ok(AddTrackEvent(i, data)) => {
                 info!("[Voice] Adding event to track {}.", i);
 
-                let event_store = events.get_mut(i)
-                    .expect("[Voice] Event thread was given an illegal store index for AddTrackEvent.");
-                let state = states.get_mut(i)
-                    .expect("[Voice] Event thread was given an illegal state index for AddTrackEvent.");
+                let event_store = events.get_mut(i).expect(
+                    "[Voice] Event thread was given an illegal store index for AddTrackEvent.",
+                );
+                let state = states.get_mut(i).expect(
+                    "[Voice] Event thread was given an illegal state index for AddTrackEvent.",
+                );
 
                 event_store.add_event(data, state.position);
             },
             Ok(FireCoreEvent(ctx)) => {
                 let ctx = ctx.to_user_context();
-                let evt = ctx.to_core_event()
+                let evt = ctx
+                    .to_core_event()
                     .expect("[Voice] Event thread was passed a non-core event in FireCoreEvent.");
 
                 trace!("[Voice] Firing core event {:?}.", evt);
@@ -57,10 +53,14 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                 use TrackStateChange::*;
 
                 let max_states = states.len();
-                debug!("[Voice] Changing state for track {} of {}: {:?}", i, max_states, change);
+                debug!(
+                    "[Voice] Changing state for track {} of {}: {:?}",
+                    i, max_states, change
+                );
 
-                let state = states.get_mut(i)
-                    .expect("[Voice] Event thread was given an illegal state index for ChangeState.");
+                let state = states.get_mut(i).expect(
+                    "[Voice] Event thread was given an illegal state index for ChangeState.",
+                );
 
                 match change {
                     Mode(mode) => {
@@ -70,7 +70,9 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                             global.fire_track_event(TrackEvent::End, i);
                         }
                     },
-                    Volume(vol) => {state.volume = vol;},
+                    Volume(vol) => {
+                        state.volume = vol;
+                    },
                     Position(pos) => {
                         // Currently, only Tick should fire time events.
                         state.position = pos;
@@ -88,7 +90,11 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                 }
             },
             Ok(RemoveTrack(i)) => {
-                info!("[Voice] Event state for track {} of {} removed.", i, events.len());
+                info!(
+                    "[Voice] Event state for track {} of {} removed.",
+                    i,
+                    events.len()
+                );
 
                 events.remove(i);
                 states.remove(i);

@@ -7,13 +7,7 @@ mod events;
 mod mixer;
 mod udp;
 
-pub(crate) use self::{
-	aux_network::*,
-	core::*,
-	events::*,
-	mixer::*,
-	udp::*,
-};
+pub(crate) use self::{aux_network::*, core::*, events::*, mixer::*, udp::*};
 
 use tracing::info;
 
@@ -43,7 +37,7 @@ impl Interconnect {
 
     pub fn restart_volatile_internals(&mut self, guild_id: GuildId) {
         self.poison();
-        
+
         let (evt_tx, evt_rx) = flume::unbounded();
         let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
 
@@ -59,12 +53,17 @@ impl Interconnect {
 
         let ic = self.clone();
         tokio::spawn(async move {
-            info!("[Voice] Network processor restarted for guild: {}", guild_id);
+            info!(
+                "[Voice] Network processor restarted for guild: {}",
+                guild_id
+            );
             super::aux_network::runner(ic, pkt_aux_rx).await;
             info!("[Voice] Network processor finished for guild: {}", guild_id);
         });
 
         // Make mixer aware of new targets...
-        let _ = self.mixer.send(MixerMessage::ReplaceInterconnect(self.clone()));
+        let _ = self
+            .mixer
+            .send(MixerMessage::ReplaceInterconnect(self.clone()));
     }
 }

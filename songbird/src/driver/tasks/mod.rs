@@ -8,11 +8,7 @@ use crate::{
     driver::connection::{error::Error as ConnectionError, Connection},
     model::id::GuildId,
 };
-use flume::{
-    Receiver,
-    Sender,
-    RecvError,
-};
+use flume::{Receiver, RecvError, Sender};
 use message::*;
 use tracing::{error, info, warn};
 
@@ -107,7 +103,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
             },
             Ok(CoreMessage::AddEvent(evt)) => {
                 let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));
-            }
+            },
             Ok(CoreMessage::Mute(m)) => {
                 let _ = interconnect.mixer.send(MixerMessage::SetMute(m));
             },
@@ -137,8 +133,15 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                     };
 
                     if full_connect {
-                        connection = Connection::new(info, &interconnect).await
-                            .map_err(|e| {error!("[Voice] Catastrophic connection failure. Stopping. {:?}", e); e})
+                        connection = Connection::new(info, &interconnect)
+                            .await
+                            .map_err(|e| {
+                                error!(
+                                    "[Voice] Catastrophic connection failure. Stopping. {:?}",
+                                    e
+                                );
+                                e
+                            })
                             .ok();
                     }
                 }

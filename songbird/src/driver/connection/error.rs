@@ -1,8 +1,5 @@
 use crate::{
-    driver::tasks::{
-        error::Recipient,
-        message::*,
-    },
+    driver::tasks::{error::Recipient, message::*},
     ws::Error as WsError,
 };
 use flume::SendError;
@@ -38,31 +35,45 @@ pub enum Error {
 }
 
 impl From<CryptoError> for Error {
-    fn from(e: CryptoError) -> Self { Error::Crypto(e) }
+    fn from(e: CryptoError) -> Self {
+        Error::Crypto(e)
+    }
 }
 
 impl From<IoError> for Error {
-    fn from(e: IoError) -> Error { Error::Io(e) }
+    fn from(e: IoError) -> Error {
+        Error::Io(e)
+    }
 }
 
 impl From<JsonError> for Error {
-    fn from(e: JsonError) -> Error { Error::Json(e) }
+    fn from(e: JsonError) -> Error {
+        Error::Json(e)
+    }
 }
 
 impl From<SendError<AuxPacketMessage>> for Error {
-    fn from(_e: SendError<AuxPacketMessage>) -> Error { Error::InterconnectFailure(Recipient::AuxNetwork) }
+    fn from(_e: SendError<AuxPacketMessage>) -> Error {
+        Error::InterconnectFailure(Recipient::AuxNetwork)
+    }
 }
 
 impl From<SendError<EventMessage>> for Error {
-    fn from(_e: SendError<EventMessage>) -> Error { Error::InterconnectFailure(Recipient::Event) }
+    fn from(_e: SendError<EventMessage>) -> Error {
+        Error::InterconnectFailure(Recipient::Event)
+    }
 }
 
 impl From<SendError<MixerMessage>> for Error {
-    fn from(_e: SendError<MixerMessage>) -> Error { Error::InterconnectFailure(Recipient::Mixer) }
+    fn from(_e: SendError<MixerMessage>) -> Error {
+        Error::InterconnectFailure(Recipient::Mixer)
+    }
 }
 
 impl From<WsError> for Error {
-    fn from(e: WsError) -> Error { Error::Ws(e) }
+    fn from(e: WsError) -> Error {
+        Error::Ws(e)
+    }
 }
 
 impl fmt::Display for Error {
@@ -75,7 +86,8 @@ impl fmt::Display for Error {
             CryptoModeUnavailable => write!(f, "server did not offer chosen encryption mode."),
             EndpointUrl => write!(f, "endpoint URL received from gateway was invalid."),
             ExpectedHandshake => write!(f, "voice initialisation protocol was violated."),
-            IllegalDiscoveryResponse => write!(f, "IP discovery/NAT punching response was invalid."),
+            IllegalDiscoveryResponse =>
+                write!(f, "IP discovery/NAT punching response was invalid."),
             IllegalIp => write!(f, "IP discovery/NAT punching response had bad IP value."),
             Io(i) => write!(f, "I/O failure ({}).", i),
             Json(j) => write!(f, "JSON (de)serialization issue ({}).", j),

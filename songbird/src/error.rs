@@ -25,20 +25,12 @@ impl fmt::Display for JoinError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "Failed to Join Voice channel: ")?;
         match self {
-            JoinError::NoSender => {
-                write!(f, "no gateway destination.")
-            },
-            JoinError::NoCall => {
-                write!(f, "tried to leave a non-existent call.")
-            },
+            JoinError::NoSender => write!(f, "no gateway destination."),
+            JoinError::NoCall => write!(f, "tried to leave a non-existent call."),
             #[cfg(feature = "serenity")]
-            JoinError::Serenity(t) => {
-                write!(f, "serenity failure {}.", t)
-            },
+            JoinError::Serenity(t) => write!(f, "serenity failure {}.", t),
             #[cfg(feature = "twilight")]
-            JoinError::Twilight(t) => {
-                write!(f, "twilight failure {}.", t)
-            },
+            JoinError::Twilight(t) => write!(f, "twilight failure {}.", t),
         }
     }
 }

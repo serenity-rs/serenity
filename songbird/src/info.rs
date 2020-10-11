@@ -44,12 +44,12 @@ impl ConnectionProgress {
                 c.session_id = session_id;
                 should_reconn
             },
-            Incomplete(i) => {
-                i.apply_state_update(session_id)
-                    .map(|info| {
-                        *self = Complete(info);
-                    }).is_some()
-            },
+            Incomplete(i) => i
+                .apply_state_update(session_id)
+                .map(|info| {
+                    *self = Complete(info);
+                })
+                .is_some(),
         }
     }
 
@@ -57,20 +57,19 @@ impl ConnectionProgress {
         use ConnectionProgress::*;
         match self {
             Complete(c) => {
-                let should_reconn = c.endpoint != endpoint
-                    || c.token != token;
+                let should_reconn = c.endpoint != endpoint || c.token != token;
 
                 c.endpoint = endpoint;
                 c.token = token;
 
                 should_reconn
             },
-            Incomplete(i) => {
-                i.apply_server_update(endpoint, token)
-                    .map(|info| {
-                        *self = Complete(info);
-                    }).is_some()
-            },
+            Incomplete(i) => i
+                .apply_server_update(endpoint, token)
+                .map(|info| {
+                    *self = Complete(info);
+                })
+                .is_some(),
         }
     }
 }

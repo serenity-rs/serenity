@@ -1,3 +1,5 @@
+#[cfg(feature = "driver")]
+use crate::driver::Error as DriverError;
 use crate::{
     error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
@@ -5,8 +7,6 @@ use crate::{
     Call,
     ConnectionInfo,
 };
-#[cfg(feature = "driver")]
-use crate::driver::Error as DriverError;
 #[cfg(feature = "serenity")]
 use async_trait::async_trait;
 use flume::Receiver;
@@ -18,10 +18,7 @@ use serenity::{
     client::bridge::voice::VoiceGatewayManager,
     gateway::InterMessage,
     model::{
-        id::{
-            GuildId as SerenityGuild,
-            UserId as SerenityUser,
-        },
+        id::{GuildId as SerenityGuild, UserId as SerenityUser},
         voice::VoiceState,
     },
 };
@@ -64,13 +61,14 @@ impl Songbird {
 
     #[cfg(feature = "twilight")]
     pub fn twilight<U>(cluster: Cluster, shard_count: u64, user_id: U) -> Arc<Self>
-        where U: Into<UserId>,
+    where
+        U: Into<UserId>,
     {
         Arc::new(Self {
             client_data: PRwLock::new(ClientData {
                 shard_count,
                 initialised: true,
-                user_id: user_id.into()
+                user_id: user_id.into(),
             }),
             calls: Default::default(),
             sharder: Sharder::Twilight(cluster),
@@ -101,18 +99,17 @@ impl Songbird {
         self.get(guild_id).unwrap_or_else(|| {
             let mut map_read = self.calls.write();
 
-            map_read.entry(guild_id)
+            map_read
+                .entry(guild_id)
                 .or_insert_with(|| {
                     let info = self.manager_info();
                     let shard = shard_id(guild_id.0, info.shard_count);
-                    let shard_handle = self.sharder.get_shard(shard)
+                    let shard_handle = self
+                        .sharder
+                        .get_shard(shard)
                         .expect("Failed to get shard handle: shard_count incorrect?");
 
-                    Arc::new(Mutex::new(Call::new(
-                        guild_id,
-                        shard_handle,
-                        info.user_id,
-                    )))
+                    Arc::new(Mutex::new(Call::new(guild_id, shard_handle, info.user_id)))
                 })
                 .clone()
         })
@@ -147,8 +144,18 @@ impl Songbird {
     /// [`Call`]: struct.Call.html
     /// [`get`]: #method.get
     #[inline]
-    pub async fn join<C, G>(&self, guild_id: G, channel_id: C) -> (Arc<Mutex<Call>>, JoinResult<Receiver<Result<(), DriverError>>>)
-        where C: Into<ChannelId>, G: Into<GuildId> {
+    pub async fn join<C, G>(
+        &self,
+        guild_id: G,
+        channel_id: C,
+    ) -> (
+        Arc<Mutex<Call>>,
+        JoinResult<Receiver<Result<(), DriverError>>>,
+    )
+    where
+        C: Into<ChannelId>,
+        G: Into<GuildId>,
+    {
         self._join(guild_id.into(), channel_id.into()).await
     }
 
@@ -157,7 +164,10 @@ impl Songbird {
         &self,
         guild_id: GuildId,
         channel_id: ChannelId,
-    ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<Result<(), DriverError>>>) {
+    ) -> (
+        Arc<Mutex<Call>>,
+        JoinResult<Receiver<Result<(), DriverError>>>,
+    ) {
         let call = self.get_or_insert_call(guild_id);
 
         let result = {
@@ -174,8 +184,15 @@ impl Songbird {
     /// This method returns the handle and the connection info needed for other libraries
     /// or drivers, such as lavalink, and does not actually start or run a voice call.
     #[inline]
-    pub async fn join_gateway<C, G>(&self, guild_id: G, channel_id: C) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionInfo>>)
-        where C: Into<ChannelId>, G: Into<GuildId> {
+    pub async fn join_gateway<C, G>(
+        &self,
+        guild_id: G,
+        channel_id: C,
+    ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionInfo>>)
+    where
+        C: Into<ChannelId>,
+        G: Into<GuildId>,
+    {
         self._join_gateway(guild_id.into(), channel_id.into()).await
     }
 
@@ -246,9 +263,7 @@ impl Songbird {
     pub async fn process(&self, event: &TwilightEvent) {
         match event {
             TwilightEvent::VoiceServerUpdate(v) => {
-                let call = v.guild_id
-                    .map(GuildId::from)
-                    .and_then(|id| self.get(id));
+                let call = v.guild_id.map(GuildId::from).and_then(|id| self.get(id));
 
                 if let Some(call) = call {
                     let mut handler = call.lock().await;
@@ -262,9 +277,7 @@ impl Songbird {
                     return;
                 }
 
-                let call = v.0.guild_id
-                    .map(GuildId::from)
-                    .and_then(|id| self.get(id));
+                let call = v.0.guild_id.map(GuildId::from).and_then(|id| self.get(id));
 
                 if let Some(call) = call {
                     let mut handler = call.lock().await;
@@ -313,4 +326,6 @@ impl VoiceGatewayManager for Songbird {
 }
 
 #[inline]
-fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }
+fn shard_id(guild_id: u64, shard_count: u64) -> u64 {
+    (guild_id >> 22) % shard_count
+}

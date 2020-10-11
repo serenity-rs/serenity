@@ -1,9 +1,6 @@
 use super::{Interconnect, UdpMessage};
 
-use crate::{
-    tracks::Track,
-    Bitrate,
-};
+use crate::{tracks::Track, Bitrate};
 use flume::Sender;
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 

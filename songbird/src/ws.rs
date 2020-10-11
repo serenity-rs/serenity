@@ -6,15 +6,11 @@
 use crate::model::Event;
 
 use async_trait::async_trait;
-use async_tungstenite::{
-    tokio::ConnectStream,
-    tungstenite::Message,
-    WebSocketStream,
-};
-use serde_json::Error as JsonError;
-use tracing::{warn, instrument};
+use async_tungstenite::{tokio::ConnectStream, tungstenite::Message, WebSocketStream};
 use futures::{SinkExt, StreamExt, TryStreamExt};
+use serde_json::Error as JsonError;
 use tokio::time::timeout;
+use tracing::{instrument, warn};
 
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 
@@ -40,30 +36,32 @@ pub enum Error {
 }
 
 impl From<JsonError> for Error {
-    fn from(e: JsonError) -> Error { Error::Json(e) }
+    fn from(e: JsonError) -> Error {
+        Error::Json(e)
+    }
 }
 
 #[cfg(all(feature = "rustls", not(feature = "native")))]
 impl From<RustlsError> for Error {
-    fn from(e: RustlsError) -> Error { Error::Tls(e) }
+    fn from(e: RustlsError) -> Error {
+        Error::Tls(e)
+    }
 }
 
 impl From<TungsteniteError> for Error {
-    fn from(e: TungsteniteError) -> Error { Error::Ws(e) }
+    fn from(e: TungsteniteError) -> Error {
+        Error::Ws(e)
+    }
 }
 
+use futures::stream::SplitSink;
 #[cfg(all(feature = "rustls", not(feature = "native")))]
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-    },
+    fmt::{Display, Formatter, Result as FmtResult},
     io::Error as IoError,
 };
 use url::Url;
-use futures::stream::SplitSink;
 
 #[async_trait]
 pub trait ReceiverExt {
@@ -120,17 +118,12 @@ impl SenderExt for WsStream {
 #[inline]
 pub(crate) fn convert_ws_message(message: Option<Message>) -> Result<Option<Event>> {
     Ok(match message {
-        Some(Message::Text(payload)) => {
+        Some(Message::Text(payload)) =>
             serde_json::from_str(&payload).map(Some).map_err(|why| {
-                warn!(
-                    "Err deserializing text: {:?}; text: {}",
-                    why,
-                    payload,
-                );
+                warn!("Err deserializing text: {:?}; text: {}", why, payload,);
 
                 why
-            })?
-        },
+            })?,
         Some(Message::Binary(bytes)) => {
             return Err(Error::UnexpectedBinaryMessage(bytes));
         },
@@ -164,7 +157,8 @@ impl From<IoError> for RustlsError {
 impl Display for RustlsError {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
-            RustlsError::HandshakeError => f.write_str("TLS handshake failed when making the websocket connection"),
+            RustlsError::HandshakeError =>
+                f.write_str("TLS handshake failed when making the websocket connection"),
             RustlsError::Io(inner) => Display::fmt(&inner, f),
         }
     }
@@ -189,9 +183,10 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
             max_message_size: None,
             max_frame_size: None,
             max_send_queue: None,
-        }))
-        .await
-        .map_err(|_| RustlsError::HandshakeError)?;
+        }),
+    )
+    .await
+    .map_err(|_| RustlsError::HandshakeError)?;
 
     Ok(stream)
 }
@@ -205,8 +200,9 @@ pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
             max_message_size: None,
             max_frame_size: None,
             max_send_queue: None,
-        }))
-        .await?;
+        }),
+    )
+    .await?;
 
     Ok(stream)
 }

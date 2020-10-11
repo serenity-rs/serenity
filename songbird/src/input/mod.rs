@@ -7,10 +7,7 @@ pub mod utils;
 
 use crate::constants::*;
 use audiopus::{
-    coder::{
-        Decoder as OpusDecoder,
-        GenericCtl,
-    },
+    coder::{Decoder as OpusDecoder, GenericCtl},
     Channels,
     Error as OpusError,
 };
@@ -23,13 +20,9 @@ use parking_lot::Mutex;
 use serde_json::Value;
 use std::{
     convert::TryFrom,
-    fs::File,
     ffi::OsStr,
-    fmt::{
-        Debug,
-        Error as FormatError,
-        Formatter,
-    },
+    fmt::{Debug, Error as FormatError, Formatter},
+    fs::File,
     io::{
         self,
         BufReader,
@@ -47,11 +40,7 @@ use std::{
     time::Duration,
 };
 use streamcatcher::{Catcher, TxCatcher};
-use tokio::{
-    fs::File as TokioFile,
-    io::AsyncReadExt,
-    process::Command as TokioCommand,
-};
+use tokio::{fs::File as TokioFile, io::AsyncReadExt, process::Command as TokioCommand};
 use tracing::{debug, error};
 
 /// Type of data being passed into an [`Input`].
@@ -83,9 +72,7 @@ impl TryFrom<CodecType> for Codec {
         use CodecType::*;
 
         match f {
-            Opus => Ok(Codec::Opus(
-                OpusDecoderState::new()?
-            )),
+            Opus => Ok(Codec::Opus(OpusDecoderState::new()?)),
             Pcm => Ok(Codec::Pcm),
             FloatPcm => Ok(Codec::FloatPcm),
         }
@@ -133,7 +120,10 @@ pub struct OpusDecoderState {
 
 impl OpusDecoderState {
     pub fn new() -> StdResult<Self, OpusError> {
-        Ok(Self::from_decoder(OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)?))
+        Ok(Self::from_decoder(OpusDecoder::new(
+            SAMPLE_RATE,
+            Channels::Stereo,
+        )?))
     }
 
     pub fn from_decoder(decoder: OpusDecoder) -> Self {
@@ -159,16 +149,23 @@ pub struct Frame {
 #[derive(Clone, Copy, Debug)]
 pub enum Container {
     Raw,
-    Dca{ first_frame: usize },
+    Dca { first_frame: usize },
 }
 
 impl Container {
-    pub fn next_frame_length(&mut self, mut reader: impl Read, input: CodecType) -> IoResult<Frame> {
+    pub fn next_frame_length(
+        &mut self,
+        mut reader: impl Read,
+        input: CodecType,
+    ) -> IoResult<Frame> {
         use Container::*;
 
         match self {
-            Raw => Ok(Frame{header_len: 0, frame_len: input.sample_len()}),
-            Dca{ .. } => reader.read_i16::<LittleEndian>().map(|frame_len| Frame {
+            Raw => Ok(Frame {
+                header_len: 0,
+                frame_len: input.sample_len(),
+            }),
+            Dca { .. } => reader.read_i16::<LittleEndian>().map(|frame_len| Frame {
                 header_len: mem::size_of::<i16>(),
                 frame_len: frame_len.max(0) as usize,
             }),
@@ -200,12 +197,10 @@ impl Container {
 pub struct ChildContainer(Child);
 
 fn child_to_reader<T>(child: Child) -> Reader {
-    Reader::Pipe(
-        BufReader::with_capacity(
-            STEREO_FRAME_SIZE * mem::size_of::<T>() * CHILD_BUFFER_LEN,
-            ChildContainer(child),
-        )
-    )
+    Reader::Pipe(BufReader::with_capacity(
+        STEREO_FRAME_SIZE * mem::size_of::<T>() * CHILD_BUFFER_LEN,
+        ChildContainer(child),
+    ))
 }
 
 impl From<Child> for Reader {
@@ -221,7 +216,7 @@ impl Read for ChildContainer {
 }
 
 impl Drop for ChildContainer {
-    fn drop (&mut self) {
+    fn drop(&mut self) {
         if let Err(e) = self.0.kill() {
             debug!("[Voice] Error awaiting child process: {:?}", e);
         }
@@ -279,7 +274,8 @@ impl Seek for Reader {
         match self {
             Pipe(_) | Extension(_) => Err(IoError::new(
                 IoErrorKind::InvalidInput,
-                "Seeking not supported on Reader of this type.")),
+                "Seeking not supported on Reader of this type.",
+            )),
             Memory(a) => Seek::seek(a, pos),
             Compressed(a) => Seek::seek(a, pos),
             File(a) => Seek::seek(a, pos),
@@ -301,9 +297,7 @@ impl Debug for Reader {
             Extension(_) => "Extension".to_string(),
             ExtensionSeek(_) => "ExtensionSeek".to_string(),
         };
-        f.debug_tuple("Reader")
-            .field(&field)
-            .finish()
+        f.debug_tuple("Reader").field(&field).finish()
     }
 }
 
@@ -327,11 +321,11 @@ impl Seek for dyn ReadSeek {
 }
 
 impl<R: Read + Seek> ReadSeek for R {
-    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize>{
+    fn read(&mut self, buf: &mut [u8]) -> IoResult<usize> {
         Read::read(self, buf)
     }
 
-    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64>{
+    fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
         Seek::seek(self, pos)
     }
 }
@@ -355,9 +349,7 @@ impl Metadata {
     /// Extract metadata and details from the output of
     /// `ffprobe`.
     pub fn from_ffprobe_json(value: &Value) -> Self {
-        let format = value
-            .as_object()
-            .and_then(|m| m.get("format"));
+        let format = value.as_object().and_then(|m| m.get("format"));
 
         let duration = format
             .and_then(|m| m.get("duration"))
@@ -371,8 +363,7 @@ impl Metadata {
             .and_then(|v| v.parse::<f64>().ok())
             .map(Duration::from_secs_f64);
 
-        let tags = format
-            .and_then(|m| m.get("tags"));
+        let tags = format.and_then(|m| m.get("tags"));
 
         let title = tags
             .and_then(|m| m.get("title"))
@@ -393,11 +384,10 @@ impl Metadata {
             .as_object()
             .and_then(|m| m.get("streams"))
             .and_then(|v| v.as_array())
-            .and_then(|v|
-                v.iter().find(|line|
-                    line.get("codec_type").and_then(Value::as_str) == Some("audio")
-                )
-            );
+            .and_then(|v| {
+                v.iter()
+                    .find(|line| line.get("codec_type").and_then(Value::as_str) == Some("audio"))
+            });
 
         let channels = stream
             .and_then(|m| m.get("channels"))
@@ -443,11 +433,11 @@ impl Metadata {
             .and_then(Value::as_str)
             .map(str::to_string);
 
-        let title = track.or_else(|| obj
-            .and_then(|m| m.get("title"))
-            .and_then(Value::as_str)
-            .map(str::to_string)
-        );
+        let title = track.or_else(|| {
+            obj.and_then(|m| m.get("title"))
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        });
 
         let artist = obj
             .and_then(|m| m.get("artist"))
@@ -459,11 +449,11 @@ impl Metadata {
             .and_then(Value::as_str)
             .map(str::to_string);
 
-        let date = r_date.or_else(|| obj
-            .and_then(|m| m.get("upload_date"))
-            .and_then(Value::as_str)
-            .map(str::to_string)
-        );
+        let date = r_date.or_else(|| {
+            obj.and_then(|m| m.get("upload_date"))
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        });
 
         let duration = obj
             .and_then(|m| m.get("duration"))
@@ -523,7 +513,13 @@ impl Input {
         }
     }
 
-    pub fn new(stereo: bool, reader: Reader, kind: Codec, container: Container, metadata: Option<Metadata>) -> Self {
+    pub fn new(
+        stereo: bool,
+        reader: Reader,
+        kind: Codec,
+        container: Container,
+        metadata: Option<Metadata>,
+    ) -> Self {
         Input {
             metadata: metadata.unwrap_or_default(),
             stereo,
@@ -574,8 +570,8 @@ impl Input {
                 if matches!(self.container, Container::Raw) {
                     return Err(IoError::new(
                         IoErrorKind::InvalidInput,
-                        "Raw container cannot demarcate Opus frames.")
-                    );
+                        "Raw container cannot demarcate Opus frames.",
+                    ));
                 }
 
                 if ignore_decode {
@@ -583,7 +579,8 @@ impl Input {
                     // then we must decode to make sure the next starting offset is correct.
 
                     // Step one: use up the remainder of the frame.
-                    let mut aud_skipped = decoder_state.current_frame.len() - decoder_state.frame_pos;
+                    let mut aud_skipped =
+                        decoder_state.current_frame.len() - decoder_state.frame_pos;
 
                     decoder_state.frame_pos = 0;
                     decoder_state.current_frame.truncate(0);
@@ -592,12 +589,13 @@ impl Input {
                     while buffer.len() - aud_skipped >= STEREO_FRAME_BYTE_SIZE {
                         decoder_state.should_reset = true;
 
-                        let frame = self.container.next_frame_length(&mut self.reader, CodecType::Opus)?;
+                        let frame = self
+                            .container
+                            .next_frame_length(&mut self.reader, CodecType::Opus)?;
                         self.reader.consume(frame.frame_len);
 
                         aud_skipped += STEREO_FRAME_BYTE_SIZE;
                     }
-                    
 
                     Ok(aud_skipped)
                 } else {
@@ -606,18 +604,30 @@ impl Input {
                         let mut decoder = decoder_state.decoder.lock();
 
                         if decoder_state.should_reset {
-                            decoder.reset_state().expect("Critical failure resetting decoder.");
+                            decoder
+                                .reset_state()
+                                .expect("Critical failure resetting decoder.");
                             decoder_state.should_reset = false;
                         }
-                        let frame = self.container.next_frame_length(&mut self.reader, CodecType::Opus)?;
-                        
+                        let frame = self
+                            .container
+                            .next_frame_length(&mut self.reader, CodecType::Opus)?;
+
                         let mut opus_data_buffer = [0u8; 4000];
 
-                        decoder_state.current_frame.resize(decoder_state.current_frame.capacity(), 0.0);
+                        decoder_state
+                            .current_frame
+                            .resize(decoder_state.current_frame.capacity(), 0.0);
 
-                        let seen = Read::read(&mut self.reader, &mut opus_data_buffer[..frame.frame_len])?;
+                        let seen =
+                            Read::read(&mut self.reader, &mut opus_data_buffer[..frame.frame_len])?;
 
-                        let samples = decoder.decode_float(Some(&opus_data_buffer[..seen]), &mut decoder_state.current_frame[..], false)
+                        let samples = decoder
+                            .decode_float(
+                                Some(&opus_data_buffer[..seen]),
+                                &mut decoder_state.current_frame[..],
+                                false,
+                            )
                             .unwrap_or(0);
 
                         decoder_state.current_frame.truncate(2 * samples);
@@ -650,12 +660,13 @@ impl Input {
                 }
                 Ok(written_floats * mem::size_of::<f32>())
             },
-            Codec::FloatPcm => {
-                Read::read(&mut self.reader, buffer)
-            },
+            Codec::FloatPcm => Read::read(&mut self.reader, buffer),
         };
 
-        out.map(|v| {self.pos += v; v})
+        out.map(|v| {
+            self.pos += v;
+            v
+        })
     }
 
     fn cheap_consume(&mut self, count: usize) -> IoResult<usize> {
@@ -676,7 +687,7 @@ impl Input {
 
     pub(crate) fn supports_passthrough(&self) -> bool {
         match &self.kind {
-            Codec::Opus(state) => { state.allow_passthrough },
+            Codec::Opus(state) => state.allow_passthrough,
             _ => false,
         }
     }
@@ -691,10 +702,13 @@ impl Input {
             state.current_frame.truncate(0);
 
             // step 2: read new header.
-            let frame = self.container.next_frame_length(&mut self.reader, CodecType::Opus)?;
+            let frame = self
+                .container
+                .next_frame_length(&mut self.reader, CodecType::Opus)?;
 
             // step 3: read in bytes.
-            self.reader.read_exact(&mut buffer[..frame.frame_len])
+            self.reader
+                .read_exact(&mut buffer[..frame.frame_len])
                 .map(|_| {
                     self.pos += STEREO_FRAME_BYTE_SIZE;
                     frame.frame_len
@@ -702,7 +716,8 @@ impl Input {
         } else {
             Err(IoError::new(
                 IoErrorKind::InvalidInput,
-                "Frame passthrough not supported for this file."))
+                "Frame passthrough not supported for this file.",
+            ))
         }
     }
 }
@@ -717,45 +732,64 @@ impl Seek for Input {
     fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
         let mut target = self.pos;
         match pos {
-            SeekFrom::Start(pos) => {target = pos as usize;},
-            SeekFrom::Current(rel) => {target = target.wrapping_add(rel as usize);},
+            SeekFrom::Start(pos) => {
+                target = pos as usize;
+            },
+            SeekFrom::Current(rel) => {
+                target = target.wrapping_add(rel as usize);
+            },
             SeekFrom::End(_pos) => unimplemented!(),
         }
 
         debug!("Seeking to {:?}", pos);
-        
+
         (if target == self.pos {
             Ok(0)
         } else if let Some(conversion) = self.container.try_seek_trivial(self.get_type()) {
             let inside_target = (target * conversion) / mem::size_of::<f32>();
-            Seek::seek(&mut self.reader, SeekFrom::Start(inside_target as u64))
-                .map(|inner_dest| {
-                    let outer_dest = ((inner_dest as usize) * mem::size_of::<f32>()) / conversion;
-                    self.pos = outer_dest;
-                    outer_dest
-                })
+            Seek::seek(&mut self.reader, SeekFrom::Start(inside_target as u64)).map(|inner_dest| {
+                let outer_dest = ((inner_dest as usize) * mem::size_of::<f32>()) / conversion;
+                self.pos = outer_dest;
+                outer_dest
+            })
         } else if target > self.pos {
             // seek in the next amount, disabling decoding if need be.
             let shift = target - self.pos;
             self.cheap_consume(shift)
         } else {
             // start from scratch, then seek in...
-            Seek::seek(&mut self.reader, SeekFrom::Start(self.container.input_start() as u64))?;
+            Seek::seek(
+                &mut self.reader,
+                SeekFrom::Start(self.container.input_start() as u64),
+            )?;
 
             self.cheap_consume(target)
-        }).map(|_| self.pos as u64)
+        })
+        .map(|_| self.pos as u64)
     }
 }
 
 /// Extension trait to pull frames of audio from a byte source.
 pub(crate) trait ReadAudioExt {
-    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], true_stereo: bool, volume: f32) -> Option<usize>;
+    fn add_float_pcm_frame(
+        &mut self,
+        float_buffer: &mut [f32; STEREO_FRAME_SIZE],
+        true_stereo: bool,
+        volume: f32,
+    ) -> Option<usize>;
 
-    fn consume(&mut self, amt: usize) -> usize where Self: Sized;
+    fn consume(&mut self, amt: usize) -> usize
+    where
+        Self: Sized;
 }
 
 impl<R: Read + Sized> ReadAudioExt for R {
-    fn add_float_pcm_frame(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], stereo: bool, volume: f32) -> Option<usize> {
+    fn add_float_pcm_frame(
+        &mut self,
+        float_buffer: &mut [f32; STEREO_FRAME_SIZE],
+        stereo: bool,
+        volume: f32,
+    ) -> Option<usize> {
         // IDEA: Read in 8 floats at a time, then use iterator code
         // to gently nudge the compiler into vectorising for us.
         // Max SIMD float32 lanes is 8 on AVX, older archs use a divisor of this
@@ -763,7 +797,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
         const SAMPLE_LEN: usize = mem::size_of::<f32>();
         let mut simd_float_bytes = [0u8; 8 * SAMPLE_LEN];
         let mut simd_float_buf = [0f32; 8];
-        
+
         let mut frame_pos = 0;
 
         // Code duplication here is because unifying these codepaths
@@ -772,18 +806,20 @@ impl<R: Read + Sized> ReadAudioExt for R {
             let mut max_bytes = STEREO_FRAME_BYTE_SIZE;
 
             while frame_pos < float_buffer.len() {
-                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
+                let progress = self
+                    .read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
                     .and_then(|byte_len| {
-                        let target = byte_len/SAMPLE_LEN;
+                        let target = byte_len / SAMPLE_LEN;
                         (&simd_float_bytes[..byte_len])
-                            .read_f32_into::<LittleEndian>(
-                                &mut simd_float_buf[..target]
-                            )
+                            .read_f32_into::<LittleEndian>(&mut simd_float_buf[..target])
                             .map(|_| target)
                     })
                     .map(|f32_len| {
                         let new_pos = frame_pos + f32_len;
-                        for (el, new_el) in float_buffer[frame_pos..new_pos].iter_mut().zip(&simd_float_buf[..f32_len]) {
+                        for (el, new_el) in float_buffer[frame_pos..new_pos]
+                            .iter_mut()
+                            .zip(&simd_float_buf[..f32_len])
+                        {
                             *el += volume * new_el;
                         }
                         (new_pos, f32_len)
@@ -798,32 +834,33 @@ impl<R: Read + Sized> ReadAudioExt for R {
                             break;
                         }
                     },
-                    Err(ref e) => {
+                    Err(ref e) =>
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(frame_pos)
                         } else {
                             error!("Input died unexpectedly: {:?}", e);
                             None
-                        }
-                    },
+                        },
                 }
             }
         } else {
             let mut max_bytes = MONO_FRAME_BYTE_SIZE;
 
             while frame_pos < float_buffer.len() {
-                let progress = self.read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
+                let progress = self
+                    .read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
                     .and_then(|byte_len| {
-                        let target = byte_len/SAMPLE_LEN;
+                        let target = byte_len / SAMPLE_LEN;
                         (&simd_float_bytes[..byte_len])
-                            .read_f32_into::<LittleEndian>(
-                                &mut simd_float_buf[..target]
-                            )
+                            .read_f32_into::<LittleEndian>(&mut simd_float_buf[..target])
                             .map(|_| target)
                     })
                     .map(|f32_len| {
                         let new_pos = frame_pos + (2 * f32_len);
-                        for (els, new_el) in float_buffer[frame_pos..new_pos].chunks_exact_mut(2).zip(&simd_float_buf[..f32_len]) {
+                        for (els, new_el) in float_buffer[frame_pos..new_pos]
+                            .chunks_exact_mut(2)
+                            .zip(&simd_float_buf[..f32_len])
+                        {
                             let sample = volume * new_el;
                             els[0] += sample;
                             els[1] += sample;
@@ -840,14 +877,13 @@ impl<R: Read + Sized> ReadAudioExt for R {
                             break;
                         }
                     },
-                    Err(ref e) => {
+                    Err(ref e) =>
                         return if e.kind() == IoErrorKind::UnexpectedEof {
                             Some(frame_pos)
                         } else {
                             error!("Input died unexpectedly: {:?}", e);
                             None
-                        }
-                    },
+                        },
                 }
             }
         }
@@ -867,21 +903,28 @@ pub async fn ffmpeg<P: AsRef<OsStr>>(path: P) -> Result<Input> {
 
 async fn _ffmpeg(path: &OsStr) -> Result<Input> {
     // Will fail if the path is not to a file on the fs. Likely a YouTube URI.
-    let is_stereo = is_stereo(path).await
+    let is_stereo = is_stereo(path)
+        .await
         .unwrap_or_else(|_e| (false, Default::default()));
     let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
-    _ffmpeg_optioned(path, &[], &[
-        "-f",
-        "s16le",
-        "-ac",
-        stereo_val,
-        "-ar",
-        "48000",
-        "-acodec",
-        "pcm_f32le",
-        "-",
-    ], Some(is_stereo)).await
+    _ffmpeg_optioned(
+        path,
+        &[],
+        &[
+            "-f",
+            "s16le",
+            "-ac",
+            stereo_val,
+            "-ar",
+            "48000",
+            "-acodec",
+            "pcm_f32le",
+            "-",
+        ],
+        Some(is_stereo),
+    )
+    .await
 }
 
 /// Opens an audio file through `ffmpeg` and creates an audio source, with
@@ -944,7 +987,13 @@ async fn _ffmpeg_optioned(
         .stdout(Stdio::piped())
         .spawn()?;
 
-    Ok(Input::new(is_stereo, child_to_reader::<f32>(command), Codec::FloatPcm, Container::Raw, Some(metadata)))
+    Ok(Input::new(
+        is_stereo,
+        child_to_reader::<f32>(command),
+        Codec::FloatPcm,
+        Container::Raw,
+        Some(metadata),
+    ))
 }
 
 /// Creates a streamed audio source from a DCA file.
@@ -954,14 +1003,13 @@ pub async fn dca<P: AsRef<OsStr>>(path: P) -> StdResult<Input, DcaError> {
 }
 
 async fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
-    let mut reader = TokioFile::open(path)
-        .await
-        .map_err(DcaError::IoError)?;
+    let mut reader = TokioFile::open(path).await.map_err(DcaError::IoError)?;
 
     let mut header = [0u8; 4];
 
     // Read in the magic number to verify it's a DCA file.
-    reader.read_exact(&mut header)
+    reader
+        .read_exact(&mut header)
         .await
         .map_err(DcaError::IoError)?;
 
@@ -969,7 +1017,9 @@ async fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
         return Err(DcaError::InvalidHeader);
     }
 
-    let size = reader.read_i32_le().await
+    let size = reader
+        .read_i32_le()
+        .await
         .map_err(|_| DcaError::InvalidHeader)?;
 
     // Sanity check
@@ -979,8 +1029,7 @@ async fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
 
     let mut raw_json = Vec::with_capacity(size as usize);
 
-    let mut json_reader = reader
-        .take(size as u64);
+    let mut json_reader = reader.take(size as u64);
 
     json_reader
         .read_to_end(&mut raw_json)
@@ -998,10 +1047,10 @@ async fn _dca(path: &OsStr) -> StdResult<Input, DcaError> {
     Ok(Input::new(
         stereo,
         Reader::File(reader),
-        Codec::Opus(
-            OpusDecoderState::new().map_err(DcaError::Opus)?
-        ),
-        Container::Dca{ first_frame: (size as usize) + mem::size_of::<i32>() + header.len() },
+        Codec::Opus(OpusDecoderState::new().map_err(DcaError::Opus)?),
+        Container::Dca {
+            first_frame: (size as usize) + mem::size_of::<i32>() + header.len(),
+        },
         Some(metadata),
     ))
 }
@@ -1021,7 +1070,7 @@ async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         "--ignore-config",
         uri,
         "-o",
-        "-"
+        "-",
     ];
 
     let ffmpeg_args = [
@@ -1057,17 +1106,31 @@ async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
 
     debug!("[Voice] ytdl metadata {:?}", metadata);
 
-    Ok(Input::new(true, child_to_reader::<f32>(ffmpeg), Codec::FloatPcm, Container::Raw, Some(metadata)))
+    Ok(Input::new(
+        true,
+        child_to_reader::<f32>(ffmpeg),
+        Codec::FloatPcm,
+        Container::Raw,
+        Some(metadata),
+    ))
 }
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
 /// Takes the first video listed from the YouTube search.
 pub async fn ytdl_search(name: &str) -> Result<Input> {
-    ytdl(&format!("ytsearch1:{}",name)).await
+    ytdl(&format!("ytsearch1:{}", name)).await
 }
 
 async fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
-    let args = ["-v", "quiet", "-of", "json", "-show_format", "-show_streams", "-i"];
+    let args = [
+        "-v",
+        "quiet",
+        "-of",
+        "json",
+        "-show_format",
+        "-show_streams",
+        "-i",
+    ];
 
     let out = TokioCommand::new("ffprobe")
         .args(&args)
@@ -1115,14 +1178,11 @@ pub struct Restartable {
 impl Restartable {
     /// Create a new source, which can be restarted using a `recreator` function.
     pub fn new(recreator: impl Restart + Send + 'static) -> Result<Self> {
-        recreator.call_restart(None)
-            .map(move |source| {
-                Self {
-                    position: 0,
-                    recreator: Box::new(recreator),
-                    source: Box::new(source),
-                }
-            })
+        recreator.call_restart(None).map(move |source| Self {
+            position: 0,
+            recreator: Box::new(recreator),
+            source: Box::new(source),
+        })
     }
 
     /// Create a new restartable ffmpeg source for a local file.
@@ -1139,7 +1199,7 @@ impl Restartable {
             if let Some(time) = time {
                 let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
 
-                executor::block_on(_ytdl(uri.as_ref(), &["-ss",&ts,]))
+                executor::block_on(_ytdl(uri.as_ref(), &["-ss", &ts]))
             } else {
                 executor::block_on(ytdl(uri.as_ref()))
             }
@@ -1151,7 +1211,7 @@ impl Restartable {
     /// The cost of restarting and seeking will probably be *very* high:
     /// expect a pause if you seek backwards.
     pub fn ytdl_search(name: &str) -> Result<Self> {
-       Self::ytdl(format!("ytsearch1:{}",name))
+        Self::ytdl(format!("ytsearch1:{}", name))
     }
 }
 
@@ -1160,47 +1220,52 @@ pub trait Restart {
 }
 
 struct FfmpegRestarter<P>
-    where P: AsRef<OsStr> + Send,
+where
+    P: AsRef<OsStr> + Send,
 {
     path: P,
 }
 
 impl<P> Restart for FfmpegRestarter<P>
-    where P: AsRef<OsStr> + Send,
+where
+    P: AsRef<OsStr> + Send,
 {
     fn call_restart(&self, time: Option<Duration>) -> Result<Input> {
         executor::block_on(async {
-        if let Some(time) = time {
+            if let Some(time) = time {
+                let is_stereo = is_stereo(self.path.as_ref())
+                    .await
+                    .unwrap_or_else(|_e| (false, Default::default()));
+                let stereo_val = if is_stereo.0 { "2" } else { "1" };
 
-            let is_stereo = is_stereo(self.path.as_ref()).await
-                .unwrap_or_else(|_e| (false, Default::default()));
-            let stereo_val = if is_stereo.0 { "2" } else { "1" };
-
-            let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
-            _ffmpeg_optioned(self.path.as_ref(), &[
-                "-ss",
-                &ts,
-                ],
-
-                &[
-                "-f",
-                "s16le",
-                "-ac",
-                stereo_val,
-                "-ar",
-                "48000",
-                "-acodec",
-                "pcm_f32le",
-                "-",
-            ], Some(is_stereo)).await
-        } else {
-            ffmpeg(self.path.as_ref()).await
-        }})
+                let ts = format!("{}.{}", time.as_secs(), time.subsec_millis());
+                _ffmpeg_optioned(
+                    self.path.as_ref(),
+                    &["-ss", &ts],
+                    &[
+                        "-f",
+                        "s16le",
+                        "-ac",
+                        stereo_val,
+                        "-ar",
+                        "48000",
+                        "-acodec",
+                        "pcm_f32le",
+                        "-",
+                    ],
+                    Some(is_stereo),
+                )
+                .await
+            } else {
+                ffmpeg(self.path.as_ref()).await
+            }
+        })
     }
 }
 
 impl<P> Restart for P
-    where P: Fn(Option<Duration>) -> Result<Input> + Send + 'static
+where
+    P: Fn(Option<Duration>) -> Result<Input> + Send + 'static,
 {
     fn call_restart(&self, time: Option<Duration>) -> Result<Input> {
         (&self)(time)
@@ -1223,20 +1288,16 @@ impl From<Restartable> for Input {
         let meta = Some(src.source.metadata.take());
         let stereo = src.source.stereo;
         let container = src.source.container;
-        Input::new(
-            stereo,
-            Reader::Restartable(src),
-            kind,
-            container,
-            meta,
-        )
+        Input::new(stereo, Reader::Restartable(src), kind, container, meta)
     }
 }
 
 impl Read for Restartable {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
-        Read::read(&mut self.source, buffer)
-            .map(|a| { self.position += a; a })
+        Read::read(&mut self.source, buffer).map(|a| {
+            self.position += a;
+            a
+        })
     }
 }
 
@@ -1254,9 +1315,9 @@ impl Seek for Restartable {
                 if offset < self.position {
                     // FIXME: don't unwrap
                     self.source = Box::new(
-                        self.recreator.call_restart(
-                            Some(utils::byte_count_to_timestamp(offset, stereo))
-                        ).unwrap()
+                        self.recreator
+                            .call_restart(Some(utils::byte_count_to_timestamp(offset, stereo)))
+                            .unwrap(),
                     );
                     self.position = offset;
                 } else {
@@ -1267,7 +1328,8 @@ impl Seek for Restartable {
             },
             End(_offset) => Err(IoError::new(
                 IoErrorKind::InvalidInput,
-                "End point for Restartables is not known.")),
+                "End point for Restartables is not known.",
+            )),
             Current(_offset) => unimplemented!(),
         }
     }

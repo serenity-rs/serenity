@@ -1,9 +1,9 @@
-use serde::Deserialize;
 use super::Metadata;
+use serde::Deserialize;
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct DcaMetadata {
-	pub(crate) dca: Dca,
+    pub(crate) dca: Dca,
     pub(crate) opus: Opus,
     pub(crate) info: Option<Info>,
     pub(crate) origin: Option<Origin>,
@@ -26,11 +26,11 @@ pub(crate) struct Tool {
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct Opus {
-  	pub(crate) mode: String,
-  	pub(crate) sample_rate: u32,
-  	pub(crate) frame_size: u64,
-  	pub(crate) abr: u64,
-  	pub(crate) vbr: u64,
+    pub(crate) mode: String,
+    pub(crate) sample_rate: u32,
+    pub(crate) frame_size: u64,
+    pub(crate) abr: u64,
+    pub(crate) vbr: u64,
     pub(crate) channels: u8,
 }
 
@@ -53,15 +53,17 @@ pub(crate) struct Origin {
 }
 
 impl From<DcaMetadata> for Metadata {
-	fn from(mut d: DcaMetadata) -> Self {
-		let (title, artist) = d.info.take()
-			.map(|mut m| (m.title.take(), m.artist.take()))
-			.unwrap_or_else(|| (None, None));
+    fn from(mut d: DcaMetadata) -> Self {
+        let (title, artist) = d
+            .info
+            .take()
+            .map(|mut m| (m.title.take(), m.artist.take()))
+            .unwrap_or_else(|| (None, None));
 
-		let channels = Some(d.opus.channels);
-		let sample_rate = Some(d.opus.sample_rate);
+        let channels = Some(d.opus.channels);
+        let sample_rate = Some(d.opus.sample_rate);
 
-		Self {
+        Self {
             title,
             artist,
 
@@ -70,5 +72,5 @@ impl From<DcaMetadata> for Metadata {
 
             ..Default::default()
         }
-	}
+    }
 }
