@@ -3,7 +3,7 @@ use serde_json::from_str;
 use serenity_voice_model::Event;
 
 pub fn json_deser(c: &mut Criterion) {
-	let json_data = r#"{
+    let json_data = r#"{
         "op": 2,
         "d": {
             "ssrc": 1,
@@ -25,9 +25,13 @@ pub fn json_deser(c: &mut Criterion) {
         "op": 2
     }"#;
 
-    c.bench_function("Ready event", |b| b.iter(|| from_str::<Event>(black_box(json_data))));
+    c.bench_function("Ready event", |b| {
+        b.iter(|| from_str::<Event>(black_box(json_data)))
+    });
 
-    c.bench_function("Ready event (bad order)", |b| b.iter(|| from_str::<Event>(black_box(wonky_json_data))));
+    c.bench_function("Ready event (bad order)", |b| {
+        b.iter(|| from_str::<Event>(black_box(wonky_json_data)))
+    });
 }
 
 criterion_group!(benches, json_deser);

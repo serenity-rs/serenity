@@ -1,12 +1,7 @@
 use bitflags::bitflags;
-use serde::{
-	de::Deserializer,
-	ser::Serializer,
-	Deserialize,
-	Serialize,
-};
+use serde::{de::Deserializer, ser::Serializer, Deserialize, Serialize};
 
-bitflags!{
+bitflags! {
     /// Flag set describing how a speaker is sending audio.
     pub struct SpeakingState: u8 {
         /// Normal transmission of voice audio.
@@ -30,7 +25,7 @@ impl SpeakingState {
     }
 
     pub fn priority(self) -> bool {
-        self.contains(Self::PRIORITY)   
+        self.contains(Self::PRIORITY)
     }
 }
 

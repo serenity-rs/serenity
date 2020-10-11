@@ -6,7 +6,7 @@ use serde::{Deserialize, Serialize};
 /// Acts as a source of UserId+SSRC identification.
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct ClientConnect {
-	/// SSRC of any audio packets sent by this newly joined user.
+    /// SSRC of any audio packets sent by this newly joined user.
     pub audio_ssrc: u32,
     /// ID of the connecting user.
     pub user_id: UserId,

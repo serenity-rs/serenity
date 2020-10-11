@@ -18,4 +18,4 @@ twilight-standby = "0.1"
 [dependencies.songbird]
 path = "../.."
 default-features = false
-features = ["twilight-rustls", "gateway", "driver"]
+features = ["twilight-rustls", "gateway", "driver", "stock-zlib"]

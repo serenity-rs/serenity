@@ -11,8 +11,8 @@ mod speaking_state;
 mod util;
 
 pub use self::{
-	event::Event,
-	opcode::OpCode,
-	protocol_data::ProtocolData,
-	speaking_state::SpeakingState,
+    event::Event,
+    opcode::OpCode,
+    protocol_data::ProtocolData,
+    speaking_state::SpeakingState,
 };

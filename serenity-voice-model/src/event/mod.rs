@@ -2,6 +2,7 @@ mod from;
 #[cfg(test)]
 mod tests;
 
+use crate::{opcode::OpCode, payload::*};
 use serde::{
     de::{
         value::U8Deserializer,
@@ -17,10 +18,6 @@ use serde::{
     Serialize,
 };
 use serde_json::value::RawValue;
-use crate::{
-    opcode::OpCode,
-    payload::*,
-};
 
 /// A representation of data received for voice gateway events.
 #[derive(Clone, Debug)]
@@ -78,7 +75,8 @@ impl Event {
 
 impl Serialize for Event {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: Serializer
+    where
+        S: Serializer,
     {
         let mut s = serializer.serialize_struct("Event", 2)?;
 
@@ -125,31 +123,44 @@ impl<'de> Visitor<'de> for EventVisitor {
                 Some("op") => {
                     let raw = map.next_value::<u8>()?;
                     let des: U8Deserializer<A::Error> = raw.into_deserializer();
-                    let valid_op = OpCode::deserialize(des)
-                        .map_err(|_| DeError::invalid_value(Unexpected::Unsigned(raw.into()), &"opcode in [0--9] + [12--13]"))?;
+                    let valid_op = OpCode::deserialize(des).map_err(|_| {
+                        DeError::invalid_value(
+                            Unexpected::Unsigned(raw.into()),
+                            &"opcode in [0--9] + [12--13]",
+                        )
+                    })?;
                     op = Some(valid_op);
                 },
                 // Idea: Op comes first, but missing it is not failure.
                 // So, if order correct then we don't need to pass the RawValue back out.
                 Some("d") => match op {
-                    Some(OpCode::Identify) => { return Ok(map.next_value::<Identify>()?.into())},
-                    Some(OpCode::SelectProtocol) => { return Ok(map.next_value::<SelectProtocol>()?.into())},
-                    Some(OpCode::Ready) => { return Ok(map.next_value::<Ready>()?.into())},
-                    Some(OpCode::Heartbeat) => { return Ok(map.next_value::<Heartbeat>()?.into())},
-                    Some(OpCode::HeartbeatAck) => { return Ok(map.next_value::<HeartbeatAck>()?.into())},
-                    Some(OpCode::SessionDescription) => { return Ok(map.next_value::<SessionDescription>()?.into())},
-                    Some(OpCode::Speaking) => { return Ok(map.next_value::<Speaking>()?.into())},
-                    Some(OpCode::Resume) => { return Ok(map.next_value::<Resume>()?.into())},
-                    Some(OpCode::Hello) => { return Ok(map.next_value::<Hello>()?.into())},
-                    Some(OpCode::Resumed) => { let _ = map.next_value::<Option<()>>()?; return Ok(Event::Resumed)},
-                    Some(OpCode::ClientConnect) => { return Ok(map.next_value::<ClientConnect>()?.into())},
-                    Some(OpCode::ClientDisconnect) => { return Ok(map.next_value::<ClientDisconnect>()?.into())},
+                    Some(OpCode::Identify) => return Ok(map.next_value::<Identify>()?.into()),
+                    Some(OpCode::SelectProtocol) =>
+                        return Ok(map.next_value::<SelectProtocol>()?.into()),
+                    Some(OpCode::Ready) => return Ok(map.next_value::<Ready>()?.into()),
+                    Some(OpCode::Heartbeat) => return Ok(map.next_value::<Heartbeat>()?.into()),
+                    Some(OpCode::HeartbeatAck) =>
+                        return Ok(map.next_value::<HeartbeatAck>()?.into()),
+                    Some(OpCode::SessionDescription) =>
+                        return Ok(map.next_value::<SessionDescription>()?.into()),
+                    Some(OpCode::Speaking) => return Ok(map.next_value::<Speaking>()?.into()),
+                    Some(OpCode::Resume) => return Ok(map.next_value::<Resume>()?.into()),
+                    Some(OpCode::Hello) => return Ok(map.next_value::<Hello>()?.into()),
+                    Some(OpCode::Resumed) => {
+                        let _ = map.next_value::<Option<()>>()?;
+                        return Ok(Event::Resumed);
+                    },
+                    Some(OpCode::ClientConnect) =>
+                        return Ok(map.next_value::<ClientConnect>()?.into()),
+                    Some(OpCode::ClientDisconnect) =>
+                        return Ok(map.next_value::<ClientDisconnect>()?.into()),
                     None => {
                         d = Some(map.next_value::<&RawValue>()?);
-                    }
+                    },
                 },
                 Some(_) => {},
-                None => if d.is_none() {
+                None =>
+                    if d.is_none() {
                         return Err(DeError::missing_field("d"));
                     } else if op.is_none() {
                         return Err(DeError::missing_field("op"));
@@ -161,7 +172,9 @@ impl<'de> Visitor<'de> for EventVisitor {
             }
         }
 
-        let d = d.expect("Struct body known to exist if loop has been escaped.").get();
+        let d = d
+            .expect("Struct body known to exist if loop has been escaped.")
+            .get();
         let op = op.expect("Struct variant known to exist if loop has been escaped.");
 
         (match op {
@@ -170,20 +183,23 @@ impl<'de> Visitor<'de> for EventVisitor {
             OpCode::Ready => serde_json::from_str::<Ready>(d).map(Into::into),
             OpCode::Heartbeat => serde_json::from_str::<Heartbeat>(d).map(Into::into),
             OpCode::HeartbeatAck => serde_json::from_str::<HeartbeatAck>(d).map(Into::into),
-            OpCode::SessionDescription => serde_json::from_str::<SessionDescription>(d).map(Into::into),
+            OpCode::SessionDescription =>
+                serde_json::from_str::<SessionDescription>(d).map(Into::into),
             OpCode::Speaking => serde_json::from_str::<Speaking>(d).map(Into::into),
             OpCode::Resume => serde_json::from_str::<Resume>(d).map(Into::into),
             OpCode::Hello => serde_json::from_str::<Hello>(d).map(Into::into),
             OpCode::Resumed => Ok(Event::Resumed),
             OpCode::ClientConnect => serde_json::from_str::<ClientConnect>(d).map(Into::into),
             OpCode::ClientDisconnect => serde_json::from_str::<ClientDisconnect>(d).map(Into::into),
-        }).map_err(DeError::custom)
+        })
+        .map_err(DeError::custom)
     }
 }
 
 impl<'de> Deserialize<'de> for Event {
     fn deserialize<D>(deserializer: D) -> Result<Self, D::Error>
-        where D: Deserializer<'de>
+    where
+        D: Deserializer<'de>,
     {
         deserializer.deserialize_map(EventVisitor)
     }

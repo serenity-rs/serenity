@@ -30,12 +30,10 @@ fn deserialize_identify_json() {
         user_id: UserId(104694319306248192),
     };
 
-    assert!(
-        match event {
-            Ok(Event::Identify(i)) if i == ident => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Identify(i)) if i == ident => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -57,18 +55,16 @@ fn deserialize_select_protocol_json() {
     let proto = SelectProtocol {
         protocol: "udp".into(),
         data: ProtocolData {
-            address: Ipv4Addr::new(127,0,0,1).into(),
+            address: Ipv4Addr::new(127, 0, 0, 1).into(),
             port: 1337,
             mode: "xsalsa20_poly1305_lite".into(),
         },
     };
 
-    assert!(
-        match event {
-            Ok(Event::SelectProtocol(i)) if i == proto => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::SelectProtocol(i)) if i == proto => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -90,7 +86,7 @@ fn deserialize_ready_json() {
 
     let ready = Ready {
         ssrc: 1,
-        ip: Ipv4Addr::new(127,0,0,1).into(),
+        ip: Ipv4Addr::new(127, 0, 0, 1).into(),
         port: 1234,
         modes: vec![
             "xsalsa20_poly1305".into(),
@@ -99,12 +95,10 @@ fn deserialize_ready_json() {
         ],
     };
 
-    assert!(
-        match event {
-            Ok(Event::Ready(i)) if i == ready => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Ready(i)) if i == ready => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -116,14 +110,14 @@ fn deserialize_heartbeat_json() {
 
     let event = serde_json::from_str(&json_data);
 
-    let hb = Heartbeat { nonce: 1501184119561 };
+    let hb = Heartbeat {
+        nonce: 1501184119561,
+    };
 
-    assert!(
-        match event {
-            Ok(Event::Heartbeat(i)) if i == hb => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Heartbeat(i)) if i == hb => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -142,12 +136,10 @@ fn deserialize_session_description_json() {
         secret_key: vec![251, 100, 11],
     };
 
-    assert!(
-        match event {
-            Ok(Event::SessionDescription(i)) if i == sd => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::SessionDescription(i)) if i == sd => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -169,12 +161,10 @@ fn deserialize_speaking_json() {
         user_id: None,
     };
 
-    assert!(
-        match event {
-            Ok(Event::Speaking(i)) if i == speak => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Speaking(i)) if i == speak => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -186,14 +176,14 @@ fn deserialize_heartbeat_ack_json() {
 
     let event = serde_json::from_str(&json_data);
 
-    let hb = HeartbeatAck { nonce: 1501184119561 };
+    let hb = HeartbeatAck {
+        nonce: 1501184119561,
+    };
 
-    assert!(
-        match event {
-            Ok(Event::HeartbeatAck(i)) if i == hb => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::HeartbeatAck(i)) if i == hb => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -215,12 +205,10 @@ fn deserialize_resume_json() {
         token: "my_token".into(),
     };
 
-    assert!(
-        match event {
-            Ok(Event::Resume(i)) if i == resume => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Resume(i)) if i == resume => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -238,13 +226,11 @@ fn deserialize_hello_json() {
         heartbeat_interval: 41250.0,
     };
 
-    assert!(
-        match event {
-            Ok(Event::Hello(i)) =>
-                (i.heartbeat_interval - hello.heartbeat_interval).abs() < f64::EPSILON,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Hello(i)) =>
+            (i.heartbeat_interval - hello.heartbeat_interval).abs() < f64::EPSILON,
+        _ => false,
+    });
 }
 
 #[test]
@@ -256,12 +242,10 @@ fn deserialize_resumed_json() {
 
     let event = serde_json::from_str(&json_data);
 
-    assert!(
-        match event {
-            Ok(Event::Resumed) => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::Resumed) => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -283,12 +267,10 @@ fn deserialize_client_connect_json() {
         video_ssrc: 9012,
     };
 
-    assert!(
-        match event {
-            Ok(Event::ClientConnect(i)) if i == conn => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::ClientConnect(i)) if i == conn => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -306,12 +288,10 @@ fn deserialize_client_disconnect_json() {
         user_id: UserId(1234),
     };
 
-    assert!(
-        match event {
-            Ok(Event::ClientDisconnect(i)) if i == conn => true,
-            _ => false,
-        }
-    );
+    assert!(match event {
+        Ok(Event::ClientDisconnect(i)) if i == conn => true,
+        _ => false,
+    });
 }
 
 #[test]
@@ -321,7 +301,8 @@ fn serialize_identify() {
         session_id: "56f88a86dce65c65b9".into(),
         token: "56f88a86dce65c65b8".into(),
         user_id: UserId(2),
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -349,7 +330,7 @@ fn serialize_identify() {
             Token::Str("2"),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -358,11 +339,12 @@ fn serialize_select_protocol() {
     let value: Event = SelectProtocol {
         protocol: "udp".into(),
         data: ProtocolData {
-            address: Ipv4Addr::new(192,168,0,141).into(),
+            address: Ipv4Addr::new(192, 168, 0, 141).into(),
             port: 40404,
             mode: "xsalsa20_poly1305_suffix".into(),
         },
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value.readable(),
@@ -394,7 +376,7 @@ fn serialize_select_protocol() {
             Token::Str("udp"),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -406,10 +388,11 @@ fn serialize_ready() {
             "xsalsa20_poly1305_suffix".into(),
             "xsalsa20_poly1305_lite".into(),
         ],
-        ip: Ipv4Addr::new(127,0,0,1).into(),
+        ip: Ipv4Addr::new(127, 0, 0, 1).into(),
         port: 12345,
         ssrc: 0xcafe_d00d,
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value.readable(),
@@ -428,7 +411,7 @@ fn serialize_ready() {
             Token::Str("ip"),
             Token::Str("127.0.0.1"),
             Token::Str("modes"),
-            Token::Seq{ len: Some(3) },
+            Token::Seq { len: Some(3) },
             Token::Str("xsalsa20_poly1305"),
             Token::Str("xsalsa20_poly1305_suffix"),
             Token::Str("xsalsa20_poly1305_lite"),
@@ -439,15 +422,13 @@ fn serialize_ready() {
             Token::U32(0xcafe_d00d),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
 #[test]
 fn serialize_heartbeat() {
-    let value: Event = Heartbeat {
-        nonce: 1234567890,
-    }.into();
+    let value: Event = Heartbeat { nonce: 1234567890 }.into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -461,7 +442,7 @@ fn serialize_heartbeat() {
             Token::Str("d"),
             Token::Str("1234567890"),
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -470,7 +451,8 @@ fn serialize_session_description() {
     let value: Event = SessionDescription {
         mode: "xsalsa20_poly1305_suffix".into(),
         secret_key: vec![1, 2, 3, 4, 5],
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -489,7 +471,7 @@ fn serialize_session_description() {
             Token::Str("mode"),
             Token::Str("xsalsa20_poly1305_suffix"),
             Token::Str("secret_key"),
-            Token::Seq{ len: Some(5) },
+            Token::Seq { len: Some(5) },
             Token::U8(1),
             Token::U8(2),
             Token::U8(3),
@@ -498,7 +480,7 @@ fn serialize_session_description() {
             Token::SeqEnd,
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -509,7 +491,8 @@ fn serialize_speaking() {
         speaking: SpeakingState::MICROPHONE,
         ssrc: 12345678,
         user_id: None,
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -536,15 +519,13 @@ fn serialize_speaking() {
             Token::None,
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
 #[test]
 fn serialize_heartbeat_ack() {
-    let value: Event = HeartbeatAck {
-        nonce: 1234567890,
-    }.into();
+    let value: Event = HeartbeatAck { nonce: 1234567890 }.into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -558,7 +539,7 @@ fn serialize_heartbeat_ack() {
             Token::Str("d"),
             Token::Str("1234567890"),
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -568,7 +549,8 @@ fn serialize_resume() {
         server_id: GuildId(1),
         session_id: "sess_sess_sess_sess".into(),
         token: "my_token".into(),
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -593,7 +575,7 @@ fn serialize_resume() {
             Token::Str("my_token"),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -601,7 +583,8 @@ fn serialize_resume() {
 fn serialize_hello() {
     let value: Event = Hello {
         heartbeat_interval: 41250.0,
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -621,7 +604,7 @@ fn serialize_hello() {
             Token::F64(41250.0),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -641,7 +624,7 @@ fn serialize_resumed() {
             Token::Str("d"),
             Token::None,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -651,7 +634,8 @@ fn serialize_client_connect() {
         audio_ssrc: 12345,
         user_id: UserId(56),
         video_ssrc: 67890,
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -676,7 +660,7 @@ fn serialize_client_connect() {
             Token::U32(67890),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }
 
@@ -684,7 +668,8 @@ fn serialize_client_connect() {
 fn serialize_client_disconnect() {
     let value: Event = ClientDisconnect {
         user_id: UserId(56),
-    }.into();
+    }
+    .into();
 
     serde_test::assert_ser_tokens(
         &value,
@@ -705,6 +690,6 @@ fn serialize_client_disconnect() {
             Token::Str("56"),
             Token::StructEnd,
             Token::StructEnd,
-        ]
+        ],
     );
 }

@@ -23,12 +23,13 @@ enum Return {
     Conn(Sender<Result<(), Error>>),
 }
 
-/// The handler is responsible for "handling" a single voice connection, acting
-/// as a clean API above the inner connection.
+/// The Call handler is responsible for a single voice connection, acting
+/// as a clean API above the inner state and gateway message management.
 ///
-/// If the `"driver"` feature is enabled, then 
+/// If the `"driver"` feature is enabled, then a Call exposes all control methods of
+/// [`Driver`] via `Deref(Mut)`.
 ///
-/// [`Driver`]: struct.Dri.html
+/// [`Driver`]: driver/struct.Driver.html
 /// [`Shard`]: ../gateway/struct.Shard.html
 #[derive(Clone, Debug)]
 pub struct Call {
@@ -56,6 +57,7 @@ impl Call {
     /// Creates a new Call, which will send out WebSocket messages via
     /// the given shard.
     #[inline]
+    #[instrument]
     pub fn new(
         guild_id: GuildId,
         ws: Shard,
@@ -73,6 +75,7 @@ impl Call {
     ///
     /// For most use cases you do not want this.
     #[inline]
+    #[instrument]
     pub fn standalone(guild_id: GuildId, user_id: UserId) -> Self {
         Self::new_raw(guild_id, None, user_id)
     }
@@ -94,6 +97,7 @@ impl Call {
         }
     }
 
+    #[instrument(skip(self))]
     fn do_connect(&mut self) {
         match &self.connection {
             Some((_, ConnectionProgress::Complete(c), Return::Info(tx))) => {
@@ -108,7 +112,7 @@ impl Call {
         }
     }
 
-    /// Sets whether the current connection to be deafened.
+    /// Sets whether the current connection is to be deafened.
     ///
     /// If there is no live voice connection, then this only acts as a settings
     /// update for future connections.
@@ -120,18 +124,24 @@ impl Call {
     /// will _only_ update whether the connection is internally deafened.
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument(skip(self))]
     pub async fn deafen(&mut self, deaf: bool) -> JoinResult<()> {
         self.self_deaf = deaf;
 
         self.update().await
     }
 
+    /// Returns whether the current connection is self-deafened in this server.
+    ///
+    /// This is purely cosmetic.
+    #[instrument(skip(self))]
     pub fn is_deaf(&self) -> bool {
         self.self_deaf
     }
 
     #[cfg(feature = "driver")]
     /// Connect or switch to the given voice channel by its Id.
+    #[instrument(skip(self))]
     pub async fn join(&mut self, channel_id: ChannelId) -> JoinResult<Receiver<Result<(), Error>>> {
         let (tx, rx) = flume::unbounded();
 
@@ -150,7 +160,8 @@ impl Call {
     /// session or running the driver.
     ///
     /// Use this if you require connection info for lavalink,
-    /// or some other voice implementation.
+    /// some other voice implementation, or don't want to use the driver for a given call.
+    #[instrument(skip(self))]
     pub async fn join_gateway(&mut self, channel_id: ChannelId) -> JoinResult<Receiver<ConnectionInfo>> {
         let (tx, rx) = flume::unbounded();
 
@@ -175,6 +186,7 @@ impl Call {
     /// voice channel.
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument(skip(self))]
     pub async fn leave(&mut self) -> JoinResult<()> {
         // Only send an update if we were in a voice channel.
         self.connection = None;
@@ -194,6 +206,7 @@ impl Call {
     /// will _only_ update whether the connection is internally muted.
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument(skip(self))]
     pub async fn mute(&mut self, mute: bool) -> JoinResult<()> {
         self.self_mute = mute;
 
@@ -203,6 +216,8 @@ impl Call {
         self.update().await
     }
 
+    /// Returns whether the current connection is self-muted in this server.
+    #[instrument(skip(self))]
     pub fn is_mute(&self) -> bool {
         self.self_mute
     }
@@ -238,6 +253,7 @@ impl Call {
     ///
     /// [`connect`]: #method.connect
     /// [`standalone`]: #method.standalone
+    #[instrument(skip(self))]
     pub fn update_state(&mut self, session_id: String) {
         let try_conn = if let Some((_, ref mut progress, _)) = self.connection.as_mut() {
             progress.apply_state_update(session_id)
@@ -253,6 +269,7 @@ impl Call {
     /// Does nothing if initialized via [`standalone`].
     ///
     /// [`standalone`]: #method.standalone
+    #[instrument(skip(self))]
     async fn update(&mut self) -> JoinResult<()> {
         if let Some(ws) = self.ws.as_mut() {
             let map = json!({

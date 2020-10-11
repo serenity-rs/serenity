@@ -1,6 +1,9 @@
 pub(crate) mod json_safe_u64 {
     use core::fmt::{Formatter, Result as FmtResult};
-    use serde::{de::{Deserializer, Error, Visitor}, ser::Serializer};
+    use serde::{
+        de::{Deserializer, Error, Visitor},
+        ser::Serializer,
+    };
 
     struct U64Visitor;
 

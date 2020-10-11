@@ -1,7 +1,9 @@
-use serde_repr::{Serialize_repr, Deserialize_repr};
+use serde_repr::{Deserialize_repr, Serialize_repr};
 
 /// Enum to map voice opcodes.
-#[derive(Clone, Copy, Debug, Deserialize_repr, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize_repr)]
+#[derive(
+    Clone, Copy, Debug, Deserialize_repr, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize_repr,
+)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum OpCode {
