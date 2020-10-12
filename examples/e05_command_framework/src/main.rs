@@ -293,7 +293,7 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
     let counter = data.get::<CommandCounter>().expect("Expected CommandCounter in TypeMap.");
 
     for (k, v) in counter {
-        let _ = writeln!(contents, "- {name}: {amount}", name=k, amount=v);
+        writeln!(contents, "- {name}: {amount}", name=k, amount=v)?;
     }
 
     if let Err(why) = msg.channel_id.say(&ctx.http, &contents).await {
