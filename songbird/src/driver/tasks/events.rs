@@ -17,17 +17,17 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
         use EventMessage::*;
         match evt_rx.recv_async().await {
             Ok(AddGlobalEvent(data)) => {
-                info!("[Voice] Global event added.");
+                info!("Global event added.");
                 global.add_event(data);
             },
             Ok(AddTrackEvent(i, data)) => {
-                info!("[Voice] Adding event to track {}.", i);
+                info!("Adding event to track {}.", i);
 
                 let event_store = events.get_mut(i).expect(
-                    "[Voice] Event thread was given an illegal store index for AddTrackEvent.",
+                    "Event thread was given an illegal store index for AddTrackEvent.",
                 );
                 let state = states.get_mut(i).expect(
-                    "[Voice] Event thread was given an illegal state index for AddTrackEvent.",
+                    "Event thread was given an illegal state index for AddTrackEvent.",
                 );
 
                 event_store.add_event(data, state.position);
@@ -36,9 +36,9 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                 let ctx = ctx.to_user_context();
                 let evt = ctx
                     .to_core_event()
-                    .expect("[Voice] Event thread was passed a non-core event in FireCoreEvent.");
+                    .expect("Event thread was passed a non-core event in FireCoreEvent.");
 
-                trace!("[Voice] Firing core event {:?}.", evt);
+                trace!("Firing core event {:?}.", evt);
 
                 global.fire_core_event(evt, ctx).await;
             },
@@ -47,19 +47,19 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                 states.push(state);
                 handles.push(handle);
 
-                info!("[Voice] Event state for track {} added", events.len());
+                info!("Event state for track {} added", events.len());
             },
             Ok(ChangeState(i, change)) => {
                 use TrackStateChange::*;
 
                 let max_states = states.len();
                 debug!(
-                    "[Voice] Changing state for track {} of {}: {:?}",
+                    "Changing state for track {} of {}: {:?}",
                     i, max_states, change
                 );
 
                 let state = states.get_mut(i).expect(
-                    "[Voice] Event thread was given an illegal state index for ChangeState.",
+                    "Event thread was given an illegal state index for ChangeState.",
                 );
 
                 match change {
@@ -91,7 +91,7 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
             },
             Ok(RemoveTrack(i)) => {
                 info!(
-                    "[Voice] Event state for track {} of {} removed.",
+                    "Event state for track {} of {} removed.",
                     i,
                     events.len()
                 );
@@ -101,7 +101,7 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                 handles.remove(i);
             },
             Ok(RemoveAllTracks) => {
-                info!("[Voice] Event state for all tracks removed.");
+                info!("Event state for all tracks removed.");
 
                 events.clear();
                 states.clear();
@@ -117,5 +117,5 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
         }
     }
 
-    info!("[Voice] Event thread exited.");
+    info!("Event thread exited.");
 }

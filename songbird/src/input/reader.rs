@@ -1,5 +1,4 @@
 use super::*;
-use crate::constants::*;
 use std::{
     fmt::{Debug, Error as FormatError, Formatter},
     fs::File,
@@ -12,12 +11,9 @@ use std::{
         Seek,
         SeekFrom,
     },
-    mem,
-    process::Child,
     result::Result as StdResult,
 };
 use streamcatcher::{Catcher, TxCatcher};
-use tracing::debug;
 
 /// Usable data/byte sources for an audio stream.
 ///
@@ -123,37 +119,5 @@ impl<R: Read + Seek> ReadSeek for R {
 
     fn seek(&mut self, pos: SeekFrom) -> IoResult<u64> {
         Seek::seek(self, pos)
-    }
-}
-
-/// Handle for a child process which ensures that any subprocesses are properly closed
-/// on drop.
-#[derive(Debug)]
-pub struct ChildContainer(Child);
-
-pub(crate) fn child_to_reader<T>(child: Child) -> Reader {
-    Reader::Pipe(BufReader::with_capacity(
-        STEREO_FRAME_SIZE * mem::size_of::<T>() * CHILD_BUFFER_LEN,
-        ChildContainer(child),
-    ))
-}
-
-impl From<Child> for Reader {
-    fn from(container: Child) -> Self {
-        child_to_reader::<f32>(container)
-    }
-}
-
-impl Read for ChildContainer {
-    fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
-        self.0.stdout.as_mut().unwrap().read(buffer)
-    }
-}
-
-impl Drop for ChildContainer {
-    fn drop(&mut self) {
-        if let Err(e) = self.0.kill() {
-            debug!("[Voice] Error awaiting child process: {:?}", e);
-        }
     }
 }

@@ -14,9 +14,9 @@ use tracing::{error, info, warn};
 
 pub(crate) fn start(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     tokio::spawn(async move {
-        info!("[Voice] Core started for guild: {}", guild_id);
+        info!("Core started for guild: {}", guild_id);
         runner(guild_id, rx, tx).await;
-        info!("[Voice] Core finished for guild: {}", guild_id);
+        info!("Core finished for guild: {}", guild_id);
     });
 }
 
@@ -34,23 +34,23 @@ fn start_internals(guild_id: GuildId, core: Sender<CoreMessage>) -> Interconnect
 
     let ic = interconnect.clone();
     tokio::spawn(async move {
-        info!("[Voice] Event processor started for guild: {}", guild_id);
+        info!("Event processor started for guild: {}", guild_id);
         events::runner(ic, evt_rx).await;
-        info!("[Voice] Event processor finished for guild: {}", guild_id);
+        info!("Event processor finished for guild: {}", guild_id);
     });
 
     let ic = interconnect.clone();
     tokio::spawn(async move {
-        info!("[Voice] Network processor started for guild: {}", guild_id);
+        info!("Network processor started for guild: {}", guild_id);
         aux_network::runner(ic, pkt_aux_rx).await;
-        info!("[Voice] Network processor finished for guild: {}", guild_id);
+        info!("Network processor finished for guild: {}", guild_id);
     });
 
     let ic = interconnect.clone();
     std::thread::spawn(move || {
-        info!("[Voice] Mixer started for guild: {}", guild_id);
+        info!("Mixer started for guild: {}", guild_id);
         mixer::runner(ic, mix_rx);
-        info!("[Voice] Mixer finished for guild: {}", guild_id);
+        info!("Mixer finished for guild: {}", guild_id);
     });
 
     interconnect
@@ -62,16 +62,6 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
 
     loop {
         match rx.recv_async().await {
-            Ok(CoreMessage::Connect(info)) => {
-                connection = match Connection::new(info, &interconnect).await {
-                    Ok(connection) => Some(connection),
-                    Err(why) => {
-                        warn!("[Voice] Error connecting: {:?}", why);
-
-                        None
-                    },
-                };
-            },
             Ok(CoreMessage::ConnectWithResult(info, tx)) => {
                 connection = match Connection::new(info, &interconnect).await {
                     Ok(connection) => {
@@ -81,7 +71,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                     },
                     Err(why) => {
                         // See above.
-                        tx.send(Err(why));
+                        let _ = tx.send(Err(why));
 
                         None
                     },
@@ -137,7 +127,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                             .await
                             .map_err(|e| {
                                 error!(
-                                    "[Voice] Catastrophic connection failure. Stopping. {:?}",
+                                    "Catastrophic connection failure. Stopping. {:?}",
                                     e
                                 );
                                 e
@@ -155,6 +145,6 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
         }
     }
 
-    info!("[Voice] Main thread exited");
+    info!("Main thread exited");
     interconnect.poison_all();
 }

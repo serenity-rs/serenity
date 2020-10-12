@@ -136,7 +136,7 @@ impl Call {
 
         self.connection = Some((
             channel_id,
-            ConnectionProgress::new(self.guild_id.into(), self.user_id.into()),
+            ConnectionProgress::new(self.guild_id, self.user_id),
             Return::Conn(tx),
         ));
 
@@ -157,7 +157,7 @@ impl Call {
 
         self.connection = Some((
             channel_id,
-            ConnectionProgress::new(self.guild_id.into(), self.user_id.into()),
+            ConnectionProgress::new(self.guild_id, self.user_id),
             Return::Info(tx),
         ));
 

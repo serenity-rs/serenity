@@ -128,7 +128,7 @@ impl TrackQueue {
         track
             .events
             .as_mut()
-            .expect("[Voice] Queue inspecting EventStore on new Track: did not exist.")
+            .expect("Queue inspecting EventStore on new Track: did not exist.")
             .add_event(
                 EventData::new(Event::Track(TrackEvent::End), QueueHandler { remote_lock }),
                 track.position,

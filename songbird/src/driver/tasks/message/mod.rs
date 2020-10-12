@@ -46,19 +46,19 @@ impl Interconnect {
 
         let ic = self.clone();
         tokio::spawn(async move {
-            info!("[Voice] Event processor restarted for guild: {}", guild_id);
+            info!("Event processor restarted for guild: {}", guild_id);
             super::events::runner(ic, evt_rx).await;
-            info!("[Voice] Event processor finished for guild: {}", guild_id);
+            info!("Event processor finished for guild: {}", guild_id);
         });
 
         let ic = self.clone();
         tokio::spawn(async move {
             info!(
-                "[Voice] Network processor restarted for guild: {}",
+                "Network processor restarted for guild: {}",
                 guild_id
             );
             super::aux_network::runner(ic, pkt_aux_rx).await;
-            info!("[Voice] Network processor finished for guild: {}", guild_id);
+            info!("Network processor finished for guild: {}", guild_id);
         });
 
         // Make mixer aware of new targets...

@@ -136,7 +136,7 @@ pub(crate) async fn is_stereo(path: &OsStr) -> Result<(bool, Metadata)> {
 
     let metadata = Metadata::from_ffprobe_json(&value);
 
-    debug!("[Voice] FFprobe metadata {:?}", metadata);
+    debug!("FFprobe metadata {:?}", metadata);
 
     if let Some(count) = metadata.channels {
         Ok((count == 2, metadata))

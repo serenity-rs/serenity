@@ -241,16 +241,20 @@ impl Songbird {
     ///
     /// The handler is then dropped, removing settings for the target.
     ///
+    /// An Err(...) value implies that the gateway could not be contacted,
+    /// and that leaving should be attempted again later (i.e., after reconnect).
+    ///
     /// [`Call`]: struct.Call.html
     #[inline]
-    pub async fn remove<G: Into<GuildId>>(&self, guild_id: G) {
+    pub async fn remove<G: Into<GuildId>>(&self, guild_id: G) -> JoinResult<()> {
         self._remove(guild_id.into()).await
     }
 
-    async fn _remove(&self, guild_id: GuildId) {
-        self.leave(guild_id).await;
+    async fn _remove(&self, guild_id: GuildId) -> JoinResult<()> {
+        self.leave(guild_id).await?;
         let mut calls = self.calls.write();
         calls.remove(&guild_id);
+        Ok(())
     }
 }
 

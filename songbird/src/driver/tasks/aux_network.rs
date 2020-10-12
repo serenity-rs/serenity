@@ -49,7 +49,7 @@ impl SsrcState {
         Self {
             silent_frame_count: 5, // We do this to make the first speech packet fire an event.
             decoder: OpusDecoder::new(SAMPLE_RATE, Channels::Stereo)
-                .expect("[Voice] Failed to create new Opus decoder for source."),
+                .expect("Failed to create new Opus decoder for source."),
             last_seq: pkt.get_sequence().into(),
         }
     }
@@ -109,7 +109,7 @@ impl SsrcState {
             RtpExtensionPacket::new(data)
                 .map(|pkt| pkt.packet_size())
                 .ok_or_else(|| {
-                    error!("[Voice] Extension packet indicated, but insufficient space.");
+                    error!("Extension packet indicated, but insufficient space.");
                     Error::IllegalVoicePacket
                 })
         } else {
@@ -119,7 +119,7 @@ impl SsrcState {
         for _ in 0..missed_packets {
             let missing_frame: Option<&[u8]> = None;
             if let Err(e) = self.decoder.decode(missing_frame, &mut out[..], false) {
-                warn!("[Voice] Issue while decoding for missed packet: {:?}.", e);
+                warn!("Issue while decoding for missed packet: {:?}.", e);
             }
         }
 
@@ -127,7 +127,7 @@ impl SsrcState {
             .decoder
             .decode(Some(&data[start..]), &mut out[..], false)
             .map_err(|e| {
-                error!("[Voice] Failed to decode received packet: {:?}.", e);
+                error!("Failed to decode received packet: {:?}.", e);
                 e
             })?;
 
@@ -187,7 +187,7 @@ impl AuxNetwork {
         'aux_runner: loop {
             let mut ws_error = match self.process_ws_messages(interconnect).await {
                 Err(e) => {
-                    error!("[Voice] Error processing ws {:?}.", e);
+                    error!("Error processing ws {:?}.", e);
                     true
                 },
                 _ => false,
@@ -217,7 +217,7 @@ impl AuxNetwork {
                     Ok(AuxPacketMessage::SetSsrc(new_ssrc)) => {
                         self.ssrc = new_ssrc;
                         let mut ka = MutableKeepalivePacket::new(&mut self.keepalive_bytes[..])
-                            .expect("[Voice] Insufficient bytes given to keepalive packet.");
+                            .expect("Insufficient bytes given to keepalive packet.");
                         ka.set_ssrc(new_ssrc);
                     },
                     Ok(AuxPacketMessage::SetKeepalive(keepalive)) => {
@@ -240,7 +240,7 @@ impl AuxNetwork {
 
                                 ws_error |= match ssu_status {
                                     Err(e) => {
-                                        error!("[Voice] Issue sending speaking update {:?}.", e);
+                                        error!("Issue sending speaking update {:?}.", e);
                                         true
                                     },
                                     _ => false,
@@ -264,7 +264,7 @@ impl AuxNetwork {
             }
         }
 
-        info!("[Voice] Auxiliary network thread exited");
+        info!("Auxiliary network thread exited");
     }
 
     async fn process_ws_messages(&mut self, interconnect: &Interconnect) -> Result<()> {
@@ -306,17 +306,17 @@ impl AuxNetwork {
                     GatewayEvent::HeartbeatAck(ev) => {
                         if let Some(nonce) = self.last_heartbeat_nonce.take() {
                             if ev.nonce == nonce {
-                                info!("[Voice] Heartbeat ACK received.");
+                                info!("Heartbeat ACK received.");
                             } else {
                                 warn!(
-                                    "[Voice] Heartbeat nonce mismatch! Expected {}, saw {}.",
+                                    "Heartbeat nonce mismatch! Expected {}, saw {}.",
                                     nonce, ev.nonce
                                 );
                             }
                         }
                     },
                     other => {
-                        info!("[Voice] Received other websocket data: {:?}", other);
+                        info!("Received other websocket data: {:?}", other);
                     },
                 }
             }
@@ -343,17 +343,17 @@ impl AuxNetwork {
                 let cipher = self
                     .cipher
                     .as_ref()
-                    .expect("[Voice] Tried to decrypt without a valid key.");
+                    .expect("Tried to decrypt without a valid key.");
 
                 match demux::demux_mut(packet) {
                     DemuxedMut::Rtp(mut rtp) => {
                         if !rtp_valid(rtp.to_immutable()) {
-                            error!("[Voice] Illegal RTP message received.");
+                            error!("Illegal RTP message received.");
                             continue;
                         }
 
                         let rtp_body_start = decrypt_in_place(&mut rtp, cipher)
-                            .expect("[Voice] RTP decryption failed.");
+                            .expect("RTP decryption failed.");
 
                         let entry = self
                             .decoder_map
@@ -391,7 +391,7 @@ impl AuxNetwork {
                                 },
                             ));
                         } else {
-                            warn!("[Voice] RTP decoding/decrytion failed.");
+                            warn!("RTP decoding/decrytion failed.");
                         }
                     },
                     DemuxedMut::Rtcp(mut rtcp) => {
@@ -405,14 +405,14 @@ impl AuxNetwork {
                                 },
                             ));
                         } else {
-                            warn!("[Voice] RTCP decryption failed.");
+                            warn!("RTCP decryption failed.");
                         }
                     },
                     DemuxedMut::FailedParse(t) => {
-                        warn!("[Voice] Failed to parse message of type {:?}.", t);
+                        warn!("Failed to parse message of type {:?}.", t);
                     },
                     _ => {
-                        warn!("[Voice] Illegal UDP packet from voice server.");
+                        warn!("Illegal UDP packet from voice server.");
                     },
                 }
             }

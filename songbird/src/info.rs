@@ -16,26 +16,6 @@ impl ConnectionProgress {
         })
     }
 
-    pub fn from_complete(info: ConnectionInfo) -> Self {
-        ConnectionProgress::Complete(info)
-    }
-
-    pub fn guild_id(&self) -> GuildId {
-        use ConnectionProgress::*;
-        match self {
-            Complete(c) => c.guild_id,
-            Incomplete(i) => i.guild_id,
-        }
-    }
-
-    pub fn user_id(&self) -> UserId {
-        use ConnectionProgress::*;
-        match self {
-            Complete(c) => c.user_id,
-            Incomplete(i) => i.user_id,
-        }
-    }
-
     pub(crate) fn apply_state_update(&mut self, session_id: String) -> bool {
         use ConnectionProgress::*;
         match self {

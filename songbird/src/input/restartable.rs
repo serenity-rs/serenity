@@ -43,7 +43,7 @@ impl Restartable {
 
     /// Create a new restartable ffmpeg source for a local file.
     pub fn ffmpeg<P: AsRef<OsStr> + Send + Clone + 'static>(path: P) -> Result<Self> {
-        Self::new(FfmpegRestarter { path: path.clone() })
+        Self::new(FfmpegRestarter { path })
     }
 
     /// Create a new restartable ytdl source.

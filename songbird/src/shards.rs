@@ -96,13 +96,14 @@ pub enum Shard {
 
 impl Shard {
     pub async fn send(&mut self, msg: Value) -> JoinResult<()> {
-        Ok(match self {
+        match self {
             #[cfg(feature = "serenity")]
             Shard::Serenity(s) => s.send(InterMessage::Json(msg))?,
             #[cfg(feature = "twilight")]
             Shard::Twilight(t) => t.command(&msg).await?,
-            _ => Err(JoinError::NoSender)?,
-        })
+            _ => return Err(JoinError::NoSender),
+        }
+        Ok(())
     }
 }
 

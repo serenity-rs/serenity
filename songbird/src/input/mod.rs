@@ -10,6 +10,7 @@
 //! [`Codec`]: struct.Codec.html
 
 pub mod cached;
+mod child;
 pub mod codec;
 mod container;
 mod dca;
@@ -22,6 +23,7 @@ pub mod utils;
 mod ytdl_src;
 
 pub use self::{
+    child::*,
     codec::{Codec, CodecType},
     container::{Container, Frame},
     dca::dca,
@@ -37,7 +39,7 @@ use audiopus::coder::GenericCtl;
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::OpusCompressor;
 use error::{Error, Result};
-use reader::child_to_reader;
+
 use std::{
     convert::TryFrom,
     io::{

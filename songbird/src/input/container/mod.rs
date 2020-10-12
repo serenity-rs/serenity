@@ -1,3 +1,7 @@
+mod frame;
+
+pub use frame::*;
+
 use super::CodecType;
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::{
@@ -51,11 +55,4 @@ impl Container {
             Dca { first_frame } => *first_frame,
         }
     }
-}
-
-/// Information used in audio frame detection.
-#[derive(Clone, Copy, Debug)]
-pub struct Frame {
-    pub header_len: usize,
-    pub frame_len: usize,
 }

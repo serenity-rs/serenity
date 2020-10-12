@@ -82,7 +82,7 @@ impl Connection {
                     }
                 },
                 other => {
-                    debug!("[Voice] Expected ready/hello; got: {:?}", other);
+                    debug!("Expected ready/hello; got: {:?}", other);
 
                     return Err(Error::ExpectedHandshake);
                 },
@@ -90,9 +90,9 @@ impl Connection {
         }
 
         let hello = hello
-            .expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+            .expect("Hello packet expected in connection initialisation, but not found.");
         let ready = ready
-            .expect("[Voice] Ready packet expected in connection initialisation, but not found.");
+            .expect("Ready packet expected in connection initialisation, but not found.");
 
         if !has_valid_mode(&ready.modes, CryptoMode::Normal) {
             return Err(Error::CryptoModeUnavailable);
@@ -105,7 +105,7 @@ impl Connection {
         let mut bytes = [0; IpDiscoveryPacket::const_packet_size()];
         {
             let mut view = MutableIpDiscoveryPacket::new(&mut bytes[..]).expect(
-                "[Voice] Too few bytes in 'bytes' for IPDiscovery packet.\
+                "Too few bytes in 'bytes' for IPDiscovery packet.\
                     (Blame: IpDiscoveryPacket::const_packet_size()?)",
             );
             view.set_pkt_type(IpDiscoveryType::Request);
@@ -118,7 +118,7 @@ impl Connection {
         let (len, _addr) = udp.recv_from(&mut bytes).await?;
         {
             let view = IpDiscoveryPacket::new(&bytes[..len])
-                .ok_or_else(|| Error::IllegalDiscoveryResponse)?;
+                .ok_or(Error::IllegalDiscoveryResponse)?;
 
             if view.get_pkt_type() != IpDiscoveryType::Response {
                 return Err(Error::IllegalDiscoveryResponse);
@@ -155,10 +155,10 @@ impl Connection {
 
         let cipher = init_cipher(&mut client).await?;
 
-        info!("[Voice] Connected to: {}", info.endpoint);
+        info!("Connected to: {}", info.endpoint);
 
         info!(
-            "[Voice] WS heartbeat duration {}ms.",
+            "WS heartbeat duration {}ms.",
             hello.heartbeat_interval,
         );
 
@@ -168,11 +168,11 @@ impl Connection {
 
         let ssrc = ready.ssrc;
         tokio::spawn(async move {
-            info!("[Voice] UDP handle started.");
+            info!("UDP handle started.");
 
             let mut keepalive_bytes = [0u8; MutableKeepalivePacket::minimum_packet_size()];
             let mut ka = MutableKeepalivePacket::new(&mut keepalive_bytes[..])
-                .expect("[Voice] Insufficient bytes given to keepalive packet.");
+                .expect("Insufficient bytes given to keepalive packet.");
             ka.set_ssrc(ssrc);
 
             let mut ka_time = Instant::now() + UDP_KEEPALIVE_GAP;
@@ -181,7 +181,7 @@ impl Connection {
                 use UdpMessage::*;
                 match timeout_at(ka_time, udp_msg_rx.recv_async()).await {
                     Err(Elapsed { .. }) => {
-                        info!("[Voice] Sending UDP Keepalive.");
+                        info!("Sending UDP Keepalive.");
                         let _ = udp_tx.send(&keepalive_bytes[..]).await;
                         ka_time += UDP_KEEPALIVE_GAP;
                     },
@@ -194,7 +194,7 @@ impl Connection {
                 }
             }
 
-            info!("[Voice] UDP handle stopped.");
+            info!("UDP handle stopped.");
         });
 
         interconnect
@@ -268,7 +268,7 @@ impl Connection {
                     }
                 },
                 other => {
-                    debug!("[Voice] Expected resumed/hello; got: {:?}", other);
+                    debug!("Expected resumed/hello; got: {:?}", other);
 
                     return Err(Error::ExpectedHandshake);
                 },
@@ -276,7 +276,7 @@ impl Connection {
         }
 
         let hello = hello
-            .expect("[Voice] Hello packet expected in connection initialisation, but not found.");
+            .expect("Hello packet expected in connection initialisation, but not found.");
 
         interconnect
             .aux_packets
@@ -285,14 +285,14 @@ impl Connection {
             .aux_packets
             .send(AuxPacketMessage::Ws(Box::new(client)))?;
 
-        info!("[Voice] Reconnected to: {}", &self.info.endpoint);
+        info!("Reconnected to: {}", &self.info.endpoint);
         Ok(())
     }
 }
 
 impl Drop for Connection {
     fn drop(&mut self) {
-        info!("[Voice] Disconnected");
+        info!("Disconnected");
     }
 }
 
@@ -326,7 +326,7 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
             },
             other => {
                 debug!(
-                    "[Voice] Expected ready for key; got: op{}/v{:?}",
+                    "Expected ready for key; got: op{}/v{:?}",
                     other.kind() as u8,
                     other
                 );

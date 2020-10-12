@@ -50,13 +50,13 @@ impl Mixer {
     fn new(mix_rx: Receiver<MixerMessage>) -> Self {
         let bitrate = DEFAULT_BITRATE;
         let encoder = new_encoder(bitrate)
-            .expect("[Voice] Failed to create encoder in mixing thread with known-good values.");
+            .expect("Failed to create encoder in mixing thread with known-good values.");
         let soft_clip = SoftClip::new(Channels::Stereo);
 
         let mut packet = [0u8; VOICE_PACKET_MAX];
 
         let mut rtp = MutableRtpPacket::new(&mut packet[..]).expect(
-            "[Voice] Too few bytes in self.packet for RTP header.\
+            "Too few bytes in self.packet for RTP header.\
                 (Blame: VOICE_PACKET_MAX?)",
         );
         rtp.set_version(RTP_VERSION);
@@ -98,7 +98,7 @@ impl Mixer {
                     Ok(SetBitrate(b)) => {
                         self.bitrate = b;
                         if let Err(e) = self.set_bitrate(b) {
-                            error!("[Voice] Failed to update bitrate {:?}", e);
+                            error!("Failed to update bitrate {:?}", e);
                         }
                     },
                     Ok(SetMute(m)) => {
@@ -107,7 +107,7 @@ impl Mixer {
                     Ok(SetConn(conn, ssrc)) => {
                         self.conn_active = Some(conn);
                         let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
-                            "[Voice] Too few bytes in self.packet for RTP header.\
+                            "Too few bytes in self.packet for RTP header.\
                                 (Blame: VOICE_PACKET_MAX?)",
                         );
                         rtp.set_ssrc(ssrc);
@@ -124,12 +124,12 @@ impl Mixer {
                         },
                         Err(e) => {
                             error!(
-                                "[Voice] Failed to rebuild encoder. Resetting bitrate. {:?}",
+                                "Failed to rebuild encoder. Resetting bitrate. {:?}",
                                 e
                             );
                             self.bitrate = DEFAULT_BITRATE;
                             self.encoder = new_encoder(self.bitrate).expect(
-                                "[Voice] Failed fallback rebuild of OpusEncoder with safe inputs.",
+                                "Failed fallback rebuild of OpusEncoder with safe inputs.",
                             );
                         },
                     },
@@ -149,7 +149,7 @@ impl Mixer {
                     let _ = interconnect.core.send(CoreMessage::RebuildInterconnect);
                 }
 
-                error!("[Voice] Mixer thread cycle: {:?}", e);
+                error!("Mixer thread cycle: {:?}", e);
 
                 let _ = interconnect.core.send(CoreMessage::Reconnect);
             } else {
@@ -241,7 +241,7 @@ impl Mixer {
             let track = self
                 .tracks
                 .get_mut(i)
-                .expect("[Voice] Tried to remove an illegal track index.");
+                .expect("Tried to remove an illegal track index.");
 
             if track.playing.is_done() {
                 let p_state = track.playing();
@@ -338,7 +338,7 @@ impl Mixer {
         let mut nonce = Nonce::default();
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
-                "[Voice] Too few bytes in self.packet for RTP header.\
+                "Too few bytes in self.packet for RTP header.\
                     (Blame: VOICE_PACKET_MAX?)",
             );
 
@@ -362,7 +362,7 @@ impl Mixer {
             let tag = conn
                 .cipher
                 .encrypt_in_place_detached(&nonce, b"", &mut payload[TAG_SIZE..final_payload_size])
-                .expect("[Voice] Encryption failed?");
+                .expect("Encryption failed?");
             payload[..TAG_SIZE].copy_from_slice(&tag[..]);
 
             rtp_len + final_payload_size
@@ -373,7 +373,7 @@ impl Mixer {
             .send(UdpMessage::Packet(self.packet[..index].to_vec()))?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
-            "[Voice] Too few bytes in self.packet for RTP header.\
+            "Too few bytes in self.packet for RTP header.\
                 (Blame: VOICE_PACKET_MAX?)",
         );
         rtp.set_sequence(rtp.get_sequence() + 1);
