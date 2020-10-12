@@ -1,25 +1,25 @@
 //! Live, controllable audio instances.
-
+//!
+//! TODO: explain at a high level.
+mod command;
+mod handle;
+mod looping;
+mod mode;
 mod queue;
+mod state;
 
-use crate::{
-    constants::*,
-    driver::tasks::message::*,
-    events::{Event, EventData, EventHandler, EventStore},
-    input::Input,
-};
+pub use self::{command::*, handle::*, looping::*, mode::*, queue::*, state::*};
+
+use crate::{constants::*, driver::tasks::message::*, events::EventStore, input::Input};
 use std::time::Duration;
 use tokio::sync::{
     mpsc::{
         self,
         error::{SendError, TryRecvError},
         UnboundedReceiver,
-        UnboundedSender,
     },
-    oneshot::{self, Receiver as OneshotReceiver, Sender as OneshotSender},
+    oneshot::Receiver as OneshotReceiver,
 };
-
-pub use queue::*;
 
 /// Control object for audio playback.
 ///
@@ -336,29 +336,6 @@ pub fn create_player(source: Input) -> (Track, TrackHandle) {
     (player, TrackHandle::new(tx, can_seek))
 }
 
-/// State of an [`Track`] object, designed to be passed to event handlers
-/// and retrieved remotely via [`TrackHandle::get_info`] or
-/// [`TrackHandle::get_info_blocking`].
-///
-/// [`Track`]: struct.Track.html
-/// [`TrackHandle::get_info`]: struct.TrackHandle.html#method.get_info
-/// [`TrackHandle::get_info_blocking`]: struct.TrackHandle.html#method.get_info_blocking
-#[derive(Copy, Clone, Debug, Default, PartialEq)]
-pub struct TrackState {
-    pub playing: PlayMode,
-    pub volume: f32,
-    pub position: Duration,
-    pub play_time: Duration,
-    pub loops: LoopState,
-}
-
-impl TrackState {
-    pub(crate) fn step_frame(&mut self) {
-        self.position += TIMESTEP_LENGTH;
-        self.play_time += TIMESTEP_LENGTH;
-    }
-}
-
 /// Alias for most result-free calls to an [`TrackHandle`].
 ///
 /// Failure indicates that the accessed audio object has been
@@ -388,253 +365,3 @@ pub type TrackQueryResult = Result<OneshotReceiver<Box<TrackState>>, SendError<T
 ///
 /// [`TrackHandle::get_info_blocking`]: struct.TrackHandle.html#method.get_info_blocking
 pub type BlockingTrackQueryResult = Result<Box<TrackState>, SendError<TrackCommand>>;
-
-#[derive(Clone, Debug)]
-/// Handle for safe control of a [`Track`] track from other threads, outside
-/// of the audio mixing and voice handling context.
-///
-/// Almost all method calls here are fallible; in most cases, this will be because
-/// the underlying [`Track`] object has been discarded. Those which aren't refer
-/// to immutable properties of the underlying stream.
-///
-/// [`Track`]: struct.Track.html
-pub struct TrackHandle {
-    command_channel: UnboundedSender<TrackCommand>,
-    seekable: bool,
-}
-
-impl TrackHandle {
-    pub fn new(command_channel: UnboundedSender<TrackCommand>, seekable: bool) -> Self {
-        Self {
-            command_channel,
-            seekable,
-        }
-    }
-
-    /// Unpauses an audio track.
-    pub fn play(&self) -> TrackResult {
-        self.send(TrackCommand::Play)
-    }
-
-    /// Pauses an audio track.
-    pub fn pause(&self) -> TrackResult {
-        self.send(TrackCommand::Pause)
-    }
-
-    /// Stops an audio track.
-    ///
-    /// This is *final*, and will cause the audio context to fire
-    /// a [`TrackEvent::End`] event.
-    ///
-    /// [`TrackEvent::End`]: ../events/enum.TrackEvent.html#variant.End
-    pub fn stop(&self) -> TrackResult {
-        self.send(TrackCommand::Stop)
-    }
-
-    /// Sets the volume of an audio track.
-    pub fn set_volume(&self, volume: f32) -> TrackResult {
-        self.send(TrackCommand::Volume(volume))
-    }
-
-    /// Denotes whether the underlying [`Input`] stream is compatible with arbitrary seeking.
-    ///
-    /// If this returns `false`, all calls to [`seek`] will fail, and the track is
-    /// incapable of looping.
-    ///
-    /// [`seek`]: #method.seek
-    /// [`Input`]: ../input/struct.Input.html
-    pub fn is_seekable(&self) -> bool {
-        self.seekable
-    }
-
-    /// Seeks along the track to the specified position.
-    ///
-    /// If the underlying [`Input`] does not support this behaviour,
-    /// then all calls will fail.
-    ///
-    /// [`Input`]: ../input/struct.Input.html
-    pub fn seek_time(&self, position: Duration) -> TrackResult {
-        if self.seekable {
-            self.send(TrackCommand::Seek(position))
-        } else {
-            Err(SendError(TrackCommand::Seek(position)))
-        }
-    }
-
-    /// Attach an event handler to an audio track. These will receive [`EventContext::Track`].
-    ///
-    /// Users **must** ensure that no costly work or blocking occurs
-    /// within the supplied function or closure. *Taking excess time could prevent
-    /// timely sending of packets, causing audio glitches and delays*.
-    ///
-    /// [`Track`]: struct.Track.html
-    /// [`EventContext::Track`]: ../events/enum.EventContext.html#variant.Track
-    pub fn add_event<F: EventHandler + 'static>(&self, event: Event, action: F) -> TrackResult {
-        let cmd = TrackCommand::AddEvent(EventData::new(event, action));
-        if event.is_global_only() {
-            Err(SendError(cmd))
-        } else {
-            self.send(cmd)
-        }
-    }
-
-    /// Perform an arbitrary action on a raw [`Track`] object.
-    ///
-    /// Users **must** ensure that no costly work or blocking occurs
-    /// within the supplied function or closure. *Taking excess time could prevent
-    /// timely sending of packets, causing audio glitches and delays*.
-    ///
-    /// [`Track`]: struct.Track.html
-    pub fn action<F>(&self, action: F) -> TrackResult
-    where
-        F: FnOnce(&mut Track) + Send + Sync + 'static,
-    {
-        self.send(TrackCommand::Do(Box::new(action)))
-    }
-
-    /// Request playback information and state from the audio context.
-    ///
-    /// Crucially, the audio thread will respond *at a later time*:
-    /// It is up to the user when or how this should be read from the returned channel.
-    pub fn get_info(&self) -> TrackQueryResult {
-        let (tx, rx) = oneshot::channel();
-        self.send(TrackCommand::Request(tx)).map(move |_| rx)
-    }
-
-    // Set an audio track to loop indefinitely.
-    pub fn enable_loop(&self) -> TrackResult {
-        if self.seekable {
-            self.send(TrackCommand::Loop(LoopState::Infinite))
-        } else {
-            Err(SendError(TrackCommand::Loop(LoopState::Infinite)))
-        }
-    }
-
-    // Set an audio track to no longer loop.
-    pub fn disable_loop(&self) -> TrackResult {
-        if self.seekable {
-            self.send(TrackCommand::Loop(LoopState::Finite(0)))
-        } else {
-            Err(SendError(TrackCommand::Loop(LoopState::Finite(0))))
-        }
-    }
-
-    // Set an audio track to loop a set number of times.
-    pub fn loop_for(&self, count: usize) -> TrackResult {
-        if self.seekable {
-            self.send(TrackCommand::Loop(LoopState::Finite(count)))
-        } else {
-            Err(SendError(TrackCommand::Loop(LoopState::Finite(count))))
-        }
-    }
-
-    #[inline]
-    /// Send a raw command to the [`Track`] object.
-    ///
-    /// [`Track`]: struct.Track.html
-    pub fn send(&self, cmd: TrackCommand) -> TrackResult {
-        self.command_channel.send(cmd)
-    }
-}
-
-#[derive(Copy, Clone, Debug, Eq, PartialEq)]
-/// Looping behaviour for a [`Track`].
-///
-/// [`Track`]: struct.Track.html
-pub enum LoopState {
-    /// Track will loop endlessly until loop state is changed or
-    /// manually stopped.
-    Infinite,
-
-    /// Track will loop `n` more times.
-    ///
-    /// `Finite(0)` is the `Default`, stopping the track once its [`Input`] ends.
-    ///
-    /// [`Input`]: ../input/struct.Input.html
-    Finite(usize),
-}
-
-impl Default for LoopState {
-    fn default() -> Self {
-        Self::Finite(0)
-    }
-}
-
-/// A request from external code using an [`TrackHandle`] to modify
-/// or act upon an [`Track`] object.
-///
-/// [`Track`]: struct.Track.html
-/// [`TrackHandle`]: struct.TrackHandle.html
-pub enum TrackCommand {
-    Play,
-    Pause,
-    Stop,
-    Volume(f32),
-    Seek(Duration),
-    AddEvent(EventData),
-    Do(Box<dyn FnOnce(&mut Track) + Send + Sync + 'static>),
-    Request(OneshotSender<Box<TrackState>>),
-    Loop(LoopState),
-}
-
-impl std::fmt::Debug for TrackCommand {
-    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> Result<(), std::fmt::Error> {
-        use TrackCommand::*;
-        write!(
-            f,
-            "TrackCommand::{}",
-            match self {
-                Play => "Play".to_string(),
-                Pause => "Pause".to_string(),
-                Stop => "Stop".to_string(),
-                Volume(vol) => format!("Volume({})", vol),
-                Seek(d) => format!("Seek({:?})", d),
-                AddEvent(evt) => format!("AddEvent({:?})", evt),
-                Do(_f) => "Do([function])".to_string(),
-                Request(tx) => format!("Request({:?})", tx),
-                Loop(loops) => format!("Loop({:?})", loops),
-            }
-        )
-    }
-}
-
-#[derive(Clone, Copy, Debug, Eq, PartialEq)]
-/// Playback status of a track.
-pub enum PlayMode {
-    /// The track is currently playing.
-    Play,
-
-    /// The track is currently paused, and may be resumed.
-    Pause,
-
-    /// The track has been manually stopped, and cannot be restarted.
-    Stop,
-
-    /// The track has naturally ended, and cannot be restarted.
-    End,
-}
-
-impl PlayMode {
-    /// Returns whether the track has irreversibly stopped.
-    pub fn is_done(self) -> bool {
-        matches!(self, PlayMode::Stop | PlayMode::End)
-    }
-
-    fn change_to(self, other: Self) -> PlayMode {
-        use PlayMode::*;
-
-        // Idea: a finished track cannot be restarted -- this action is final.
-        // We may want to change this in future so that seekable tracks can uncancel
-        // themselves, perhaps, but this requires a bit more machinery to readd...
-        match self {
-            Play | Pause => other,
-            state => state,
-        }
-    }
-}
-
-impl Default for PlayMode {
-    fn default() -> Self {
-        PlayMode::Play
-    }
-}
