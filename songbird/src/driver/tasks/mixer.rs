@@ -22,6 +22,7 @@ use flume::{Receiver, TryRecvError};
 use rand::random;
 use spin_sleep::SpinSleeper;
 use std::time::Instant;
+use tokio::runtime::Handle;
 use tracing::{debug, error};
 use xsalsa20poly1305::{aead::AeadInPlace, Nonce, TAG_SIZE};
 
@@ -79,7 +80,7 @@ impl Mixer {
         }
     }
 
-    fn run(&mut self, mut interconnect: Interconnect) {
+    fn run(&mut self, mut interconnect: Interconnect, async_handle: Handle) {
         'runner: loop {
             loop {
                 use MixerMessage::*;
@@ -123,14 +124,10 @@ impl Mixer {
                             self.encoder = encoder;
                         },
                         Err(e) => {
-                            error!(
-                                "Failed to rebuild encoder. Resetting bitrate. {:?}",
-                                e
-                            );
+                            error!("Failed to rebuild encoder. Resetting bitrate. {:?}", e);
                             self.bitrate = DEFAULT_BITRATE;
-                            self.encoder = new_encoder(self.bitrate).expect(
-                                "Failed fallback rebuild of OpusEncoder with safe inputs.",
-                            );
+                            self.encoder = new_encoder(self.bitrate)
+                                .expect("Failed fallback rebuild of OpusEncoder with safe inputs.");
                         },
                     },
 
@@ -369,8 +366,8 @@ impl Mixer {
         };
 
         // FIXME: This is dog slow, don't do this.
-        conn.udp
-            .send(UdpMessage::Packet(self.packet[..index].to_vec()))?;
+        conn.udp_tx
+            .send(UdpTxMessage::Packet(self.packet[..index].to_vec()))?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
             "Too few bytes in self.packet for RTP header.\
@@ -383,8 +380,16 @@ impl Mixer {
     }
 }
 
-pub(crate) fn runner(interconnect: Interconnect, mix_rx: Receiver<MixerMessage>) {
+/// The mixing thread is a synchronous contect due to its compute-bound nature.
+///
+/// We pass in an async handle for the benefit of some Input classes (e.g., restartables)
+/// who need to run their restart code elsewhere and return blank data until such time.
+pub(crate) fn runner(
+    interconnect: Interconnect,
+    mix_rx: Receiver<MixerMessage>,
+    async_handle: Handle,
+) {
     let mut mixer = Mixer::new(mix_rx);
 
-    mixer.run(interconnect);
+    mixer.run(interconnect, async_handle);
 }

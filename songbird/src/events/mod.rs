@@ -7,14 +7,7 @@ mod store;
 mod track;
 mod untimed;
 
-pub use self::{
-    context::*,
-    core::*,
-    data::*,
-    store::*,
-    track::*,
-    untimed::*,
-};
+pub use self::{context::*, core::*, data::*, store::*, track::*, untimed::*};
 
 use async_trait::async_trait;
 use std::time::Duration;

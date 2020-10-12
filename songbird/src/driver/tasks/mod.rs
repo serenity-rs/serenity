@@ -3,24 +3,28 @@ pub mod error;
 mod events;
 pub(crate) mod message;
 mod mixer;
+pub(crate) mod udp_rx;
+pub(crate) mod udp_tx;
 
-use crate::{
-    driver::connection::{error::Error as ConnectionError, Connection},
-    model::id::GuildId,
+use super::{
+    connection::{error::Error as ConnectionError, Connection},
+    Config,
 };
+use crate::model::id::GuildId;
 use flume::{Receiver, RecvError, Sender};
 use message::*;
+use tokio::runtime::Handle;
 use tracing::{error, info, warn};
 
-pub(crate) fn start(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
+pub(crate) fn start(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     tokio::spawn(async move {
-        info!("Core started for guild: {}", guild_id);
-        runner(guild_id, rx, tx).await;
-        info!("Core finished for guild: {}", guild_id);
+        info!("Driver started.");
+        runner(config, rx, tx).await;
+        info!("Driver finished.");
     });
 }
 
-fn start_internals(guild_id: GuildId, core: Sender<CoreMessage>) -> Interconnect {
+fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
     let (evt_tx, evt_rx) = flume::unbounded();
     let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
     let (mix_tx, mix_rx) = flume::unbounded();
@@ -34,36 +38,37 @@ fn start_internals(guild_id: GuildId, core: Sender<CoreMessage>) -> Interconnect
 
     let ic = interconnect.clone();
     tokio::spawn(async move {
-        info!("Event processor started for guild: {}", guild_id);
+        info!("Event processor started.");
         events::runner(ic, evt_rx).await;
-        info!("Event processor finished for guild: {}", guild_id);
+        info!("Event processor finished.");
     });
 
     let ic = interconnect.clone();
     tokio::spawn(async move {
-        info!("Network processor started for guild: {}", guild_id);
+        info!("Network processor started.");
         aux_network::runner(ic, pkt_aux_rx).await;
-        info!("Network processor finished for guild: {}", guild_id);
+        info!("Network processor finished.");
     });
 
     let ic = interconnect.clone();
+    let handle = Handle::current();
     std::thread::spawn(move || {
-        info!("Mixer started for guild: {}", guild_id);
-        mixer::runner(ic, mix_rx);
-        info!("Mixer finished for guild: {}", guild_id);
+        info!("Mixer started.");
+        mixer::runner(ic, mix_rx, handle);
+        info!("Mixer finished.");
     });
 
     interconnect
 }
 
-async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
+async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     let mut connection = None;
-    let mut interconnect = start_internals(guild_id, tx);
+    let mut interconnect = start_internals(tx);
 
     loop {
         match rx.recv_async().await {
             Ok(CoreMessage::ConnectWithResult(info, tx)) => {
-                connection = match Connection::new(info, &interconnect).await {
+                connection = match Connection::new(info, &interconnect, &config).await {
                     Ok(connection) => {
                         // Other side may not be listening: this is fine.
                         let _ = tx.send(Ok(()));
@@ -109,7 +114,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                             false
                         },
                         Err(ConnectionError::InterconnectFailure(_)) => {
-                            interconnect.restart_volatile_internals(guild_id);
+                            interconnect.restart_volatile_internals();
 
                             match conn.reconnect(&interconnect).await {
                                 Ok(()) => {
@@ -123,13 +128,10 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                     };
 
                     if full_connect {
-                        connection = Connection::new(info, &interconnect)
+                        connection = Connection::new(info, &interconnect, &config)
                             .await
                             .map_err(|e| {
-                                error!(
-                                    "Catastrophic connection failure. Stopping. {:?}",
-                                    e
-                                );
+                                error!("Catastrophic connection failure. Stopping. {:?}", e);
                                 e
                             })
                             .ok();
@@ -137,7 +139,7 @@ async fn runner(guild_id: GuildId, rx: Receiver<CoreMessage>, tx: Sender<CoreMes
                 }
             },
             Ok(CoreMessage::RebuildInterconnect) => {
-                interconnect.restart_volatile_internals(guild_id);
+                interconnect.restart_volatile_internals();
             },
             Err(RecvError::Disconnected) | Ok(CoreMessage::Poison) => {
                 break;

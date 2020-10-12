@@ -37,7 +37,7 @@ impl Driver {
     /// This will create the core voice tasks in the background.
     #[inline]
     pub fn new(config: Config) -> Self {
-        let sender = Self::start_inner();
+        let sender = Self::start_inner(config.clone());
 
         Driver {
             config,
@@ -46,17 +46,16 @@ impl Driver {
         }
     }
 
-    fn start_inner() -> Sender<CoreMessage> {
+    fn start_inner(config: Config) -> Sender<CoreMessage> {
         let (tx, rx) = flume::unbounded();
 
-        // FIXME: excise guild id.
-        tasks::start(serenity_voice_model::id::GuildId(0), rx, tx.clone());
+        tasks::start(config, rx, tx.clone());
 
         tx
     }
 
     fn restart_inner(&mut self) {
-        self.sender = Self::start_inner();
+        self.sender = Self::start_inner(self.config.clone());
 
         self.mute(self.self_mute);
     }

@@ -5,9 +5,10 @@ mod aux_network;
 mod core;
 mod events;
 mod mixer;
-mod udp;
+mod udp_rx;
+mod udp_tx;
 
-pub(crate) use self::{aux_network::*, core::*, events::*, mixer::*, udp::*};
+pub(crate) use self::{aux_network::*, core::*, events::*, mixer::*, udp_rx::*, udp_tx::*};
 
 use tracing::info;
 
@@ -30,12 +31,12 @@ impl Interconnect {
         let _ = self.mixer.send(MixerMessage::Poison);
     }
 
-    pub fn restart(self, guild_id: GuildId) -> Self {
+    pub fn restart(self) -> Self {
         self.poison();
-        super::start_internals(guild_id, self.core)
+        super::start_internals(self.core)
     }
 
-    pub fn restart_volatile_internals(&mut self, guild_id: GuildId) {
+    pub fn restart_volatile_internals(&mut self) {
         self.poison();
 
         let (evt_tx, evt_rx) = flume::unbounded();
@@ -46,19 +47,16 @@ impl Interconnect {
 
         let ic = self.clone();
         tokio::spawn(async move {
-            info!("Event processor restarted for guild: {}", guild_id);
+            info!("Event processor restarted.");
             super::events::runner(ic, evt_rx).await;
-            info!("Event processor finished for guild: {}", guild_id);
+            info!("Event processor finished.");
         });
 
         let ic = self.clone();
         tokio::spawn(async move {
-            info!(
-                "Network processor restarted for guild: {}",
-                guild_id
-            );
+            info!("Network processor restarted.");
             super::aux_network::runner(ic, pkt_aux_rx).await;
-            info!("Network processor finished for guild: {}", guild_id);
+            info!("Network processor finished.");
         });
 
         // Make mixer aware of new targets...

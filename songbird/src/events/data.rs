@@ -1,8 +1,5 @@
 use super::*;
-use std::{
-    cmp::Ordering,
-    time::Duration,
-};
+use std::{cmp::Ordering, time::Duration};
 
 /// Internal representation of an event, as handled by the audio context.
 pub struct EventData {
@@ -89,4 +86,3 @@ impl PartialEq for EventData {
 }
 
 impl Eq for EventData {}
-

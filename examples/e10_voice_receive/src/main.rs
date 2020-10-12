@@ -251,7 +251,7 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        manager.remove(guild_id);
+        manager.remove(guild_id).await;
 
         check_msg(msg.channel_id.say(&ctx.http,"Left voice channel").await);
     } else {

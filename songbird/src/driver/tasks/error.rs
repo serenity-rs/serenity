@@ -1,4 +1,4 @@
-use super::message::{AuxPacketMessage, EventMessage, MixerMessage, UdpMessage};
+use super::message::*;
 use crate::ws::Error as WsError;
 use audiopus::Error as OpusError;
 use flume::SendError;
@@ -10,7 +10,8 @@ pub enum Recipient {
     AuxNetwork,
     Event,
     Mixer,
-    Udp,
+    UdpRx,
+    UdpTx,
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
@@ -62,9 +63,15 @@ impl From<SendError<MixerMessage>> for Error {
     }
 }
 
-impl From<SendError<UdpMessage>> for Error {
-    fn from(_e: SendError<UdpMessage>) -> Error {
-        Error::InterconnectFailure(Recipient::Udp)
+impl From<SendError<UdpRxMessage>> for Error {
+    fn from(_e: SendError<UdpRxMessage>) -> Error {
+        Error::InterconnectFailure(Recipient::UdpRx)
+    }
+}
+
+impl From<SendError<UdpTxMessage>> for Error {
+    fn from(_e: SendError<UdpTxMessage>) -> Error {
+        Error::InterconnectFailure(Recipient::UdpTx)
     }
 }
 

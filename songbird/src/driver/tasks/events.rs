@@ -23,12 +23,12 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
             Ok(AddTrackEvent(i, data)) => {
                 info!("Adding event to track {}.", i);
 
-                let event_store = events.get_mut(i).expect(
-                    "Event thread was given an illegal store index for AddTrackEvent.",
-                );
-                let state = states.get_mut(i).expect(
-                    "Event thread was given an illegal state index for AddTrackEvent.",
-                );
+                let event_store = events
+                    .get_mut(i)
+                    .expect("Event thread was given an illegal store index for AddTrackEvent.");
+                let state = states
+                    .get_mut(i)
+                    .expect("Event thread was given an illegal state index for AddTrackEvent.");
 
                 event_store.add_event(data, state.position);
             },
@@ -58,9 +58,9 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                     i, max_states, change
                 );
 
-                let state = states.get_mut(i).expect(
-                    "Event thread was given an illegal state index for ChangeState.",
-                );
+                let state = states
+                    .get_mut(i)
+                    .expect("Event thread was given an illegal state index for ChangeState.");
 
                 match change {
                     Mode(mode) => {
@@ -90,11 +90,7 @@ pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMe
                 }
             },
             Ok(RemoveTrack(i)) => {
-                info!(
-                    "Event state for track {} of {} removed.",
-                    i,
-                    events.len()
-                );
+                info!("Event state for track {} of {} removed.", i, events.len());
 
                 events.remove(i);
                 states.remove(i);

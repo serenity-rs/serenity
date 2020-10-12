@@ -1,4 +1,4 @@
-use super::{Interconnect, UdpMessage};
+use super::{Interconnect, UdpRxMessage, UdpTxMessage};
 
 use crate::{tracks::Track, Bitrate};
 use flume::Sender;
@@ -6,12 +6,14 @@ use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
 pub struct MixerConnection {
     pub cipher: Cipher,
-    pub udp: Sender<UdpMessage>,
+    pub udp_rx: Sender<UdpRxMessage>,
+    pub udp_tx: Sender<UdpTxMessage>,
 }
 
 impl Drop for MixerConnection {
     fn drop(&mut self) {
-        let _ = self.udp.send(UdpMessage::Poison);
+        let _ = self.udp_rx.send(UdpRxMessage::Poison);
+        let _ = self.udp_tx.send(UdpTxMessage::Poison);
     }
 }
 

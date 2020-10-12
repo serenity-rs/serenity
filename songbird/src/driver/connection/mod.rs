@@ -1,6 +1,10 @@
 pub mod error;
 
-use super::{tasks::message::*, CryptoMode};
+use super::{
+    tasks::{message::*, udp_rx, udp_tx},
+    Config,
+    CryptoMode,
+};
 use crate::{
     constants::*,
     model::{
@@ -11,18 +15,10 @@ use crate::{
     ws::{self, ReceiverExt, SenderExt, WsStream},
     ConnectionInfo,
 };
-use discortp::discord::{
-    IpDiscoveryPacket,
-    IpDiscoveryType,
-    MutableIpDiscoveryPacket,
-    MutableKeepalivePacket,
-};
+use discortp::discord::{IpDiscoveryPacket, IpDiscoveryType, MutableIpDiscoveryPacket};
 use error::{Error, Result};
 use std::{net::IpAddr, str::FromStr};
-use tokio::{
-    net::UdpSocket,
-    time::{timeout_at, Elapsed, Instant},
-};
+use tokio::net::UdpSocket;
 use tracing::{debug, info};
 use url::Url;
 use xsalsa20poly1305::{aead::NewAead, XSalsa20Poly1305 as Cipher};
@@ -41,7 +37,10 @@ impl Connection {
     pub(crate) async fn new(
         mut info: ConnectionInfo,
         interconnect: &Interconnect,
+        config: &Config,
     ) -> Result<Connection> {
+        let crypto_mode = config.crypto_mode.unwrap_or(CryptoMode::Normal);
+
         let url = generate_url(&mut info.endpoint)?;
 
         #[cfg(all(feature = "rustls", not(feature = "native")))]
@@ -89,12 +88,12 @@ impl Connection {
             }
         }
 
-        let hello = hello
-            .expect("Hello packet expected in connection initialisation, but not found.");
-        let ready = ready
-            .expect("Ready packet expected in connection initialisation, but not found.");
+        let hello =
+            hello.expect("Hello packet expected in connection initialisation, but not found.");
+        let ready =
+            ready.expect("Ready packet expected in connection initialisation, but not found.");
 
-        if !has_valid_mode(&ready.modes, CryptoMode::Normal) {
+        if !has_valid_mode(&ready.modes, crypto_mode) {
             return Err(Error::CryptoModeUnavailable);
         }
 
@@ -117,8 +116,8 @@ impl Connection {
 
         let (len, _addr) = udp.recv_from(&mut bytes).await?;
         {
-            let view = IpDiscoveryPacket::new(&bytes[..len])
-                .ok_or(Error::IllegalDiscoveryResponse)?;
+            let view =
+                IpDiscoveryPacket::new(&bytes[..len]).ok_or(Error::IllegalDiscoveryResponse)?;
 
             if view.get_pkt_type() != IpDiscoveryType::Response {
                 return Err(Error::IllegalDiscoveryResponse);
@@ -146,60 +145,25 @@ impl Connection {
                     protocol: "udp".into(),
                     data: ProtocolData {
                         address,
-                        mode: CryptoMode::Normal.to_request_str().into(),
+                        mode: crypto_mode.to_request_str().into(),
                         port: view.get_port(),
                     },
                 }))
                 .await?;
         }
 
-        let cipher = init_cipher(&mut client).await?;
+        let cipher = init_cipher(&mut client, crypto_mode).await?;
 
         info!("Connected to: {}", info.endpoint);
 
-        info!(
-            "WS heartbeat duration {}ms.",
-            hello.heartbeat_interval,
-        );
+        info!("WS heartbeat duration {}ms.", hello.heartbeat_interval,);
 
-        let (udp_rx, mut udp_tx) = udp.split();
-
-        let (udp_msg_tx, udp_msg_rx) = flume::unbounded();
+        let (udp_sender_msg_tx, udp_sender_msg_rx) = flume::unbounded();
+        let (udp_receiver_msg_tx, udp_receiver_msg_rx) = flume::unbounded();
+        let (udp_rx, udp_tx) = udp.split();
 
         let ssrc = ready.ssrc;
-        tokio::spawn(async move {
-            info!("UDP handle started.");
 
-            let mut keepalive_bytes = [0u8; MutableKeepalivePacket::minimum_packet_size()];
-            let mut ka = MutableKeepalivePacket::new(&mut keepalive_bytes[..])
-                .expect("Insufficient bytes given to keepalive packet.");
-            ka.set_ssrc(ssrc);
-
-            let mut ka_time = Instant::now() + UDP_KEEPALIVE_GAP;
-
-            loop {
-                use UdpMessage::*;
-                match timeout_at(ka_time, udp_msg_rx.recv_async()).await {
-                    Err(Elapsed { .. }) => {
-                        info!("Sending UDP Keepalive.");
-                        let _ = udp_tx.send(&keepalive_bytes[..]).await;
-                        ka_time += UDP_KEEPALIVE_GAP;
-                    },
-                    Ok(Ok(Packet(p))) => {
-                        let _ = udp_tx.send(&p[..]).await;
-                    },
-                    Ok(Err(_)) | Ok(Ok(Poison)) => {
-                        break;
-                    },
-                }
-            }
-
-            info!("UDP handle stopped.");
-        });
-
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::UdpCipher(cipher.clone()))?;
         interconnect
             .aux_packets
             .send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
@@ -208,19 +172,26 @@ impl Connection {
             .send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
         interconnect
             .aux_packets
-            .send(AuxPacketMessage::Udp(udp_rx))?;
-        interconnect
-            .aux_packets
             .send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         let mix_conn = MixerConnection {
-            cipher,
-            udp: udp_msg_tx,
+            cipher: cipher.clone(),
+            udp_rx: udp_receiver_msg_tx,
+            udp_tx: udp_sender_msg_tx,
         };
 
         interconnect
             .mixer
             .send(MixerMessage::SetConn(mix_conn, ready.ssrc))?;
+
+        tokio::spawn(udp_rx::runner(
+            interconnect.clone(),
+            udp_receiver_msg_rx,
+            cipher,
+            crypto_mode,
+            udp_rx,
+        ));
+        tokio::spawn(udp_tx::runner(udp_sender_msg_rx, ssrc, udp_tx));
 
         Ok(Connection { info })
     }
@@ -275,8 +246,8 @@ impl Connection {
             }
         }
 
-        let hello = hello
-            .expect("Hello packet expected in connection initialisation, but not found.");
+        let hello =
+            hello.expect("Hello packet expected in connection initialisation, but not found.");
 
         interconnect
             .aux_packets
@@ -308,7 +279,7 @@ fn generate_url(endpoint: &mut String) -> Result<Url> {
 }
 
 #[inline]
-async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
+async fn init_cipher(client: &mut WsStream, mode: CryptoMode) -> Result<Cipher> {
     loop {
         let value = match client.recv_json().await? {
             Some(value) => value,
@@ -318,7 +289,7 @@ async fn init_cipher(client: &mut WsStream) -> Result<Cipher> {
         match value {
             GatewayEvent::SessionDescription(desc) => {
                 // FIXME: check against config.
-                if desc.mode != CryptoMode::Normal.to_request_str() {
+                if desc.mode != mode.to_request_str() {
                     return Err(Error::CryptoModeInvalid);
                 }
 
