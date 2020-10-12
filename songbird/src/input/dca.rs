@@ -1,5 +1,66 @@
-use super::Metadata;
+use super::{codec::OpusDecoderState, error::DcaError, Codec, Container, Input, Metadata, Reader};
 use serde::Deserialize;
+use std::{ffi::OsStr, io::BufReader, mem};
+use tokio::{fs::File as TokioFile, io::AsyncReadExt};
+
+/// Creates a streamed audio source from a DCA file.
+/// Currently only accepts the [DCA1 format](https://github.com/bwmarrin/dca).
+pub async fn dca<P: AsRef<OsStr>>(path: P) -> Result<Input, DcaError> {
+    _dca(path.as_ref()).await
+}
+
+async fn _dca(path: &OsStr) -> Result<Input, DcaError> {
+    let mut reader = TokioFile::open(path).await.map_err(DcaError::IoError)?;
+
+    let mut header = [0u8; 4];
+
+    // Read in the magic number to verify it's a DCA file.
+    reader
+        .read_exact(&mut header)
+        .await
+        .map_err(DcaError::IoError)?;
+
+    if header != b"DCA1"[..] {
+        return Err(DcaError::InvalidHeader);
+    }
+
+    let size = reader
+        .read_i32_le()
+        .await
+        .map_err(|_| DcaError::InvalidHeader)?;
+
+    // Sanity check
+    if size < 2 {
+        return Err(DcaError::InvalidSize(size));
+    }
+
+    let mut raw_json = Vec::with_capacity(size as usize);
+
+    let mut json_reader = reader.take(size as u64);
+
+    json_reader
+        .read_to_end(&mut raw_json)
+        .await
+        .map_err(DcaError::IoError)?;
+
+    let reader = BufReader::new(json_reader.into_inner().into_std().await);
+
+    let metadata: Metadata = serde_json::from_slice::<DcaMetadata>(raw_json.as_slice())
+        .map_err(DcaError::InvalidMetadata)?
+        .into();
+
+    let stereo = metadata.channels == Some(2);
+
+    Ok(Input::new(
+        stereo,
+        Reader::File(reader),
+        Codec::Opus(OpusDecoderState::new().map_err(DcaError::Opus)?),
+        Container::Dca {
+            first_frame: (size as usize) + mem::size_of::<i32>() + header.len(),
+        },
+        Some(metadata),
+    ))
+}
 
 #[derive(Debug, Deserialize)]
 pub(crate) struct DcaMetadata {

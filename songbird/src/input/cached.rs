@@ -470,6 +470,9 @@ mod tests {
         let mut true_read_buffer = [0u8; 64];
         let mut mem_read_buffer = [0u8; 64];
 
+        println!("{:#?}", mem);
+        println!("{:#?}", input_reader_2);
+
         let mut cnt = 0;
         let mut discrep = 0;
         loop {

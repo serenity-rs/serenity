@@ -191,6 +191,6 @@ jobs:
       - name: 'Build example 16'
         working-directory: examples
         run: cargo build -p e16_voice_events_queue
-      - name: 'Build example 16'
+      - name: 'Build example 17'
         working-directory: examples
         run: cargo build -p e17_voice_storage
