@@ -6,7 +6,7 @@ use tokio::{
     net::udp::SendHalf,
     time::{timeout_at, Elapsed, Instant},
 };
-use tracing::{error, info};
+use tracing::{error, info, trace};
 
 pub(crate) async fn runner(udp_msg_rx: Receiver<UdpTxMessage>, ssrc: u32, mut udp_tx: SendHalf) {
     info!("UDP transmit handle started.");
@@ -22,7 +22,7 @@ pub(crate) async fn runner(udp_msg_rx: Receiver<UdpTxMessage>, ssrc: u32, mut ud
         use UdpTxMessage::*;
         match timeout_at(ka_time, udp_msg_rx.recv_async()).await {
             Err(Elapsed { .. }) => {
-                info!("Sending UDP Keepalive.");
+                trace!("Sending UDP Keepalive.");
                 if let Err(e) = udp_tx.send(&keepalive_bytes[..]).await {
                     error!("Fatal UDP keepalive send error: {:?}.", e);
                     break;

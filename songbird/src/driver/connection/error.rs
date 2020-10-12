@@ -52,8 +52,8 @@ impl From<JsonError> for Error {
     }
 }
 
-impl From<SendError<AuxPacketMessage>> for Error {
-    fn from(_e: SendError<AuxPacketMessage>) -> Error {
+impl From<SendError<WsMessage>> for Error {
+    fn from(_e: SendError<WsMessage>) -> Error {
         Error::InterconnectFailure(Recipient::AuxNetwork)
     }
 }

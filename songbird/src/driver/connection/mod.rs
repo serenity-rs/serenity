@@ -1,7 +1,7 @@
 pub mod error;
 
 use super::{
-    tasks::{message::*, udp_rx, udp_tx},
+    tasks::{message::*, udp_rx, udp_tx, ws as ws_task},
     Config,
     CryptoMode,
 };
@@ -17,6 +17,7 @@ use crate::{
 };
 use discortp::discord::{IpDiscoveryPacket, IpDiscoveryType, MutableIpDiscoveryPacket};
 use error::{Error, Result};
+use flume::Sender;
 use std::{net::IpAddr, str::FromStr};
 use tokio::net::UdpSocket;
 use tracing::{debug, info};
@@ -31,6 +32,7 @@ use ws::create_native_tls_client;
 
 pub(crate) struct Connection {
     pub(crate) info: ConnectionInfo,
+    pub(crate) ws: Sender<WsMessage>,
 }
 
 impl Connection {
@@ -158,21 +160,12 @@ impl Connection {
 
         info!("WS heartbeat duration {}ms.", hello.heartbeat_interval,);
 
+        let (ws_msg_tx, ws_msg_rx) = flume::unbounded();
         let (udp_sender_msg_tx, udp_sender_msg_rx) = flume::unbounded();
         let (udp_receiver_msg_tx, udp_receiver_msg_rx) = flume::unbounded();
         let (udp_rx, udp_tx) = udp.split();
 
         let ssrc = ready.ssrc;
-
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::SetSsrc(ready.ssrc))?;
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::Ws(Box::new(client)))?;
 
         let mix_conn = MixerConnection {
             cipher: cipher.clone(),
@@ -182,7 +175,19 @@ impl Connection {
 
         interconnect
             .mixer
+            .send(MixerMessage::Ws(Some(ws_msg_tx.clone())))?;
+
+        interconnect
+            .mixer
             .send(MixerMessage::SetConn(mix_conn, ready.ssrc))?;
+
+        tokio::spawn(ws_task::runner(
+            interconnect.clone(),
+            ws_msg_rx,
+            client,
+            ssrc,
+            hello.heartbeat_interval,
+        ));
 
         tokio::spawn(udp_rx::runner(
             interconnect.clone(),
@@ -193,10 +198,13 @@ impl Connection {
         ));
         tokio::spawn(udp_tx::runner(udp_sender_msg_rx, ssrc, udp_tx));
 
-        Ok(Connection { info })
+        Ok(Connection {
+            info,
+            ws: ws_msg_tx,
+        })
     }
 
-    pub async fn reconnect(&mut self, interconnect: &Interconnect) -> Result<()> {
+    pub async fn reconnect(&mut self) -> Result<()> {
         let url = generate_url(&mut self.info.endpoint)?;
 
         // Thread may have died, we want to send to prompt a clean exit
@@ -249,12 +257,9 @@ impl Connection {
         let hello =
             hello.expect("Hello packet expected in connection initialisation, but not found.");
 
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::SetKeepalive(hello.heartbeat_interval))?;
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::Ws(Box::new(client)))?;
+        self.ws
+            .send(WsMessage::SetKeepalive(hello.heartbeat_interval))?;
+        self.ws.send(WsMessage::Ws(Box::new(client)))?;
 
         info!("Reconnected to: {}", &self.info.endpoint);
         Ok(())

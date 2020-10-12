@@ -1,4 +1,4 @@
-use super::{Interconnect, UdpRxMessage, UdpTxMessage};
+use super::{Interconnect, UdpRxMessage, UdpTxMessage, WsMessage};
 
 use crate::{tracks::Track, Bitrate};
 use flume::Sender;
@@ -26,5 +26,6 @@ pub(crate) enum MixerMessage {
     DropConn,
     ReplaceInterconnect(Interconnect),
     RebuildEncoder,
+    Ws(Option<Sender<WsMessage>>),
     Poison,
 }

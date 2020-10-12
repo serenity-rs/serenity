@@ -66,7 +66,7 @@ use url::Url;
 #[async_trait]
 pub trait ReceiverExt {
     async fn recv_json(&mut self) -> Result<Option<Event>>;
-    async fn try_recv_json(&mut self) -> Result<Option<Event>>;
+    async fn recv_json_no_timeout(&mut self) -> Result<Option<Event>>;
 }
 
 #[async_trait]
@@ -88,7 +88,7 @@ impl ReceiverExt for WsStream {
         convert_ws_message(ws_message)
     }
 
-    async fn try_recv_json(&mut self) -> Result<Option<Event>> {
+    async fn recv_json_no_timeout(&mut self) -> Result<Option<Event>> {
         convert_ws_message(self.try_next().await.ok().flatten())
     }
 }

@@ -40,8 +40,6 @@ pub mod serenity;
 #[cfg(feature = "gateway")]
 pub mod shards;
 #[cfg(feature = "driver")]
-mod timer;
-#[cfg(feature = "driver")]
 pub mod tracks;
 #[cfg(feature = "driver")]
 mod ws;

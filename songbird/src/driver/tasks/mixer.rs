@@ -18,7 +18,7 @@ use discortp::{
     MutablePacket,
     Packet,
 };
-use flume::{Receiver, TryRecvError};
+use flume::{Receiver, Sender, TryRecvError};
 use rand::random;
 use spin_sleep::SpinSleeper;
 use std::time::Instant;
@@ -27,6 +27,7 @@ use tracing::{debug, error};
 use xsalsa20poly1305::{aead::AeadInPlace, Nonce, TAG_SIZE};
 
 struct Mixer {
+    async_handle: Handle,
     bitrate: Bitrate,
     conn_active: Option<MixerConnection>,
     deadline: Instant,
@@ -38,6 +39,7 @@ struct Mixer {
     sleeper: SpinSleeper,
     soft_clip: SoftClip,
     tracks: Vec<Track>,
+    ws: Option<Sender<WsMessage>>,
 }
 
 fn new_encoder(bitrate: Bitrate) -> Result<OpusEncoder> {
@@ -48,7 +50,7 @@ fn new_encoder(bitrate: Bitrate) -> Result<OpusEncoder> {
 }
 
 impl Mixer {
-    fn new(mix_rx: Receiver<MixerMessage>) -> Self {
+    fn new(mix_rx: Receiver<MixerMessage>, async_handle: Handle) -> Self {
         let bitrate = DEFAULT_BITRATE;
         let encoder = new_encoder(bitrate)
             .expect("Failed to create encoder in mixing thread with known-good values.");
@@ -66,6 +68,7 @@ impl Mixer {
         rtp.set_timestamp(random::<u32>().into());
 
         Self {
+            async_handle,
             bitrate,
             conn_active: None,
             deadline: Instant::now(), // FIXME: refresh on connection start
@@ -77,10 +80,11 @@ impl Mixer {
             sleeper: Default::default(),
             soft_clip,
             tracks: vec![],
+            ws: None,
         }
     }
 
-    fn run(&mut self, mut interconnect: Interconnect, async_handle: Handle) {
+    fn run(&mut self, mut interconnect: Interconnect) {
         'runner: loop {
             loop {
                 use MixerMessage::*;
@@ -117,6 +121,9 @@ impl Mixer {
                         self.conn_active = None;
                     },
                     Ok(ReplaceInterconnect(i)) => {
+                        if let Some(ws) = &self.ws {
+                            let _ = ws.send(WsMessage::ReplaceInterconnect(i.clone()));
+                        }
                         interconnect = i;
                     },
                     Ok(RebuildEncoder) => match new_encoder(self.bitrate) {
@@ -129,6 +136,9 @@ impl Mixer {
                             self.encoder = new_encoder(self.bitrate)
                                 .expect("Failed fallback rebuild of OpusEncoder with safe inputs.");
                         },
+                    },
+                    Ok(Ws(new_ws_handle)) => {
+                        self.ws = new_ws_handle;
                     },
 
                     Err(TryRecvError::Disconnected) | Ok(Poison) => {
@@ -300,9 +310,9 @@ impl Mixer {
                 opus_frame = &SILENT_FRAME[..];
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
-                interconnect
-                    .aux_packets
-                    .send(AuxPacketMessage::Speaking(false))?;
+                if let Some(ws) = &self.ws {
+                    ws.send(WsMessage::Speaking(false))?;
+                }
 
                 self.march_deadline();
 
@@ -312,9 +322,9 @@ impl Mixer {
             self.silence_frames = 5;
         }
 
-        interconnect
-            .aux_packets
-            .send(AuxPacketMessage::Speaking(true))?;
+        if let Some(ws) = &self.ws {
+            ws.send(WsMessage::Speaking(true))?;
+        }
 
         self.march_deadline();
         self.prep_and_send_packet(mix_buffer, opus_frame)?;
@@ -389,7 +399,7 @@ pub(crate) fn runner(
     mix_rx: Receiver<MixerMessage>,
     async_handle: Handle,
 ) {
-    let mut mixer = Mixer::new(mix_rx);
+    let mut mixer = Mixer::new(mix_rx, async_handle);
 
-    mixer.run(interconnect, async_handle);
+    mixer.run(interconnect);
 }

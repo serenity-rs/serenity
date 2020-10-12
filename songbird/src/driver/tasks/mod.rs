@@ -1,16 +1,15 @@
-mod aux_network;
 pub mod error;
 mod events;
 pub(crate) mod message;
 mod mixer;
 pub(crate) mod udp_rx;
 pub(crate) mod udp_tx;
+pub(crate) mod ws;
 
 use super::{
     connection::{error::Error as ConnectionError, Connection},
     Config,
 };
-use crate::model::id::GuildId;
 use flume::{Receiver, RecvError, Sender};
 use message::*;
 use tokio::runtime::Handle;
@@ -26,13 +25,11 @@ pub(crate) fn start(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMe
 
 fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
     let (evt_tx, evt_rx) = flume::unbounded();
-    let (pkt_aux_tx, pkt_aux_rx) = flume::unbounded();
     let (mix_tx, mix_rx) = flume::unbounded();
 
     let interconnect = Interconnect {
         core,
         events: evt_tx,
-        aux_packets: pkt_aux_tx,
         mixer: mix_tx,
     };
 
@@ -41,13 +38,6 @@ fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
         info!("Event processor started.");
         events::runner(ic, evt_rx).await;
         info!("Event processor finished.");
-    });
-
-    let ic = interconnect.clone();
-    tokio::spawn(async move {
-        info!("Network processor started.");
-        aux_network::runner(ic, pkt_aux_rx).await;
-        info!("Network processor finished.");
     });
 
     let ic = interconnect.clone();
@@ -108,7 +98,7 @@ async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessag
                     // if still issue, full connect.
                     let info = conn.info.clone();
 
-                    let full_connect = match conn.reconnect(&interconnect).await {
+                    let full_connect = match conn.reconnect().await {
                         Ok(()) => {
                             connection = Some(conn);
                             false
@@ -116,7 +106,7 @@ async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessag
                         Err(ConnectionError::InterconnectFailure(_)) => {
                             interconnect.restart_volatile_internals();
 
-                            match conn.reconnect(&interconnect).await {
+                            match conn.reconnect().await {
                                 Ok(()) => {
                                     connection = Some(conn);
                                     false
