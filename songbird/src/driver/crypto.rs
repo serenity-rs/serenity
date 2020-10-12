@@ -1,6 +1,8 @@
 //! Encryption schemes supported by Discord's secure RTP negotiation.
 
 /// Variants of the XSalsa20Poly1305 encryption scheme.
+///
+/// At present, only `Normal` is supported or selectable.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum Mode {
@@ -31,4 +33,6 @@ impl Mode {
     }
 }
 
-// FIXME: implement encrypt + decrypt + nonce selection for each.
+// TODO: implement encrypt + decrypt + nonce selection for each.
+// This will probably need some research into correct handling of
+// padding, reported length, SRTP profiles, and so on.
