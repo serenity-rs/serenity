@@ -103,7 +103,7 @@ use crate::http::Http;
 
 
 #[cfg(feature = "client")]
-#[derive(Default)]
+#[derive(Clone, Default)]
 #[non_exhaustive]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
