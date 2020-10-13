@@ -147,9 +147,12 @@ impl GuildChannel {
     /// ```rust,ignore
     /// let invite = channel.create_invite(&context, |i| i.max_uses(5)).await;
     /// ```
+    #[inline]
     #[cfg(feature = "utils")]
     pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
-        where F: FnOnce(&mut CreateInvite) -> &mut CreateInvite {
+    where
+        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite
+    {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -161,12 +164,7 @@ impl GuildChannel {
             }
         }
 
-        let mut invite = CreateInvite::default();
-        f(&mut invite);
-
-        let map = serenity_utils::hashmap_to_json_map(invite.0);
-
-        cache_http.http().create_invite(self.id.0, &map).await
+        self.id.create_invite(cache_http.http(), f).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -952,7 +950,7 @@ impl GuildChannel {
                 "data:image/png;base64,".to_string() + &base64::encode(&picture)
             },
         };
-        
+
         let map = serde_json::json!({
             "name": name,
             "avatar": avatar
