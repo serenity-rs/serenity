@@ -4,6 +4,7 @@ use crate::model::prelude::*;
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
 use crate::builder::{
+    CreateInvite,
     CreateMessage,
     EditChannel,
     EditMessage,
@@ -13,7 +14,7 @@ use crate::builder::{
 use crate::cache::Cache;
 #[cfg(feature = "model")]
 use crate::http::AttachmentType;
-#[cfg(feature = "model")]
+#[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp, Typing};
@@ -58,6 +59,20 @@ impl ChannelId {
     #[inline]
     pub async fn broadcast_typing(self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().broadcast_typing(self.0).await
+    }
+
+    /// Creates an invite leading to the given channel.
+    #[cfg(feature = "utils")]
+    pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
+    where
+        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite
+    {
+        let mut invite = CreateInvite::default();
+        f(&mut invite);
+
+        let map = utils::hashmap_to_json_map(invite.0);
+
+        http.as_ref().create_invite(self.0, &map).await
     }
 
     /// Creates a [permission overwrite][`PermissionOverwrite`] for either a
@@ -827,7 +842,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     ///
     /// This drops any messages that were currently in the buffer, so it should
     /// only be called when `self.buffer` is empty. Additionally, this updates
-    /// `self.before` so that the next call does not return duplicate items. 
+    /// `self.before` so that the next call does not return duplicate items.
     /// If there are no more messages to be fetched, then this marks
     /// `self.before` as None, indicating that no more calls ought to be made.
     ///
