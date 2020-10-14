@@ -6,7 +6,7 @@ use crate::{
         Event as GatewayEvent,
         SpeakingState,
     },
-    ws::{ReceiverExt, SenderExt, WsStream},
+    ws::{Error as WsError, ReceiverExt, SenderExt, WsStream},
 };
 use flume::Receiver;
 use rand::random;
@@ -65,6 +65,10 @@ impl AuxNetwork {
                 }
                 ws_msg = self.ws_client.recv_json_no_timeout() => {
                     ws_error = match ws_msg {
+                        Err(WsError::Json(e)) => {
+                            warn!("Unexpected JSON {:?}.", e);
+                            false
+                        },
                         Err(e) => {
                             error!("Error processing ws {:?}.", e);
                             true

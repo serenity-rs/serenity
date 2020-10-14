@@ -4,14 +4,11 @@ use crate::input::{
     CodecType,
     Container,
     Input,
-    Metadata, 
+    Metadata,
     Reader,
 };
 use std::convert::TryInto;
-use streamcatcher::{
-    Catcher,
-    Config,
-};
+use streamcatcher::{Catcher, Config};
 
 /// A wrapper around an existing [`Input`] which caches
 /// the decoded and converted audio data locally in memory.

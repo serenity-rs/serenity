@@ -28,46 +28,6 @@ async fn streamcatcher_preserves_file() {
 
     assert_eq!(input, out_buf);
 }
-
-#[tokio::test]
-async fn memory_cached_matches_input() {
-    let input_reader = ffmpeg(&TEST_FILE).await.unwrap();
-
-    // let mut mem = Input::from(Memory::new(input_reader).unwrap());
-    let mut mem = Memory::new(input_reader).unwrap();
-
-    let mut input_reader_2 = ffmpeg(&TEST_FILE).await.unwrap();
-
-    let mut true_read_buffer = [0u8; 64];
-    let mut mem_read_buffer = [0u8; 64];
-
-    // println!("{:#?}", mem);
-    // println!("{:#?}", input_reader_2);
-
-    let mut cnt = 0;
-    let mut discrep = 0;
-    loop {
-        let r1 = input_reader_2.read(&mut true_read_buffer[..]).unwrap();
-        let r2 = mem.raw.read(&mut mem_read_buffer[..r1]).unwrap();
-
-        // assert_eq!((cnt, r1), (cnt, r2));
-
-        if (cnt, &true_read_buffer[..r1]) == (cnt, &mem_read_buffer[..r2]) {
-            discrep += 1;
-        }
-        // assert_eq!((cnt, &true_read_buffer[..r1]), (cnt, &mem_read_buffer[..r2]));
-
-        if r1 == 0 {
-            // println!("{:?}", r2);
-            break;
-        }
-
-        cnt += 1;
-    }
-    // println!("{:?}", cnt);
-    assert_eq!(discrep, 0);
-}
-
 #[test]
 fn compressed_scans_frames_decodes_mono() {
     let data = one_s_compressed_sine(false);

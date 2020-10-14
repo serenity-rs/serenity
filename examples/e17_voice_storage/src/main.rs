@@ -132,19 +132,13 @@ async fn main() {
         //
         // This is a full song, making this a much less memory-heavy choice.
         //
-        // Music by Cloudkicker, used under CC BY 3.0 (https://creativecommons.org/licenses/by/3.0/).
-        // let song_src = Compressed::new(
-        let song_src = Memory::new(
-                input::ytdl("https://cloudkicker.bandcamp.com/track/2011-07").await.expect("Link may be dead."),
-                // Bitrate::BitsPerSecond(128_000),
+        // Music by Cloudkicker, used under CC BY-SC-SA 3.0 (https://creativecommons.org/licenses/by-nc-sa/3.0/).
+        let song_src = Compressed::new(
+                input::ffmpeg("Cloudkicker_-_Loops_-_22_2011_07.mp3").await.expect("Link may be dead."),
+                Bitrate::BitsPerSecond(128_000),
             ).expect("These parameters are well-defined.");
-
-        println!("{:?}", song_src);
         let _ = song_src.raw.spawn_loader();
-        // Compressed cannot be sent between threads, so we need to discard some state using
-        // `into_sendable`.
-        // audio_map.insert("song".into(), CachedSound::Compressed(song_src));
-        audio_map.insert("song".into(), CachedSound::Uncompressed(song_src));
+        audio_map.insert("song".into(), CachedSound::Compressed(song_src));
 
         data.insert::<SoundStore>(Arc::new(Mutex::new(audio_map)));
     }

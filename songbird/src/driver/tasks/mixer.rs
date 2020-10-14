@@ -198,8 +198,32 @@ impl Mixer {
         };
 
         if do_passthrough {
-            let opus_len = self.tracks[0].source.read_opus_frame(opus_frame)?;
-            Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]))
+            let track = &mut self.tracks[0];
+            if track.playing == PlayMode::Play {
+                if let Ok(opus_len) = track.source.read_opus_frame(opus_frame) {
+                    track.step_frame();
+                    Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]))
+                } else {
+                    if track.do_loop() {
+                        if let Some(time) = track.seek_time(Default::default()) {
+                            let _ = interconnect.events.send(EventMessage::ChangeState(
+                                0,
+                                TrackStateChange::Position(time),
+                            ));
+                            let _ = interconnect.events.send(EventMessage::ChangeState(
+                                0,
+                                TrackStateChange::Loops(track.loops, false),
+                            ));
+                        }
+                    } else {
+                        track.end();
+                    }
+
+                    Ok((0, &opus_frame[..0]))
+                }
+            } else {
+                Ok((0, &opus_frame[..0]))
+            }
         } else {
             for (i, track) in self.tracks.iter_mut().enumerate() {
                 let vol = track.volume;

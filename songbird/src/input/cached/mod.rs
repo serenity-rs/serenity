@@ -4,23 +4,13 @@ mod memory;
 #[cfg(test)]
 mod tests;
 
-pub use self::{
-    compressed::*,
-    hint::*,
-    memory::*,
-};
+pub use self::{compressed::*, hint::*, memory::*};
 
-use crate::input::utils;
 use crate::constants::*;
+use crate::input::utils;
 use audiopus::Bitrate;
-use std::{
-    mem,
-    time::Duration,
-};
-use streamcatcher::{
-    Config,
-    GrowthStrategy,
-};
+use std::{mem, time::Duration};
+use streamcatcher::{Config, GrowthStrategy};
 
 pub fn compressed_cost_per_sec(bitrate: Bitrate) -> usize {
     let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();

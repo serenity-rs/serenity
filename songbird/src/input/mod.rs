@@ -404,6 +404,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
                     },
                     Err(ref e) =>
                         return if e.kind() == IoErrorKind::UnexpectedEof {
+                            error!("EOF unexpectedly: {:?}", e);
                             Some(frame_pos)
                         } else {
                             error!("Input died unexpectedly: {:?}", e);
@@ -472,7 +473,13 @@ mod tests {
     #[test]
     fn float_pcm_input_unchanged_mono() {
         let data = make_sine(50 * MONO_FRAME_SIZE, false);
-        let mut input = Input::new(false, data.clone().into(), Codec::FloatPcm, Container::Raw, None);
+        let mut input = Input::new(
+            false,
+            data.clone().into(),
+            Codec::FloatPcm,
+            Container::Raw,
+            None,
+        );
 
         let mut out_vec = vec![];
 
@@ -483,7 +490,13 @@ mod tests {
     #[test]
     fn float_pcm_input_unchanged_stereo() {
         let data = make_sine(50 * MONO_FRAME_SIZE, true);
-        let mut input = Input::new(true, data.clone().into(), Codec::FloatPcm, Container::Raw, None);
+        let mut input = Input::new(
+            true,
+            data.clone().into(),
+            Codec::FloatPcm,
+            Container::Raw,
+            None,
+        );
 
         let mut out_vec = vec![];
 

@@ -44,7 +44,9 @@ pub fn make_pcm_sine(i16_len: usize, stereo: bool) -> Vec<u8> {
 
     for i in 0..i16_len {
         let x_val = (i as f32) * 50.0 / std::f32::consts::PI;
-        byte_slice.write_i16::<LittleEndian>((x_val.sin() * 10_000.0) as i16).unwrap();
+        byte_slice
+            .write_i16::<LittleEndian>((x_val.sin() * 10_000.0) as i16)
+            .unwrap();
     }
 
     if stereo {

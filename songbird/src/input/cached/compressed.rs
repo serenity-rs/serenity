@@ -1,4 +1,4 @@
-use super::{apply_length_hint, default_config, compressed_cost_per_sec};
+use super::{apply_length_hint, compressed_cost_per_sec, default_config};
 use crate::{
     constants::*,
     input::{
@@ -6,7 +6,7 @@ use crate::{
         CodecType,
         Container,
         Input,
-        Metadata, 
+        Metadata,
         Reader,
     },
 };
@@ -22,24 +22,12 @@ use audiopus::{
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::{
     convert::TryInto,
-    io::{
-        Error as IoError,
-        ErrorKind as IoErrorKind,
-        Read,
-        Result as IoResult,
-    },
+    io::{Error as IoError, ErrorKind as IoErrorKind, Read, Result as IoResult},
     mem,
     sync::atomic::{AtomicUsize, Ordering},
 };
-use streamcatcher::{
-    Config,
-    NeedsBytes,
-    Stateful,
-    Transform,
-    TransformPosition,
-    TxCatcher,
-};
-use tracing::debug;
+use streamcatcher::{Config, NeedsBytes, Stateful, Transform, TransformPosition, TxCatcher};
+use tracing::{debug, trace};
 
 /// A wrapper around an existing [`Input`] which compresses
 /// the input using the Opus codec before storing it in memory.
@@ -220,9 +208,11 @@ where
 
             if out.is_none() && raw_len > 0 {
                 loop {
+                    // NOTE: we don't index by raw_len because the last frame can be too small
+                    // to occupy a "whole packet". Zero-padding is the correct behaviour.
                     match self
                         .encoder
-                        .encode_float(&sample_buf[..raw_len], &mut self.last_frame[..])
+                        .encode_float(&sample_buf[..], &mut self.last_frame[..])
                     {
                         Ok(pkt_len) => {
                             debug!("Next packet to write has {:?}", pkt_len);
@@ -236,6 +226,7 @@ where
                             self.last_frame.resize(self.last_frame.len() + 256, 0);
                         },
                         Err(e) => {
+                            debug!("Read error {:?} {:?} {:?}.", e, out, raw_len);
                             out = Some(Err(IoError::new(IoErrorKind::Other, e)));
                             break;
                         },
@@ -255,7 +246,7 @@ where
                     );
                 self.frame_pos += output_start;
 
-                debug!("Wrote frame header.");
+                trace!("Wrote frame header: {}.", self.last_frame.len());
 
                 output_start
             } else {
@@ -268,7 +259,7 @@ where
             buf[start..start + write_len]
                 .copy_from_slice(&self.last_frame[out_pos..out_pos + write_len]);
             self.frame_pos += write_len;
-            debug!("Appended {} to inner store", write_len);
+            trace!("Appended {} to inner store", write_len);
             out = Some(Ok(write_len + start));
         }
 
