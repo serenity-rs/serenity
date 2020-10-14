@@ -212,7 +212,7 @@ where
                     // to occupy a "whole packet". Zero-padding is the correct behaviour.
                     match self
                         .encoder
-                        .encode_float(&sample_buf[..], &mut self.last_frame[..])
+                        .encode_float(&sample_buf[..samples_in_frame], &mut self.last_frame[..])
                     {
                         Ok(pkt_len) => {
                             debug!("Next packet to write has {:?}", pkt_len);
