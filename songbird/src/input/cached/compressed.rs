@@ -1,6 +1,15 @@
-use super::error::{Error, Result};
-use super::{utils, CodecType, Container, Input, Metadata, Reader};
-use crate::constants::*;
+use super::{apply_length_hint, default_config, compressed_cost_per_sec};
+use crate::{
+    constants::*,
+    input::{
+        error::{Error, Result},
+        CodecType,
+        Container,
+        Input,
+        Metadata, 
+        Reader,
+    },
+};
 use audiopus::{
     coder::Encoder as OpusEncoder,
     Application,
@@ -13,15 +22,17 @@ use audiopus::{
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use std::{
     convert::TryInto,
-    io::{Error as IoError, ErrorKind as IoErrorKind, Read, Result as IoResult},
+    io::{
+        Error as IoError,
+        ErrorKind as IoErrorKind,
+        Read,
+        Result as IoResult,
+    },
     mem,
     sync::atomic::{AtomicUsize, Ordering},
-    time::Duration,
 };
 use streamcatcher::{
-    Catcher,
     Config,
-    GrowthStrategy,
     NeedsBytes,
     Stateful,
     Transform,
@@ -29,129 +40,6 @@ use streamcatcher::{
     TxCatcher,
 };
 use tracing::debug;
-
-/// Expected amount of time that an input should last.
-#[derive(Copy, Clone, Debug)]
-pub enum LengthHint {
-    Bytes(usize),
-    Time(Duration),
-}
-
-impl From<usize> for LengthHint {
-    fn from(size: usize) -> Self {
-        LengthHint::Bytes(size)
-    }
-}
-
-impl From<Duration> for LengthHint {
-    fn from(size: Duration) -> Self {
-        LengthHint::Time(size)
-    }
-}
-
-/// A wrapper around an existing [`Input`] which caches
-/// the decoded and converted audio data locally in memory.
-///
-/// The main purpose of this wrapper is to enable seeking on
-/// incompatible sources (i.e., ffmpeg output) and to ease resource
-/// consumption for commonly reused/shared tracks. [`Restartable`]
-/// and [`Compressed`] offer the same functionality with different
-/// tradeoffs.
-///
-/// This is intended for use with small, repeatedly used audio
-/// tracks shared between sources, and stores the sound data
-/// retrieved in **uncompressed floating point** form to minimise the
-/// cost of audio processing. This is a significant *3 Mbps (375 kiB/s)*,
-/// or 131 MiB of RAM for a 6 minute song.
-///
-/// [`Input`]: ../struct.Input.html
-/// [`Compressed`]: struct.Compressed.html
-/// [`Restartable`]: ../struct.Restartable.html
-#[derive(Clone, Debug)]
-pub struct Memory {
-    pub raw: Catcher<Box<Reader>>,
-    pub metadata: Metadata,
-    pub kind: CodecType,
-    pub stereo: bool,
-    pub container: Container,
-}
-
-// work out the froms, intos...
-
-// issues: need enough info to reconstruct input from reader.
-// ALSO: need to make sure that compressed can only be opus + dca
-// and that memory preserves its input format.
-
-impl Memory {
-    /// Wrap an existing [`Input`] with an in-memory store with the same codec and framing.
-    ///
-    /// [`Input`]: ../struct.Input.html
-    pub fn new(source: Input) -> Result<Self> {
-        Self::with_config(source, None)
-    }
-
-    /// Wrap an existing [`Input`] with an in-memory store with the same codec and framing.
-    ///
-    /// `length_hint` may be used to control the size of the initial chunk, preventing
-    /// needless allocations and copies. If this is not present, the value specified in
-    /// `source`'s [`Metadata.duration`] will be used, assuming that the source is uncompressed.
-    ///
-    /// [`Input`]: ../struct.Input.html
-    /// [`Metadata.duration`]: ../struct.Metadata.html#structfield.duration
-    pub fn with_config(mut source: Input, config: Option<Config>) -> Result<Self> {
-        let stereo = source.stereo;
-        let kind = (&source.kind).into();
-        let container = source.container;
-        let metadata = source.metadata.take();
-
-        let cost_per_sec = raw_cost_per_sec(stereo);
-
-        let mut config = config.unwrap_or_else(|| default_config(cost_per_sec));
-
-        // apply length hint.
-        if config.length_hint.is_none() {
-            if let Some(dur) = metadata.duration {
-                apply_length_hint(&mut config, dur, cost_per_sec);
-            }
-        }
-
-        let raw = config
-            .build(Box::new(source.reader))
-            .map_err(Error::Streamcatcher)?;
-
-        Ok(Self {
-            raw,
-            metadata,
-            kind,
-            stereo,
-            container,
-        })
-    }
-
-    /// Acquire a new handle to this object, creating a new
-    /// view of the existing cached data from the beginning.
-    pub fn new_handle(&self) -> Self {
-        Self {
-            raw: self.raw.new_handle(),
-            metadata: self.metadata.clone(),
-            kind: self.kind,
-            stereo: self.stereo,
-            container: self.container,
-        }
-    }
-}
-
-impl From<Memory> for Input {
-    fn from(src: Memory) -> Self {
-        Input::new(
-            src.stereo,
-            Reader::Memory(src.raw),
-            src.kind.try_into().expect("FIXME: make this a tryinto"),
-            src.container,
-            Some(src.metadata),
-        )
-    }
-}
 
 /// A wrapper around an existing [`Input`] which compresses
 /// the input using the Opus codec before storing it in memory.
@@ -259,7 +147,7 @@ impl Compressed {
 impl From<Compressed> for Input {
     fn from(src: Compressed) -> Self {
         Input::new(
-            src.stereo,
+            true,
             Reader::Compressed(src.raw),
             CodecType::Opus
                 .try_into()
@@ -334,7 +222,7 @@ where
                 loop {
                     match self
                         .encoder
-                        .encode_float(&sample_buf[..], &mut self.last_frame[..])
+                        .encode_float(&sample_buf[..raw_len], &mut self.last_frame[..])
                     {
                         Ok(pkt_len) => {
                             debug!("Next packet to write has {:?}", pkt_len);
@@ -411,104 +299,5 @@ impl Stateful for OpusCompressor {
 
     fn state(&self) -> Self::State {
         self.audio_bytes.load(Ordering::Acquire)
-    }
-}
-
-pub fn compressed_cost_per_sec(bitrate: Bitrate) -> usize {
-    let framing_cost_per_sec = AUDIO_FRAME_RATE * mem::size_of::<u16>();
-
-    let bitrate_raw = match bitrate {
-        Bitrate::BitsPerSecond(i) => i,
-        Bitrate::Auto => 64_000,
-        Bitrate::Max => 512_000,
-    } as usize;
-
-    (bitrate_raw / 8) + framing_cost_per_sec
-}
-
-pub fn raw_cost_per_sec(stereo: bool) -> usize {
-    utils::timestamp_to_byte_count(Duration::from_secs(1), stereo)
-}
-
-pub fn apply_length_hint<H>(config: &mut Config, hint: H, cost_per_sec: usize)
-where
-    H: Into<LengthHint>,
-{
-    config.length_hint = Some(match hint.into() {
-        LengthHint::Bytes(a) => a,
-        LengthHint::Time(t) => {
-            let s = t.as_secs() + if t.subsec_millis() > 0 { 1 } else { 0 };
-            (s as usize) * cost_per_sec
-        },
-    });
-}
-
-pub fn default_config(cost_per_sec: usize) -> Config {
-    Config::new().chunk_size(GrowthStrategy::Constant(5 * cost_per_sec))
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-    use crate::{
-        constants::*,
-        input::{ffmpeg, Input},
-    };
-    use std::io::Read;
-
-    const TEST_FILE: &str = "test-assets/loop.wav";
-
-    #[tokio::test]
-    async fn memory_cached_matches_input() {
-        let input_reader = ffmpeg(&TEST_FILE).await.unwrap();
-
-        // let mut mem = Input::from(Memory::new(input_reader).unwrap());
-        let mut mem = Memory::new(input_reader).unwrap();
-
-        let mut input_reader_2 = ffmpeg(&TEST_FILE).await.unwrap();
-
-        let mut true_read_buffer = [0u8; 64];
-        let mut mem_read_buffer = [0u8; 64];
-
-        println!("{:#?}", mem);
-        println!("{:#?}", input_reader_2);
-
-        let mut cnt = 0;
-        let mut discrep = 0;
-        loop {
-            let r1 = input_reader_2.read(&mut true_read_buffer[..]).unwrap();
-            let r2 = mem.raw.read(&mut mem_read_buffer[..]).unwrap();
-
-            assert_eq!((cnt, r1), (cnt, r2));
-
-            if (cnt, &true_read_buffer[..r1]) == (cnt, &mem_read_buffer[..r2]) {
-                discrep += 1;
-            }
-            // assert_eq!((cnt, &true_read_buffer[..r1]), (cnt, &mem_read_buffer[..r2]));
-
-            if r1 == 0 {
-                println!("{:?}", r2);
-                break;
-            }
-
-            cnt += 1;
-        }
-        println!("{:?}", cnt);
-        assert_eq!(discrep, 0);
-    }
-
-    #[tokio::test]
-    async fn compressed_scans_frames() {
-        unimplemented!();
-    }
-
-    #[tokio::test]
-    async fn compressed_decodes() {
-        unimplemented!();
-    }
-
-    #[tokio::test]
-    async fn compressed_triggers_passthrough() {
-        unimplemented!();
     }
 }

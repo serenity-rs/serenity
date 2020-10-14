@@ -4,6 +4,7 @@ use std::{
     fs::File,
     io::{
         BufReader,
+        Cursor,
         Error as IoError,
         ErrorKind as IoErrorKind,
         Read,
@@ -28,6 +29,7 @@ pub enum Reader {
     Compressed(TxCatcher<Box<Input>, OpusCompressor>),
     Restartable(Restartable),
     File(BufReader<File>),
+    Vec(Cursor<Vec<u8>>),
     Extension(Box<dyn Read + Send>),
     ExtensionSeek(Box<dyn ReadSeek + Send>),
 }
@@ -54,6 +56,7 @@ impl Read for Reader {
             Compressed(a) => Read::read(a, buffer),
             Restartable(a) => Read::read(a, buffer),
             File(a) => Read::read(a, buffer),
+            Vec(a) => Read::read(a, buffer),
             Extension(a) => a.read(buffer),
             ExtensionSeek(a) => a.read(buffer),
         }
@@ -72,6 +75,7 @@ impl Seek for Reader {
             Compressed(a) => Seek::seek(a, pos),
             File(a) => Seek::seek(a, pos),
             Restartable(a) => Seek::seek(a, pos),
+            Vec(a) => Seek::seek(a, pos),
             ExtensionSeek(a) => a.seek(pos),
         }
     }
@@ -86,10 +90,17 @@ impl Debug for Reader {
             Compressed(a) => format!("{:?}", a),
             Restartable(a) => format!("{:?}", a),
             File(a) => format!("{:?}", a),
+            Vec(a) => format!("{:?}", a),
             Extension(_) => "Extension".to_string(),
             ExtensionSeek(_) => "ExtensionSeek".to_string(),
         };
         f.debug_tuple("Reader").field(&field).finish()
+    }
+}
+
+impl From<Vec<u8>> for Reader {
+    fn from(val: Vec<u8>) -> Reader {
+        Reader::Vec(Cursor::new(val))
     }
 }
 

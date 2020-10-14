@@ -463,3 +463,73 @@ impl<R: Read + Sized> ReadAudioExt for R {
         io::copy(&mut self.by_ref().take(amt as u64), &mut io::sink()).unwrap_or(0) as usize
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::test_utils::*;
+
+    #[test]
+    fn float_pcm_input_unchanged_mono() {
+        let data = make_sine(50 * MONO_FRAME_SIZE, false);
+        let mut input = Input::new(false, data.clone().into(), Codec::FloatPcm, Container::Raw, None);
+
+        let mut out_vec = vec![];
+
+        let len = input.read_to_end(&mut out_vec).unwrap();
+        assert_eq!(out_vec[..len], data[..]);
+    }
+
+    #[test]
+    fn float_pcm_input_unchanged_stereo() {
+        let data = make_sine(50 * MONO_FRAME_SIZE, true);
+        let mut input = Input::new(true, data.clone().into(), Codec::FloatPcm, Container::Raw, None);
+
+        let mut out_vec = vec![];
+
+        let len = input.read_to_end(&mut out_vec).unwrap();
+        assert_eq!(out_vec[..len], data[..]);
+    }
+
+    #[test]
+    fn pcm_input_becomes_float_mono() {
+        let data = make_pcm_sine(50 * MONO_FRAME_SIZE, false);
+        let mut input = Input::new(false, data.clone().into(), Codec::Pcm, Container::Raw, None);
+
+        let mut out_vec = vec![];
+        let len = input.read_to_end(&mut out_vec).unwrap();
+
+        let mut i16_window = &data[..];
+        let mut float_window = &out_vec[..];
+
+        while i16_window.len() != 0 {
+            let before = i16_window.read_i16::<LittleEndian>().unwrap() as f32;
+            let after = float_window.read_f32::<LittleEndian>().unwrap();
+
+            let diff = (before / 32768.0) - after;
+
+            assert!(diff.abs() < f32::EPSILON);
+        }
+    }
+
+    #[test]
+    fn pcm_input_becomes_float_stereo() {
+        let data = make_pcm_sine(50 * MONO_FRAME_SIZE, true);
+        let mut input = Input::new(true, data.clone().into(), Codec::Pcm, Container::Raw, None);
+
+        let mut out_vec = vec![];
+        let len = input.read_to_end(&mut out_vec).unwrap();
+
+        let mut i16_window = &data[..];
+        let mut float_window = &out_vec[..];
+
+        while i16_window.len() != 0 {
+            let before = i16_window.read_i16::<LittleEndian>().unwrap() as f32;
+            let after = float_window.read_f32::<LittleEndian>().unwrap();
+
+            let diff = (before / 32768.0) - after;
+
+            assert!(diff.abs() < f32::EPSILON);
+        }
+    }
+}

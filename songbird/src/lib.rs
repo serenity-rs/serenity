@@ -16,7 +16,7 @@
 //!
 //! Songbird's logo is based upon the copyright-free image ["Black-Capped Chickadee"] by George Gorgas White.
 //!
-//! [logo]: https://raw.githubusercontent.com/FelixMcFelix/serenity/voice-rework/songbird/songbird.svg
+//! [logo]: https://raw.githubusercontent.com/FelixMcFelix/serenity/voice-rework/songbird/songbird.png
 //! [serenity]: https://github.com/serenity-rs/serenity
 //! [twilight]: https://github.com/twilight-rs/twilight
 //! ["Black-Capped Chickadee"]: https://www.oldbookillustrations.com/illustrations/black-capped-chickadee/
@@ -39,6 +39,8 @@ mod manager;
 pub mod serenity;
 #[cfg(feature = "gateway")]
 pub mod shards;
+#[cfg(test)]
+mod test_utils;
 #[cfg(feature = "driver")]
 pub mod tracks;
 #[cfg(feature = "driver")]
