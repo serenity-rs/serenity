@@ -39,6 +39,7 @@ use audiopus::coder::GenericCtl;
 use byteorder::{LittleEndian, ReadBytesExt, WriteBytesExt};
 use cached::OpusCompressor;
 use error::{Error, Result};
+use tokio::runtime::Handle;
 
 use std::{
     convert::TryFrom,
@@ -287,6 +288,10 @@ impl Input {
                 "Frame passthrough not supported for this file.",
             ))
         }
+    }
+
+    pub(crate) fn prep_with_handle(&mut self, handle: Handle) {
+        self.reader.prep_with_handle(handle);
     }
 }
 

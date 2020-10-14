@@ -37,12 +37,19 @@ pub enum Reader {
 impl Reader {
     pub(crate) fn is_seekable(&self) -> bool {
         use Reader::*;
-
         match self {
             Restartable(_) | Compressed(_) | Memory(_) => true,
             Extension(_) => false,
             ExtensionSeek(_) => true,
             _ => false,
+        }
+    }
+
+    pub(crate) fn prep_with_handle(&mut self, handle: Handle) {
+        use Reader::*;
+        match self {
+            Restartable(r) => r.prep_with_handle(handle),
+            _ => {},
         }
     }
 }

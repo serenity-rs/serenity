@@ -1,4 +1,5 @@
 use super::*;
+use flume::{Receiver, TryRecvError};
 use futures::executor;
 use std::{
     ffi::OsStr,
@@ -26,8 +27,10 @@ use std::{
 /// [`Memory`]: cached/struct.Memory.html
 /// [`Compressed`]: cached/struct.Compressed.html
 pub struct Restartable {
+    async_handle: Option<Handle>,
+    awaiting_source: Option<Receiver<Result<(Box<Input>, Box<dyn Restart + Send + 'static>)>>>,
     position: usize,
-    recreator: Box<dyn Restart + Send + 'static>,
+    recreator: Option<Box<dyn Restart + Send + 'static>>,
     source: Box<Input>,
 }
 
@@ -35,8 +38,10 @@ impl Restartable {
     /// Create a new source, which can be restarted using a `recreator` function.
     pub fn new(mut recreator: impl Restart + Send + 'static) -> Result<Self> {
         recreator.call_restart(None).map(move |source| Self {
+            async_handle: None,
+            awaiting_source: None,
             position: 0,
-            recreator: Box::new(recreator),
+            recreator: Some(Box::new(recreator)),
             source: Box::new(source),
         })
     }
@@ -68,6 +73,10 @@ impl Restartable {
     /// expect a pause if you seek backwards.
     pub fn ytdl_search(name: &str) -> Result<Self> {
         Self::ytdl(format!("ytsearch1:{}", name))
+    }
+
+    pub(crate) fn prep_with_handle(&mut self, handle: Handle) {
+        self.async_handle = Some(handle);
     }
 }
 
@@ -130,7 +139,9 @@ where
 
 impl Debug for Restartable {
     fn fmt(&self, f: &mut Formatter<'_>) -> StdResult<(), FormatError> {
-        f.debug_struct("Reader")
+        f.debug_struct("Restartable")
+            .field("async_handle", &self.async_handle)
+            .field("awaiting_source", &self.awaiting_source)
             .field("position", &self.position)
             .field("recreator", &"<fn>")
             .field("source", &self.source)
@@ -148,12 +159,59 @@ impl From<Restartable> for Input {
     }
 }
 
+// How do these work at a high level?
+// If you need to restart, send a request to do this to the async context.
+// if a request is pending, then just output all zeroes.
+
 impl Read for Restartable {
     fn read(&mut self, buffer: &mut [u8]) -> IoResult<usize> {
-        Read::read(&mut self.source, buffer).map(|a| {
-            self.position += a;
-            a
-        })
+        let (out_val, march_pos, remove_async) = if let Some(chan) = &self.awaiting_source {
+            match chan.try_recv() {
+                Ok(Ok((new_source, recreator))) => {
+                    self.source = new_source;
+                    self.recreator = Some(recreator);
+
+                    (Read::read(&mut self.source, buffer), true, true)
+                },
+                Ok(Err(source_error)) => {
+                    let e = Err(IoError::new(
+                        IoErrorKind::UnexpectedEof,
+                        format!("Failed to create new reader: {:?}.", source_error),
+                    ));
+                    (e, false, true)
+                },
+                Err(TryRecvError::Empty) => {
+                    // Output all zeroes.
+                    for el in buffer.iter_mut() {
+                        *el = 0;
+                    }
+                    (Ok(buffer.len()), false, false)
+                },
+                Err(_) => {
+                    let e = Err(IoError::new(
+                        IoErrorKind::UnexpectedEof,
+                        "Failed to create new reader: dropped.",
+                    ));
+                    (e, false, true)
+                }
+            }
+        } else {
+            // already have a good, valid source.
+            (Read::read(&mut self.source, buffer), true, false)
+        };
+
+        if remove_async {
+            self.awaiting_source = None;
+        }
+
+        if march_pos {
+            out_val.map(|a| {
+                self.position += a;
+                a
+            })
+        } else {
+            out_val
+        }
     }
 }
 
@@ -169,13 +227,35 @@ impl Seek for Restartable {
                 let offset = offset as usize;
 
                 if offset < self.position {
-                    // FIXME: don't unwrap
-                    self.source = Box::new(
-                        self.recreator
-                            .call_restart(Some(utils::byte_count_to_timestamp(offset, stereo)))
-                            .unwrap(),
-                    );
-                    self.position = offset;
+                    // We're going back in time.
+                    if let Some(handle) = self.async_handle.as_ref() {
+                        let (tx, rx) = flume::bounded(1);
+
+                        self.awaiting_source = Some(rx);
+
+                        let recreator = self.recreator.take();
+
+                        if let Some(mut rec) = recreator {
+                            handle.spawn(async move {
+                                let ret_val = rec
+                                    .call_restart(Some(utils::byte_count_to_timestamp(offset, stereo)));
+
+                                let _ = tx.send(ret_val.map(Box::new).map(|v| (v, rec)));
+                            });
+                        } else {
+                            return Err(IoError::new(
+                                IoErrorKind::Interrupted,
+                                "Previous seek in progress.",
+                            ));
+                        }
+
+                        self.position = offset;
+                    } else {
+                        return Err(IoError::new(
+                            IoErrorKind::Interrupted,
+                            "Cannot safely call seek until provided an async context handle.",
+                        ));
+                    }
                 } else {
                     self.position += self.source.consume(offset - self.position);
                 }

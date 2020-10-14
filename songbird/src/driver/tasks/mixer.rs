@@ -90,13 +90,15 @@ impl Mixer {
                 use MixerMessage::*;
 
                 match self.mix_rx.try_recv() {
-                    Ok(AddTrack(t)) => {
+                    Ok(AddTrack(mut t)) => {
+                        t.source.prep_with_handle(self.async_handle.clone());
                         let _ = self.add_track(t, &interconnect);
                     },
                     Ok(SetTrack(t)) => {
                         self.tracks.clear();
                         let _ = interconnect.events.send(EventMessage::RemoveAllTracks);
-                        if let Some(t) = t {
+                        if let Some(mut t) = t {
+                            t.source.prep_with_handle(self.async_handle.clone());
                             let _ = self.add_track(t, &interconnect);
                         }
                     },
