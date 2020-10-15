@@ -8,7 +8,7 @@ use std::{
 };
 use futures::channel::mpsc::{self, UnboundedSender as Sender, UnboundedReceiver as Receiver};
 use futures::StreamExt;
-use super::super::super::{EventHandler, RawEventHandler};
+use crate::client::{EventHandler, RawEventHandler};
 use super::{
     GatewayIntents,
     ShardId,

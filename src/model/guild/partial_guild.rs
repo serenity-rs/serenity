@@ -1,7 +1,7 @@
 use serde::de::Error as DeError;
 
 use crate::model::prelude::*;
-use super::super::utils::{deserialize_emojis, deserialize_roles};
+use crate::model::utils::{deserialize_emojis, deserialize_roles};
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};

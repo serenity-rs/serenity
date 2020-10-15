@@ -1,7 +1,7 @@
 use tokio::sync::Mutex;
 use std::sync::Arc;
 use super::{ShardManager, ShardManagerMessage};
-use super::super::gateway::ShardId;
+use crate::client::bridge::gateway::ShardId;
 use tracing::{debug, warn, instrument};
 use futures::{
     StreamExt,

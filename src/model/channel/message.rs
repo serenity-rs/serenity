@@ -21,7 +21,7 @@ use serde::{
     ser::{Serialize, Serializer},
 };
 #[cfg(feature = "model")]
-use super::super::utils::U64Visitor;
+use crate::model::utils::U64Visitor;
 #[cfg(feature = "model")]
 use std::{
     result::Result as StdResult,

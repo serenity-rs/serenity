@@ -1,4 +1,4 @@
-use super::super::id::AttachmentId;
+use crate::model::id::AttachmentId;
 
 #[cfg(feature = "model")]
 use reqwest::Client as ReqwestClient;

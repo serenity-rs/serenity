@@ -11,7 +11,7 @@ use futures::{
     channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
 };
 use tokio::time::{delay_for, timeout, Duration, Instant};
-use super::super::super::{EventHandler, RawEventHandler};
+use crate::client::{EventHandler, RawEventHandler};
 use super::{
     GatewayIntents,
     ShardId,

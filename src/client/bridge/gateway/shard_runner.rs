@@ -11,8 +11,8 @@ use std::{
 };
 use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::{SinkExt, StreamExt};
-use super::super::super::dispatch::{DispatchEvent, dispatch};
-use super::super::super::{EventHandler, RawEventHandler};
+use crate::client::dispatch::{DispatchEvent, dispatch};
+use crate::client::{EventHandler, RawEventHandler};
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
 use async_tungstenite::tungstenite::{
@@ -25,7 +25,9 @@ use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use super::super::voice::VoiceGatewayManager;
+use crate::client::bridge::voice::VoiceGatewayManager;
+#[cfg(feature = "voice")]
+use tokio::sync::Mutex;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 
