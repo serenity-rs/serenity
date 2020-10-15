@@ -215,7 +215,7 @@ Voice + youtube-dl:
 [`validate_token`]: https://docs.rs/serenity/*/serenity/client/fn.validate_token.html
 [cache docs]: https://docs.rs/serenity/*/serenity/cache/index.html
 [ci]: https://github.com/serenity-rs/serenity/actions
-[ci-badge]: https://github.com/serenity-rs/serenity/workflows/CI/badge.svg
+[ci-badge]: https://img.shields.io/github/workflow/status/serenity-rs/serenity/CI?style=flat-square
 [client's module-level documentation]: https://docs.rs/serenity/*/serenity/client/index.html
 [crates.io link]: https://crates.io/crates/serenity
 [crates.io version]: https://img.shields.io/crates/v/serenity.svg?style=flat-square
