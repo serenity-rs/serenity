@@ -557,6 +557,8 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 pub struct GuildMembersChunkEvent {
     pub guild_id: GuildId,
     pub members: HashMap<UserId, Member>,
+    pub chunk_index: u32,
+    pub chunk_count: u32,
     pub nonce: Option<String>,
     #[serde(skip)]
     pub(crate) _nonexhaustive: (),
@@ -592,6 +594,16 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
         let mut members = map.remove("members")
             .ok_or_else(|| DeError::custom("missing member chunk members"))?;
 
+        let chunk_index = map.get("chunk_index")
+            .ok_or_else(|| DeError::custom("missing member chunk index"))
+            .and_then(u32::deserialize)
+            .map_err(DeError::custom)?;
+
+        let chunk_count = map.get("chunk_count")
+            .ok_or_else(|| DeError::custom("missing member chunk count"))
+            .and_then(u32::deserialize)
+            .map_err(DeError::custom)?;
+
         if let Some(members) = members.as_array_mut() {
             let num = Value::Number(Number::from(guild_id.0));
 
@@ -621,6 +633,8 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
         Ok(GuildMembersChunkEvent {
             guild_id,
             members,
+            chunk_index,
+            chunk_count,
             nonce,
             _nonexhaustive: (),
         })
