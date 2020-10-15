@@ -294,7 +294,6 @@ async fn init_cipher(client: &mut WsStream, mode: CryptoMode) -> Result<Cipher> 
 
         match value {
             GatewayEvent::SessionDescription(desc) => {
-                // FIXME: check against config.
                 if desc.mode != mode.to_request_str() {
                     return Err(Error::CryptoModeInvalid);
                 }

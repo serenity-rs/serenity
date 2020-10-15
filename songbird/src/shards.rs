@@ -23,6 +23,7 @@ pub enum Sharder {
 }
 
 impl Sharder {
+    #[allow(unreachable_patterns)]
     pub fn get_shard(&self, shard_id: u64) -> Option<Shard> {
         match self {
             #[cfg(feature = "serenity")]
@@ -36,6 +37,7 @@ impl Sharder {
 
 #[cfg(feature = "serenity")]
 impl Sharder {
+    #[allow(unreachable_patterns)]
     pub(crate) fn register_shard_handle(&self, shard_id: u64, sender: Sender<InterMessage>) {
         match self {
             Sharder::Serenity(s) => s.register_shard_handle(shard_id, sender),
@@ -43,6 +45,7 @@ impl Sharder {
         }
     }
 
+    #[allow(unreachable_patterns)]
     pub(crate) fn deregister_shard_handle(&self, shard_id: u64) {
         match self {
             Sharder::Serenity(s) => s.deregister_shard_handle(shard_id),
@@ -95,6 +98,7 @@ pub enum Shard {
 }
 
 impl Shard {
+    #[allow(unreachable_patterns)]
     pub async fn send(&mut self, msg: Value) -> JoinResult<()> {
         match self {
             #[cfg(feature = "serenity")]

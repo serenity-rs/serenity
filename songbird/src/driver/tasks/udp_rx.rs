@@ -130,7 +130,8 @@ impl SsrcState {
 struct UdpRx {
     cipher: Cipher,
     decoder_map: HashMap<u32, SsrcState>,
-    mode: CryptoMode,
+    #[allow(dead_code)]
+    mode: CryptoMode, // In future, this will allow crypto mode selection.
     packet_buffer: [u8; VOICE_PACKET_MAX],
     rx: Receiver<UdpRxMessage>,
     udp_socket: RecvHalf,

@@ -278,7 +278,6 @@ impl Track {
                     }
                 },
                 Err(TryRecvError::Closed) => {
-                    // TODO: issue with keeping the track handle in the struct...
                     // this branch will never be visited.
                     break;
                 },

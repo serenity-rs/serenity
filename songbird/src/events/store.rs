@@ -110,7 +110,9 @@ impl EventStore {
         // fields.
         let events = self.untimed.remove(&untimed_event);
         if let Some(mut events) = events {
-            // FIXME: Possibly use tombstones to prevent realloc/memcpys?
+            // TODO: Possibly use tombstones to prevent realloc/memcpys?
+            // i.e., never shrink array, replace ended tracks with <DEAD>,
+            // maintain a "first-track" stack and freelist alongside.
             let mut i = 0;
             while i < events.len() {
                 let evt = &mut events[i];

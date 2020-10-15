@@ -26,7 +26,7 @@ use serenity::{
             macros::{command, group},
         },
     },
-    model::{channel::Message, gateway::Ready, misc::Mentionable},
+    model::{channel::Message, gateway::Ready},
     Result as SerenityResult,
 };
 
@@ -94,7 +94,9 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
     if handler.is_deaf() {
         check_msg(msg.channel_id.say(&ctx.http, "Already deafened").await);
     } else {
-        handler.deafen(true).await;
+        if let Err(e) = handler.deafen(true).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http, "Deafened").await);
     }
@@ -149,10 +151,12 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
-    let mut has_handler = manager.get(guild_id).is_some();
+    let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        manager.remove(guild_id).await;
+        if let Err(e) = manager.remove(guild_id).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http, "Left voice channel").await);
     } else {
@@ -190,7 +194,9 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
     if handler.is_mute() {
         check_msg(msg.channel_id.say(&ctx.http, "Already muted").await);
     } else {
-        handler.mute(true).await;
+        if let Err(e) = handler.mute(true).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http, "Now muted").await);
     }
@@ -274,7 +280,9 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
 
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
-        handler.deafen(false).await;
+        if let Err(e) = handler.deafen(false).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http, "Undeafened").await);
     } else {
@@ -299,7 +307,9 @@ async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
 
     if let Some(handler_lock) = manager.get(guild_id) {
         let mut handler = handler_lock.lock().await;
-        handler.mute(false).await;
+        if let Err(e) = handler.mute(false).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http, "Unmuted").await);
     } else {

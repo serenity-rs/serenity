@@ -57,6 +57,7 @@ impl Receiver {
 
 #[async_trait]
 impl VoiceEventHandler for Receiver {
+    #[allow(unused_variables)]
     async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
         use EventContext as Ctx;
         match ctx {
@@ -251,7 +252,9 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        manager.remove(guild_id).await;
+        if let Err(e) = manager.remove(guild_id).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http,"Left voice channel").await);
     } else {

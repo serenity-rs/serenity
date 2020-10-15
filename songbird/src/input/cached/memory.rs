@@ -7,7 +7,7 @@ use crate::input::{
     Metadata,
     Reader,
 };
-use std::convert::TryInto;
+use std::convert::{TryFrom, TryInto};
 use streamcatcher::{Catcher, Config};
 
 /// A wrapper around an existing [`Input`] which caches
@@ -102,14 +102,16 @@ impl Memory {
     }
 }
 
-impl From<Memory> for Input {
-    fn from(src: Memory) -> Self {
-        Input::new(
+impl TryFrom<Memory> for Input {
+    type Error = Error;
+
+    fn try_from(src: Memory) -> Result<Self> {
+        Ok(Input::new(
             src.stereo,
             Reader::Memory(src.raw),
-            src.kind.try_into().expect("FIXME: make this a tryinto"),
+            src.kind.try_into()?,
             src.container,
             Some(src.metadata),
-        )
+        ))
     }
 }

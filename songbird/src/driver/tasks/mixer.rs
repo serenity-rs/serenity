@@ -23,7 +23,7 @@ use rand::random;
 use spin_sleep::SpinSleeper;
 use std::time::Instant;
 use tokio::runtime::Handle;
-use tracing::{debug, error, instrument};
+use tracing::{error, instrument};
 use xsalsa20poly1305::{aead::AeadInPlace, Nonce, TAG_SIZE};
 
 struct Mixer {
@@ -267,7 +267,7 @@ impl Mixer {
             track.process_commands(i, interconnect);
         }
 
-        // FIXME: do without vec?
+        // TODO: do without vec?
         let mut i = 0;
         let mut to_remove = Vec::with_capacity(self.tracks.len());
         while i < self.tracks.len() {
@@ -405,7 +405,9 @@ impl Mixer {
             rtp_len + final_payload_size
         };
 
-        // FIXME: This is dog slow, don't do this.
+        // TODO: This is dog slow, don't do this.
+        // Can we replace this with a shared ring buffer + semaphore?
+        // i.e., do something like double/triple buffering in graphics.
         conn.udp_tx
             .send(UdpTxMessage::Packet(self.packet[..index].to_vec()))?;
 

@@ -6,15 +6,15 @@
 use crate::model::Event;
 
 use async_trait::async_trait;
-use async_tungstenite::{tokio::ConnectStream, tungstenite::Message, WebSocketStream};
+use async_tungstenite::{
+    tokio::ConnectStream,
+    tungstenite::{error::Error as TungsteniteError, protocol::CloseFrame, Message},
+    WebSocketStream,
+};
 use futures::{SinkExt, StreamExt, TryStreamExt};
 use serde_json::Error as JsonError;
 use tokio::time::timeout;
 use tracing::{instrument, warn};
-
-use async_tungstenite::tungstenite::error::Error as TungsteniteError;
-
-use async_tungstenite::tungstenite::protocol::CloseFrame;
 
 pub type WsStream = WebSocketStream<ConnectStream>;
 

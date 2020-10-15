@@ -9,6 +9,9 @@ use std::{
     time::Duration,
 };
 
+type Recreator = Box<dyn Restart + Send + 'static>;
+type RecreateChannel = Receiver<Result<(Box<Input>, Recreator)>>;
+
 /// A wrapper around a method to create a new [`Input`] which
 /// seeks backward by recreating the source.
 ///
@@ -28,9 +31,9 @@ use std::{
 /// [`Compressed`]: cached/struct.Compressed.html
 pub struct Restartable {
     async_handle: Option<Handle>,
-    awaiting_source: Option<Receiver<Result<(Box<Input>, Box<dyn Restart + Send + 'static>)>>>,
+    awaiting_source: Option<RecreateChannel>,
     position: usize,
-    recreator: Option<Box<dyn Restart + Send + 'static>>,
+    recreator: Option<Recreator>,
     source: Box<Input>,
 }
 

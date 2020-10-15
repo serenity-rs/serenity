@@ -27,11 +27,6 @@ impl Interconnect {
         let _ = self.mixer.send(MixerMessage::Poison);
     }
 
-    pub fn restart(self) -> Self {
-        self.poison();
-        super::start_internals(self.core)
-    }
-
     pub fn restart_volatile_internals(&mut self) {
         self.poison();
 

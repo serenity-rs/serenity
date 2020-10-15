@@ -133,7 +133,8 @@ impl Input {
         let float_space = buffer.len() / sample_len;
         let mut written_floats = 0;
 
-        // FIXME: this is a little bit backwards, and assumes the bottom cases are always raw..
+        // TODO: better decouple codec and container here.
+        // this is a little bit backwards, and assumes the bottom cases are always raw...
         let out = match &mut self.kind {
             Codec::Opus(decoder_state) => {
                 if matches!(self.container, Container::Raw) {

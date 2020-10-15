@@ -13,7 +13,7 @@ use super::{
 use flume::{Receiver, RecvError, Sender};
 use message::*;
 use tokio::runtime::Handle;
-use tracing::{error, info, instrument, warn};
+use tracing::{error, info, instrument};
 
 pub(crate) fn start(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     tokio::spawn(async move {

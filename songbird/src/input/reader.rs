@@ -45,6 +45,7 @@ impl Reader {
         }
     }
 
+    #[allow(clippy::single_match)]
     pub(crate) fn prep_with_handle(&mut self, handle: Handle) {
         use Reader::*;
         match self {
