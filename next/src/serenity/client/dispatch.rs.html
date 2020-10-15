@@ -1278,7 +1278,7 @@
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
             <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_members_chunk</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">members</span>, <span class="ident">event</span>.<span class="ident">nonce</span>).<span class="ident">await</span>;
+                <span class="ident">event_handler</span>.<span class="ident">guild_members_chunk</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleCreate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {

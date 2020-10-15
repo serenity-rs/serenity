@@ -121,7 +121,7 @@
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardManager</span>, <span class="ident">ShardManagerMessage</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">gateway</span>::<span class="ident">ShardId</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardId</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">warn</span>, <span class="ident">instrument</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{
     <span class="ident">StreamExt</span>,

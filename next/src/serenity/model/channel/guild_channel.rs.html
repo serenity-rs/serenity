@@ -969,8 +969,6 @@
 <span id="966">966</span>
 <span id="967">967</span>
 <span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -1121,9 +1119,12 @@
     <span class="doccomment">/// ```rust,ignore</span>
     <span class="doccomment">/// let invite = channel.create_invite(&amp;context, |i| i.max_uses(5)).await;</span>
     <span class="doccomment">/// ```</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_invite</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInvite</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInvite</span> {
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInvite</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInvite</span>
+    {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
@@ -1135,12 +1136,7 @@
             }
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">invite</span> <span class="op">=</span> <span class="ident">CreateInvite</span>::<span class="ident">default</span>();
-        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">invite</span>);
-
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serenity_utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">invite</span>.<span class="number">0</span>);
-
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">create_invite</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">await</span>
+        <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_invite</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">f</span>).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Creates a [permission overwrite][`PermissionOverwrite`] for either a</span>
@@ -1926,7 +1922,7 @@
                 <span class="string">&quot;data:image/png;base64,&quot;</span>.<span class="ident">to_string</span>() <span class="op">+</span> <span class="kw-2">&amp;</span><span class="ident">base64</span>::<span class="ident">encode</span>(<span class="kw-2">&amp;</span><span class="ident">picture</span>)
             },
         };
-        
+
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="macro">json</span><span class="macro">!</span>({
             <span class="string">&quot;name&quot;</span>: <span class="ident">name</span>,
             <span class="string">&quot;avatar&quot;</span>: <span class="ident">avatar</span>

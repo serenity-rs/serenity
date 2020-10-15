@@ -639,6 +639,7 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
+<span id="639">639</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>, <span class="ident">GatewayError</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -653,8 +654,8 @@
 };
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="self">self</span>, <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::{<span class="ident">SinkExt</span>, <span class="ident">StreamExt</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">dispatch</span>::{<span class="ident">DispatchEvent</span>, <span class="ident">dispatch</span>};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="kw">super</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">dispatch</span>::{<span class="ident">DispatchEvent</span>, <span class="ident">dispatch</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::{<span class="ident">EventHandler</span>, <span class="ident">RawEventHandler</span>};
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">event</span>::{<span class="ident">ClientEvent</span>, <span class="ident">ShardStageUpdateEvent</span>};
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardId</span>, <span class="ident">ShardManagerMessage</span>, <span class="ident">ShardRunnerMessage</span>};
 <span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::{
@@ -667,7 +668,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">framework</span>::<span class="ident">Framework</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">voice</span>::<span class="ident">ClientVoiceManager</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">voice</span>::<span class="ident">ClientVoiceManager</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
@@ -1004,11 +1005,12 @@
 
                         <span class="bool-val">true</span>
                     },
-                <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuilds</span> { <span class="ident">guild_ids</span>, <span class="ident">limit</span>, <span class="ident">query</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuilds</span> { <span class="ident">guild_ids</span>, <span class="ident">limit</span>, <span class="ident">query</span>, <span class="ident">nonce</span> }) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">chunk_guilds</span>(
                         <span class="ident">guild_ids</span>,
                         <span class="ident">limit</span>,
                         <span class="ident">query</span>.<span class="ident">as_deref</span>(),
+                        <span class="ident">nonce</span>.<span class="ident">as_deref</span>(),
                     ).<span class="ident">await</span>.<span class="ident">is_ok</span>()
                 },
                 <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>)) <span class="op">=</span><span class="op">&gt;</span> {

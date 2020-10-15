@@ -242,16 +242,16 @@
     <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">FmtResult</span>,
     <span class="ident">Write</span> <span class="kw">as</span> <span class="ident">FmtWrite</span>
 };
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">id</span>::{<span class="ident">EmojiId</span>, <span class="ident">RoleId</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">EmojiId</span>, <span class="ident">RoleId</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">json</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">ModelError</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">ModelError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">super</span>::<span class="kw">super</span>::<span class="ident">id</span>::<span class="ident">GuildId</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">GuildId</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
