@@ -13,7 +13,7 @@ use super::{
 use flume::{Receiver, RecvError, Sender};
 use message::*;
 use tokio::runtime::Handle;
-use tracing::{error, info, warn};
+use tracing::{error, info, instrument, warn};
 
 pub(crate) fn start(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     tokio::spawn(async move {
@@ -51,6 +51,7 @@ fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
     interconnect
 }
 
+#[instrument(skip(rx, tx))]
 async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
     let mut connection = None;
     let mut interconnect = start_internals(tx);

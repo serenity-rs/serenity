@@ -12,7 +12,7 @@ use flume::Receiver;
 use rand::random;
 use std::time::Duration;
 use tokio::time::{self, Instant};
-use tracing::{error, info, trace, warn};
+use tracing::{error, info, instrument, trace, warn};
 
 struct AuxNetwork {
     rx: Receiver<WsMessage>,
@@ -46,6 +46,7 @@ impl AuxNetwork {
         }
     }
 
+    #[instrument(skip(self))]
     async fn run(&mut self, interconnect: &mut Interconnect) {
         let mut next_heartbeat = Instant::now() + self.heartbeat_interval;
 
@@ -188,6 +189,7 @@ impl AuxNetwork {
     }
 }
 
+#[instrument(skip(interconnect, ws_client))]
 pub(crate) async fn runner(
     mut interconnect: Interconnect,
     evt_rx: Receiver<WsMessage>,

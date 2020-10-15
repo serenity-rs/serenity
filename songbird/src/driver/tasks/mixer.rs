@@ -23,7 +23,7 @@ use rand::random;
 use spin_sleep::SpinSleeper;
 use std::time::Instant;
 use tokio::runtime::Handle;
-use tracing::{debug, error};
+use tracing::{debug, error, instrument};
 use xsalsa20poly1305::{aead::AeadInPlace, Nonce, TAG_SIZE};
 
 struct Mixer {
@@ -420,10 +420,11 @@ impl Mixer {
     }
 }
 
-/// The mixing thread is a synchronous contect due to its compute-bound nature.
+/// The mixing thread is a synchronous context due to its compute-bound nature.
 ///
 /// We pass in an async handle for the benefit of some Input classes (e.g., restartables)
 /// who need to run their restart code elsewhere and return blank data until such time.
+#[instrument(skip(interconnect, mix_rx, async_handle))]
 pub(crate) fn runner(
     interconnect: Interconnect,
     mix_rx: Receiver<MixerMessage>,

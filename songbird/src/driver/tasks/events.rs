@@ -4,8 +4,9 @@ use crate::{
     tracks::{TrackHandle, TrackState},
 };
 use flume::Receiver;
-use tracing::{debug, info, trace};
+use tracing::{debug, info, instrument, trace};
 
+#[instrument(skip(_interconnect, evt_rx))]
 pub(crate) async fn runner(_interconnect: Interconnect, evt_rx: Receiver<EventMessage>) {
     let mut global = GlobalEvents::default();
 

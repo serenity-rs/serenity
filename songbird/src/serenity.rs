@@ -57,17 +57,11 @@ impl TypeMapKey for SongbirdQueueKey {
 /// `ClientBuilder`.
 ///
 /// These install the client to receive gateway voice events, and
-/// store an easily accessible reference to songbir'd managers.
+/// store an easily accessible reference to Songbird's managers.
 pub trait SerenityInit {
     fn register_songbird(self) -> Self;
 
     fn register_songbird_with(self, voice: Arc<Songbird>) -> Self;
-
-    #[cfg(feature = "driver")]
-    fn register_trackqueue(self) -> Self;
-
-    #[cfg(feature = "driver")]
-    fn register_trackqueue_with(self, queue: TrackQueue) -> Self;
 }
 
 impl SerenityInit for ClientBuilder<'_> {
@@ -77,15 +71,5 @@ impl SerenityInit for ClientBuilder<'_> {
 
     fn register_songbird_with(self, voice: Arc<Songbird>) -> Self {
         register_with(self, voice)
-    }
-
-    #[cfg(feature = "driver")]
-    fn register_trackqueue(self) -> Self {
-        unimplemented!()
-    }
-
-    #[cfg(feature = "driver")]
-    fn register_trackqueue_with(self, queue: TrackQueue) -> Self {
-        unimplemented!()
     }
 }

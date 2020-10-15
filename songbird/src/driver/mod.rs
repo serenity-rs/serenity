@@ -61,6 +61,7 @@ impl Driver {
     }
 
     /// Connects to a voice channel using the specified server.
+    #[instrument(skip(self))]
     pub fn connect(&mut self, info: ConnectionInfo) -> Receiver<Result<(), Error>> {
         let (tx, rx) = flume::bounded(1);
 
@@ -70,6 +71,7 @@ impl Driver {
     }
 
     /// Connects to a voice channel using the specified server.
+    #[instrument(skip(self))]
     pub(crate) fn raw_connect(&mut self, info: ConnectionInfo, tx: Sender<Result<(), Error>>) {
         self.send(CoreMessage::ConnectWithResult(info, tx));
     }
@@ -78,6 +80,7 @@ impl Driver {
     ///
     /// This does *not* forget settings, like whether to be self-deafened or
     /// self-muted.
+    #[instrument(skip(self))]
     pub fn leave(&mut self) {
         self.send(CoreMessage::Disconnect);
     }
@@ -86,6 +89,7 @@ impl Driver {
     ///
     /// If there is no live voice connection, then this only acts as a settings
     /// update for future connections.
+    #[instrument(skip(self))]
     pub fn mute(&mut self, mute: bool) {
         self.self_mute = mute;
         self.send(CoreMessage::Mute(mute));
@@ -93,6 +97,7 @@ impl Driver {
 
     /// Returns whether the driver is muted (i.e., processes audio internally
     /// but submits none).
+    #[instrument(skip(self))]
     pub fn is_mute(&self) -> bool {
         self.self_mute
     }
@@ -103,6 +108,7 @@ impl Driver {
     ///
     /// [`voice::ffmpeg`]: input/fn.ffmpeg.html
     /// [`voice::ytdl`]: input/fn.ytdl.html
+    #[instrument(skip(self))]
     pub fn play_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
         self.send(CoreMessage::AddTrack(player));
@@ -116,6 +122,7 @@ impl Driver {
     /// to the channel.
     ///
     /// [`play_only_source`]: #method.play_only_source
+    #[instrument(skip(self))]
     pub fn play_only_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
         self.send(CoreMessage::SetTrack(Some(player)));
@@ -133,6 +140,7 @@ impl Driver {
     /// [`voice::create_player`]: tracks/fn.create_player.html
     /// [`Track`]: tracks/struct.Track.html
     /// [`play_source`]: #method.play_source
+    #[instrument(skip(self))]
     pub fn play(&mut self, track: Track) {
         self.send(CoreMessage::AddTrack(track));
     }
@@ -148,6 +156,7 @@ impl Driver {
     /// [`Track`]: tracks/struct.Track.html
     /// [`play_only_source`]: #method.play_only_source
     /// [`play`]: #method.play
+    #[instrument(skip(self))]
     pub fn play_only(&mut self, track: Track) {
         self.send(CoreMessage::SetTrack(Some(track)));
     }
@@ -159,11 +168,13 @@ impl Driver {
     /// Sensible values range between `Bits(512)` and `Bits(512_000)`
     /// bits per second.
     /// Alternatively, `Auto` and `Max` remain available.
+    #[instrument(skip(self))]
     pub fn set_bitrate(&mut self, bitrate: Bitrate) {
         self.send(CoreMessage::SetBitrate(bitrate))
     }
 
     /// Stops playing audio from all sources, if any are set.
+    #[instrument(skip(self))]
     pub fn stop(&mut self) {
         self.send(CoreMessage::SetTrack(None))
     }
@@ -182,6 +193,7 @@ impl Driver {
     /// [`Track`]: tracks/struct.Track.html
     /// [`TrackEvent`]: events/enum.TrackEvent.html
     /// [`EventContext`]: events/enum.EventContext.html
+    #[instrument(skip(self, action))]
     pub fn add_global_event<F: EventHandler + 'static>(&mut self, event: Event, action: F) {
         self.send(CoreMessage::AddEvent(EventData::new(event, action)));
     }

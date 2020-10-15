@@ -20,7 +20,7 @@ use error::{Error, Result};
 use flume::Sender;
 use std::{net::IpAddr, str::FromStr};
 use tokio::net::UdpSocket;
-use tracing::{debug, info};
+use tracing::{debug, info, instrument};
 use url::Url;
 use xsalsa20poly1305::{aead::NewAead, XSalsa20Poly1305 as Cipher};
 
@@ -204,6 +204,7 @@ impl Connection {
         })
     }
 
+    #[instrument(skip(self))]
     pub async fn reconnect(&mut self) -> Result<()> {
         let url = generate_url(&mut self.info.endpoint)?;
 

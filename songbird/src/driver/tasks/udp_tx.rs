@@ -6,8 +6,9 @@ use tokio::{
     net::udp::SendHalf,
     time::{timeout_at, Elapsed, Instant},
 };
-use tracing::{error, info, trace};
+use tracing::{error, info, instrument, trace};
 
+#[instrument(skip(udp_msg_rx))]
 pub(crate) async fn runner(udp_msg_rx: Receiver<UdpTxMessage>, ssrc: u32, mut udp_tx: SendHalf) {
     info!("UDP transmit handle started.");
 

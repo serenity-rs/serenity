@@ -15,7 +15,7 @@ use discortp::{
 use flume::Receiver;
 use std::collections::HashMap;
 use tokio::net::udp::RecvHalf;
-use tracing::{error, info, warn};
+use tracing::{error, info, instrument, warn};
 use xsalsa20poly1305::{aead::AeadInPlace, Nonce, Tag, XSalsa20Poly1305 as Cipher, TAG_SIZE};
 
 #[derive(Debug)]
@@ -137,6 +137,7 @@ struct UdpRx {
 }
 
 impl UdpRx {
+    #[instrument(skip(self))]
     async fn run(&mut self, interconnect: &Interconnect) {
         loop {
             tokio::select! {
@@ -230,6 +231,7 @@ impl UdpRx {
     }
 }
 
+#[instrument(skip(interconnect, rx, cipher))]
 pub(crate) async fn runner(
     interconnect: Interconnect,
     rx: Receiver<UdpRxMessage>,
