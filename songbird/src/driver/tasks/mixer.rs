@@ -337,7 +337,11 @@ impl Mixer {
             } else {
                 // Per official guidelines, send 5x silence BEFORE we stop speaking.
                 if let Some(ws) = &self.ws {
-                    ws.send(WsMessage::Speaking(false))?;
+                    // NOTE: this should prevent a catastrophic thread pileup.
+                    // A full reconnect might cause an inner closed connection.
+                    // It's safer to leave the central task to clean this up and
+                    // pass the mixer a new channel.
+                    let _ = ws.send(WsMessage::Speaking(false));
                 }
 
                 self.march_deadline();

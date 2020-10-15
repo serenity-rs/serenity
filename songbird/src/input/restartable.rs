@@ -193,7 +193,7 @@ impl Read for Restartable {
                         "Failed to create new reader: dropped.",
                     ));
                     (e, false, true)
-                }
+                },
             }
         } else {
             // already have a good, valid source.
@@ -237,8 +237,9 @@ impl Seek for Restartable {
 
                         if let Some(mut rec) = recreator {
                             handle.spawn(async move {
-                                let ret_val = rec
-                                    .call_restart(Some(utils::byte_count_to_timestamp(offset, stereo)));
+                                let ret_val = rec.call_restart(Some(
+                                    utils::byte_count_to_timestamp(offset, stereo),
+                                ));
 
                                 let _ = tx.send(ret_val.map(Box::new).map(|v| (v, rec)));
                             });

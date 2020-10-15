@@ -17,6 +17,7 @@ use tracing::{error, info, trace, warn};
 struct AuxNetwork {
     rx: Receiver<WsMessage>,
     ws_client: WsStream,
+    dont_send: bool,
 
     ssrc: u32,
     heartbeat_interval: Duration,
@@ -35,6 +36,7 @@ impl AuxNetwork {
         Self {
             rx: evt_rx,
             ws_client,
+            dont_send: false,
 
             ssrc,
             heartbeat_interval: Duration::from_secs_f64(heartbeat_interval / 1000.0),
@@ -63,7 +65,7 @@ impl AuxNetwork {
                     };
                     next_heartbeat = self.next_heartbeat();
                 }
-                ws_msg = self.ws_client.recv_json_no_timeout() => {
+                ws_msg = self.ws_client.recv_json_no_timeout(), if !self.dont_send => {
                     ws_error = match ws_msg {
                         Err(WsError::Json(e)) => {
                             warn!("Unexpected JSON {:?}.", e);
@@ -85,6 +87,7 @@ impl AuxNetwork {
                         Ok(WsMessage::Ws(data)) => {
                             self.ws_client = *data;
                             next_heartbeat = self.next_heartbeat();
+                            self.dont_send = false;
                         },
                         Ok(WsMessage::ReplaceInterconnect(i)) => {
                             *interconnect = i;
@@ -94,7 +97,7 @@ impl AuxNetwork {
                             next_heartbeat = self.next_heartbeat();
                         },
                         Ok(WsMessage::Speaking(is_speaking)) => {
-                            if self.speaking.contains(SpeakingState::MICROPHONE) != is_speaking {
+                            if self.speaking.contains(SpeakingState::MICROPHONE) != is_speaking && !self.dont_send {
                                 self.speaking.set(SpeakingState::MICROPHONE, is_speaking);
                                 info!("Changing to {:?}", self.speaking);
 
@@ -125,6 +128,7 @@ impl AuxNetwork {
 
             if ws_error {
                 let _ = interconnect.core.send(CoreMessage::Reconnect);
+                self.dont_send = true;
             }
         }
     }
@@ -139,9 +143,12 @@ impl AuxNetwork {
 
         trace!("Sent heartbeat {:?}", self.speaking);
 
-        self.ws_client
-            .send_json(&GatewayEvent::from(Heartbeat { nonce }))
-            .await?;
+        if !self.dont_send {
+            self.ws_client
+                .send_json(&GatewayEvent::from(Heartbeat { nonce }))
+                .await?;
+        }
+
         Ok(())
     }
 

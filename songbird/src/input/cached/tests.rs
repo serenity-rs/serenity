@@ -8,9 +8,6 @@ use audiopus::{coder::Decoder, Bitrate, Channels, SampleRate};
 use byteorder::{LittleEndian, ReadBytesExt};
 use std::io::{Cursor, Read};
 
-// const TEST_FILE: &str = "test-assets/loop.wav";
-const TEST_FILE: &str = "test-assets/ck.mp3";
-
 #[tokio::test]
 async fn streamcatcher_preserves_file() {
     let input = make_sine(50 * MONO_FRAME_SIZE, true);
@@ -28,6 +25,7 @@ async fn streamcatcher_preserves_file() {
 
     assert_eq!(input, out_buf);
 }
+
 #[test]
 fn compressed_scans_frames_decodes_mono() {
     let data = one_s_compressed_sine(false);
