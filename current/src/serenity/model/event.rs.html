@@ -2222,6 +2222,20 @@
 <span id="2219">2219</span>
 <span id="2220">2220</span>
 <span id="2221">2221</span>
+<span id="2222">2222</span>
+<span id="2223">2223</span>
+<span id="2224">2224</span>
+<span id="2225">2225</span>
+<span id="2226">2226</span>
+<span id="2227">2227</span>
+<span id="2228">2228</span>
+<span id="2229">2229</span>
+<span id="2230">2230</span>
+<span id="2231">2231</span>
+<span id="2232">2232</span>
+<span id="2233">2233</span>
+<span id="2234">2234</span>
+<span id="2235">2235</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -2782,6 +2796,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMembersChunkEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Member</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">chunk_index</span>: <span class="ident">u32</span>,
+    <span class="kw">pub</span> <span class="ident">chunk_count</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
@@ -2817,6 +2833,16 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;members&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk members&quot;</span>))<span class="question-mark">?</span>;
 
+        <span class="kw">let</span> <span class="ident">chunk_index</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;chunk_index&quot;</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk index&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="ident">u32</span>::<span class="ident">deserialize</span>)
+            .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
+
+        <span class="kw">let</span> <span class="ident">chunk_count</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;chunk_count&quot;</span>)
+            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk count&quot;</span>))
+            .<span class="ident">and_then</span>(<span class="ident">u32</span>::<span class="ident">deserialize</span>)
+            .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
+
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">members</span>) <span class="op">=</span> <span class="ident">members</span>.<span class="ident">as_array_mut</span>() {
             <span class="kw">let</span> <span class="ident">num</span> <span class="op">=</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">guild_id</span>.<span class="number">0</span>));
 
@@ -2846,6 +2872,8 @@
         <span class="prelude-val">Ok</span>(<span class="ident">GuildMembersChunkEvent</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">members</span>,
+            <span class="ident">chunk_index</span>,
+            <span class="ident">chunk_count</span>,
             <span class="ident">nonce</span>,
             <span class="ident">_nonexhaustive</span>: (),
         })

@@ -260,6 +260,8 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -328,13 +330,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let guild_ids = vec![GuildId(81384788765712384)];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.chunk_guilds(guild_ids, Some(2000), None);</span>
+    <span class="doccomment">/// shard.chunk_guilds(guild_ids, Some(2000), None, None);</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Chunk a single guild by Id, limiting to 20 members, and specifying a</span>
-    <span class="doccomment">/// query parameter of `&quot;do&quot;`:</span>
+    <span class="doccomment">/// Chunk a single guild by Id, limiting to 20 members, specifying a</span>
+    <span class="doccomment">/// query parameter of `&quot;do&quot;` and a nonce of `&quot;request&quot;`:</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
@@ -350,7 +352,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// let guild_ids = vec![GuildId(81384788765712384)];</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// shard.chunk_guilds(guild_ids, Some(20), Some(&quot;do&quot;));</span>
+    <span class="doccomment">/// shard.chunk_guilds(guild_ids, Some(20), Some(&quot;do&quot;), Some(&quot;request&quot;));</span>
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
@@ -363,6 +365,7 @@
         <span class="ident">guild_ids</span>: <span class="ident">It</span>,
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
         <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+        <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) <span class="kw">where</span> <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">guilds</span> <span class="op">=</span> <span class="ident">guild_ids</span>.<span class="ident">into_iter</span>().<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
@@ -370,6 +373,7 @@
             <span class="ident">guild_ids</span>: <span class="ident">guilds</span>,
             <span class="ident">limit</span>,
             <span class="ident">query</span>,
+            <span class="ident">nonce</span>,
         });
     }
 

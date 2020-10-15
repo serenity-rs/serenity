@@ -639,6 +639,7 @@
 <span id="636">636</span>
 <span id="637">637</span>
 <span id="638">638</span>
+<span id="639">639</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>, <span class="ident">GatewayError</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -1004,11 +1005,12 @@
 
                         <span class="bool-val">true</span>
                     },
-                <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuilds</span> { <span class="ident">guild_ids</span>, <span class="ident">limit</span>, <span class="ident">query</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuilds</span> { <span class="ident">guild_ids</span>, <span class="ident">limit</span>, <span class="ident">query</span>, <span class="ident">nonce</span> }) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">chunk_guilds</span>(
                         <span class="ident">guild_ids</span>,
                         <span class="ident">limit</span>,
                         <span class="ident">query</span>.<span class="ident">as_deref</span>(),
+                        <span class="ident">nonce</span>.<span class="ident">as_deref</span>(),
                     ).<span class="ident">await</span>.<span class="ident">is_ok</span>()
                 },
                 <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Close</span>(<span class="ident">code</span>, <span class="ident">reason</span>)) <span class="op">=</span><span class="op">&gt;</span> {

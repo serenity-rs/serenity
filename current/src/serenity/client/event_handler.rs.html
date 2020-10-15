@@ -485,7 +485,7 @@
     <span class="doccomment">/// Dispatched when the data for offline members was requested.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id and the data.</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_members_chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_offline_members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Member</span><span class="op">&gt;</span>, <span class="ident">_nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>) {}
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_members_chunk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_chunk</span>: <span class="ident">GuildMembersChunkEvent</span>) {}
 
     <span class="doccomment">/// Dispatched when a role is created.</span>
     <span class="doccomment">///</span>
