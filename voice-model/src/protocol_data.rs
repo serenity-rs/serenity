@@ -1,7 +1,7 @@
 use serde::{Deserialize, Serialize};
 use std::net::IpAddr;
 
-/// The client's response to a conenction offer.
+/// The client's response to a connection offer.
 #[derive(Clone, Debug, Deserialize, Eq, Hash, PartialEq, Serialize)]
 pub struct ProtocolData {
     /// IP address of the client as seen by the server (*e.g.*, after using [IP DIscovery]
