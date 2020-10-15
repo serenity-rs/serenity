@@ -71,12 +71,12 @@ impl Mixer {
             async_handle,
             bitrate,
             conn_active: None,
-            deadline: Instant::now(), // FIXME: refresh on connection start
+            deadline: Instant::now(),
             encoder,
             mix_rx,
             muted: false,
             packet,
-            silence_frames: 0, // FIXME: shouldn't this start at 5? Test.
+            silence_frames: 0,
             sleeper: Default::default(),
             soft_clip,
             tracks: vec![],
@@ -118,6 +118,7 @@ impl Mixer {
                                 (Blame: VOICE_PACKET_MAX?)",
                         );
                         rtp.set_ssrc(ssrc);
+                        self.deadline = Instant::now();
                     },
                     Ok(DropConn) => {
                         self.conn_active = None;

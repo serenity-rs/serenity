@@ -34,7 +34,7 @@ pub enum EventContext<'a> {
         /// its original UserId.
         ssrc: u32,
         /// Whether this user is currently speaking.
-        speaking: bool
+        speaking: bool,
     },
     /// Opus audio packet, received from another stream (detailed in `packet`).
     /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
