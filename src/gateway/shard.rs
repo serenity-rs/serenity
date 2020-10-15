@@ -697,13 +697,13 @@ impl Shard {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None).await?;
+    /// shard.chunk_guilds(guild_ids, Some(2000), None, None).await?;
     /// #     Ok(())
     /// # }
     /// ```
     ///
     /// Chunk a single guild by Id, limiting to 20 members, and specifying a
-    /// query parameter of `"do"`:
+    /// query parameter of `"do"` and a nonce of `"request"`:
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
@@ -720,7 +720,7 @@ impl Shard {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do")).await?;
+    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"), Some("request")).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -734,6 +734,7 @@ impl Shard {
         guild_ids: It,
         limit: Option<u16>,
         query: Option<&str>,
+        nonce: Option<&str>,
     ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send {
         debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
 
@@ -742,6 +743,7 @@ impl Shard {
             &self.shard_info,
             limit,
             query,
+            nonce,
         ).await
     }
 

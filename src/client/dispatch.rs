@@ -530,7 +530,7 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.guild_members_chunk(context, event.guild_id, event.members, event.nonce).await;
+                event_handler.guild_members_chunk(context, event).await;
             });
         },
         DispatchEvent::Model(Event::GuildRoleCreate(mut event)) => {
