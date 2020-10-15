@@ -8,7 +8,10 @@ use super::*;
 ///
 /// [`EventData`]: struct.EventData.html
 pub enum UntimedEvent {
+	/// Untimed events belonging to a track, such as state changes, end, or loops.
     Track(TrackEvent),
+    /// Untimed events belonging to the global context, such as finished tracks,
+    /// client speaking updates, or RT(C)P voice and telemetry data.
     Core(CoreEvent),
 }
 

@@ -48,8 +48,11 @@ use tracing::{debug, trace};
 /// [`Restartable`]: ../struct.Restartable.html
 #[derive(Clone, Debug)]
 pub struct Compressed {
+    /// Inner shared bytestore.
     pub raw: TxCatcher<Box<Input>, OpusCompressor>,
+    /// Metadata moved out of the captured source.
     pub metadata: Metadata,
+    /// Stereo-ness of the captured source.
     pub stereo: bool,
 }
 
@@ -146,6 +149,12 @@ impl From<Compressed> for Input {
     }
 }
 
+/// Transform applied inside [`Compressed`], converting a floating-point PCM
+/// input stream into a DCA-framed Opus stream.
+///
+/// Created and managed by [`Compressed`].
+///
+/// [`Compressed`]: struct.Compressed.html
 #[derive(Debug)]
 pub struct OpusCompressor {
     encoder: OpusEncoder,

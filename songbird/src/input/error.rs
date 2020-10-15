@@ -1,30 +1,30 @@
+//! Errors caused by input creation.
+
 use audiopus::Error as OpusError;
 use serde_json::{Error as JsonError, Value};
 use std::{io::Error as IoError, process::Output};
 use streamcatcher::CatcherError;
 
-/// An error returned from the voice module.
-// Errors which are not visible to the end user are hidden.
+/// An error returned when creating a new [`Input`].
+///
+/// [`Input`]: ../struct.Input.html
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
+    /// An error occurred while opening a new DCA source.
     Dca(DcaError),
-
+    /// An error occurred while reading, or opening a file.
     Io(IoError),
-
+    /// An error occurred while parsing JSON (i.e., during metadata/stereo detection).
     Json(JsonError),
-
     /// An error occurred within the Opus codec.
     Opus(OpusError),
-
     /// Apparently failed to create stdout...
     Stdout,
-
     /// An error occurred while checking if a path is stereo.
     Streams,
     /// Configuration error for a cached Input.
     Streamcatcher(CatcherError),
-
     /// An error occurred while processing the JSON output from `youtube-dl`.
     ///
     /// The JSON output is given.
@@ -67,15 +67,25 @@ impl From<OpusError> for Error {
     }
 }
 
-/// An error returned from the `dca` method.
+/// An error returned from the [`dca`] method.
+///
+/// [`dca`]: ../fn.dca.html
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum DcaError {
+    /// An error occurred while reading, or opening a file.
     IoError(IoError),
+    /// The file opened did not have a valid DCA JSON header.
     InvalidHeader,
+    /// The file's metadata block was invalid, or could not be parsed.
     InvalidMetadata(JsonError),
+    /// The file's header reported an invalid metadata block size.
     InvalidSize(i32),
+    /// An error was encountered while creating a new Opus decoder.
     Opus(OpusError),
 }
 
+/// Convenience type for fallible return of [`Input`]s.
+///
+/// [`Input`]: ../struct.Input.html
 pub type Result<T> = std::result::Result<T, Error>;

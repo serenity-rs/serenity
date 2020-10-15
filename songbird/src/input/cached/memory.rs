@@ -30,18 +30,17 @@ use streamcatcher::{Catcher, Config};
 /// [`Restartable`]: ../struct.Restartable.html
 #[derive(Clone, Debug)]
 pub struct Memory {
+    /// Inner shared bytestore.
     pub raw: Catcher<Box<Reader>>,
+    /// Metadata moved out of the captured source.
     pub metadata: Metadata,
+    /// Codec used to read the inner bytestore.
     pub kind: CodecType,
+    /// Stereo-ness of the captured source.
     pub stereo: bool,
+    /// Framing mechanism for the inner bytestore.
     pub container: Container,
 }
-
-// work out the froms, intos...
-
-// issues: need enough info to reconstruct input from reader.
-// ALSO: need to make sure that compressed can only be opus + dca
-// and that memory preserves its input format.
 
 impl Memory {
     /// Wrap an existing [`Input`] with an in-memory store with the same codec and framing.

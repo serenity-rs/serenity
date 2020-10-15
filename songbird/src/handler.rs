@@ -1,5 +1,5 @@
 #[cfg(feature = "driver")]
-use crate::driver::{Driver, Error};
+use crate::{driver::Driver, error::ConnectionResult};
 use crate::{
     error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
@@ -17,7 +17,7 @@ use std::ops::{Deref, DerefMut};
 enum Return {
     Info(Sender<ConnectionInfo>),
     #[cfg(feature = "driver")]
-    Conn(Sender<Result<(), Error>>),
+    Conn(Sender<ConnectionResult<()>>),
 }
 
 /// The Call handler is responsible for a single voice connection, acting
@@ -131,7 +131,10 @@ impl Call {
     #[cfg(feature = "driver")]
     /// Connect or switch to the given voice channel by its Id.
     #[instrument(skip(self))]
-    pub async fn join(&mut self, channel_id: ChannelId) -> JoinResult<Receiver<Result<(), Error>>> {
+    pub async fn join(
+        &mut self,
+        channel_id: ChannelId,
+    ) -> JoinResult<Receiver<ConnectionResult<()>>> {
         let (tx, rx) = flume::unbounded();
 
         self.connection = Some((

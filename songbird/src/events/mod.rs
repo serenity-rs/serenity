@@ -13,7 +13,11 @@ use async_trait::async_trait;
 use std::time::Duration;
 
 #[async_trait]
+/// Trait to handle an event which can be fired per-track, or globally.
+///
+/// These may be feasibly reused between several event sources.
 pub trait EventHandler: Send + Sync {
+    /// Respond to one received event.
     async fn act(&self, ctx: &EventContext<'_>) -> Option<Event>;
 }
 

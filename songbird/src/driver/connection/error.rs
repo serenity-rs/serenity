@@ -1,3 +1,5 @@
+//! Connection errors and convenience types.
+
 use crate::{
     driver::tasks::{error::Recipient, message::*},
     ws::Error as WsError,
@@ -7,7 +9,7 @@ use serde_json::Error as JsonError;
 use std::{error::Error as ErrorTrait, fmt, io::Error as IoError};
 use xsalsa20poly1305::aead::Error as CryptoError;
 
-/// Errors encountered while connecting to a Discord voice server.
+/// Errors encountered while connecting to a Discord voice server over the driver.
 #[derive(Debug)]
 pub enum Error {
     /// An error occurred during [en/de]cryption of voice packets or key generation.
@@ -99,4 +101,5 @@ impl fmt::Display for Error {
 
 impl ErrorTrait for Error {}
 
+/// Convenience type for Discord voice/driver connection error handling.
 pub type Result<T> = std::result::Result<T, Error>;

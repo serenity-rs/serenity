@@ -1,5 +1,5 @@
 #[cfg(feature = "driver")]
-use crate::driver::Error as DriverError;
+use crate::error::ConnectionResult;
 use crate::{
     error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
@@ -36,7 +36,7 @@ struct ClientData {
     user_id: UserId,
 }
 
-/// A struct responsible for managing [`Call`]s.
+/// A shard-aware struct responsible for managing [`Call`]s.
 ///
 /// This manager transparently maps guild state and a source of shard information
 /// into individual calls, and forwards state updates which affect call state.
@@ -51,6 +51,11 @@ pub struct Songbird {
 
 impl Songbird {
     #[cfg(feature = "serenity")]
+    /// Create a new Songbird instance for serenity.
+    ///
+    /// This must be [registered] after creation.
+    ///
+    /// [registered]: serenity/fn.register_with.html
     pub fn serenity() -> Arc<Self> {
         Arc::new(Self {
             client_data: Default::default(),
@@ -60,6 +65,13 @@ impl Songbird {
     }
 
     #[cfg(feature = "twilight")]
+    /// Create a new Songbird instance for twilight.
+    ///
+    /// Twilight handlers do not need to be registered, but
+    /// users are responsible for passing in any events using
+    /// [`process`].
+    ///
+    /// [`process`]: #method.process
     pub fn twilight<U>(cluster: Cluster, shard_count: u64, user_id: U) -> Arc<Self>
     where
         U: Into<UserId>,
@@ -90,12 +102,21 @@ impl Songbird {
         client_data.initialised = true;
     }
 
+    /// Retreives a [`Call`] for the given guild, if one already exists.
+    ///
+    /// [`Call`]: struct.Call.html
     pub fn get<G: Into<GuildId>>(&self, guild_id: G) -> Option<Arc<Mutex<Call>>> {
         let map_read = self.calls.read();
         map_read.get(&guild_id.into()).cloned()
     }
 
-    fn get_or_insert_call(&self, guild_id: GuildId) -> Arc<Mutex<Call>> {
+    /// Retreives a [`Call`] for the given guild, creating a new one if
+    /// none is found.
+    ///
+    /// This will not join any calls, or cause connection state to change.
+    ///
+    /// [`Call`]: struct.Call.html
+    pub fn get_or_insert(&self, guild_id: GuildId) -> Arc<Mutex<Call>> {
         self.get(guild_id).unwrap_or_else(|| {
             let mut map_read = self.calls.write();
 
@@ -129,9 +150,7 @@ impl Songbird {
     /// for the target and the current connected channel is not equal to the
     /// given channel.
     ///
-    /// In the case of channel targets, the same channel is used to connect to.
-    ///
-    /// In the case of guilds, the provided channel is used to connect to. The
+    /// The provided channel ID is used as a connection target. The
     /// channel _must_ be in the provided guild. This is _not_ checked by the
     /// library, and will result in an error. If there is already a connected
     /// handler for the guild, _and_ the provided channel is different from the
@@ -148,10 +167,7 @@ impl Songbird {
         &self,
         guild_id: G,
         channel_id: C,
-    ) -> (
-        Arc<Mutex<Call>>,
-        JoinResult<Receiver<Result<(), DriverError>>>,
-    )
+    ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionResult<()>>>)
     where
         C: Into<ChannelId>,
         G: Into<GuildId>,
@@ -164,11 +180,8 @@ impl Songbird {
         &self,
         guild_id: GuildId,
         channel_id: ChannelId,
-    ) -> (
-        Arc<Mutex<Call>>,
-        JoinResult<Receiver<Result<(), DriverError>>>,
-    ) {
-        let call = self.get_or_insert_call(guild_id);
+    ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionResult<()>>>) {
+        let call = self.get_or_insert(guild_id);
 
         let result = {
             let mut handler = call.lock().await;
@@ -183,6 +196,8 @@ impl Songbird {
     ///
     /// This method returns the handle and the connection info needed for other libraries
     /// or drivers, such as lavalink, and does not actually start or run a voice call.
+    ///
+    /// [`Call`]: struct.Call.html
     #[inline]
     pub async fn join_gateway<C, G>(
         &self,
@@ -201,7 +216,7 @@ impl Songbird {
         guild_id: GuildId,
         channel_id: ChannelId,
     ) -> (Arc<Mutex<Call>>, JoinResult<Receiver<ConnectionInfo>>) {
-        let call = self.get_or_insert_call(guild_id);
+        let call = self.get_or_insert(guild_id);
 
         let result = {
             let mut handler = call.lock().await;

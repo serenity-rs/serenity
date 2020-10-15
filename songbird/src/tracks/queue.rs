@@ -22,28 +22,35 @@ use tracing::{info, warn};
 ///
 /// # Example
 ///
-/// ```rust,ignore
-/// use serenity::model::id::GuildId;
-/// use serenity::voice::{Call, LockedAudio, ffmpeg, create_player};
+/// ```rust,no_run
+/// use songbird::{
+///     driver::Driver,
+///     id::GuildId,
+///     ffmpeg,
+///     tracks::{create_player, TrackQueue},
+/// };
 /// use std::collections::HashMap;
 ///
-/// let mut manager: ClientVoiceManager = /* ... */;
-/// let queues: HashMap<GuildId, TrackQueue> = Default::default();
+/// # async {
+/// let guild = GuildId(0);
+/// // A Call is also valid here!
+/// let mut driver: Driver = Default::default();
 ///
-/// let guild_id: GuildId = /* ... */;
+/// let mut queues: HashMap<GuildId, TrackQueue> = Default::default();
 ///
-/// let source = ffmpeg("../audio/my-favourite-song.mp3")?;
-/// if let Some(handler) = manager.get_mut(guild_id) {
-///     // We need to ensure that this guild has a TrackQueue created for it.
-///     let queue = queues.entry(guild_id)
-///         .or_default();
+/// let source = ffmpeg("../audio/my-favourite-song.mp3")
+///     .await
+///     .expect("This might fail: handle this error!");
 ///
-///     // Queueing a track is this easy!
-///     queue.add_source(source, handler);
-/// } else {
-///     panic!("No voice manager for this guild!");
-/// }
+/// // We need to ensure that this guild has a TrackQueue created for it.
+/// let queue = queues.entry(guild)
+///     .or_default();
+///
+/// // Queueing a track is this easy!
+/// queue.add_source(source, &mut driver);
+/// # };
 /// ```
+
 ///
 /// [`TrackEvent`]: ../events/enum.TrackEvent.html
 pub struct TrackQueue {
@@ -95,6 +102,7 @@ impl EventHandler for QueueHandler {
 }
 
 impl TrackQueue {
+    /// Create a new, empty, track queue.
     pub fn new() -> Self {
         Self {
             inner: Arc::new(Mutex::new(TrackQueueCore {

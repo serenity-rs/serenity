@@ -10,15 +10,23 @@ use std::{
     mem,
 };
 
-/// Marker for decoding framed input files.
+/// Marker and state for decoding framed input files.
 #[non_exhaustive]
 #[derive(Clone, Copy, Debug)]
 pub enum Container {
+    /// Raw, unframed input.
     Raw,
-    Dca { first_frame: usize },
+    /// Framed input, beginning with a JSON header.
+    ///
+    /// Frames have the form `{ len: i16, payload: [u8; len]}`.
+    Dca {
+        /// Byte index of the first frame after the JSON header.
+        first_frame: usize,
+    },
 }
 
 impl Container {
+    /// Tries to read the header of the next frame from an input stream.
     pub fn next_frame_length(
         &mut self,
         mut reader: impl Read,
@@ -38,6 +46,8 @@ impl Container {
         }
     }
 
+    /// Tries to seek on an input directly using sample length, if the input
+    /// is unframed.
     pub fn try_seek_trivial(&self, input: CodecType) -> Option<usize> {
         use Container::*;
 
@@ -47,6 +57,7 @@ impl Container {
         }
     }
 
+    /// Returns the byte index of the first frame containing audio payload data.
     pub fn input_start(&self) -> usize {
         use Container::*;
 

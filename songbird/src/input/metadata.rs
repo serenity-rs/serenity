@@ -8,13 +8,24 @@ use tokio::process::Command as TokioCommand;
 /// [`Input`]: struct.Input.html
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct Metadata {
+    /// The title of this stream.
     pub title: Option<String>,
+    /// The main artist of this stream.
     pub artist: Option<String>,
+    /// The date of creation of this stream.
     pub date: Option<String>,
 
+    /// The number of audio channels in this stream.
+    ///
+    /// Any number `>= 2` is treated as stereo.
     pub channels: Option<u8>,
+    /// The time at which the first true sample is played back.
+    ///
+    /// This occurs as an artefact of coder delay.
     pub start_time: Option<Duration>,
+    /// The reported duration of this stream.
     pub duration: Option<Duration>,
+    /// The sample rate of this stream.
     pub sample_rate: Option<u32>,
 }
 

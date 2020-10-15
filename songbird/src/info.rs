@@ -54,12 +54,21 @@ impl ConnectionProgress {
     }
 }
 
+/// Parameters and information needed to start communicating with Discord's voice servers, either
+/// with the Songbird driver, lavalink, or other system.
 #[derive(Clone)]
 pub struct ConnectionInfo {
+    /// URL of the voice websocket gateway server assigned to this call.
     pub endpoint: String,
+    /// ID of the target voice channel's parent guild.
+    ///
+    /// Bots cannot connect to a guildless (i.e., direct message) voice call.
     pub guild_id: GuildId,
+    /// Unique string describing this session for validation/authentication purposes.
     pub session_id: String,
+    /// Ephemeral secret used to validate the above session.
     pub token: String,
+    /// UserID of this bot.
     pub user_id: UserId,
 }
 

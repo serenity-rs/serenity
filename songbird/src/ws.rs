@@ -26,7 +26,7 @@ pub enum Error {
     #[cfg(all(feature = "rustls", not(feature = "native")))]
     Tls(RustlsError),
 
-    /// The discord voice gateway does noe support or offer zlib compression.
+    /// The discord voice gateway does not support or offer zlib compression.
     /// As a result, only text messages are expected.
     UnexpectedBinaryMessage(Vec<u8>),
 

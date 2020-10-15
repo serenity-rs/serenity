@@ -1,12 +1,20 @@
-//! TODO: explain how the driver works internally.
+//! Runner for a voice connection.
+//!
+//! Songbird's driver is a mixed-sync system, using:
+//!  * Asynchronous connection management, event-handling, and gateway integration.
+//!  * Synchronous audio mixing, packet generation, and encoding.
+//!
+//! This splits up work according to its IO/compute bound nature, preventing packet
+//! generation from being slowed down past its deadline, or from affecting other
+//! asynchronous tasks your bot must handle.
 
 mod config;
-mod connection;
+pub(crate) mod connection;
 mod crypto;
 pub(crate) mod tasks;
 
 pub use config::Config;
-pub use connection::error::Error;
+use connection::error::Result;
 pub use crypto::Mode as CryptoMode;
 
 use crate::{
@@ -62,7 +70,7 @@ impl Driver {
 
     /// Connects to a voice channel using the specified server.
     #[instrument(skip(self))]
-    pub fn connect(&mut self, info: ConnectionInfo) -> Receiver<Result<(), Error>> {
+    pub fn connect(&mut self, info: ConnectionInfo) -> Receiver<Result<()>> {
         let (tx, rx) = flume::bounded(1);
 
         self.raw_connect(info, tx);
@@ -72,7 +80,7 @@ impl Driver {
 
     /// Connects to a voice channel using the specified server.
     #[instrument(skip(self))]
-    pub(crate) fn raw_connect(&mut self, info: ConnectionInfo, tx: Sender<Result<(), Error>>) {
+    pub(crate) fn raw_connect(&mut self, info: ConnectionInfo, tx: Sender<Result<()>>) {
         self.send(CoreMessage::ConnectWithResult(info, tx));
     }
 
@@ -104,10 +112,10 @@ impl Driver {
 
     /// Plays audio from a source, returning a handle for further control.
     ///
-    /// This can be a source created via [`voice::ffmpeg`] or [`voice::ytdl`].
+    /// This can be a source created via [`ffmpeg`] or [`ytdl`].
     ///
-    /// [`voice::ffmpeg`]: input/fn.ffmpeg.html
-    /// [`voice::ytdl`]: input/fn.ytdl.html
+    /// [`ffmpeg`]: ../input/fn.ffmpeg.html
+    /// [`ytdl`]: ../input/fn.ytdl.html
     #[instrument(skip(self))]
     pub fn play_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
@@ -118,10 +126,10 @@ impl Driver {
 
     /// Plays audio from a source, returning a handle for further control.
     ///
-    /// Unlike [`play_only_source`], this stops all other sources attached
+    /// Unlike [`play_source`], this stops all other sources attached
     /// to the channel.
     ///
-    /// [`play_only_source`]: #method.play_only_source
+    /// [`play_source`]: #method.play_source
     #[instrument(skip(self))]
     pub fn play_only_source(&mut self, source: Input) -> TrackHandle {
         let (player, handle) = super::create_player(source);
@@ -132,13 +140,13 @@ impl Driver {
 
     /// Plays audio from a [`Track`] object.
     ///
-    /// This will be one half of the return value of [`voice::create_player`].
+    /// This will be one half of the return value of [`create_player`].
     /// The main difference between this function and [`play_source`] is
     /// that this allows for direct manipulation of the [`Track`] object
     /// before it is passed over to the voice and mixing contexts.
     ///
-    /// [`voice::create_player`]: tracks/fn.create_player.html
-    /// [`Track`]: tracks/struct.Track.html
+    /// [`create_player`]: ../tracks/fn.create_player.html
+    /// [`Track`]: ../tracks/struct.Track.html
     /// [`play_source`]: #method.play_source
     #[instrument(skip(self))]
     pub fn play(&mut self, track: Track) {
@@ -147,13 +155,13 @@ impl Driver {
 
     /// Exclusively plays audio from a [`Track`] object.
     ///
-    /// This will be one half of the return value of [`voice::create_player`].
+    /// This will be one half of the return value of [`create_player`].
     /// As in [`play_only_source`], this stops all other sources attached to the
     /// channel. Like [`play`], however, this allows for direct manipulation of the
     /// [`Track`] object before it is passed over to the voice and mixing contexts.
     ///
-    /// [`voice::create_player`]: tracks/fn.create_player.html
-    /// [`Track`]: tracks/struct.Track.html
+    /// [`create_player`]: ../tracks/fn.create_player.html
+    /// [`Track`]: ../tracks/struct.Track.html
     /// [`play_only_source`]: #method.play_only_source
     /// [`play`]: #method.play
     #[instrument(skip(self))]
@@ -190,9 +198,9 @@ impl Driver {
     /// within the supplied function or closure. *Taking excess time could prevent
     /// timely sending of packets, causing audio glitches and delays*.
     ///
-    /// [`Track`]: tracks/struct.Track.html
-    /// [`TrackEvent`]: events/enum.TrackEvent.html
-    /// [`EventContext`]: events/enum.EventContext.html
+    /// [`Track`]: ../tracks/struct.Track.html
+    /// [`TrackEvent`]: ../events/enum.TrackEvent.html
+    /// [`EventContext`]: ../events/enum.EventContext.html
     #[instrument(skip(self, action))]
     pub fn add_global_event<F: EventHandler + 'static>(&mut self, event: Event, action: F) {
         self.send(CoreMessage::AddEvent(EventData::new(event, action)));

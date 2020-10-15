@@ -1,6 +1,19 @@
 //! Live, controllable audio instances.
 //!
-//! TODO: explain at a high level.
+//! Tracks add control and event data around the bytestreams offered by [`Input`],
+//! where each represents a live audio source inside of the driver's mixer.
+//!
+//! To prevent locking and stalling of the driver, tracks are controlled from your bot using a
+//! [`TrackHandle`]. These handles remotely send commands from your bot's (a)sync
+//! context to control playback, register events, and execute synchronous closures.
+//!
+//! If you want a new track from an [`Input`], i.e., for direct control before
+//! playing your source on the driver, use [`create_player`].
+//!
+//! [`Input`]: ../input/struct.Input.html
+//! [`TrackHandle`]: struct.TrackHandle.html
+//! [`create_player`]: fn.create_player.html
+
 mod command;
 mod handle;
 mod looping;
@@ -25,29 +38,34 @@ use tokio::sync::{
 ///
 /// Accessed by both commands and the playback code -- as such, access from user code is
 /// almost always guarded via a [`TrackHandle`]. You should expect to receive
-/// access to a raw object of this type via [`voice::create_player`], for use in
-/// [`Handler::play`] or [`Handler::play_only`].
+/// access to a raw object of this type via [`create_player`], for use in
+/// [`Driver::play`] or [`Driver::play_only`].
 ///
 /// # Example
 ///
-/// ```rust,ignore
-/// use serenity::voice::{Handler, ffmpeg, create_player};
+/// ```rust,no_run
+/// use songbird::{driver::Driver, ffmpeg, tracks::create_player};
 ///
-/// let handler: Handler = /* ... */;
-/// let source = ffmpeg("../audio/my-favourite-song.mp3")?;
-/// let (audio, audio_handle) = create_player(source);
+/// # async {
+/// // A Call is also valid here!
+/// let mut handler: Driver = Default::default();
+/// let source = ffmpeg("../audio/my-favourite-song.mp3")
+///     .await
+///     .expect("This might fail: handle this error!");
+/// let (mut audio, audio_handle) = create_player(source);
 ///
-/// audio.volume(0.5);
+/// audio.set_volume(0.5);
 ///
 /// handler.play_only(audio);
 ///
 /// // Future access occurs via audio_handle.
+/// # };
 /// ```
 ///
-/// [`Handler::play_only`]: ../struct.Handler.html#method.play_only
-/// [`Handler::play`]: ../struct.Handler.html#method.play
+/// [`Driver::play_only`]: ../struct.Driver.html#method.play_only
+/// [`Driver::play`]: ../struct.Driver.html#method.play
 /// [`TrackHandle`]: struct.TrackHandle.html
-/// [`voice::create_player`]: fn.create_player.html
+/// [`create_player`]: fn.create_player.html
 #[derive(Debug)]
 pub struct Track {
     /// Whether or not this sound is currently playing.
@@ -102,7 +120,13 @@ pub struct Track {
 }
 
 impl Track {
-    pub fn new(
+    /// Create a new track directly from an input, command source,
+    /// and handle.
+    ///
+    /// In general, you should probably use [`create_player`].
+    ///
+    /// [`create_player`]: fn.create_player.html
+    pub fn new_raw(
         source: Input,
         commands: UnboundedReceiver<TrackCommand>,
         handle: TrackHandle,
@@ -149,6 +173,7 @@ impl Track {
         self
     }
 
+    /// Returns the current play status of this track.
     pub fn playing(&self) -> PlayMode {
         self.playing
     }
@@ -291,7 +316,7 @@ impl Track {
     /// Creates a read-only copy of the audio track's state.
     ///
     /// The primary use-case of this is sending information across
-    /// threads in response to an [`TrackHandle`].
+    /// threads in response to a [`TrackHandle`].
     ///
     /// [`TrackHandle`]: struct.TrackHandle.html
     pub fn state(&self) -> TrackState {
@@ -318,24 +343,23 @@ impl Track {
     }
 }
 
-/// Creates an [`Track`] object to pass into the audio context, and an [`TrackHandle`]
+/// Creates a [`Track`] object to pass into the audio context, and a [`TrackHandle`]
 /// for safe, lock-free access in external code.
 ///
 /// Typically, this would be used if you wished to directly work on or configure
-/// the [`Track`] object before it is passed over to the audio mixing, transmission,
-/// and event handling tasks.
+/// the [`Track`] object before it is passed over to the driver.
 ///
 /// [`Track`]: struct.Track.html
 /// [`TrackHandle`]: struct.TrackHandle.html
 pub fn create_player(source: Input) -> (Track, TrackHandle) {
     let (tx, rx) = mpsc::unbounded_channel();
     let can_seek = source.is_seekable();
-    let player = Track::new(source, rx, TrackHandle::new(tx.clone(), can_seek));
+    let player = Track::new_raw(source, rx, TrackHandle::new(tx.clone(), can_seek));
 
     (player, TrackHandle::new(tx, can_seek))
 }
 
-/// Alias for most result-free calls to an [`TrackHandle`].
+/// Alias for most result-free calls to a [`TrackHandle`].
 ///
 /// Failure indicates that the accessed audio object has been
 /// removed or deleted by the audio context.
@@ -353,14 +377,3 @@ pub type TrackResult = Result<(), SendError<TrackCommand>>;
 ///
 /// [`TrackHandle::get_info`]: struct.TrackHandle.html#method.get_info
 pub type TrackQueryResult = Result<OneshotReceiver<Box<TrackState>>, SendError<TrackCommand>>;
-
-/// Alias for return value from calls to [`TrackHandle::get_info_blocking`].
-///
-/// Crucially, the audio thread will respond *at a later time*:
-/// in ordinary use, this **will block for up to 20ms**.
-///
-/// Failure indicates that the accessed audio object has been
-/// removed or deleted by the audio context.
-///
-/// [`TrackHandle::get_info_blocking`]: struct.TrackHandle.html#method.get_info_blocking
-pub type BlockingTrackQueryResult = Result<Box<TrackState>, SendError<TrackCommand>>;

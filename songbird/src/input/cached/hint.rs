@@ -4,7 +4,11 @@ use streamcatcher::Config;
 /// Expected amount of time that an input should last.
 #[derive(Copy, Clone, Debug)]
 pub enum LengthHint {
+    /// Estimate of a source's length in bytes.
     Bytes(usize),
+    /// Estimate of a source's length in time.
+    ///
+    /// This will be converted to a bytecount at setup.
     Time(Duration),
 }
 
@@ -20,6 +24,8 @@ impl From<Duration> for LengthHint {
     }
 }
 
+/// Modify the given cache configuration to initially allocate
+/// enough bytes to store a length of audio at the given bitrate.
 pub fn apply_length_hint<H>(config: &mut Config, hint: H, cost_per_sec: usize)
 where
     H: Into<LengthHint>,

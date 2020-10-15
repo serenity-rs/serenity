@@ -1,3 +1,5 @@
+//! Handlers for sending packets over sharded connections.
+
 use crate::error::{JoinError, JoinResult};
 #[cfg(feature = "serenity")]
 use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
@@ -14,16 +16,19 @@ use twilight_gateway::{Cluster, Shard as TwilightShard};
 
 #[derive(Debug)]
 #[non_exhaustive]
+/// Source of individual shard connection handles.
 pub enum Sharder {
     #[cfg(feature = "serenity")]
-    /// Test docs
+    /// Serenity-specific wrapper for sharder state initialised by the library.
     Serenity(SerenitySharder),
     #[cfg(feature = "twilight")]
+    /// Twilight-specific wrapper for sharder state initialised by the user.
     Twilight(Cluster),
 }
 
 impl Sharder {
     #[allow(unreachable_patterns)]
+    /// Returns a new handle to the required inner shard.
     pub fn get_shard(&self, shard_id: u64) -> Option<Shard> {
         match self {
             #[cfg(feature = "serenity")]
@@ -56,6 +61,10 @@ impl Sharder {
 
 #[cfg(feature = "serenity")]
 #[derive(Debug, Default)]
+/// Serenity-specific wrapper for sharder state initialised by the library.
+///
+/// This is updated and maintained by the library, and is designed to prevent
+/// message loss during rebalances and reconnects.
 pub struct SerenitySharder(PRwLock<HashMap<u64, Arc<SerenityShardHandle>>>);
 
 #[cfg(feature = "serenity")]
@@ -88,17 +97,19 @@ impl SerenitySharder {
 
 #[derive(Clone, Debug)]
 #[non_exhaustive]
+/// A reference to an individual websocket connection.
 pub enum Shard {
     #[cfg(feature = "serenity")]
-    /// Test 2.
+    /// Handle to one of serenity's shard runners.
     Serenity(Arc<SerenityShardHandle>),
     #[cfg(feature = "twilight")]
-    /// Test 3
+    /// Handle to a twilight shard spawned from a cluster.
     Twilight(TwilightShard),
 }
 
 impl Shard {
     #[allow(unreachable_patterns)]
+    /// Send a JSON message to the inner shard handle.
     pub async fn send(&mut self, msg: Value) -> JoinResult<()> {
         match self {
             #[cfg(feature = "serenity")]
@@ -112,6 +123,8 @@ impl Shard {
 }
 
 #[cfg(feature = "serenity")]
+/// Handle to an individual shard designed to buffer unsent messages while
+/// a reconnect/rebalance is ongoing.
 #[derive(Debug, Default)]
 pub struct SerenityShardHandle {
     sender: PRwLock<Option<Sender<InterMessage>>>,

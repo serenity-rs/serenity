@@ -1,3 +1,5 @@
+//! Newtypes around Discord IDs for library cross-compatibility.
+
 #[cfg(feature = "driver")]
 use crate::model::id::{GuildId as DriverGuild, UserId as DriverUser};
 #[cfg(feature = "serenity")]
@@ -14,12 +16,15 @@ use twilight_model::id::{
     UserId as TwilightUser,
 };
 
+/// ID of a Discord voice/text channel.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
 pub struct ChannelId(pub u64);
 
+/// ID of a Discord guild (colloquially, "server").
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
 pub struct GuildId(pub u64);
 
+/// ID of a Discord user.
 #[derive(Clone, Copy, Debug, Default, Eq, Hash, PartialEq)]
 pub struct UserId(pub u64);
 

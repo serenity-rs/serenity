@@ -1,3 +1,14 @@
+//! A source which supports seeking by recreating its input stream.
+//!
+//! This is intended for use with single-use audio tracks which
+//! may require looping or seeking, but where additional memory
+//! cannot be spared. Forward seeks will drain the track until reaching
+//! the desired timestamp.
+//!
+//! Restarting occurs by temporarily pausing the track, running the restart
+//! mechanism, and then passing the handle back to the mixer thread. Until
+//! success/failure is confirmed, the track produces silence.
+
 use super::*;
 use flume::{Receiver, TryRecvError};
 use futures::executor;
@@ -83,7 +94,14 @@ impl Restartable {
     }
 }
 
+/// Trait used to create an instance of a [`Reader`] at instantiation and when
+/// a backwards seek is needed.
+///
+/// Many closures derive this automatically.
+///
+/// [`Reader`]: ../reader/enum.Reader.html
 pub trait Restart {
+    /// Tries to create a replacement source.
     fn call_restart(&mut self, time: Option<Duration>) -> Result<Input>;
 }
 

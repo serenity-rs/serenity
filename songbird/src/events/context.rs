@@ -27,21 +27,36 @@ pub enum EventContext<'a> {
     /// Speaking state transition, describing whether a given source has started/stopped
     /// transmitting. This fires in response to a silent burst, or the first packet
     /// breaking such a burst.
-    SpeakingUpdate { ssrc: u32, speaking: bool },
+    SpeakingUpdate {
+        /// Synchronisation Source of the user who has begun speaking.
+        ///
+        /// This must be combined with another event class to map this back to
+        /// its original UserId.
+        ssrc: u32,
+        /// Whether this user is currently speaking.
+        speaking: bool
+    },
     /// Opus audio packet, received from another stream (detailed in `packet`).
     /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
     /// if extensions or raw packet data are required.
     /// if `audio.len() == 0`, then this packet arrived out-of-order.
     VoicePacket {
+        /// Decoded audio from this packet.
         audio: &'a Vec<i16>,
+        /// Raw RTP packet data.
+        ///
+        /// Includes the SSRC (i.e., sender) of this packet.
         packet: &'a Rtp,
+        /// Byte index into the packet for where the payload begins.
         payload_offset: usize,
     },
     /// Telemetry/statistics packet, received from another stream (detailed in `packet`).
     /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
     /// to allow manual decoding of `Rtcp` packet bodies.
     RtcpPacket {
+        /// Raw RTCP packet data.
         packet: &'a Rtcp,
+        /// Byte index into the packet for where the payload begins.
         payload_offset: usize,
     },
     /// Fired whenever a client connects to a call for the first time, allowing SSRC/UserID
@@ -104,6 +119,8 @@ impl<'a> CoreContext {
 }
 
 impl EventContext<'_> {
+    /// Retreive the event class for an event (i.e., when matching)
+    /// an event against the registered listeners.
     pub fn to_core_event(&self) -> Option<CoreEvent> {
         use EventContext::*;
 

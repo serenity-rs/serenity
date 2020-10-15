@@ -23,10 +23,17 @@ pub struct EventStore {
 }
 
 impl EventStore {
+    /// Creates a new event store to be used globally.
     pub fn new() -> Self {
         Default::default()
     }
 
+    /// Creates a new event store to be used within a [`Track`].
+    ///
+    /// This is usually automatically installed by the driver once
+    /// a track has been registered.
+    ///
+    /// [`Track`]: ../tracks/struct.Track.html
     pub fn new_local() -> Self {
         EventStore {
             local_only: true,

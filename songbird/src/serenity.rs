@@ -4,16 +4,16 @@
 //! [serenity]: https://crates.io/crates/serenity/0.9.0-rc.2
 
 use crate::manager::Songbird;
-#[cfg(feature = "driver")]
-use crate::tracks::TrackQueue;
 use serenity::{
     client::{ClientBuilder, Context},
     prelude::TypeMapKey,
 };
 use std::sync::Arc;
 
-/// Key type used to store and retrieve access to the manager from the serenity client's
-/// shared key-value store.
+/// Zero-size type used to retrieve the registered [`Songbird`] instance
+/// from serenity's inner TypeMap.
+///
+/// [`Songbird`]: ../struct.Songbird.html
 pub struct SongbirdKey;
 
 impl TypeMapKey for SongbirdKey {
@@ -45,22 +45,18 @@ pub async fn get(ctx: &Context) -> Option<Arc<Songbird>> {
     data.get::<SongbirdKey>().cloned()
 }
 
-#[cfg(feature = "driver")]
-pub struct SongbirdQueueKey;
-
-#[cfg(feature = "driver")]
-impl TypeMapKey for SongbirdQueueKey {
-    type Value = Arc<TrackQueue>;
-}
-
 /// Helper trait to add installation/creation methods to serenity's
 /// `ClientBuilder`.
 ///
 /// These install the client to receive gateway voice events, and
 /// store an easily accessible reference to Songbird's managers.
 pub trait SerenityInit {
+    /// Registers a new Songbird voice system with serenity, storing it for easy
+    /// access via [`get`].
+    ///
+    /// [`get`]: fn.get.html
     fn register_songbird(self) -> Self;
-
+    /// Registers a given Songbird voice system with serenity, as above.
     fn register_songbird_with(self, voice: Arc<Songbird>) -> Self;
 }
 

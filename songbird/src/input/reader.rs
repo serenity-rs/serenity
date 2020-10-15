@@ -1,3 +1,5 @@
+//! Raw handlers for input bytestreams.
+
 use super::*;
 use std::{
     fmt::{Debug, Error as FormatError, Formatter},
@@ -24,18 +26,49 @@ use streamcatcher::{Catcher, TxCatcher};
 /// [`Extension`]: #variant.Extension
 /// [`ExtensionSeek`]: #variant.ExtensionSeek
 pub enum Reader {
+    /// Piped output of another program (i.e., [`ffmpeg`]).
+    ///
+    /// Does not support seeking.
+    ///
+    /// [`ffmpeg`]: ../fn.ffmpeg.html
     Pipe(BufReader<ChildContainer>),
+    /// A cached, raw in-memory store, provided by Songbird.
+    ///
+    /// Supports seeking.
     Memory(Catcher<Box<Reader>>),
+    /// A cached, Opus-compressed in-memory store, provided by Songbird.
+    ///
+    /// Supports seeking.
     Compressed(TxCatcher<Box<Input>, OpusCompressor>),
+    /// A source which supports seeking by recreating its inout stream.
+    ///
+    /// Supports seeking.
     Restartable(Restartable),
+    /// A source contained in a local file.
+    ///
+    /// Supports seeking.
     File(BufReader<File>),
+    /// A source contained as an array in memory.
+    ///
+    /// Supports seeking.
     Vec(Cursor<Vec<u8>>),
+    /// A basic user-provided source.
+    ///
+    /// Does not support seeking.
     Extension(Box<dyn Read + Send>),
+    /// A user-provided source which also implements [`Seek`].
+    ///
+    /// Supports seeking.
+    ///
+    /// [`Seek`]: https://doc.rust-lang.org/std/io/trait.Seek.html
     ExtensionSeek(Box<dyn ReadSeek + Send>),
 }
 
 impl Reader {
-    pub(crate) fn is_seekable(&self) -> bool {
+    /// Returns whether the given source implements [`Seek`].
+    ///
+    /// [`Seek`]: https://doc.rust-lang.org/std/io/trait.Seek.html
+    pub fn is_seekable(&self) -> bool {
         use Reader::*;
         match self {
             Restartable(_) | Compressed(_) | Memory(_) => true,
@@ -114,8 +147,13 @@ impl From<Vec<u8>> for Reader {
 
 /// Fusion trait for custom input sources which allow seeking.
 pub trait ReadSeek {
+    /// See [`Read::read`].
+    ///
+    /// [`Read::read`]: https://doc.rust-lang.org/nightly/std/io/trait.Read.html#tymethod.read
     fn read(&mut self, buf: &mut [u8]) -> IoResult<usize>;
-
+    /// See [`Seek::seek`].
+    ///
+    /// [`Seek::seek`]: https://doc.rust-lang.org/nightly/std/io/trait.Seek.html#tymethod.seek
     fn seek(&mut self, pos: SeekFrom) -> IoResult<u64>;
 }
 

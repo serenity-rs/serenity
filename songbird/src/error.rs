@@ -1,3 +1,5 @@
+//! Driver and gateway error handling.
+
 #[cfg(feature = "serenity")]
 use futures::channel::mpsc::TrySendError;
 #[cfg(feature = "serenity")]
@@ -12,11 +14,18 @@ use twilight_gateway::shard::CommandError;
 /// Error returned when a manager or call handler is
 /// unable to send messages over Discord's gateway.
 pub enum JoinError {
+    /// No available gateway connection was provided to send
+    /// voice state update messages.
     NoSender,
+    /// Tried to leave a [`Call`] which was not found.
+    ///
+    /// [`Call`]: ../struct.Call.html
     NoCall,
     #[cfg(feature = "serenity")]
+    /// Serenity-specific WebSocket send error.
     Serenity(TrySendError<InterMessage>),
     #[cfg(feature = "twilight")]
+    /// Twilight-specific WebSocket send error.
     Twilight(CommandError),
 }
 
@@ -53,7 +62,8 @@ impl From<CommandError> for JoinError {
 }
 
 #[cfg(feature = "gateway")]
+/// Convenience type for Discord gateway error handling.
 pub type JoinResult<T> = Result<T, JoinError>;
 
 #[cfg(feature = "driver")]
-pub use crate::driver::Error as ConnectionError;
+pub use crate::driver::connection::error::{Error as ConnectionError, Result as ConnectionResult};

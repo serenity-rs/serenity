@@ -4,7 +4,9 @@ use parking_lot::Mutex;
 use std::sync::Arc;
 
 #[derive(Clone, Debug)]
+/// Inner state
 pub struct OpusDecoderState {
+    /// Inner decoder used to convert opus frames into a stream of samples.
     pub decoder: Arc<Mutex<OpusDecoder>>,
     /// Controls whether this source allows direct Opus frame passthrough.
     /// Defaults to `true`.
@@ -20,6 +22,7 @@ pub struct OpusDecoderState {
 }
 
 impl OpusDecoderState {
+    /// Creates a new decoder, having stereo output at 48kHz.
     pub fn new() -> Result<Self, OpusError> {
         Ok(Self::from_decoder(OpusDecoder::new(
             SAMPLE_RATE,
@@ -27,6 +30,7 @@ impl OpusDecoderState {
         )?))
     }
 
+    /// Creates a new decoder pre-configured by the user.
     pub fn from_decoder(decoder: OpusDecoder) -> Self {
         Self {
             decoder: Arc::new(Mutex::new(decoder)),

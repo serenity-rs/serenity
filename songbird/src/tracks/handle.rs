@@ -21,6 +21,10 @@ pub struct TrackHandle {
 }
 
 impl TrackHandle {
+    /// Creates a new handle, using the given command sink and hint as to whether
+    /// the underlying [`Input`] supports seek operations.
+    ///
+    /// [`Input`]: ../input/struct.Input.html
     pub fn new(command_channel: UnboundedSender<TrackCommand>, seekable: bool) -> Self {
         Self {
             command_channel,
@@ -118,7 +122,7 @@ impl TrackHandle {
         self.send(TrackCommand::Request(tx)).map(move |_| rx)
     }
 
-    // Set an audio track to loop indefinitely.
+    /// Set an audio track to loop indefinitely.
     pub fn enable_loop(&self) -> TrackResult {
         if self.seekable {
             self.send(TrackCommand::Loop(LoopState::Infinite))
@@ -127,7 +131,7 @@ impl TrackHandle {
         }
     }
 
-    // Set an audio track to no longer loop.
+    /// Set an audio track to no longer loop.
     pub fn disable_loop(&self) -> TrackResult {
         if self.seekable {
             self.send(TrackCommand::Loop(LoopState::Finite(0)))
@@ -136,7 +140,7 @@ impl TrackHandle {
         }
     }
 
-    // Set an audio track to loop a set number of times.
+    /// Set an audio track to loop a set number of times.
     pub fn loop_for(&self, count: usize) -> TrackResult {
         if self.seekable {
             self.send(TrackCommand::Loop(LoopState::Finite(count)))

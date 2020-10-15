@@ -1,13 +1,32 @@
 //! Raw audio input data streams and sources.
 //!
-//! [`Input`] is handled in songbird by combining metadata with:
+//! [`Input`] is handled in Songbird by combining metadata with:
 //!  * A 48kHz audio bytestream, via [`Reader`],
 //!  * A [`Container`] describing the framing mechanism of the bytestream,
 //!  * A [`Codec`], defining the format of audio frames.
 //!
+//! When used as a [`Read`], the output bytestream will be a floating-point
+//! PCM stream at 48kHz, matching the channel count of the input source.
+//!
+//! ## Opus frame passthrough.
+//! Some sources, such as [`Compressed`] or the output of [`dca`], support
+//! direct frame passthrough to the driver. This lets you directly send the
+//! audio data you have *without decoding, re-encoding, or mixing*. In many
+//! cases, this can greatly reduce the processing/compute cost of the driver.
+//!
+//! This functionality requires that:
+//!  * only one track is active (including paused tracks),
+//!  * that track's input supports direct Opus frame reads,
+//!  * its [`Input`] [meets the promises described herein](codec/struct.OpusDecoderState.html#structfield.allow_passthrough),
+//!  * and that track's volume is set to `1.0`.
+//!
 //! [`Input`]: struct.Input.html
-//! [`Container`]: struct.Container.html
-//! [`Codec`]: struct.Codec.html
+//! [`Reader`]: reader/enum.Reader.html
+//! [`Container`]: enum.Container.html
+//! [`Codec`]: codec/enum.Codec.html
+//! [`Read`]: https://doc.rust-lang.org/std/io/trait.Read.html
+//! [`Compressed`]: cached/struct.Compressed.html
+//! [`dca`]: fn.dca.html
 
 pub mod cached;
 mod child;
@@ -59,18 +78,27 @@ use tracing::{debug, error};
 
 /// Data and metadata needed to correctly parse a [`Reader`]'s audio bytestream.
 ///
+/// See the [module root] for more information.
+///
 /// [`Reader`]: enum.Reader.html
+/// [module root]: index.html
 #[derive(Debug)]
 pub struct Input {
+    /// Information about the played source.
     pub metadata: Metadata,
+    /// Indicates whether `source` is stereo or mono.
     pub stereo: bool,
+    /// Underlying audio data bytestream.
     pub reader: Reader,
+    /// Decoder used to parse the output of `reader`.
     pub kind: Codec,
+    /// Framing strategy needed to identify frames of compressed audio.
     pub container: Container,
     pos: usize,
 }
 
 impl Input {
+    /// Creates a floating-point PCM Input from a given reader.
     pub fn float_pcm(is_stereo: bool, reader: Reader) -> Input {
         Input {
             metadata: Default::default(),
@@ -82,6 +110,7 @@ impl Input {
         }
     }
 
+    /// Creates a new Input using (at least) the given reader, codec, and container.
     pub fn new(
         stereo: bool,
         reader: Reader,
@@ -99,18 +128,27 @@ impl Input {
         }
     }
 
+    /// Returns whether the inner [`Reader`] implements [`Seek`].
+    ///
+    /// [`Reader`]: reader/enum.Reader.html
+    /// [`Seek`]: https://doc.rust-lang.org/std/io/trait.Seek.html
     pub fn is_seekable(&self) -> bool {
         self.reader.is_seekable()
     }
 
+    /// Returns whether the read audio signal is stereo (or mono).
     pub fn is_stereo(&self) -> bool {
         self.stereo
     }
 
+    /// Returns the type of the inner [`Codec`].
+    ///
+    /// [`Codec`]: codec/enum.Codec.html
     pub fn get_type(&self) -> CodecType {
         (&self.kind).into()
     }
 
+    /// Mixes the output of this stream into a 20ms stereo audio buffer.
     #[inline]
     pub fn mix(&mut self, float_buffer: &mut [f32; STEREO_FRAME_SIZE], volume: f32) -> usize {
         match self.add_float_pcm_frame(float_buffer, self.stereo, volume) {
@@ -119,6 +157,9 @@ impl Input {
         }
     }
 
+    /// Seeks the stream to the given time, if possible.
+    ///
+    /// Returns the actual time reached.
     pub fn seek_time(&mut self, time: Duration) -> Option<Duration> {
         let future_pos = utils::timestamp_to_byte_count(time, self.stereo);
         Seek::seek(self, SeekFrom::Start(future_pos as u64))
