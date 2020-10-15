@@ -296,9 +296,7 @@ async fn commands(ctx: &Context, msg: &Message) -> CommandResult {
         writeln!(contents, "- {name}: {amount}", name=k, amount=v)?;
     }
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &contents).await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, &contents).await?;
 
     Ok(())
 }
@@ -325,9 +323,7 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 
     let content = content_safe(&ctx.cache, &args.rest(), &settings).await;
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &content).await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, &content).await?;
 
     Ok(())
 }
@@ -359,9 +355,7 @@ async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOption
 
 #[command]
 async fn some_long_command(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())).await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, &format!("Arguments: {:?}", args.rest())).await?;
 
     Ok(())
 }
@@ -384,9 +378,7 @@ async fn about_role(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         }
     }
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)).await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, format!("Could not find role named: {:?}", potential_role_name)).await?;
 
     Ok(())
 }
@@ -400,18 +392,14 @@ async fn multiply(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult
 
     let res = first * second;
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, &res.to_string()).await {
-        println!("Err sending product of {} and {}: {:?}", first, second, why);
-    }
+    msg.channel_id.say(&ctx.http, &res.to_string()).await?;
 
     Ok(())
 }
 
 #[command]
 async fn about(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "This is a small test-bot! : )").await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, "This is a small test-bot! : )").await?;
 
     Ok(())
 }
@@ -425,7 +413,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let shard_manager = match data.get::<ShardManagerContainer>() {
         Some(v) => v,
         None => {
-            let _ = msg.reply(ctx, "There was a problem getting the shard manager").await;
+            msg.reply(ctx, "There was a problem getting the shard manager").await?;
 
             return Ok(());
         },
@@ -440,13 +428,13 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
-            let _ = msg.reply(ctx,  "No shard found");
+            msg.reply(ctx,  "No shard found")?;
 
             return Ok(());
         },
     };
 
-    let _ = msg.reply(ctx, &format!("The shard latency is {:?}", runner.latency)).await;
+    msg.reply(ctx, &format!("The shard latency is {:?}", runner.latency)).await?;
 
     Ok(())
 }
@@ -456,9 +444,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
 #[only_in(guilds)]
 #[checks(Owner)]
 async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, "Pong! : )").await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, "Pong! : )").await?;
 
     Ok(())
 }
@@ -471,9 +457,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 // Allow only administrators to call this:
 #[required_permissions("ADMINISTRATOR")]
 async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, ":cat:").await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, ":cat:").await?;
 
     Ok(())
 }
@@ -482,9 +466,7 @@ async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
 #[description = "Sends an emoji with a dog."]
 #[bucket = "emoji"]
 async fn dog(ctx: &Context, msg: &Message) -> CommandResult {
-    if let Err(why) = msg.channel_id.say(&ctx.http, ":dog:").await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, ":dog:").await?;
 
     Ok(())
 }
@@ -497,9 +479,7 @@ async fn bird(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
         format!(":bird: could not find animal named: `{}`.", args.rest())
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, say_content).await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, say_content).await?;
 
     Ok(())
 }
@@ -513,18 +493,14 @@ async fn am_i_admin(ctx: &Context, msg: &Message, _args: Args) -> CommandResult 
 
         for role in &member.roles {
             if role.to_role_cached(&ctx.cache).await.map_or(false, |r| r.has_permission(Permissions::ADMINISTRATOR)) {
-                if let Err(why) = msg.channel_id.say(&ctx.http, "Yes, you are.").await {
-                    println!("Error sending message: {:?}", why);
-                }
+                msg.channel_id.say(&ctx.http, "Yes, you are.").await?;
 
                 return Ok(());
             }
         }
     }
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, "No, you are not.").await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, "No, you are not.").await?;
 
     Ok(())
 }
@@ -545,9 +521,7 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
         "Failed to find channel in cache.".to_string()
     };
 
-    if let Err(why) = msg.channel_id.say(&ctx.http, say_content).await {
-        println!("Error sending message: {:?}", why);
-    }
+    msg.channel_id.say(&ctx.http, say_content).await?;
 
     Ok(())
 }
