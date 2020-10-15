@@ -574,7 +574,7 @@ impl CacheUpdate for GuildMembersChunkEvent {
             cache.update_user_entry(&member.user).await;
         }
 
-        if let Some(mut g) = cache.guild(self.guild_id).await {
+        if let Some(g) = cache.guilds.write().await.get_mut(&self.guild_id) {
             g.members.extend(self.members.clone());
         }
 
