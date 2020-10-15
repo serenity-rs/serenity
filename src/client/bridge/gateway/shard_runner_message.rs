@@ -31,6 +31,10 @@ pub enum ShardRunnerMessage {
         ///
         /// [`Member`]: ../../../model/guild/struct.Member.html
         query: Option<String>,
+        /// Nonce to identify [`GuildMembersChunkEvent`] responses.
+        ///
+        /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
+        nonce: Option<String>,
     },
     /// Indicates that the client is to close with the given status code and
     /// reason.

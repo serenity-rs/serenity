@@ -19,6 +19,7 @@ pub trait WebSocketGatewayClientExt {
         shard_info: &[u64; 2],
         limit: Option<u16>,
         query: Option<&str>,
+        nonce: Option<&str>,
     ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send;
 
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
@@ -51,6 +52,7 @@ impl WebSocketGatewayClientExt for WsStream {
         shard_info: &[u64; 2],
         limit: Option<u16>,
         query: Option<&str>,
+        nonce: Option<&str>,
     ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send {
         debug!("[Shard {:?}] Requesting member chunks", shard_info);
 
@@ -60,6 +62,7 @@ impl WebSocketGatewayClientExt for WsStream {
                 "guild_id": guild_ids.into_iter().map(|x| x.as_ref().0).collect::<Vec<u64>>(),
                 "limit": limit.unwrap_or(0),
                 "query": query.unwrap_or(""),
+                "nonce": nonce.unwrap_or(""),
             },
         })).await.map_err(From::from)
     }
