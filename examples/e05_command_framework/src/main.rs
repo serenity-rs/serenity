@@ -428,7 +428,7 @@ async fn latency(ctx: &Context, msg: &Message) -> CommandResult {
     let runner = match runners.get(&ShardId(ctx.shard_id)) {
         Some(runner) => runner,
         None => {
-            msg.reply(ctx,  "No shard found")?;
+            msg.reply(ctx,  "No shard found").await?;
 
             return Ok(());
         },
