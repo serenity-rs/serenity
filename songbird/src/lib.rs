@@ -5,10 +5,17 @@
 #![deny(missing_docs)]
 //! ![project logo][logo]
 //!
-//! Songbird is an async, cross-library compatible voice system for Discord, written in Rust. The library offers:
-//!  * A (standalone) gateway frontend compatible with [serenity] and [twilight] using the `"gateway"` and `"[serenity/twilight]-[rustls/native]"` features.
-//!  * An optionally standalone driver for voice calls, via the `"driver"` feature.
-//!  * And, by default, a fully featured voice system featuring events, RT(C)P packet handling, seeking on compatible streams, shared multithreaded audio stream caches, and direct Opus data passthrough from DCA files.
+//! Songbird is an async, cross-library compatible voice system for Discord, written in Rust.
+//! The library offers:
+//!  * A standalone gateway frontend compatible with [serenity] and [twilight] using the
+//!  `"gateway"` and `"[serenity/twilight]-[rustls/native]"` features. You can even run
+//!  driverless, to help manage your [lavalink] sessions.
+//!  * A standalone driver for voice calls, via the `"driver"` feature. If you can create
+//!  a [`ConnectionInfo`] using any other gateway, or language for your bot, then you
+//!  can run the songbird voice driver.
+//!  * And, by default, a fully featured voice system featuring events, queues, RT(C)P packet
+//!  handling, seeking on compatible streams, shared multithreaded audio stream caches,
+//!  and direct Opus data passthrough from DCA files.
 //!
 //! ## Examples
 //! Full examples showing various types of functionality and integrations can be found as part of [serenity's examples],
@@ -24,6 +31,8 @@
 //! [serenity's examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [this crate's examples directory]: https://github.com/serenity-rs/serenity/tree/current/songbird/examples
 //! ["Black-Capped Chickadee"]: https://www.oldbookillustrations.com/illustrations/black-capped-chickadee/
+//! [`ConnectionInfo`]: struct.ConnectionInfo.html
+//! [lavalink]: https://github.com/Frederikam/Lavalink
 
 pub mod constants;
 #[cfg(feature = "driver")]

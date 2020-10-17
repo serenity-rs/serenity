@@ -244,7 +244,7 @@ async fn pause(msg: Message, state: State) -> Result<(), Box<dyn Error + Send + 
             }
         };
 
-        let action = if paused { "Unpaused " } else { "Paused" };
+        let action = if paused { "Unpaused" } else { "Paused" };
 
         format!("{} the track", action)
     } else {
@@ -292,7 +292,7 @@ async fn seek(msg: Message, state: State) -> Result<(), Box<dyn Error + Send + S
             format!("Track is not compatible with seeking!")
         }
     } else {
-        format!("No track to change volume!")
+        format!("No track to seek over!")
     };
 
     state

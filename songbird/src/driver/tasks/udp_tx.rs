@@ -14,7 +14,7 @@ pub(crate) async fn runner(udp_msg_rx: Receiver<UdpTxMessage>, ssrc: u32, mut ud
 
     let mut keepalive_bytes = [0u8; MutableKeepalivePacket::minimum_packet_size()];
     let mut ka = MutableKeepalivePacket::new(&mut keepalive_bytes[..])
-        .expect("Insufficient bytes given to keepalive packet.");
+        .expect("FATAL: Insufficient bytes given to keepalive packet.");
     ka.set_ssrc(ssrc);
 
     let mut ka_time = Instant::now() + UDP_KEEPALIVE_GAP;

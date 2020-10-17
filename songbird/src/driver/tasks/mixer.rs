@@ -312,6 +312,9 @@ impl Mixer {
             return Ok(());
         }
 
+        // TODO: can we make opus_frame_backing *actually* a view over
+        // some region of self.packet, derived using the encryption mode?
+        // This saves a copy on Opus passthrough.
         let mut opus_frame_backing = [0u8; STEREO_FRAME_SIZE];
         let mut mix_buffer = [0f32; STEREO_FRAME_SIZE];
 
@@ -376,7 +379,7 @@ impl Mixer {
         let mut nonce = Nonce::default();
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
-                "Too few bytes in self.packet for RTP header.\
+                "FATAL: Too few bytes in self.packet for RTP header.\
                     (Blame: VOICE_PACKET_MAX?)",
             );
 
@@ -397,10 +400,11 @@ impl Mixer {
 
             let final_payload_size = TAG_SIZE + payload_len;
 
-            let tag = conn
-                .cipher
-                .encrypt_in_place_detached(&nonce, b"", &mut payload[TAG_SIZE..final_payload_size])
-                .expect("Encryption failed?");
+            let tag = conn.cipher.encrypt_in_place_detached(
+                &nonce,
+                b"",
+                &mut payload[TAG_SIZE..final_payload_size],
+            )?;
             payload[..TAG_SIZE].copy_from_slice(&tag[..]);
 
             rtp_len + final_payload_size
@@ -413,7 +417,7 @@ impl Mixer {
             .send(UdpTxMessage::Packet(self.packet[..index].to_vec()))?;
 
         let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
-            "Too few bytes in self.packet for RTP header.\
+            "FATAL: Too few bytes in self.packet for RTP header.\
                 (Blame: VOICE_PACKET_MAX?)",
         );
         rtp.set_sequence(rtp.get_sequence() + 1);

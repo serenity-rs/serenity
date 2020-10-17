@@ -89,7 +89,10 @@ impl Songbird {
 
     /// Set the bot's user, and the number of shards in use.
     ///
-    /// This *must not* be called more than once, or after any calls have begun.
+    /// If this struct is already initialised (e.g., from [`::twilight`]),
+    /// or a previous call, then this function is a no-op.
+    ///
+    /// [`::twilight`]: #method.twilight
     pub fn initialise_client_data<U: Into<UserId>>(&self, shard_count: u64, user_id: U) {
         let mut client_data = self.client_data.write();
 

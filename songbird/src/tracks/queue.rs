@@ -16,7 +16,7 @@ use tracing::{info, warn};
 /// This makes use of [`TrackEvent`]s to determine when the current
 /// song or audio file has finished before playing the next entry.
 ///
-/// `examples/13_voice_events` demonstrates how a user might manage,
+/// `examples/e16_voice_events` demonstrates how a user might manage,
 /// track and use this to run a song queue in many guilds in parallel.
 /// This code is trivial to extend if extra functionality is needed.
 ///
