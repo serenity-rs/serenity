@@ -73,10 +73,12 @@ version = "0.9.2"
 
 [dependencies.rustls]
 default-features = false
-version = "0.18"
+optional = true
+version = "0.18" # keep in sync with reqwest's rustls version
 
 [dependencies.webpki-roots]
-version = "0.19"
+optional = true
+version = "0.19" # keep in sync with reqwest's webpki-roots version
 
 [dependencies.typemap_rev]
 optional = true
@@ -150,7 +152,7 @@ gateway = [
 ]
 http = ["url", "bytes"]
 absolute_ratelimits = ["http"]
-rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls"]
+rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls", "rustls", "webpki-roots"]
 native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"]
 model = ["builder", "http"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
