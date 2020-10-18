@@ -19,7 +19,9 @@ pub enum Error {
     Json(JsonError),
     /// An error occurred within the Opus codec.
     Opus(OpusError),
-    /// Apparently failed to create stdout...
+    /// Failed to extract metadata from alternate pipe.
+    Metadata,
+    /// Apparently failed to create stdout.
     Stdout,
     /// An error occurred while checking if a path is stereo.
     Streams,

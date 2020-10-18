@@ -6,7 +6,12 @@ use super::{
     Input,
     Metadata,
 };
-use std::process::{Command, Stdio};
+use serde_json::Value;
+use std::{
+    io::{BufRead, BufReader, Read},
+    process::{Command, Stdio},
+};
+use tokio::task;
 use tracing::trace;
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
@@ -16,6 +21,7 @@ pub async fn ytdl(uri: &str) -> Result<Input> {
 
 pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
     let ytdl_args = [
+        "--print-json",
         "-f",
         "webm[abr>0]/bestaudio/best",
         "-R",
@@ -39,12 +45,35 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         "-",
     ];
 
-    let youtube_dl = Command::new("youtube-dl")
+    let mut youtube_dl = Command::new("youtube-dl")
         .args(&ytdl_args)
         .stdin(Stdio::null())
-        .stderr(Stdio::null())
+        .stderr(Stdio::piped())
         .stdout(Stdio::piped())
         .spawn()?;
+
+    let stderr = youtube_dl.stderr.take();
+
+    let (returned_stderr, value) = task::spawn_blocking(move || {
+        if let Some(mut s) = stderr {
+            let out: Option<Value> = {
+                let mut o_vec = vec![];
+                let mut serde_read = BufReader::new(s.by_ref());
+                // Newline...
+                if let Ok(len) = serde_read.read_until(0xA, &mut o_vec) {
+                    serde_json::from_slice(&o_vec[..len]).ok()
+                } else {
+                    None
+                }
+            };
+
+            (Some(s), out)
+        } else {
+            (None, None)
+        }
+    }).await.map_err(|_| Error::Metadata)?;
+
+    youtube_dl.stderr = returned_stderr;
 
     let ffmpeg = Command::new("ffmpeg")
         .args(pre_args)
@@ -56,7 +85,7 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         .stdout(Stdio::piped())
         .spawn()?;
 
-    let metadata = Metadata::from_ytdl_uri(uri).await;
+    let metadata = Metadata::from_ytdl_output(value.unwrap_or_default());
 
     trace!("ytdl metadata {:?}", metadata);
 

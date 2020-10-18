@@ -1,7 +1,6 @@
 use crate::constants::*;
 use serde_json::Value;
-use std::{process::Stdio, time::Duration};
-use tokio::process::Command as TokioCommand;
+use std::time::Duration;
 
 /// Information about an [`Input`] source.
 ///
@@ -97,19 +96,7 @@ impl Metadata {
     }
 
     /// Use `youtube-dl` to extract metadata for an online resource.
-    pub async fn from_ytdl_uri(uri: &str) -> Self {
-        let args = ["-s", "-j"];
-
-        let out: Option<Value> = TokioCommand::new("youtube-dl")
-            .args(&args)
-            .arg(uri)
-            .stdin(Stdio::null())
-            .output()
-            .await
-            .ok()
-            .and_then(|r| serde_json::from_reader(&r.stdout[..]).ok());
-
-        let value = out.unwrap_or_default();
+    pub fn from_ytdl_output(value: Value) -> Self {
         let obj = value.as_object();
 
         let track = obj
@@ -123,10 +110,16 @@ impl Metadata {
                 .map(str::to_string)
         });
 
-        let artist = obj
+        let true_artist = obj
             .and_then(|m| m.get("artist"))
             .and_then(Value::as_str)
             .map(str::to_string);
+
+        let artist = true_artist.or_else(|| {
+            obj.and_then(|m| m.get("uploader"))
+                .and_then(Value::as_str)
+                .map(str::to_string)
+        });
 
         let r_date = obj
             .and_then(|m| m.get("release_date"))
