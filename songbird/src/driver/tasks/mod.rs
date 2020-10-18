@@ -129,6 +129,18 @@ async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessag
                     }
                 }
             },
+            Ok(CoreMessage::FullReconnect) =>
+                if let Some(conn) = connection.take() {
+                    let info = conn.info.clone();
+
+                    connection = Connection::new(info, &interconnect, &config)
+                        .await
+                        .map_err(|e| {
+                            error!("Catastrophic connection failure. Stopping. {:?}", e);
+                            e
+                        })
+                        .ok();
+                },
             Ok(CoreMessage::RebuildInterconnect) => {
                 interconnect.restart_volatile_internals();
             },

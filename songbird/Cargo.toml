@@ -1,6 +1,6 @@
 [package]
-authors = ["Alex M. M. <acdenissk69@gmail.com>"]
-description = "A Rust library for the Discord voice API."
+authors = ["Kyle Simpson <kyleandrew.simpson@gmail.com>"]
+description = "An async Rust library for the Discord voice API."
 documentation = "https://docs.rs/songbird"
 edition = "2018"
 homepage = "https://github.com/serenity-rs/serenity"

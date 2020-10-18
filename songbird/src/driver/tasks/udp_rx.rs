@@ -139,7 +139,7 @@ struct UdpRx {
 
 impl UdpRx {
     #[instrument(skip(self))]
-    async fn run(&mut self, interconnect: &Interconnect) {
+    async fn run(&mut self, interconnect: &mut Interconnect) {
         loop {
             tokio::select! {
                 Ok((len, _addr)) = self.udp_socket.recv_from(&mut self.packet_buffer[..]) => {
@@ -148,6 +148,9 @@ impl UdpRx {
                 msg = self.rx.recv_async() => {
                     use UdpRxMessage::*;
                     match msg {
+                        Ok(ReplaceInterconnect(i)) => {
+                            *interconnect = i;
+                        }
                         Ok(Poison) | Err(_) => break,
                     }
                 }
@@ -159,6 +162,10 @@ impl UdpRx {
         // NOTE: errors here (and in general for UDP) are not fatal to the connection.
         // Panics should be avoided due to adversarial nature of rx'd packets,
         // but correct handling should not prompt a reconnect.
+        //
+        // For simplicity, we nominate the mixing context to rebuild the event
+        // context if it fails (hence, the `let _ =` statements.), as it will try to
+        // make contact every 20ms.
         let packet = &mut self.packet_buffer[..len];
 
         match demux::demux_mut(packet) {
@@ -234,7 +241,7 @@ impl UdpRx {
 
 #[instrument(skip(interconnect, rx, cipher))]
 pub(crate) async fn runner(
-    interconnect: Interconnect,
+    mut interconnect: Interconnect,
     rx: Receiver<UdpRxMessage>,
     cipher: Cipher,
     mode: CryptoMode,
@@ -251,7 +258,7 @@ pub(crate) async fn runner(
         udp_socket,
     };
 
-    state.run(&interconnect).await;
+    state.run(&mut interconnect).await;
 
     info!("UDP receive handle stopped.");
 }

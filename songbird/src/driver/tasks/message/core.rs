@@ -18,6 +18,7 @@ pub enum CoreMessage {
     AddEvent(EventData),
     Mute(bool),
     Reconnect,
+    FullReconnect,
     RebuildInterconnect,
     Poison,
 }

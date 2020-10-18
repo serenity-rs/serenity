@@ -1,3 +1,7 @@
-pub enum UdpRxMessage {
+use super::Interconnect;
+
+pub(crate) enum UdpRxMessage {
+    ReplaceInterconnect(Interconnect),
+
     Poison,
 }

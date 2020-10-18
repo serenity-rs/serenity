@@ -170,6 +170,7 @@ async fn main() {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
@@ -180,14 +181,8 @@ async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         },
     };
 
-    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
-        Some(id) => id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -237,15 +232,10 @@ async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
-        Some(id) => id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();

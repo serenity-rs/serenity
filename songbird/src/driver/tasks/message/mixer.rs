@@ -4,7 +4,7 @@ use crate::{tracks::Track, Bitrate};
 use flume::Sender;
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
-pub struct MixerConnection {
+pub(crate) struct MixerConnection {
     pub cipher: Cipher,
     pub udp_rx: Sender<UdpRxMessage>,
     pub udp_tx: Sender<UdpTxMessage>,
@@ -26,6 +26,7 @@ pub(crate) enum MixerMessage {
     DropConn,
     ReplaceInterconnect(Interconnect),
     RebuildEncoder,
+
     Ws(Option<Sender<WsMessage>>),
     Poison,
 }

@@ -26,7 +26,7 @@ pub enum Error {
     IllegalDiscoveryResponse,
     /// Could not parse Discord's view of our IP.
     IllegalIp,
-    /// Miscellaneous I/O error..
+    /// Miscellaneous I/O error.
     Io(IoError),
     /// JSON (de)serialization error.
     Json(JsonError),

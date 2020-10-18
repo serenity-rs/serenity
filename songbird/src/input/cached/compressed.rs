@@ -224,14 +224,14 @@ where
                         .encode_float(&sample_buf[..samples_in_frame], &mut self.last_frame[..])
                     {
                         Ok(pkt_len) => {
-                            debug!("Next packet to write has {:?}", pkt_len);
+                            trace!("Next packet to write has {:?}", pkt_len);
                             self.frame_pos = 0;
                             self.last_frame.truncate(pkt_len);
                             break;
                         },
                         Err(OpusError::Opus(OpusErrorCode::BufferTooSmall)) => {
                             // If we need more capacity to encode this frame, then take it.
-                            debug!("Resizing inner buffer (+256).");
+                            trace!("Resizing inner buffer (+256).");
                             self.last_frame.resize(self.last_frame.len() + 256, 0);
                         },
                         Err(e) => {

@@ -1,7 +1,7 @@
 //! Example demonstrating how to store and convert audio streams which you
 //! either want to reuse between servers, or to seek/loop on. See `join`, and `ting`.
 //!
-//! Requires the "cache", "methods", and "voice" features be enabled in your
+//! Requires the "cache", "standard_framework", and "voice" features be enabled in your
 //! Cargo.toml, like so:
 //!
 //! ```toml
@@ -149,15 +149,10 @@ async fn main() {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.guild_id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -187,16 +182,9 @@ async fn deafen(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild = match msg.guild(&ctx.cache).await {
-        Some(guild) => guild,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
-
-            return Ok(());
-        }
-    };
-
+    let guild = msg.guild(&ctx.cache).await.unwrap();
     let guild_id = guild.id;
 
     let channel_id = guild
@@ -270,15 +258,10 @@ impl VoiceEventHandler for LoopPlaySound {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.guild_id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -298,15 +281,10 @@ async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.guild_id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Groups and DMs not supported").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -336,15 +314,10 @@ async fn mute(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn ting(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.guild_id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -367,15 +340,10 @@ async fn ting(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.guild_id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
@@ -396,15 +364,10 @@ async fn undeafen(ctx: &Context, msg: &Message) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn unmute(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel(msg.channel_id).await {
-        Some(channel) => channel.guild_id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "Error finding channel info").await);
-
-            return Ok(());
-        },
-    };
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
     let manager = songbird::get(ctx).await
         .expect("Songbird Voice client placed in at initialisation.").clone();
 

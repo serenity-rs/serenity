@@ -7,7 +7,7 @@ use super::{
     Metadata,
 };
 use std::process::{Command, Stdio};
-use tracing::debug;
+use tracing::trace;
 
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
 pub async fn ytdl(uri: &str) -> Result<Input> {
@@ -58,7 +58,7 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
 
     let metadata = Metadata::from_ytdl_uri(uri).await;
 
-    debug!("ytdl metadata {:?}", metadata);
+    trace!("ytdl metadata {:?}", metadata);
 
     Ok(Input::new(
         true,

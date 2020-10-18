@@ -27,6 +27,24 @@ pub enum Error {
     Ws(WsError),
 }
 
+impl Error {
+    pub(crate) fn should_trigger_connect(&self) -> bool {
+        match self {
+            Error::InterconnectFailure(Recipient::AuxNetwork)
+            | Error::InterconnectFailure(Recipient::UdpRx)
+            | Error::InterconnectFailure(Recipient::UdpTx) => true,
+            _ => false,
+        }
+    }
+
+    pub(crate) fn should_trigger_interconnect_rebuild(&self) -> bool {
+        match self {
+            Error::InterconnectFailure(Recipient::Event) => true,
+            _ => false,
+        }
+    }
+}
+
 impl From<CryptoError> for Error {
     fn from(e: CryptoError) -> Self {
         Error::Crypto(e)

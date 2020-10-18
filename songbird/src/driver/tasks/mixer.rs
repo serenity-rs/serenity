@@ -1,7 +1,4 @@
-use super::{
-    error::{Error, Result},
-    message::*,
-};
+use super::{error::Result, message::*};
 use crate::{
     constants::*,
     tracks::{PlayMode, Track},
@@ -32,9 +29,11 @@ struct Mixer {
     conn_active: Option<MixerConnection>,
     deadline: Instant,
     encoder: OpusEncoder,
+    interconnect: Interconnect,
     mix_rx: Receiver<MixerMessage>,
     muted: bool,
     packet: [u8; VOICE_PACKET_MAX],
+    prevent_events: bool,
     silence_frames: u8,
     sleeper: SpinSleeper,
     soft_clip: SoftClip,
@@ -50,7 +49,11 @@ fn new_encoder(bitrate: Bitrate) -> Result<OpusEncoder> {
 }
 
 impl Mixer {
-    fn new(mix_rx: Receiver<MixerMessage>, async_handle: Handle) -> Self {
+    fn new(
+        mix_rx: Receiver<MixerMessage>,
+        async_handle: Handle,
+        interconnect: Interconnect,
+    ) -> Self {
         let bitrate = DEFAULT_BITRATE;
         let encoder = new_encoder(bitrate)
             .expect("Failed to create encoder in mixing thread with known-good values.");
@@ -59,7 +62,7 @@ impl Mixer {
         let mut packet = [0u8; VOICE_PACKET_MAX];
 
         let mut rtp = MutableRtpPacket::new(&mut packet[..]).expect(
-            "Too few bytes in self.packet for RTP header.\
+            "FATAL: Too few bytes in self.packet for RTP header.\
                 (Blame: VOICE_PACKET_MAX?)",
         );
         rtp.set_version(RTP_VERSION);
@@ -73,9 +76,11 @@ impl Mixer {
             conn_active: None,
             deadline: Instant::now(),
             encoder,
+            interconnect,
             mix_rx,
             muted: false,
             packet,
+            prevent_events: false,
             silence_frames: 0,
             sleeper: Default::default(),
             soft_clip,
@@ -84,32 +89,46 @@ impl Mixer {
         }
     }
 
-    fn run(&mut self, mut interconnect: Interconnect) {
+    fn run(&mut self) {
+        let mut events_failure = false;
+        let mut conn_failure = false;
+
         'runner: loop {
             loop {
                 use MixerMessage::*;
 
-                match self.mix_rx.try_recv() {
+                let error = match self.mix_rx.try_recv() {
                     Ok(AddTrack(mut t)) => {
                         t.source.prep_with_handle(self.async_handle.clone());
-                        let _ = self.add_track(t, &interconnect);
+                        self.add_track(t)
                     },
                     Ok(SetTrack(t)) => {
                         self.tracks.clear();
-                        let _ = interconnect.events.send(EventMessage::RemoveAllTracks);
+
+                        let mut out = self.fire_event(EventMessage::RemoveAllTracks);
+
                         if let Some(mut t) = t {
                             t.source.prep_with_handle(self.async_handle.clone());
-                            let _ = self.add_track(t, &interconnect);
+
+                            // Do this unconditionally: this affects local state infallibly,
+                            // with the event installation being the remote part.
+                            if let Err(e) = self.add_track(t) {
+                                out = Err(e.into());
+                            }
                         }
+
+                        out
                     },
                     Ok(SetBitrate(b)) => {
                         self.bitrate = b;
                         if let Err(e) = self.set_bitrate(b) {
                             error!("Failed to update bitrate {:?}", e);
                         }
+                        Ok(())
                     },
                     Ok(SetMute(m)) => {
                         self.muted = m;
+                        Ok(())
                     },
                     Ok(SetConn(conn, ssrc)) => {
                         self.conn_active = Some(conn);
@@ -119,29 +138,44 @@ impl Mixer {
                         );
                         rtp.set_ssrc(ssrc);
                         self.deadline = Instant::now();
+                        Ok(())
                     },
                     Ok(DropConn) => {
                         self.conn_active = None;
+                        Ok(())
                     },
                     Ok(ReplaceInterconnect(i)) => {
+                        self.prevent_events = false;
                         if let Some(ws) = &self.ws {
-                            let _ = ws.send(WsMessage::ReplaceInterconnect(i.clone()));
+                            conn_failure |=
+                                ws.send(WsMessage::ReplaceInterconnect(i.clone())).is_err();
                         }
-                        interconnect = i;
+                        if let Some(conn) = &self.conn_active {
+                            conn_failure |= conn
+                                .udp_rx
+                                .send(UdpRxMessage::ReplaceInterconnect(i.clone()))
+                                .is_err();
+                        }
+                        self.interconnect = i;
+
+                        self.rebuild_tracks()
                     },
                     Ok(RebuildEncoder) => match new_encoder(self.bitrate) {
                         Ok(encoder) => {
                             self.encoder = encoder;
+                            Ok(())
                         },
                         Err(e) => {
                             error!("Failed to rebuild encoder. Resetting bitrate. {:?}", e);
                             self.bitrate = DEFAULT_BITRATE;
                             self.encoder = new_encoder(self.bitrate)
                                 .expect("Failed fallback rebuild of OpusEncoder with safe inputs.");
+                            Ok(())
                         },
                     },
                     Ok(Ws(new_ws_handle)) => {
                         self.ws = new_ws_handle;
+                        Ok(())
                     },
 
                     Err(TryRecvError::Disconnected) | Ok(Poison) => {
@@ -151,34 +185,82 @@ impl Mixer {
                     Err(TryRecvError::Empty) => {
                         break;
                     },
+                };
+
+                if let Err(e) = error {
+                    events_failure |= e.should_trigger_interconnect_rebuild();
+                    conn_failure |= e.should_trigger_connect();
                 }
             }
 
-            if let Err(e) = self.cycle(&interconnect) {
-                if matches!(e, Error::InterconnectFailure(_)) {
-                    let _ = interconnect.core.send(CoreMessage::RebuildInterconnect);
-                }
+            if let Err(e) = self.cycle().and_then(|_| self.audio_commands_events()) {
+                events_failure |= e.should_trigger_interconnect_rebuild();
+                conn_failure |= e.should_trigger_connect();
 
                 error!("Mixer thread cycle: {:?}", e);
+            }
 
-                let _ = interconnect.core.send(CoreMessage::Reconnect);
-            } else {
-                self.audio_commands_events(&interconnect);
+            // event failure? rebuild interconnect.
+            // ws or udp failure? full connect
+            // (soft reconnect is covered by the ws task.)
+            if events_failure {
+                self.prevent_events = true;
+                self.interconnect
+                    .core
+                    .send(CoreMessage::RebuildInterconnect)
+                    .expect("FATAL: No way to rebuild driver core from mixer.");
+                events_failure = false;
+            }
+
+            if conn_failure {
+                self.interconnect
+                    .core
+                    .send(CoreMessage::FullReconnect)
+                    .expect("FATAL: No way to rebuild driver core from mixer.");
+                conn_failure = false;
             }
         }
     }
 
     #[inline]
-    fn add_track(&mut self, mut track: Track, interconnect: &Interconnect) -> Result<()> {
+    fn fire_event(&self, event: EventMessage) -> Result<()> {
+        // As this task is responsible for noticing the potential death of an event context,
+        // it's responsible for not forcibly recreating said context repeatedly.
+        if !self.prevent_events {
+            self.interconnect.events.send(event)?;
+            Ok(())
+        } else {
+            Ok(())
+        }
+    }
+
+    #[inline]
+    fn add_track(&mut self, mut track: Track) -> Result<()> {
         let evts = track.events.take().unwrap_or_default();
         let state = track.state();
         let handle = track.handle.clone();
 
         self.tracks.push(track);
 
-        interconnect
+        self.interconnect
             .events
             .send(EventMessage::AddTrack(evts, state, handle))?;
+
+        Ok(())
+    }
+
+    // rebuilds the event thread's view of each track, in event of a full rebuild.
+    #[inline]
+    fn rebuild_tracks(&mut self) -> Result<()> {
+        for track in self.tracks.iter_mut() {
+            let evts = track.events.take().unwrap_or_default();
+            let state = track.state();
+            let handle = track.handle.clone();
+
+            self.interconnect
+                .events
+                .send(EventMessage::AddTrack(evts, state, handle))?;
+        }
 
         Ok(())
     }
@@ -188,7 +270,6 @@ impl Mixer {
         &mut self,
         opus_frame: &'a mut [u8],
         mix_buffer: &mut [f32; STEREO_FRAME_SIZE],
-        interconnect: &Interconnect,
     ) -> Result<(usize, &'a [u8])> {
         let mut len = 0;
 
@@ -200,72 +281,63 @@ impl Mixer {
             (track.volume - 1.0).abs() < f32::EPSILON && track.source.supports_passthrough()
         };
 
-        if do_passthrough {
-            let track = &mut self.tracks[0];
-            if track.playing == PlayMode::Play {
-                if let Ok(opus_len) = track.source.read_opus_frame(opus_frame) {
-                    track.step_frame();
-                    Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]))
-                } else {
-                    if track.do_loop() {
-                        if let Some(time) = track.seek_time(Default::default()) {
-                            let _ = interconnect.events.send(EventMessage::ChangeState(
-                                0,
-                                TrackStateChange::Position(time),
-                            ));
-                            let _ = interconnect.events.send(EventMessage::ChangeState(
-                                0,
-                                TrackStateChange::Loops(track.loops, false),
-                            ));
-                        }
-                    } else {
-                        track.end();
-                    }
+        for (i, track) in self.tracks.iter_mut().enumerate() {
+            let vol = track.volume;
+            let stream = &mut track.source;
 
-                    Ok((0, &opus_frame[..0]))
-                }
-            } else {
-                Ok((0, &opus_frame[..0]))
+            if track.playing != PlayMode::Play {
+                continue;
             }
-        } else {
-            for (i, track) in self.tracks.iter_mut().enumerate() {
-                let vol = track.volume;
-                let stream = &mut track.source;
 
-                if track.playing != PlayMode::Play {
-                    continue;
-                }
+            let (temp_len, opus_len) = if do_passthrough {
+                (0, track.source.read_opus_frame(opus_frame).ok())
+            } else {
+                (stream.mix(mix_buffer, vol), None)
+            };
 
-                let temp_len = stream.mix(mix_buffer, vol);
-
-                len = len.max(temp_len);
-                if temp_len > 0 {
-                    track.step_frame();
-                } else if track.do_loop() {
-                    if let Some(time) = track.seek_time(Default::default()) {
-                        let _ = interconnect.events.send(EventMessage::ChangeState(
+            len = len.max(temp_len);
+            if temp_len > 0 || opus_len.is_some() {
+                track.step_frame();
+            } else if track.do_loop() {
+                if let Some(time) = track.seek_time(Default::default()) {
+                    // have to reproduce self.fire_event here
+                    // to circumvent the borrow checker's lack of knowledge.
+                    //
+                    // In event of error, one of the later event calls will
+                    // trigger the event thread rebuild: it is more prudent that
+                    // the mixer works as normal right now.
+                    if !self.prevent_events {
+                        let _ = self.interconnect.events.send(EventMessage::ChangeState(
                             i,
                             TrackStateChange::Position(time),
                         ));
-                        let _ = interconnect.events.send(EventMessage::ChangeState(
+                        let _ = self.interconnect.events.send(EventMessage::ChangeState(
                             i,
                             TrackStateChange::Loops(track.loops, false),
                         ));
                     }
-                } else {
-                    track.end();
                 }
+            } else {
+                track.end();
             }
 
-            Ok((len, &opus_frame[..0]))
+            if let Some(opus_len) = opus_len {
+                return Ok((STEREO_FRAME_SIZE, &opus_frame[..opus_len]));
+            }
         }
+
+        Ok((len, &opus_frame[..0]))
     }
 
     #[inline]
-    fn audio_commands_events(&mut self, interconnect: &Interconnect) {
+    fn audio_commands_events(&mut self) -> Result<()> {
         // Apply user commands.
         for (i, track) in self.tracks.iter_mut().enumerate() {
-            track.process_commands(i, interconnect);
+            // This causes fallible event system changes,
+            // but if the event thread has died then we'll certainly
+            // detect that on the tick later.
+            // Changes to play state etc. MUST all be handled.
+            track.process_commands(i, &self.interconnect);
         }
 
         // TODO: do without vec?
@@ -281,22 +353,24 @@ impl Mixer {
                 let p_state = track.playing();
                 self.tracks.remove(i);
                 to_remove.push(i);
-                let _ = interconnect.events.send(EventMessage::ChangeState(
+                self.fire_event(EventMessage::ChangeState(
                     i,
                     TrackStateChange::Mode(p_state),
-                ));
+                ))?;
             } else {
                 i += 1;
             }
         }
 
         // Tick
-        let _ = interconnect.events.send(EventMessage::Tick);
+        self.fire_event(EventMessage::Tick)?;
 
         // Then do removals.
         for i in &to_remove[..] {
-            let _ = interconnect.events.send(EventMessage::RemoveTrack(*i));
+            self.fire_event(EventMessage::RemoveTrack(*i))?;
         }
+
+        Ok(())
     }
 
     #[inline]
@@ -306,7 +380,7 @@ impl Mixer {
         self.deadline += TIMESTEP_LENGTH;
     }
 
-    fn cycle(&mut self, interconnect: &Interconnect) -> Result<()> {
+    fn cycle(&mut self) -> Result<()> {
         if self.conn_active.is_none() {
             self.march_deadline();
             return Ok(());
@@ -323,8 +397,7 @@ impl Mixer {
 
         // Walk over all the audio files, combining into one audio frame according
         // to volume, play state, etc.
-        let (mut len, mut opus_frame) =
-            self.mix_tracks(&mut opus_space, &mut mix_buffer, interconnect)?;
+        let (mut len, mut opus_frame) = self.mix_tracks(&mut opus_space, &mut mix_buffer)?;
 
         self.soft_clip.apply(&mut mix_buffer[..])?;
 
@@ -437,7 +510,7 @@ pub(crate) fn runner(
     mix_rx: Receiver<MixerMessage>,
     async_handle: Handle,
 ) {
-    let mut mixer = Mixer::new(mix_rx, async_handle);
+    let mut mixer = Mixer::new(mix_rx, async_handle, interconnect);
 
-    mixer.run(interconnect);
+    mixer.run();
 }
