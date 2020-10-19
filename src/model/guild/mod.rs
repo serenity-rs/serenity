@@ -2059,13 +2059,12 @@ impl InviteGuild {
 /// Data for an unavailable guild.
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
 pub struct GuildUnavailable {
-    /// The Id of the [`Guild`] that is unavailable.
+    /// The Id of the [`Guild`] that may be unavailable.
     ///
     /// [`Guild`]: struct.Guild.html
     pub id: GuildId,
     /// Indicator of whether the guild is unavailable.
-    ///
-    /// This should always be `true`.
+    #[serde(default)]
     pub unavailable: bool,
 }
 

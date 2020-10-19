@@ -339,7 +339,7 @@ impl Serialize for GuildCreateEvent {
 
 #[derive(Clone, Debug)]
 pub struct GuildDeleteEvent {
-    pub guild: PartialGuild,
+    pub guild: GuildUnavailable,
     pub(crate) _nonexhaustive: (),
 }
 
@@ -369,7 +369,7 @@ impl CacheUpdate for GuildDeleteEvent {
 impl<'de> Deserialize<'de> for GuildDeleteEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
-            guild: PartialGuild::deserialize(deserializer)?,
+            guild: GuildUnavailable::deserialize(deserializer)?,
             _nonexhaustive: (),
         })
     }
@@ -378,7 +378,7 @@ impl<'de> Deserialize<'de> for GuildDeleteEvent {
 impl Serialize for GuildDeleteEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
-        PartialGuild::serialize(&self.guild, serializer)
+        GuildUnavailable::serialize(&self.guild, serializer)
     }
 }
 
