@@ -983,7 +983,6 @@ mod test {
         cache::{Cache, CacheUpdate, Settings},
         model::prelude::*,
     };
-    use crate::model::guild::PremiumTier::Tier2;
 
     #[tokio::test]
     async fn test_cache_messages() {
@@ -1135,29 +1134,9 @@ mod test {
         assert!(cache.update(&mut event).await.is_none());
 
         let mut guild_delete = GuildDeleteEvent {
-            guild: PartialGuild {
+            guild: GuildUnavailable {
                 id: GuildId(1),
-                afk_channel_id: None,
-                afk_timeout: 0,
-                default_message_notifications: DefaultMessageNotificationLevel::All,
-                embed_channel_id: None,
-                embed_enabled: false,
-                emojis: HashMap::new(),
-                features: vec![],
-                icon: None,
-                mfa_level: MfaLevel::None,
-                name: String::new(),
-                owner_id: UserId(3),
-                region: String::new(),
-                roles: HashMap::new(),
-                splash: None,
-                verification_level: VerificationLevel::Low,
-                description: None,
-                premium_tier: Tier2,
-                premium_subscription_count: 12,
-                banner: None,
-                vanity_url_code: Some("bruhmoment".to_string()),
-                _nonexhaustive: (),
+                unavailable: false,
             },
             _nonexhaustive: (),
         };
