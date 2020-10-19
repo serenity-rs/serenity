@@ -147,12 +147,8 @@ impl StdError for RustlsError {
 #[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 #[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
-    let mut config = rustls::ClientConfig::new();
-    config.root_store.add_server_trust_anchors(&webpki_roots::TLS_SERVER_ROOTS);
-    let connector = std::sync::Arc::new(config).into();
-    let (stream, _) = async_tungstenite::tokio::connect_async_with_tls_connector_and_config::<Url>(
+    let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url,
-        Some(connector),
         Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
             max_message_size: None,
             max_frame_size: None,
