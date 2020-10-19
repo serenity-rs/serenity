@@ -330,6 +330,14 @@
 <span id="327">327</span>
 <span id="328">328</span>
 <span id="329">329</span>
+<span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
@@ -432,14 +440,22 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the partial data of the guild sent by discord,</span>
     <span class="doccomment">/// and the full data from the cache, if available.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `unavailable` flag in the partial data determines the status of the guild.</span>
+    <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
+    <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">PartialGuild</span>, <span class="ident">_full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span>) {}
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>, <span class="ident">_full</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span>) {}
 
     <span class="doccomment">/// Dispatched when a guild is deleted.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the partial data of the guild sent by discord.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// The `unavailable` flag in the partial data determines the status of the guild.</span>
+    <span class="doccomment">/// If the flag is false, the bot was removed from the guild, either by being</span>
+    <span class="doccomment">/// kicked or banned. If the flag is true, the guild went offline.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">PartialGuild</span>) {}
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_incomplete</span>: <span class="ident">GuildUnavailable</span>) {}
 
     <span class="comment">/* the emojis were updated. */</span>
 
