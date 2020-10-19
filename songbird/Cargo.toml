@@ -26,7 +26,7 @@ version = "0.1"
 default-features = false
 features = ["tokio-runtime"]
 optional = true
-version = "0.8"
+version = "0.9"
 
 [dependencies.audiopus]
 optional = true
@@ -131,7 +131,7 @@ driver = [
     "url",
     "xsalsa20poly1305",
 ]
-rustls = ["async-tungstenite/async-tls"]
+rustls = ["async-tungstenite/tokio-rustls"]
 native = ["async-tungstenite/tokio-native-tls"]
 serenity-rustls = ["serenity/rustls_backend", "rustls", "gateway", "serenity-deps"]
 serenity-native = ["serenity/native_tls_backend", "native", "gateway", "serenity-deps"]
