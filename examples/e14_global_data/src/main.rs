@@ -1,4 +1,4 @@
-//! In this example, you will be shown various ways of sharing data between events and commands.
+//! Ie this example, you will be shown various ways of sharing data between events and commands.
 //! And how to use locks correctly to avoid deadlocking the bot.
 
 use std::{sync::{Arc, atomic::{AtomicUsize, Ordering}}, collections::HashMap, env};
@@ -118,7 +118,7 @@ async fn main() {
         .await
         .expect("Err creating client");
 
-    // This is wherere we can initially insert the data we desire into the "global" data TypeMap.
+    // This is where we can initially insert the data we desire into the "global" data TypeMap.
     // client.data is wrapped on a RwLock, and since we want to insert to it, we have to open it in
     // write mode, but there's a small thing catch:
     // There can only be a single writer to a given lock open in the entire application, this means
