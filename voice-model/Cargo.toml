@@ -29,6 +29,6 @@ criterion = "0.3"
 serde_test = "1"
 
 [[bench]]
-name = "allocs"
+name = "deserialisation"
 path = "benches/de.rs"
 harness = false

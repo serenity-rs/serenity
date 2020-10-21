@@ -71,7 +71,9 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         } else {
             (None, None)
         }
-    }).await.map_err(|_| Error::Metadata)?;
+    })
+    .await
+    .map_err(|_| Error::Metadata)?;
 
     youtube_dl.stderr = returned_stderr;
 

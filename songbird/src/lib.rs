@@ -52,8 +52,6 @@ mod manager;
 pub mod serenity;
 #[cfg(feature = "gateway")]
 pub mod shards;
-#[cfg(test)]
-mod test_utils;
 #[cfg(feature = "driver")]
 pub mod tracks;
 #[cfg(feature = "driver")]
@@ -65,6 +63,9 @@ pub use audiopus::{self as opus, Bitrate};
 pub use discortp as packet;
 #[cfg(feature = "driver")]
 pub use serenity_voice_model as model;
+
+#[cfg(test)]
+use utils as test_utils;
 
 #[cfg(feature = "driver")]
 pub use crate::{

@@ -98,6 +98,10 @@ version = "2"
 optional = true
 version = "0.5"
 
+[dev-dependencies]
+criterion = "0.3"
+utils = { path = "utils" }
+
 [features]
 default = [
     "serenity-rustls",
@@ -141,6 +145,11 @@ twilight = ["twilight-model"]
 simd-zlib = ["twilight-gateway/simd-zlib"]
 stock-zlib = ["twilight-gateway/stock-zlib"]
 serenity-deps = ["async-trait"]
+
+[[bench]]
+name = "mixing"
+path = "benches/mixing.rs"
+harness = false
 
 [package.metadata.docs.rs]
 all-features = true

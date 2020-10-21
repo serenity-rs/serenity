@@ -410,8 +410,9 @@ impl<R: Read + Sized> ReadAudioExt for R {
         // Max SIMD float32 lanes is 8 on AVX, older archs use a divisor of this
         // e.g., 4.
         const SAMPLE_LEN: usize = mem::size_of::<f32>();
-        let mut simd_float_bytes = [0u8; 8 * SAMPLE_LEN];
-        let mut simd_float_buf = [0f32; 8];
+        const FLOAT_COUNT: usize = 512;
+        let mut simd_float_bytes = [0u8; FLOAT_COUNT * SAMPLE_LEN];
+        let mut simd_float_buf = [0f32; FLOAT_COUNT];
 
         let mut frame_pos = 0;
 
@@ -422,7 +423,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
 
             while frame_pos < float_buffer.len() {
                 let progress = self
-                    .read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
+                    .read(&mut simd_float_bytes[..max_bytes.min(FLOAT_COUNT * SAMPLE_LEN)])
                     .and_then(|byte_len| {
                         let target = byte_len / SAMPLE_LEN;
                         (&simd_float_bytes[..byte_len])
@@ -464,7 +465,7 @@ impl<R: Read + Sized> ReadAudioExt for R {
 
             while frame_pos < float_buffer.len() {
                 let progress = self
-                    .read(&mut simd_float_bytes[..max_bytes.min(8 * SAMPLE_LEN)])
+                    .read(&mut simd_float_bytes[..max_bytes.min(FLOAT_COUNT * SAMPLE_LEN)])
                     .and_then(|byte_len| {
                         let target = byte_len / SAMPLE_LEN;
                         (&simd_float_bytes[..byte_len])

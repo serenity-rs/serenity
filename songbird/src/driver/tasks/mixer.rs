@@ -113,7 +113,7 @@ impl Mixer {
                             // Do this unconditionally: this affects local state infallibly,
                             // with the event installation being the remote part.
                             if let Err(e) = self.add_track(t) {
-                                out = Err(e.into());
+                                out = Err(e);
                             }
                         }
 
