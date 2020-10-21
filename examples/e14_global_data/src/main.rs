@@ -1,4 +1,4 @@
-//! Ie this example, you will be shown various ways of sharing data between events and commands.
+//! In this example, you will be shown various ways of sharing data between events and commands.
 //! And how to use locks correctly to avoid deadlocking the bot.
 
 use std::{sync::{Arc, atomic::{AtomicUsize, Ordering}}, collections::HashMap, env};
