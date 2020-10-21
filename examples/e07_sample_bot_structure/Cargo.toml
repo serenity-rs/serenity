@@ -12,7 +12,7 @@ tracing-futures = "0.2" # needed so intrument works with async functions.
 
 [dependencies.tokio]
 version = "0.2"
-features = ["macros"]
+features = ["macros", "signal"]
 
 [dependencies.serenity]
 features = ["cache", "framework", "standard_framework", "rustls_backend"]
