@@ -2383,7 +2383,6 @@
 <span id="2380">2380</span>
 <span id="2381">2381</span>
 <span id="2382">2382</span>
-<span id="2383">2383</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -4446,13 +4445,12 @@
 <span class="doccomment">/// Data for an unavailable guild.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildUnavailable</span> {
-    <span class="doccomment">/// The Id of the [`Guild`] that is unavailable.</span>
+    <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// Indicator of whether the guild is unavailable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// This should always be `true`.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">unavailable</span>: <span class="ident">bool</span>,
 }
 

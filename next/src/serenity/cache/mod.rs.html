@@ -1152,27 +1152,6 @@
 <span id="1149">1149</span>
 <span id="1150">1150</span>
 <span id="1151">1151</span>
-<span id="1152">1152</span>
-<span id="1153">1153</span>
-<span id="1154">1154</span>
-<span id="1155">1155</span>
-<span id="1156">1156</span>
-<span id="1157">1157</span>
-<span id="1158">1158</span>
-<span id="1159">1159</span>
-<span id="1160">1160</span>
-<span id="1161">1161</span>
-<span id="1162">1162</span>
-<span id="1163">1163</span>
-<span id="1164">1164</span>
-<span id="1165">1165</span>
-<span id="1166">1166</span>
-<span id="1167">1167</span>
-<span id="1168">1168</span>
-<span id="1169">1169</span>
-<span id="1170">1170</span>
-<span id="1171">1171</span>
-<span id="1172">1172</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2159,7 +2138,6 @@
         <span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>, <span class="ident">Settings</span>},
         <span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>,
     };
-    <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">guild</span>::<span class="ident">PremiumTier</span>::<span class="ident">Tier2</span>;
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">test_cache_messages</span>() {
@@ -2311,29 +2289,9 @@
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>.<span class="ident">is_none</span>());
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">guild_delete</span> <span class="op">=</span> <span class="ident">GuildDeleteEvent</span> {
-            <span class="ident">guild</span>: <span class="ident">PartialGuild</span> {
+            <span class="ident">guild</span>: <span class="ident">GuildUnavailable</span> {
                 <span class="ident">id</span>: <span class="ident">GuildId</span>(<span class="number">1</span>),
-                <span class="ident">afk_channel_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">afk_timeout</span>: <span class="number">0</span>,
-                <span class="ident">default_message_notifications</span>: <span class="ident">DefaultMessageNotificationLevel</span>::<span class="ident">All</span>,
-                <span class="ident">embed_channel_id</span>: <span class="prelude-val">None</span>,
-                <span class="ident">embed_enabled</span>: <span class="bool-val">false</span>,
-                <span class="ident">emojis</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-                <span class="ident">features</span>: <span class="macro">vec</span><span class="macro">!</span>[],
-                <span class="ident">icon</span>: <span class="prelude-val">None</span>,
-                <span class="ident">mfa_level</span>: <span class="ident">MfaLevel</span>::<span class="prelude-val">None</span>,
-                <span class="ident">name</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
-                <span class="ident">owner_id</span>: <span class="ident">UserId</span>(<span class="number">3</span>),
-                <span class="ident">region</span>: <span class="ident">String</span>::<span class="ident">new</span>(),
-                <span class="ident">roles</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-                <span class="ident">splash</span>: <span class="prelude-val">None</span>,
-                <span class="ident">verification_level</span>: <span class="ident">VerificationLevel</span>::<span class="ident">Low</span>,
-                <span class="ident">description</span>: <span class="prelude-val">None</span>,
-                <span class="ident">premium_tier</span>: <span class="ident">Tier2</span>,
-                <span class="ident">premium_subscription_count</span>: <span class="number">12</span>,
-                <span class="ident">banner</span>: <span class="prelude-val">None</span>,
-                <span class="ident">vanity_url_code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;bruhmoment&quot;</span>.<span class="ident">to_string</span>()),
-                <span class="ident">_nonexhaustive</span>: (),
+                <span class="ident">unavailable</span>: <span class="bool-val">false</span>,
             },
             <span class="ident">_nonexhaustive</span>: (),
         };
