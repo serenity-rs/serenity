@@ -42,7 +42,7 @@ To run an example, you have various options:
       Additionally, show how to send a message to a specific channel.
 ```
 
-2. Manualy running:
+2. Manually running:
 - Clone the repository: `git clone https://github.com/serenity-rs/serenity.git`
 - CD into the examples folder: `cd serenity/examples`
 - CD into the example of choice: `cd e01_basic_ping_bot`
