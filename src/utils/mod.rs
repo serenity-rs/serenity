@@ -451,7 +451,7 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 /// assert_eq!(utils::shard_id(81384788765712384, 17), 7);
 /// ```
 #[inline]
-pub fn shard_id(guild_id: u64, shard_count: u64) -> u64 { (guild_id >> 22) % shard_count }
+pub fn shard_id(guild_id: impl Into<u64>, shard_count: u64) -> u64 { (guild_id.into() >> 22) % shard_count }
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
 ///
