@@ -1321,7 +1321,10 @@ impl Guild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
+    /// This requires cache to be enabled. Otherwise, please use [`member_permissions`]
+    ///
     /// [`Member`]: struct.Member.html
+    /// [`member_permissions`]: #method.member_permissions
     #[inline]
     pub fn member_permissions_cached(&self, user_id: impl Into<UserId>) -> Permissions {
         self._member_permissions_cached(user_id.into())
