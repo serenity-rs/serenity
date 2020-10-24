@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.0-rc.4] - 2020-10-24
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Changed
+
+- [misc] Increase the type length limit ([@acdenisSK]) [c:7e55a0e]
+
 ## [0.9.0-rc.3] - 2020-10-23
 
 Thanks to the following for their contributions:
@@ -3713,6 +3723,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.9.0-rc.4]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.3...v0.9.0-rc.4
 [0.9.0-rc.3]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.2...v0.9.0-rc.3
 [0.9.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.1...v0.9.0-rc.2
 [0.9.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.0...v0.9.0-rc.1
@@ -3907,6 +3918,8 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+[c:7e55a0e]: https://github.com/serenity-rs/serenity/commit/7e55a0e6eec2106b0ca540822772706232aa2a1f
 
 [c:5bb8342]: https://github.com/serenity-rs/serenity/commit/5bb8342b018bc60def13f36218fd9ee31ce18c0d
 [c:a1b3c8d]: https://github.com/serenity-rs/serenity/commit/a1b3c8ddbfde9fdcd6484d99a6f4ad6bc25a742c
