@@ -305,7 +305,7 @@ impl Member {
                 if let Some(guild) = cache.guilds.read().await.get(&self.guild_id) {
                     let req = Permissions::KICK_MEMBERS;
 
-                    if !guild.has_perms(cache, req).await {
+                    if !guild.has_perms(&cache_http, req).await {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
 
@@ -361,13 +361,13 @@ impl Member {
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
-    pub async fn permissions(&self, cache: impl AsRef<Cache>) -> Result<Permissions> {
-        let guild = match cache.as_ref().guild(self.guild_id).await {
+    pub async fn permissions(&self, cache_http: impl CacheHttp + AsRef<Cache>) -> Result<Permissions> {
+        let guild = match cache_http.as_ref().guild(self.guild_id).await {
             Some(guild) => guild,
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        Ok(guild.member_permissions_cached(self.user.id))
+        guild.member_permissions(cache_http, self.user.id).await
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the

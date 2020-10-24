@@ -220,13 +220,20 @@ impl Guild {
     }
 
     #[cfg(feature = "cache")]
-    async fn has_perms(&self, cache: impl AsRef<Cache>, mut permissions: Permissions) -> bool {
-        let user_id = cache.as_ref().current_user().await.id;
+    async fn has_perms(&self, cache_http: impl CacheHttp, mut permissions: Permissions) -> bool {
+        if let Some(cache) = cache_http.cache() {
+            let user_id = cache.current_user().await.id;
 
-        let perms = self.member_permissions_cached(user_id);
-        permissions.remove(perms);
+            if let Ok(perms) = self.member_permissions(&cache_http, user_id).await {
+                permissions.remove(perms);
 
-        permissions.is_empty()
+                permissions.is_empty()
+            } else {
+                false
+            }
+        } else {
+            false
+        }
     }
 
     #[cfg(feature = "cache")]
@@ -301,7 +308,7 @@ impl Guild {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::BAN_MEMBERS;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
 
@@ -327,10 +334,10 @@ impl Guild {
     pub async fn bans(&self, cache_http: impl CacheHttp) -> Result<Vec<Ban>> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::BAN_MEMBERS;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -424,10 +431,10 @@ impl Guild {
     pub async fn create_channel(&self, cache_http: impl CacheHttp, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::MANAGE_CHANNELS;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -497,10 +504,10 @@ impl Guild {
     {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::MANAGE_ROLES;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -604,10 +611,10 @@ impl Guild {
     {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::MANAGE_GUILD;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -687,10 +694,10 @@ impl Guild {
     pub async fn edit_nickname(&self, cache_http: impl CacheHttp, new_nickname: Option<&str>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::CHANGE_NICKNAME;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -875,10 +882,10 @@ impl Guild {
     pub async fn invites(&self, cache_http: impl CacheHttp) -> Result<Vec<RichInvite>> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::MANAGE_GUILD;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -1264,16 +1271,12 @@ impl Guild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
-    /// If the cache feature is enabled the cache will be used.
+    /// If the cache feature is enabled the cache will be checked
+    /// first. If not found it will resort to an http request.
     ///
     /// [`Member`]: struct.Member.html
     #[inline]
     pub async fn member_permissions(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Permissions> {
-        #[cfg(features = "cache")]
-        {
-            return self._member_permissions_cached(user_id.into())
-        }
-
         self._member_permissions(cache_http, user_id.into()).await
     }
 
@@ -1317,62 +1320,6 @@ impl Guild {
         }
 
         Ok(permissions)
-    }
-
-    /// Calculate a [`Member`]'s permissions in the guild.
-    ///
-    /// This requires cache to be enabled. Otherwise, please use [`member_permissions`]
-    ///
-    /// [`Member`]: struct.Member.html
-    /// [`member_permissions`]: #method.member_permissions
-    #[inline]
-    pub fn member_permissions_cached(&self, user_id: impl Into<UserId>) -> Permissions {
-        self._member_permissions_cached(user_id.into())
-    }
-
-    fn _member_permissions_cached(&self, user_id: UserId) -> Permissions {
-        if user_id == self.owner_id {
-            return Permissions::all();
-        }
-
-        let everyone = match self.roles.get(&RoleId(self.id.0)) {
-            Some(everyone) => everyone,
-            None => {
-                error!(
-                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
-                    self.id,
-                    self.name,
-                );
-
-                return Permissions::empty();
-            },
-        };
-
-        let member = match self.members.get(&user_id) {
-            Some(member) => member,
-            None => return everyone.permissions,
-        };
-
-        let mut permissions = everyone.permissions;
-
-        for role in &member.roles {
-            if let Some(role) = self.roles.get(role) {
-                if role.permissions.contains(Permissions::ADMINISTRATOR) {
-                    return Permissions::all();
-                }
-
-                permissions |= role.permissions;
-            } else {
-                warn!(
-                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.id,
-                    self.id,
-                    role,
-                );
-            }
-        }
-
-        permissions
     }
 
     /// Moves a member to a specific voice channel.
@@ -1576,10 +1523,10 @@ impl Guild {
     pub async fn prune_count(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::KICK_MEMBERS;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -1698,10 +1645,10 @@ impl Guild {
     pub async fn start_prune(&self, cache_http: impl CacheHttp, days: u16) -> Result<GuildPrune> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::KICK_MEMBERS;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
@@ -1725,10 +1672,10 @@ impl Guild {
     pub async fn unban(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<()> {
         #[cfg(feature = "cache")]
         {
-            if let Some(cache) = cache_http.cache() {
+            if cache_http.cache().is_some() {
                 let req = Permissions::BAN_MEMBERS;
 
-                if !self.has_perms(cache, req).await {
+                if !self.has_perms(&cache_http, req).await {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }

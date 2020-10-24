@@ -62,6 +62,7 @@ use super::{
 };
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::{
+    http::CacheHttp,
     cache::Cache,
     client::Context,
     framework::standard::CommonOptions,
@@ -273,15 +274,15 @@ pub(crate) fn levenshtein_distance(word_a: &str, word_b: &str) -> usize {
 /// and given the required permissions.
 #[cfg(feature = "cache")]
 pub async fn has_all_requirements(
-    cache: impl AsRef<Cache>,
+    cache_http: impl CacheHttp + AsRef<Cache>,
     cmd: &CommandOptions,
     msg: &Message,
 ) -> bool {
-    let cache = cache.as_ref();
+    let cache = cache_http.as_ref();
 
     if let Some(guild_id) = msg.guild_id {
         if let Some(member) = cache.member(guild_id, &msg.author.id).await {
-            if let Ok(permissions) = member.permissions(&cache).await {
+            if let Ok(permissions) = member.permissions(&cache_http).await {
                 return if cmd.allowed_roles.is_empty() {
                     permissions.administrator() || has_correct_permissions(&cache, &cmd, msg).await
                 } else if let Some(roles) = cache.guild_roles(guild_id).await {
