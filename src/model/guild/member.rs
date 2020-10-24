@@ -367,7 +367,7 @@ impl Member {
             None => return Err(From::from(ModelError::GuildNotFound)),
         };
 
-        Ok(guild.member_permissions(self.user.id))
+        Ok(guild.member_permissions_cached(self.user.id))
     }
 
     /// Removes a [`Role`] from the member, editing its roles in-place if the

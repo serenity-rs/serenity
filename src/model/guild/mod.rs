@@ -223,7 +223,7 @@ impl Guild {
     async fn has_perms(&self, cache: impl AsRef<Cache>, mut permissions: Permissions) -> bool {
         let user_id = cache.as_ref().current_user().await.id;
 
-        let perms = self.member_permissions(user_id);
+        let perms = self.member_permissions_cached(user_id);
         permissions.remove(perms);
 
         permissions.is_empty()
@@ -1264,13 +1264,70 @@ impl Guild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
+    /// If the cache feature is enabled the cache will be used.
+    ///
     /// [`Member`]: struct.Member.html
     #[inline]
-    pub fn member_permissions(&self, user_id: impl Into<UserId>) -> Permissions {
-        self._member_permissions(user_id.into())
+    pub async fn member_permissions(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Permissions> {
+        #[cfg(features = "cache")]
+        {
+            return self._member_permissions_cached(user_id.into())
+        }
+
+        self._member_permissions(cache_http, user_id.into()).await
     }
 
-    fn _member_permissions(&self, user_id: UserId) -> Permissions {
+    async fn _member_permissions(&self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Permissions> {
+        if user_id == self.owner_id {
+            return Ok(Permissions::all());
+        }
+
+        let everyone = match self.roles.get(&RoleId(self.id.0)) {
+            Some(everyone) => everyone,
+            None => {
+                error!(
+                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
+                    self.id,
+                    self.name,
+                );
+
+                return Ok(Permissions::empty());
+            },
+        };
+
+        let member = self.member(cache_http, &user_id).await?;
+
+        let mut permissions = everyone.permissions;
+
+        for role in &member.roles {
+            if let Some(role) = self.roles.get(role) {
+                if role.permissions.contains(Permissions::ADMINISTRATOR) {
+                    return Ok(Permissions::all());
+                }
+
+                permissions |= role.permissions;
+            } else {
+                warn!(
+                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                    member.user.id,
+                    self.id,
+                    role,
+                );
+            }
+        }
+
+        Ok(permissions)
+    }
+
+    /// Calculate a [`Member`]'s permissions in the guild.
+    ///
+    /// [`Member`]: struct.Member.html
+    #[inline]
+    pub fn member_permissions_cached(&self, user_id: impl Into<UserId>) -> Permissions {
+        self._member_permissions_cached(user_id.into())
+    }
+
+    fn _member_permissions_cached(&self, user_id: UserId) -> Permissions {
         if user_id == self.owner_id {
             return Permissions::all();
         }
