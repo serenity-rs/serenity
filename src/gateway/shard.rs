@@ -7,7 +7,7 @@ use crate::model::{
     user::OnlineStatus
 };
 use tokio::sync::Mutex;
-use crate::client::bridge::gateway::GatewayIntents;
+use crate::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
 use std::{
     sync::Arc,
     time::{Duration as StdDuration, Instant}
@@ -733,7 +733,7 @@ impl Shard {
         &mut self,
         guild_ids: It,
         limit: Option<u16>,
-        query: Option<&str>,
+        filter: ChunkGuildFilter,
         nonce: Option<&str>,
     ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send {
         debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
@@ -742,7 +742,7 @@ impl Shard {
             guild_ids,
             &self.shard_info,
             limit,
-            query,
+            filter,
             nonce,
         ).await
     }

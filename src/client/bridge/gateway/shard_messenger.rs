@@ -1,6 +1,6 @@
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use super::{ShardClientMessage, ShardRunnerMessage};
+use super::{ShardClientMessage, ShardRunnerMessage, ChunkGuildFilter};
 use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
 use async_tungstenite::tungstenite::Message;
 #[cfg(feature = "collector")]
@@ -99,7 +99,7 @@ impl ShardMessenger {
         &self,
         guild_ids: It,
         limit: Option<u16>,
-        query: Option<String>,
+        filter: ChunkGuildFilter,
         nonce: Option<String>,
     ) where It: IntoIterator<Item=GuildId> {
         let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
@@ -107,7 +107,7 @@ impl ShardMessenger {
         let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuilds {
             guild_ids: guilds,
             limit,
-            query,
+            filter,
             nonce,
         });
     }
