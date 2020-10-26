@@ -53,6 +53,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -65,7 +66,7 @@ impl ShardMessenger {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None, None);
+    /// shard.chunk_guilds(guild_ids, Some(2000), ChunkGuildFilter::None, None);
     /// #     Ok(())
     /// # }
     /// ```
@@ -75,6 +76,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -87,7 +89,7 @@ impl ShardMessenger {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"), Some("request"));
+    /// shard.chunk_guilds(guild_ids, Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request"));
     /// #     Ok(())
     /// # }
     /// ```
