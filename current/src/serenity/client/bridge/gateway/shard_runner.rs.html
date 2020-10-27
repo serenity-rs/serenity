@@ -1005,11 +1005,11 @@
 
                         <span class="bool-val">true</span>
                     },
-                <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuilds</span> { <span class="ident">guild_ids</span>, <span class="ident">limit</span>, <span class="ident">query</span>, <span class="ident">nonce</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuilds</span> { <span class="ident">guild_ids</span>, <span class="ident">limit</span>, <span class="ident">filter</span>, <span class="ident">nonce</span> }) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">chunk_guilds</span>(
                         <span class="ident">guild_ids</span>,
                         <span class="ident">limit</span>,
-                        <span class="ident">query</span>.<span class="ident">as_deref</span>(),
+                        <span class="ident">filter</span>,
                         <span class="ident">nonce</span>.<span class="ident">as_deref</span>(),
                     ).<span class="ident">await</span>.<span class="ident">is_ok</span>()
                 },

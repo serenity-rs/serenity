@@ -64,16 +64,33 @@
 <span id="61">61</span>
 <span id="62">62</span>
 <span id="63">63</span>
+<span id="64">64</span>
+<span id="65">65</span>
+<span id="66">66</span>
+<span id="67">67</span>
+<span id="68">68</span>
+<span id="69">69</span>
+<span id="70">70</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
     <span class="ident">gateway</span>::<span class="ident">Activity</span>,
-    <span class="ident">id</span>::<span class="ident">GuildId</span>,
+    <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
     <span class="ident">user</span>::<span class="ident">OnlineStatus</span>,
 };
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
+
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ChunkGuildFilter</span> {
+    <span class="doccomment">/// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.</span>
+    <span class="prelude-val">None</span>,
+    <span class="doccomment">/// A common username prefix filter for the members returned.</span>
+    <span class="ident">Query</span>(<span class="ident">String</span>),
+    <span class="doccomment">/// A set of exact user IDs to query for.</span>
+    <span class="ident">UserIds</span>(<span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>),
+}
 
 <span class="doccomment">/// A message to send from a shard over a WebSocket.</span>
 <span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
@@ -82,6 +99,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardRunnerMessage</span> {
     <span class="doccomment">/// Indicates that the client is to send a member chunk message.</span>
     <span class="ident">ChunkGuilds</span> {
+        <span class="comment">// FIXME: When intents are enabled, chunking guilds is limited to 1 guild per chunk</span>
+        <span class="comment">// request. Will be mandatory when using API v8.</span>
         <span class="doccomment">/// The IDs of the [`Guild`]s to chunk.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Guild`]: ../../../model/guild/struct.Guild.html</span>
@@ -91,14 +110,9 @@
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html</span>
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// Text to filter members by.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// For example, a query of `&quot;s&quot;` will cause only [`Member`]s whose</span>
-        <span class="doccomment">/// usernames start with `&quot;s&quot;` to be chunked.</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`Member`]: ../../../model/guild/struct.Member.html</span>
-        <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-        <span class="doccomment">/// Nonce to identify [`GuildMembersChunkEvent`] responses.</span>
+        <span class="doccomment">/// A filter to apply to the returned members.</span>
+        <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
+        <span class="doccomment">/// Optional nonce to identify [`GuildMembersChunkEvent`] responses.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html</span>
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,

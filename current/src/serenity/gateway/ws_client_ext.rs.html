@@ -151,19 +151,29 @@
 <span id="148">148</span>
 <span id="149">149</span>
 <span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">GatewayIntents</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::{<span class="self">self</span>, <span class="ident">OpCode</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">CurrentPresence</span>, <span class="ident">WsStream</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">GatewayIntents</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">ws_impl</span>::<span class="ident">SenderExt</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">GuildId</span>;
+<span class="kw">use</span> <span class="ident">async_trait</span>::<span class="ident">async_trait</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">json</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">consts</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">SystemTime</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
-<span class="kw">use</span> <span class="ident">async_trait</span>::<span class="ident">async_trait</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::<span class="ident">instrument</span>;
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">trace</span>};
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">WebSocketGatewayClientExt</span> {
@@ -172,7 +182,7 @@
         <span class="ident">guild_ids</span>: <span class="ident">It</span>,
         <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>],
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-        <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+        <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">GuildId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>;
 
@@ -205,20 +215,30 @@
         <span class="ident">guild_ids</span>: <span class="ident">It</span>,
         <span class="ident">shard_info</span>: <span class="kw-2">&amp;</span>[<span class="ident">u64</span>; <span class="number">2</span>],
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
-        <span class="ident">query</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
+        <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">GuildId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span> {
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> <span class="kw">where</span> <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">GuildId</span><span class="op">&gt;</span> <span class="op">+</span> <span class="ident">Send</span>, {
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Requesting member chunks&quot;</span>, <span class="ident">shard_info</span>);
 
-        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="macro">json</span><span class="macro">!</span>({
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">GetGuildMembers</span>.<span class="ident">num</span>(),
             <span class="string">&quot;d&quot;</span>: {
                 <span class="string">&quot;guild_id&quot;</span>: <span class="ident">guild_ids</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>().<span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>(),
                 <span class="string">&quot;limit&quot;</span>: <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
-                <span class="string">&quot;query&quot;</span>: <span class="ident">query</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
                 <span class="string">&quot;nonce&quot;</span>: <span class="ident">nonce</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
             },
-        })).<span class="ident">await</span>.<span class="ident">map_err</span>(<span class="ident">From</span>::<span class="ident">from</span>)
+        });
+
+        <span class="kw">match</span> <span class="ident">filter</span> {
+            <span class="ident">ChunkGuildFilter</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {},
+            <span class="ident">ChunkGuildFilter</span>::<span class="ident">Query</span>(<span class="ident">query</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="ident">query</span>),
+            <span class="ident">ChunkGuildFilter</span>::<span class="ident">UserIds</span>(<span class="ident">user_ids</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">user_ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_ref</span>().<span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+                <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;user_ids&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="ident">ids</span>)
+            },
+        };
+
+        <span class="self">self</span>.<span class="ident">send_json</span>(<span class="kw-2">&amp;</span><span class="ident">payload</span>).<span class="ident">await</span>.<span class="ident">map_err</span>(<span class="ident">From</span>::<span class="ident">from</span>)
     }
 
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
