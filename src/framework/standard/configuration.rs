@@ -404,7 +404,9 @@ impl Configuration {
     /// Sets the prefix to respond to. A prefix can be a string slice of any
     /// non-zero length.
     ///
-    /// **Note**: Defaults to an empty vector.
+    /// **Note**: Defaults to "~".
+    ///
+    /// **Note**: Passing empty string `""` will set no prefix.
     ///
     /// # Examples
     ///
@@ -417,7 +419,12 @@ impl Configuration {
     ///     .prefix("!"));
     /// ```
     pub fn prefix(&mut self, prefix: &str) -> &mut Self {
-        self.prefixes = vec![prefix.to_string()];
+        self.prefixes =
+            if prefix.is_empty() {
+                vec![]
+            } else {
+                vec![prefix.to_string()]
+            };
 
         self
     }
@@ -551,7 +558,7 @@ impl Default for Configuration {
     /// - **no_dm_prefix** to `false`
     /// - **on_mention** to `false`
     /// - **owners** to an empty HashSet
-    /// - **prefix** to an empty vector
+    /// - **prefix** to "~"
     fn default() -> Configuration {
         Configuration {
             allow_dm: true,
@@ -569,7 +576,7 @@ impl Default for Configuration {
             no_dm_prefix: false,
             on_mention: None,
             owners: HashSet::default(),
-            prefixes: vec![],
+            prefixes: vec![String::from("~")],
         }
     }
 }
