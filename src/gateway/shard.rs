@@ -7,7 +7,7 @@ use crate::model::{
     user::OnlineStatus
 };
 use tokio::sync::Mutex;
-use crate::client::bridge::gateway::GatewayIntents;
+use crate::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
 use std::{
     sync::Arc,
     time::{Duration as StdDuration, Instant}
@@ -685,6 +685,7 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -697,7 +698,7 @@ impl Shard {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None, None).await?;
+    /// shard.chunk_guilds(guild_ids, Some(2000), ChunkGuildFilter::None, None).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -708,6 +709,7 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
@@ -720,7 +722,7 @@ impl Shard {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"), Some("request")).await?;
+    /// shard.chunk_guilds(guild_ids, Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request")).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -733,7 +735,7 @@ impl Shard {
         &mut self,
         guild_ids: It,
         limit: Option<u16>,
-        query: Option<&str>,
+        filter: ChunkGuildFilter,
         nonce: Option<&str>,
     ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send {
         debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
@@ -742,7 +744,7 @@ impl Shard {
             guild_ids,
             &self.shard_info,
             limit,
-            query,
+            filter,
             nonce,
         ).await
     }

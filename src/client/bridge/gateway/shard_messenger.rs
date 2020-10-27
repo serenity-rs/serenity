@@ -1,6 +1,6 @@
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use super::{ShardClientMessage, ShardRunnerMessage};
+use super::{ShardClientMessage, ShardRunnerMessage, ChunkGuildFilter};
 use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
 use async_tungstenite::tungstenite::Message;
 #[cfg(feature = "collector")]
@@ -53,6 +53,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -65,7 +66,7 @@ impl ShardMessenger {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None, None);
+    /// shard.chunk_guilds(guild_ids, Some(2000), ChunkGuildFilter::None, None);
     /// #     Ok(())
     /// # }
     /// ```
@@ -75,6 +76,7 @@ impl ShardMessenger {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
+    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
@@ -87,7 +89,7 @@ impl ShardMessenger {
     ///
     /// let guild_ids = vec![GuildId(81384788765712384)];
     ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"), Some("request"));
+    /// shard.chunk_guilds(guild_ids, Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request"));
     /// #     Ok(())
     /// # }
     /// ```
@@ -99,7 +101,7 @@ impl ShardMessenger {
         &self,
         guild_ids: It,
         limit: Option<u16>,
-        query: Option<String>,
+        filter: ChunkGuildFilter,
         nonce: Option<String>,
     ) where It: IntoIterator<Item=GuildId> {
         let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
@@ -107,7 +109,7 @@ impl ShardMessenger {
         let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuilds {
             guild_ids: guilds,
             limit,
-            query,
+            filter,
             nonce,
         });
     }

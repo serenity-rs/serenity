@@ -1,12 +1,22 @@
 use crate::model::{
     gateway::Activity,
-    id::GuildId,
+    id::{GuildId, UserId},
     user::OnlineStatus,
 };
 
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionFilter};
 use async_tungstenite::tungstenite::Message;
+
+#[derive(Clone, Debug)]
+pub enum ChunkGuildFilter {
+    /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
+    None,
+    /// A common username prefix filter for the members returned.
+    Query(String),
+    /// A set of exact user IDs to query for.
+    UserIds(Vec<UserId>),
+}
 
 /// A message to send from a shard over a WebSocket.
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
@@ -15,6 +25,8 @@ use async_tungstenite::tungstenite::Message;
 pub enum ShardRunnerMessage {
     /// Indicates that the client is to send a member chunk message.
     ChunkGuilds {
+        // FIXME: When intents are enabled, chunking guilds is limited to 1 guild per chunk
+        // request. Will be mandatory when using API v8.
         /// The IDs of the [`Guild`]s to chunk.
         ///
         /// [`Guild`]: ../../../model/guild/struct.Guild.html
@@ -24,14 +36,9 @@ pub enum ShardRunnerMessage {
         ///
         /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
         limit: Option<u16>,
-        /// Text to filter members by.
-        ///
-        /// For example, a query of `"s"` will cause only [`Member`]s whose
-        /// usernames start with `"s"` to be chunked.
-        ///
-        /// [`Member`]: ../../../model/guild/struct.Member.html
-        query: Option<String>,
-        /// Nonce to identify [`GuildMembersChunkEvent`] responses.
+        /// A filter to apply to the returned members.
+        filter: ChunkGuildFilter,
+        /// Optional nonce to identify [`GuildMembersChunkEvent`] responses.
         ///
         /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
         nonce: Option<String>,
