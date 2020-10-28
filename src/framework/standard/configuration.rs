@@ -419,12 +419,11 @@ impl Configuration {
     ///     .prefix("!"));
     /// ```
     pub fn prefix(&mut self, prefix: &str) -> &mut Self {
-        self.prefixes =
-            if prefix.is_empty() {
-                vec![]
-            } else {
-                vec![prefix.to_string()]
-            };
+        self.prefixes = if prefix.is_empty() {
+            vec![]
+        } else {
+            vec![prefix.to_string()]
+        };
 
         self
     }
