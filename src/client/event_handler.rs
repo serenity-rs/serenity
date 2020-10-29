@@ -34,11 +34,6 @@ pub trait EventHandler: Send + Sync {
     /// Provides said category's data.
     async fn category_delete(&self, _ctx: Context, _category: &ChannelCategory) {}
 
-    /// Dispatched when a private channel is created.
-    ///
-    /// Provides said channel's data.
-    async fn private_channel_create(&self, _ctx: Context, _channel: &PrivateChannel) {}
-
     /// Dispatched when a channel is deleted.
     ///
     /// Provides said channel's data.
