@@ -30,5 +30,3 @@ pub use crate::gateway::GatewayError;
 pub use crate::http::HttpError;
 #[cfg(feature = "model")]
 pub use crate::model::ModelError;
-#[cfg(feature = "voice")]
-pub use crate::voice::VoiceError;

@@ -28,7 +28,7 @@ use tracing::{debug, info, warn, instrument};
 
 use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]
-use crate::client::bridge::voice::ClientVoiceManager;
+use crate::client::bridge::voice::VoiceGatewayManager;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 
@@ -78,7 +78,7 @@ pub struct ShardQueuer {
     pub rx: Receiver<ShardQueuerMessage>,
     /// A copy of the client's voice manager.
     #[cfg(feature = "voice")]
-    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     /// A copy of the URI to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
@@ -198,7 +198,7 @@ impl ShardQueuer {
             framework: Arc::clone(&self.framework),
             manager_tx: self.manager_tx.clone(),
             #[cfg(feature = "voice")]
-            voice_manager: Arc::clone(&self.voice_manager),
+            voice_manager: self.voice_manager.clone(),
             shard,
             cache_and_http: Arc::clone(&self.cache_and_http),
         });
