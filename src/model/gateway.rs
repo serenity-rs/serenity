@@ -472,8 +472,6 @@ pub struct Presence {
     pub client_status: Option<ClientStatus>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
-    /// The nickname of the member, if applicable.
-    pub nick: Option<String>,
     /// The user's online status.
     pub status: OnlineStatus,
     /// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user's creation
@@ -532,12 +530,6 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
 
-        let nick = match map.remove("nick") {
-            Some(v) => serde_json::from_value::<Option<String>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
-
         let status = map
             .remove("status")
             .ok_or_else(|| DeError::custom("expected presence status"))
@@ -549,7 +541,6 @@ impl<'de> Deserialize<'de> for Presence {
             activities,
             client_status,
             last_modified,
-            nick,
             status,
             user,
             user_id,
@@ -570,7 +561,6 @@ impl Serialize for Presence {
         state.serialize_field("game", &self.activity)?;
         state.serialize_field("client_status", &self.client_status)?;
         state.serialize_field("last_modified", &self.last_modified)?;
-        state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
 
         if let Some(user) = &self.user {
