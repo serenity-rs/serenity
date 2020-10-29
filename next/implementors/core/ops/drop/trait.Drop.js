@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["serenity"] = [{"text":"impl Drop for ShardManager","synthetic":false,"types":[]},{"text":"impl Drop for Handler","synthetic":false,"types":[]},{"text":"impl Drop for MessageCollector","synthetic":false,"types":[]},{"text":"impl Drop for ReactionCollector","synthetic":false,"types":[]}];
+implementors["serenity"] = [{"text":"impl Drop for ShardManager","synthetic":false,"types":[]},{"text":"impl Drop for MessageCollector","synthetic":false,"types":[]},{"text":"impl Drop for ReactionCollector","synthetic":false,"types":[]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()

@@ -367,8 +367,6 @@
 <span id="364">364</span>
 <span id="365">365</span>
 <span id="366">366</span>
-<span id="367">367</span>
-<span id="368">368</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">CacheAndHttp</span>;
@@ -396,7 +394,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">framework</span>::<span class="ident">Framework</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">voice</span>::<span class="ident">ClientVoiceManager</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">voice</span>::<span class="ident">VoiceGatewayManager</span>;
 
 <span class="doccomment">/// A manager for handling the status of shards by starting them, restarting</span>
 <span class="doccomment">/// them, and stopping them when required.</span>
@@ -412,8 +410,6 @@
 <span class="doccomment">/// ```rust,no_run</span>
 <span class="doccomment">/// # use std::error::Error;</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// # #[cfg(feature = &quot;voice&quot;)]</span>
-<span class="doccomment">/// # use serenity::client::bridge::voice::ClientVoiceManager;</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;voice&quot;)]</span>
 <span class="doccomment">/// # use serenity::model::id::UserId;</span>
 <span class="doccomment">/// # #[cfg(feature = &quot;cache&quot;)]</span>
@@ -456,7 +452,7 @@
 <span class="doccomment">///     // the total number of shards in use</span>
 <span class="doccomment">///     shard_total: 5,</span>
 <span class="doccomment">///     # #[cfg(feature = &quot;voice&quot;)]</span>
-<span class="doccomment">///     # voice_manager: &amp;Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),</span>
+<span class="doccomment">///     # voice_manager: &amp;None,</span>
 <span class="doccomment">///     ws_url: &amp;gateway_url,</span>
 <span class="doccomment">///     # cache_and_http: &amp;cache_and_http,</span>
 <span class="doccomment">///     guild_subscriptions: true,</span>
@@ -508,7 +504,7 @@
             <span class="ident">runners</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">runners</span>),
             <span class="ident">rx</span>: <span class="ident">shard_queue_rx</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="ident">voice_manager</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">opt</span>.<span class="ident">voice_manager</span>),
+            <span class="ident">voice_manager</span>: <span class="ident">opt</span>.<span class="ident">voice_manager</span>.<span class="ident">clone</span>(),
             <span class="ident">ws_url</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">opt</span>.<span class="ident">ws_url</span>),
             <span class="ident">cache_and_http</span>: <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">opt</span>.<span class="ident">cache_and_http</span>),
             <span class="ident">guild_subscriptions</span>: <span class="ident">opt</span>.<span class="ident">guild_subscriptions</span>,
@@ -732,7 +728,7 @@
     <span class="kw">pub</span> <span class="ident">shard_init</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_total</span>: <span class="ident">u64</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ClientVoiceManager</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">ws_url</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">guild_subscriptions</span>: <span class="ident">bool</span>,
