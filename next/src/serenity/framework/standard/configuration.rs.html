@@ -576,6 +576,12 @@
 <span id="573">573</span>
 <span id="574">574</span>
 <span id="575">575</span>
+<span id="576">576</span>
+<span id="577">577</span>
+<span id="578">578</span>
+<span id="579">579</span>
+<span id="580">580</span>
+<span id="581">581</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Delimiter</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
@@ -983,7 +989,9 @@
     <span class="doccomment">/// Sets the prefix to respond to. A prefix can be a string slice of any</span>
     <span class="doccomment">/// non-zero length.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: Defaults to an empty vector.</span>
+    <span class="doccomment">/// **Note**: Defaults to &quot;~&quot;.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Passing empty string `&quot;&quot;` will set no prefix.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -996,7 +1004,11 @@
     <span class="doccomment">///     .prefix(&quot;!&quot;));</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefix</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">prefix</span>.<span class="ident">to_string</span>()];
+        <span class="self">self</span>.<span class="ident">prefixes</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">prefix</span>.<span class="ident">is_empty</span>() {
+            <span class="macro">vec</span><span class="macro">!</span>[]
+        } <span class="kw">else</span> {
+            <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">prefix</span>.<span class="ident">to_string</span>()]
+        };
 
         <span class="self">self</span>
     }
@@ -1130,7 +1142,7 @@
     <span class="doccomment">/// - **no_dm_prefix** to `false`</span>
     <span class="doccomment">/// - **on_mention** to `false`</span>
     <span class="doccomment">/// - **owners** to an empty HashSet</span>
-    <span class="doccomment">/// - **prefix** to an empty vector</span>
+    <span class="doccomment">/// - **prefix** to &quot;~&quot;</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Configuration</span> {
         <span class="ident">Configuration</span> {
             <span class="ident">allow_dm</span>: <span class="bool-val">true</span>,
@@ -1148,7 +1160,7 @@
             <span class="ident">no_dm_prefix</span>: <span class="bool-val">false</span>,
             <span class="ident">on_mention</span>: <span class="prelude-val">None</span>,
             <span class="ident">owners</span>: <span class="ident">HashSet</span>::<span class="ident">default</span>(),
-            <span class="ident">prefixes</span>: <span class="macro">vec</span><span class="macro">!</span>[],
+            <span class="ident">prefixes</span>: <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">String</span>::<span class="ident">from</span>(<span class="string">&quot;~&quot;</span>)],
         }
     }
 }
