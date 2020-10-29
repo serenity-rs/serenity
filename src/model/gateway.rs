@@ -546,7 +546,7 @@ impl Serialize for Presence {
             id: u64,
         }
 
-        let mut state = serializer.serialize_struct("Presence", 5)?;
+        let mut state = serializer.serialize_struct("Presence", 3)?;
         state.serialize_field("client_status", &self.client_status)?;
         state.serialize_field("last_modified", &self.last_modified)?;
         state.serialize_field("status", &self.status)?;

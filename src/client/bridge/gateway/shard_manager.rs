@@ -51,7 +51,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// # async fn run() -> Result<(), Box<dyn Error>> {
 /// #
 /// use tokio::sync::{Mutex, RwLock};
-/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
+/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions, GatewayIntents};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
@@ -87,7 +87,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
-///     intents: None,
+///     intents: GatewayIntents::non_privileged(),
 /// });
 /// #     Ok(())
 /// # }

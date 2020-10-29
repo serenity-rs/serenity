@@ -394,15 +394,15 @@ impl Serialize for PermissionOverwrite {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
         let (id, kind) = match self.kind {
-            PermissionOverwriteType::Member(id) => (id.0, "member"),
-            PermissionOverwriteType::Role(id) => (id.0, "role"),
+            PermissionOverwriteType::Member(id) => (id.0, 0),
+            PermissionOverwriteType::Role(id) => (id.0, 0),
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
         state.serialize_field("allow", &self.allow.bits())?;
         state.serialize_field("deny", &self.deny.bits())?;
         state.serialize_field("id", &id)?;
-        state.serialize_field("type", kind)?;
+        state.serialize_field("type", &kind)?;
 
         state.end()
     }
