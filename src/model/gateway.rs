@@ -65,7 +65,7 @@ pub struct Activity {
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Game` struct that appears as a `Playing <name>` status.
+    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -156,7 +156,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Game` struct that appears as a `Listening to <name>` status.
+    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -200,7 +200,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Game` struct that appears as a `Competing in <name>` status.
+    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -460,11 +460,7 @@ pub struct ClientStatus {
 /// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
-    /// The activity that a [`User`] is performing.
-    ///
-    /// [`User`]: struct.User.html
-    pub activity: Option<Activity>,
-    /// [`User`]'s current activities
+    /// [`User`]'s current activities.
     ///
     /// [`User`]: struct.User.html
     pub activities: Vec<Activity>,
@@ -505,12 +501,6 @@ impl<'de> Deserialize<'de> for Presence {
             (user_id, None)
         };
 
-        let activity = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Activity>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
-
         let activities = match map.remove("activities") {
             Some(v) => serde_json::from_value::<Vec<Activity>>(v)
                 .map_err(DeError::custom)?,
@@ -537,7 +527,6 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity,
             activities,
             client_status,
             last_modified,
@@ -558,7 +547,6 @@ impl Serialize for Presence {
         }
 
         let mut state = serializer.serialize_struct("Presence", 5)?;
-        state.serialize_field("game", &self.activity)?;
         state.serialize_field("client_status", &self.client_status)?;
         state.serialize_field("last_modified", &self.last_modified)?;
         state.serialize_field("status", &self.status)?;
