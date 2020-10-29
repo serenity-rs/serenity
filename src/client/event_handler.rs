@@ -99,22 +99,14 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
-    ///
-    /// The `unavailable` flag in the partial data determines the status of the guild.
-    /// If the flag is false, the bot was removed from the guild, either by being
-    /// kicked or banned. If the flag is true, the guild went offline.
     #[cfg(feature = "cache")]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable, _full: Option<Guild>) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Guild>) {}
 
     /// Dispatched when a guild is deleted.
     ///
     /// Provides the partial data of the guild sent by discord.
-    ///
-    /// The `unavailable` flag in the partial data determines the status of the guild.
-    /// If the flag is false, the bot was removed from the guild, either by being
-    /// kicked or banned. If the flag is true, the guild went offline.
     #[cfg(not(feature = "cache"))]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild) {}
 
     /* the emojis were updated. */
 
@@ -131,36 +123,51 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user joins a guild.
     ///
     /// Provides the guild's id and the user's member data.
+    /// 
+    /// Note: This event will not trigger unless the "guild members" privileged intent
+    /// is enabled on the bot application page.
     async fn guild_member_addition(&self, _ctx: Context, _guild_id: GuildId, _new_member: Member) {}
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
     /// Provides the guild's id, the user's data, and the user's member data if available.
+    /// 
+    /// Note: This event will not trigger unless the "guild members" privileged intent
+    /// is enabled on the bot application page.
     #[cfg(feature = "cache")]
     async fn guild_member_removal(&self, _ctx: Context, _guild_id: GuildId, _user: User, _member_data_if_available: Option<Member>) {}
 
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
     /// Provides the guild's id, the user's data.
+    /// 
+    /// Note: This event will not trigger unless the "guild members" privileged intent
+    /// is enabled on the bot application page.
     #[cfg(not(feature = "cache"))]
     async fn guild_member_removal(&self, _ctx: Context, _guild_id: GuildId, _kicked: User) {}
 
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
     /// Provides the member's old data (if available) and the new data.
+    /// 
+    /// Note: This event will not trigger unless the "guild members" privileged intent
+    /// is enabled on the bot application page.
     #[cfg(feature = "cache")]
     async fn guild_member_update(&self, _ctx: Context, _old_if_available: Option<Member>, _new: Member) {}
 
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
     /// Provides the new data.
+    /// 
+    /// Note: This event will not trigger unless the "guild members" privileged intent
+    /// is enabled on the bot application page.
     #[cfg(not(feature = "cache"))]
     async fn guild_member_update(&self, _ctx: Context, _new: GuildMemberUpdateEvent) {}
 
     /// Dispatched when the data for offline members was requested.
     ///
     /// Provides the guild's id and the data.
-    async fn guild_members_chunk(&self, _ctx: Context, _chunk: GuildMembersChunkEvent) {}
+    async fn guild_members_chunk(&self, _ctx: Context, _guild_id: GuildId, _offline_members: HashMap<UserId, Member>, _nonce: Option<String>) {}
 
     /// Dispatched when a role is created.
     ///
@@ -264,11 +271,15 @@ pub trait EventHandler: Send + Sync {
     /// Provides the channel's id and the message's id.
     async fn reaction_remove_all(&self, _ctx: Context, _channel_id: ChannelId, _removed_from_message_id: MessageId) {}
 
+    /// This event is legacy, and likely no longer sent by discord.
     async fn presence_replace(&self, _ctx: Context, _: Vec<Presence>) {}
 
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
     /// Provides the presence's new data.
+    /// 
+    /// Note: This event will not trigger unless the "guild presences" privileged intent
+    /// is enabled on the bot application page.
     async fn presence_update(&self, _ctx: Context, _new_data: PresenceUpdateEvent) {}
 
     /// Dispatched upon startup.
