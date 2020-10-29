@@ -19,7 +19,7 @@ where possible. Issuing too many requests will lead to ratelimits.</p>
 <p>The important detail to note here is that this is the number of
 _member_s that have not had data received. A single <a href="../model/user/struct.User.html"><code>User</code></a> may have
 multiple associated member objects that have not been received.</p>
-<p>This can be used in combination with <a href="../gateway/struct.Shard.html#method.chunk_guilds"><code>Shard::chunk_guilds</code></a>, and can be
+<p>This can be used in combination with <a href="../gateway/struct.Shard.html#method.chunk_guild"><code>Shard::chunk_guild</code></a>, and can be
 used to determine how many members have not yet been received.</p>
 
 <div class="example-wrap"><pre class="rust rust-example-rendered">

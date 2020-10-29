@@ -1373,7 +1373,7 @@
     <span class="doccomment">/// _member_s that have not had data received. A single [`User`] may have</span>
     <span class="doccomment">/// multiple associated member objects that have not been received.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This can be used in combination with [`Shard::chunk_guilds`], and can be</span>
+    <span class="doccomment">/// This can be used in combination with [`Shard::chunk_guild`], and can be</span>
     <span class="doccomment">/// used to determine how many members have not yet been received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
@@ -1413,7 +1413,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Member`]: ../model/guild/struct.Member.html</span>
-    <span class="doccomment">/// [`Shard::chunk_guilds`]: ../gateway/struct.Shard.html#method.chunk_guilds</span>
+    <span class="doccomment">/// [`Shard::chunk_guild`]: ../gateway/struct.Shard.html#method.chunk_guild</span>
     <span class="doccomment">/// [`User`]: ../model/user/struct.User.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unknown_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
