@@ -69,8 +69,6 @@
 <span id="66">66</span>
 <span id="67">67</span>
 <span id="68">68</span>
-<span id="69">69</span>
-<span id="70">70</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
     <span class="ident">gateway</span>::<span class="ident">Activity</span>,
@@ -98,13 +96,11 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardRunnerMessage</span> {
     <span class="doccomment">/// Indicates that the client is to send a member chunk message.</span>
-    <span class="ident">ChunkGuilds</span> {
-        <span class="comment">// FIXME: When intents are enabled, chunking guilds is limited to 1 guild per chunk</span>
-        <span class="comment">// request. Will be mandatory when using API v8.</span>
-        <span class="doccomment">/// The IDs of the [`Guild`]s to chunk.</span>
+    <span class="ident">ChunkGuild</span> {
+        <span class="doccomment">/// The IDs of the [`Guild`] to chunk.</span>
         <span class="doccomment">///</span>
         <span class="doccomment">/// [`Guild`]: ../../../model/guild/struct.Guild.html</span>
-        <span class="ident">guild_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
         <span class="doccomment">/// The maximum number of members to receive [`GuildMembersChunkEvent`]s</span>
         <span class="doccomment">/// for.</span>
         <span class="doccomment">///</span>
