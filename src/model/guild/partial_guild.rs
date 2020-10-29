@@ -27,8 +27,8 @@ pub struct PartialGuild {
     pub afk_channel_id: Option<ChannelId>,
     pub afk_timeout: u64,
     pub default_message_notifications: DefaultMessageNotificationLevel,
-    pub embed_channel_id: Option<ChannelId>,
-    pub embed_enabled: bool,
+    pub widget_channel_id: Option<ChannelId>,
+    pub widget_enabled: bool,
     #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     /// Features enabled for the guild.
     ///
@@ -658,12 +658,12 @@ impl<'de> Deserialize<'de> for PartialGuild {
             })
             .and_then(DefaultMessageNotificationLevel::deserialize)
             .map_err(DeError::custom)?;
-        let embed_channel_id = match map.remove("embed_channel_id") {
+        let widget_channel_id = match map.remove("widget_channel_id") {
             Some(e) => Option::<ChannelId>::deserialize(e).map_err(DeError::custom)?,
             None => None,
         };
-        let embed_enabled = map.remove("embed_enabled")
-            .ok_or_else(|| DeError::custom("expected guild embed_enabled"))
+        let widget_enabled = map.remove("widget_enabled")
+            .ok_or_else(|| DeError::custom("expected guild widget_enabled"))
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
         let emojis = map.remove("emojis")
@@ -735,8 +735,8 @@ impl<'de> Deserialize<'de> for PartialGuild {
             afk_channel_id,
             afk_timeout,
             default_message_notifications,
-            embed_channel_id,
-            embed_enabled,
+            widget_channel_id,
+            widget_enabled,
             emojis,
             features,
             icon,
