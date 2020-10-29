@@ -81,7 +81,7 @@ pub struct ClientBuilder<'a> {
     data: Option<TypeMap>,
     http: Option<Http>,
     fut: Option<BoxFuture<'a, Result<Client>>>,
-    intents: Option<GatewayIntents>,
+    intents: GatewayIntents,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     #[cfg(feature = "framework")]
@@ -107,7 +107,7 @@ impl<'a> ClientBuilder<'a> {
             data: Some(TypeMap::new()),
             http: None,
             fut: None,
-            intents: None,
+            intents: GatewayIntents::non_privileged(),
             #[cfg(feature = "cache")]
             timeout: None,
             #[cfg(feature = "framework")]
@@ -210,38 +210,15 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// Sets all intents directly, replacing already set intents.
+    /// Sets all intents. Defaults to all non-privileged intents.
     ///
-    /// *See also*:
-    /// If visually preferred, you can use [`add_intent`] and chain it
-    /// in order to add intent after intent.
+    /// To enable privileged intents, `GatewayIntents::all` to
     ///
     /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
     /// `|`-operator.
-    ///
-    /// [`add_intent`]: #method.add_intent
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
-        self.intents = Some(intents);
-
-        self
-    }
-
-    /// Adds a single `intent`, this method can be called
-    /// repetitively to add multiple intents.
-    ///
-    /// *See also*:
-    /// If visually preferred, you can use [`intents`] and specify all
-    /// intents at once. In theory you could also achieve the same result
-    /// by passing the combined `intents`-bitflag to this method.
-    ///
-    /// [`intents`]: #method.intents
-    pub fn add_intent(mut self, intent: GatewayIntents) -> Self {
-        if let Some(ref mut intents) = self.intents {
-            intents.insert(intent);
-        } else {
-            self.intents = Some(intent);
-        }
+        self.intents = intents;
 
         self
     }

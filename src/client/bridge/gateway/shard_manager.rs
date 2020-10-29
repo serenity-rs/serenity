@@ -361,5 +361,5 @@ pub struct ShardManagerOptions<'a> {
     pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
-    pub intents: Option<GatewayIntents>,
+    pub intents: GatewayIntents,
 }

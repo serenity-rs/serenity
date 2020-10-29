@@ -25,7 +25,7 @@ pub trait WebSocketGatewayClientExt {
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: GatewayIntents)
         -> Result<()>;
 
     async fn send_presence_update(
@@ -89,7 +89,7 @@ impl WebSocketGatewayClientExt for WsStream {
     }
 
     #[instrument(skip(self, token))]
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: GatewayIntents)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
