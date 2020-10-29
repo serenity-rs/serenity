@@ -360,7 +360,7 @@ struct PermissionOverwriteData {
     allow: Permissions,
     deny: Permissions,
     #[serde(serialize_with = "serialize_u64", deserialize_with = "deserialize_u64")] id: u64,
-    #[serde(rename = "type")] kind: String,
+    #[serde(rename = "type")] kind: u8,
 }
 
 /// A channel-specific permission overwrite for a member or role.
@@ -376,9 +376,9 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
                                          -> StdResult<PermissionOverwrite, D::Error> {
         let data = PermissionOverwriteData::deserialize(deserializer)?;
 
-        let kind = match &data.kind[..] {
-            "member" => PermissionOverwriteType::Member(UserId(data.id)),
-            "role" => PermissionOverwriteType::Role(RoleId(data.id)),
+        let kind = match &data.kind {
+            1 => PermissionOverwriteType::Member(UserId(data.id)),
+            0 => PermissionOverwriteType::Role(RoleId(data.id)),
             _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
         };
 
