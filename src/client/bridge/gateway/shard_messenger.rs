@@ -64,9 +64,7 @@ impl ShardMessenger {
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), ChunkGuildFilter::None, None);
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(2000), ChunkGuildFilter::None, None);
     /// #     Ok(())
     /// # }
     /// ```
@@ -87,9 +85,7 @@ impl ShardMessenger {
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request"));
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request"));
     /// #     Ok(())
     /// # }
     /// ```
@@ -97,17 +93,15 @@ impl ShardMessenger {
     /// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../../../model/guild/struct.Guild.html
     /// [`Member`]: ../../../model/guild/struct.Member.html
-    pub fn chunk_guilds<It>(
+    pub fn chunk_guild(
         &self,
-        guild_ids: It,
+        guild_id: GuildId,
         limit: Option<u16>,
         filter: ChunkGuildFilter,
         nonce: Option<String>,
-    ) where It: IntoIterator<Item=GuildId> {
-        let guilds = guild_ids.into_iter().collect::<Vec<GuildId>>();
-
-        let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuilds {
-            guild_ids: guilds,
+    ) {
+        let _ = self.send_to_shard(ShardRunnerMessage::ChunkGuild {
+            guild_id,
             limit,
             filter,
             nonce,
