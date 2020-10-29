@@ -15,8 +15,6 @@ use tracing::instrument;
 
 #[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
-#[cfg(feature = "voice")]
-use audiopus::Error as OpusError;
 #[cfg(feature = "gateway")]
 use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
@@ -27,8 +25,6 @@ use crate::gateway::GatewayError;
 use crate::http::HttpError;
 #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::RustlsError;
-#[cfg(feature = "voice")]
-use crate::voice::VoiceError;
 
 /// The common result type between most library functions.
 ///
@@ -102,14 +98,6 @@ pub enum Error {
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
-    /// An error from the `opus` crate.
-    #[cfg(feature = "voice")]
-    Opus(OpusError),
-    /// Indicating an error within the [voice module].
-    ///
-    /// [voice module]: voice/index.html
-    #[cfg(feature = "voice")]
-    Voice(VoiceError),
 }
 
 impl From<FormatError> for Error {
@@ -135,16 +123,6 @@ impl From<ParseIntError> for Error {
 
 impl From<ModelError> for Error {
     fn from(e: ModelError) -> Error { Error::Model(e) }
-}
-
-#[cfg(feature = "voice")]
-impl From<OpusError> for Error {
-    fn from(e: OpusError) -> Error { Error::Opus(e) }
-}
-
-#[cfg(feature = "voice")]
-impl From<VoiceError> for Error {
-    fn from(e: VoiceError) -> Error { Error::Voice(e) }
 }
 
 #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
@@ -189,14 +167,10 @@ impl Display for Error {
             Error::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
             Error::Http(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "voice")]
-            Error::Opus(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "voice")]
-            Error::Voice(_) => f.write_str("Voice error"),
         }
     }
 }
@@ -216,8 +190,6 @@ impl StdError for Error {
             Error::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Error::Http(inner) => Some(inner),
-            #[cfg(feature = "voice")]
-            Error::Opus(inner) => Some(inner),
             #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => Some(inner),
             #[cfg(feature = "gateway")]

@@ -5,8 +5,6 @@ pub const EMBED_MAX_LENGTH: u16 = 6000;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 6;
-/// The voice gateway version used by the library.
-pub const VOICE_GATEWAY_VERSION: u8 = 3;
 /// The large threshold to send on identify.
 pub const LARGE_THRESHOLD: u8 = 250;
 /// The maximum unicode code points allowed within a message by Discord.
@@ -125,72 +123,6 @@ impl OpCode {
             OpCode::InvalidSession => 9,
             OpCode::Hello => 10,
             OpCode::HeartbeatAck => 11,
-        }
-    }
-}
-
-/// Enum to map voice opcodes.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-#[non_exhaustive]
-pub enum VoiceOpCode {
-    /// Used to begin a voice websocket connection.
-    Identify = 0,
-    /// Used to select the voice protocol.
-    SelectProtocol = 1,
-    /// Used to complete the websocket handshake.
-    Ready = 2,
-    /// Used to keep the websocket connection alive.
-    Heartbeat = 3,
-    /// Used to describe the session.
-    SessionDescription = 4,
-    /// Used to indicate which users are speaking.
-    Speaking = 5,
-    /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
-    HeartbeatAck = 6,
-    /// Sent after a disconnect to attempt to resume a session.
-    Resume = 7,
-    /// Used to determine how often the client must send a heartbeat.
-    Hello = 8,
-    /// Sent by the server if a session coulkd successfully be resumed.
-    Resumed = 9,
-    /// Message indicating that another user has connected to the voice channel.
-    ClientConnect = 12,
-    /// Message indicating that another user has disconnected from the voice channel.
-    ClientDisconnect = 13,
-}
-
-enum_number!(
-    VoiceOpCode {
-        Identify,
-        SelectProtocol,
-        Ready,
-        Heartbeat,
-        SessionDescription,
-        Speaking,
-        HeartbeatAck,
-        Resume,
-        Hello,
-        Resumed,
-        ClientConnect,
-        ClientDisconnect,
-    }
-);
-
-impl VoiceOpCode {
-    pub fn num(self) -> u64 {
-        match self {
-            VoiceOpCode::Identify => 0,
-            VoiceOpCode::SelectProtocol => 1,
-            VoiceOpCode::Ready => 2,
-            VoiceOpCode::Heartbeat => 3,
-            VoiceOpCode::SessionDescription => 4,
-            VoiceOpCode::Speaking => 5,
-            VoiceOpCode::HeartbeatAck => 6,
-            VoiceOpCode::Resume => 7,
-            VoiceOpCode::Hello => 8,
-            VoiceOpCode::Resumed => 9,
-            VoiceOpCode::ClientConnect => 12,
-            VoiceOpCode::ClientDisconnect => 13,
         }
     }
 }
