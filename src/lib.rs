@@ -80,8 +80,6 @@ pub mod gateway;
 pub mod http;
 #[cfg(feature = "utils")]
 pub mod utils;
-#[cfg(feature = "voice")]
-pub mod voice;
 #[cfg(feature = "collector")]
 pub mod collector;
 

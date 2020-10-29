@@ -65,9 +65,7 @@ use tracing::{error, debug, info, instrument};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use crate::model::id::UserId;
-#[cfg(feature = "voice")]
-use self::bridge::voice::ClientVoiceManager;
+use self::bridge::voice::VoiceGatewayManager;
 use crate::http::Http;
 use typemap_rev::{TypeMap, TypeMapKey};
 use futures::future::BoxFuture;
@@ -87,6 +85,8 @@ pub struct ClientBuilder<'a> {
     timeout: Option<Duration>,
     #[cfg(feature = "framework")]
     framework: Option<Arc<Box<dyn Framework + Send + Sync + 'static>>>,
+    #[cfg(feature = "voice")]
+    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
 }
@@ -114,6 +114,8 @@ impl<'a> ClientBuilder<'a> {
             timeout: None,
             #[cfg(feature = "framework")]
             framework: None,
+            #[cfg(feature = "voice")]
+            voice_manager: None,
             event_handler: None,
             raw_event_handler: None,
         }.token(token)
@@ -222,6 +224,38 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
+
+    /// Sets the voice gateway handler to be used. It will receive voice events sent
+    /// over the gateway and then consider - based on its settings - whether to
+    /// dispatch a command.
+    ///
+    /// *Info*:
+    /// If a reference to the voice_manager is required for manual dispatch,
+    /// use the [`voice_manager_arc`]-method instead.
+    ///
+    /// [`voice_manager_arc`]: #method.voice_manager_arc
+    #[cfg(feature = "voice")]
+    pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
+    where V: VoiceGatewayManager + Send + Sync + 'static,
+    {
+        self.voice_manager = Some(Arc::new(voice_manager));
+
+        self
+    }
+
+    /// This method allows to pass an `Arc`'ed `voice_manager` - this step is
+    /// done for you in the [`voice_manager`]-method, if you don't need the
+    /// extra control.
+    /// You can provide a clone and keep the original to manually dispatch.
+    ///
+    /// [`voice_manager`]: #method.voice_manager
+    #[cfg(feature = "voice")]
+    pub fn voice_manager_arc(mut self, voice_manager: Arc<dyn VoiceGatewayManager + Send + Sync + 'static>) -> Self {
+        self.voice_manager = Some(voice_manager);
+
+        self
+    }
+
     /// Sets all intents directly, replacing already set intents.
     ///
     /// *See also*:
@@ -292,10 +326,7 @@ impl<'a> Future for ClientBuilder<'a> {
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
             #[cfg(feature = "voice")]
-            let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
-                0,
-                UserId(0),
-            )));
+            let voice_manager = self.voice_manager.take();
 
             let cache_and_http = Arc::new(CacheAndHttp {
                 #[cfg(feature = "cache")]
@@ -564,7 +595,7 @@ pub struct Client {
     /// This is an ergonomic structure for interfacing over shards' voice
     /// connections.
     #[cfg(feature = "voice")]
-    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     /// URI that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
@@ -882,13 +913,10 @@ impl Client {
     #[instrument(skip(self))]
     async fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         #[cfg(feature = "voice")]
-        self.voice_manager.lock().await.set_shard_count(shard_data[2]);
-
-        #[cfg(feature = "voice")]
-        {
+        if let Some(voice_manager) = &self.voice_manager {
             let user = self.cache_and_http.http.get_current_user().await?;
 
-            self.voice_manager.lock().await.set_user_id(user.id);
+            voice_manager.initialise(shard_data[2], user.id).await;
         }
 
         {

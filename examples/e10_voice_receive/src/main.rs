@@ -6,29 +6,35 @@
 //! git = "https://github.com/serenity-rs/serenity.git"
 //! features = ["client", "standard_framework", "voice"]
 //! ```
-use std::{env, sync::Arc};
+use std::env;
 
 use serenity::{
     async_trait,
-    client::{bridge::voice::ClientVoiceManager, Client, Context, EventHandler},
+    client::{Client, Context, EventHandler},
     framework::{
         StandardFramework,
         standard::{
-            Args, CommandResult,
             macros::{command, group},
+            Args, CommandResult,
         },
     },
-    model::{channel::Message, gateway::Ready, id::ChannelId, misc::Mentionable},
-    prelude::*,
-    voice::AudioReceiver,
+    model::{
+        channel::Message,
+        gateway::Ready,
+        id::ChannelId,
+        misc::Mentionable
+    },
     Result as SerenityResult,
 };
 
-struct VoiceManager;
-
-impl TypeMapKey for VoiceManager {
-    type Value = Arc<Mutex<ClientVoiceManager>>;
-}
+use songbird::{
+    model::payload::{ClientConnect, ClientDisconnect, Speaking},
+    CoreEvent,
+    Event,
+    EventContext,
+    EventHandler as VoiceEventHandler,
+    SerenityInit,
+};
 
 struct Handler;
 
@@ -50,43 +56,91 @@ impl Receiver {
 }
 
 #[async_trait]
-impl AudioReceiver for Receiver {
-    async fn speaking_update(&self, _ssrc: u32, _user_id: u64, _speaking: bool) {
-        // You can implement logic here so that you can differentiate users'
-        // SSRCs and map the SSRC to the User ID and maintain a state in
-        // `Receiver`. Using this map, you can map the `ssrc` in `voice_packet`
-        // to the user ID and handle their audio packets separately.
-    }
+impl VoiceEventHandler for Receiver {
+    #[allow(unused_variables)]
+    async fn act(&self, ctx: &EventContext<'_>) -> Option<Event> {
+        use EventContext as Ctx;
+        match ctx {
+            Ctx::SpeakingStateUpdate(
+                Speaking {speaking, ssrc, user_id, ..}
+            ) => {
+                // Discord voice calls use RTP, where every sender uses a randomly allocated
+                // *Synchronisation Source* (SSRC) to allow receivers to tell which audio
+                // stream a received packet belongs to. As this number is not derived from
+                // the sender's user_id, only Discord Voice Gateway messages like this one
+                // inform us about which random SSRC a user has been allocated. Future voice
+                // packets will contain *only* the SSRC.
+                //
+                // You can implement logic here so that you can differentiate users'
+                // SSRCs and map the SSRC to the User ID and maintain this state.
+                // Using this map, you can map the `ssrc` in `voice_packet`
+                // to the user ID and handle their audio packets separately.
 
-    async fn voice_packet(
-        &self,
-        ssrc: u32,
-        sequence: u16,
-        _timestamp: u32,
-        _stereo: bool,
-        data: &[i16],
-        compressed_size: usize,
-    ) {
-        println!("Audio packet's first 5 bytes: {:?}", data.get(..5));
-        println!(
-            "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
-            sequence,
-            data.len(),
-            compressed_size,
-            ssrc,
-        );
-    }
+                println!(
+                    "Speaking state update: user {:?} has SSRC {:?}, using {:?}",
+                    user_id,
+                    ssrc,
+                    speaking,
+                );
+            },
+            Ctx::SpeakingUpdate {ssrc, speaking} => {
+                // You can implement logic here which reacts to a user starting
+                // or stopping speaking.
 
-    async fn client_connect(&self, _ssrc: u32, _user_id: u64) {
-        // You can implement your own logic here to handle a user who has joined the
-        // voice channel e.g., allocate structures, map their SSRC to User ID.
-    }
+                println!(
+                    "Source {} has {} speaking.",
+                    ssrc,
+                    if *speaking {"started"} else {"stopped"},
+                );
+            },
+            Ctx::VoicePacket {audio, packet, payload_offset} => {
+                // An event which fires for every received audio packet,
+                // containing the decoded data.
 
-    async fn client_disconnect(&self, _user_id: u64) {
-        // You can implement your own logic here to handle a user who has left the
-        // voice channel e.g., finalise processing of statistics etc.
-        // You will typically need to map the User ID to their SSRC; observed when
-        // speaking or connecting.
+                println!("Audio packet's first 5 samples: {:?}", audio.get(..5.min(audio.len())));
+                println!(
+                    "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
+                    packet.sequence.0,
+                    audio.len() * std::mem::size_of::<i16>(),
+                    packet.payload.len(),
+                    packet.ssrc,
+                );
+            },
+            Ctx::RtcpPacket {packet, payload_offset} => {
+                // An event which fires for every received rtcp packet,
+                // containing the call statistics and reporting information.
+                println!("RTCP packet received: {:?}", packet);
+            },
+            Ctx::ClientConnect(
+                ClientConnect {audio_ssrc, video_ssrc, user_id, ..}
+            ) => {
+                // You can implement your own logic here to handle a user who has joined the
+                // voice channel e.g., allocate structures, map their SSRC to User ID.
+
+                println!(
+                    "Client connected: user {:?} has audio SSRC {:?}, video SSRC {:?}",
+                    user_id,
+                    audio_ssrc,
+                    video_ssrc,
+                );
+            },
+            Ctx::ClientDisconnect(
+                ClientDisconnect {user_id, ..}
+            ) => {
+                // You can implement your own logic here to handle a user who has left the
+                // voice channel e.g., finalise processing of statistics etc.
+                // You will typically need to map the User ID to their SSRC; observed when
+                // speaking or connecting.
+
+                println!("Client disconnected: user {:?}", user_id);
+            },
+            _ => {
+                // We won't be registering this struct for any more event classes.
+                unimplemented!()
+            }
+        }
+
+        None
     }
 }
 
@@ -108,21 +162,15 @@ async fn main() {
     let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
+        .register_songbird()
         .await
         .expect("Err creating client");
-
-    // Obtain a lock to the data owned by the client, and insert the client's
-    // voice manager into it. This allows the voice manager to be accessible by
-    // event handlers and framework commands.
-    {
-        let mut data = client.data.write().await;
-        data.insert::<VoiceManager>(Arc::clone(&client.voice_manager));
-    }
 
     let _ = client.start().await.map_err(|why| println!("Client ended: {:?}", why));
 }
 
 #[command]
+#[only_in(guilds)]
 async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
     let connect_to = match args.single::<u64>() {
         Ok(id) => ChannelId(id),
@@ -133,21 +181,48 @@ async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
         },
     };
 
-    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
-        Some(id) => id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
-            return Ok(());
-        },
-    };
+    let manager = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
 
-    let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
-    let mut manager = manager_lock.lock().await;
+    let (handler_lock, conn_result) = manager.join(guild_id, connect_to).await;
 
-    if let Some(handler) = manager.join(guild_id, connect_to) {
-        handler.listen(Some(Arc::new(Receiver::new())));
+    if let Ok(_) = conn_result {
+        // NOTE: this skips listening for the actual connection result.
+        let mut handler = handler_lock.lock().await;
+
+        handler.add_global_event(
+            CoreEvent::SpeakingStateUpdate.into(),
+            Receiver::new(),
+        );
+
+        handler.add_global_event(
+            CoreEvent::SpeakingUpdate.into(),
+            Receiver::new(),
+        );
+
+        handler.add_global_event(
+            CoreEvent::VoicePacket.into(),
+            Receiver::new(),
+        );
+
+        handler.add_global_event(
+            CoreEvent::RtcpPacket.into(),
+            Receiver::new(),
+        );
+
+        handler.add_global_event(
+            CoreEvent::ClientConnect.into(),
+            Receiver::new(),
+        );
+
+        handler.add_global_event(
+            CoreEvent::ClientDisconnect.into(),
+            Receiver::new(),
+        );
+
         check_msg(msg.channel_id.say(&ctx.http, &format!("Joined {}", connect_to.mention())).await);
     } else {
         check_msg(msg.channel_id.say(&ctx.http, "Error joining the channel").await);
@@ -157,23 +232,19 @@ async fn join(ctx: &Context, msg: &Message, mut args: Args) -> CommandResult {
 }
 
 #[command]
+#[only_in(guilds)]
 async fn leave(ctx: &Context, msg: &Message) -> CommandResult {
-    let guild_id = match ctx.cache.guild_channel_field(msg.channel_id, |channel| channel.guild_id).await {
-        Some(id) => id,
-        None => {
-            check_msg(msg.channel_id.say(&ctx.http, "DMs not supported").await);
+    let guild = msg.guild(&ctx.cache).await.unwrap();
+    let guild_id = guild.id;
 
-            return Ok(());
-        },
-    };
-
-    let manager_lock = ctx.data.read().await
-        .get::<VoiceManager>().cloned().expect("Expected VoiceManager in TypeMap.");
-    let mut manager = manager_lock.lock().await;
+    let manager = songbird::get(ctx).await
+        .expect("Songbird Voice client placed in at initialisation.").clone();
     let has_handler = manager.get(guild_id).is_some();
 
     if has_handler {
-        manager.remove(guild_id);
+        if let Err(e) = manager.remove(guild_id).await {
+            check_msg(msg.channel_id.say(&ctx.http, format!("Failed: {:?}", e)).await);
+        }
 
         check_msg(msg.channel_id.say(&ctx.http,"Left voice channel").await);
     } else {
