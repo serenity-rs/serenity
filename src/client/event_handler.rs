@@ -99,14 +99,22 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the partial data of the guild sent by discord,
     /// and the full data from the cache, if available.
+    ///
+    /// The `unavailable` flag in the partial data determines the status of the guild.
+    /// If the flag is false, the bot was removed from the guild, either by being
+    /// kicked or banned. If the flag is true, the guild went offline.
     #[cfg(feature = "cache")]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild, _full: Option<Guild>) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable, _full: Option<Guild>) {}
 
     /// Dispatched when a guild is deleted.
     ///
     /// Provides the partial data of the guild sent by discord.
+    ///
+    /// The `unavailable` flag in the partial data determines the status of the guild.
+    /// If the flag is false, the bot was removed from the guild, either by being
+    /// kicked or banned. If the flag is true, the guild went offline.
     #[cfg(not(feature = "cache"))]
-    async fn guild_delete(&self, _ctx: Context, _incomplete: PartialGuild) {}
+    async fn guild_delete(&self, _ctx: Context, _incomplete: GuildUnavailable) {}
 
     /* the emojis were updated. */
 
@@ -167,7 +175,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when the data for offline members was requested.
     ///
     /// Provides the guild's id and the data.
-    async fn guild_members_chunk(&self, _ctx: Context, _guild_id: GuildId, _offline_members: HashMap<UserId, Member>, _nonce: Option<String>) {}
+    async fn guild_members_chunk(&self, _ctx: Context, _chunk: GuildMembersChunkEvent) {}}
 
     /// Dispatched when a role is created.
     ///
