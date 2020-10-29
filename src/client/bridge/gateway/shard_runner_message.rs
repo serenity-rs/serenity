@@ -24,13 +24,11 @@ pub enum ChunkGuildFilter {
 #[derive(Clone, Debug)]
 pub enum ShardRunnerMessage {
     /// Indicates that the client is to send a member chunk message.
-    ChunkGuilds {
-        // FIXME: When intents are enabled, chunking guilds is limited to 1 guild per chunk
-        // request. Will be mandatory when using API v8.
-        /// The IDs of the [`Guild`]s to chunk.
+    ChunkGuild {
+        /// The IDs of the [`Guild`] to chunk.
         ///
         /// [`Guild`]: ../../../model/guild/struct.Guild.html
-        guild_ids: Vec<GuildId>,
+        guild_id: GuildId,
         /// The maximum number of members to receive [`GuildMembersChunkEvent`]s
         /// for.
         ///
