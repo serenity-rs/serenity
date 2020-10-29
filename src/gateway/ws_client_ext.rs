@@ -13,19 +13,19 @@ use tracing::{debug, trace};
 
 #[async_trait]
 pub trait WebSocketGatewayClientExt {
-    async fn send_chunk_guilds<It>(
+    async fn send_chunk_guild(
         &mut self,
-        guild_ids: It,
+        guild_id: GuildId,
         shard_info: &[u64; 2],
         limit: Option<u16>,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send;
+    ) -> Result<()>;
 
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: Option<GatewayIntents>)
         -> Result<()>;
 
     async fn send_presence_update(
@@ -45,21 +45,21 @@ pub trait WebSocketGatewayClientExt {
 
 #[async_trait]
 impl WebSocketGatewayClientExt for WsStream {
-    #[instrument(skip(self, guild_ids))]
-    async fn send_chunk_guilds<It>(
+    #[instrument(skip(self))]
+    async fn send_chunk_guild(
         &mut self,
-        guild_ids: It,
+        guild_id: GuildId,
         shard_info: &[u64; 2],
         limit: Option<u16>,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item = GuildId> + Send, {
+    ) -> Result<()> {
         debug!("[Shard {:?}] Requesting member chunks", shard_info);
 
         let mut payload = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": guild_ids.into_iter().map(|x| x.as_ref().0).collect::<Vec<u64>>(),
+                "guild_id": [guild_id.as_ref().0],
                 "limit": limit.unwrap_or(0),
                 "nonce": nonce.unwrap_or(""),
             },
@@ -89,7 +89,7 @@ impl WebSocketGatewayClientExt for WsStream {
     }
 
     #[instrument(skip(self, token))]
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -98,7 +98,6 @@ impl WebSocketGatewayClientExt for WsStream {
             "d": {
                 "compress": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
-                "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,
                 "token": token,
                 "intents": intents,

@@ -89,7 +89,6 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
-    guild_subscriptions: bool,
     /// Whether the shard has permanently shutdown.
     shutdown: bool,
     stage: ConnectionStage,
@@ -124,7 +123,7 @@ impl Shard {
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
-    /// let shard = Shard::new(gateway, &token, [0u64, 1u64], true, None).await?;
+    /// let shard = Shard::new(gateway, &token, [0u64, 1u64], None).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -135,7 +134,6 @@ impl Shard {
         ws_url: Arc<Mutex<String>>,
         token: &str,
         shard_info: [u64; 2],
-        guild_subscriptions: bool,
         intents: Option<GatewayIntents>,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
@@ -162,7 +160,6 @@ impl Shard {
             token: token.to_string(),
             session_id,
             shard_info,
-            guild_subscriptions,
             ws_url,
             intents,
         })
@@ -317,7 +314,7 @@ impl Shard {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await.unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], None).await.unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
@@ -692,13 +689,11 @@ impl Shard {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), ChunkGuildFilter::None, None).await?;
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -716,13 +711,11 @@ impl Shard {
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], None).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request")).await?;
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request")).await?;
     /// #     Ok(())
     /// # }
     /// ```
@@ -730,18 +723,18 @@ impl Shard {
     /// [`Event::GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`Member`]: ../model/guild/struct.Member.html
-    #[instrument(skip(self, guild_ids))]
-    pub async fn chunk_guilds<It>(
+    #[instrument(skip(self))]
+    pub async fn chunk_guild(
         &mut self,
-        guild_ids: It,
+        guild_id: GuildId,
         limit: Option<u16>,
         filter: ChunkGuildFilter,
         nonce: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId> + Send {
+    ) -> Result<()> {
         debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
 
-        self.client.send_chunk_guilds(
-            guild_ids,
+        self.client.send_chunk_guild(
+            guild_id,
             &self.shard_info,
             limit,
             filter,
@@ -755,7 +748,7 @@ impl Shard {
     /// - the `stage` to `Identifying`
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions, self.intents).await?;
+        self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
