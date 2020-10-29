@@ -82,7 +82,6 @@ pub struct ShardQueuer {
     /// A copy of the URI to use to connect to the gateway.
     pub ws_url: Arc<Mutex<String>>,
     pub cache_and_http: Arc<CacheAndHttp>,
-    pub guild_subscriptions: bool,
     pub intents: Option<GatewayIntents>,
 }
 
@@ -186,7 +185,6 @@ impl ShardQueuer {
             Arc::clone(&self.ws_url),
             &self.cache_and_http.http.token,
             shard_info,
-            self.guild_subscriptions,
             self.intents,
         ).await?;
 

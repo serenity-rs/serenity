@@ -81,7 +81,6 @@ pub struct ClientBuilder<'a> {
     data: Option<TypeMap>,
     http: Option<Http>,
     fut: Option<BoxFuture<'a, Result<Client>>>,
-    guild_subscriptions: bool,
     intents: Option<GatewayIntents>,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
@@ -108,7 +107,6 @@ impl<'a> ClientBuilder<'a> {
             data: Some(TypeMap::new()),
             http: None,
             fut: None,
-            guild_subscriptions: true,
             intents: None,
             #[cfg(feature = "cache")]
             timeout: None,
@@ -177,16 +175,6 @@ impl<'a> ClientBuilder<'a> {
     #[cfg(feature = "cache")]
     pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
         self.timeout = Some(timeout);
-
-        self
-    }
-
-    /// Whether presence or typing events shall be received over the gateway.
-    ///
-    /// **Info**:
-    /// Prefer to use `intents`, as this may be replaced by them in the future.**
-    pub fn guild_subscriptions(mut self, is_enabled: bool) -> Self {
-        self.guild_subscriptions = is_enabled;
 
         self
     }
@@ -288,7 +276,6 @@ impl<'a> Future for ClientBuilder<'a> {
                 If you don't want to use the command framework, disable default features and specify all features you want to use.");
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
-            let guild_subscriptions = self.guild_subscriptions;
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
             #[cfg(feature = "voice")]
@@ -322,7 +309,6 @@ impl<'a> Future for ClientBuilder<'a> {
                         voice_manager: &voice_manager,
                         ws_url: &url,
                         cache_and_http: &cache_and_http,
-                        guild_subscriptions,
                         intents,
                     }).await
                 };

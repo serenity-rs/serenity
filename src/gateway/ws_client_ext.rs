@@ -25,7 +25,7 @@ pub trait WebSocketGatewayClientExt {
     async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: Option<GatewayIntents>)
         -> Result<()>;
 
     async fn send_presence_update(
@@ -89,7 +89,7 @@ impl WebSocketGatewayClientExt for WsStream {
     }
 
     #[instrument(skip(self, token))]
-    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool, intents: Option<GatewayIntents>)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: Option<GatewayIntents>)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -98,7 +98,6 @@ impl WebSocketGatewayClientExt for WsStream {
             "d": {
                 "compress": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
-                "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,
                 "token": token,
                 "intents": intents,
