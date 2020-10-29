@@ -218,7 +218,7 @@ impl Cache {
     /// _member_s that have not had data received. A single [`User`] may have
     /// multiple associated member objects that have not been received.
     ///
-    /// This can be used in combination with [`Shard::chunk_guilds`], and can be
+    /// This can be used in combination with [`Shard::chunk_guild`], and can be
     /// used to determine how many members have not yet been received.
     ///
     /// ```rust,no_run
@@ -258,7 +258,7 @@ impl Cache {
     /// ```
     ///
     /// [`Member`]: ../model/guild/struct.Member.html
-    /// [`Shard::chunk_guilds`]: ../gateway/struct.Shard.html#method.chunk_guilds
+    /// [`Shard::chunk_guild`]: ../gateway/struct.Shard.html#method.chunk_guild
     /// [`User`]: ../model/user/struct.User.html
     pub async fn unknown_members(&self) -> u64 {
         let mut total = 0;

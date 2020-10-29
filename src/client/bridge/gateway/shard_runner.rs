@@ -362,9 +362,9 @@ impl ShardRunner {
 
                         true
                     },
-                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuilds { guild_ids, limit, filter, nonce }) => {
-                    self.shard.chunk_guilds(
-                        guild_ids,
+                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuild { guild_id, limit, filter, nonce }) => {
+                    self.shard.chunk_guild(
+                        guild_id,
                         limit,
                         filter,
                         nonce.as_deref(),
