@@ -142,7 +142,30 @@ impl Serialize for GatewayIntents {
 
 #[cfg(feature = "model")]
 impl GatewayIntents {
-     /// Shorthand for checking that the set of intents contains the
+    /// Gets all of the intents that don't are considered privileged by Discord.
+    pub const fn non_privileged() -> GatewayIntents {
+        // bitflags don't support const evaluation. Workaround.
+        // See: https://github.com/bitflags/bitflags/issues/180
+        Self::from_bits_truncate(Self::all().bits() & !Self::privileged().bits())
+    }
+
+    /// Gets all of the intents that are considered privileged by Discord.
+    /// Use of these intents will require explicitly whitelisting the bot.
+    pub const fn privileged() -> GatewayIntents {
+        // bitflags don't support const evaluation. Workaround.
+        // See: https://github.com/bitflags/bitflags/issues/180
+        Self::from_bits_truncate(Self::GUILD_MEMBERS.bits() & Self::GUILD_PRESENCES.bits())
+    }
+
+    /// Checks if any of the included intents are privileged
+    ///
+    /// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS
+    /// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES
+    pub fn is_privileged(self) -> bool {
+        self.guild_members() || self.guild_presences()
+    }
+
+    /// Shorthand for checking that the set of intents contains the
     /// [GUILDS] intent.
     ///
     /// [GUILDS]: #associatedconstant.GUILDS

@@ -211,7 +211,7 @@
             "position": 0,
             "permission_overwrites": [
                 {
-                    "type": "role",
+                    "type": 0,
                     "id": "123131231321",
                     "deny": 0,
                     "allow": 0
@@ -236,7 +236,7 @@
             "position": 1,
             "permission_overwrites": [
                 {
-                    "type": "role",
+                    "type": 0,
                     "id": "23423432423",
                     "deny": 2097152,
                     "allow": 0

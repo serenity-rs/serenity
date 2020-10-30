@@ -35,8 +35,9 @@ async fn main() {
     // Build our client.
     let mut client = Client::builder(token)
         .event_handler(Handler)
-        .add_intent(GatewayIntents::GUILDS)
-        .add_intent(GatewayIntents::GUILD_MESSAGES)
+        // Intents are a bitflag, bitwise operations can be used to dictate which intents to use
+        // By default, GatewayIntents::non_privileged() is used.
+        .intents(GatewayIntents::GUILDS | GatewayIntents::GUILD_MESSAGES)
         .await
         .expect("Error creating client");
 

@@ -55,7 +55,7 @@ use std::{
     },
     time::SystemTime,
     i64,
-    u64,
+    f64,
 };
 use tokio::time::{delay_for, Duration};
 use super::{HttpError, Request};
@@ -197,7 +197,7 @@ impl Ratelimiter {
             // which is in milliseconds - and then `continue` to try again
             //
             // If it didn't ratelimit, subtract one from the Ratelimit's
-            // 'remaining'
+            // 'remaining'.
             //
             // Update `reset` with the value of 'x-ratelimit-reset' header.
             // Similarly, update `reset-after` with the 'x-ratelimit-reset-after' header.
@@ -212,9 +212,9 @@ impl Ratelimiter {
                     let _ = self.global.lock().await;
 
                     Ok(
-                        if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
-                            debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-                            delay_for(Duration::from_millis(retry_after)).await;
+                        if let Some(retry_after) = parse_header::<f64>(&response.headers(), "retry-after")? {
+                            debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
+                            delay_for(Duration::from_secs_f64(retry_after)).await;
 
                             true
                         } else {
@@ -282,7 +282,7 @@ impl Ratelimit {
                 return;
             }
         };
-        
+
         if self.remaining() == 0 {
 
             debug!(
@@ -319,9 +319,9 @@ impl Ratelimit {
 
         Ok(if response.status() != StatusCode::TOO_MANY_REQUESTS {
             false
-        } else if let Some(retry_after) = parse_header::<u64>(&response.headers(), "retry-after")? {
+        } else if let Some(retry_after) = parse_header::<f64>(&response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            delay_for(Duration::from_millis(retry_after)).await;
+            delay_for(Duration::from_secs_f64(retry_after)).await;
 
             true
         } else {

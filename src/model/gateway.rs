@@ -65,7 +65,7 @@ pub struct Activity {
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Game` struct that appears as a `Playing <name>` status.
+    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -156,7 +156,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Game` struct that appears as a `Listening to <name>` status.
+    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -200,7 +200,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Game` struct that appears as a `Competing in <name>` status.
+    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -460,11 +460,7 @@ pub struct ClientStatus {
 /// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
-    /// The activity that a [`User`] is performing.
-    ///
-    /// [`User`]: struct.User.html
-    pub activity: Option<Activity>,
-    /// [`User`]'s current activities
+    /// [`User`]'s current activities.
     ///
     /// [`User`]: struct.User.html
     pub activities: Vec<Activity>,
@@ -472,8 +468,6 @@ pub struct Presence {
     pub client_status: Option<ClientStatus>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
-    /// The nickname of the member, if applicable.
-    pub nick: Option<String>,
     /// The user's online status.
     pub status: OnlineStatus,
     /// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user's creation
@@ -507,12 +501,6 @@ impl<'de> Deserialize<'de> for Presence {
             (user_id, None)
         };
 
-        let activity = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Activity>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
-
         let activities = match map.remove("activities") {
             Some(v) => serde_json::from_value::<Vec<Activity>>(v)
                 .map_err(DeError::custom)?,
@@ -532,12 +520,6 @@ impl<'de> Deserialize<'de> for Presence {
             None => None,
         };
 
-        let nick = match map.remove("nick") {
-            Some(v) => serde_json::from_value::<Option<String>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
-
         let status = map
             .remove("status")
             .ok_or_else(|| DeError::custom("expected presence status"))
@@ -545,11 +527,9 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity,
             activities,
             client_status,
             last_modified,
-            nick,
             status,
             user,
             user_id,
@@ -566,11 +546,9 @@ impl Serialize for Presence {
             id: u64,
         }
 
-        let mut state = serializer.serialize_struct("Presence", 5)?;
-        state.serialize_field("game", &self.activity)?;
+        let mut state = serializer.serialize_struct("Presence", 3)?;
         state.serialize_field("client_status", &self.client_status)?;
         state.serialize_field("last_modified", &self.last_modified)?;
-        state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
 
         if let Some(user) = &self.user {

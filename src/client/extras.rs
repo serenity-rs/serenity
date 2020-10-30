@@ -21,7 +21,6 @@ pub struct Extras {
     pub(crate) framework: Arc<Option<Box<dyn Framework + Send + Sync + 'static>>>,
     #[cfg(feature = "cache")]
     pub(crate) timeout: Option<Duration>,
-    pub(crate) guild_subscriptions: bool,
     pub(crate) intents: Option<GatewayIntents>,
 }
 
@@ -66,14 +65,6 @@ impl Extras {
         self
     }
 
-    /// Set whether the library should subscribe for listening to presence and typing events.
-    ///
-    /// By default, this is `true`.
-    pub fn guild_subscriptions(&mut self, guild_subscriptions: bool) -> &mut Self {
-        self.guild_subscriptions = guild_subscriptions;
-        self
-    }
-
     /// Set what Discord gateway events shall be received.
     ///
     /// By default, no intents are being used and all events are received.
@@ -92,7 +83,6 @@ impl Default for Extras {
             framework: Arc::new(None),
             #[cfg(feature = "cache")]
             timeout: None,
-            guild_subscriptions: true,
             intents: None,
         }
     }
