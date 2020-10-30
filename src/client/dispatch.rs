@@ -333,17 +333,7 @@ async fn handle_event(
         }
         DispatchEvent::Model(Event::ChannelCreate(mut event)) => {
             update(&cache_and_http, &mut event).await;
-            // Discord sends both a MessageCreate and a ChannelCreate upon a new message in a private channel.
-            // This could potentially be annoying to handle when otherwise wanting to normally take care of a new channel.
-            // So therefore, private channels are dispatched to their own handler code.
             match event.channel {
-                Channel::Private(channel) => {
-                    let event_handler = Arc::clone(event_handler);
-
-                    tokio::spawn(async move {
-                        event_handler.private_channel_create(context, &channel).await;
-                    });
-                },
                 Channel::Guild(channel) => {
                     let event_handler = Arc::clone(event_handler);
 
@@ -358,6 +348,8 @@ async fn handle_event(
                         event_handler.category_create(context, &channel).await;
                     });
                 },
+                // Private channel create events are no longer sent to bots in the v8 gateway.
+                _ => {}
             }
         },
         DispatchEvent::Model(Event::ChannelDelete(mut event)) => {

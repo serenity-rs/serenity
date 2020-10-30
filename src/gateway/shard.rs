@@ -89,7 +89,6 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
-    guild_subscriptions: bool,
     /// Whether the shard has permanently shutdown.
     shutdown: bool,
     stage: ConnectionStage,
@@ -99,7 +98,7 @@ pub struct Shard {
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
-    pub intents: Option<GatewayIntents>,
+    pub intents: GatewayIntents,
 }
 
 impl Shard {
@@ -118,13 +117,14 @@ impl Shard {
     /// use std::sync::Arc;
     /// #
     /// # use serenity::http::Http;
+    /// # use serenity::client::bridge::gateway::GatewayIntents;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::default());
     /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
     /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
-    /// let shard = Shard::new(gateway, &token, [0u64, 1u64], true, None).await?;
+    /// let shard = Shard::new(gateway, &token, [0u64, 1u64], GatewayIntents::all()).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
@@ -135,8 +135,7 @@ impl Shard {
         ws_url: Arc<Mutex<String>>,
         token: &str,
         shard_info: [u64; 2],
-        guild_subscriptions: bool,
-        intents: Option<GatewayIntents>,
+        intents: GatewayIntents,
     ) -> Result<Shard> {
         let url = ws_url.lock().await.clone();
         let client = connect(&url).await?;
@@ -162,7 +161,6 @@ impl Shard {
             token: token.to_string(),
             session_id,
             shard_info,
-            guild_subscriptions,
             ws_url,
             intents,
         })
@@ -309,15 +307,18 @@ impl Shard {
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "model")]
-    /// # async fn run() {
     /// # use serenity::gateway::Shard;
     /// # use serenity::prelude::Mutex;
+    /// # use serenity::client::bridge::gateway::GatewayIntents;
     /// # use std::sync::Arc;
+    /// #
+    /// # #[cfg(feature = "model")]
+    /// # async fn run() {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await.unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                            GatewayIntents::all()).await.unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
@@ -685,14 +686,14 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
-    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
+    /// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
     /// # use serenity::gateway::Shard;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -707,14 +708,15 @@ impl Shard {
     /// ```rust,no_run
     /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
-    /// # use serenity::client::bridge::gateway::ChunkGuildFilter;
+    /// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], true, None).await?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                                GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
@@ -751,7 +753,7 @@ impl Shard {
     /// - the `stage` to `Identifying`
     #[instrument(skip(self))]
     pub async fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions, self.intents).await?;
+        self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;

@@ -49,7 +49,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 /// # async fn run() -> Result<(), Box<dyn Error>> {
 /// #
 /// use tokio::sync::{Mutex, RwLock};
-/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions};
+/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions, GatewayIntents};
 /// use serenity::client::{EventHandler, RawEventHandler};
 /// use serenity::http::Http;
 /// use serenity::CacheAndHttp;
@@ -85,8 +85,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 ///     # voice_manager: &None,
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
-///     guild_subscriptions: true,
-///     intents: None,
+///     intents: GatewayIntents::non_privileged(),
 /// });
 /// #     Ok(())
 /// # }
@@ -137,7 +136,6 @@ impl ShardManager {
             voice_manager: opt.voice_manager.clone(),
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
-            guild_subscriptions: opt.guild_subscriptions,
             intents: opt.intents,
         };
 
@@ -361,6 +359,5 @@ pub struct ShardManagerOptions<'a> {
     pub voice_manager: &'a Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
-    pub guild_subscriptions: bool,
-    pub intents: Option<GatewayIntents>,
+    pub intents: GatewayIntents,
 }

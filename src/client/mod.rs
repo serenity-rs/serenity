@@ -79,8 +79,7 @@ pub struct ClientBuilder<'a> {
     data: Option<TypeMap>,
     http: Option<Http>,
     fut: Option<BoxFuture<'a, Result<Client>>>,
-    guild_subscriptions: bool,
-    intents: Option<GatewayIntents>,
+    intents: GatewayIntents,
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     #[cfg(feature = "framework")]
@@ -108,8 +107,7 @@ impl<'a> ClientBuilder<'a> {
             data: Some(TypeMap::new()),
             http: None,
             fut: None,
-            guild_subscriptions: true,
-            intents: None,
+            intents: GatewayIntents::non_privileged(),
             #[cfg(feature = "cache")]
             timeout: None,
             #[cfg(feature = "framework")]
@@ -183,16 +181,6 @@ impl<'a> ClientBuilder<'a> {
         self
     }
 
-    /// Whether presence or typing events shall be received over the gateway.
-    ///
-    /// **Info**:
-    /// Prefer to use `intents`, as this may be replaced by them in the future.**
-    pub fn guild_subscriptions(mut self, is_enabled: bool) -> Self {
-        self.guild_subscriptions = is_enabled;
-
-        self
-    }
-
     /// Sets the command framework to be used. It will receive messages sent
     /// over the gateway and then consider - based on its settings - whether to
     /// dispatch a command.
@@ -223,7 +211,6 @@ impl<'a> ClientBuilder<'a> {
 
         self
     }
-
 
     /// Sets the voice gateway handler to be used. It will receive voice events sent
     /// over the gateway and then consider - based on its settings - whether to
@@ -258,36 +245,13 @@ impl<'a> ClientBuilder<'a> {
 
     /// Sets all intents directly, replacing already set intents.
     ///
-    /// *See also*:
-    /// If visually preferred, you can use [`add_intent`] and chain it
-    /// in order to add intent after intent.
+    /// To enable privileged intents, `GatewayIntents::all` to
     ///
     /// *Info*:
     /// Intents are a bitflag, you can combine them by performing the
     /// `|`-operator.
-    ///
-    /// [`add_intent`]: #method.add_intent
     pub fn intents(mut self, intents: GatewayIntents) -> Self {
-        self.intents = Some(intents);
-
-        self
-    }
-
-    /// Adds a single `intent`, this method can be called
-    /// repetitively to add multiple intents.
-    ///
-    /// *See also*:
-    /// If visually preferred, you can use [`intents`] and specify all
-    /// intents at once. In theory you could also achieve the same result
-    /// by passing the combined `intents`-bitflag to this method.
-    ///
-    /// [`intents`]: #method.intents
-    pub fn add_intent(mut self, intent: GatewayIntents) -> Self {
-        if let Some(ref mut intents) = self.intents {
-            intents.insert(intent);
-        } else {
-            self.intents = Some(intent);
-        }
+        self.intents = intents;
 
         self
     }
@@ -322,7 +286,6 @@ impl<'a> Future for ClientBuilder<'a> {
                 If you don't want to use the command framework, disable default features and specify all features you want to use.");
             let event_handler = self.event_handler.take();
             let raw_event_handler = self.raw_event_handler.take();
-            let guild_subscriptions = self.guild_subscriptions;
             let intents = self.intents;
             let http = Arc::new(self.http.take().unwrap());
             #[cfg(feature = "voice")]
@@ -353,7 +316,6 @@ impl<'a> Future for ClientBuilder<'a> {
                         voice_manager: &voice_manager,
                         ws_url: &url,
                         cache_and_http: &cache_and_http,
-                        guild_subscriptions,
                         intents,
                     }).await
                 };

@@ -1009,7 +1009,6 @@ impl CacheUpdate for MessageUpdateEvent {
 pub struct PresenceUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub presence: Presence,
-    pub roles: Option<Vec<RoleId>>,
     #[serde(skip_serializing)]
     pub(crate) _nonexhaustive: (),
 }
@@ -1041,20 +1040,17 @@ impl CacheUpdate for PresenceUpdateEvent {
                 }
 
                 // Create a partial member instance out of the presence update
-                // data. This includes everything but `deaf`, `mute`, and
-                // `joined_at`.
+                // data.
                 if !guild.members.contains_key(&self.presence.user_id) {
                     if let Some(user) = self.presence.user.as_ref() {
-                        let roles = self.roles.clone().unwrap_or_default();
-
                         guild.members.insert(self.presence.user_id, Member {
                             deaf: false,
                             guild_id,
                             joined_at: None,
                             mute: false,
-                            nick: self.presence.nick.clone(),
+                            nick: None,
                             user: user.clone(),
-                            roles,
+                            roles: vec![],
                             _nonexhaustive: (),
                         });
                     }
@@ -1083,18 +1079,12 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
                 .map_err(DeError::custom)?,
             None => None,
         };
-        let roles = match map.remove("roles") {
-            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
         let presence = Presence::deserialize(Value::Object(map))
             .map_err(DeError::custom)?;
 
         Ok(Self {
             guild_id,
             presence,
-            roles,
             _nonexhaustive: (),
         })
     }
