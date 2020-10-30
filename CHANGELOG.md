@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.0] - 2020-10-30
+
+Thanks to the following for their contributions:
+
+- [@james7132]
+- [@JellyWX]
+- [@nitsuga5124]
+- [@Qeenon]
+
+### Added
+
+- [client] Mention the required intents for certain events ([@nitsuga5124]) [c:c9971b6]
+- [gateway] Add support for filtering by user ids when requesting guild chunks ([@james7132]) [c:0d9b821]
+
+### Changed
+
+- [gateway] Change `Shard::chunk_guilds` to `chunk_guild` ([@james7132]) [c:50d9643]
+- [framework] Use `~` as a default command prefix ([@Qeenon]) [c:d9e9bf7]
+- [utils] Make `utils::shard_id` accept the guild id with `impl Into<u64>` ([@JellyWX]) [c:85b5489]
+
 ## [0.9.0-rc.4] - 2020-10-24
 
 Thanks to the following for their contributions:
@@ -3723,6 +3743,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.0-rc.4
 [0.9.0-rc.4]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.3...v0.9.0-rc.4
 [0.9.0-rc.3]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.2...v0.9.0-rc.3
 [0.9.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.1...v0.9.0-rc.2
@@ -3842,6 +3863,7 @@ Initial commit.
 [@ijks]: https://github.com/ijks
 [@JellyWX]: https://github.com/JellyWX
 [@Jerald]: https://github.com/Jerald
+[@james7132]: https://github.com/james7132
 [@jhelwig]: https://github.com/jhelwig
 [@jkcclemens]: https://github.com/jkcclemens
 [@jmgao]: https://github.com/jmgao
@@ -3918,6 +3940,12 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+[c:c9971b6]: https://github.com/serenity-rs/serenity/commit/c9971b6e60f3b5f5ac9c3e8931f6a7ecbf8194db
+[c:0d9b821]: https://github.com/serenity-rs/serenity/commit/0d9b821953268edeeea8b1c01fe0d33447ba08cb
+[c:50d9643]: https://github.com/serenity-rs/serenity/commit/50d96436612b18c5bb807287b10a68f62747b7e4
+[c:d9e9bf7]: https://github.com/serenity-rs/serenity/commit/d9e9bf77aff4770e22aacc5153947e1ecf1a9862
+[c:85b5489]: https://github.com/serenity-rs/serenity/commit/85b5489bc8f05a98ad8aeacc20e220ad08206ff8
 
 [c:7e55a0e]: https://github.com/serenity-rs/serenity/commit/7e55a0e6eec2106b0ca540822772706232aa2a1f
 
