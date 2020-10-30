@@ -3743,7 +3743,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
-[0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.0-rc.4
+[0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.4...v0.9.0
 [0.9.0-rc.4]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.3...v0.9.0-rc.4
 [0.9.0-rc.3]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.2...v0.9.0-rc.3
 [0.9.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.1...v0.9.0-rc.2
