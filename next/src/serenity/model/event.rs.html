@@ -1,4 +1,4 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Source of the Rust file `src/model/event.rs`."><meta name="keywords" content="rust, rustlang, rust-lang"><title>event.rs - source</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc source"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><pre class="line-numbers"><span id="1">   1</span>
@@ -2041,16 +2041,6 @@
 <span id="2038">2038</span>
 <span id="2039">2039</span>
 <span id="2040">2040</span>
-<span id="2041">2041</span>
-<span id="2042">2042</span>
-<span id="2043">2043</span>
-<span id="2044">2044</span>
-<span id="2045">2045</span>
-<span id="2046">2046</span>
-<span id="2047">2047</span>
-<span id="2048">2048</span>
-<span id="2049">2049</span>
-<span id="2050">2050</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
@@ -3063,7 +3053,6 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PresenceUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">presence</span>: <span class="ident">Presence</span>,
-    <span class="kw">pub</span> <span class="ident">roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
@@ -3095,20 +3084,17 @@
                 }
 
                 <span class="comment">// Create a partial member instance out of the presence update</span>
-                <span class="comment">// data. This includes everything but `deaf`, `mute`, and</span>
-                <span class="comment">// `joined_at`.</span>
+                <span class="comment">// data.</span>
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>) {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user</span>.<span class="ident">as_ref</span>() {
-                        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>().<span class="ident">unwrap_or_default</span>();
-
                         <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>, <span class="ident">Member</span> {
                             <span class="ident">deaf</span>: <span class="bool-val">false</span>,
                             <span class="ident">guild_id</span>,
                             <span class="ident">joined_at</span>: <span class="prelude-val">None</span>,
                             <span class="ident">mute</span>: <span class="bool-val">false</span>,
-                            <span class="ident">nick</span>: <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">nick</span>.<span class="ident">clone</span>(),
+                            <span class="ident">nick</span>: <span class="prelude-val">None</span>,
                             <span class="ident">user</span>: <span class="ident">user</span>.<span class="ident">clone</span>(),
-                            <span class="ident">roles</span>,
+                            <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
                             <span class="ident">_nonexhaustive</span>: (),
                         });
                     }
@@ -3137,18 +3123,12 @@
                 .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
-        <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;roles&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        };
         <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">Presence</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">presence</span>,
-            <span class="ident">roles</span>,
             <span class="ident">_nonexhaustive</span>: (),
         })
     }
