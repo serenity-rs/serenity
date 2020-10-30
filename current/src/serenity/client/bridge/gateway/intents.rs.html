@@ -257,6 +257,29 @@
 <span id="254">254</span>
 <span id="255">255</span>
 <span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
+<span id="278">278</span>
+<span id="279">279</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bitflags</span>::<span class="ident">__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
@@ -402,7 +425,30 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">GatewayIntents</span> {
-     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
+    <span class="doccomment">/// Gets all of the intents that don&#39;t are considered privileged by Discord.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">non_privileged</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GatewayIntents</span> {
+        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
+        <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
+        <span class="self">Self</span>::<span class="ident">from_bits_truncate</span>(<span class="self">Self</span>::<span class="ident">all</span>().<span class="ident">bits</span>() <span class="op">&amp;</span> <span class="op">!</span><span class="self">Self</span>::<span class="ident">privileged</span>().<span class="ident">bits</span>())
+    }
+
+    <span class="doccomment">/// Gets all of the intents that are considered privileged by Discord.</span>
+    <span class="doccomment">/// Use of these intents will require explicitly whitelisting the bot.</span>
+    <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">privileged</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GatewayIntents</span> {
+        <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
+        <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
+        <span class="self">Self</span>::<span class="ident">from_bits_truncate</span>(<span class="self">Self</span>::<span class="ident">GUILD_MEMBERS</span>.<span class="ident">bits</span>() <span class="op">&amp;</span> <span class="self">Self</span>::<span class="ident">GUILD_PRESENCES</span>.<span class="ident">bits</span>())
+    }
+
+    <span class="doccomment">/// Checks if any of the included intents are privileged</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS</span>
+    <span class="doccomment">/// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_privileged</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="self">self</span>.<span class="ident">guild_members</span>() <span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">guild_presences</span>()
+    }
+
+    <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILDS] intent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [GUILDS]: #associatedconstant.GUILDS</span>

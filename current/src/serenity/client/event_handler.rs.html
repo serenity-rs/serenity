@@ -352,11 +352,6 @@
 <span id="349">349</span>
 <span id="350">350</span>
 <span id="351">351</span>
-<span id="352">352</span>
-<span id="353">353</span>
-<span id="354">354</span>
-<span id="355">355</span>
-<span id="356">356</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
@@ -393,11 +388,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides said category&#39;s data.</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">category_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_category</span>: <span class="kw-2">&amp;</span><span class="ident">ChannelCategory</span>) {}
-
-    <span class="doccomment">/// Dispatched when a private channel is created.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides said channel&#39;s data.</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">private_channel_create</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_channel</span>: <span class="kw-2">&amp;</span><span class="ident">PrivateChannel</span>) {}
 
     <span class="doccomment">/// Dispatched when a channel is deleted.</span>
     <span class="doccomment">///</span>

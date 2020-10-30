@@ -258,6 +258,12 @@
 <span id="255">255</span>
 <span id="256">256</span>
 <span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -314,14 +320,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], true, None).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64],</span>
+    <span class="doccomment">/// #                                GatewayIntents::all()).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
@@ -335,14 +342,15 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
-    <span class="doccomment">/// # use serenity::client::bridge::gateway::ChunkGuildFilter;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], true, None).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64],</span>
+    <span class="doccomment">/// #                                GatewayIntents::all()).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::id::GuildId;</span>
     <span class="doccomment">///</span>
@@ -380,12 +388,14 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], true, None).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64],</span>
+    <span class="doccomment">/// #                                GatewayIntents::all()).await?;</span>
     <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// shard.set_activity(Some(Activity::playing(&quot;Heroes of the Storm&quot;)));</span>
@@ -414,7 +424,7 @@
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], true, None).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], None).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::gateway::Activity;</span>
     <span class="doccomment">/// use serenity::model::user::OnlineStatus;</span>
@@ -446,12 +456,14 @@
     <span class="doccomment">/// ```rust,no_run</span>
     <span class="doccomment">/// # use tokio::sync::Mutex;</span>
     <span class="doccomment">/// # use serenity::gateway::Shard;</span>
+    <span class="doccomment">/// # use serenity::client::bridge::gateway::GatewayIntents;</span>
     <span class="doccomment">/// # use std::sync::Arc;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
     <span class="doccomment">/// #     let mutex = Arc::new(Mutex::new(&quot;&quot;.to_string()));</span>
     <span class="doccomment">/// #</span>
-    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64], true, None).await?;</span>
+    <span class="doccomment">/// #     let mut shard = Shard::new(mutex.clone(), &quot;&quot;, [0u64, 1u64],</span>
+    <span class="doccomment">/// #                                GatewayIntents::all()).await?;</span>
     <span class="doccomment">/// #</span>
     <span class="doccomment">/// use serenity::model::user::OnlineStatus;</span>
     <span class="doccomment">///</span>

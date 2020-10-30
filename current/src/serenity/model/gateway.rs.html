@@ -610,28 +610,6 @@
 <span id="607">607</span>
 <span id="608">608</span>
 <span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -700,7 +678,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Activity</span> {
-    <span class="doccomment">/// Creates a `Game` struct that appears as a `Playing &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Playing &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -791,7 +769,7 @@
         }
     }
 
-    <span class="doccomment">/// Creates a `Game` struct that appears as a `Listening to &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Listening to &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -835,7 +813,7 @@
         }
     }
 
-    <span class="doccomment">/// Creates a `Game` struct that appears as a `Competing in &lt;name&gt;` status.</span>
+    <span class="doccomment">/// Creates a `Activity` struct that appears as a `Competing in &lt;name&gt;` status.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Maximum `name` length is 128.</span>
     <span class="doccomment">///</span>
@@ -1095,11 +1073,7 @@
 <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
-    <span class="doccomment">/// The activity that a [`User`] is performing.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: struct.User.html</span>
-    <span class="kw">pub</span> <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// [`User`]&#39;s current activities</span>
+    <span class="doccomment">/// [`User`]&#39;s current activities.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`User`]: struct.User.html</span>
     <span class="kw">pub</span> <span class="ident">activities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>,
@@ -1107,8 +1081,6 @@
     <span class="kw">pub</span> <span class="ident">client_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientStatus</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The date of the last presence update.</span>
     <span class="kw">pub</span> <span class="ident">last_modified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="doccomment">/// The nickname of the member, if applicable.</span>
-    <span class="kw">pub</span> <span class="ident">nick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The user&#39;s online status.</span>
     <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>,
     <span class="doccomment">/// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user&#39;s creation</span>
@@ -1142,12 +1114,6 @@
             (<span class="ident">user_id</span>, <span class="prelude-val">None</span>)
         };
 
-        <span class="kw">let</span> <span class="ident">activity</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;game&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        };
-
         <span class="kw">let</span> <span class="ident">activities</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;activities&quot;</span>) {
             <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>)
                 .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
@@ -1167,12 +1133,6 @@
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">nick</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;nick&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
-        };
-
         <span class="kw">let</span> <span class="ident">status</span> <span class="op">=</span> <span class="ident">map</span>
             .<span class="ident">remove</span>(<span class="string">&quot;status&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected presence status&quot;</span>))
@@ -1180,11 +1140,9 @@
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">Presence</span> {
-            <span class="ident">activity</span>,
             <span class="ident">activities</span>,
             <span class="ident">client_status</span>,
             <span class="ident">last_modified</span>,
-            <span class="ident">nick</span>,
             <span class="ident">status</span>,
             <span class="ident">user</span>,
             <span class="ident">user_id</span>,
@@ -1201,11 +1159,9 @@
             <span class="ident">id</span>: <span class="ident">u64</span>,
         }
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_struct</span>(<span class="string">&quot;Presence&quot;</span>, <span class="number">5</span>)<span class="question-mark">?</span>;
-        <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;game&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">activity</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">state</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_struct</span>(<span class="string">&quot;Presence&quot;</span>, <span class="number">3</span>)<span class="question-mark">?</span>;
         <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;client_status&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">client_status</span>)<span class="question-mark">?</span>;
         <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;last_modified&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">last_modified</span>)<span class="question-mark">?</span>;
-        <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;nick&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">nick</span>)<span class="question-mark">?</span>;
         <span class="ident">state</span>.<span class="ident">serialize_field</span>(<span class="string">&quot;status&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">status</span>)<span class="question-mark">?</span>;
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">user</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">user</span> {

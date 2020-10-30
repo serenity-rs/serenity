@@ -985,16 +985,6 @@
 <span id="982">982</span>
 <span id="983">983</span>
 <span id="984">984</span>
-<span id="985">985</span>
-<span id="986">986</span>
-<span id="987">987</span>
-<span id="988">988</span>
-<span id="989">989</span>
-<span id="990">990</span>
-<span id="991">991</span>
-<span id="992">992</span>
-<span id="993">993</span>
-<span id="994">994</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
@@ -1063,9 +1053,7 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">framework</span>::<span class="ident">Framework</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">bridge</span>::<span class="ident">voice</span>::<span class="ident">ClientVoiceManager</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">bridge</span>::<span class="ident">voice</span>::<span class="ident">VoiceGatewayManager</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
 <span class="kw">use</span> <span class="ident">typemap_rev</span>::{<span class="ident">TypeMap</span>, <span class="ident">TypeMapKey</span>};
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
@@ -1079,12 +1067,13 @@
     <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span>,
     <span class="ident">http</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
     <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">guild_subscriptions</span>: <span class="ident">bool</span>,
-    <span class="ident">intents</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GatewayIntents</span><span class="op">&gt;</span>,
+    <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Duration</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="ident">framework</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
+    <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
@@ -1106,12 +1095,13 @@
             <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">TypeMap</span>::<span class="ident">new</span>()),
             <span class="ident">http</span>: <span class="prelude-val">None</span>,
             <span class="ident">fut</span>: <span class="prelude-val">None</span>,
-            <span class="ident">guild_subscriptions</span>: <span class="bool-val">true</span>,
-            <span class="ident">intents</span>: <span class="prelude-val">None</span>,
+            <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>::<span class="ident">non_privileged</span>(),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="ident">timeout</span>: <span class="prelude-val">None</span>,
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
             <span class="ident">framework</span>: <span class="prelude-val">None</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
+            <span class="ident">voice_manager</span>: <span class="prelude-val">None</span>,
             <span class="ident">event_handler</span>: <span class="prelude-val">None</span>,
             <span class="ident">raw_event_handler</span>: <span class="prelude-val">None</span>,
         }.<span class="ident">token</span>(<span class="ident">token</span>)
@@ -1179,16 +1169,6 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Whether presence or typing events shall be received over the gateway.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Info**:</span>
-    <span class="doccomment">/// Prefer to use `intents`, as this may be replaced by them in the future.**</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_subscriptions</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">is_enabled</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">guild_subscriptions</span> <span class="op">=</span> <span class="ident">is_enabled</span>;
-
-        <span class="self">self</span>
-    }
-
     <span class="doccomment">/// Sets the command framework to be used. It will receive messages sent</span>
     <span class="doccomment">/// over the gateway and then consider - based on its settings - whether to</span>
     <span class="doccomment">/// dispatch a command.</span>
@@ -1220,38 +1200,46 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Sets all intents directly, replacing already set intents.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// *See also*:</span>
-    <span class="doccomment">/// If visually preferred, you can use [`add_intent`] and chain it</span>
-    <span class="doccomment">/// in order to add intent after intent.</span>
+    <span class="doccomment">/// Sets the voice gateway handler to be used. It will receive voice events sent</span>
+    <span class="doccomment">/// over the gateway and then consider - based on its settings - whether to</span>
+    <span class="doccomment">/// dispatch a command.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// *Info*:</span>
-    <span class="doccomment">/// Intents are a bitflag, you can combine them by performing the</span>
-    <span class="doccomment">/// `|`-operator.</span>
+    <span class="doccomment">/// If a reference to the voice_manager is required for manual dispatch,</span>
+    <span class="doccomment">/// use the [`voice_manager_arc`]-method instead.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`add_intent`]: #method.add_intent</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intents</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="ident">intents</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">intents</span>);
+    <span class="doccomment">/// [`voice_manager_arc`]: #method.voice_manager_arc</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">voice_manager</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
+    <span class="kw">where</span> <span class="ident">V</span>: <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
+    {
+        <span class="self">self</span>.<span class="ident">voice_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">voice_manager</span>));
 
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// Adds a single `intent`, this method can be called</span>
-    <span class="doccomment">/// repetitively to add multiple intents.</span>
+    <span class="doccomment">/// This method allows to pass an `Arc`&#39;ed `voice_manager` - this step is</span>
+    <span class="doccomment">/// done for you in the [`voice_manager`]-method, if you don&#39;t need the</span>
+    <span class="doccomment">/// extra control.</span>
+    <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// *See also*:</span>
-    <span class="doccomment">/// If visually preferred, you can use [`intents`] and specify all</span>
-    <span class="doccomment">/// intents at once. In theory you could also achieve the same result</span>
-    <span class="doccomment">/// by passing the combined `intents`-bitflag to this method.</span>
+    <span class="doccomment">/// [`voice_manager`]: #method.voice_manager</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager_arc</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">voice_manager</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">voice_manager</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>);
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Sets all intents directly, replacing already set intents.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`intents`]: #method.intents</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_intent</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">intent</span>: <span class="ident">GatewayIntents</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">intents</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">intents</span> {
-            <span class="ident">intents</span>.<span class="ident">insert</span>(<span class="ident">intent</span>);
-        } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">intents</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">intent</span>);
-        }
+    <span class="doccomment">/// To enable privileged intents, `GatewayIntents::all` to</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// *Info*:</span>
+    <span class="doccomment">/// Intents are a bitflag, you can combine them by performing the</span>
+    <span class="doccomment">/// `|`-operator.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">intents</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">intents</span>: <span class="ident">GatewayIntents</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="ident">intents</span> <span class="op">=</span> <span class="ident">intents</span>;
 
         <span class="self">self</span>
     }
@@ -1286,14 +1274,10 @@
                 If you don&#39;t want to use the command framework, disable default features and specify all features you want to use.&quot;</span>);
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">event_handler</span>.<span class="ident">take</span>();
             <span class="kw">let</span> <span class="ident">raw_event_handler</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">raw_event_handler</span>.<span class="ident">take</span>();
-            <span class="kw">let</span> <span class="ident">guild_subscriptions</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_subscriptions</span>;
             <span class="kw">let</span> <span class="ident">intents</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">intents</span>;
             <span class="kw">let</span> <span class="ident">http</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="self">self</span>.<span class="ident">http</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>());
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-            <span class="kw">let</span> <span class="ident">voice_manager</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="ident">ClientVoiceManager</span>::<span class="ident">new</span>(
-                <span class="number">0</span>,
-                <span class="ident">UserId</span>(<span class="number">0</span>),
-            )));
+            <span class="kw">let</span> <span class="ident">voice_manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">take</span>();
 
             <span class="kw">let</span> <span class="ident">cache_and_http</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">CacheAndHttp</span> {
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -1320,7 +1304,6 @@
                         <span class="ident">voice_manager</span>: <span class="kw-2">&amp;</span><span class="ident">voice_manager</span>,
                         <span class="ident">ws_url</span>: <span class="kw-2">&amp;</span><span class="ident">url</span>,
                         <span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>,
-                        <span class="ident">guild_subscriptions</span>,
                         <span class="ident">intents</span>,
                     }).<span class="ident">await</span>
                 };
@@ -1562,7 +1545,7 @@
     <span class="doccomment">/// This is an ergonomic structure for interfacing over shards&#39; voice</span>
     <span class="doccomment">/// connections.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ClientVoiceManager</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">voice_manager</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// URI that the client&#39;s shards will use to connect to the gateway.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is likely not important for production usage and is, at best, used</span>
@@ -1880,13 +1863,10 @@
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_connection</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_data</span>: [<span class="ident">u64</span>; <span class="number">3</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-        <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">set_shard_count</span>(<span class="ident">shard_data</span>[<span class="number">2</span>]);
-
-        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
-        {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">voice_manager</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_manager</span> {
             <span class="kw">let</span> <span class="ident">user</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">cache_and_http</span>.<span class="ident">http</span>.<span class="ident">get_current_user</span>().<span class="ident">await</span><span class="question-mark">?</span>;
 
-            <span class="self">self</span>.<span class="ident">voice_manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">set_user_id</span>(<span class="ident">user</span>.<span class="ident">id</span>);
+            <span class="ident">voice_manager</span>.<span class="ident">initialise</span>(<span class="ident">shard_data</span>[<span class="number">2</span>], <span class="ident">user</span>.<span class="ident">id</span>).<span class="ident">await</span>;
         }
 
         {
