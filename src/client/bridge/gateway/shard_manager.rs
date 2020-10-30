@@ -24,7 +24,7 @@ use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use crate::client::bridge::voice::ClientVoiceManager;
+use crate::client::bridge::voice::VoiceGatewayManager;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -40,8 +40,6 @@ use crate::client::bridge::voice::ClientVoiceManager;
 /// ```rust,no_run
 /// # use std::error::Error;
 /// #
-/// # #[cfg(feature = "voice")]
-/// # use serenity::client::bridge::voice::ClientVoiceManager;
 /// # #[cfg(feature = "voice")]
 /// # use serenity::model::id::UserId;
 /// # #[cfg(feature = "cache")]
@@ -84,7 +82,7 @@ use crate::client::bridge::voice::ClientVoiceManager;
 ///     // the total number of shards in use
 ///     shard_total: 5,
 ///     # #[cfg(feature = "voice")]
-///     # voice_manager: &Arc::new(Mutex::new(ClientVoiceManager::new(0, UserId(0)))),
+///     # voice_manager: &None,
 ///     ws_url: &gateway_url,
 ///     # cache_and_http: &cache_and_http,
 ///     intents: GatewayIntents::non_privileged(),
@@ -135,7 +133,7 @@ impl ShardManager {
             runners: Arc::clone(&runners),
             rx: shard_queue_rx,
             #[cfg(feature = "voice")]
-            voice_manager: Arc::clone(opt.voice_manager),
+            voice_manager: opt.voice_manager.clone(),
             ws_url: Arc::clone(opt.ws_url),
             cache_and_http: Arc::clone(&opt.cache_and_http),
             intents: opt.intents,
@@ -358,7 +356,7 @@ pub struct ShardManagerOptions<'a> {
     pub shard_init: u64,
     pub shard_total: u64,
     #[cfg(feature = "voice")]
-    pub voice_manager: &'a Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: &'a Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     pub ws_url: &'a Arc<Mutex<String>>,
     pub cache_and_http: &'a Arc<CacheAndHttp>,
     pub intents: GatewayIntents,

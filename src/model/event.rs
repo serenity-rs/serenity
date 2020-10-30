@@ -1,5 +1,4 @@
 //! All the events this library handles.
-
 use chrono::{DateTime, Utc};
 use serde::de::Error as DeError;
 use serde::ser::{
@@ -11,9 +10,9 @@ use std::{
     collections::HashMap,
     fmt
 };
-use super::utils::{deserialize_emojis, deserialize_u64};
+use super::utils::deserialize_emojis;
 use super::prelude::*;
-use crate::constants::{OpCode, VoiceOpCode};
+use crate::constants::OpCode;
 use crate::internal::prelude::*;
 
 #[cfg(feature = "cache")]
@@ -2037,189 +2036,5 @@ impl<'de> Deserialize<'de> for EventType {
         }
 
         deserializer.deserialize_str(EventTypeVisitor)
-    }
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceHeartbeat {
-    pub nonce: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Serialize)]
-pub struct VoiceHeartbeatAck {
-    pub nonce: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        deserialize_u64(deserializer)
-            .map(|nonce| Self { nonce, _nonexhaustive: () })
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceReady {
-    pub heartbeat_interval: u64,
-    pub modes: Vec<String>,
-    pub ip: String,
-    pub port: u16,
-    pub ssrc: u32,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceHello {
-    pub heartbeat_interval: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceSessionDescription {
-    pub mode: String,
-    pub secret_key: Vec<u8>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceSpeaking {
-    pub speaking: bool,
-    pub ssrc: u32,
-    pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Deserialize, Serialize)]
-pub struct VoiceResume {
-    pub server_id: String,
-    pub session_id: String,
-    pub token: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-impl fmt::Debug for VoiceResume {
-    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("VoiceResume")
-            .field("server_id", &self.server_id)
-            .field("session_id", &self.session_id)
-            .finish()
-    }
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceClientConnect {
-    pub audio_ssrc: u32,
-    pub user_id: UserId,
-    pub video_ssrc: u32,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceClientDisconnect {
-    pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-/// A representation of data received for [`voice`] events.
-///
-/// [`voice`]: ../../voice/index.html
-#[derive(Clone, Debug, Serialize)]
-#[non_exhaustive]
-#[serde(untagged)]
-pub enum VoiceEvent {
-    /// Server's response to the client's Identify operation.
-    /// Contains session-specific information, e.g.
-    /// [`ssrc`] and supported encryption modes.
-    ///
-    /// [`ssrc`]: struct.VoiceReady.html#structfield.ssrc
-    Ready(VoiceReady),
-    /// A voice event describing the current session.
-    SessionDescription(VoiceSessionDescription),
-    /// A voice event denoting that someone is speaking.
-    Speaking(VoiceSpeaking),
-    /// Acknowledgement from the server for a prior voice heartbeat.
-    HeartbeatAck(VoiceHeartbeatAck),
-    /// A "hello" was received with initial voice data, such as the
-    /// true [`heartbeat_interval`].
-    ///
-    /// [`heartbeat_interval`]: struct.VoiceHello.html#structfield.heartbeat_interval
-    Hello(VoiceHello),
-    /// Message received if a Resume request was successful.
-    Resumed,
-    /// Status update in the current channel, indicating that a user has
-    /// connected.
-    ClientConnect(VoiceClientConnect),
-    /// Status update in the current channel, indicating that a user has
-    /// disconnected.
-    ClientDisconnect(VoiceClientDisconnect),
-    /// An unknown voice event not registered.
-    Unknown(VoiceOpCode, Value),
-}
-
-impl<'de> Deserialize<'de> for VoiceEvent {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-        where D: Deserializer<'de> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let op = map.remove("op")
-            .ok_or_else(|| DeError::custom("expected voice event op"))
-            .and_then(VoiceOpCode::deserialize)
-            .map_err(DeError::custom)?;
-
-        let v = map.remove("d")
-            .ok_or_else(|| DeError::custom("expected voice gateway payload"))
-            .and_then(Value::deserialize)
-            .map_err(DeError::custom)?;
-
-        Ok(match op {
-            VoiceOpCode::HeartbeatAck => {
-                let v = serde_json::from_value(v).map_err(DeError::custom)?;
-
-                VoiceEvent::HeartbeatAck(v)
-            },
-            VoiceOpCode::Ready => {
-                let v = VoiceReady::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::Ready(v)
-            },
-            VoiceOpCode::Hello => {
-                let v = serde_json::from_value(v).map_err(DeError::custom)?;
-
-                VoiceEvent::Hello(v)
-            },
-            VoiceOpCode::SessionDescription => {
-                let v = VoiceSessionDescription::deserialize(v)
-                    .map_err(DeError::custom)?;
-
-                VoiceEvent::SessionDescription(v)
-            },
-            VoiceOpCode::Speaking => {
-                let v = VoiceSpeaking::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::Speaking(v)
-            },
-            VoiceOpCode::Resumed => VoiceEvent::Resumed,
-            VoiceOpCode::ClientConnect => {
-                let v = VoiceClientConnect::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::ClientConnect(v)
-            },
-            VoiceOpCode::ClientDisconnect => {
-                let v = VoiceClientDisconnect::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::ClientDisconnect(v)
-            },
-            other => VoiceEvent::Unknown(other, v),
-        })
     }
 }

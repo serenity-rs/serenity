@@ -42,6 +42,8 @@ __impl_bitflags! {
         /// This intent is *privileged*.
         /// In order to use it, you must head to your application in the
         /// Developer Portal and enable the toggle for *Privileged Intents*.
+        ///
+        /// This intent is also necessary to even recieve the events in contains.
         GUILD_MEMBERS = 1 << 1;
         /// Enables following gateway events:
         ///
@@ -77,6 +79,8 @@ __impl_bitflags! {
         /// This intent is *privileged*.
         /// In order to use it, you must head to your application in the
         /// Developer Portal and enable the toggle for *Privileged Intents*.
+        ///
+        /// This intent is also necessary to even recieve the events in contains.
         GUILD_PRESENCES = 1 << 8;
         /// Enables following gateway events:
         ///
