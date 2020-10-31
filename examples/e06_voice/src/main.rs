@@ -4,7 +4,7 @@
 //! ```toml
 //! [dependencies.serenity]
 //! git = "https://github.com/serenity-rs/serenity.git"
-//! features = ["client", standard_framework", "voice"]
+//! features = ["client", "standard_framework", "voice"]
 //! ```
 use std::env;
 
