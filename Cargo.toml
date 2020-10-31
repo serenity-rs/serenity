@@ -10,6 +10,7 @@ readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
 version = "0.9.0"
 edition = "2018"
+include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
 [dependencies]
 bitflags = "1"
