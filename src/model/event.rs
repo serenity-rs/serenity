@@ -2031,6 +2031,58 @@ impl From<&Event> for EventType {
     }
 }
 
+impl EventType {
+    /// Return the event name of this event. Some events are synthetic, and we lack
+    /// the information to recover the original event name for these events, in which
+    /// case this method returns `None`.
+    pub fn name(&self) -> Option<&str> {
+        match self {
+            Self::ChannelCreate => Some("CHANNEL_CREATE"),
+            Self::ChannelDelete => Some("CHANNEL_DELETE"),
+            Self::ChannelPinsUpdate => Some("CHANNEL_PINS_UPDATE"),
+            Self::ChannelUpdate => Some("CHANNEL_UPDATE"),
+            Self::GuildBanAdd => Some("GUILD_BAN_ADD"),
+            Self::GuildBanRemove => Some("GUILD_BAN_REMOVE"),
+            Self::GuildCreate => Some("GUILD_CREATE"),
+            Self::GuildDelete => Some("GUILD_DELETE"),
+            Self::GuildEmojisUpdate => Some("GUILD_EMOJIS_UPDATE"),
+            Self::GuildIntegrationsUpdate => Some("GUILD_INTEGRATIONS_UPDATE"),
+            Self::GuildMemberAdd => Some("GUILD_MEMBER_ADD"),
+            Self::GuildMemberRemove => Some("GUILD_MEMBER_REMOVE"),
+            Self::GuildMemberUpdate => Some("GUILD_MEMBER_UPDATE"),
+            Self::GuildMembersChunk => Some("GUILD_MEMBERS_CHUNK"),
+            Self::GuildRoleCreate => Some("GUILD_ROLE_CREATE"),
+            Self::GuildRoleDelete => Some("GUILD_ROLE_DELETE"),
+            Self::GuildRoleUpdate => Some("GUILD_ROLE_UPDATE"),
+            Self::InviteCreate => Some("INVITE_CREATE"),
+            Self::InviteDelete => Some("INVITE_DELETE"),
+            Self::GuildUpdate => Some("GUILD_UPDATE"),
+            Self::MessageCreate => Some("MESSAGE_CREATE"),
+            Self::MessageDelete => Some("MESSAGE_DELETE"),
+            Self::MessageDeleteBulk => Some("MESSAGE_DELETE_BULK"),
+            Self::ReactionAdd => Some("MESSAGE_REACTION_ADD"),
+            Self::ReactionRemove => Some("MESSAGE_REACTION_REMOVE"),
+            Self::ReactionRemoveAll => Some("MESSAGE_REACTION_REMOVE_ALL"),
+            Self::MessageUpdate => Some("MESSAGE_UPDATE"),
+            Self::PresenceUpdate => Some("PRESENCE_UPDATE"),
+            Self::PresencesReplace => Some("PRESENCES_REPLACE"),
+            Self::Ready => Some("READY"),
+            Self::Resumed => Some("RESUMED"),
+            Self::TypingStart => Some("TYPING_START"),
+            Self::UserUpdate => Some("USER_UPDATE"),
+            Self::VoiceServerUpdate => Some("VOICE_SERVER_UPDATE"),
+            Self::VoiceStateUpdate => Some("VOICE_STATE_UPDATE"),
+            Self::WebhookUpdate => Some("WEBHOOKS_UPDATE"),
+            // GuildUnavailable is a synthetic event type, corresponding to either
+            // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
+            // to recover the name here, so we return `None` instead.
+            Self::GuildUnavailable => None,
+            Self::Other(other) => Some(&other),
+        }
+    }
+}
+
+
 impl<'de> Deserialize<'de> for EventType {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
         where D: Deserializer<'de> {
