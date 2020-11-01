@@ -1616,6 +1616,52 @@ pub enum Event {
     Unknown(UnknownEvent),
 }
 
+impl Event {
+    /// Return the type of this event.
+    pub fn event_type(&self) -> EventType {
+        match self {
+            Self::ChannelCreate(_) => EventType::ChannelCreate,
+            Self::ChannelDelete(_) => EventType::ChannelDelete,
+            Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
+            Self::ChannelUpdate(_) => EventType::ChannelUpdate,
+            Self::GuildBanAdd(_) => EventType::GuildBanAdd,
+            Self::GuildBanRemove(_) => EventType::GuildBanRemove,
+            Self::GuildCreate(_) => EventType::GuildCreate,
+            Self::GuildDelete(_) => EventType::GuildDelete,
+            Self::GuildEmojisUpdate(_) => EventType::GuildEmojisUpdate,
+            Self::GuildIntegrationsUpdate(_) => EventType::GuildIntegrationsUpdate,
+            Self::GuildMemberAdd(_) => EventType::GuildMemberAdd,
+            Self::GuildMemberRemove(_) => EventType::GuildMemberRemove,
+            Self::GuildMemberUpdate(_) => EventType::GuildMemberUpdate,
+            Self::GuildMembersChunk(_) => EventType::GuildMembersChunk,
+            Self::GuildRoleCreate(_) => EventType::GuildRoleCreate,
+            Self::GuildRoleDelete(_) => EventType::GuildRoleDelete,
+            Self::GuildRoleUpdate(_) => EventType::GuildRoleUpdate,
+            Self::GuildUnavailable(_) => EventType::GuildUnavailable,
+            Self::GuildUpdate(_) => EventType::GuildUpdate,
+            Self::InviteCreate(_) => EventType::InviteCreate,
+            Self::InviteDelete(_) => EventType::InviteDelete,
+            Self::MessageCreate(_) => EventType::MessageCreate,
+            Self::MessageDelete(_) => EventType::MessageDelete,
+            Self::MessageDeleteBulk(_) => EventType::MessageDeleteBulk,
+            Self::MessageUpdate(_) => EventType::MessageUpdate,
+            Self::PresenceUpdate(_) => EventType::PresenceUpdate,
+            Self::PresencesReplace(_) => EventType::PresencesReplace,
+            Self::ReactionAdd(_) => EventType::ReactionAdd,
+            Self::ReactionRemove(_) => EventType::ReactionRemove,
+            Self::ReactionRemoveAll(_) => EventType::ReactionRemoveAll,
+            Self::Ready(_) => EventType::Ready,
+            Self::Resumed(_) => EventType::Resumed,
+            Self::TypingStart(_) => EventType::TypingStart,
+            Self::UserUpdate(_) => EventType::UserUpdate,
+            Self::VoiceStateUpdate(_) => EventType::VoiceStateUpdate,
+            Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
+            Self::WebhookUpdate(_) => EventType::WebhookUpdate,
+            Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
+        }
+    }
+}
+
 /// Deserializes a `serde_json::Value` into an `Event`.
 ///
 /// The given `EventType` is used to determine what event to deserialize into.
@@ -1977,6 +2023,12 @@ pub enum EventType {
     /// This should be logged so that support for it can be added in the
     /// library.
     Other(String),
+}
+
+impl From<&Event> for EventType {
+    fn from(event: &Event) -> EventType {
+        event.event_type()
+    }
 }
 
 impl<'de> Deserialize<'de> for EventType {
