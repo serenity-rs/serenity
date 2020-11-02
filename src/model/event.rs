@@ -1616,6 +1616,52 @@ pub enum Event {
     Unknown(UnknownEvent),
 }
 
+impl Event {
+    /// Return the type of this event.
+    pub fn event_type(&self) -> EventType {
+        match self {
+            Self::ChannelCreate(_) => EventType::ChannelCreate,
+            Self::ChannelDelete(_) => EventType::ChannelDelete,
+            Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
+            Self::ChannelUpdate(_) => EventType::ChannelUpdate,
+            Self::GuildBanAdd(_) => EventType::GuildBanAdd,
+            Self::GuildBanRemove(_) => EventType::GuildBanRemove,
+            Self::GuildCreate(_) => EventType::GuildCreate,
+            Self::GuildDelete(_) => EventType::GuildDelete,
+            Self::GuildEmojisUpdate(_) => EventType::GuildEmojisUpdate,
+            Self::GuildIntegrationsUpdate(_) => EventType::GuildIntegrationsUpdate,
+            Self::GuildMemberAdd(_) => EventType::GuildMemberAdd,
+            Self::GuildMemberRemove(_) => EventType::GuildMemberRemove,
+            Self::GuildMemberUpdate(_) => EventType::GuildMemberUpdate,
+            Self::GuildMembersChunk(_) => EventType::GuildMembersChunk,
+            Self::GuildRoleCreate(_) => EventType::GuildRoleCreate,
+            Self::GuildRoleDelete(_) => EventType::GuildRoleDelete,
+            Self::GuildRoleUpdate(_) => EventType::GuildRoleUpdate,
+            Self::GuildUnavailable(_) => EventType::GuildUnavailable,
+            Self::GuildUpdate(_) => EventType::GuildUpdate,
+            Self::InviteCreate(_) => EventType::InviteCreate,
+            Self::InviteDelete(_) => EventType::InviteDelete,
+            Self::MessageCreate(_) => EventType::MessageCreate,
+            Self::MessageDelete(_) => EventType::MessageDelete,
+            Self::MessageDeleteBulk(_) => EventType::MessageDeleteBulk,
+            Self::MessageUpdate(_) => EventType::MessageUpdate,
+            Self::PresenceUpdate(_) => EventType::PresenceUpdate,
+            Self::PresencesReplace(_) => EventType::PresencesReplace,
+            Self::ReactionAdd(_) => EventType::ReactionAdd,
+            Self::ReactionRemove(_) => EventType::ReactionRemove,
+            Self::ReactionRemoveAll(_) => EventType::ReactionRemoveAll,
+            Self::Ready(_) => EventType::Ready,
+            Self::Resumed(_) => EventType::Resumed,
+            Self::TypingStart(_) => EventType::TypingStart,
+            Self::UserUpdate(_) => EventType::UserUpdate,
+            Self::VoiceStateUpdate(_) => EventType::VoiceStateUpdate,
+            Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
+            Self::WebhookUpdate(_) => EventType::WebhookUpdate,
+            Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
+        }
+    }
+}
+
 /// Deserializes a `serde_json::Value` into an `Event`.
 ///
 /// The given `EventType` is used to determine what event to deserialize into.
@@ -1979,6 +2025,101 @@ pub enum EventType {
     Other(String),
 }
 
+impl From<&Event> for EventType {
+    fn from(event: &Event) -> EventType {
+        event.event_type()
+    }
+}
+
+impl EventType {
+    const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
+    const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
+    const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
+    const CHANNEL_UPDATE: &'static str = "CHANNEL_UPDATE";
+    const GUILD_BAN_ADD: &'static str = "GUILD_BAN_ADD";
+    const GUILD_BAN_REMOVE: &'static str = "GUILD_BAN_REMOVE";
+    const GUILD_CREATE: &'static str = "GUILD_CREATE";
+    const GUILD_DELETE: &'static str = "GUILD_DELETE";
+    const GUILD_EMOJIS_UPDATE: &'static str = "GUILD_EMOJIS_UPDATE";
+    const GUILD_INTEGRATIONS_UPDATE: &'static str = "GUILD_INTEGRATIONS_UPDATE";
+    const GUILD_MEMBER_ADD: &'static str = "GUILD_MEMBER_ADD";
+    const GUILD_MEMBER_REMOVE: &'static str = "GUILD_MEMBER_REMOVE";
+    const GUILD_MEMBER_UPDATE: &'static str = "GUILD_MEMBER_UPDATE";
+    const GUILD_MEMBERS_CHUNK: &'static str = "GUILD_MEMBERS_CHUNK";
+    const GUILD_ROLE_CREATE: &'static str = "GUILD_ROLE_CREATE";
+    const GUILD_ROLE_DELETE: &'static str = "GUILD_ROLE_DELETE";
+    const GUILD_ROLE_UPDATE: &'static str = "GUILD_ROLE_UPDATE";
+    const INVITE_CREATE: &'static str = "INVITE_CREATE";
+    const INVITE_DELETE: &'static str = "INVITE_DELETE";
+    const GUILD_UPDATE: &'static str = "GUILD_UPDATE";
+    const MESSAGE_CREATE: &'static str = "MESSAGE_CREATE";
+    const MESSAGE_DELETE: &'static str = "MESSAGE_DELETE";
+    const MESSAGE_DELETE_BULK: &'static str = "MESSAGE_DELETE_BULK";
+    const MESSAGE_REACTION_ADD: &'static str = "MESSAGE_REACTION_ADD";
+    const MESSAGE_REACTION_REMOVE: &'static str = "MESSAGE_REACTION_REMOVE";
+    const MESSAGE_REACTION_REMOVE_ALL: &'static str = "MESSAGE_REACTION_REMOVE_ALL";
+    const MESSAGE_UPDATE: &'static str = "MESSAGE_UPDATE";
+    const PRESENCE_UPDATE: &'static str = "PRESENCE_UPDATE";
+    const PRESENCES_REPLACE: &'static str = "PRESENCES_REPLACE";
+    const READY: &'static str = "READY";
+    const RESUMED: &'static str = "RESUMED";
+    const TYPING_START: &'static str = "TYPING_START";
+    const USER_UPDATE: &'static str = "USER_UPDATE";
+    const VOICE_SERVER_UPDATE: &'static str = "VOICE_SERVER_UPDATE";
+    const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
+    const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
+
+    /// Return the event name of this event. Some events are synthetic, and we lack
+    /// the information to recover the original event name for these events, in which
+    /// case this method returns `None`.
+    pub fn name(&self) -> Option<&str> {
+        match self {
+            Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
+            Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
+            Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
+            Self::ChannelUpdate => Some(Self::CHANNEL_UPDATE),
+            Self::GuildBanAdd => Some(Self::GUILD_BAN_ADD),
+            Self::GuildBanRemove => Some(Self::GUILD_BAN_REMOVE),
+            Self::GuildCreate => Some(Self::GUILD_CREATE),
+            Self::GuildDelete => Some(Self::GUILD_DELETE),
+            Self::GuildEmojisUpdate => Some(Self::GUILD_EMOJIS_UPDATE),
+            Self::GuildIntegrationsUpdate => Some(Self::GUILD_INTEGRATIONS_UPDATE),
+            Self::GuildMemberAdd => Some(Self::GUILD_MEMBER_ADD),
+            Self::GuildMemberRemove => Some(Self::GUILD_MEMBER_REMOVE),
+            Self::GuildMemberUpdate => Some(Self::GUILD_MEMBER_UPDATE),
+            Self::GuildMembersChunk => Some(Self::GUILD_MEMBERS_CHUNK),
+            Self::GuildRoleCreate => Some(Self::GUILD_ROLE_CREATE),
+            Self::GuildRoleDelete => Some(Self::GUILD_ROLE_DELETE),
+            Self::GuildRoleUpdate => Some(Self::GUILD_ROLE_UPDATE),
+            Self::InviteCreate => Some(Self::INVITE_CREATE),
+            Self::InviteDelete => Some(Self::INVITE_DELETE),
+            Self::GuildUpdate => Some(Self::GUILD_UPDATE),
+            Self::MessageCreate => Some(Self::MESSAGE_CREATE),
+            Self::MessageDelete => Some(Self::MESSAGE_DELETE),
+            Self::MessageDeleteBulk => Some(Self::MESSAGE_DELETE_BULK),
+            Self::ReactionAdd => Some(Self::MESSAGE_REACTION_ADD),
+            Self::ReactionRemove => Some(Self::MESSAGE_REACTION_REMOVE),
+            Self::ReactionRemoveAll => Some(Self::MESSAGE_REACTION_REMOVE_ALL),
+            Self::MessageUpdate => Some(Self::MESSAGE_UPDATE),
+            Self::PresenceUpdate => Some(Self::PRESENCE_UPDATE),
+            Self::PresencesReplace => Some(Self::PRESENCES_REPLACE),
+            Self::Ready => Some(Self::READY),
+            Self::Resumed => Some(Self::RESUMED),
+            Self::TypingStart => Some(Self::TYPING_START),
+            Self::UserUpdate => Some(Self::USER_UPDATE),
+            Self::VoiceServerUpdate => Some(Self::VOICE_SERVER_UPDATE),
+            Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
+            Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
+            // GuildUnavailable is a synthetic event type, corresponding to either
+            // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
+            // to recover the name here, so we return `None` instead.
+            Self::GuildUnavailable => None,
+            Self::Other(other) => Some(&other),
+        }
+    }
+}
+
+
 impl<'de> Deserialize<'de> for EventType {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
         where D: Deserializer<'de> {
@@ -1994,42 +2135,42 @@ impl<'de> Deserialize<'de> for EventType {
             fn visit_str<E>(self, v: &str) -> StdResult<Self::Value, E>
                 where E: DeError {
                 Ok(match v {
-                    "CHANNEL_CREATE" => EventType::ChannelCreate,
-                    "CHANNEL_DELETE" => EventType::ChannelDelete,
-                    "CHANNEL_PINS_UPDATE" => EventType::ChannelPinsUpdate,
-                    "CHANNEL_UPDATE" => EventType::ChannelUpdate,
-                    "GUILD_BAN_ADD" => EventType::GuildBanAdd,
-                    "GUILD_BAN_REMOVE" => EventType::GuildBanRemove,
-                    "GUILD_CREATE" => EventType::GuildCreate,
-                    "GUILD_DELETE" => EventType::GuildDelete,
-                    "GUILD_EMOJIS_UPDATE" => EventType::GuildEmojisUpdate,
-                    "GUILD_INTEGRATIONS_UPDATE" => EventType::GuildIntegrationsUpdate,
-                    "GUILD_MEMBER_ADD" => EventType::GuildMemberAdd,
-                    "GUILD_MEMBER_REMOVE" => EventType::GuildMemberRemove,
-                    "GUILD_MEMBER_UPDATE" => EventType::GuildMemberUpdate,
-                    "GUILD_MEMBERS_CHUNK" => EventType::GuildMembersChunk,
-                    "GUILD_ROLE_CREATE" => EventType::GuildRoleCreate,
-                    "GUILD_ROLE_DELETE" => EventType::GuildRoleDelete,
-                    "GUILD_ROLE_UPDATE" => EventType::GuildRoleUpdate,
-                    "INVITE_CREATE" => EventType::InviteCreate,
-                    "INVITE_DELETE" => EventType::InviteDelete,
-                    "GUILD_UPDATE" => EventType::GuildUpdate,
-                    "MESSAGE_CREATE" => EventType::MessageCreate,
-                    "MESSAGE_DELETE" => EventType::MessageDelete,
-                    "MESSAGE_DELETE_BULK" => EventType::MessageDeleteBulk,
-                    "MESSAGE_REACTION_ADD" => EventType::ReactionAdd,
-                    "MESSAGE_REACTION_REMOVE" => EventType::ReactionRemove,
-                    "MESSAGE_REACTION_REMOVE_ALL" => EventType::ReactionRemoveAll,
-                    "MESSAGE_UPDATE" => EventType::MessageUpdate,
-                    "PRESENCE_UPDATE" => EventType::PresenceUpdate,
-                    "PRESENCES_REPLACE" => EventType::PresencesReplace,
-                    "READY" => EventType::Ready,
-                    "RESUMED" => EventType::Resumed,
-                    "TYPING_START" => EventType::TypingStart,
-                    "USER_UPDATE" => EventType::UserUpdate,
-                    "VOICE_SERVER_UPDATE" => EventType::VoiceServerUpdate,
-                    "VOICE_STATE_UPDATE" => EventType::VoiceStateUpdate,
-                    "WEBHOOKS_UPDATE" => EventType::WebhookUpdate,
+                    EventType::CHANNEL_CREATE => EventType::ChannelCreate,
+                    EventType::CHANNEL_DELETE => EventType::ChannelDelete,
+                    EventType::CHANNEL_PINS_UPDATE => EventType::ChannelPinsUpdate,
+                    EventType::CHANNEL_UPDATE => EventType::ChannelUpdate,
+                    EventType::GUILD_BAN_ADD => EventType::GuildBanAdd,
+                    EventType::GUILD_BAN_REMOVE => EventType::GuildBanRemove,
+                    EventType::GUILD_CREATE => EventType::GuildCreate,
+                    EventType::GUILD_DELETE => EventType::GuildDelete,
+                    EventType::GUILD_EMOJIS_UPDATE => EventType::GuildEmojisUpdate,
+                    EventType::GUILD_INTEGRATIONS_UPDATE => EventType::GuildIntegrationsUpdate,
+                    EventType::GUILD_MEMBER_ADD => EventType::GuildMemberAdd,
+                    EventType::GUILD_MEMBER_REMOVE => EventType::GuildMemberRemove,
+                    EventType::GUILD_MEMBER_UPDATE => EventType::GuildMemberUpdate,
+                    EventType::GUILD_MEMBERS_CHUNK => EventType::GuildMembersChunk,
+                    EventType::GUILD_ROLE_CREATE => EventType::GuildRoleCreate,
+                    EventType::GUILD_ROLE_DELETE => EventType::GuildRoleDelete,
+                    EventType::GUILD_ROLE_UPDATE => EventType::GuildRoleUpdate,
+                    EventType::INVITE_CREATE => EventType::InviteCreate,
+                    EventType::INVITE_DELETE => EventType::InviteDelete,
+                    EventType::GUILD_UPDATE => EventType::GuildUpdate,
+                    EventType::MESSAGE_CREATE => EventType::MessageCreate,
+                    EventType::MESSAGE_DELETE => EventType::MessageDelete,
+                    EventType::MESSAGE_DELETE_BULK => EventType::MessageDeleteBulk,
+                    EventType::MESSAGE_REACTION_ADD => EventType::ReactionAdd,
+                    EventType::MESSAGE_REACTION_REMOVE => EventType::ReactionRemove,
+                    EventType::MESSAGE_REACTION_REMOVE_ALL => EventType::ReactionRemoveAll,
+                    EventType::MESSAGE_UPDATE => EventType::MessageUpdate,
+                    EventType::PRESENCE_UPDATE => EventType::PresenceUpdate,
+                    EventType::PRESENCES_REPLACE => EventType::PresencesReplace,
+                    EventType::READY => EventType::Ready,
+                    EventType::RESUMED => EventType::Resumed,
+                    EventType::TYPING_START => EventType::TypingStart,
+                    EventType::USER_UPDATE => EventType::UserUpdate,
+                    EventType::VOICE_SERVER_UPDATE => EventType::VoiceServerUpdate,
+                    EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
+                    EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
                     other => EventType::Other(other.to_owned()),
                 })
             }
