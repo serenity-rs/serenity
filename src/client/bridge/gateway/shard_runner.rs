@@ -29,7 +29,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 #[cfg(feature = "collector")]
 use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 
-use tracing::{trace, error, debug, warn, instrument};
+use tracing::{trace, error, debug, warn, info, instrument};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
 ///
@@ -108,7 +108,7 @@ impl ShardRunner {
     /// [`ShardRunnerMessage`]: enum.ShardRunnerMessage.html
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
-        warn!("[ShardRunner {:?}] Running", self.shard.shard_info());
+        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
             trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
