@@ -83,26 +83,17 @@ impl Error {
 
     /// Returns true when the error is caused by an unsuccessful request
     pub fn is_unsuccessful_request(&self) -> bool {
-        match self {
-            Self::UnsuccessfulRequest(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::UnsuccessfulRequest(_))
     }
 
     /// Returns true when the error is caused by the url containing invalid input
     pub fn is_url_error(&self) -> bool {
-        match self {
-            Self::Url(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::Url(_))
     }
 
     /// Returns true when the error is caused by an invalid header
     pub fn is_invalid_header(&self) -> bool {
-        match self {
-            Self::InvalidHeader(_) => true,
-            _ => false,
-        }
+        matches!(self, Self::InvalidHeader(_))
     }
 
     /// Returns the status code if the error is an unsuccessful request
