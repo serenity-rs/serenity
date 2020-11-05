@@ -208,6 +208,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     (quote! {
         #(#cooked)*
+        #[allow(missing_docs)]
         pub static #options: #options_path = #options_path {
             checks: #checks,
             bucket: #bucket,
@@ -228,11 +229,13 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
         };
 
         #(#cooked2)*
+        #[allow(missing_docs)]
         pub static #n: #command_path = #command_path {
             fun: #name,
             options: &#options,
         };
 
+        #[allow(missing_docs)]
         #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
@@ -464,6 +467,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     (quote! {
         #(#cooked)*
+        #[allow(missing_docs)]
         pub static #options: #options_path = #options_path {
             names: &[#(#names),*],
             suggestion_text: #suggestion_text,
@@ -497,11 +501,13 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         };
 
         #(#cooked2)*
+        #[allow(missing_docs)]
         pub static #n: #command_path = #command_path {
             fun: #nn,
             options: &#options,
         };
 
+        #[allow(missing_docs)]
         pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
@@ -679,6 +685,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
 
     (quote! {
         #(#cooked)*
+        #[allow(missing_docs)]
         pub static #options: #options_path = #options_path {
             prefixes: &[#(#prefixes),*],
             only_in: #only_in,
@@ -695,6 +702,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         };
 
         #(#cooked2)*
+        #[allow(missing_docs)]
         pub static #n: #group_path = #group_path {
             name: #name,
             options: &#options,
@@ -763,6 +771,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let args = fun.args;
 
     (quote! {
+        #[allow(missing_docs)]
         pub static #name: #check = #check {
             name: #n2,
             function: #n,
@@ -770,6 +779,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
             check_in_help: #check_in_help
         };
 
+        #[allow(missing_docs)]
         #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
 
@@ -796,6 +806,7 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
             (quote! {
                 #(#cooked)*
+                #[allow(missing_docs)]
                 #visibility fn #fun_name<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
                     use ::serenity::futures::future::FutureExt;
 
