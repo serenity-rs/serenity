@@ -17,6 +17,9 @@
 //!  handling, seeking on compatible streams, shared multithreaded audio stream caches,
 //!  and direct Opus data passthrough from DCA files.
 //!
+//! ## Intents
+//! Songbird's gateway functionality requires you to specify the `GUILD_VOICE_STATES` intent.
+//!
 //! ## Examples
 //! Full examples showing various types of functionality and integrations can be found as part of [serenity's examples],
 //! and in [this crate's examples directory].
