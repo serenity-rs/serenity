@@ -198,7 +198,6 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let n = name.with_suffix(COMMAND);
 
     let cooked = fun.cooked.clone();
-    let cooked2 = cooked.clone();
 
     let options_path = quote!(serenity::framework::standard::CommandOptions);
     let command_path = quote!(serenity::framework::standard::Command);
@@ -228,13 +227,14 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
             sub_commands: &[#(&#sub_commands),*],
         };
 
-        #(#cooked2)*
+        #(#cooked)*
         #[allow(missing_docs)]
         pub static #n: #command_path = #command_path {
             fun: #name,
             options: &#options,
         };
 
+        #(#cooked)*
         #[allow(missing_docs)]
         #visibility fn #name<'fut> (#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
@@ -455,7 +455,6 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let nn = fun.name.clone();
 
     let cooked = fun.cooked.clone();
-    let cooked2 = cooked.clone();
 
     let options_path = quote!(serenity::framework::standard::HelpOptions);
     let command_path = quote!(serenity::framework::standard::HelpCommand);
@@ -500,13 +499,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
             indention_prefix: #indention_prefix,
         };
 
-        #(#cooked2)*
+        #(#cooked)*
         #[allow(missing_docs)]
         pub static #n: #command_path = #command_path {
             fun: #nn,
             options: &#options,
         };
 
+        #(#cooked)*
         #[allow(missing_docs)]
         pub fn #nn<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
@@ -659,7 +659,6 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
     } = options;
 
     let cooked = group.cooked.clone();
-    let cooked2 = cooked.clone();
 
     let n = group.name.with_suffix(GROUP);
 
@@ -701,7 +700,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
             sub_groups: &[#(&#sub_groups),*],
         };
 
-        #(#cooked2)*
+        #(#cooked)*
         #[allow(missing_docs)]
         pub static #n: #group_path = #group_path {
             name: #name,
@@ -765,6 +764,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);
+    let cooked = fun.cooked;
     let body = fun.body;
     let ret = fun.ret;
     populate_fut_lifetimes_on_refs(&mut fun.args);
@@ -779,6 +779,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
             check_in_help: #check_in_help
         };
 
+        #(#cooked)*
         #[allow(missing_docs)]
         #visibility fn #n<'fut>(#(#args),*) -> ::serenity::futures::future::BoxFuture<'fut, #ret> {
             use ::serenity::futures::future::FutureExt;
