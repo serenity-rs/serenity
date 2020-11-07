@@ -7,7 +7,7 @@
     "roles": [
         {
             "position": -1,
-            "permissions": 37215297,
+            "permissions": "37215297",
             "name": "@everyone",
             "mentionable": false,
             "managed": false,
@@ -17,7 +17,7 @@
         },
         {
             "position": 1,
-            "permissions": 66583679,
+            "permissions": "66583679",
             "name": "role",
             "mentionable": false,
             "managed": false,
@@ -27,7 +27,7 @@
         },
         {
             "position": 2,
-            "permissions": 536345727,
+            "permissions": "536345727",
             "name": "role 2",
             "mentionable": false,
             "managed": false,
@@ -37,7 +37,7 @@
         },
         {
             "position": 3,
-            "permissions": 66583679,
+            "permissions": "66583679",
             "name": "role 3",
             "mentionable": false,
             "managed": false,
@@ -47,7 +47,7 @@
         },
         {
             "position": 1,
-            "permissions": 37215297,
+            "permissions": "37215297",
             "name": "aaaaaa",
             "mentionable": true,
             "managed": false,
@@ -57,7 +57,7 @@
         },
         {
             "position": 1,
-            "permissions": 35840,
+            "permissions": "35840",
             "name": "aaaabsadfasda",
             "mentionable": false,
             "managed": true,
@@ -213,8 +213,8 @@
                 {
                     "type": 0,
                     "id": "123131231321",
-                    "deny": 0,
-                    "allow": 0
+                    "deny": "0",
+                    "allow": "0"
                 }
             ],
             "name": "asdadsa",
@@ -238,8 +238,8 @@
                 {
                     "type": 0,
                     "id": "23423432423",
-                    "deny": 2097152,
-                    "allow": 0
+                    "deny": "2097152",
+                    "allow": "0"
                 }
             ],
             "name": "AFK",

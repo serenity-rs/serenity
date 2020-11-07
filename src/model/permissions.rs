@@ -564,7 +564,7 @@ impl<'de> Deserialize<'de> for Permissions {
 impl Serialize for Permissions {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where S: Serializer {
-        serializer.serialize_u64(self.bits())
+        serializer.collect_str(&self.bits())
     }
 }
 
