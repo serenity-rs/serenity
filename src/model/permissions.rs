@@ -44,9 +44,8 @@
 //! [Manage Roles]: struct.Permissions.html#associatedconstant.MANAGE_ROLES
 //! [Manage Webhooks]: struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
 
-use serde::de::{Deserialize, Deserializer};
+use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
-use super::utils::U64Visitor;
 use bitflags::__impl_bitflags;
 use std::fmt::{Display, Formatter, Result as FmtResult};
 
@@ -555,8 +554,9 @@ impl Default for Permissions {
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let str_u64 = String::deserialize(deserializer)?;
         Ok(Permissions::from_bits_truncate(
-            deserializer.deserialize_u64(U64Visitor)?,
+            str_u64.parse::<u64>().map_err(D::Error::custom)?,
         ))
     }
 }
