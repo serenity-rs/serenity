@@ -399,8 +399,8 @@ impl Serialize for PermissionOverwrite {
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
-        state.serialize_field("allow", &self.allow.bits())?;
-        state.serialize_field("deny", &self.deny.bits())?;
+        state.serialize_field("allow", &self.allow)?;
+        state.serialize_field("deny", &self.deny)?;
         state.serialize_field("id", &id)?;
         state.serialize_field("type", &kind)?;
 
