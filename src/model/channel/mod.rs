@@ -377,8 +377,8 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
         let data = PermissionOverwriteData::deserialize(deserializer)?;
 
         let kind = match &data.kind {
-            1 => PermissionOverwriteType::Member(UserId(data.id)),
             0 => PermissionOverwriteType::Role(RoleId(data.id)),
+            1 => PermissionOverwriteType::Member(UserId(data.id)),
             _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
         };
 
@@ -394,8 +394,8 @@ impl Serialize for PermissionOverwrite {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
         let (id, kind) = match self.kind {
-            PermissionOverwriteType::Member(id) => (id.0, 0),
             PermissionOverwriteType::Role(id) => (id.0, 0),
+            PermissionOverwriteType::Member(id) => (id.0, 1),
         };
 
         let mut state = serializer.serialize_struct("PermissionOverwrite", 4)?;
