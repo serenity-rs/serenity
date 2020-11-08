@@ -437,7 +437,7 @@
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">privileged</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GatewayIntents</span> {
         <span class="comment">// bitflags don&#39;t support const evaluation. Workaround.</span>
         <span class="comment">// See: https://github.com/bitflags/bitflags/issues/180</span>
-        <span class="self">Self</span>::<span class="ident">from_bits_truncate</span>(<span class="self">Self</span>::<span class="ident">GUILD_MEMBERS</span>.<span class="ident">bits</span>() <span class="op">&amp;</span> <span class="self">Self</span>::<span class="ident">GUILD_PRESENCES</span>.<span class="ident">bits</span>())
+        <span class="self">Self</span>::<span class="ident">from_bits_truncate</span>(<span class="self">Self</span>::<span class="ident">GUILD_MEMBERS</span>.<span class="ident">bits</span>() <span class="op">|</span> <span class="self">Self</span>::<span class="ident">GUILD_PRESENCES</span>.<span class="ident">bits</span>())
     }
 
     <span class="doccomment">/// Checks if any of the included intents are privileged</span>
