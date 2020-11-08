@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.1] - 2020-11-8
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@nickelc]
+
+### Changed
+
+- [gateway] Use the info level when notifying the user that a shard is running ([@acdenisSK]) [c:7ea8098]
+- [command_attr] Allow missing documentation for generated statics and functions ([@acdenisSK]) [c:182ee78]
+- [model] Change the use of the `#[doc]` attribute on `VerificationLevel` to doc comments ([@nickelc]) [c:58e3d49]
+- [misc] Reduce size of the crate by only including files that are necessary ([@nickelc]) [c:a836180]
+
+### Fixed
+
+- [command_attr] Apply cooked attributes on generated functions ([@acdenisSK]) [c:61597d6]
+
 ## [0.9.0] - 2020-10-30
 
 Thanks to the following for their contributions:
@@ -3743,6 +3761,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.4...v0.9.0
 [0.9.0-rc.4]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.3...v0.9.0-rc.4
 [0.9.0-rc.3]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.2...v0.9.0-rc.3
@@ -3940,6 +3959,12 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+[c:7ea8098]: https://github.com/serenity-rs/serenity/commit/7ea80988604ce1a9c772dabd8b150b5f89ca355c
+[c:182ee78]: https://github.com/serenity-rs/serenity/commit/182ee78f685595d43b951dab2d0f8a59c9a3f84d
+[c:58e3d49]: https://github.com/serenity-rs/serenity/commit/58e3d495185eee497555faaaa311e6c69b9b35cc
+[c:a836180]: https://github.com/serenity-rs/serenity/commit/a8361804e324d3739734736debd676bc87c5aab9
+[c:61597d6]: https://github.com/serenity-rs/serenity/commit/61597d66bbf44511bf4b92337ea7236c63cfba1f
 
 [c:c9971b6]: https://github.com/serenity-rs/serenity/commit/c9971b6e60f3b5f5ac9c3e8931f6a7ecbf8194db
 [c:0d9b821]: https://github.com/serenity-rs/serenity/commit/0d9b821953268edeeea8b1c01fe0d33447ba08cb
