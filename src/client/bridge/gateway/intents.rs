@@ -154,7 +154,7 @@ impl GatewayIntents {
     pub const fn privileged() -> GatewayIntents {
         // bitflags don't support const evaluation. Workaround.
         // See: https://github.com/bitflags/bitflags/issues/180
-        Self::from_bits_truncate(Self::GUILD_MEMBERS.bits() & Self::GUILD_PRESENCES.bits())
+        Self::from_bits_truncate(Self::GUILD_MEMBERS.bits() | Self::GUILD_PRESENCES.bits())
     }
 
     /// Checks if any of the included intents are privileged
