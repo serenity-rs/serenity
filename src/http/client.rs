@@ -893,59 +893,62 @@ impl Http {
     /// if the file is too large to send.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
-    pub async fn execute_webhook_with_file<'a, T>(
+    pub async fn execute_webhook_with_files<'a, T, It: IntoIterator<Item=T>>(
         &self,
         webhook_id: u64,
         token: &str,
         wait: bool,
-        file: T,
+        files: It,
         map: JsonMap) -> Result<Option<Message>>
         where T: Into<AttachmentType<'a>> {
         let mut multipart = reqwest::multipart::Form::new();
 
-        match file.into() {
-            AttachmentType::Bytes{ data, filename } => {
-                multipart = multipart
-                    .part("file", Part::bytes(data.into_owned())
-                        .file_name(filename));
-            },
-            AttachmentType::File{ file, filename } => {
-                let mut buf = Vec::new();
-                file.try_clone().await?.read_to_end(&mut buf).await?;
+        for (file_num, file) in files.into_iter().enumerate() {
 
-                multipart = multipart
-                    .part("file",
-                        Part::stream(buf)
+            match file.into() {
+                AttachmentType::Bytes { data, filename } => {
+                    multipart = multipart
+                        .part(file_num.to_string(), Part::bytes(data.into_owned())
                             .file_name(filename));
-            },
-            AttachmentType::Path(path) => {
-                let filename = path
-                    .file_name()
-                    .map(|filename| filename.to_string_lossy().into_owned());
-                let mut file = File::open(path).await?;
-                let mut buf = vec![];
-                file.read_to_end(&mut buf).await?;
+                },
+                AttachmentType::File { file, filename } => {
+                    let mut buf = Vec::new();
+                    file.try_clone().await?.read_to_end(&mut buf).await?;
 
-                let part = match filename {
-                    Some(filename) => Part::bytes(buf).file_name(filename),
-                    None => Part::bytes(buf),
-                };
+                    multipart = multipart
+                        .part(file_num.to_string(),
+                              Part::stream(buf)
+                                  .file_name(filename));
+                },
+                AttachmentType::Path(path) => {
+                    let filename = path
+                        .file_name()
+                        .map(|filename| filename.to_string_lossy().into_owned());
+                    let mut file = File::open(path).await?;
+                    let mut buf = vec![];
+                    file.read_to_end(&mut buf).await?;
 
-                multipart = multipart.part("file", part);
-            },
-            AttachmentType::Image(url) => {
-                let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
-                let filename = url.path_segments()
-                  .and_then(|segments| segments.last().map(ToString::to_string))
-                  .ok_or_else(|| Error::Url(url.to_string()))?;
-                let response = self.client.get(url).send().await?;
-                let mut bytes = response.bytes().await?;
-                let mut picture: Vec<u8> = vec![0; bytes.len()];
-                bytes.copy_to_slice(&mut picture[..]);
-                multipart = multipart
-                    .part("file", Part::bytes(picture)
-                        .file_name(filename.to_string()));
-            },
+                    let part = match filename {
+                        Some(filename) => Part::bytes(buf).file_name(filename),
+                        None => Part::bytes(buf),
+                    };
+
+                    multipart = multipart.part(file_num.to_string(), part);
+                },
+                AttachmentType::Image(url) => {
+                    let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                    let filename = url.path_segments()
+                        .and_then(|segments| segments.last().map(ToString::to_string))
+                        .ok_or_else(|| Error::Url(url.to_string()))?;
+                    let response = self.client.get(url).send().await?;
+                    let mut bytes = response.bytes().await?;
+                    let mut picture: Vec<u8> = vec![0; bytes.len()];
+                    bytes.copy_to_slice(&mut picture[..]);
+                    multipart = multipart
+                        .part(file_num.to_string(), Part::bytes(picture)
+                            .file_name(filename.to_string()));
+                },
+            }
         }
 
         multipart = multipart.text("payload_json", serde_json::to_string(&map)?);

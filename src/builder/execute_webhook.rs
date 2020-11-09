@@ -51,7 +51,7 @@ use crate::http::AttachmentType;
 /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Option<AttachmentType<'a>>);
+pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
 
 impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
@@ -115,9 +115,24 @@ impl<'a> ExecuteWebhook<'a> {
         self
     }
 
-    /// Set a file to be sent
-    pub fn set_file(&mut self, file: AttachmentType<'a>) -> &mut Self {
-        self.1 = Some(file);
+    /// Appends a file to the webhook message.
+    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+        self.1.push(file.into());
+        self
+    }
+
+    /// Appends a list of files to the webhook message.
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+        self.1.extend(files.into_iter().map(|f| f.into()));
+        self
+    }
+
+    /// Sets a list of files to include in the webhook message.
+    ///
+    /// Calling this multiple times will overwrite the file list.
+    /// To append files, call `add_file` or `add_files` instead.
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+        self.1 = files.into_iter().map(|f| f.into()).collect();
         self
     }
 
@@ -219,6 +234,6 @@ impl<'a> Default for ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        ExecuteWebhook(map, None)
+        ExecuteWebhook(map, vec![])
     }
 }

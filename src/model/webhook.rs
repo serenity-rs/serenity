@@ -238,8 +238,8 @@ impl Webhook {
 
         let map = utils::hashmap_to_json_map(execute_webhook.0);
 
-        if let Some(file) = execute_webhook.1 {
-            http.as_ref().execute_webhook_with_file(self.id.0, &self.token, wait, file, map).await
+        if !execute_webhook.1.is_empty() {
+            http.as_ref().execute_webhook_with_files(self.id.0, &self.token, wait, execute_webhook.1.clone(), map).await
         } else {
             http.as_ref().execute_webhook(self.id.0, &self.token, wait, &map).await
         }
