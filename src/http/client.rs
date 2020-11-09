@@ -899,12 +899,14 @@ impl Http {
         token: &str,
         wait: bool,
         files: It,
-        map: JsonMap) -> Result<Option<Message>>
-        where T: Into<AttachmentType<'a>> {
+        map: JsonMap
+    ) -> Result<Option<Message>>
+        where
+            T: Into<AttachmentType<'a>>,
+    {
         let mut multipart = reqwest::multipart::Form::new();
 
         for (file_num, file) in files.into_iter().enumerate() {
-
             match file.into() {
                 AttachmentType::Bytes { data, filename } => {
                     multipart = multipart
