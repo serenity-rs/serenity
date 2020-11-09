@@ -204,6 +204,8 @@ Thanks to the following for their contributions:
 
 It has long been `.await`ed for, but it's finally here! Serenity now leverages `async` functions, thanks to the `tokio` runtime.
 
+A big thanks goes to [@Lakelezz]. Without the dedication to her efforts, it wouldn't have been possible to make the switch easily.
+
 # Release candidate
 
 As that is a huge change, among other changes, this is actually a *testing release*. It is encouraged to consumers of this release to provide feedback for any warts you might encounter, be it missing features, or bugs. One important bug is the OOM bug. After a period of time has passed since the bot connected, there might be a big random spike in memory usage, prompting the OOM killer to shutdown the bot's process. It is unknown where the spike comes from, or when exactly does it occur. It doesn't happen to every bot either. If you find your bot suddenly using a lot of memory, or being killed, please let us know by opening an Issue.
@@ -215,6 +217,7 @@ Thanks to the following for their contributions:
 - [@bdashore3]
 - [@DimiDimit]
 - [@jmgao]
+- [@Lakelezz]
 - [@MaxOhn]
 - [@mendess]
 - [@mjsir911]
@@ -242,7 +245,7 @@ Thanks to the following for their contributions:
 ### Changed
 
 - [misc] Update rustls dependency to 0.18 ([@acdenisSK]) [c:3dda20d]
-- [all] Serenity.await ([@acdenisSK]) [c:5df4c6d]
+- [all] Serenity.await ([@Lakelezz]) [c:5df4c6d]
 - [misc] Address the renaming of the lavalink project ([@acdenisSK]) [c:802df92]
 - [utils] Replace the in-house typemap implementation with `typemap_rev` ([@bdashore3]) [c:c1c7300]
 - [misc] Apply copyright to all people who have contributed to Serenity ([@acdenisSK]) [c:287245a]
