@@ -1271,15 +1271,19 @@ impl Guild {
 
     /// Calculate a [`Member`]'s permissions in the guild.
     ///
-    /// If the cache feature is enabled the cache will be checked
+    /// If member caching is enabled the cache will be checked
     /// first. If not found it will resort to an http request.
+    ///
+    /// Cache is still required to look up roles.
     ///
     /// [`Member`]: struct.Member.html
     #[inline]
+    #[cfg(feature = "cache")]
     pub async fn member_permissions(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Permissions> {
         self._member_permissions(cache_http, user_id.into()).await
     }
 
+    #[cfg(feature = "cache")]
     async fn _member_permissions(&self, cache_http: impl CacheHttp, user_id: UserId) -> Result<Permissions> {
         if user_id == self.owner_id {
             return Ok(Permissions::all());
