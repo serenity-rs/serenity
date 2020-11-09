@@ -1,5 +1,6 @@
 use serde_json::Value;
 use std::collections::HashMap;
+use crate::http::AttachmentType;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -50,9 +51,9 @@ use std::collections::HashMap;
 /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
+pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Option<AttachmentType<'a>>);
 
-impl ExecuteWebhook {
+impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
     ///
     /// # Examples
@@ -111,6 +112,12 @@ impl ExecuteWebhook {
     /// [`embeds`]: #method.embeds
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
+        self
+    }
+
+    /// Set a file to be sent
+    pub fn set_file(&mut self, file: AttachmentType<'a>) -> &mut Self {
+        self.1 = Some(file);
         self
     }
 
@@ -191,7 +198,7 @@ impl ExecuteWebhook {
     }
 }
 
-impl Default for ExecuteWebhook {
+impl<'a> Default for ExecuteWebhook<'a> {
     /// Returns a default set of values for a [`Webhook`] execution.
     ///
     /// The only default value is [`tts`] being set to `false`.
@@ -208,10 +215,10 @@ impl Default for ExecuteWebhook {
     ///
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html
     /// [`tts`]: #method.tts
-    fn default() -> ExecuteWebhook {
+    fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        ExecuteWebhook(map)
+        ExecuteWebhook(map, None)
     }
 }
