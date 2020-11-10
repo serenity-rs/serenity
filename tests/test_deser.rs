@@ -178,6 +178,8 @@ fn typing_start() {
 fn voice_state_update() {
     p!(VoiceStateUpdateEvent, "voice_state_update_1");
     p!(VoiceStateUpdateEvent, "voice_state_update_2");
+    p!(VoiceStateUpdateEvent, "voice_state_update_3");
+    p!(VoiceStateUpdateEvent, "voice_state_update_4");
 }
 
 #[test]
