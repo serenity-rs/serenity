@@ -884,13 +884,13 @@ impl Http {
             .map_err(From::from)
     }
 
-    /// Send file over a webhook.
+    /// Send file(s) over a webhook.
     ///
     /// # Errors
     ///
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the file is too large to send.
+    /// if the files are too large to send.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn execute_webhook_with_files<'a, T, It: IntoIterator<Item=T>>(
@@ -1575,7 +1575,7 @@ impl Http {
     ///
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the file is too large to send.
+    /// if the files are too large to send.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn send_files<'a, T, It: IntoIterator<Item=T>>(&self, channel_id: u64, files: It, map: JsonMap) -> Result<Message>
@@ -1587,10 +1587,8 @@ impl Http {
         };
 
         let mut multipart = reqwest::multipart::Form::new();
-        let mut file_num = "0".to_string();
 
-        for file in files {
-
+        for (file_num, file) in files.into_iter().enumerate() {
             match file.into() {
                 AttachmentType::Bytes{ data, filename } => {
                     multipart = multipart
@@ -1635,23 +1633,9 @@ impl Http {
                             .file_name(filename.to_string()));
                 },
             }
-
-            unsafe {
-                let vec = file_num.as_mut_vec();
-                vec[0] += 1;
-            }
         }
 
-        for (k, v) in map {
-            match v {
-                Value::Bool(false) => multipart = multipart.text(k.clone(), "false"),
-                Value::Bool(true) => multipart = multipart.text(k.clone(), "true"),
-                Value::Number(inner) => multipart = multipart.text(k.clone(), inner.to_string()),
-                Value::String(inner) => multipart = multipart.text(k.clone(), inner),
-                Value::Object(inner) => multipart = multipart.text(k.clone(), serde_json::to_string(&inner)?),
-                _ => continue,
-            };
-        }
+        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
 
         let response = self.client
             .post(url)
