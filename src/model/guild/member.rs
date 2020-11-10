@@ -82,7 +82,12 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        let mut roles = self.roles.to_vec();
+        if role_ids.is_empty() {
+            return Ok(());
+        }
+
+        let mut roles = Vec::with_capacity(self.roles.len() + role_ids.len());
+        roles.extend_from_slice(&self.roles);
 
         for id in role_ids {
             if !roles.contains(id) {
