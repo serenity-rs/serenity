@@ -82,7 +82,11 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        self.roles.extend_from_slice(role_ids);
+        for id in role_ids {
+            if !self.roles.contains(id) {
+                self.roles.push(*id);
+            }
+        }
 
         let mut builder = EditMember::default();
         builder.roles(&self.roles);
