@@ -1859,6 +1859,80 @@
 <span id="1856">1856</span>
 <span id="1857">1857</span>
 <span id="1858">1858</span>
+<span id="1859">1859</span>
+<span id="1860">1860</span>
+<span id="1861">1861</span>
+<span id="1862">1862</span>
+<span id="1863">1863</span>
+<span id="1864">1864</span>
+<span id="1865">1865</span>
+<span id="1866">1866</span>
+<span id="1867">1867</span>
+<span id="1868">1868</span>
+<span id="1869">1869</span>
+<span id="1870">1870</span>
+<span id="1871">1871</span>
+<span id="1872">1872</span>
+<span id="1873">1873</span>
+<span id="1874">1874</span>
+<span id="1875">1875</span>
+<span id="1876">1876</span>
+<span id="1877">1877</span>
+<span id="1878">1878</span>
+<span id="1879">1879</span>
+<span id="1880">1880</span>
+<span id="1881">1881</span>
+<span id="1882">1882</span>
+<span id="1883">1883</span>
+<span id="1884">1884</span>
+<span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
+<span id="1890">1890</span>
+<span id="1891">1891</span>
+<span id="1892">1892</span>
+<span id="1893">1893</span>
+<span id="1894">1894</span>
+<span id="1895">1895</span>
+<span id="1896">1896</span>
+<span id="1897">1897</span>
+<span id="1898">1898</span>
+<span id="1899">1899</span>
+<span id="1900">1900</span>
+<span id="1901">1901</span>
+<span id="1902">1902</span>
+<span id="1903">1903</span>
+<span id="1904">1904</span>
+<span id="1905">1905</span>
+<span id="1906">1906</span>
+<span id="1907">1907</span>
+<span id="1908">1908</span>
+<span id="1909">1909</span>
+<span id="1910">1910</span>
+<span id="1911">1911</span>
+<span id="1912">1912</span>
+<span id="1913">1913</span>
+<span id="1914">1914</span>
+<span id="1915">1915</span>
+<span id="1916">1916</span>
+<span id="1917">1917</span>
+<span id="1918">1918</span>
+<span id="1919">1919</span>
+<span id="1920">1920</span>
+<span id="1921">1921</span>
+<span id="1922">1922</span>
+<span id="1923">1923</span>
+<span id="1924">1924</span>
+<span id="1925">1925</span>
+<span id="1926">1926</span>
+<span id="1927">1927</span>
+<span id="1928">1928</span>
+<span id="1929">1929</span>
+<span id="1930">1930</span>
+<span id="1931">1931</span>
+<span id="1932">1932</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>;
 <span class="kw">use</span> <span class="ident">reqwest</span>::{
@@ -1896,6 +1970,7 @@
     <span class="ident">io</span>::<span class="ident">AsyncReadExt</span>,
     <span class="ident">fs</span>::<span class="ident">File</span>,
 };
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">routing</span>::<span class="ident">Route</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
@@ -2745,6 +2820,95 @@
             .<span class="ident">map_err</span>(<span class="ident">From</span>::<span class="ident">from</span>)
     }
 
+    <span class="doccomment">/// Send file(s) over a webhook.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an</span>
+    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]</span>
+    <span class="doccomment">/// if the files are too large to send.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest</span>
+    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">execute_webhook_with_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
+        <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
+        <span class="ident">wait</span>: <span class="ident">bool</span>,
+        <span class="ident">files</span>: <span class="ident">It</span>,
+        <span class="ident">map</span>: <span class="ident">JsonMap</span>
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
+        <span class="kw">where</span>
+            <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">reqwest</span>::<span class="ident">multipart</span>::<span class="ident">Form</span>::<span class="ident">new</span>();
+
+        <span class="kw">for</span> (<span class="ident">file_num</span>, <span class="ident">file</span>) <span class="kw">in</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
+            <span class="kw">match</span> <span class="ident">file</span>.<span class="ident">into</span>() {
+                <span class="ident">AttachmentType</span>::<span class="ident">Bytes</span> { <span class="ident">data</span>, <span class="ident">filename</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>
+                        .<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(), <span class="ident">Part</span>::<span class="ident">bytes</span>(<span class="ident">data</span>.<span class="ident">into_owned</span>())
+                            .<span class="ident">file_name</span>(<span class="ident">filename</span>));
+                },
+                <span class="ident">AttachmentType</span>::<span class="ident">File</span> { <span class="ident">file</span>, <span class="ident">filename</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
+                    <span class="ident">file</span>.<span class="ident">try_clone</span>().<span class="ident">await</span><span class="question-mark">?</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+
+                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>
+                        .<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(),
+                              <span class="ident">Part</span>::<span class="ident">stream</span>(<span class="ident">buf</span>)
+                                  .<span class="ident">file_name</span>(<span class="ident">filename</span>));
+                },
+                <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="ident">path</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">path</span>
+                        .<span class="ident">file_name</span>()
+                        .<span class="ident">map</span>(<span class="op">|</span><span class="ident">filename</span><span class="op">|</span> <span class="ident">filename</span>.<span class="ident">to_string_lossy</span>().<span class="ident">into_owned</span>());
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="ident">File</span>::<span class="ident">open</span>(<span class="ident">path</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buf</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[];
+                    <span class="ident">file</span>.<span class="ident">read_to_end</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">buf</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+
+                    <span class="kw">let</span> <span class="ident">part</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">filename</span> {
+                        <span class="prelude-val">Some</span>(<span class="ident">filename</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Part</span>::<span class="ident">bytes</span>(<span class="ident">buf</span>).<span class="ident">file_name</span>(<span class="ident">filename</span>),
+                        <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Part</span>::<span class="ident">bytes</span>(<span class="ident">buf</span>),
+                    };
+
+                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(), <span class="ident">part</span>);
+                },
+                <span class="ident">AttachmentType</span>::<span class="ident">Image</span>(<span class="ident">url</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">let</span> <span class="ident">url</span> <span class="op">=</span> <span class="ident">Url</span>::<span class="ident">parse</span>(<span class="ident">url</span>).<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">Error</span>::<span class="ident">Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">url</span>.<span class="ident">path_segments</span>()
+                        .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">segments</span><span class="op">|</span> <span class="ident">segments</span>.<span class="ident">last</span>().<span class="ident">map</span>(<span class="ident">ToString</span>::<span class="ident">to_string</span>))
+                        .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Error</span>::<span class="ident">Url</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()))<span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">get</span>(<span class="ident">url</span>).<span class="ident">send</span>().<span class="ident">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">bytes</span> <span class="op">=</span> <span class="ident">response</span>.<span class="ident">bytes</span>().<span class="ident">await</span><span class="question-mark">?</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">picture</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">vec</span><span class="macro">!</span>[<span class="number">0</span>; <span class="ident">bytes</span>.<span class="ident">len</span>()];
+                    <span class="ident">bytes</span>.<span class="ident">copy_to_slice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">picture</span>[..]);
+                    <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>
+                        .<span class="ident">part</span>(<span class="ident">file_num</span>.<span class="ident">to_string</span>(), <span class="ident">Part</span>::<span class="ident">bytes</span>(<span class="ident">picture</span>)
+                            .<span class="ident">file_name</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>()));
+                },
+            }
+        }
+
+        <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>);
+
+        <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>
+            .<span class="ident">post</span>(<span class="kw-2">&amp;</span><span class="ident">Route</span>::<span class="ident">webhook_with_token_optioned</span>(<span class="ident">webhook_id</span>, <span class="ident">token</span>, <span class="ident">wait</span>))
+            .<span class="ident">multipart</span>(<span class="ident">multipart</span>)
+            .<span class="ident">header</span>(<span class="ident">CONTENT_TYPE</span>, <span class="ident">HeaderValue</span>::<span class="ident">from_static</span>(<span class="kw-2">&amp;</span><span class="string">&quot;multipart/form-data&quot;</span>))
+            .<span class="ident">send</span>()
+            .<span class="ident">await</span><span class="question-mark">?</span>;
+
+        <span class="kw">if</span> <span class="op">!</span><span class="ident">response</span>.<span class="ident">status</span>().<span class="ident">is_success</span>() {
+            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">HttpError</span>::<span class="ident">from_response</span>(<span class="ident">response</span>).<span class="ident">await</span>.<span class="ident">into</span>());
+        }
+
+        <span class="ident">response</span>
+            .<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>()
+            .<span class="ident">await</span>
+            .<span class="ident">map</span>(<span class="prelude-val">Some</span>)
+            .<span class="ident">map_err</span>(<span class="ident">From</span>::<span class="ident">from</span>)
+    }
+
     <span class="doccomment">/// Gets the active maintenances from Discord&#39;s Status API.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Does not require authentication.</span>
@@ -3347,7 +3511,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns an</span>
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]</span>
-    <span class="doccomment">/// if the file is too large to send.</span>
+    <span class="doccomment">/// if the files are too large to send.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">files</span>: <span class="ident">It</span>, <span class="ident">map</span>: <span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
@@ -3359,10 +3523,8 @@
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">reqwest</span>::<span class="ident">multipart</span>::<span class="ident">Form</span>::<span class="ident">new</span>();
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file_num</span> <span class="op">=</span> <span class="string">&quot;0&quot;</span>.<span class="ident">to_string</span>();
 
-        <span class="kw">for</span> <span class="ident">file</span> <span class="kw">in</span> <span class="ident">files</span> {
-
+        <span class="kw">for</span> (<span class="ident">file_num</span>, <span class="ident">file</span>) <span class="kw">in</span> <span class="ident">files</span>.<span class="ident">into_iter</span>().<span class="ident">enumerate</span>() {
             <span class="kw">match</span> <span class="ident">file</span>.<span class="ident">into</span>() {
                 <span class="ident">AttachmentType</span>::<span class="ident">Bytes</span>{ <span class="ident">data</span>, <span class="ident">filename</span> } <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>
@@ -3407,23 +3569,9 @@
                             .<span class="ident">file_name</span>(<span class="ident">filename</span>.<span class="ident">to_string</span>()));
                 },
             }
-
-            <span class="kw">unsafe</span> {
-                <span class="kw">let</span> <span class="ident">vec</span> <span class="op">=</span> <span class="ident">file_num</span>.<span class="ident">as_mut_vec</span>();
-                <span class="ident">vec</span>[<span class="number">0</span>] <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
-            }
         }
 
-        <span class="kw">for</span> (<span class="ident">k</span>, <span class="ident">v</span>) <span class="kw">in</span> <span class="ident">map</span> {
-            <span class="kw">match</span> <span class="ident">v</span> {
-                <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="bool-val">false</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="string">&quot;false&quot;</span>),
-                <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="bool-val">true</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="string">&quot;true&quot;</span>),
-                <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>.<span class="ident">to_string</span>()),
-                <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">inner</span>),
-                <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span><span class="ident">multipart</span> <span class="op">=</span>  <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="ident">k</span>.<span class="ident">clone</span>(), <span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>)<span class="question-mark">?</span>),
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">continue</span>,
-            };
-        }
+        <span class="ident">multipart</span> <span class="op">=</span> <span class="ident">multipart</span>.<span class="ident">text</span>(<span class="string">&quot;payload_json&quot;</span>, <span class="ident">serde_json</span>::<span class="ident">to_string</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>);
 
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">client</span>
             .<span class="ident">post</span>(<span class="ident">url</span>)
@@ -3441,7 +3589,7 @@
             .<span class="ident">json</span>::<span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>()
             .<span class="ident">await</span>
             .<span class="ident">map_err</span>(<span class="ident">From</span>::<span class="ident">from</span>)
-        }
+    }
 
     <span class="doccomment">/// Sends a message to a channel.</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
