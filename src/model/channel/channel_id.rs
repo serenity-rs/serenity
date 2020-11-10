@@ -539,7 +539,7 @@ impl ChannelId {
         self.send_message(&http, |m| m.content(content)).await
     }
 
-    /// Sends a file along with optional message contents. The filename _must_
+    /// Sends file(s) along with optional message contents. The filename _must_
     /// be specified.
     ///
     /// Message contents may be passed by using the [`CreateMessage::content`]
@@ -606,7 +606,7 @@ impl ChannelId {
     ///
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the file is too large to send.
+    /// if the file(s) are too large to send.
     ///
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
@@ -621,19 +621,11 @@ impl ChannelId {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
-        if let Some(content) = msg.0.get(&"content") {
-            if let Value::String(ref content) = *content {
-                if let Some(length_over) = Message::overflow_length(content) {
-                    return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-                }
-            }
-        }
-
-        if let Some(e) = msg.0.remove(&"embed") {
-            msg.0.insert("payload_json", json!({ "embed": e }));
-        }
-
         let map = utils::hashmap_to_json_map(msg.0.clone());
+
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
+
         http.as_ref().send_files(self.0, files, map).await
     }
 
@@ -661,16 +653,6 @@ impl ChannelId {
         where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
-
-        if !msg.2.is_empty() {
-            if let Some(e) = msg.0.remove(&"embed") {
-                if let Some(c) = msg.0.remove(&"content") {
-                    msg.0.insert("payload_json", json!({ "content": c, "embed": e }));
-                } else {
-                    msg.0.insert("payload_json", json!({ "embed": e }));
-                }
-            }
-        }
 
         let map = utils::hashmap_to_json_map(msg.0.clone());
 

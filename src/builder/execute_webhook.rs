@@ -1,5 +1,6 @@
 use serde_json::Value;
 use std::collections::HashMap;
+use crate::http::AttachmentType;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -50,9 +51,9 @@ use std::collections::HashMap;
 /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
 /// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
+pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
 
-impl ExecuteWebhook {
+impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
     ///
     /// # Examples
@@ -111,6 +112,27 @@ impl ExecuteWebhook {
     /// [`embeds`]: #method.embeds
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
+        self
+    }
+
+    /// Appends a file to the webhook message.
+    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+        self.1.push(file.into());
+        self
+    }
+
+    /// Appends a list of files to the webhook message.
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+        self.1.extend(files.into_iter().map(|f| f.into()));
+        self
+    }
+
+    /// Sets a list of files to include in the webhook message.
+    ///
+    /// Calling this multiple times will overwrite the file list.
+    /// To append files, call `add_file` or `add_files` instead.
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+        self.1 = files.into_iter().map(|f| f.into()).collect();
         self
     }
 
@@ -191,7 +213,7 @@ impl ExecuteWebhook {
     }
 }
 
-impl Default for ExecuteWebhook {
+impl<'a> Default for ExecuteWebhook<'a> {
     /// Returns a default set of values for a [`Webhook`] execution.
     ///
     /// The only default value is [`tts`] being set to `false`.
@@ -208,10 +230,10 @@ impl Default for ExecuteWebhook {
     ///
     /// [`Webhook`]: ../model/webhook/struct.Webhook.html
     /// [`tts`]: #method.tts
-    fn default() -> ExecuteWebhook {
+    fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        ExecuteWebhook(map)
+        ExecuteWebhook(map, vec![])
     }
 }

@@ -34,6 +34,7 @@ use tokio::{
     io::AsyncReadExt,
     fs::File,
 };
+use crate::http::routing::Route;
 
 pub struct Http {
     pub(crate) client: Arc<Client>,
@@ -883,6 +884,95 @@ impl Http {
             .map_err(From::from)
     }
 
+    /// Send file(s) over a webhook.
+    ///
+    /// # Errors
+    ///
+    /// Returns an
+    /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
+    /// if the files are too large to send.
+    ///
+    /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
+    pub async fn execute_webhook_with_files<'a, T, It: IntoIterator<Item=T>>(
+        &self,
+        webhook_id: u64,
+        token: &str,
+        wait: bool,
+        files: It,
+        map: JsonMap
+    ) -> Result<Option<Message>>
+        where
+            T: Into<AttachmentType<'a>>,
+    {
+        let mut multipart = reqwest::multipart::Form::new();
+
+        for (file_num, file) in files.into_iter().enumerate() {
+            match file.into() {
+                AttachmentType::Bytes { data, filename } => {
+                    multipart = multipart
+                        .part(file_num.to_string(), Part::bytes(data.into_owned())
+                            .file_name(filename));
+                },
+                AttachmentType::File { file, filename } => {
+                    let mut buf = Vec::new();
+                    file.try_clone().await?.read_to_end(&mut buf).await?;
+
+                    multipart = multipart
+                        .part(file_num.to_string(),
+                              Part::stream(buf)
+                                  .file_name(filename));
+                },
+                AttachmentType::Path(path) => {
+                    let filename = path
+                        .file_name()
+                        .map(|filename| filename.to_string_lossy().into_owned());
+                    let mut file = File::open(path).await?;
+                    let mut buf = vec![];
+                    file.read_to_end(&mut buf).await?;
+
+                    let part = match filename {
+                        Some(filename) => Part::bytes(buf).file_name(filename),
+                        None => Part::bytes(buf),
+                    };
+
+                    multipart = multipart.part(file_num.to_string(), part);
+                },
+                AttachmentType::Image(url) => {
+                    let url = Url::parse(url).map_err(|_| Error::Url(url.to_string()))?;
+                    let filename = url.path_segments()
+                        .and_then(|segments| segments.last().map(ToString::to_string))
+                        .ok_or_else(|| Error::Url(url.to_string()))?;
+                    let response = self.client.get(url).send().await?;
+                    let mut bytes = response.bytes().await?;
+                    let mut picture: Vec<u8> = vec![0; bytes.len()];
+                    bytes.copy_to_slice(&mut picture[..]);
+                    multipart = multipart
+                        .part(file_num.to_string(), Part::bytes(picture)
+                            .file_name(filename.to_string()));
+                },
+            }
+        }
+
+        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
+
+        let response = self.client
+            .post(&Route::webhook_with_token_optioned(webhook_id, token, wait))
+            .multipart(multipart)
+            .header(CONTENT_TYPE, HeaderValue::from_static(&"multipart/form-data"))
+            .send()
+            .await?;
+
+        if !response.status().is_success() {
+            return Err(HttpError::from_response(response).await.into());
+        }
+
+        response
+            .json::<Message>()
+            .await
+            .map(Some)
+            .map_err(From::from)
+    }
+
     /// Gets the active maintenances from Discord's Status API.
     ///
     /// Does not require authentication.
@@ -1485,7 +1575,7 @@ impl Http {
     ///
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
-    /// if the file is too large to send.
+    /// if the files are too large to send.
     ///
     /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn send_files<'a, T, It: IntoIterator<Item=T>>(&self, channel_id: u64, files: It, map: JsonMap) -> Result<Message>
@@ -1497,10 +1587,8 @@ impl Http {
         };
 
         let mut multipart = reqwest::multipart::Form::new();
-        let mut file_num = "0".to_string();
 
-        for file in files {
-
+        for (file_num, file) in files.into_iter().enumerate() {
             match file.into() {
                 AttachmentType::Bytes{ data, filename } => {
                     multipart = multipart
@@ -1545,23 +1633,9 @@ impl Http {
                             .file_name(filename.to_string()));
                 },
             }
-
-            unsafe {
-                let vec = file_num.as_mut_vec();
-                vec[0] += 1;
-            }
         }
 
-        for (k, v) in map {
-            match v {
-                Value::Bool(false) => multipart = multipart.text(k.clone(), "false"),
-                Value::Bool(true) => multipart = multipart.text(k.clone(), "true"),
-                Value::Number(inner) => multipart = multipart.text(k.clone(), inner.to_string()),
-                Value::String(inner) => multipart = multipart.text(k.clone(), inner),
-                Value::Object(inner) =>multipart =  multipart.text(k.clone(), serde_json::to_string(&inner)?),
-                _ => continue,
-            };
-        }
+        multipart = multipart.text("payload_json", serde_json::to_string(&map)?);
 
         let response = self.client
             .post(url)
@@ -1579,7 +1653,7 @@ impl Http {
             .json::<Message>()
             .await
             .map_err(From::from)
-        }
+    }
 
     /// Sends a message to a channel.
     pub async fn send_message(&self, channel_id: u64, map: &Value) -> Result<Message> {

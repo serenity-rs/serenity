@@ -230,14 +230,19 @@ impl Webhook {
     /// # }
     /// ```
     #[inline]
-    pub async fn execute<F>(&self, http: impl AsRef<Http>, wait: bool, f: F) -> Result<Option<Message>>
-    where F: FnOnce(&mut ExecuteWebhook) -> &mut ExecuteWebhook
+    pub async fn execute<'a, F>(&self, http: impl AsRef<Http>, wait: bool, f: F) -> Result<Option<Message>>
+    where for <'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>
     {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
+
         let map = utils::hashmap_to_json_map(execute_webhook.0);
 
-        http.as_ref().execute_webhook(self.id.0, &self.token, wait, &map).await
+        if !execute_webhook.1.is_empty() {
+            http.as_ref().execute_webhook_with_files(self.id.0, &self.token, wait, execute_webhook.1.clone(), map).await
+        } else {
+            http.as_ref().execute_webhook(self.id.0, &self.token, wait, &map).await
+        }
     }
 
     /// Retrieves the latest information about the webhook, editing the
