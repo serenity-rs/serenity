@@ -2182,6 +2182,10 @@
 <span id="2179">2179</span>
 <span id="2180">2180</span>
 <span id="2181">2181</span>
+<span id="2182">2182</span>
+<span id="2183">2183</span>
+<span id="2184">2184</span>
+<span id="2185">2185</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
@@ -3539,6 +3543,10 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="ident">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
+
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">member</span> {
+                    <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">member</span>.<span class="ident">clone</span>());
+                }
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">channel_id</span>.<span class="ident">is_some</span>() {
                     <span class="comment">// Update or add to the voice state list</span>
