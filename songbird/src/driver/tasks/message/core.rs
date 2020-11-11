@@ -1,5 +1,5 @@
 use crate::{
-    driver::connection::error::Error,
+    driver::{connection::error::Error, Config},
     events::EventData,
     tracks::Track,
     Bitrate,
@@ -16,6 +16,7 @@ pub enum CoreMessage {
     AddTrack(Track),
     SetBitrate(Bitrate),
     AddEvent(EventData),
+    SetConfig(Config),
     Mute(bool),
     Reconnect,
     FullReconnect,

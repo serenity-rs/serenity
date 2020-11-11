@@ -1,4 +1,4 @@
-use super::{error::Result, message::*};
+use super::{error::Result, message::*, Config};
 use crate::{
     constants::*,
     tracks::{PlayMode, Track},
@@ -13,7 +13,6 @@ use audiopus::{
 use discortp::{
     rtp::{MutableRtpPacket, RtpPacket},
     MutablePacket,
-    Packet,
 };
 use flume::{Receiver, Sender, TryRecvError};
 use rand::random;
@@ -21,11 +20,12 @@ use spin_sleep::SpinSleeper;
 use std::time::Instant;
 use tokio::runtime::Handle;
 use tracing::{error, instrument};
-use xsalsa20poly1305::{aead::AeadInPlace, Nonce, TAG_SIZE};
+use xsalsa20poly1305::TAG_SIZE;
 
 struct Mixer {
     async_handle: Handle,
     bitrate: Bitrate,
+    config: Config,
     conn_active: Option<MixerConnection>,
     deadline: Instant,
     encoder: OpusEncoder,
@@ -53,6 +53,7 @@ impl Mixer {
         mix_rx: Receiver<MixerMessage>,
         async_handle: Handle,
         interconnect: Interconnect,
+        config: Config,
     ) -> Self {
         let bitrate = DEFAULT_BITRATE;
         let encoder = new_encoder(bitrate)
@@ -70,9 +71,12 @@ impl Mixer {
         rtp.set_sequence(random::<u16>().into());
         rtp.set_timestamp(random::<u32>().into());
 
+        let tracks = Vec::with_capacity(1.max(config.preallocated_tracks));
+
         Self {
             async_handle,
             bitrate,
+            config,
             conn_active: None,
             deadline: Instant::now(),
             encoder,
@@ -84,7 +88,7 @@ impl Mixer {
             silence_frames: 0,
             sleeper: Default::default(),
             soft_clip,
-            tracks: vec![],
+            tracks,
             ws: None,
         }
     }
@@ -137,6 +141,8 @@ impl Mixer {
                                 (Blame: VOICE_PACKET_MAX?)",
                         );
                         rtp.set_ssrc(ssrc);
+                        rtp.set_sequence(random::<u16>().into());
+                        rtp.set_timestamp(random::<u32>().into());
                         self.deadline = Instant::now();
                         Ok(())
                     },
@@ -159,6 +165,23 @@ impl Mixer {
                         self.interconnect = i;
 
                         self.rebuild_tracks()
+                    },
+                    Ok(SetConfig(new_config)) => {
+                        self.config = new_config.clone();
+
+                        if self.tracks.capacity() < self.config.preallocated_tracks {
+                            self.tracks
+                                .reserve(self.config.preallocated_tracks - self.tracks.len());
+                        }
+
+                        if let Some(conn) = &self.conn_active {
+                            conn_failure |= conn
+                                .udp_rx
+                                .send(UdpRxMessage::SetConfig(new_config))
+                                .is_err();
+                        }
+
+                        Ok(())
                     },
                     Ok(RebuildEncoder) => match new_encoder(self.bitrate) {
                         Ok(encoder) => {
@@ -449,38 +472,38 @@ impl Mixer {
             .as_mut()
             .expect("Shouldn't be mixing packets without access to a cipher + UDP dest.");
 
-        let mut nonce = Nonce::default();
         let index = {
             let mut rtp = MutableRtpPacket::new(&mut self.packet[..]).expect(
                 "FATAL: Too few bytes in self.packet for RTP header.\
                     (Blame: VOICE_PACKET_MAX?)",
             );
 
-            let pkt = rtp.packet();
-            let rtp_len = RtpPacket::minimum_packet_size();
-            nonce[..rtp_len].copy_from_slice(&pkt[..rtp_len]);
-
             let payload = rtp.payload_mut();
+            let crypto_mode = conn.crypto_state.kind();
 
             let payload_len = if opus_frame.is_empty() {
-                self.encoder
-                    .encode_float(&buffer[..STEREO_FRAME_SIZE], &mut payload[TAG_SIZE..])?
+                let total_payload_space = payload.len() - crypto_mode.payload_suffix_len();
+                self.encoder.encode_float(
+                    &buffer[..STEREO_FRAME_SIZE],
+                    &mut payload[TAG_SIZE..total_payload_space],
+                )?
             } else {
                 let len = opus_frame.len();
                 payload[TAG_SIZE..TAG_SIZE + len].clone_from_slice(opus_frame);
                 len
             };
 
-            let final_payload_size = TAG_SIZE + payload_len;
+            let final_payload_size = conn
+                .crypto_state
+                .write_packet_nonce(&mut rtp, TAG_SIZE + payload_len);
 
-            let tag = conn.cipher.encrypt_in_place_detached(
-                &nonce,
-                b"",
-                &mut payload[TAG_SIZE..final_payload_size],
+            conn.crypto_state.kind().encrypt_in_place(
+                &mut rtp,
+                &conn.cipher,
+                final_payload_size,
             )?;
-            payload[..TAG_SIZE].copy_from_slice(&tag[..]);
 
-            rtp_len + final_payload_size
+            RtpPacket::minimum_packet_size() + final_payload_size
         };
 
         // TODO: This is dog slow, don't do this.
@@ -509,8 +532,9 @@ pub(crate) fn runner(
     interconnect: Interconnect,
     mix_rx: Receiver<MixerMessage>,
     async_handle: Handle,
+    config: Config,
 ) {
-    let mut mixer = Mixer::new(mix_rx, async_handle, interconnect);
+    let mut mixer = Mixer::new(mix_rx, async_handle, interconnect, config);
 
     mixer.run();
 }

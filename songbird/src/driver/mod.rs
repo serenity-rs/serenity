@@ -11,11 +11,13 @@
 mod config;
 pub(crate) mod connection;
 mod crypto;
+mod decode_mode;
 pub(crate) mod tasks;
 
 pub use config::Config;
 use connection::error::Result;
-pub use crypto::Mode as CryptoMode;
+pub use crypto::*;
+pub use decode_mode::DecodeMode;
 
 use crate::{
     events::EventData,
@@ -185,6 +187,13 @@ impl Driver {
     #[instrument(skip(self))]
     pub fn stop(&mut self) {
         self.send(CoreMessage::SetTrack(None))
+    }
+
+    /// Sets the configuration for this driver.
+    #[instrument(skip(self))]
+    pub fn set_config(&mut self, config: Config) {
+        self.config = config.clone();
+        self.send(CoreMessage::SetConfig(config))
     }
 
     /// Attach a global event handler to an audio context. Global events may receive

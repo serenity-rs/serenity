@@ -23,7 +23,7 @@ pub(crate) fn start(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMe
     });
 }
 
-fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
+fn start_internals(core: Sender<CoreMessage>, config: Config) -> Interconnect {
     let (evt_tx, evt_rx) = flume::unbounded();
     let (mix_tx, mix_rx) = flume::unbounded();
 
@@ -44,7 +44,7 @@ fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
     let handle = Handle::current();
     std::thread::spawn(move || {
         info!("Mixer started.");
-        mixer::runner(ic, mix_rx, handle);
+        mixer::runner(ic, mix_rx, handle, config);
         info!("Mixer finished.");
     });
 
@@ -52,13 +52,23 @@ fn start_internals(core: Sender<CoreMessage>) -> Interconnect {
 }
 
 #[instrument(skip(rx, tx))]
-async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
+async fn runner(mut config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessage>) {
+    let mut next_config: Option<Config> = None;
     let mut connection = None;
-    let mut interconnect = start_internals(tx);
+    let mut interconnect = start_internals(tx, config.clone());
 
     loop {
         match rx.recv_async().await {
             Ok(CoreMessage::ConnectWithResult(info, tx)) => {
+                config = if let Some(new_config) = next_config.take() {
+                    let _ = interconnect
+                        .mixer
+                        .send(MixerMessage::SetConfig(new_config.clone()));
+                    new_config
+                } else {
+                    config
+                };
+
                 connection = match Connection::new(info, &interconnect, &config).await {
                     Ok(connection) => {
                         // Other side may not be listening: this is fine.
@@ -86,6 +96,13 @@ async fn runner(config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMessag
             },
             Ok(CoreMessage::SetBitrate(b)) => {
                 let _ = interconnect.mixer.send(MixerMessage::SetBitrate(b));
+            },
+            Ok(CoreMessage::SetConfig(mut new_config)) => {
+                next_config = Some(new_config.clone());
+
+                new_config.make_safe(&config, connection.is_some());
+
+                let _ = interconnect.mixer.send(MixerMessage::SetConfig(new_config));
             },
             Ok(CoreMessage::AddEvent(evt)) => {
                 let _ = interconnect.events.send(EventMessage::AddGlobalEvent(evt));

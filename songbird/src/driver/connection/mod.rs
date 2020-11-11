@@ -41,8 +41,6 @@ impl Connection {
         interconnect: &Interconnect,
         config: &Config,
     ) -> Result<Connection> {
-        let crypto_mode = config.crypto_mode.unwrap_or(CryptoMode::Normal);
-
         let url = generate_url(&mut info.endpoint)?;
 
         #[cfg(all(feature = "rustls", not(feature = "native")))]
@@ -95,7 +93,7 @@ impl Connection {
         let ready =
             ready.expect("Ready packet expected in connection initialisation, but not found.");
 
-        if !has_valid_mode(&ready.modes, crypto_mode) {
+        if !has_valid_mode(&ready.modes, config.crypto_mode) {
             return Err(Error::CryptoModeUnavailable);
         }
 
@@ -147,14 +145,14 @@ impl Connection {
                     protocol: "udp".into(),
                     data: ProtocolData {
                         address,
-                        mode: crypto_mode.to_request_str().into(),
+                        mode: config.crypto_mode.to_request_str().into(),
                         port: view.get_port(),
                     },
                 }))
                 .await?;
         }
 
-        let cipher = init_cipher(&mut client, crypto_mode).await?;
+        let cipher = init_cipher(&mut client, config.crypto_mode).await?;
 
         info!("Connected to: {}", info.endpoint);
 
@@ -169,6 +167,7 @@ impl Connection {
 
         let mix_conn = MixerConnection {
             cipher: cipher.clone(),
+            crypto_state: config.crypto_mode.into(),
             udp_rx: udp_receiver_msg_tx,
             udp_tx: udp_sender_msg_tx,
         };
@@ -193,7 +192,7 @@ impl Connection {
             interconnect.clone(),
             udp_receiver_msg_rx,
             cipher,
-            crypto_mode,
+            config.clone(),
             udp_rx,
         ));
         tokio::spawn(udp_tx::runner(udp_sender_msg_rx, ssrc, udp_tx));
