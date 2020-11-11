@@ -42,13 +42,15 @@ pub enum EventContext<'a> {
     /// if `audio.len() == 0`, then this packet arrived out-of-order.
     VoicePacket {
         /// Decoded audio from this packet.
-        audio: &'a Vec<i16>,
+        audio: &'a Option<Vec<i16>>,
         /// Raw RTP packet data.
         ///
         /// Includes the SSRC (i.e., sender) of this packet.
         packet: &'a Rtp,
-        /// Byte index into the packet for where the payload begins.
+        /// Byte index into the packet body (after headers) for where the payload begins.
         payload_offset: usize,
+        /// Number of bytes at the end of the packet to discard.
+        payload_end_pad: usize,
     },
     /// Telemetry/statistics packet, received from another stream (detailed in `packet`).
     /// `payload_offset` contains the true payload location within the raw packet's `payload()`,
@@ -56,8 +58,10 @@ pub enum EventContext<'a> {
     RtcpPacket {
         /// Raw RTCP packet data.
         packet: &'a Rtcp,
-        /// Byte index into the packet for where the payload begins.
+        /// Byte index into the packet body (after headers) for where the payload begins.
         payload_offset: usize,
+        /// Number of bytes at the end of the packet to discard.
+        payload_end_pad: usize,
     },
     /// Fired whenever a client connects to a call for the first time, allowing SSRC/UserID
     /// matching.
@@ -74,13 +78,15 @@ pub(crate) enum CoreContext {
         speaking: bool,
     },
     VoicePacket {
-        audio: Vec<i16>,
+        audio: Option<Vec<i16>>,
         packet: Rtp,
         payload_offset: usize,
+        payload_end_pad: usize,
     },
     RtcpPacket {
         packet: Rtcp,
         payload_offset: usize,
+        payload_end_pad: usize,
     },
     ClientConnect(ClientConnect),
     ClientDisconnect(ClientDisconnect),
@@ -100,17 +106,21 @@ impl<'a> CoreContext {
                 audio,
                 packet,
                 payload_offset,
+                payload_end_pad,
             } => EventContext::VoicePacket {
                 audio,
                 packet,
                 payload_offset: *payload_offset,
+                payload_end_pad: *payload_end_pad,
             },
             RtcpPacket {
                 packet,
                 payload_offset,
+                payload_end_pad,
             } => EventContext::RtcpPacket {
                 packet,
                 payload_offset: *payload_offset,
+                payload_end_pad: *payload_end_pad,
             },
             ClientConnect(evt) => EventContext::ClientConnect(*evt),
             ClientDisconnect(evt) => EventContext::ClientDisconnect(*evt),

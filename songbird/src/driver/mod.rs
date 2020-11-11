@@ -11,11 +11,13 @@
 mod config;
 pub(crate) mod connection;
 mod crypto;
+mod decode_mode;
 pub(crate) mod tasks;
 
 pub use config::Config;
 use connection::error::Result;
-pub use crypto::Mode as CryptoMode;
+pub use crypto::*;
+pub use decode_mode::DecodeMode;
 
 use crate::{
     events::EventData,

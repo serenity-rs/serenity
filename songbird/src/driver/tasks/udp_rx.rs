@@ -2,13 +2,12 @@ use super::{
     error::{Error, Result},
     message::*,
 };
-use crate::{constants::*, driver::CryptoMode, events::CoreContext};
+use crate::{constants::*, driver::Config, events::CoreContext};
 use audiopus::{coder::Decoder as OpusDecoder, Channels};
 use discortp::{
     demux::{self, DemuxedMut},
     rtp::{RtpExtensionPacket, RtpPacket},
     FromPacket,
-    MutablePacket,
     Packet,
     PacketSize,
 };
@@ -16,7 +15,7 @@ use flume::Receiver;
 use std::collections::HashMap;
 use tokio::net::udp::RecvHalf;
 use tracing::{error, info, instrument, warn};
-use xsalsa20poly1305::{aead::AeadInPlace, Nonce, Tag, XSalsa20Poly1305 as Cipher, TAG_SIZE};
+use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 
 #[derive(Debug)]
 struct SsrcState {
@@ -46,19 +45,21 @@ impl SsrcState {
         &mut self,
         pkt: RtpPacket<'_>,
         data_offset: usize,
-    ) -> Result<(SpeakingDelta, Vec<i16>)> {
+        data_trailer: usize,
+    ) -> Result<(SpeakingDelta, Option<Vec<i16>>)> {
         let new_seq: u16 = pkt.get_sequence().into();
+        let payload_len = pkt.payload().len();
 
         let extensions = pkt.get_extension() != 0;
         let seq_delta = new_seq.wrapping_sub(self.last_seq);
         Ok(if seq_delta >= (1 << 15) {
             // Overflow, reordered (previously missing) packet.
-            (SpeakingDelta::Same, vec![])
+            (SpeakingDelta::Same, Some(vec![]))
         } else {
             self.last_seq = new_seq;
             let missed_packets = seq_delta.saturating_sub(1);
             let (audio, pkt_size) =
-                self.scan_and_decode(&pkt.payload()[data_offset..], extensions, missed_packets)?;
+                self.scan_and_decode(&pkt.payload()[data_offset..payload_len-data_trailer], extensions, missed_packets)?;
 
             let delta = if pkt_size == SILENT_FRAME.len() {
                 // Frame is silent.
@@ -82,7 +83,7 @@ impl SsrcState {
                 out
             };
 
-            (delta, audio)
+            (delta, Some(audio))
         })
     }
 
@@ -131,7 +132,7 @@ struct UdpRx {
     cipher: Cipher,
     decoder_map: HashMap<u32, SsrcState>,
     #[allow(dead_code)]
-    mode: CryptoMode, // In future, this will allow crypto mode selection.
+    config: Config,
     packet_buffer: [u8; VOICE_PACKET_MAX],
     rx: Receiver<UdpRxMessage>,
     udp_socket: RecvHalf,
@@ -150,7 +151,10 @@ impl UdpRx {
                     match msg {
                         Ok(ReplaceInterconnect(i)) => {
                             *interconnect = i;
-                        }
+                        },
+                        Ok(SetConfig(c)) => {
+                            self.config = c;
+                        },
                         Ok(Poison) | Err(_) => break,
                     }
                 }
@@ -175,15 +179,15 @@ impl UdpRx {
                     return;
                 }
 
-                let rtp_body_start =
-                    decrypt_in_place(&mut rtp, &self.cipher).expect("RTP decryption failed.");
+                // FIXME: don't crash here!
+                let (rtp_body_start, rtp_body_tail) = self.config.crypto_mode.decrypt_in_place(&mut rtp, &self.cipher).expect("RTP decryption failed.");
 
                 let entry = self
                     .decoder_map
                     .entry(rtp.get_ssrc())
                     .or_insert_with(|| SsrcState::new(rtp.to_immutable()));
 
-                if let Ok((delta, audio)) = entry.process(rtp.to_immutable(), rtp_body_start) {
+                if let Ok((delta, audio)) = entry.process(rtp.to_immutable(), rtp_body_start, rtp_body_tail) {
                     match delta {
                         SpeakingDelta::Start => {
                             let _ = interconnect.events.send(EventMessage::FireCoreEvent(
@@ -209,20 +213,22 @@ impl UdpRx {
                             audio,
                             packet: rtp.from_packet(),
                             payload_offset: rtp_body_start,
+                            payload_end_pad: rtp_body_tail,
                         },
                     ));
                 } else {
-                    warn!("RTP decoding/decrytion failed.");
+                    warn!("RTP decoding/decryption failed.");
                 }
             },
             DemuxedMut::Rtcp(mut rtcp) => {
-                let rtcp_body_start = decrypt_in_place(&mut rtcp, &self.cipher);
+                let rtcp_body_data = self.config.crypto_mode.decrypt_in_place(&mut rtcp, &self.cipher);
 
-                if let Ok(start) = rtcp_body_start {
+                if let Ok((start, tail)) = rtcp_body_data {
                     let _ = interconnect.events.send(EventMessage::FireCoreEvent(
                         CoreContext::RtcpPacket {
                             packet: rtcp.from_packet(),
                             payload_offset: start,
+                            payload_end_pad: tail,
                         },
                     ));
                 } else {
@@ -244,7 +250,7 @@ pub(crate) async fn runner(
     mut interconnect: Interconnect,
     rx: Receiver<UdpRxMessage>,
     cipher: Cipher,
-    mode: CryptoMode,
+    config: Config,
     udp_socket: RecvHalf,
 ) {
     info!("UDP receive handle started.");
@@ -252,7 +258,7 @@ pub(crate) async fn runner(
     let mut state = UdpRx {
         cipher,
         decoder_map: Default::default(),
-        mode,
+        config,
         packet_buffer: [0u8; VOICE_PACKET_MAX],
         rx,
         udp_socket,
@@ -261,23 +267,6 @@ pub(crate) async fn runner(
     state.run(&mut interconnect).await;
 
     info!("UDP receive handle stopped.");
-}
-
-#[inline]
-fn decrypt_in_place(packet: &mut impl MutablePacket, cipher: &Cipher) -> Result<usize> {
-    // Applies discord's cheapest.
-    // In future, might want to make a choice...
-    let header_len = packet.packet().len() - packet.payload().len();
-    let mut nonce = Nonce::default();
-    nonce[..header_len].copy_from_slice(&packet.packet()[..header_len]);
-
-    let data = packet.payload_mut();
-    let (tag_bytes, data_bytes) = data.split_at_mut(TAG_SIZE);
-    let tag = Tag::from_slice(tag_bytes);
-
-    Ok(cipher
-        .decrypt_in_place_detached(&nonce, b"", data_bytes, tag)
-        .map(|_| TAG_SIZE)?)
 }
 
 #[inline]
