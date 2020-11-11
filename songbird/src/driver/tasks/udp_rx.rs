@@ -58,8 +58,11 @@ impl SsrcState {
         } else {
             self.last_seq = new_seq;
             let missed_packets = seq_delta.saturating_sub(1);
-            let (audio, pkt_size) =
-                self.scan_and_decode(&pkt.payload()[data_offset..payload_len-data_trailer], extensions, missed_packets)?;
+            let (audio, pkt_size) = self.scan_and_decode(
+                &pkt.payload()[data_offset..payload_len - data_trailer],
+                extensions,
+                missed_packets,
+            )?;
 
             let delta = if pkt_size == SILENT_FRAME.len() {
                 // Frame is silent.
@@ -180,14 +183,20 @@ impl UdpRx {
                 }
 
                 // FIXME: don't crash here!
-                let (rtp_body_start, rtp_body_tail) = self.config.crypto_mode.decrypt_in_place(&mut rtp, &self.cipher).expect("RTP decryption failed.");
+                let (rtp_body_start, rtp_body_tail) = self
+                    .config
+                    .crypto_mode
+                    .decrypt_in_place(&mut rtp, &self.cipher)
+                    .expect("RTP decryption failed.");
 
                 let entry = self
                     .decoder_map
                     .entry(rtp.get_ssrc())
                     .or_insert_with(|| SsrcState::new(rtp.to_immutable()));
 
-                if let Ok((delta, audio)) = entry.process(rtp.to_immutable(), rtp_body_start, rtp_body_tail) {
+                if let Ok((delta, audio)) =
+                    entry.process(rtp.to_immutable(), rtp_body_start, rtp_body_tail)
+                {
                     match delta {
                         SpeakingDelta::Start => {
                             let _ = interconnect.events.send(EventMessage::FireCoreEvent(
@@ -221,7 +230,10 @@ impl UdpRx {
                 }
             },
             DemuxedMut::Rtcp(mut rtcp) => {
-                let rtcp_body_data = self.config.crypto_mode.decrypt_in_place(&mut rtcp, &self.cipher);
+                let rtcp_body_data = self
+                    .config
+                    .crypto_mode
+                    .decrypt_in_place(&mut rtcp, &self.cipher);
 
                 if let Ok((start, tail)) = rtcp_body_data {
                     let _ = interconnect.events.send(EventMessage::FireCoreEvent(

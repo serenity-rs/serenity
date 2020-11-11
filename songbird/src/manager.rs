@@ -1,5 +1,5 @@
 #[cfg(feature = "driver")]
-use crate::error::ConnectionResult;
+use crate::{driver::Config, error::ConnectionResult};
 use crate::{
     error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
@@ -47,6 +47,9 @@ pub struct Songbird {
     client_data: PRwLock<ClientData>,
     calls: PRwLock<HashMap<GuildId, Arc<Mutex<Call>>>>,
     sharder: Sharder,
+
+    #[cfg(feature = "driver")]
+    driver_config: PRwLock<Option<Config>>,
 }
 
 impl Songbird {
@@ -61,6 +64,9 @@ impl Songbird {
             client_data: Default::default(),
             calls: Default::default(),
             sharder: Sharder::Serenity(Default::default()),
+
+            #[cfg(feature = "driver")]
+            driver_config: Default::default(),
         })
     }
 
@@ -84,6 +90,9 @@ impl Songbird {
             }),
             calls: Default::default(),
             sharder: Sharder::Twilight(cluster),
+
+            #[cfg(feature = "driver")]
+            driver_config: Default::default(),
         })
     }
 
@@ -133,7 +142,18 @@ impl Songbird {
                         .get_shard(shard)
                         .expect("Failed to get shard handle: shard_count incorrect?");
 
-                    Arc::new(Mutex::new(Call::new(guild_id, shard_handle, info.user_id)))
+                    #[cfg(feature = "driver")]
+                    let call = Call::from_driver_config(
+                        guild_id,
+                        shard_handle,
+                        info.user_id,
+                        self.driver_config.read().clone().unwrap_or_default(),
+                    );
+
+                    #[cfg(not(feature = "driver"))]
+                    let call = Call::new(guild_id, shard_handle, info.user_id);
+
+                    Arc::new(Mutex::new(call))
                 })
                 .clone()
         })
@@ -344,6 +364,20 @@ impl VoiceGatewayManager for Songbird {
             let mut handler = call.lock().await;
             handler.update_state(voice_state.session_id.clone());
         }
+    }
+}
+
+#[cfg(feature = "driver")]
+impl Songbird {
+    /// Sets a shared configuration for all drivers created from this
+    /// manager.
+    ///
+    /// Changes made here will apply to new Call and Driver instances only.
+    ///
+    /// Requires the `"driver"` feature.
+    pub fn set_config(&self, new_config: Config) {
+        let mut config = self.driver_config.write();
+        *config = Some(new_config);
     }
 }
 

@@ -1,5 +1,8 @@
 #[cfg(feature = "driver")]
-use crate::{driver::Driver, error::ConnectionResult};
+use crate::{
+    driver::{Config, Driver},
+    error::ConnectionResult,
+};
 use crate::{
     error::{JoinError, JoinResult},
     id::{ChannelId, GuildId, UserId},
@@ -59,6 +62,19 @@ impl Call {
         Self::new_raw(guild_id, Some(ws), user_id)
     }
 
+    #[cfg(feature = "driver")]
+    /// Creates a new Call, configuring the driver as specified.
+    #[inline]
+    #[instrument]
+    pub fn from_driver_config(
+        guild_id: GuildId,
+        ws: Shard,
+        user_id: UserId,
+        config: Config,
+    ) -> Self {
+        Self::new_raw_cfg(guild_id, Some(ws), user_id, config)
+    }
+
     /// Creates a new, standalone Call which is not connected via
     /// WebSocket to the Gateway.
     ///
@@ -73,11 +89,36 @@ impl Call {
         Self::new_raw(guild_id, None, user_id)
     }
 
+    #[cfg(feature = "driver")]
+    /// Creates a new standalone Call, configuring the driver as specified.
+    #[inline]
+    #[instrument]
+    pub fn standalone_from_driver_config(
+        guild_id: GuildId,
+        user_id: UserId,
+        config: Config,
+    ) -> Self {
+        Self::new_raw_cfg(guild_id, None, user_id, config)
+    }
+
     fn new_raw(guild_id: GuildId, ws: Option<Shard>, user_id: UserId) -> Self {
         Call {
             connection: None,
             #[cfg(feature = "driver")]
             driver: Default::default(),
+            guild_id,
+            self_deaf: false,
+            self_mute: false,
+            user_id,
+            ws,
+        }
+    }
+
+    #[cfg(feature = "driver")]
+    fn new_raw_cfg(guild_id: GuildId, ws: Option<Shard>, user_id: UserId, config: Config) -> Self {
+        Call {
+            connection: None,
+            driver: Driver::new(config),
             guild_id,
             self_deaf: false,
             self_mute: false,

@@ -170,7 +170,8 @@ impl Mixer {
                         self.config = new_config.clone();
 
                         if self.tracks.capacity() < self.config.preallocated_tracks {
-                            self.tracks.reserve(self.config.preallocated_tracks - self.tracks.len());
+                            self.tracks
+                                .reserve(self.config.preallocated_tracks - self.tracks.len());
                         }
 
                         if let Some(conn) = &self.conn_active {
@@ -482,19 +483,25 @@ impl Mixer {
 
             let payload_len = if opus_frame.is_empty() {
                 let total_payload_space = payload.len() - crypto_mode.payload_suffix_len();
-                self.encoder
-                    .encode_float(&buffer[..STEREO_FRAME_SIZE], &mut payload[TAG_SIZE..total_payload_space])?
+                self.encoder.encode_float(
+                    &buffer[..STEREO_FRAME_SIZE],
+                    &mut payload[TAG_SIZE..total_payload_space],
+                )?
             } else {
                 let len = opus_frame.len();
                 payload[TAG_SIZE..TAG_SIZE + len].clone_from_slice(opus_frame);
                 len
             };
 
-            let final_payload_size = conn.crypto_state.write_packet_nonce(&mut rtp, TAG_SIZE + payload_len);
+            let final_payload_size = conn
+                .crypto_state
+                .write_packet_nonce(&mut rtp, TAG_SIZE + payload_len);
 
-            conn.crypto_state
-                .kind()
-                .encrypt_in_place(&mut rtp, &conn.cipher, final_payload_size)?;
+            conn.crypto_state.kind().encrypt_in_place(
+                &mut rtp,
+                &conn.cipher,
+                final_payload_size,
+            )?;
 
             RtpPacket::minimum_packet_size() + final_payload_size
         };

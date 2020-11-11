@@ -44,38 +44,38 @@ pub struct Config {
 }
 
 impl Default for Config {
-	fn default() -> Self {
-		Self {
-			crypto_mode: CryptoMode::Normal,
-			decode_mode: DecodeMode::Decrypt,
-			preallocated_tracks: 1,
-		}
-	}
+    fn default() -> Self {
+        Self {
+            crypto_mode: CryptoMode::Normal,
+            decode_mode: DecodeMode::Decrypt,
+            preallocated_tracks: 1,
+        }
+    }
 }
 
 impl Config {
-	/// Sets this `Config`'s chosen cryptographic tagging scheme.
-	pub fn crypto_mode(mut self, crypto_mode: CryptoMode) -> Self {
-		self.crypto_mode = crypto_mode;
-		self
-	}
+    /// Sets this `Config`'s chosen cryptographic tagging scheme.
+    pub fn crypto_mode(mut self, crypto_mode: CryptoMode) -> Self {
+        self.crypto_mode = crypto_mode;
+        self
+    }
 
-	/// Sets this `Config`'s received packet decryption/decoding behaviour.
-	pub fn decode_mode(mut self, decode_mode: DecodeMode) -> Self {
-		self.decode_mode = decode_mode;
-		self
-	}
+    /// Sets this `Config`'s received packet decryption/decoding behaviour.
+    pub fn decode_mode(mut self, decode_mode: DecodeMode) -> Self {
+        self.decode_mode = decode_mode;
+        self
+    }
 
-	/// Sets this `Config`'s number of tracks to preallocate.
-	pub fn preallocated_tracks(mut self, preallocated_tracks: usize) -> Self {
-		self.preallocated_tracks = preallocated_tracks;
-		self
-	}
+    /// Sets this `Config`'s number of tracks to preallocate.
+    pub fn preallocated_tracks(mut self, preallocated_tracks: usize) -> Self {
+        self.preallocated_tracks = preallocated_tracks;
+        self
+    }
 
-	/// This is used to prevent changes which would invalidate the current session.
-	pub(crate) fn make_safe(&mut self, previous: &Config, connected: bool) {
-		if connected {
-			self.crypto_mode = previous.crypto_mode;
-		}
-	}
+    /// This is used to prevent changes which would invalidate the current session.
+    pub(crate) fn make_safe(&mut self, previous: &Config, connected: bool) {
+        if connected {
+            self.crypto_mode = previous.crypto_mode;
+        }
+    }
 }

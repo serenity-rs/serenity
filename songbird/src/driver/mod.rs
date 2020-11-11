@@ -189,6 +189,13 @@ impl Driver {
         self.send(CoreMessage::SetTrack(None))
     }
 
+    /// Sets the configuration for this driver.
+    #[instrument(skip(self))]
+    pub fn set_config(&mut self, config: Config) {
+        self.config = config.clone();
+        self.send(CoreMessage::SetConfig(config))
+    }
+
     /// Attach a global event handler to an audio context. Global events may receive
     /// any [`EventContext`].
     ///

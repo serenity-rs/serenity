@@ -1,6 +1,10 @@
 use super::{Interconnect, UdpRxMessage, UdpTxMessage, WsMessage};
 
-use crate::{driver::{Config, CryptoState}, tracks::Track, Bitrate};
+use crate::{
+    driver::{Config, CryptoState},
+    tracks::Track,
+    Bitrate,
+};
 use flume::Sender;
 use xsalsa20poly1305::XSalsa20Poly1305 as Cipher;
 

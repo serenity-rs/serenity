@@ -61,7 +61,9 @@ async fn runner(mut config: Config, rx: Receiver<CoreMessage>, tx: Sender<CoreMe
         match rx.recv_async().await {
             Ok(CoreMessage::ConnectWithResult(info, tx)) => {
                 config = if let Some(new_config) = next_config.take() {
-                    let _ = interconnect.mixer.send(MixerMessage::SetConfig(new_config.clone()));
+                    let _ = interconnect
+                        .mixer
+                        .send(MixerMessage::SetConfig(new_config.clone()));
                     new_config
                 } else {
                     config

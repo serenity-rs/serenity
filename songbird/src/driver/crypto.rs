@@ -1,12 +1,16 @@
 //! Encryption schemes supported by Discord's secure RTP negotiation.
 use byteorder::{NetworkEndian, WriteBytesExt};
-use discortp::{
-    rtp::RtpPacket,
-    MutablePacket,
-};
+use discortp::{rtp::RtpPacket, MutablePacket};
 use rand::Rng;
 use std::num::Wrapping;
-use xsalsa20poly1305::{aead::{AeadInPlace, Error as CryptoError}, Nonce, Tag, XSalsa20Poly1305 as Cipher, NONCE_SIZE, TAG_SIZE};
+use xsalsa20poly1305::{
+    aead::{AeadInPlace, Error as CryptoError},
+    Nonce,
+    Tag,
+    XSalsa20Poly1305 as Cipher,
+    NONCE_SIZE,
+    TAG_SIZE,
+};
 
 /// Variants of the XSalsa20Poly1305 encryption scheme.
 ///
@@ -88,15 +92,15 @@ impl CryptoMode {
 
     /// Extracts the byte slice in a packet used as the nonce, and the remaining mutable
     /// portion of the packet.
-    fn nonce_slice<'a>(self, header: &'a [u8], body: &'a mut [u8]) -> (&'a[u8], &'a mut [u8]) {
+    fn nonce_slice<'a>(self, header: &'a [u8], body: &'a mut [u8]) -> (&'a [u8], &'a mut [u8]) {
         use CryptoMode::*;
         match self {
             Normal => (header, body),
             Suffix | Lite => {
                 let len = body.len();
-                let (body_left, nonce_loc) = body.split_at_mut(len-self.payload_suffix_len());
+                let (body_left, nonce_loc) = body.split_at_mut(len - self.payload_suffix_len());
                 (&nonce_loc[..self.nonce_size()], body_left)
-            }
+            },
         }
     }
 
@@ -105,7 +109,11 @@ impl CryptoMode {
     /// If successful, this returns the number of bytes to be ignored from the
     /// start and end of the packet payload.
     #[inline]
-    pub(crate) fn decrypt_in_place(self, packet: &mut impl MutablePacket, cipher: &Cipher) -> Result<(usize, usize), CryptoError> {
+    pub(crate) fn decrypt_in_place(
+        self,
+        packet: &mut impl MutablePacket,
+        cipher: &Cipher,
+    ) -> Result<(usize, usize), CryptoError> {
         let header_len = packet.packet().len() - packet.payload().len();
         let (header, body) = packet.packet_mut().split_at_mut(header_len);
         let (slice_to_use, body_remaining) = self.nonce_slice(header, body);
@@ -135,7 +143,12 @@ impl CryptoMode {
     /// Use of this requires that the input packet has had a nonce generated in the correct location,
     /// and `payload_len` specifies the number of bytes after the header including this nonce.
     #[inline]
-    pub fn encrypt_in_place(self, packet: &mut impl MutablePacket, cipher: &Cipher, payload_len: usize) -> Result<(), CryptoError> {
+    pub fn encrypt_in_place(
+        self,
+        packet: &mut impl MutablePacket,
+        cipher: &Cipher,
+        payload_len: usize,
+    ) -> Result<(), CryptoError> {
         let header_len = packet.packet().len() - packet.payload().len();
         let (header, body) = packet.packet_mut().split_at_mut(header_len);
         let (slice_to_use, body_remaining) = self.nonce_slice(header, &mut body[..payload_len]);
@@ -150,11 +163,8 @@ impl CryptoMode {
 
         // body_remaining is now correctly truncated by this point.
         // the true_payload to encrypt follows after the first TAG_LEN bytes.
-        let tag = cipher.encrypt_in_place_detached(
-            nonce_slice,
-            b"",
-            &mut body_remaining[TAG_SIZE..],
-        )?;
+        let tag =
+            cipher.encrypt_in_place_detached(nonce_slice, b"", &mut body_remaining[TAG_SIZE..])?;
         body_remaining[..TAG_SIZE].copy_from_slice(&tag[..]);
 
         Ok(())
@@ -182,20 +192,25 @@ impl From<CryptoMode> for CryptoState {
 
 impl CryptoState {
     /// Writes packet nonce into the body, if required, returning the new length.
-    pub fn write_packet_nonce(&mut self, packet: &mut impl MutablePacket, payload_end: usize) -> usize {
+    pub fn write_packet_nonce(
+        &mut self,
+        packet: &mut impl MutablePacket,
+        payload_end: usize,
+    ) -> usize {
         let mode = self.kind();
         let endpoint = payload_end + mode.payload_suffix_len();
 
         use CryptoState::*;
         match self {
             Suffix => {
-                rand::thread_rng()
-                    .fill(&mut packet.payload_mut()[payload_end..endpoint]);
+                rand::thread_rng().fill(&mut packet.payload_mut()[payload_end..endpoint]);
             },
             Lite(mut i) => {
                 (&mut packet.payload_mut()[payload_end..endpoint])
                     .write_u32::<NetworkEndian>(i.0)
-                    .expect("Nonce size is guaranteed to be sufficient to write u32 for lite tagging.");
+                    .expect(
+                        "Nonce size is guaranteed to be sufficient to write u32 for lite tagging.",
+                    );
                 i += Wrapping(1);
             },
             _ => {},
