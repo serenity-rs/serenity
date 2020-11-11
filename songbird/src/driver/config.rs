@@ -2,7 +2,6 @@ use super::{CryptoMode, DecodeMode};
 
 /// Configuration for the inner Driver.
 ///
-/// At present, this cannot be changed.
 #[derive(Clone, Debug)]
 pub struct Config {
     /// Selected tagging mode for voice packet encryption.
