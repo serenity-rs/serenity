@@ -13,8 +13,6 @@ use xsalsa20poly1305::{
 };
 
 /// Variants of the XSalsa20Poly1305 encryption scheme.
-///
-/// At present, only `Normal` is supported or selectable.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum CryptoMode {

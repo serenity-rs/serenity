@@ -6,6 +6,13 @@ pub enum DecodeMode {
     /// changes applied.
     ///
     /// No CPU work involved.
+    ///
+    /// *BEWARE: this will almost certainly break [user speaking events].
+    /// Silent frame detection only works if extensions can be parsed or
+    /// are not present, as they are encrypted.
+    /// This event requires such functionality.*
+    ///
+    /// [user speaking events]: ../events/enum.CoreEvent.html#variant.SpeakingUpdate
     Pass,
     /// Decrypts the body of each received packet.
     ///

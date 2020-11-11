@@ -28,12 +28,14 @@ use serenity::{
 };
 
 use songbird::{
+    driver::{Config as DriverConfig, DecodeMode},
     model::payload::{ClientConnect, ClientDisconnect, Speaking},
     CoreEvent,
     Event,
     EventContext,
     EventHandler as VoiceEventHandler,
     SerenityInit,
+    Songbird,
 };
 
 struct Handler;
@@ -75,7 +77,6 @@ impl VoiceEventHandler for Receiver {
                 // SSRCs and map the SSRC to the User ID and maintain this state.
                 // Using this map, you can map the `ssrc` in `voice_packet`
                 // to the user ID and handle their audio packets separately.
-
                 println!(
                     "Speaking state update: user {:?} has SSRC {:?}, using {:?}",
                     user_id,
@@ -86,27 +87,29 @@ impl VoiceEventHandler for Receiver {
             Ctx::SpeakingUpdate {ssrc, speaking} => {
                 // You can implement logic here which reacts to a user starting
                 // or stopping speaking.
-
                 println!(
                     "Source {} has {} speaking.",
                     ssrc,
                     if *speaking {"started"} else {"stopped"},
                 );
             },
-            Ctx::VoicePacket {audio, packet, payload_offset} => {
+            Ctx::VoicePacket {audio, packet, payload_offset, payload_end_pad} => {
                 // An event which fires for every received audio packet,
                 // containing the decoded data.
-
-                println!("Audio packet's first 5 samples: {:?}", audio.get(..5.min(audio.len())));
-                println!(
-                    "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
-                    packet.sequence.0,
-                    audio.len() * std::mem::size_of::<i16>(),
-                    packet.payload.len(),
-                    packet.ssrc,
-                );
+                if let Some(audio) = audio {
+                    println!("Audio packet's first 5 samples: {:?}", audio.get(..5.min(audio.len())));
+                    println!(
+                        "Audio packet sequence {:05} has {:04} bytes (decompressed from {}), SSRC {}",
+                        packet.sequence.0,
+                        audio.len() * std::mem::size_of::<i16>(),
+                        packet.payload.len(),
+                        packet.ssrc,
+                    );
+                } else {
+                    println!("RTP packet, but no audio. Driver may not be configured to decode.");
+                }
             },
-            Ctx::RtcpPacket {packet, payload_offset} => {
+            Ctx::RtcpPacket {packet, payload_offset, payload_end_pad} => {
                 // An event which fires for every received rtcp packet,
                 // containing the call statistics and reporting information.
                 println!("RTCP packet received: {:?}", packet);
@@ -159,10 +162,19 @@ async fn main() {
             .prefix("~"))
         .group(&GENERAL_GROUP);
 
+    // Here, we need to configure Songbird to decode all incoming voice packets.
+    // If you want, you can do this on a per-call basis---here, we need it to
+    // read the audio data that other people are sending us!
+    let songbird = Songbird::serenity();
+    songbird.set_config(
+        DriverConfig::default()
+            .decode_mode(DecodeMode::Decode)
+    );
+
     let mut client = Client::builder(&token)
         .event_handler(Handler)
         .framework(framework)
-        .register_songbird()
+        .register_songbird_with(songbird.into())
         .await
         .expect("Err creating client");
 

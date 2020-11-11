@@ -18,16 +18,17 @@ pub struct Config {
     /// Configures whether decoding and decryption occur for all received packets.
     ///
     /// If voice receiving voice packets, generally you should choose [`DecodeMode::Decode`].
-    /// [`DecodeMode::Decrypt`] is intended for users running their own selective decoding
-    /// or who need to inspect Opus packets. If you're certain you will never need any RT(C)P
-    /// events, then consider [`DecodeMode::Pass`].
+    /// [`DecodeMode::Decrypt`] is intended for users running their own selective decoding,
+    /// who rely upon [user speaking events], or who need to inspect Opus packets.
+    /// If you're certain you will never need any RT(C)P events, then consider [`DecodeMode::Pass`].
     ///
     /// Defaults to [`DecodeMode::Decrypt`]. This is due to per-packet decoding costs,
-    /// which most users will not want to pay.
+    /// which most users will not want to pay, but allowing speaking events which are commonly used.
     ///
     /// [`DecodeMode::Decode`]: enum.DecodeMode.html#variant.Decode
     /// [`DecodeMode::Decrypt`]: enum.DecodeMode.html#variant.Decrypt
     /// [`DecodeMode::Pass`]: enum.DecodeMode.html#variant.Pass
+    /// [user speaking events]: ../events/enum.CoreEvent.html#variant.SpeakingUpdate
     pub decode_mode: DecodeMode,
     /// Number of concurrently active tracks to allocate memory for.
     ///
