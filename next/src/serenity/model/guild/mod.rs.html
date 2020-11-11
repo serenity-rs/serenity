@@ -2383,6 +2383,17 @@
 <span id="2380">2380</span>
 <span id="2381">2381</span>
 <span id="2382">2382</span>
+<span id="2383">2383</span>
+<span id="2384">2384</span>
+<span id="2385">2385</span>
+<span id="2386">2386</span>
+<span id="2387">2387</span>
+<span id="2388">2388</span>
+<span id="2389">2389</span>
+<span id="2390">2390</span>
+<span id="2391">2391</span>
+<span id="2392">2392</span>
+<span id="2393">2393</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -2606,13 +2617,20 @@
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="kw-2">mut</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">current_user</span>().<span class="ident">await</span>.<span class="ident">id</span>;
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="kw-2">mut</span> <span class="ident">permissions</span>: <span class="ident">Permissions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">await</span>.<span class="ident">id</span>;
 
-        <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">member_permissions</span>(<span class="ident">user_id</span>);
-        <span class="ident">permissions</span>.<span class="ident">remove</span>(<span class="ident">perms</span>);
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">perms</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">member_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">user_id</span>).<span class="ident">await</span> {
+                <span class="ident">permissions</span>.<span class="ident">remove</span>(<span class="ident">perms</span>);
 
-        <span class="ident">permissions</span>.<span class="ident">is_empty</span>()
+                <span class="ident">permissions</span>.<span class="ident">is_empty</span>()
+            } <span class="kw">else</span> {
+                <span class="bool-val">false</span>
+            }
+        } <span class="kw">else</span> {
+            <span class="bool-val">false</span>
+        }
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2687,7 +2705,7 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">BAN_MEMBERS</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
 
@@ -2713,10 +2731,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">bans</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ban</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">BAN_MEMBERS</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -2810,10 +2828,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_CHANNELS</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -2883,10 +2901,10 @@
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_ROLES</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -2990,10 +3008,10 @@
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_GUILD</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -3073,10 +3091,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_nickname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">CHANGE_NICKNAME</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -3261,10 +3279,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">invites</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_GUILD</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -3650,15 +3668,22 @@
 
     <span class="doccomment">/// Calculate a [`Member`]&#39;s permissions in the guild.</span>
     <span class="doccomment">///</span>
+    <span class="doccomment">/// If member caching is enabled the cache will be checked</span>
+    <span class="doccomment">/// first. If not found it will resort to an http request.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Cache is still required to look up roles.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">member_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Permissions</span> {
-        <span class="self">self</span>.<span class="ident">_member_permissions</span>(<span class="ident">user_id</span>.<span class="ident">into</span>())
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">member_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_member_permissions</span>(<span class="ident">cache_http</span>, <span class="ident">user_id</span>.<span class="ident">into</span>()).<span class="ident">await</span>
     }
 
-    <span class="kw">fn</span> <span class="ident">_member_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Permissions</span> {
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">_member_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="self">self</span>.<span class="ident">owner_id</span> {
-            <span class="kw">return</span> <span class="ident">Permissions</span>::<span class="ident">all</span>();
+            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Permissions</span>::<span class="ident">all</span>());
         }
 
         <span class="kw">let</span> <span class="ident">everyone</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)) {
@@ -3670,21 +3695,18 @@
                     <span class="self">self</span>.<span class="ident">name</span>,
                 );
 
-                <span class="kw">return</span> <span class="ident">Permissions</span>::<span class="ident">empty</span>();
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Permissions</span>::<span class="ident">empty</span>());
             },
         };
 
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">member</span>,
-            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="ident">everyone</span>.<span class="ident">permissions</span>,
-        };
+        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">member</span>(<span class="ident">cache_http</span>, <span class="kw-2">&amp;</span><span class="ident">user_id</span>).<span class="ident">await</span><span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">everyone</span>.<span class="ident">permissions</span>;
 
         <span class="kw">for</span> <span class="ident">role</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">member</span>.<span class="ident">roles</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">get</span>(<span class="ident">role</span>) {
                 <span class="kw">if</span> <span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">contains</span>(<span class="ident">Permissions</span>::<span class="ident">ADMINISTRATOR</span>) {
-                    <span class="kw">return</span> <span class="ident">Permissions</span>::<span class="ident">all</span>();
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">Permissions</span>::<span class="ident">all</span>());
                 }
 
                 <span class="ident">permissions</span> <span class="op">|</span><span class="op">=</span> <span class="ident">role</span>.<span class="ident">permissions</span>;
@@ -3698,7 +3720,7 @@
             }
         }
 
-        <span class="ident">permissions</span>
+        <span class="prelude-val">Ok</span>(<span class="ident">permissions</span>)
     }
 
     <span class="doccomment">/// Moves a member to a specific voice channel.</span>
@@ -3902,10 +3924,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">KICK_MEMBERS</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -4024,10 +4046,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">KICK_MEMBERS</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -4051,10 +4073,10 @@
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unban</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
+            <span class="kw">if</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">is_some</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">BAN_MEMBERS</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="ident">cache</span>, <span class="ident">req</span>).<span class="ident">await</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">req</span>).<span class="ident">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
