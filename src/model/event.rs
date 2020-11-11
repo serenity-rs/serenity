@@ -1355,6 +1355,10 @@ impl CacheUpdate for VoiceStateUpdateEvent {
 
             if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
 
+                if let Some(member) = &self.voice_state.member {
+                    guild.members.insert(member.user.id, member.clone());
+                }
+
                 if self.voice_state.channel_id.is_some() {
                     // Update or add to the voice state list
                     guild
