@@ -82,19 +82,30 @@ impl Member {
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
-        self.roles.extend_from_slice(role_ids);
+        if role_ids.is_empty() {
+            return Ok(());
+        }
+
+        let mut roles = Vec::with_capacity(self.roles.len() + role_ids.len());
+        roles.extend_from_slice(&self.roles);
+
+        for id in role_ids {
+            if !roles.contains(id) {
+                roles.push(*id);
+            }
+        }
 
         let mut builder = EditMember::default();
-        builder.roles(&self.roles);
+        builder.roles(&roles);
         let map = utils::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
-            Ok(()) => Ok(()),
-            Err(why) => {
-                self.roles.retain(|r| !role_ids.contains(r));
+            Ok(()) => {
+                self.roles = roles;
 
-                Err(why)
+                Ok(())
             },
+            Err(why) => Err(why),
         }
     }
 
