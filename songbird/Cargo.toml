@@ -4,7 +4,7 @@ description = "An async Rust library for the Discord voice API."
 documentation = "https://docs.rs/songbird"
 edition = "2018"
 homepage = "https://github.com/serenity-rs/serenity"
-include = ["src/**/*.rs", "Cargo.toml"]
+include = ["src/**/*.rs", "Cargo.toml", "build.rs"]
 keywords = ["discord", "api", "rtp", "audio"]
 license = "ISC"
 name = "songbird"
@@ -60,12 +60,12 @@ version = "0.7"
 optional = true
 features = ["voice", "gateway"]
 path = "../"
-version = "0.9.0-rc.2"
+version = "0.9.0"
 
 [dependencies.serenity-voice-model]
 optional = true
 path = "../voice-model"
-version = "0.9.0-rc.2"
+version = "0.10"
 
 [dependencies.spin_sleep]
 optional = true
@@ -82,12 +82,12 @@ default-features = false
 
 [dependencies.twilight-gateway]
 optional = true
-version = "0.1"
+version = "0.2"
 default-features = false
 
 [dependencies.twilight-model]
 optional = true
-version = "0.1"
+version = "0.2"
 default-features = false
 
 [dependencies.url]
@@ -96,7 +96,7 @@ version = "2"
 
 [dependencies.xsalsa20poly1305]
 optional = true
-version = "0.5"
+version = "0.6"
 
 [dev-dependencies]
 criterion = "0.3"
