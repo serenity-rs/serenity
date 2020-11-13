@@ -23,9 +23,10 @@ compile_error!(
 #[cfg(all(feature = "youtube-dl", feature = "youtube-dlc"))]
 compile_error!(
     "Only youtube-dl or youtube-dlc can be selected \
-    - `youtube-dl` is readily availible on most linux package managers however is error prone \
-    - `youtube-dlc` is a more maintained fork of youtube-dl \
-    If you are unsure, go with `youtube-dlc`."
+    - `youtube-dl` is the standard downloading tool of youtube videos \
+    - `youtube-dlc` is a fork of youtube-dl that aims to solve bugs with youtube-dl \
+    If you are unsure, go with `youtube-dl`, however, if you encounter any errors with `youtube-dl`,
+    such as songs ending immedietly when they are queued/played, try 'youtube-dlc'."
 );
 
 fn main() {}
