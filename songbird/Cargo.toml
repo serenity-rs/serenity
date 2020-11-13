@@ -107,7 +107,7 @@ default = [
     "serenity-rustls",
     "driver",
     "gateway",
-    "youtube-dlc"
+    "youtube-dl"
 ]
 gateway = [
     "flume",
