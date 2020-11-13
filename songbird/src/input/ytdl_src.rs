@@ -14,7 +14,13 @@ use std::{
 use tokio::task;
 use tracing::trace;
 
+#[cfg(feature = "youtube-dl")]
+const YOUTUBE_DL_COMMAND: &str = "youtube-dl";
+#[cfg(feature = "youtube-dlc")]
+const YOUTUBE_DL_COMMAND: &str = "youtube-dlc";
+
 /// Creates a streamed audio source with `youtube-dl` and `ffmpeg`.
+#[cfg(any(feature = "youtube-dl", feature = "youtube-dlc"))]
 pub async fn ytdl(uri: &str) -> Result<Input> {
     _ytdl(uri, &[]).await
 }
@@ -45,7 +51,7 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         "-",
     ];
 
-    let mut youtube_dl = Command::new("youtube-dlc")
+    let mut youtube_dl = Command::new(YOUTUBE_DL_COMMAND)
         .args(&ytdl_args)
         .stdin(Stdio::null())
         .stderr(Stdio::piped())
@@ -102,6 +108,7 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
 
 /// Creates a streamed audio source from YouTube search results with `youtube-dl`,`ffmpeg`, and `ytsearch`.
 /// Takes the first video listed from the YouTube search.
+#[cfg(any(feature = "youtube-dl", feature = "youtube-dlc"))]
 pub async fn ytdl_search(name: &str) -> Result<Input> {
     ytdl(&format!("ytsearch1:{}", name)).await
 }

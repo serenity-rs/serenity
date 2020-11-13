@@ -107,6 +107,7 @@ default = [
     "serenity-rustls",
     "driver",
     "gateway",
+    "youtube-dlc"
 ]
 gateway = [
     "flume",
@@ -135,6 +136,8 @@ driver = [
     "url",
     "xsalsa20poly1305",
 ]
+youtube-dl = []
+youtube-dlc = []
 rustls = ["async-tungstenite/tokio-rustls"]
 native = ["async-tungstenite/tokio-native-tls"]
 serenity-rustls = ["serenity/rustls_backend", "rustls", "gateway", "serenity-deps"]

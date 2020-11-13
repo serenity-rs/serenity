@@ -20,4 +20,12 @@ compile_error!(
     If you are unsure, go with `stock-zlib`."
 );
 
+#[cfg(all(feature = "youtube-dl", feature = "youtube-dlc"))]
+compile_error!(
+    "Only youtube-dl or youtube-dlc can be selected \
+    - `youtube-dl` is readily availible on most linux package managers however is error prone \
+    - `youtube-dlc` is a more maintained fork of youtube-dl \
+    If you are unsure, go with `youtube-dlc`."
+);
+
 fn main() {}
