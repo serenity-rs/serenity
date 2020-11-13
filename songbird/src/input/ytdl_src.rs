@@ -45,7 +45,7 @@ pub(crate) async fn _ytdl(uri: &str, pre_args: &[&str]) -> Result<Input> {
         "-",
     ];
 
-    let mut youtube_dl = Command::new("youtube-dl")
+    let mut youtube_dl = Command::new("youtube-dlc")
         .args(&ytdl_args)
         .stdin(Stdio::null())
         .stderr(Stdio::piped())
