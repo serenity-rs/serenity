@@ -1,5 +1,5 @@
 [package]
-name = "e09_shard_manager"
+name = "e08_shard_manager"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"

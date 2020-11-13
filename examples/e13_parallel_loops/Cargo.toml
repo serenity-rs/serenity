@@ -1,5 +1,5 @@
 [package]
-name = "e15_parallel_loops"
+name = "e13_parallel_loops"
 version = "0.1.0"
 authors = ["my name <my@email.address>"]
 edition = "2018"
