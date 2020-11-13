@@ -160,37 +160,25 @@ jobs:
         run: cargo build -p e05_command_framework
       - name: 'Build example 6'
         working-directory: examples
-        run: cargo build -p e06_voice
+        run: cargo build -p e06_sample_bot_structure
       - name: 'Build example 7'
         working-directory: examples
-        run: cargo build -p e07_sample_bot_structure
+        run: cargo build -p e07_env_logging
       - name: 'Build example 8'
         working-directory: examples
-        run: cargo build -p e08_env_logging
+        run: cargo build -p e08_shard_manager
       - name: 'Build example 9'
         working-directory: examples
-        run: cargo build -p e09_shard_manager
+        run: cargo build -p e09_create_message_builder
       - name: 'Build example 10'
         working-directory: examples
-        run: cargo build -p e10_voice_receive
+        run: cargo build -p e10_collectors
       - name: 'Build example 11'
         working-directory: examples
-        run: cargo build -p e11_create_message_builder
+        run: cargo build -p e11_gateway_intents
       - name: 'Build example 12'
         working-directory: examples
-        run: cargo build -p e12_collectors
+        run: cargo build -p e12_global_data
       - name: 'Build example 13'
         working-directory: examples
-        run: cargo build -p e13_gateway_intents
-      - name: 'Build example 14'
-        working-directory: examples
-        run: cargo build -p e14_global_data
-      - name: 'Build example 15'
-        working-directory: examples
-        run: cargo build -p e15_parallel_loops
-      - name: 'Build example 16'
-        working-directory: examples
-        run: cargo build -p e16_voice_events_queue
-      - name: 'Build example 17'
-        working-directory: examples
-        run: cargo build -p e17_voice_storage
+        run: cargo build -p e13_parallel_loops
