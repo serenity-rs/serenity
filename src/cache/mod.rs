@@ -991,7 +991,9 @@ mod test {
                 application: None,
                 message_reference: None,
                 flags: None,
+                stickers: vec![],
                 referenced_message: None,
+                _nonexhaustive: (),
             },
         };
         // Check that the channel cache doesn't exist.
