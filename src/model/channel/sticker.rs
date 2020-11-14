@@ -30,11 +30,11 @@ pub struct Sticker {
 #[non_exhaustive]
 pub enum StickerFormatType {
     /// A PNG format sticker.
-    PNG = 0,
+    PNG = 1,
     /// An APNG format animated sticker.
-    APNG = 1,
+    APNG = 2,
     /// A LOTTIE format animated sticker.
-    LOTTIE = 2,
+    LOTTIE = 3,
 }
 
 enum_number!(
