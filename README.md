@@ -140,8 +140,8 @@ enough level that optional parameters can be provided at will via a JsonMap.
 the HTTP functions.
 - **standard_framework**: A standard, default implementation of the Framework
 - **utils**: Utility functions for common use cases by users.
-- **voice**: Enables compilation of voice support, so that voice channels can be
-connected to and audio can be sent/received.
+- **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
+[lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
 - **default_native_tls**: Default features but using `native_tls_backend`
 instead of `rustls_backend`.
 - **absolute_ratelimits**: Whether the library should use your system clock to avoid
@@ -184,24 +184,10 @@ If you use the `native_tls_backend` and you are not developing on macOS or Windo
 
 - openssl
 
-If you want to use `voice`, Serenity will attempt to build these for you:
-
-- libsodium (Arch: `community/libsodium`)
-- opus (Arch: `extra/opus`)
-
-In case the automated building fails, you may report it to us, but installing should fix it.
-
-Voice + ffmpeg:
-
-- ffmpeg (Arch: `extra/ffmpeg`)
-
-Voice + youtube-dl:
-
-- youtube-dl (Arch: `community/youtube-dl`)
-
 # Projects extending Serenity
 
 - [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
+- [Songbird][project:songbird]: An async Rust library for the Discord voice API.
 
 [`Cache`]: https://docs.rs/serenity/*/serenity/cache/struct.Cache.html
 [`Client::builder`]: https://docs.rs/serenity/*/serenity/client/struct.Client.html#method.builder
@@ -227,6 +213,7 @@ Voice + youtube-dl:
 [guild]: https://discord.gg/9X7vCus
 [guild-badge]: https://img.shields.io/discord/381880193251409931.svg?style=flat-square&colorB=7289DA
 [project:lavalink-rs]: https://gitlab.com/nitsuga5124/lavalink-rs/
+[project:songbird]: https://github.com/serenity-rs/songbird
 [repo:lavalink]: https://github.com/Frederikam/Lavalink
 [repo:lavaplayer]: https://github.com/sedmelluq/lavaplayer
 [logo]: https://raw.githubusercontent.com/serenity-rs/serenity/current/logo.png
