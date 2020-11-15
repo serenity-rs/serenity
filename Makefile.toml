@@ -137,187 +137,149 @@ alias = "run_6"
 
 [tasks.run_6]
 command = "cargo"
-args = ["make", "run_example_release", "e06_voice"]
+args = ["make", "run_example_release", "e06_sample_bot_structure"]
 
 [tasks.build_6]
 command = "cargo"
-args = ["make", "build_example_release", "e06_voice"]
+args = ["make", "build_example_release", "e06_sample_bot_structure"]
 
 [tasks.dev_run_6]
 command = "cargo"
-args = ["make", "run_example", "e06_voice"]
+args = ["make", "run_example", "e06_sample_bot_structure"]
 
 [tasks.dev_build_6]
 command = "cargo"
-args = ["make", "build_example", "e06_voice"]
+args = ["make", "build_example", "e06_sample_bot_structure"]
 
 [tasks.7]
 alias = "run_7"
 
 [tasks.run_7]
 command = "cargo"
-args = ["make", "run_example_release", "e07_sample_bot_structure"]
+args = ["make", "run_example_release", "e07_env_logging"]
 
 [tasks.build_7]
 command = "cargo"
-args = ["make", "build_example_release", "e07_sample_bot_structure"]
+args = ["make", "build_example_release", "e07_env_logging"]
 
 [tasks.dev_run_7]
 command = "cargo"
-args = ["make", "run_example", "e07_sample_bot_structure"]
+args = ["make", "run_example", "e07_env_logging"]
 
 [tasks.dev_build_7]
 command = "cargo"
-args = ["make", "build_example", "e07_sample_bot_structure"]
+args = ["make", "build_example", "e07_env_logging"]
 
 [tasks.8]
 alias = "run_8"
 
 [tasks.run_8]
 command = "cargo"
-args = ["make", "run_example_release", "e08_env_logging"]
+args = ["make", "run_example_release", "e08_shard_manager"]
 
 [tasks.build_8]
 command = "cargo"
-args = ["make", "build_example_release", "e08_env_logging"]
+args = ["make", "build_example_release", "e08_shard_manager"]
 
 [tasks.dev_run_8]
 command = "cargo"
-args = ["make", "run_example", "e08_env_logging"]
+args = ["make", "run_example", "e08_shard_manager"]
 
 [tasks.dev_build_8]
 command = "cargo"
-args = ["make", "build_example", "e08_env_logging"]
+args = ["make", "build_example", "e08_shard_manager"]
 
 [tasks.9]
 alias = "run_9"
 
 [tasks.run_9]
 command = "cargo"
-args = ["make", "run_example_release", "e09_shard_manager"]
+args = ["make", "run_example_release", "e09_create_message_builder"]
 
 [tasks.build_9]
 command = "cargo"
-args = ["make", "build_example_release", "e09_shard_manager"]
+args = ["make", "build_example_release", "e09_create_message_builder"]
 
 [tasks.dev_run_9]
 command = "cargo"
-args = ["make", "run_example", "e09_shard_manager"]
+args = ["make", "run_example", "e09_create_message_builder"]
 
 [tasks.dev_build_9]
 command = "cargo"
-args = ["make", "build_example", "e09_shard_manager"]
+args = ["make", "build_example", "e09_create_message_builder"]
 
 [tasks.10]
 alias = "run_10"
 
 [tasks.run_10]
 command = "cargo"
-args = ["make", "run_example_release", "e10_voice_receive"]
+args = ["make", "run_example_release", "e10_collectors"]
 
 [tasks.build_10]
 command = "cargo"
-args = ["make", "build_example_release", "e10_voice_receive"]
+args = ["make", "build_example_release", "e10_collectors"]
 
 [tasks.dev_run_10]
 command = "cargo"
-args = ["make", "run_example", "e10_voice_receive"]
+args = ["make", "run_example", "e10_collectors"]
 
 [tasks.dev_build_10]
 command = "cargo"
-args = ["make", "build_example", "e10_voice_receive"]
+args = ["make", "build_example", "e10_collectors"]
 
 [tasks.11]
 alias = "run_11"
 
 [tasks.run_11]
 command = "cargo"
-args = ["make", "run_example_release", "e11_create_message_builder"]
+args = ["make", "run_example_release", "e11_gateway_intents"]
 
 [tasks.build_11]
 command = "cargo"
-args = ["make", "build_example_release", "e11_create_message_builder"]
+args = ["make", "build_example_release", "e11_gateway_intents"]
 
 [tasks.dev_run_11]
 command = "cargo"
-args = ["make", "run_example", "e11_create_message_builder"]
+args = ["make", "run_example", "e11_gateway_intents"]
 
 [tasks.dev_build_11]
 command = "cargo"
-args = ["make", "build_example", "e11_create_message_builder"]
+args = ["make", "build_example", "e11_gateway_intents"]
 
 [tasks.12]
 alias = "run_12"
 
 [tasks.run_12]
 command = "cargo"
-args = ["make", "run_example_release", "e12_collectors"]
+args = ["make", "run_example_release", "e12_global_data"]
 
 [tasks.build_12]
 command = "cargo"
-args = ["make", "build_example_release", "e12_collectors"]
+args = ["make", "build_example_release", "e12_global_data"]
 
 [tasks.dev_run_12]
 command = "cargo"
-args = ["make", "run_example", "e12_collectors"]
+args = ["make", "run_example", "e12_global_data"]
 
 [tasks.dev_build_12]
 command = "cargo"
-args = ["make", "build_example", "e12_collectors"]
+args = ["make", "build_example", "e12_global_data"]
 
 [tasks.13]
 alias = "run_13"
 
 [tasks.run_13]
 command = "cargo"
-args = ["make", "run_example_release", "e13_gateway_intents"]
+args = ["make", "run_example_release", "e13_parallel_loops"]
 
 [tasks.build_13]
 command = "cargo"
-args = ["make", "build_example_release", "e13_gateway_intents"]
+args = ["make", "build_example_release", "e13_parallel_loops"]
 
 [tasks.dev_run_13]
 command = "cargo"
-args = ["make", "run_example", "e13_gateway_intents"]
+args = ["make", "run_example", "e13_parallel_loops"]
 
 [tasks.dev_build_13]
 command = "cargo"
-args = ["make", "build_example", "e13_gateway_intents"]
-
-[tasks.14]
-alias = "run_14"
-
-[tasks.run_14]
-command = "cargo"
-args = ["make", "run_example_release", "e14_global_data"]
-
-[tasks.build_14]
-command = "cargo"
-args = ["make", "build_example_release", "e14_global_data"]
-
-[tasks.dev_run_14]
-command = "cargo"
-args = ["make", "run_example", "e14_global_data"]
-
-[tasks.dev_build_14]
-command = "cargo"
-args = ["make", "build_example", "e14_global_data"]
-
-[tasks.15]
-alias = "run_15"
-
-[tasks.run_15]
-command = "cargo"
-args = ["make", "run_example_release", "e15_parallel_loops"]
-
-[tasks.build_15]
-command = "cargo"
-args = ["make", "build_example_release", "e15_parallel_loops"]
-
-[tasks.dev_run_15]
-command = "cargo"
-args = ["make", "run_example", "e15_parallel_loops"]
-
-[tasks.dev_build_15]
-command = "cargo"
-args = ["make", "build_example", "e15_parallel_loops"]
+args = ["make", "build_example", "e13_parallel_loops"]
