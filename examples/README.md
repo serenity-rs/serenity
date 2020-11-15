@@ -60,6 +60,6 @@ clarified.
 ### Contributing
 
 If you add a new example also add it to the following files:
-- `azure-build-examples.yml`
+- `.github/workflows/ci.yml`
 - `Makefile.toml`
 - `examples/README.md`
