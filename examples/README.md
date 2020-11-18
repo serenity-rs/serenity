@@ -28,20 +28,15 @@ To run an example, you have various options:
  5 => Command Framework: The main example, where it's demonstrated how to use serenity's command framework,
       along with mosts of it's utilities.
       This example also shows how to share data between events and commands, using `Context.data`
- 6 => Voice: Simple example on playing back audio with serenity, along with FFMPEG and Youtube-DL.
- 7 => Simple Bot Stucture: An example showing the recommended file structure to use.
- 8 => Env Logging: How to use the tracing crate along with serenity.
- 9 => Shard Manager: How to get started with using the shard manager.
-10 => Voice Recieve: How to recieve voice audio packets.
-      WARNING: This example *may* not work, PR #806 is aiming to fix this.
-11 => Create Message Builder: How to send embeds and files.
-12 => Collectors: How to use the collectors feature to wait for messages and reactions.
-13 => Gateway Intents: How to use intents to limit the events the bot will recieve.
-14 => Global Data: How to use the client data to share data between commands and events safely.
-15 => Parallel Loops: How to run tasks in a loop with context access.
+ 6 => Simple Bot Stucture: An example showing the recommended file structure to use.
+ 7 => Env Logging: How to use the tracing crate along with serenity.
+ 8 => Shard Manager: How to get started with using the shard manager.
+ 9 => Create Message Builder: How to send embeds and files.
+10 => Collectors: How to use the collectors feature to wait for messages and reactions.
+11 => Gateway Intents: How to use intents to limit the events the bot will recieve.
+12 => Global Data: How to use the client data to share data between commands and events safely.
+13 => Parallel Loops: How to run tasks in a loop with context access.
       Additionally, show how to send a message to a specific channel.
-16 => Voice Events and Queue: How to register and access a voice track queue, and how to use track events (e.g., timing).
-17 => Voice Storage: How to use in-memory and compressed sources to cheaply share resources between several calls, compress larger resources, and allow for fast seeking.
 ```
 
 2. Manually running:
@@ -65,6 +60,6 @@ clarified.
 ### Contributing
 
 If you add a new example also add it to the following files:
-- `azure-build-examples.yml`
+- `.github/workflows/ci.yml`
 - `Makefile.toml`
 - `examples/README.md`
