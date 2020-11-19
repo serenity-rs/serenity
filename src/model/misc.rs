@@ -201,7 +201,7 @@ impl EmojiIdentifier {
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
-    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or_else(|| ()) }
+    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or(()) }
 }
 
 
