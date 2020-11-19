@@ -1455,7 +1455,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                     .ok_or_else(|| DeError::custom("expected gateway event type"))
                     .and_then(EventType::deserialize)
                     .map_err(DeError::custom)?;
-                let payload = map.remove("d").ok_or_else(|| {
+                let payload = map.remove("d").ok_or({
                     Error::Decode("expected gateway event d", Value::Object(map))
                 }).map_err(DeError::custom)?;
 
