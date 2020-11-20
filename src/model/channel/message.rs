@@ -904,6 +904,7 @@ impl MessageType {
             NitroTier1 => 9,
             NitroTier2 => 10,
             NitroTier3 => 11,
+            InlineReply => 19,
         }
     }
 }
