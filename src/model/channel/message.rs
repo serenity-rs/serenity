@@ -866,7 +866,7 @@ pub enum MessageType {
     /// An indicator that the guild has reached nitro tier 3
     NitroTier3 = 11,
     // /// An message reply.
-    // InlineReply = 19, // TODO Enable this when v8 hits.
+    InlineReply = 19,
 }
 
 enum_number!(
@@ -883,7 +883,7 @@ enum_number!(
         NitroTier1,
         NitroTier2,
         NitroTier3,
-        // InlineReply, // TODO Enable this when v8 hits
+        InlineReply,
     }
 );
 
