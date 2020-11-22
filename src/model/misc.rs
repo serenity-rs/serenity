@@ -193,8 +193,12 @@ pub struct EmojiIdentifier {
 #[cfg(all(feature = "model", feature = "utils"))]
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
-    #[inline]
-    pub fn url(&self) -> String { format!(cdn!("/emojis/{}.png"), self.id) }
+    pub fn url(&self) -> String {
+        match self.animated {
+            true => format!(cdn!("/emojis/{}.gif"), self.id),
+            false => format!(cdn!("/emojis/{}.png"), self.id),
+        }
+    }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
