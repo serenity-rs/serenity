@@ -117,7 +117,7 @@ If you want more information about a specific command, just pass the command as 
 #[wrong_channel = "Strike"]
 // Serenity will automatically analyse and generate a hint/tip explaining the possible
 // cases of ~~strikethrough-commands~~, but only if
-// `strikethrough_commands_tip_{dm, guild}` aren't specified.
+// `strikethrough_commands_tip_in_{dm, guild}` aren't specified.
 // If you pass in a value, it will be displayed instead.
 async fn my_help(
     context: &Context,
