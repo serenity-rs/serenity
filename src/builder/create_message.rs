@@ -1,6 +1,6 @@
 use crate::internal::prelude::*;
 use crate::http::AttachmentType;
-use crate::model::channel::ReactionType;
+use crate::model::channel::{ReactionType, MessageReference};
 use super::CreateEmbed;
 use super::CreateAllowedMentions;
 use crate::utils;
@@ -138,6 +138,12 @@ impl<'a> CreateMessage<'a> {
         let allowed_mentions = Value::Object(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
+        self
+    }
+
+    /// Set the reference message this message is a reply to.
+    pub fn reference_message(&mut self, reference: impl Into<MessageReference>) -> &mut Self {
+        self.0.insert("message_reference", serde_json::to_value(reference.into()).unwrap());
         self
     }
 }
