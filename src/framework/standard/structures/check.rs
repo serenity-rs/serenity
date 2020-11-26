@@ -11,7 +11,7 @@ use futures::future::BoxFuture;
 /// **Note**:
 /// The bot-developer is supposed to process this `enum` as the framework is not.
 /// It solely serves as a way to inform a user about why a check
-/// has failed and for the developer to log given failure (e.g. bugs or statstics)
+/// has failed and for the developer to log given failure (e.g. bugs or statistics)
 /// occurring in [`Check`]s.
 ///
 /// [`Check`]: struct.Check.html
