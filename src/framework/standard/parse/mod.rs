@@ -1,17 +1,17 @@
 use super::*;
 use crate::client::Context;
 use crate::model::prelude::*;
-use crate::http::Http;
-
-use uwl::Stream;
 
 pub mod map;
 
 use map::{CommandMap, GroupMap, ParseMap};
 
-use std::borrow::Cow;
+use uwl::Stream;
 use futures::future::{BoxFuture, FutureExt};
 use tracing::{error, warn};
+
+use std::borrow::Cow;
+use std::collections::HashMap;
 
 // FIXME: Add the `http` parameter to `Guild::user_permissions_in`.
 //
@@ -27,19 +27,20 @@ use tracing::{error, warn};
 // the author does possess them. To avoid defaulting to permissions of everyone, we fetch
 // the member from HTTP if it is missing in the guild's members list.
 async fn permissions_in(
-    http: impl AsRef<Http>,
-    guild: &Guild,
+    ctx: &Context,
+    guild_id: GuildId,
     channel_id: ChannelId,
-    user_id: UserId,
+    member: &Member,
+    roles: &HashMap<RoleId, Role>,
 ) -> Permissions {
-    if user_id == guild.owner_id {
+    if let Some(true) = ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id).await {
         return Permissions::all();
     }
 
-    let everyone = match guild.roles.get(&RoleId(guild.id.0)) {
+    let everyone = match roles.get(&RoleId(guild_id.0)) {
         Some(everyone) => everyone,
         None => {
-            error!("@everyone role ({}) missing in '{}'", guild.id, guild.name);
+            error!("@everyone role is missing in guild {}", guild_id);
 
             return Permissions::empty();
         },
@@ -47,19 +48,11 @@ async fn permissions_in(
 
     let mut permissions = everyone.permissions;
 
-    let member = match guild.members.get(&user_id) {
-        Some(member) => Cow::Borrowed(member),
-        None => match http.as_ref().get_member(guild.id.0, user_id.0).await {
-            Ok(member) => Cow::Owned(member),
-            Err(_) => return everyone.permissions,
-        },
-    };
-
     for &role in &member.roles {
-        if let Some(role) = guild.roles.get(&role) {
+        if let Some(role) = roles.get(&role) {
             permissions |= role.permissions;
         } else {
-            warn!("{} on {} has non-existent role {:?}", member.user.id, guild.id, role);
+            warn!("{} on {} has non-existent role {:?}", member.user.id, guild_id, role);
         }
     }
 
@@ -67,7 +60,14 @@ async fn permissions_in(
         return Permissions::all();
     }
 
-    if let Some(channel) = guild.channels.get(&channel_id) {
+    if let Some(Some(channel)) = ctx
+        .cache
+        .guild_field(
+            guild_id,
+            |guild| guild.channels.get(&channel_id).cloned()
+        )
+        .await
+    {
         if channel.kind == ChannelType::Text {
             permissions &= !(Permissions::CONNECT
                              | Permissions::SPEAK
@@ -82,11 +82,11 @@ async fn permissions_in(
 
         for overwrite in &channel.permission_overwrites {
             if let PermissionOverwriteType::Role(role) = overwrite.kind {
-                if role.0 != guild.id.0 && !member.roles.contains(&role) {
+                if role.0 != guild_id.0 && !member.roles.contains(&role) {
                     continue;
                 }
 
-                if let Some(role) = guild.roles.get(&role) {
+                if let Some(role) = roles.get(&role) {
                     data.push((role.position, overwrite.deny, overwrite.allow));
                 }
             }
@@ -99,21 +99,40 @@ async fn permissions_in(
         }
 
         for overwrite in &channel.permission_overwrites {
-            if PermissionOverwriteType::Member(user_id) != overwrite.kind {
+            if PermissionOverwriteType::Member(member.user.id) != overwrite.kind {
                 continue;
             }
 
             permissions = (permissions & !overwrite.deny) | overwrite.allow;
         }
     } else {
-        warn!("Guild {} does not contain channel {}", guild.id, channel_id);
+        warn!("Guild {} does not contain channel {}", guild_id, channel_id);
     }
 
-    if channel_id.0 == guild.id.0 {
+    if channel_id.0 == guild_id.0 {
         permissions |= Permissions::READ_MESSAGES;
     }
 
-    guild.remove_unusable_permissions(&mut permissions);
+    // No SEND_MESSAGES => no message-sending-related actions
+    // If the member does not have the `SEND_MESSAGES` permission, then
+    // throw out message-able permissions.
+    if !permissions.contains(Permissions::SEND_MESSAGES) {
+        permissions &= !(Permissions::SEND_TTS_MESSAGES
+            | Permissions::MENTION_EVERYONE
+            | Permissions::EMBED_LINKS
+            | Permissions::ATTACH_FILES);
+    }
+
+    // If the permission does not have the `READ_MESSAGES` permission, then
+    // throw out actionable permissions.
+    if !permissions.contains(Permissions::READ_MESSAGES) {
+        permissions &= Permissions::KICK_MEMBERS
+            | Permissions::BAN_MEMBERS
+            | Permissions::ADMINISTRATOR
+            | Permissions::MANAGE_GUILD
+            | Permissions::CHANGE_NICKNAME
+            | Permissions::MANAGE_NICKNAMES;
+    }
 
     permissions
 }
@@ -253,23 +272,28 @@ async fn check_discrepancy(
     #[cfg(feature = "cache")]
     {
         if let Some(guild_id) = msg.guild_id {
-            let guild = match guild_id.to_guild_cached(&ctx).await {
-                Some(g) => g,
-                None => return Ok(()),
-            };
+            if let Some(member) = ctx.cache.guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned()).await {
+                let member = match member {
+                    Some(member) => member,
+                    None => match ctx.http.get_member(guild_id.0, msg.author.id.0).await {
+                        Ok(member) => member,
+                        Err(_) => return Ok(()),
+                    },
+                };
 
-            let perms = permissions_in(ctx, &guild, msg.channel_id, msg.author.id).await;
+                let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).await.unwrap();
+                let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles).await;
 
-            if !(perms.contains(*options.required_permissions()) || options.owner_privilege()
-                && config.owners.contains(&msg.author.id))
-            {
-                return Err(DispatchError::LackingPermissions(
-                    *options.required_permissions(),
-                ));
-            }
+                if !(perms.contains(*options.required_permissions()) || options.owner_privilege()
+                    && config.owners.contains(&msg.author.id))
+                {
+                    return Err(DispatchError::LackingPermissions(
+                        *options.required_permissions(),
+                    ));
+                }
 
-            if let Some(member) = guild.members.get(&msg.author.id) {
-                if !perms.administrator() && !has_correct_roles(options, &guild.roles, &member) {
+
+                if !perms.administrator() && !has_correct_roles(options, &roles, &member) {
                     return Err(DispatchError::LackingRole);
                 }
             }
