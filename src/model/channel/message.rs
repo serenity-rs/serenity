@@ -7,7 +7,6 @@ use std::fmt::Display;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
-#[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
