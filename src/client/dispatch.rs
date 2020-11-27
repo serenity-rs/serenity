@@ -604,14 +604,14 @@ async fn handle_event(
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.message_delete_bulk(context, event.channel_id, event.ids).await;
+                event_handler.message_delete_bulk(context, event.channel_id, event.ids, event.guild_id).await;
             });
         },
         DispatchEvent::Model(Event::MessageDelete(event)) => {
             let event_handler = Arc::clone(event_handler);
 
             tokio::spawn(async move {
-                event_handler.message_delete(context, event.channel_id, event.message_id).await;
+                event_handler.message_delete(context, event.channel_id, event.message_id, event.guild_id).await;
             });
         },
         DispatchEvent::Model(Event::MessageUpdate(mut event)) => {
