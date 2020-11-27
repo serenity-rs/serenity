@@ -34,7 +34,7 @@ async fn permissions_in(
     member: &Member,
     roles: &HashMap<RoleId, Role>,
 ) -> Permissions {
-    if let Some(true) = ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id).await {
+    if ctx.cache.guild_field(guild_id, |guild| member.user.id == guild.owner_id).await == Some(true) {
         return Permissions::all();
     }
 
