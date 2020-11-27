@@ -272,30 +272,31 @@ async fn check_discrepancy(
     #[cfg(feature = "cache")]
     {
         if let Some(guild_id) = msg.guild_id {
-            if let Some(member) = ctx.cache.guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned()).await {
-                let member = match member {
-                    Some(member) => member,
-                    None => match ctx.http.get_member(guild_id.0, msg.author.id.0).await {
-                        Ok(member) => member,
-                        Err(_) => return Ok(()),
-                    },
-                };
+            let member = match ctx.cache.guild_field(guild_id, |guild| guild.members.get(&msg.author.id).cloned()).await {
+                Some(Some(member)) => member,
+                // Member not found.
+                Some(None) => match ctx.http.get_member(guild_id.0, msg.author.id.0).await {
+                    Ok(member) => member,
+                    Err(_) => return Ok(()),
+                },
+                // Guild not found.
+                None => return Ok(()),
+            };
 
-                let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).await.unwrap();
-                let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles).await;
+            let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).await.unwrap();
+            let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles).await;
 
-                if !(perms.contains(*options.required_permissions()) || options.owner_privilege()
-                    && config.owners.contains(&msg.author.id))
-                {
-                    return Err(DispatchError::LackingPermissions(
-                        *options.required_permissions(),
-                    ));
-                }
+            if !(perms.contains(*options.required_permissions()) || options.owner_privilege()
+                && config.owners.contains(&msg.author.id))
+            {
+                return Err(DispatchError::LackingPermissions(
+                    *options.required_permissions(),
+                ));
+            }
 
 
-                if !perms.administrator() && !has_correct_roles(options, &roles, &member) {
-                    return Err(DispatchError::LackingRole);
-                }
+            if !perms.administrator() && !has_correct_roles(options, &roles, &member) {
+                return Err(DispatchError::LackingRole);
             }
         }
     }
