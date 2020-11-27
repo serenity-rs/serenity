@@ -1,13 +1,120 @@
 use super::*;
 use crate::client::Context;
-use crate::model::channel::Message;
-use uwl::Stream;
+use crate::model::prelude::*;
 
 pub mod map;
 
 use map::{CommandMap, GroupMap, ParseMap};
 
+use uwl::Stream;
+use log::{error, warn};
+
 use std::borrow::Cow;
+
+#[cfg(feature = "cache")]
+fn permissions_in(
+    guild: &Guild,
+    channel_id: ChannelId,
+    member: &Member,
+) -> Permissions {
+    let user_id = member.user.read().id;
+    if user_id == guild.owner_id {
+        return Permissions::all();
+    }
+
+    let everyone = match guild.roles.get(&RoleId(guild.id.0)) {
+        Some(everyone) => everyone,
+        None => {
+            error!("@everyone role is missing in guild {}", guild.id);
+
+            return Permissions::empty();
+        },
+    };
+
+    let mut permissions = everyone.permissions;
+
+    for &role in &member.roles {
+        if let Some(role) = guild.roles.get(&role) {
+            permissions |= role.permissions;
+        } else {
+            warn!("{} on {} has non-existent role {:?}", user_id, guild.id, role);
+        }
+    }
+
+    if permissions.contains(Permissions::ADMINISTRATOR) {
+        return Permissions::all();
+    }
+
+    if let Some(channel) = guild.channels.get(&channel_id) {
+        let channel = channel.read();
+
+        if channel.kind == ChannelType::Text {
+            permissions &= !(Permissions::CONNECT
+                             | Permissions::SPEAK
+                             | Permissions::MUTE_MEMBERS
+                             | Permissions::DEAFEN_MEMBERS
+                             | Permissions::MOVE_MEMBERS
+                             | Permissions::USE_VAD);
+        }
+
+        let mut data = Vec::with_capacity(member.roles.len());
+
+        for overwrite in &channel.permission_overwrites {
+            if let PermissionOverwriteType::Role(role) = overwrite.kind {
+                if role.0 != guild.id.0 && !member.roles.contains(&role) {
+                    continue;
+                }
+
+                if let Some(role) = guild.roles.get(&role) {
+                    data.push((role.position, overwrite.deny, overwrite.allow));
+                }
+            }
+        }
+
+        data.sort_by(|a, b| a.0.cmp(&b.0));
+
+        for overwrite in data {
+            permissions = (permissions & !overwrite.1) | overwrite.2;
+        }
+
+        for overwrite in &channel.permission_overwrites {
+            if PermissionOverwriteType::Member(user_id) != overwrite.kind {
+                continue;
+            }
+
+            permissions = (permissions & !overwrite.deny) | overwrite.allow;
+        }
+    } else {
+        warn!("Guild {} does not contain channel {}", guild.id, channel_id);
+    }
+
+    if channel_id.0 == guild.id.0 {
+        permissions |= Permissions::READ_MESSAGES;
+    }
+
+    // No SEND_MESSAGES => no message-sending-related actions
+    // If the member does not have the `SEND_MESSAGES` permission, then
+    // throw out message-able permissions.
+    if !permissions.contains(Permissions::SEND_MESSAGES) {
+        permissions &= !(Permissions::SEND_TTS_MESSAGES
+            | Permissions::MENTION_EVERYONE
+            | Permissions::EMBED_LINKS
+            | Permissions::ATTACH_FILES);
+    }
+
+    // If the permission does not have the `READ_MESSAGES` permission, then
+    // throw out actionable permissions.
+    if !permissions.contains(Permissions::READ_MESSAGES) {
+        permissions &= !(Permissions::KICK_MEMBERS
+            | Permissions::BAN_MEMBERS
+            | Permissions::ADMINISTRATOR
+            | Permissions::MANAGE_GUILD
+            | Permissions::CHANGE_NICKNAME
+            | Permissions::MANAGE_NICKNAMES);
+    }
+
+    permissions
+}
 
 #[inline]
 fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
@@ -147,7 +254,15 @@ fn check_discrepancy(
 
             let guild = guild.read();
 
-            let perms = guild.user_permissions_in(msg.channel_id, msg.author.id);
+            let member = match guild.members.get(&msg.author.id) {
+                Some(member) => Cow::Borrowed(member),
+                None => match ctx.http.get_member(guild.id.0, msg.author.id.0) {
+                    Ok(member) => Cow::Owned(member),
+                    Err(_) => return Ok(()),
+                },
+            };
+
+            let perms = permissions_in(&guild, msg.channel_id, &member);
 
             if !perms.contains(*options.required_permissions())
                 && !(options.owner_privilege() && config.owners.contains(&msg.author.id))
@@ -157,10 +272,8 @@ fn check_discrepancy(
                 ));
             }
 
-            if let Some(member) = guild.members.get(&msg.author.id) {
-                if !perms.administrator() && !has_correct_roles(options, &guild, &member) {
-                    return Err(DispatchError::LackingRole);
-                }
+            if !perms.administrator() && !has_correct_roles(options, &guild, &member) {
+                return Err(DispatchError::LackingRole);
             }
         }
     }
