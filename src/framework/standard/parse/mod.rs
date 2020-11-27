@@ -26,6 +26,7 @@ use std::collections::HashMap;
 // all members past 250, resulting in the problem to meet permissions of a command even if
 // the author does possess them. To avoid defaulting to permissions of everyone, we fetch
 // the member from HTTP if it is missing in the guild's members list.
+#[cfg(feature = "cache")]
 async fn permissions_in(
     ctx: &Context,
     guild_id: GuildId,
