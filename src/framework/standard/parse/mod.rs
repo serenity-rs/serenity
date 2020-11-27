@@ -127,12 +127,12 @@ async fn permissions_in(
     // If the permission does not have the `READ_MESSAGES` permission, then
     // throw out actionable permissions.
     if !permissions.contains(Permissions::READ_MESSAGES) {
-        permissions &= Permissions::KICK_MEMBERS
+        permissions &= !(Permissions::KICK_MEMBERS
             | Permissions::BAN_MEMBERS
             | Permissions::ADMINISTRATOR
             | Permissions::MANAGE_GUILD
             | Permissions::CHANGE_NICKNAME
-            | Permissions::MANAGE_NICKNAMES;
+            | Permissions::MANAGE_NICKNAMES);
     }
 
     permissions
