@@ -235,13 +235,13 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a message is deleted.
     ///
-    /// Provides the channel's id and the message's id.
-    async fn message_delete(&self, _ctx: Context, _channel_id: ChannelId, _deleted_message_id: MessageId) {}
+    /// Provides the guild's id, the channel's id and the message's id.
+    async fn message_delete(&self, _ctx: Context, _channel_id: ChannelId, _deleted_message_id: MessageId, _guild_id: Option<GuildId>) {}
 
     /// Dispatched when multiple messages were deleted at once.
     ///
-    /// Provides the channel's id and the deleted messages' ids.
-    async fn message_delete_bulk(&self, _ctx: Context, _channel_id: ChannelId, _multiple_deleted_messages_ids: Vec<MessageId>) {}
+    /// Provides the guild's id, channel's id and the deleted messages' ids.
+    async fn message_delete_bulk(&self, _ctx: Context, _channel_id: ChannelId, _multiple_deleted_messages_ids: Vec<MessageId>, _guild_id: Option<GuildId>) {}
 
     /// Dispatched when a message is updated.
     ///
