@@ -273,6 +273,16 @@ Thanks to the following for their contributions:
 - [misc] Remove the matches developmental dependency ([@acdenisSK]) [c:2418edd]
 - [misc] Remove usages of mem::replace where its return value is unused ([@acdenisSK]) [c:3135e0f]
 
+## [0.8.8] - 2020-11-28
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Changed
+
+- [framework] Backport changes in the framework discrepancy check from 0.9.x ([@acdenisSK]) [c:72f287c]
+
 ## [0.8.7] - 2020-08-11
 
 This is a small release to publish a bunch of fixes the `current` branch has accumulated.
@@ -3770,7 +3780,8 @@ Initial commit.
 [0.9.0-rc.3]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.2...v0.9.0-rc.3
 [0.9.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.1...v0.9.0-rc.2
 [0.9.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.0...v0.9.0-rc.1
-[0.9.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.8.7...v0.9.0-rc.0
+[0.9.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.8.8...v0.9.0-rc.0
+[0.8.8]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.8
 [0.8.7]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/serenity-rs/serenity/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/serenity-rs/serenity/compare/v0.8.4...v0.8.5
@@ -4087,6 +4098,7 @@ Initial commit.
 [c:2418edd]: https://github.com/serenity-rs/serenity/commit/2418edd02ca7bcf4f0763216cc7e986a77b6aede
 [c:3135e0f]: https://github.com/serenity-rs/serenity/commit/3135e0f3ccaf80d4ac8eabbed4040ed10e8a7863
 
+[c:72f287c]: https://github.com/serenity-rs/serenity/commit/72f287c5b4ebbd9e9fbaae9afec99187387db0dd
 
 [c:6b1021f]: https://github.com/serenity-rs/serenity/commit/6b1021f85ea8590b2aa50e4ea986b598575c6abb
 [c:9f848af]: https://github.com/serenity-rs/serenity/commit/9f848aff0fda841d7ca827447ac115bcb0d18d1a
