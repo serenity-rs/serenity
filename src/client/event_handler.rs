@@ -235,7 +235,7 @@ pub trait EventHandler: Send + Sync {
 
     /// Dispatched when a message is deleted.
     ///
-    /// Provides the guild's id, the channel's id and the messages' id.
+    /// Provides the guild's id, the channel's id and the message's id.
     async fn message_delete(&self, _ctx: Context, _channel_id: ChannelId, _deleted_message_id: MessageId, _guild_id: Option<GuildId>) {}
 
     /// Dispatched when multiple messages were deleted at once.
