@@ -2,6 +2,8 @@ use std::{
     borrow::Cow,
     fmt::{Display, Write},
 };
+use crate::constants;
+
 use super::LightMethod;
 
 /// A representation of all routes registered within the library. These are safe
@@ -519,9 +521,7 @@ impl Route {
             let _ = write!(s, "&after={}", after);
         }
 
-        if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
-        }
+        let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
 
         s
     }
