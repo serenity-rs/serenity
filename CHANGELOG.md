@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.2] - 2020-11-28
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Changed
+
+- [misc] Update the version in lib.rs to rely on any patch version in 0.9 ([@acdenisSK]) [c:85e5722]
+- [misc] Credit the real author of the Serenity.await commit ([@acdenisSK]) [c:757e0d6]
+
+### Fixed
+
+- [framework] Avoid cloning the entire guild object upon a command invocation ([@acdenisSK]) [c:bc78991]
+- [model] Only add roles that the member does not possess when calling `Member::add_roles` ([@acdenisSK]) [c:e6fd09b]
+
 ## [0.9.1] - 2020-11-08
 
 Thanks to the following for their contributions:
@@ -3764,6 +3780,7 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+[0.9.2]: https://github.com/serenity-rs/serenity/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.4...v0.9.0
 [0.9.0-rc.4]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.3...v0.9.0-rc.4
@@ -3962,6 +3979,11 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+[c:bc78991]: https://github.com/serenity-rs/serenity/commit/bc78991f7cdbdeaeba308785a42953423f5e89aa
+[c:85e5722]: https://github.com/serenity-rs/serenity/commit/85e5722c997d5cc024cb3f687a8fda3a368db2cd
+[c:757e0d6]: https://github.com/serenity-rs/serenity/commit/757e0d60067553ea49fa0dc180c6e64843a7ea13
+[c:e6fd09b]: https://github.com/serenity-rs/serenity/commit/e6fd09b15550654a6f2dd16742b9703539d0ff03
 
 [c:7ea8098]: https://github.com/serenity-rs/serenity/commit/7ea80988604ce1a9c772dabd8b150b5f89ca355c
 [c:182ee78]: https://github.com/serenity-rs/serenity/commit/182ee78f685595d43b951dab2d0f8a59c9a3f84d
