@@ -9,8 +9,6 @@ use std::fmt::Display;
 use crate::builder::{CreateEmbed, EditMessage};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
-#[cfg(feature = "model")]
-use serde_json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
@@ -557,8 +555,7 @@ impl Message {
         })
     }
 
-    /// Replies to the user, mentioning them prior to the content in the form
-    /// of: `@<USER_ID>: YOUR_CONTENT`.
+    /// Uses Discord's inline reply to a user without pinging them.
     ///
     /// User mentions are generally around 20 or 21 characters long.
     ///
@@ -579,11 +576,64 @@ impl Message {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    #[inline]
     pub async fn reply(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
-        if let Some(length_over) = Message::overflow_length(&content.to_string()) {
-            return Err(Error::Model(ModelError::MessageTooLong(length_over)));
-        }
+        self._reply(cache_http, content, Some(false)).await
+    }
 
+    /// Uses Discord's inline reply to a user with a ping.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    #[inline]
+    pub async fn reply_ping(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+        self._reply(cache_http, content, Some(true)).await
+    }
+
+    /// Replies to the user, mentioning them prior to the content in the form
+    /// of: `@<USER_ID> YOUR_CONTENT`.
+    ///
+    /// User mentions are generally around 20 or 21 characters long.
+    ///
+    /// **Note**: Requires the [Send Messages] permission.
+    ///
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns a
+    /// [`ModelError::InvalidPermissions`] if the current user does not have
+    /// the required permissions.
+    ///
+    /// Returns a [`ModelError::MessageTooLong`] if the content of the message
+    /// is over the above limit, containing the number of unicode code points
+    /// over the limit.
+    ///
+    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
+    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
+    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    #[inline]
+    pub async fn reply_mention(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+        self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
+    }
+
+    /// `inlined` decides whether this reply is inlinded and whether it pings.
+    async fn _reply(&self, cache_http: impl CacheHttp, content: impl Display, inlined: Option<bool>) -> Result<Message> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -598,14 +648,15 @@ impl Message {
             }
         }
 
-        let gen = format!("{} {}", self.author.mention(), content);
+        self.channel_id.send_message(cache_http.http(), |mut builder| {
+            if let Some(ping_user) = inlined {
+                builder = builder
+                    .reference_message(self)
+                    .allowed_mentions(|f| f.replied_user(ping_user));
+            }
 
-        let map = json!({
-            "content": gen,
-            "tts": false,
-        });
-
-        cache_http.http().send_message(self.channel_id.0, &map).await
+            builder.content(content)
+        }).await
     }
 
     /// Delete all embeds in this message
