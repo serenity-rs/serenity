@@ -474,7 +474,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     }
 
                     // We check all sub-command names in order to see if one variant
-                    // has been issued to help-system.
+                    // has been issued to the help-system.
                     let name_str = name.as_str();
                     let sub_command_found = command
                         .options
@@ -484,7 +484,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                         .cloned();
 
                     // If we found a sub-command, we replace the parent with
-                    // it. This allows the help-systme to extract information
+                    // it. This allows the help-system to extract information
                     // from the sub-command.
                     if let Some(ref sub_command) = sub_command_found {
                         command = sub_command;
