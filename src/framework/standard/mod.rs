@@ -310,8 +310,8 @@ impl StandardFramework {
         for check in group.checks.iter().chain(command.checks.iter()) {
             let res = (check.function)(ctx, msg, args, command).await;
 
-            if let CheckResult::Failure(r) = res {
-                return Some(DispatchError::CheckFailed(check.name, r));
+            if let Result::Err(reason) = res {
+                return Some(DispatchError::CheckFailed(check.name, reason));
             }
         }
 

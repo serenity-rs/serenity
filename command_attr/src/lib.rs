@@ -750,7 +750,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Check));
 
-    let res = parse_quote!(serenity::framework::standard::CheckResult);
+    let res = parse_quote!(Result<(), serenity::framework::standard::Reason>);
     create_return_type_validation(&mut fun, res);
 
     let n = fun.name.clone();
