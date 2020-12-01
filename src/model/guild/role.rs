@@ -1,12 +1,12 @@
 use crate::model::prelude::*;
 use std::cmp::Ordering;
 
-#[cfg(all(feature = "builder", feature = "cache", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-#[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::Cache;
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::cache::FromStrAndCache;
@@ -14,8 +14,10 @@ use crate::cache::FromStrAndCache;
 use crate::model::misc::RoleParseError;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_role;
-#[cfg(all(feature = "cache", feature = "http"))]
-use crate::http::client::Http;
+#[cfg(feature = "model")]
+use crate::http::Http;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use async_trait::async_trait;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -79,12 +81,9 @@ impl Role {
     /// **Note** Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "cache", feature = "http"))]
     #[inline]
-    pub fn delete<T>(&mut self, cache_and_http: T) -> Result<()>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
-        AsRef::<Http>::as_ref(&cache_and_http)
-            .delete_role(self.find_guild(&cache_and_http)?.0, self.id.0)
+    pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
+        http.as_ref().delete_role(self.guild_id.0, self.id.0).await
     }
 
     /// Edits a [`Role`], optionally setting its new fields.
@@ -109,12 +108,11 @@ impl Role {
     ///
     /// [`Role`]: struct.Role.html
     /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
-    #[cfg(all(feature = "builder", feature = "cache", feature = "http"))]
-    pub fn edit<F: FnOnce(&mut EditRole) -> &mut EditRole, T>(&self, cache_and_http: T, f: F) -> Result<Role>
-    where T: AsRef<CacheRwLock> + AsRef<Http> {
-        self.find_guild(&cache_and_http)
-            .and_then(|guild_id| guild_id.edit_role(&cache_and_http, self.id, f))
+    #[inline]
+    pub async fn edit(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut EditRole) -> &mut EditRole) -> Result<Role> {
+        self.guild_id.edit_role(http, self.id, f).await
     }
+
     /// Searches the cache for the guild that owns the role.
     ///
     /// # Errors
@@ -124,10 +122,9 @@ impl Role {
     ///
     /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
-    pub fn find_guild(&self, cache: impl AsRef<CacheRwLock>) -> Result<GuildId> {
-        for guild in cache.as_ref().read().guilds.values() {
-            let guild = guild.read();
-
+    #[deprecated(note = "replaced with the `guild_id` field", since = "0.9.0")]
+    pub async fn find_guild(&self, cache: impl AsRef<Cache>) -> Result<GuildId> {
+        for guild in cache.as_ref().guilds.read().await.values() {
             if guild.roles.contains_key(&RoleId(self.id.0)) {
                 return Ok(guild.id);
             }
@@ -147,6 +144,7 @@ impl Role {
     /// The 'precise' argument is used to check if the role's permissions are
     /// precisely equivalent to the given permissions. If you need only check
     /// that the role has at least the given permissions, pass `false`.
+    #[inline]
     pub fn has_permissions(&self, permissions: Permissions, precise: bool) -> bool {
         if precise {
             self.permissions == permissions
@@ -159,7 +157,9 @@ impl Role {
 impl Display for Role {
     /// Format a mention for the role, pinging its members.
     // This is in the format of: `<@&ROLE_ID>`.
-    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult { Display::fmt(&self.mention(), f) }
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        Display::fmt(&self.mention(), f)
+    }
 }
 
 impl Eq for Role {}
@@ -188,15 +188,8 @@ impl RoleId {
     ///
     /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
-    pub fn to_role_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Role> {
-        self._to_role_cached(&cache)
-    }
-
-    #[cfg(feature = "cache")]
-    pub(crate) fn _to_role_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Role> {
-        for guild in cache.as_ref().read().guilds.values() {
-            let guild = guild.read();
-
+    pub async fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
+        for guild in cache.as_ref().guilds.read().await.values() {
             if !guild.roles.contains_key(&self) {
                 continue;
             }
@@ -221,16 +214,19 @@ impl<'a> From<&'a Role> for RoleId {
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+#[async_trait]
 impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
-    fn from_str(cache: impl AsRef<CacheRwLock>, s: &str) -> StdResult<Self, Self::Err> {
+    async fn from_str<CRL>(cache: CRL, s: &str) -> StdResult<Self, Self::Err>
+    where CRL: AsRef<Cache> + Send + Sync
+    {
         match parse_role(s) {
-            Some(x) => match RoleId(x).to_role_cached(&cache) {
+            Some(x) => match RoleId(x).to_role_cached(&cache).await {
                 Some(role) => Ok(role),
-                _ => Err(RoleParseError::NotPresentInCache),
+                None => Err(RoleParseError::NotPresentInCache),
             },
-            _ => Err(RoleParseError::InvalidRole),
+            None => Err(RoleParseError::InvalidRole),
         }
     }
 }

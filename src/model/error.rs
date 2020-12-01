@@ -22,26 +22,23 @@ use super::Permissions;
 ///
 /// ```rust,no_run
 /// # #[cfg(all(feature = "client", feature = "model"))]
-/// # use std::error::Error;
-/// #
-/// # #[cfg(all(feature = "client", feature = "model"))]
-/// # fn try_main() -> Result<(), Box<Error>> {
+/// # async fn run() -> Result<(), Box<std::error::Error>> {
 /// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
 /// use serenity::Error;
 /// use serenity::model::ModelError;
-/// use std::env;
 ///
 /// struct Handler;
 ///
+/// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
+///     async fn guild_ban_removal(&self, context: Context, guild_id: GuildId, user: User) {
 ///         // If the user has an even discriminator, don't re-ban them.
 ///         if user.discriminator % 2 == 0 {
 ///             return;
 ///         }
 ///
-///      match guild_id.ban(&context.http, user, &8) {
+///         match guild_id.ban(&context, user, 8).await {
 ///             Ok(()) => {
 ///                 // Ban successful.
 ///             },
@@ -54,20 +51,12 @@ use super::Permissions;
 ///         }
 ///     }
 /// }
-/// let token = env::var("DISCORD_BOT_TOKEN")?;
-/// let mut client = Client::new(&token, Handler).unwrap();
+/// let token = std::env::var("DISCORD_BOT_TOKEN")?;
+/// let mut client = Client::builder(&token).event_handler(Handler).await?;
 ///
-/// client.start()?;
+/// client.start().await?;
 /// #     Ok(())
 /// # }
-/// #
-/// # #[cfg(all(feature = "client", feature = "model"))]
-/// # fn main() {
-/// #     try_main().unwrap();
-/// # }
-/// #
-/// # #[cfg(not(all(feature="client", feature = "model")))]
-/// # fn main() { }
 /// ```
 ///
 /// [`Error`]: ../../enum.Error.html
@@ -75,6 +64,7 @@ use super::Permissions;
 /// [`GuildId::ban`]: ../id/struct.GuildId.html#method.ban
 /// [`model`]: ../index.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
 pub enum Error {
     /// When attempting to delete below or above the minimum and maximum allowed
     /// number of messages.
@@ -96,7 +86,7 @@ pub enum Error {
     /// [Id][`RoleId`] in the [`Cache`].
     ///
     /// [`Role`]: ../guild/struct.Role.html
-    /// [`RoleId`]: ../id/struct.GuildId.html
+    /// [`RoleId`]: ../id/struct.RoleId.html
     /// [`Cache`]: ../../cache/struct.Cache.html
     RoleNotFound,
     /// Indicates that there are hierarchy problems restricting an action.
@@ -138,8 +128,10 @@ pub enum Error {
     ///
     /// [`ChannelType`]: ../channel/enum.ChannelType.html
     InvalidChannelType,
-    #[doc(hidden)]
-    __Nonexhaustive,
+    /// Indicates that the webhook name is under the 2 characters limit.
+    NameTooShort,
+    /// Indicates that the webhook name is over the 100 characters limit.
+    NameTooLong,
 }
 
 impl Display for Error {
@@ -157,7 +149,8 @@ impl Display for Error {
             Error::ItemMissing => f.write_str("The required item is missing from the cache."),
             Error::MessageTooLong(_) => f.write_str("Message too large."),
             Error::MessagingBot => f.write_str("Attempted to message another bot user."),
-            Error::__Nonexhaustive => unreachable!(),
+            Error::NameTooShort => f.write_str("Name is under the character limit."),
+            Error::NameTooLong => f.write_str("Name is over the character limit."),
         }
     }
 }

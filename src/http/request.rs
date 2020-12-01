@@ -1,5 +1,5 @@
 use crate::constants;
-use reqwest::blocking::{
+use reqwest::{
     Client,
     RequestBuilder as ReqwestRequestBuilder,
 };
@@ -7,6 +7,7 @@ use reqwest::{
     header::{AUTHORIZATION, CONTENT_LENGTH, CONTENT_TYPE, USER_AGENT, HeaderMap as Headers, HeaderValue},
     Url,
 };
+use tracing::instrument;
 use super::{
     HttpError,
     routing::RouteInfo,
@@ -64,6 +65,7 @@ impl<'a> Request<'a> {
         Self { body, headers, route }
     }
 
+    #[instrument(skip(token))]
     pub fn build(&'a self, client: &Client, token: &str) -> Result<ReqwestRequestBuilder, HttpError> {
         let Request {
             body,
@@ -93,8 +95,8 @@ impl<'a> Request<'a> {
             headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
         }
 
-        headers.insert(CONTENT_LENGTH, HeaderValue::from_static(&"0"));
-        headers.insert("X-Ratelimit-Precision", HeaderValue::from_static("millisecond"));
+        headers.insert(CONTENT_LENGTH,
+                       HeaderValue::from_str(&body.unwrap_or(&Vec::new()).len().to_string()).map_err(HttpError::InvalidHeader)?);
 
         if let Some(ref request_headers) = request_headers {
             headers.extend(request_headers.clone());

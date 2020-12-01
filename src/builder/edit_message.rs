@@ -17,17 +17,16 @@ use std::collections::HashMap;
 /// # #[cfg(feature = "framework")]
 /// # use serenity::framework::standard::{CommandResult, macros::command};
 /// #
-/// # #[cfg(all(feature = "http", feature = "framework"))]
+/// # #[cfg(all(feature = "model", feature = "utils", feature = "framework"))]
 /// # #[command]
-/// # fn example(ctx: &Context) -> CommandResult {
-/// # let mut message = ChannelId(7).message(&ctx.http, MessageId(8)).unwrap();
-/// let _ = message.edit(ctx, |m| {
+/// # async fn example(ctx: &Context) -> CommandResult {
+/// # let mut message = ChannelId(7).message(&ctx, MessageId(8)).await?;
+/// message.edit(ctx, |m| {
 ///     m.content("hello")
-/// });
+/// })
+/// .await?;
 /// # Ok(())
 /// # }
-/// #
-/// # fn main() {}
 /// ```
 ///
 /// [`Message`]: ../model/channel/struct.Message.html

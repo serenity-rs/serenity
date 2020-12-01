@@ -1,10 +1,7 @@
 //! Models pertaining to the gateway.
 
-use parking_lot::RwLock;
 use serde::de::Error as DeError;
 use serde::ser::{SerializeStruct, Serialize, Serializer};
-use serde_json;
-use std::sync::Arc;
 use super::utils::*;
 use super::prelude::*;
 use bitflags::bitflags;
@@ -68,7 +65,7 @@ pub struct Activity {
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Game` struct that appears as a `Playing <name>` status.
+    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -86,14 +83,12 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    /// async fn activity(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::playing(&name));
+    ///     ctx.set_activity(Activity::playing(&name)).await;
     ///
     ///     Ok(())
     /// }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn playing(name: &str) -> Activity {
         Activity {
@@ -133,16 +128,14 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    /// async fn stream(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     const STREAM_URL: &str = "...";
     ///
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL));
+    ///     ctx.set_activity(Activity::streaming(&name, STREAM_URL)).await;
     ///
     ///     Ok(())
     /// }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn streaming(name: &str, url: &str) -> Activity {
         Activity {
@@ -163,7 +156,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Game` struct that appears as a `Listening to <name>` status.
+    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -181,14 +174,12 @@ impl Activity {
     ///
     /// # #[cfg(feature = "framework")]
     /// #[command]
-    /// fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    /// async fn listen(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
     ///     let name = args.message();
-    ///     ctx.set_activity(Activity::listening(&name));
+    ///     ctx.set_activity(Activity::listening(&name)).await;
     ///
     ///     Ok(())
     /// }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn listening(name: &str) -> Activity {
         Activity {
@@ -198,6 +189,50 @@ impl Activity {
             flags: None,
             instance: None,
             kind: ActivityType::Listening,
+            name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            emoji: None,
+            timestamps: None,
+            url: None,
+            _nonexhaustive: (),
+        }
+    }
+
+    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current cometing status:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
+    ///
+    /// # #[cfg(feature = "framework")]
+    /// #[command]
+    /// async fn compete(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    ///     let name = args.message();
+    ///     ctx.set_activity(Activity::competing(&name)).await;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    pub fn competing(name: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Competing,
             name: name.to_string(),
             party: None,
             secrets: None,
@@ -355,6 +390,7 @@ pub struct ActivityEmoji {
 
 
 #[derive(Clone, Copy, Debug, PartialEq)]
+#[non_exhaustive]
 pub enum ActivityType {
     /// An indicator that the user is playing a game.
     Playing = 0,
@@ -364,8 +400,8 @@ pub enum ActivityType {
     Listening = 2,
     /// An indicator that the user uses custum statuses
     Custom = 4,
-    #[doc(hidden)]
-    __Nonexhaustive,
+    /// An indicator that the user is competing somewhere.
+    Competing = 5,
 }
 
 enum_number!(
@@ -374,6 +410,7 @@ enum_number!(
         Streaming,
         Listening,
         Custom,
+        Competing,
     }
 );
 
@@ -386,7 +423,7 @@ impl ActivityType {
             Streaming => 1,
             Listening => 2,
             Custom => 4,
-            __Nonexhaustive => unreachable!(),
+            Competing => 5,
         }
     }
 }
@@ -423,23 +460,21 @@ pub struct ClientStatus {
 /// [`User`]: ../user/struct.User.html
 #[derive(Clone, Debug)]
 pub struct Presence {
-    /// The activity that a [`User`] is performing.
+    /// [`User`]'s current activities.
     ///
     /// [`User`]: struct.User.html
-    pub activity: Option<Activity>,
+    pub activities: Vec<Activity>,
     /// The devices a user are currently active on, if available.
     pub client_status: Option<ClientStatus>,
     /// The date of the last presence update.
     pub last_modified: Option<u64>,
-    /// The nickname of the member, if applicable.
-    pub nick: Option<String>,
     /// The user's online status.
     pub status: OnlineStatus,
     /// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user's creation
     /// date.
     pub user_id: UserId,
     /// The associated user instance.
-    pub user: Option<Arc<RwLock<User>>>,
+    pub user: Option<User>,
     pub(crate) _nonexhaustive: (),
 }
 
@@ -455,7 +490,7 @@ impl<'de> Deserialize<'de> for Presence {
             let user = User::deserialize(Value::Object(user_map))
                 .map_err(DeError::custom)?;
 
-            (user.id, Some(Arc::new(RwLock::new(user))))
+            (user.id, Some(user))
         } else {
             let user_id = user_map
                 .remove("id")
@@ -466,10 +501,10 @@ impl<'de> Deserialize<'de> for Presence {
             (user_id, None)
         };
 
-        let activity = match map.remove("game") {
-            Some(v) => serde_json::from_value::<Option<Activity>>(v)
+        let activities = match map.remove("activities") {
+            Some(v) => serde_json::from_value::<Vec<Activity>>(v)
                 .map_err(DeError::custom)?,
-            None => None,
+            None => Vec::new(),
         };
 
         let client_status = match map.remove("client_status") {
@@ -478,15 +513,9 @@ impl<'de> Deserialize<'de> for Presence {
             }
             None => None,
         };
-        
+
         let last_modified = match map.remove("last_modified") {
             Some(v) => serde_json::from_value::<Option<u64>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
-
-        let nick = match map.remove("nick") {
-            Some(v) => serde_json::from_value::<Option<String>>(v)
                 .map_err(DeError::custom)?,
             None => None,
         };
@@ -498,10 +527,9 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         Ok(Presence {
-            activity,
+            activities,
             client_status,
             last_modified,
-            nick,
             status,
             user,
             user_id,
@@ -518,20 +546,18 @@ impl Serialize for Presence {
             id: u64,
         }
 
-        let mut state = serializer.serialize_struct("Presence", 5)?;
-        state.serialize_field("game", &self.activity)?;
+        let mut state = serializer.serialize_struct("Presence", 3)?;
         state.serialize_field("client_status", &self.client_status)?;
         state.serialize_field("last_modified", &self.last_modified)?;
-        state.serialize_field("nick", &self.nick)?;
         state.serialize_field("status", &self.status)?;
 
-        if let Some(ref user) = self.user {
-            state.serialize_field("user", &*user.read())?;
+        if let Some(user) = &self.user {
+            state.serialize_field("user", &user)?;
         } else {
             state.serialize_field(
                 "user",
                 &UserId {
-                    id: *self.user_id.as_u64(),
+                    id: self.user_id.0,
                 },
             )?;
         }

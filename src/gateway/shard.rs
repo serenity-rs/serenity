@@ -6,8 +6,8 @@ use crate::model::{
     id::GuildId,
     user::OnlineStatus
 };
-use crate::client::bridge::gateway::GatewayIntents;
-use parking_lot::Mutex;
+use tokio::sync::Mutex;
+use crate::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
 use std::{
     sync::Arc,
     time::{Duration as StdDuration, Instant}
@@ -18,21 +18,21 @@ use super::{
     ShardAction,
     GatewayError,
     ReconnectType,
-    WsClient,
+    WsStream,
     WebSocketGatewayClientExt,
 };
-use tungstenite::{
+use async_tungstenite::tungstenite::{
     error::Error as TungsteniteError,
     protocol::frame::CloseFrame,
 };
 use url::Url;
-use log::{error, debug, info, trace, warn};
+use tracing::{error, debug, info, trace, warn, instrument};
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::create_rustls_client;
 
 #[cfg(feature = "native_tls_backend")]
-use tungstenite::handshake::client::Request;
+use crate::internal::ws_impl::create_native_tls_client;
 
 /// A Shard is a higher-level handler for a websocket connection to Discord's
 /// gateway. The shard allows for sending and receiving messages over the
@@ -66,10 +66,10 @@ use tungstenite::handshake::client::Request;
 /// [`Client`]: ../client/struct.Client.html
 /// [`new`]: #method.new
 /// [`receive`]: #method.receive
-/// [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
+/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
 /// [module docs]: index.html#sharding
 pub struct Shard {
-    pub client: WsClient,
+    pub client: WsStream,
     current_presence: CurrentPresence,
     /// A tuple of:
     ///
@@ -89,7 +89,6 @@ pub struct Shard {
     seq: u64,
     session_id: Option<String>,
     shard_info: [u64; 2],
-    guild_subscriptions: bool,
     /// Whether the shard has permanently shutdown.
     shutdown: bool,
     stage: ConnectionStage,
@@ -99,7 +98,7 @@ pub struct Shard {
     pub started: Instant,
     pub token: String,
     ws_url: Arc<Mutex<String>>,
-    pub intents: Option<GatewayIntents>,
+    pub intents: GatewayIntents,
 }
 
 impl Shard {
@@ -114,41 +113,32 @@ impl Shard {
     ///
     /// ```rust,no_run
     /// use serenity::gateway::Shard;
-    /// use parking_lot::Mutex;
-    /// use std::{env, sync::Arc};
+    /// use tokio::sync::Mutex;
+    /// use std::sync::Arc;
     /// #
     /// # use serenity::http::Http;
-    /// # use std::{error::Error};
+    /// # use serenity::client::bridge::gateway::GatewayIntents;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::default());
-    /// let token = env::var("DISCORD_BOT_TOKEN")?;
+    /// let token = std::env::var("DISCORD_BOT_TOKEN")?;
     /// // retrieve the gateway response, which contains the URL to connect to
-    /// let gateway = Arc::new(Mutex::new(http.get_gateway()?.url));
-    /// let shard = Shard::new(gateway, &token, [0, 1], true, None)?;
+    /// let gateway = Arc::new(Mutex::new(http.get_gateway().await?.url));
+    /// let shard = Shard::new(gateway, &token, [0u64, 1u64], GatewayIntents::all()).await?;
     ///
     /// // at this point, you can create a `loop`, and receive events and match
     /// // their variants
     /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
     /// ```
-    pub fn new(
+    pub async fn new(
         ws_url: Arc<Mutex<String>>,
         token: &str,
         shard_info: [u64; 2],
-        guild_subscriptions: bool,
-        intents: Option<GatewayIntents>,
+        intents: GatewayIntents,
     ) -> Result<Shard> {
-        let mut client = connect(&*ws_url.lock())?;
-
-        // Configure timeout and buffer sizes. See the respective
-        // methods for the reasoning behind changing the defaults.
-        let _ = set_client_timeout(&mut client);
-        set_client_buffer_sizes(&mut client);
+        let url = ws_url.lock().await.clone();
+        let client = connect(&url).await?;
 
         let current_presence = (None, OnlineStatus::Online);
         let heartbeat_instants = (None, None);
@@ -171,7 +161,6 @@ impl Shard {
             token: token.to_string(),
             session_id,
             shard_info,
-            guild_subscriptions,
             ws_url,
             intents,
         })
@@ -182,6 +171,7 @@ impl Shard {
     pub fn current_presence(&self) -> &CurrentPresence {
         &self.current_presence
     }
+
     /// Whether the shard has permanently shutdown.
     ///
     /// This should normally happen due to manual calling of [`shutdown`] or
@@ -226,8 +216,9 @@ impl Shard {
     /// a heartbeat.
     ///
     /// [`GatewayError::HeartbeatFailed`]: enum.GatewayError.html#variant.HeartbeatFailed
-    pub fn heartbeat(&mut self) -> Result<()> {
-        match self.client.send_heartbeat(&self.shard_info, Some(self.seq)) {
+    #[instrument(skip(self))]
+    pub async fn heartbeat(&mut self) -> Result<()> {
+        match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
             Ok(()) => {
                 self.heartbeat_instants.0 = Some(Instant::now());
                 self.last_heartbeat_acknowledged = false;
@@ -273,36 +264,21 @@ impl Shard {
         self.session_id.as_ref()
     }
 
-    /// ```rust,no_run
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
-    /// # use serenity::{gateway::Shard, prelude::Mutex};
-    /// # use std::sync::Arc;
-    /// #
-    /// # let mutex = Arc::new(Mutex::new("".to_string()));
-    /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).unwrap();
-    /// #
-    /// use serenity::model::gateway::Activity;
-    ///
-    /// shard.set_activity(Some(Activity::playing("Heroes of the Storm")));
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "model"))]
-    /// # fn main() { }
-    /// ```
     #[inline]
+    #[instrument(skip(self))]
     pub fn set_activity(&mut self, activity: Option<Activity>) {
         self.current_presence.0 = activity;
     }
 
     #[inline]
+    #[instrument(skip(self))]
     pub fn set_presence(&mut self, status: OnlineStatus, activity: Option<Activity>) {
         self.set_activity(activity);
         self.set_status(status);
     }
 
     #[inline]
+    #[instrument(skip(self))]
     pub fn set_status(&mut self, mut status: OnlineStatus) {
         if status == OnlineStatus::Offline {
             status = OnlineStatus::Invisible;
@@ -323,22 +299,29 @@ impl Shard {
     ///
     /// Retrieving the shard info for the second shard, out of two shards total:
     ///
+        /// For example, if using 3 shards in total, and if this is shard 1, then it
+    /// can be read as "the second of three shards".
+    ///
+    /// # Examples
+    ///
+    /// Retrieving the shard info for the second shard, out of two shards total:
+    ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "model")]
-    /// # fn main() {
     /// # use serenity::gateway::Shard;
     /// # use serenity::prelude::Mutex;
+    /// # use serenity::client::bridge::gateway::GatewayIntents;
     /// # use std::sync::Arc;
+    /// #
+    /// # #[cfg(feature = "model")]
+    /// # async fn run() {
     /// #
     /// # let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// # let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None).unwrap();
+    /// # let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                            GatewayIntents::all()).await.unwrap();
     /// #
     /// assert_eq!(shard.shard_info(), [1, 2]);
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "model"))]
-    /// # fn main() {}
     /// ```
     pub fn shard_info(&self) -> [u64; 2] { self.shard_info }
 
@@ -347,12 +330,13 @@ impl Shard {
         self.stage
     }
 
+    #[instrument(skip(self))]
     fn handle_gateway_dispatch(&mut self, seq: u64, event: &Event) -> Result<Option<ShardAction>> {
         if seq > self.seq + 1 {
             warn!("[Shard {:?}] Sequence off; them: {}, us: {}", self.shard_info, seq, self.seq);
         }
 
-        match *event {
+        match event {
             Event::Ready(ref ready) => {
                 debug!("[Shard {:?}] Received Ready", self.shard_info);
 
@@ -374,6 +358,7 @@ impl Shard {
         Ok(None)
     }
 
+    #[instrument(skip(self))]
     fn handle_heartbeat_event(&mut self, s: u64) -> Result<Option<ShardAction>> {
         info!("[Shard {:?}] Received shard heartbeat", self.shard_info);
 
@@ -403,61 +388,72 @@ impl Shard {
         Ok(Some(ShardAction::Heartbeat))
     }
 
+    #[instrument(skip(self))]
     fn handle_gateway_closed(&mut self, data: &Option<CloseFrame<'static>>) -> Result<Option<ShardAction>> {
         let num = data.as_ref().map(|d| d.code.into());
         let clean = num == Some(1000);
 
         match num {
             Some(close_codes::UNKNOWN_OPCODE) => {
-                warn!("[Shard {:?}] Sent invalid opcode",
+                warn!("[Shard {:?}] Sent invalid opcode.",
                         self.shard_info);
             },
             Some(close_codes::DECODE_ERROR) => {
-                warn!("[Shard {:?}] Sent invalid message",
+                warn!("[Shard {:?}] Sent invalid message.",
                         self.shard_info);
             },
             Some(close_codes::NOT_AUTHENTICATED) => {
-                warn!("[Shard {:?}] Sent no authentication",
+                warn!("[Shard {:?}] Sent no authentication.",
                         self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::NoAuthentication));
             },
             Some(close_codes::AUTHENTICATION_FAILED) => {
-                warn!("Sent invalid authentication");
+                error!("[Shard {:?}] Sent invalid authentication, please check the token.", self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::InvalidAuthentication));
             },
             Some(close_codes::ALREADY_AUTHENTICATED) => {
-                warn!("[Shard {:?}] Already authenticated",
+                warn!("[Shard {:?}] Already authenticated.",
                         self.shard_info);
             },
             Some(close_codes::INVALID_SEQUENCE) => {
-                warn!("[Shard {:?}] Sent invalid seq: {}",
+                warn!("[Shard {:?}] Sent invalid seq: {}.",
                         self.shard_info,
                         self.seq);
 
                 self.seq = 0;
             },
             Some(close_codes::RATE_LIMITED) => {
-                warn!("[Shard {:?}] Gateway ratelimited",
+                warn!("[Shard {:?}] Gateway ratelimited.",
                         self.shard_info);
             },
             Some(close_codes::INVALID_SHARD) => {
-                warn!("[Shard {:?}] Sent invalid shard data",
+                warn!("[Shard {:?}] Sent invalid shard data.",
                         self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::InvalidShardData));
             },
             Some(close_codes::SHARDING_REQUIRED) => {
-                error!("[Shard {:?}] Shard has too many guilds",
+                error!("[Shard {:?}] Shard has too many guilds.",
                         self.shard_info);
 
                 return Err(Error::Gateway(GatewayError::OverloadedShard));
             },
             Some(4006) | Some(close_codes::SESSION_TIMEOUT) => {
-                info!("[Shard {:?}] Invalid session", self.shard_info);
+                info!("[Shard {:?}] Invalid session.", self.shard_info);
 
                 self.session_id = None;
+            },
+            Some(close_codes::INVALID_GATEWAY_INTENTS) => {
+                error!("[Shard {:?}] Invalid gateway intents have been provided.", self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::InvalidGatewayIntents));
+            },
+            Some(close_codes::DISALLOWED_GATEWAY_INTENTS) => {
+                error!("[Shard {:?}] Disallowed gateway intents have been provided.", self.shard_info);
+
+                return Err(Error::Gateway(GatewayError::DisallowedGatewayIntents));
             },
             Some(other) if !clean => {
                 warn!(
@@ -506,6 +502,7 @@ impl Shard {
     ///
     /// Returns a `GatewayError::OverloadedShard` if the shard would have too
     /// many guilds assigned to it.
+    #[instrument(skip(self))]
     pub(crate) fn handle_event(&mut self, event: &Result<GatewayEvent>)
         -> Result<Option<ShardAction>> {
         match *event {
@@ -583,7 +580,8 @@ impl Shard {
     ///
     /// - a heartbeat acknowledgement was not received in time
     /// - an error occurred while heartbeating
-    pub fn check_heartbeat(&mut self) -> bool {
+    #[instrument(skip(self))]
+    pub async fn check_heartbeat(&mut self) -> bool {
         let wait = {
             let heartbeat_interval = match self.heartbeat_interval {
                 Some(heartbeat_interval) => heartbeat_interval,
@@ -615,7 +613,7 @@ impl Shard {
         }
 
         // Otherwise, we're good to heartbeat.
-        if let Err(why) = self.heartbeat() {
+        if let Err(why) = self.heartbeat().await {
             warn!("[Shard {:?}] Err heartbeating: {:?}", self.shard_info, why);
 
             false
@@ -629,6 +627,7 @@ impl Shard {
     /// Calculates the heartbeat latency between the shard and the gateway.
     // Shamelessly stolen from brayzure's commit in eris:
     // <https://github.com/abalabahaha/eris/commit/0ce296ae9a542bcec0edf1c999ee2d9986bed5a6>
+    #[instrument(skip(self))]
     pub fn latency(&self) -> Option<StdDuration> {
         if let (Some(sent), Some(received)) = self.heartbeat_instants {
             if received > sent {
@@ -686,81 +685,75 @@ impl Shard {
     /// specifying a query parameter:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
+    /// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
     /// # use serenity::gateway::Shard;
-    /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64], GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(2000), None);
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(2000), ChunkGuildFilter::None, None).await?;
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
     /// Chunk a single guild by Id, limiting to 20 members, and specifying a
-    /// query parameter of `"do"`:
+    /// query parameter of `"do"` and a nonce of `"request"`:
     ///
     /// ```rust,no_run
-    /// # use parking_lot::Mutex;
+    /// # use tokio::sync::Mutex;
     /// # use serenity::gateway::Shard;
+    /// # use serenity::client::bridge::gateway::{GatewayIntents, ChunkGuildFilter};
     /// # use std::error::Error;
     /// # use std::sync::Arc;
     /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let mutex = Arc::new(Mutex::new("".to_string()));
     /// #
-    /// #     let mut shard = Shard::new(mutex.clone(), "", [0, 1], true, None)?;
+    /// #     let mut shard = Shard::new(mutex.clone(), "", [0u64, 1u64],
+    /// #                                GatewayIntents::all()).await?;
     /// #
     /// use serenity::model::id::GuildId;
     ///
-    /// let guild_ids = vec![GuildId(81384788765712384)];
-    ///
-    /// shard.chunk_guilds(guild_ids, Some(20), Some("do"));
+    /// shard.chunk_guild(GuildId(81384788765712384), Some(20), ChunkGuildFilter::Query("do".to_owned()), Some("request")).await?;
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
     /// [`Event::GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk
     /// [`Guild`]: ../model/guild/struct.Guild.html
     /// [`Member`]: ../model/guild/struct.Member.html
-    pub fn chunk_guilds<It>(
+    #[instrument(skip(self))]
+    pub async fn chunk_guild(
         &mut self,
-        guild_ids: It,
+        guild_id: GuildId,
         limit: Option<u16>,
-        query: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId> {
+        filter: ChunkGuildFilter,
+        nonce: Option<&str>,
+    ) -> Result<()> {
         debug!("[Shard {:?}] Requesting member chunks", self.shard_info);
 
-        self.client.send_chunk_guilds(
-            guild_ids,
+        self.client.send_chunk_guild(
+            guild_id,
             &self.shard_info,
             limit,
-            query,
-        )
+            filter,
+            nonce,
+        ).await
     }
 
-    // Sets the shard as going into identifying stage, which sets:
-    //
-    // - the time that the last heartbeat sent as being now
-    // - the `stage` to `Identifying`
-    pub fn identify(&mut self) -> Result<()> {
-        self.client.send_identify(&self.shard_info, &self.token, self.guild_subscriptions, self.intents)?;
+    /// Sets the shard as going into identifying stage, which sets:
+    ///
+    /// - the time that the last heartbeat sent as being now
+    /// - the `stage` to `Identifying`
+    #[instrument(skip(self))]
+    pub async fn identify(&mut self) -> Result<()> {
+        self.client.send_identify(&self.shard_info, &self.token, self.intents).await?;
 
         self.heartbeat_instants.0 = Some(Instant::now());
         self.stage = ConnectionStage::Identifying;
@@ -772,8 +765,9 @@ impl Shard {
     ///
     /// This will set the stage of the shard before and after instantiation of
     /// the client.
-    pub fn initialize(&mut self) -> Result<WsClient> {
-        debug!("[Shard {:?}] Initializing", self.shard_info);
+    #[instrument(skip(self))]
+    pub async fn initialize(&mut self) -> Result<WsStream> {
+        debug!("[Shard {:?}] Initializing.", self.shard_info);
 
         // We need to do two, sort of three things here:
         //
@@ -785,15 +779,15 @@ impl Shard {
         // accurate when a Hello is received.
         self.stage = ConnectionStage::Connecting;
         self.started = Instant::now();
-        let mut client = connect(&self.ws_url.lock())?;
+        let url = &self.ws_url.lock().await.clone();
+        let client = connect(&url).await?;
         self.stage = ConnectionStage::Handshake;
-
-        let _ = set_client_timeout(&mut client);
 
         Ok(client)
     }
 
-    pub fn reset(&mut self) {
+    #[instrument(skip(self))]
+    pub async fn reset(&mut self) {
         self.heartbeat_instants = (Some(Instant::now()), None);
         self.heartbeat_interval = None;
         self.last_heartbeat_acknowledged = true;
@@ -802,10 +796,11 @@ impl Shard {
         self.seq = 0;
     }
 
-    pub fn resume(&mut self) -> Result<()> {
+    #[instrument(skip(self))]
+    pub async fn resume(&mut self) -> Result<()> {
         debug!("[Shard {:?}] Attempting to resume", self.shard_info);
 
-        self.client = self.initialize()?;
+        self.client = self.initialize().await?;
         self.stage = ConnectionStage::Resuming;
 
         match self.session_id.as_ref() {
@@ -815,73 +810,43 @@ impl Shard {
                     session_id,
                     self.seq,
                     &self.token,
-                )
+                ).await
             },
             None => Err(Error::Gateway(GatewayError::NoSessionId)),
         }
     }
 
-    pub fn reconnect(&mut self) -> Result<()> {
+    #[instrument(skip(self))]
+    pub async fn reconnect(&mut self) -> Result<()> {
         info!("[Shard {:?}] Attempting to reconnect", self.shard_info());
 
-        self.reset();
-        self.client = self.initialize()?;
+        self.reset().await;
+        self.client = self.initialize().await?;
 
         Ok(())
     }
 
-    pub fn update_presence(&mut self) -> Result<()> {
+    #[instrument(skip(self))]
+    pub async fn update_presence(&mut self) -> Result<()> {
         self.client.send_presence_update(
             &self.shard_info,
             &self.current_presence,
-        )
+        ).await
     }
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
-fn connect(base_url: &str) -> Result<WsClient> {
+#[cfg(all(feature = "rustls_backend", not(feature = "native_tls_backend")))]
+async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
-    Ok(create_rustls_client(url)?)
+
+    Ok(create_rustls_client(url).await?)
 }
 
 #[cfg(feature = "native_tls_backend")]
-fn connect(base_url: &str) -> Result<WsClient> {
+async fn connect(base_url: &str) -> Result<WsStream> {
     let url = build_gateway_url(base_url)?;
-    let client = tungstenite::connect(Request::from(url))?;
 
-    Ok(client.0)
-}
-
-fn set_client_timeout(client: &mut WsClient) -> Result<()> {
-    #[cfg(not(feature = "native_tls_backend"))]
-    let stream = &client.get_mut().sock;
-
-    #[cfg(feature = "native_tls_backend")]
-    let stream = match client.get_mut() {
-        tungstenite::stream::Stream::Plain(stream) => stream,
-        tungstenite::stream::Stream::Tls(stream) => stream.get_mut(),
-    };
-
-    stream.set_read_timeout(Some(StdDuration::from_millis(500)))?;
-    stream.set_write_timeout(Some(StdDuration::from_secs(50)))?;
-
-    Ok(())
-}
-
-fn set_client_buffer_sizes(client: &mut WsClient) {
-    // Despite chunking members inside larger guilds, Discord will
-    // still send us the online state of all members at the same time
-    // in a single frame. By default, tungstenite only allows frames
-    // with a maximum of 16mb at a time. Larger guilds can easily surpass
-    // this limit.
-    //
-    // Since we know all traffic is coming from a trusted source (Discord),
-    // we can remove the buffer limit entirely. This eliminates the issue
-    // where we have to keep upping buffer sizes because of growing guilds.
-    client.set_config(|c| {
-        c.max_frame_size = None;
-        c.max_message_size = None;
-    })
+    Ok(create_native_tls_client(url).await?)
 }
 
 fn build_gateway_url(base: &str) -> Result<Url> {

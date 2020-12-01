@@ -7,6 +7,9 @@ use std::sync::Arc;
 #[cfg(feature = "cache")]
 use std::time::Duration;
 
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
+
 /// A builder to extra things for altering the [`Client`].
 ///
 /// [`Client`]: ../struct.Client.html
@@ -14,9 +17,10 @@ use std::time::Duration;
 pub struct Extras {
     pub(crate) event_handler: Option<Arc<dyn EventHandler>>,
     pub(crate) raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+    #[cfg(feature = "framework")]
+    pub(crate) framework: Arc<Option<Box<dyn Framework + Send + Sync + 'static>>>,
     #[cfg(feature = "cache")]
     pub(crate) timeout: Option<Duration>,
-    pub(crate) guild_subscriptions: bool,
     pub(crate) intents: Option<GatewayIntents>,
 }
 
@@ -34,6 +38,8 @@ impl Extras {
     ///
     /// If you have set the specialised [`event_handler`], all events
     /// will be cloned for use to the raw event handler.
+    ///
+    /// [`event_handler`]: #method.event_handler
     pub fn raw_event_handler<H>(&mut self, handler: H) -> &mut Self
     where
         H: RawEventHandler + 'static,
@@ -42,21 +48,20 @@ impl Extras {
         self
     }
 
-    /// Set the duration the library is permitted to update the cache
-    /// before giving up acquiring a write-lock.
-    ///
-    /// This can be useful for avoiding deadlocks.
-    #[cfg(feature = "cache")]
-    pub fn cache_update_timeout(&mut self, duration: Duration) -> &mut Self {
-        self.timeout = Some(duration);
+    /// Set the framework.
+    #[cfg(feature = "framework")]
+    pub fn framework<F: Framework + Send + Sync + 'static>(&mut self, framework: F) -> &mut Self {
+        self.framework = Arc::new(Some(Box::new(framework)));
         self
     }
 
-    /// Set whether the library should subscribe for listening to presence and typing events.
+    /// Set the duration the library is permitted to update the cache
+    /// before giving up acquiring a write-lock.
     ///
-    /// By default, this is `true`.
-    pub fn guild_subscriptions(&mut self, guild_subscriptions: bool) -> &mut Self {
-        self.guild_subscriptions = guild_subscriptions;
+    /// This can be useful for avoiding deadlocks, but it also may invalidate your cache.
+    #[cfg(feature = "cache")]
+    pub fn cache_update_timeout(&mut self, duration: Duration) -> &mut Self {
+        self.timeout = Some(duration);
         self
     }
 
@@ -74,9 +79,10 @@ impl Default for Extras {
         Extras {
             event_handler: None,
             raw_event_handler: None,
+            #[cfg(feature = "framework")]
+            framework: Arc::new(None),
             #[cfg(feature = "cache")]
             timeout: None,
-            guild_subscriptions: true,
             intents: None,
         }
     }

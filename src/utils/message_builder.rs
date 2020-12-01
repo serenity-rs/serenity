@@ -20,13 +20,10 @@ use std::{
 /// value:
 ///
 /// ```rust,no_run
-/// # extern crate serde_json;
-/// # extern crate serenity;
-/// #
 /// # use serde_json::json;
 /// # use serenity::model::prelude::*;
 /// #
-/// # fn main() {
+/// # async fn run() {
 /// # let user = UserId(1);
 /// # let emoji = serde_json::from_value::<Emoji>(json!({
 /// #     "animated": false,
@@ -157,13 +154,10 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::model::guild::Role;
     /// #
-    /// # fn main() {
+    /// # {
     /// #
     /// use serenity::model::guild::Emoji;
     /// use serenity::model::id::EmojiId;
@@ -926,9 +920,8 @@ impl Display for MessageBuilder {
 /// Make a named link to Rust's GitHub organization:
 ///
 /// ```rust
-/// # #[cfg(feature = "utils")]
-/// # fn main() {
-/// #
+/// #[cfg(feature = "utils")]
+/// {
 /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
 ///
 /// let msg = MessageBuilder::new()
@@ -936,10 +929,10 @@ impl Display for MessageBuilder {
 ///     .build();
 ///
 /// assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
-/// # }
-/// #
-/// # #[cfg(not(feature = "utils"))]
-/// # fn main() { }
+/// }
+///
+/// #[cfg(not(feature = "utils"))]
+/// {}
 /// ```
 ///
 /// [`MessageBuilder`]: struct.MessageBuilder.html
@@ -953,9 +946,8 @@ pub trait EmbedMessageBuilding {
     /// Make a simple link to Rust's homepage for use in an embed:
     ///
     /// ```rust
-    /// # #[cfg(feature = "utils")]
-    /// # fn main() {
-    /// #
+    /// #[cfg(feature = "utils")]
+    /// {
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
     /// let mut msg = MessageBuilder::new();
@@ -964,10 +956,10 @@ pub trait EmbedMessageBuilding {
     /// let content = msg.build();
     ///
     /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "utils"))]
-    /// # fn main() { }
+    /// }
+    ///
+    /// #[cfg(not(feature = "utils"))]
+    /// {}
     /// ```
     fn push_named_link<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self;
 
@@ -979,9 +971,8 @@ pub trait EmbedMessageBuilding {
     /// # Examples
     ///
     /// ```rust
-    /// # #[cfg(feature = "utils")]
-    /// # fn main() {
-    /// #
+    /// #[cfg(feature = "utils")]
+    /// {
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
     /// let mut msg = MessageBuilder::new();
@@ -990,10 +981,10 @@ pub trait EmbedMessageBuilding {
     /// let content = msg.build();
     ///
     /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "utils"))]
-    /// # fn main() { }
+    /// }
+    ///
+    /// #[cfg(not(feature = "utils"))]
+    /// {}
     /// ```
     ///
     /// [`push_named_link`]: #tymethod.push_named_link
@@ -1011,7 +1002,7 @@ impl EmbedMessageBuilding for MessageBuilder {
     }
 
     fn push_named_link_safe<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self {
-        self.0.push_str("[");
+        self.0.push('[');
         {
             let mut c = name.into();
             c.inner = normalize(&c.inner).replace("]", " ");
@@ -1023,7 +1014,7 @@ impl EmbedMessageBuilding for MessageBuilder {
             c.inner = normalize(&c.inner).replace(")", " ");
             self.0.push_str(&c.to_string());
         }
-        self.0.push_str(")");
+        self.0.push(')');
 
         self
     }
@@ -1043,6 +1034,7 @@ impl EmbedMessageBuilding for MessageBuilder {
 /// use serenity::utils::Content;
 /// let content: Content = Bold + Italic + "text";
 /// ```
+#[non_exhaustive]
 pub enum ContentModifier {
     Italic,
     Bold,
@@ -1050,8 +1042,6 @@ pub enum ContentModifier {
     Code,
     Underline,
     Spoiler,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Describes formatting on string content
@@ -1138,10 +1128,10 @@ impl Content {
             ContentModifier::Spoiler => {
                 self.spoiler = true;
             },
-            ContentModifier::__Nonexhaustive => unreachable!(),
         }
     }
 
+    #[allow(clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
         trait UnwrapWith {
             fn unwrap_with(&self, n: usize) -> usize;
@@ -1272,6 +1262,7 @@ fn normalize(text: &str) -> String {
         .replace("discord.me", "discord\u{2024}me")
         .replace("discordlist.net", "discordlist\u{2024}net")
         .replace("discordservers.com", "discordservers\u{2024}com")
+        .replace("discord.com/invite", "discord\u{2024}com/invite")
         .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
         // Remove right-to-left override and other similar annoying symbols
         .replace('\u{202E}', " ") // RTL Override
@@ -1584,7 +1575,7 @@ mod test {
         assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
         assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
         assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
-        assert_eq!(super::normalize("discordapp.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(super::normalize("discord.com/invite"), "discord\u{2024}com/invite");
         assert_eq!(super::normalize("\u{202E}"), " ");
         assert_eq!(super::normalize("\u{200F}"), " ");
         assert_eq!(super::normalize("\u{202B}"), " ");

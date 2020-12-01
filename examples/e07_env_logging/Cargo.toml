@@ -1,0 +1,15 @@
+[package]
+name = "e07_env_logging"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies]
+tracing = "0.1"
+tracing-subscriber = "0.2"
+tracing-futures = "0.2" # needed so intrument works with async functions.
+tokio = { version = "0.2", features = ["macros"] }
+
+[dependencies.serenity]
+features = ["client", "rustls_backend"]
+path = "../../"

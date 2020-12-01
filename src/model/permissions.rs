@@ -44,10 +44,65 @@
 //! [Manage Roles]: struct.Permissions.html#associatedconstant.MANAGE_ROLES
 //! [Manage Webhooks]: struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
 
-use serde::de::{Deserialize, Deserializer};
+use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
-use super::utils::U64Visitor;
 use bitflags::__impl_bitflags;
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
+/// This macro generates the [`Permissions::get_permission_names`] method.
+///
+/// It is invoked by passing the names of all methods used to check for
+/// permissions along with their names displayed inside Discord.
+///
+/// ## Examples
+///
+/// Using this macro
+///
+/// ```rust,no_run
+/// generate_get_permission_names! {
+///     add_reactions: "Add Reactions",
+///     administrator: "Administrator"
+/// };
+/// ```
+///
+/// Generates this implementation:
+///
+/// ```
+/// impl Permissions {
+///     fn get_permission_names(self) -> Vec<&'static str> {
+///         let mut names = Vec::new();
+///
+///         if self.add_reactions() {
+///             names.push("Add Reactions");
+///         }
+///         if self.administrator() {
+///             names.push("Administrator");
+///         }
+///
+///         names
+///     }
+/// }
+/// ```
+///
+/// [`Permissions::get_permission_names`]: struct.Permissions.html#method.get_permission_names
+macro_rules! generate_get_permission_names {
+    {$ ($perm:ident: $name:expr),*} => {
+        impl Permissions {
+            /// Returns a list of names of all contained permissions.
+            pub fn get_permission_names(self) -> Vec<&'static str> {
+                let mut names = Vec::new();
+
+                $(
+                    if self.$perm() {
+                        names.push($name);
+                    }
+                )*
+
+                names
+            }
+        }
+    }
+}
 
 /// Returns a set of permissions with the original @everyone permissions set
 /// to true.
@@ -270,6 +325,40 @@ __impl_bitflags! {
     }
 }
 
+generate_get_permission_names! {
+    add_reactions: "Add Reactions",
+    administrator: "Administrator",
+    attach_files: "Attach Files",
+    ban_members: "Ban Members",
+    change_nickname: "Change Nickname",
+    connect: "Connect",
+    create_invite: "Create Invite",
+    deafen_members: "Deafen Members",
+    embed_links: "Embed Links",
+    external_emojis: "Use External Emojis",
+    kick_members: "Kick Members",
+    manage_channels: "Manage Channels",
+    manage_emojis: "Manage Emojis",
+    manage_guild: "Manage Guilds",
+    manage_messages: "Manage Messages",
+    manage_nicknames: "Manage Nicknames",
+    manage_roles: "Manage Roles",
+    manage_webhooks: "Manage Webhooks",
+    mention_everyone: "Mention Everyone",
+    move_members: "Move Members",
+    mute_members: "Mute Members",
+    priority_speaker: "Priority Speaker",
+    read_message_history: "Read Message History",
+    read_messages: "Read Messages",
+    send_messages: "Send Messages",
+    send_tts_messages: "Send TTS Messages",
+    speak: "Speak",
+    stream: "Stream",
+    use_external_emojis: "Use External Emojis",
+    use_vad: "Use Voice Activity",
+    view_audit_log: "View Audit Log"
+}
+
 #[cfg(feature = "model")]
 impl Permissions {
     /// Shorthand for checking that the set of permissions contains the
@@ -465,8 +554,9 @@ impl Default for Permissions {
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        let str_u64 = String::deserialize(deserializer)?;
         Ok(Permissions::from_bits_truncate(
-            deserializer.deserialize_u64(U64Visitor)?,
+            str_u64.parse::<u64>().map_err(D::Error::custom)?,
         ))
     }
 }
@@ -474,6 +564,27 @@ impl<'de> Deserialize<'de> for Permissions {
 impl Serialize for Permissions {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
         where S: Serializer {
-        serializer.serialize_u64(self.bits())
+        serializer.collect_str(&self.bits())
+    }
+}
+
+impl Display for Permissions {
+    fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
+        let names = self.get_permission_names();
+
+        let total = names.len();
+        for (i, &name) in names.iter().enumerate() {
+            if i > 0 && i != total - 1 {
+                write!(f, ", ")?;
+            }
+
+            if total > 1 && i == total - 1 {
+                write!(f, " and ")?;
+            }
+
+            write!(f, "{}", name)?;
+        }
+
+        Ok(())
     }
 }

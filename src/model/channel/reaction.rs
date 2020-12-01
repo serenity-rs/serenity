@@ -1,6 +1,4 @@
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-use crate::{model::prelude::*};
+use crate::model::prelude::*;
 use serde::de::{Deserialize, Error as DeError, MapAccess, Visitor};
 use serde::ser::{SerializeMap, Serialize, Serializer};
 use std::{
@@ -16,10 +14,10 @@ use std::{
 
 use crate::internal::prelude::*;
 
-#[cfg(feature = "http")]
-use crate::http::Http;
-#[cfg(all(feature = "http", feature = "model"))]
-use log::warn;
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
+#[cfg(feature = "model")]
+use tracing::warn;
 use std::convert::TryFrom;
 use std::str::FromStr;
 
@@ -39,8 +37,11 @@ pub struct Reaction {
     pub message_id: MessageId,
     /// The Id of the [`User`] that sent the reaction.
     ///
+    /// Set to `None` by [`Message::react`] when cache is not available.
+    ///
     /// [`User`]: ../user/struct.User.html
-    pub user_id: UserId,
+    /// [`Message::react`]: struct.Message.html#method.react
+    pub user_id: Option<UserId>,
     /// The optional Id of the [`Guild`] where the reaction was sent.
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
@@ -61,9 +62,8 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     #[inline]
-    #[cfg(feature = "http")]
-    pub fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
-        self.channel_id.to_channel(cache_http)
+    pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
+        self.channel_id.to_channel(cache_http).await
     }
 
     /// Deletes the reaction, but only if the current user is the user who made
@@ -81,30 +81,32 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-
-        let mut user_id = Some(self.user_id.0);
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+        // Silences a warning when compiling without the `cache` feature.
+        #[allow(unused_mut)]
+        let mut user_id = self.user_id.map(|id| id.0);
 
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
-                if self.user_id == cache.read().user.id {
+                if self.user_id.is_some() && self.user_id == Some(cache.current_user().await.id) {
                     user_id = None;
                 }
 
                 if user_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !utils::user_has_perms(cache, self.channel_id, None, req).unwrap_or(true) {
+                    if !utils::user_has_perms(cache, self.channel_id, None, req).await.unwrap_or(true) {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
             }
         }
 
-        cache_http.http().delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+        cache_http
+            .http()
+            .delete_reaction(self.channel_id.0, self.message_id.0, user_id, &self.emoji)
+            .await
     }
 
     /// Deletes all reactions from the message with this emoji.
@@ -120,19 +122,22 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
     /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
-    pub fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
+    pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
 
-                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req)? {
+                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
                 }
             }
         }
-        cache_http.http().as_ref().delete_message_reaction_emoji(self.channel_id.0, self.message_id.0, &self.emoji)
+        cache_http
+            .http()
+            .as_ref()
+            .delete_message_reaction_emoji(self.channel_id.0, self.message_id.0, &self.emoji)
+            .await
     }
 
     /// Retrieves the [`Message`] associated with this reaction.
@@ -145,10 +150,9 @@ impl Reaction {
     ///
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [`Message`]: struct.Message.html
-    #[cfg(feature = "http")]
     #[inline]
-    pub fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
-        self.channel_id.message(&http, self.message_id)
+    pub async fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
+        self.channel_id.message(&http, self.message_id).await
     }
 
     /// Retrieves the user that made the reaction.
@@ -156,10 +160,22 @@ impl Reaction {
     /// If the cache is enabled, this will search for the already-cached user.
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
-    #[inline]
-    #[cfg(feature = "http")]
-    pub fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
-        self.user_id.to_user(cache_http)
+    pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
+        match self.user_id {
+            Some(id) => id.to_user(cache_http).await,
+            None => {
+                // This can happen if only Http was passed to Message::react, even though
+                // "cache" was enabled.
+                #[cfg(feature = "cache")]
+                {
+                    if let Some(cache) = cache_http.cache() {
+                        return Ok(User::from(&cache.current_user().await));
+                    }
+                }
+
+                Ok(cache_http.http().get_current_user().await?.into())
+            }
+        }
     }
 
     /// Retrieves the list of [`User`]s who have reacted to a [`Message`] with a
@@ -187,20 +203,18 @@ impl Reaction {
     /// [`User`]: ../user/struct.User.html
     /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
     /// [permissions]: ../permissions/index.html
-    #[cfg(feature = "http")]
     #[inline]
-    pub fn users<R, U>(&self,
+    pub async fn users<R, U>(&self,
                        http: impl AsRef<Http>,
                        reaction_type: R,
                        limit: Option<u8>,
                        after: Option<U>)
                        -> Result<Vec<User>>
         where R: Into<ReactionType>, U: Into<UserId> {
-        self._users(&http, &reaction_type.into(), limit, after.map(Into::into))
+        self._users(&http, &reaction_type.into(), limit, after.map(Into::into)).await
     }
 
-    #[cfg(feature = "http")]
-    fn _users(
+    async fn _users(
         &self,
         http: impl AsRef<Http>,
         reaction_type: &ReactionType,
@@ -220,7 +234,7 @@ impl Reaction {
             reaction_type,
             limit,
             after.map(|u| u.0),
-        )
+        ).await
     }
 }
 
@@ -228,6 +242,7 @@ impl Reaction {
 ///
 /// [`Reaction`]: struct.Reaction.html
 #[derive(Clone, Debug, Eq, PartialEq, Hash)]
+#[non_exhaustive]
 pub enum ReactionType {
     /// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the
     /// guild.
@@ -247,8 +262,6 @@ pub enum ReactionType {
     },
     /// A reaction with a twemoji.
     Unicode(String),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
@@ -342,12 +355,11 @@ impl Serialize for ReactionType {
 
                 map.end()
             },
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
-#[cfg(any(feature = "model", feature = "http"))]
+#[cfg(feature = "model")]
 impl ReactionType {
     /// Creates a data-esque display of the type. This is not very useful for
     /// displaying, as the primary client can not render it, but can be useful
@@ -355,6 +367,7 @@ impl ReactionType {
     ///
     /// **Note**: This is mainly for use internally. There is otherwise most
     /// likely little use for it.
+    #[inline]
     pub fn as_data(&self) -> String {
         match *self {
             ReactionType::Custom {
@@ -363,12 +376,10 @@ impl ReactionType {
                 ..
             } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
             ReactionType::Unicode(ref unicode) => unicode.clone(),
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
-#[cfg(feature = "model")]
 impl From<char> for ReactionType {
     /// Creates a `ReactionType` from a `char`.
     ///
@@ -385,10 +396,10 @@ impl From<char> for ReactionType {
     /// #
     /// # #[cfg(all(feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(ctx: &Context) -> CommandResult {
-    /// #   let message = ChannelId(0).message(&ctx.http, 0)?;
+    /// # async fn example(ctx: &Context) -> CommandResult {
+    /// #   let message = ChannelId(0).message(&ctx.http, 0).await?;
     /// #
-    /// message.react(ctx, '🍎')?;
+    /// message.react(ctx, '🍎').await?;
     /// # Ok(())
     /// # }
     /// #
@@ -420,7 +431,7 @@ impl From<EmojiId> for ReactionType {
 impl From<EmojiIdentifier> for ReactionType {
     fn from(emoji_id: EmojiIdentifier) -> ReactionType {
         ReactionType::Custom {
-            animated: false,
+            animated: emoji_id.animated,
             id: emoji_id.id,
             name: Some(emoji_id.name)
         }
@@ -573,19 +584,21 @@ impl Display for ReactionType {
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match *self {
             ReactionType::Custom {
+                animated,
                 id,
-                ref name,
-                ..
+                ref name
             } => {
-                f.write_char('<')?;
-                f.write_char(':')?;
+                if animated {
+                    f.write_str("<a:")?;
+                } else {
+                    f.write_str("<:")?;
+                }
                 f.write_str(name.as_ref().map_or("", |s| s.as_str()))?;
                 f.write_char(':')?;
                 Display::fmt(&id, f)?;
                 f.write_char('>')
             },
             ReactionType::Unicode(ref unicode) => f.write_str(unicode),
-            ReactionType::__Nonexhaustive => unreachable!(),
         }
     }
 }

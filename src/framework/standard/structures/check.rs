@@ -3,6 +3,7 @@ use std::fmt;
 use crate::model::channel::Message;
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
+use futures::future::BoxFuture;
 
 /// This type describes why a check has failed and occurs on
 /// [`CheckResult::Failure`].
@@ -10,12 +11,13 @@ use crate::framework::standard::{Args, CommandOptions};
 /// **Note**:
 /// The bot-developer is supposed to process this `enum` as the framework is not.
 /// It solely serves as a way to inform a user about why a check
-/// has failed and for the developer to log given failure (e.g. bugs or statstics)
+/// has failed and for the developer to log given failure (e.g. bugs or statistics)
 /// occurring in [`Check`]s.
 ///
 /// [`Check`]: struct.Check.html
 /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum Reason {
     /// No information on the failure.
     Unknown,
@@ -25,8 +27,6 @@ pub enum Reason {
     Log(String),
     /// Information for the user but also for logging purposes.
     UserAndLog { user: String, log: String },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Returned from [`Check`]s.
@@ -111,7 +111,12 @@ impl From<Reason> for CheckResult {
     }
 }
 
-pub type CheckFunction = fn(&Context, &Message, &mut Args, &CommandOptions) -> CheckResult;
+pub type CheckFunction = for<'fut> fn(
+    &'fut Context,
+    &'fut Message,
+    &'fut mut Args,
+    &'fut CommandOptions,
+) -> BoxFuture<'fut, CheckResult>;
 
 /// A check can be part of a command or group and will be executed to
 /// determine whether a user is permitted to use related item.

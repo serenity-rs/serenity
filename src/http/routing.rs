@@ -10,6 +10,7 @@ use super::LightMethod;
 ///
 /// [`http`]: ../index.html
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
 pub enum Route {
     /// Route for the `/channels/:channel_id` path.
     ///
@@ -48,7 +49,7 @@ pub enum Route {
     // Additionally, this needs to be a `LightMethod` from the parent module
     // and _not_ a `reqwest` `Method` due to `reqwest`'s not deriving `Copy`.
     //
-    // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
+    // [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
     ChannelsIdMessagesId(LightMethod, u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
     ///
@@ -261,8 +262,6 @@ pub enum Route {
     /// This is a special case, in that if the route is `None` then pre- and
     /// post-hooks are not executed.
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Route {
@@ -421,7 +420,7 @@ impl Route {
         reason: &str,
     ) -> String {
         format!(
-            api!("/guilds/{}/bans/{}?delete-message-days={}&reason={}"),
+            api!("/guilds/{}/bans/{}?delete_message_days={}&reason={}"),
             guild_id,
             user_id,
             delete_message_days,
@@ -642,6 +641,7 @@ impl Route {
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum RouteInfo<'a> {
     AddMemberRole {
         guild_id: u64,
@@ -817,6 +817,13 @@ pub enum RouteInfo<'a> {
     },
     GetCurrentApplicationInfo,
     GetCurrentUser,
+    GetEmojis {
+        guild_id: u64,
+    },
+    GetEmoji {
+        guild_id: u64,
+        emoji_id: u64,
+    },
     GetGateway,
     GetGuild {
         guild_id: u64,
@@ -935,8 +942,6 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'a> RouteInfo<'a> {
@@ -1251,6 +1256,16 @@ impl<'a> RouteInfo<'a> {
                 Route::UsersMe,
                 Cow::from(Route::user("@me")),
             ),
+            RouteInfo::GetEmojis { guild_id } => (
+                LightMethod::Get,
+                Route::GuildsIdEmojis(guild_id),
+                Cow::from(Route::guild_emojis(guild_id)),
+            ),
+            RouteInfo::GetEmoji { guild_id, emoji_id } => (
+                LightMethod::Get,
+                Route::GuildsIdEmojisId(guild_id),
+                Cow::from(Route::guild_emoji(guild_id, emoji_id)),
+            ),
             RouteInfo::GetGateway => (
                 LightMethod::Get,
                 Route::Gateway,
@@ -1463,7 +1478,6 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdPinsMessageId(channel_id),
                 Cow::from(Route::channel_pin(channel_id, message_id)),
             ),
-            RouteInfo::__Nonexhaustive => unreachable!(),
         }
     }
 }

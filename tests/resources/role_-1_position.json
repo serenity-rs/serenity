@@ -1,6 +1,6 @@
 {
     "position": -1,
-    "permissions": 37215297,
+    "permissions": "37215297",
     "name": "@everyone",
     "mentionable": false,
     "managed": false,

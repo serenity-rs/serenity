@@ -7,7 +7,7 @@ use serde::de::{
     Visitor
 };
 use serde::ser::Serializer;
-use super::super::prelude::*;
+use crate::model::prelude::*;
 use std::{
     collections::HashMap,
     mem::transmute,
@@ -16,6 +16,7 @@ use std::{
 
 /// Determines to what entity an action was used on.
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum Target {
     Guild = 10,
@@ -26,12 +27,11 @@ pub enum Target {
     Webhook = 60,
     Emoji = 70,
     Integration = 80,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Determines the action that was done on a target.
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Action {
     GuildUpdate,
     Channel(ActionChannel),
@@ -43,8 +43,6 @@ pub enum Action {
     Emoji(ActionEmoji),
     Message(ActionMessage),
     Integration(ActionIntegration),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Action {
@@ -62,19 +60,17 @@ impl Action {
             Action::Emoji(ref x) => x.num(),
             Action::Message(ref x) => x.num(),
             Action::Integration(ref x) => x.num(),
-            Action::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionChannel {
     Create = 10,
     Update = 11,
     Delete = 12,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionChannel {
@@ -83,19 +79,17 @@ impl ActionChannel {
             ActionChannel::Create => 10,
             ActionChannel::Update => 11,
             ActionChannel::Delete => 12,
-            ActionChannel::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionChannelOverwrite {
     Create = 13,
     Update = 14,
     Delete = 15,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionChannelOverwrite {
@@ -104,12 +98,12 @@ impl ActionChannelOverwrite {
             ActionChannelOverwrite::Create => 13,
             ActionChannelOverwrite::Update => 14,
             ActionChannelOverwrite::Delete => 15,
-            ActionChannelOverwrite::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionMember {
     Kick = 20,
@@ -121,8 +115,6 @@ pub enum ActionMember {
     MemberMove = 26,
     MemberDisconnect = 27,
     BotAdd = 28,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionMember {
@@ -137,19 +129,17 @@ impl ActionMember {
             ActionMember::MemberMove => 26,
             ActionMember::MemberDisconnect => 27,
             ActionMember::BotAdd => 28,
-            ActionMember::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionRole {
     Create = 30,
     Update = 31,
     Delete = 32,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionRole {
@@ -158,19 +148,17 @@ impl ActionRole {
             ActionRole::Create => 30,
             ActionRole::Update => 31,
             ActionRole::Delete => 32,
-            ActionRole::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionInvite {
     Create = 40,
     Update = 41,
     Delete = 42,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionInvite {
@@ -179,19 +167,17 @@ impl ActionInvite {
             ActionInvite::Create => 40,
             ActionInvite::Update => 41,
             ActionInvite::Delete => 42,
-            ActionInvite::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionWebhook {
     Create = 50,
     Update = 51,
     Delete = 52,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionWebhook {
@@ -200,19 +186,17 @@ impl ActionWebhook {
             ActionWebhook::Create => 50,
             ActionWebhook::Update => 51,
             ActionWebhook::Delete => 52,
-            ActionWebhook::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionEmoji {
     Create = 60,
     Delete = 61,
     Update = 62,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionEmoji {
@@ -221,20 +205,18 @@ impl ActionEmoji {
             ActionEmoji::Create => 60,
             ActionEmoji::Update => 61,
             ActionEmoji::Delete => 62,
-            ActionEmoji::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionMessage {
     Delete = 72,
     BulkDelete = 73,
     Pin = 74,
     Unpin = 75,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionMessage {
@@ -244,20 +226,18 @@ impl ActionMessage {
             ActionMessage::BulkDelete => 73,
             ActionMessage::Pin => 74,
             ActionMessage::Unpin => 75,
-            ActionMessage::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 
 #[derive(Debug)]
+#[non_exhaustive]
 #[repr(u8)]
 pub enum ActionIntegration {
     Create = 80,
     Update = 81,
     Delete = 82,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ActionIntegration {
@@ -266,7 +246,6 @@ impl ActionIntegration {
             ActionIntegration::Create => 80,
             ActionIntegration::Update => 81,
             ActionIntegration::Delete => 82,
-            ActionIntegration::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -294,9 +273,9 @@ pub struct AuditLogEntry {
     /// [`action`]: #structfield.action
     #[serde(with = "option_u64_handler")]
     pub target_id: Option<u64>,
-    /// Determines what action was done on a [`target`]
+    /// Determines what action was done on a [`target_id`]
     ///
-    /// [`target`]: #structfield.target
+    /// [`target_id`]: #structfield.target_id
     #[serde(
         with = "action_handler",
         rename = "action_type"

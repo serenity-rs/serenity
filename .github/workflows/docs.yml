@@ -1,0 +1,63 @@
+name: Publish docs
+
+on:
+  push:
+    branches:
+      - current
+      - next
+
+jobs:
+  docs:
+    name: Publish docs
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout sources
+        uses: actions/checkout@v2
+
+      - name: Install toolchain
+        id: tc
+        uses: actions-rs/toolchain@v1
+        with:
+          toolchain: nightly
+          profile: minimal
+          override: true
+
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y libopus-dev
+
+      - name: Setup cache
+        uses: actions/cache@v2
+        with:
+          path: |
+            ~/.cargo/registry
+            ~/.cargo/git
+            target/debug
+          key: ${{ runner.os }}-gh-pages-${{ steps.tc.outputs.rustc_hash }}-${{ hashFiles('**/Cargo.toml') }}
+
+      - name: Build docs
+        env:
+          RUSTDOCFLAGS: -D broken_intra_doc_links
+        run: |
+          cargo doc --no-deps --features collector,voice
+          cargo doc --no-deps -p command_attr
+
+      - name: Prepare docs
+        shell: bash -e -O extglob {0}
+        run: |
+          DIR=${GITHUB_REF/refs\/+(heads|tags)\//}
+          mkdir -p ./docs/$DIR
+          touch ./docs/.nojekyll
+          echo '<meta http-equiv="refresh" content="0;url=serenity/index.html">' > ./docs/$DIR/index.html
+          mv ./target/doc/* ./docs/$DIR/
+
+      - name: Deploy docs
+        uses: peaceiris/actions-gh-pages@v3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_branch: gh-pages
+          publish_dir: ./docs
+          allow_empty_commit: false
+          keep_files: true

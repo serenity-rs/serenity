@@ -1,9 +1,22 @@
 use crate::model::{
     gateway::Activity,
-    id::GuildId,
+    id::{GuildId, UserId},
     user::OnlineStatus,
 };
-use tungstenite::Message;
+
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
+use async_tungstenite::tungstenite::Message;
+
+#[derive(Clone, Debug)]
+pub enum ChunkGuildFilter {
+    /// Returns all members of the guilds specified. Requires GUILD_MEMBERS intent.
+    None,
+    /// A common username prefix filter for the members returned.
+    Query(String),
+    /// A set of exact user IDs to query for.
+    UserIds(Vec<UserId>),
+}
 
 /// A message to send from a shard over a WebSocket.
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
@@ -11,23 +24,22 @@ use tungstenite::Message;
 #[derive(Clone, Debug)]
 pub enum ShardRunnerMessage {
     /// Indicates that the client is to send a member chunk message.
-    ChunkGuilds {
-        /// The IDs of the [`Guild`]s to chunk.
+    ChunkGuild {
+        /// The IDs of the [`Guild`] to chunk.
         ///
         /// [`Guild`]: ../../../model/guild/struct.Guild.html
-        guild_ids: Vec<GuildId>,
+        guild_id: GuildId,
         /// The maximum number of members to receive [`GuildMembersChunkEvent`]s
         /// for.
         ///
         /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
         limit: Option<u16>,
-        /// Text to filter members by.
+        /// A filter to apply to the returned members.
+        filter: ChunkGuildFilter,
+        /// Optional nonce to identify [`GuildMembersChunkEvent`] responses.
         ///
-        /// For example, a query of `"s"` will cause only [`Member`]s whose
-        /// usernames start with `"s"` to be chunked.
-        ///
-        /// [`Member`]: ../../../model/guild/struct.Member.html
-        query: Option<String>,
+        /// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html
+        nonce: Option<String>,
     },
     /// Indicates that the client is to close with the given status code and
     /// reason.
@@ -47,4 +59,10 @@ pub enum ShardRunnerMessage {
     SetPresence(OnlineStatus, Option<Activity>),
     /// Indicates that the client is to update the shard's presence's status.
     SetStatus(OnlineStatus),
+    /// Sends a new filter for messages to the shard.
+    #[cfg(feature = "collector")]
+    SetMessageFilter(MessageFilter),
+    /// Sends a new filter for reactions to the shard.
+    #[cfg(feature = "collector")]
+    SetReactionFilter(ReactionFilter),
 }

@@ -1,9 +1,0 @@
-[package]
-name = "06_voice"
-version = "0.1.0"
-authors = ["my name <my@email.address>"]
-edition = "2018"
-
-[dependencies.serenity]
-features = ["cache", "framework", "standard_framework", "voice", "http", "rustls_backend"]
-path = "../../"

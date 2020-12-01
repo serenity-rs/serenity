@@ -26,6 +26,7 @@ macro_rules! p {
 fn activity() {
     p!(Activity, "activity_1");
     p!(Activity, "activity_2");
+    p!(Activity, "activity_3");
 }
 
 #[test]
@@ -177,6 +178,8 @@ fn typing_start() {
 fn voice_state_update() {
     p!(VoiceStateUpdateEvent, "voice_state_update_1");
     p!(VoiceStateUpdateEvent, "voice_state_update_2");
+    p!(VoiceStateUpdateEvent, "voice_state_update_3");
+    p!(VoiceStateUpdateEvent, "voice_state_update_4");
 }
 
 #[test]

@@ -1,5 +1,5 @@
 use crate::model::prelude::*;
-use chrono::{DateTime, FixedOffset, Local, TimeZone};
+use chrono::{DateTime, Utc};
 use serde_json::Value;
 
 /// A builder for constructing a personal [`Message`] instance.
@@ -81,7 +81,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is `None` (not all messages are edited).
     #[inline]
-    pub fn edited_timestamp(&mut self, timestamp: DateTime<FixedOffset>) -> &mut Self {
+    pub fn edited_timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
         self.msg.edited_timestamp = Some(timestamp);
 
         self
@@ -197,7 +197,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is the current local time.
     #[inline]
-    pub fn timestamp(&mut self, timestamp: DateTime<FixedOffset>) -> &mut Self {
+    pub fn timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
         self.msg.timestamp = timestamp;
 
         self
@@ -261,22 +261,19 @@ fn dummy_message() -> Message {
         member: None,
         mention_everyone: false,
         mention_roles: Vec::new(),
-        mention_channels: None,
+        mention_channels: Vec::new(),
         mentions: Vec::new(),
         nonce: Value::Null,
         pinned: false,
         reactions: Vec::new(),
         tts: false,
         webhook_id: None,
-        timestamp: {
-            let now = Local::now();
-
-            FixedOffset::east(0).timestamp(now.timestamp(), 0)
-        },
+        timestamp: Utc::now(),
         activity: None,
         application: None,
         message_reference: None,
         flags: None,
+        referenced_message: None,
         _nonexhaustive: (),
     }
 }

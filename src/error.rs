@@ -11,23 +11,20 @@ use std::{
     io::Error as IoError,
     num::ParseIntError
 };
+use tracing::instrument;
 
 #[cfg(feature = "http")]
 use reqwest::{Error as ReqwestError, header::InvalidHeaderValue};
-#[cfg(feature = "voice")]
-use audiopus::Error as OpusError;
 #[cfg(feature = "gateway")]
-use tungstenite::error::Error as TungsteniteError;
+use async_tungstenite::tungstenite::error::Error as TungsteniteError;
 #[cfg(feature = "client")]
 use crate::client::ClientError;
 #[cfg(feature = "gateway")]
 use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 use crate::http::HttpError;
-#[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
+#[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
 use crate::internal::ws_impl::RustlsError;
-#[cfg(feature = "voice")]
-use crate::voice::VoiceError;
 
 /// The common result type between most library functions.
 ///
@@ -52,6 +49,7 @@ pub type Result<T> = StdResult<T, Error>;
 /// [`GatewayError`]: gateway/enum.GatewayError.html
 /// [`Result`]: type.Result.html
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// An error while decoding a payload.
     Decode(&'static str, Value),
@@ -95,21 +93,11 @@ pub enum Error {
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
     /// An error occuring in rustls
-    #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
+    #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
     Rustls(RustlsError),
     /// An error from the `tungstenite` crate.
     #[cfg(feature = "gateway")]
     Tungstenite(TungsteniteError),
-    /// An error from the `opus` crate.
-    #[cfg(feature = "voice")]
-    Opus(OpusError),
-    /// Indicating an error within the [voice module].
-    ///
-    /// [voice module]: voice/index.html
-    #[cfg(feature = "voice")]
-    Voice(VoiceError),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl From<FormatError> for Error {
@@ -137,17 +125,7 @@ impl From<ModelError> for Error {
     fn from(e: ModelError) -> Error { Error::Model(e) }
 }
 
-#[cfg(feature = "voice")]
-impl From<OpusError> for Error {
-    fn from(e: OpusError) -> Error { Error::Opus(e) }
-}
-
-#[cfg(feature = "voice")]
-impl From<VoiceError> for Error {
-    fn from(e: VoiceError) -> Error { Error::Voice(e) }
-}
-
-#[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
+#[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
 impl From<RustlsError> for Error {
     fn from(e: RustlsError) -> Error { Error::Rustls(e) }
 }
@@ -189,20 +167,16 @@ impl Display for Error {
             Error::Gateway(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "http")]
             Error::Http(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "voice")]
-            Error::Opus(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => fmt::Display::fmt(&inner, f),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => fmt::Display::fmt(&inner, f),
-            #[cfg(feature = "voice")]
-            Error::Voice(_) => f.write_str("Voice error"),
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
 
 impl StdError for Error {
+    #[instrument]
     fn source(&self) -> Option<&(dyn StdError + 'static)> {
         match self {
             Error::Format(inner) => Some(inner),
@@ -216,9 +190,7 @@ impl StdError for Error {
             Error::Gateway(inner) => Some(inner),
             #[cfg(feature = "http")]
             Error::Http(inner) => Some(inner),
-            #[cfg(feature = "voice")]
-            Error::Opus(inner) => Some(inner),
-            #[cfg(all(feature = "gateway", not(feature = "native_tls_backend")))]
+            #[cfg(all(feature = "gateway", feature = "rustls_backend", not(feature = "native_tls_backend")))]
             Error::Rustls(inner) => Some(inner),
             #[cfg(feature = "gateway")]
             Error::Tungstenite(inner) => Some(inner),

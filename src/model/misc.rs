@@ -1,7 +1,6 @@
 //! Miscellaneous helper traits, enums, and structs for models.
 
 use super::prelude::*;
-use crate::internal::RwLockExt;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
@@ -27,11 +26,10 @@ impl Mentionable for ChannelId {
 
 impl Mentionable for Channel {
     fn mention(&self) -> String {
-        match *self {
-            Channel::Guild(ref x) => x.with(Mentionable::mention),
-            Channel::Private(ref x) => x.with(Mentionable::mention),
-            Channel::Category(ref x) => x.with(Mentionable::mention),
-            Channel::__Nonexhaustive => unreachable!(),
+        match self {
+            Channel::Guild(channel) => channel.mention(),
+            Channel::Private(channel) => channel.mention(),
+            Channel::Category(channel) => channel.mention(),
         }
     }
 }
@@ -49,11 +47,15 @@ impl Mentionable for CurrentUser {
 }
 
 impl Mentionable for Emoji {
-    fn mention(&self) -> String { format!("<:{}:{}>", self.name, self.id.0) }
+    fn mention(&self) -> String {
+        format!("<:{}:{}>", self.name, self.id.0)
+    }
 }
 
 impl Mentionable for Member {
-    fn mention(&self) -> String { format!("<@{}>", self.user.with(|u| u.id.0)) }
+    fn mention(&self) -> String {
+        format!("<@{}>", self.user.id.0)
+    }
 }
 
 impl Mentionable for PrivateChannel {
@@ -84,11 +86,10 @@ impl Mentionable for GuildChannel {
 
 #[cfg(all(feature = "model", feature = "utils"))]
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum UserParseError {
     InvalidUsername,
     Rest(Box<Error>),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
@@ -97,7 +98,6 @@ impl fmt::Display for UserParseError {
         match self {
             UserParseError::InvalidUsername => f.write_str("invalid username"),
             UserParseError::Rest(_) => f.write_str("could not fetch"),
-            UserParseError::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -106,7 +106,7 @@ impl fmt::Display for UserParseError {
 impl StdError for UserParseError {}
 
 macro_rules! impl_from_str {
-    (id: $($id:tt, $err:ident;)*) => {
+    (id: $($id:ident, $err:ident, $parse_function:ident;)*) => {
         $(
             #[cfg(all(feature = "model", feature = "utils"))]
             #[derive(Debug)]
@@ -131,10 +131,12 @@ macro_rules! impl_from_str {
                 type Err = $err;
 
                 fn from_str(s: &str) -> StdResult<Self, Self::Err> {
-                    Ok(match utils::parse_mention(s) {
-                        Some(id) => $id(id),
-                        None => s.parse::<u64>().map($id).map_err(|_| $err::InvalidFormat)?,
-                    })
+                    let id = match utils::$parse_function(s) {
+                        Some(id) => id,
+                        None => s.parse::<u64>().map_err(|_| $err::InvalidFormat)?,
+                    };
+
+                    Ok($id(id))
                 }
             }
         )*
@@ -166,9 +168,9 @@ macro_rules! impl_from_str {
 }
 
 impl_from_str! { id:
-    UserId, UserIdParseError;
-    RoleId, RoleIdParseError;
-    ChannelId, ChannelIdParseError;
+    UserId, UserIdParseError, parse_username;
+    RoleId, RoleIdParseError, parse_role;
+    ChannelId, ChannelIdParseError, parse_channel;
 }
 
 impl_from_str! { struct:
@@ -176,9 +178,11 @@ impl_from_str! { struct:
     Role, RoleId, RoleParseError, InvalidRole, parse_role, "invalid role";
 }
 
-/// A version of an emoji used only when solely the Id and name are known.
+/// A version of an emoji used only when solely the animated state, Id, and name are known.
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub struct EmojiIdentifier {
+    /// Whether the emoji is animated
+    pub animated: bool,
     /// The Id of the emoji.
     pub id: EmojiId,
     /// The name of the emoji. It must be at least 2 characters long and can
@@ -189,15 +193,19 @@ pub struct EmojiIdentifier {
 #[cfg(all(feature = "model", feature = "utils"))]
 impl EmojiIdentifier {
     /// Generates a URL to the emoji's image.
-    #[inline]
-    pub fn url(&self) -> String { format!(cdn!("/emojis/{}.png"), self.id) }
+    pub fn url(&self) -> String {
+        match self.animated {
+            true => format!(cdn!("/emojis/{}.gif"), self.id),
+            false => format!(cdn!("/emojis/{}.png"), self.id),
+        }
+    }
 }
 
 #[cfg(all(feature = "model", feature = "utils"))]
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
-    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or_else(|| ()) }
+    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or(()) }
 }
 
 
@@ -251,6 +259,7 @@ pub struct IncidentUpdate {
 
 /// The type of status update during a service incident.
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[non_exhaustive]
 #[serde(rename_all = "snake_case")]
 pub enum IncidentStatus {
     Identified,
@@ -258,8 +267,6 @@ pub enum IncidentStatus {
     Monitoring,
     Postmortem,
     Resolved,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// A Discord status maintenance message. This can be either for active
@@ -291,13 +298,11 @@ mod test {
     #[cfg(feature = "utils")]
     mod utils {
         use crate::model::prelude::*;
-        use parking_lot::RwLock;
-        use std::sync::Arc;
         use crate::utils::Colour;
 
-        #[test]
-        fn test_mention() {
-            let channel = Channel::Guild(Arc::new(RwLock::new(GuildChannel {
+        #[tokio::test]
+        async fn test_mention() {
+            let channel = Channel::Guild(GuildChannel {
                 bitrate: None,
                 category_id: None,
                 guild_id: GuildId(1),
@@ -313,7 +318,7 @@ mod test {
                 nsfw: false,
                 slow_mode_rate: Some(0),
                 _nonexhaustive: (),
-            })));
+            });
             let emoji = Emoji {
                 animated: false,
                 id: EmojiId(5),
@@ -350,7 +355,7 @@ mod test {
                 mute: false,
                 nick: None,
                 roles: vec![],
-                user: Arc::new(RwLock::new(user.clone())),
+                user: user.clone(),
                 _nonexhaustive: (),
             };
 
@@ -362,6 +367,17 @@ mod test {
             assert_eq!(role.id.mention(), "<@&2>");
             assert_eq!(user.mention(), "<@6>");
             assert_eq!(user.id.mention(), "<@6>");
+        }
+
+        #[test]
+        fn parse_mentions() {
+            assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId(1234));
+            assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId(1234));
+            assert_eq!("<#1234>".parse::<ChannelId>().unwrap(), ChannelId(1234));
+
+            assert!("<@1234>".parse::<ChannelId>().is_err());
+            assert!("<@&1234>".parse::<UserId>().is_err());
+            assert!("<#1234>".parse::<RoleId>().is_err());
         }
     }
 }

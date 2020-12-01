@@ -37,11 +37,13 @@ pub mod user;
 pub mod voice;
 pub mod webhook;
 
+#[cfg(feature = "voice-model")]
+pub use serenity_voice_model as voice_gateway;
+
 pub use self::error::Error as ModelError;
 pub use self::permissions::Permissions;
 
 use crate::internal::prelude::*;
-use parking_lot::RwLock;
 use self::utils::*;
 use serde::de::Visitor;
 use std::{
@@ -51,7 +53,6 @@ use std::{
         Formatter,
         Result as FmtResult
     },
-    sync::Arc,
     result::Result as StdResult
 };
 
