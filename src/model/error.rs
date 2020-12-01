@@ -117,7 +117,7 @@ pub enum Error {
     /// Indicates that a [`Message`]s content was too long and will not
     /// successfully send, as the length is over 2000 codepoints.
     ///
-    /// The number of characters larger than the limit is provided.
+    /// The number of code points larger than the limit is provided.
     ///
     /// [`Message`]: ../channel/struct.Message.html
     MessageTooLong(u64),
