@@ -115,9 +115,9 @@ pub enum Error {
     /// [`Cache`]: ../../cache/struct.Cache.html
     ItemMissing,
     /// Indicates that a [`Message`]s content was too long and will not
-    /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
+    /// successfully send, as the length is over 2000 codepoints.
     ///
-    /// The number of bytes larger than the limit is provided.
+    /// The number of characters larger than the limit is provided.
     ///
     /// [`Message`]: ../channel/struct.Message.html
     MessageTooLong(u64),
