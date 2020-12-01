@@ -378,6 +378,20 @@ impl ReactionType {
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
     }
+
+    /// Helper function to allow comparing unicode emojis without having to
+    /// perform any allocation. Will always return false if the reaction was
+    /// not a unicode reaction.
+    pub fn unicode_eq(&self, other: &str) -> bool {
+        
+        if let ReactionType::Unicode(unicode) = &self {
+            unicode == other
+        } else {
+            // Always return false if not a unicode reaction
+            false
+        }
+
+    }
 }
 
 impl From<char> for ReactionType {
