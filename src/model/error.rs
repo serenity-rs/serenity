@@ -74,7 +74,7 @@ pub enum Error {
     DeleteMessageDaysAmount(u8),
     /// Indicates that the textual content of an embed exceeds the maximum
     /// length.
-    EmbedTooLarge(u64),
+    EmbedTooLarge(usize),
     /// An indication that a [guild][`Guild`] could not be found by
     /// [Id][`GuildId`] in the [`Cache`].
     ///
@@ -115,12 +115,12 @@ pub enum Error {
     /// [`Cache`]: ../../cache/struct.Cache.html
     ItemMissing,
     /// Indicates that a [`Message`]s content was too long and will not
-    /// successfully send, as the length is over 2000 codepoints, or 4000 bytes.
+    /// successfully send, as the length is over 2000 codepoints.
     ///
-    /// The number of bytes larger than the limit is provided.
+    /// The number of characters larger than the limit is provided.
     ///
     /// [`Message`]: ../channel/struct.Message.html
-    MessageTooLong(u64),
+    MessageTooLong(usize),
     /// Indicates that the current user is attempting to Direct Message another
     /// bot user, which is disallowed by the API.
     MessagingBot,
