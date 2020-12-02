@@ -1,9 +1,9 @@
-use std::fmt::Debug;
-use std::fmt;
-use crate::model::channel::Message;
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
+use crate::model::channel::Message;
 use futures::future::BoxFuture;
+use std::error::Error;
+use std::fmt::{self, Debug, Display};
 
 /// This type describes why a check has failed.
 ///
@@ -26,6 +26,8 @@ pub enum Reason {
     /// Information for the user but also for logging purposes.
     UserAndLog { user: String, log: String },
 }
+
+impl Error for Reason {}
 
 pub type CheckFunction = for<'fut> fn(
     &'fut Context,
@@ -60,6 +62,19 @@ impl Debug for Check {
             .field("check_in_help", &self.check_in_help)
             .field("display_in_help", &self.display_in_help)
             .finish()
+    }
+}
+
+impl Display for Reason {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Unknown => write!(f, "Unknown"),
+            Self::User(reason) => write!(f, "User {}", reason),
+            Self::Log(reason) => write!(f, "Log {}", reason),
+            Self::UserAndLog { user, log } => {
+                write!(f, "UserAndLog {{user: {}, log: {}}}", user, log)
+            }
+        }
     }
 }
 
