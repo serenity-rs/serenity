@@ -1580,6 +1580,41 @@
 <span id="1577">1577</span>
 <span id="1578">1578</span>
 <span id="1579">1579</span>
+<span id="1580">1580</span>
+<span id="1581">1581</span>
+<span id="1582">1582</span>
+<span id="1583">1583</span>
+<span id="1584">1584</span>
+<span id="1585">1585</span>
+<span id="1586">1586</span>
+<span id="1587">1587</span>
+<span id="1588">1588</span>
+<span id="1589">1589</span>
+<span id="1590">1590</span>
+<span id="1591">1591</span>
+<span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
+<span id="1608">1608</span>
+<span id="1609">1609</span>
+<span id="1610">1610</span>
+<span id="1611">1611</span>
+<span id="1612">1612</span>
+<span id="1613">1613</span>
+<span id="1614">1614</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -2028,19 +2063,54 @@
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
         <span class="kw">for</span> <span class="ident">command</span> <span class="kw">in</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span> {
-            <span class="kw">let</span> <span class="ident">command</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">command</span>;
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">command</span>;
 
             <span class="kw">let</span> <span class="ident">search_command_name_matched</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
                 <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">name</span>) {
                     <span class="ident">name</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">len</span>());
                 }
 
-                <span class="ident">command</span>
+                <span class="kw">let</span> <span class="ident">command_found</span> <span class="op">=</span> <span class="ident">command</span>
                     .<span class="ident">options</span>
                     .<span class="ident">names</span>
                     .<span class="ident">iter</span>()
                     .<span class="ident">find</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>)
-                    .<span class="ident">cloned</span>()
+                    .<span class="ident">cloned</span>();
+
+                <span class="kw">if</span> <span class="ident">command_found</span>.<span class="ident">is_some</span>() {
+                    <span class="ident">command_found</span>
+                } <span class="kw">else</span> {
+                    <span class="comment">// Since the command could not be found in the group, we now will identify</span>
+                    <span class="comment">// if the command is actually using a sub-command.</span>
+                    <span class="comment">// We iterate all command names and check if one matches, if it does,</span>
+                    <span class="comment">// we potentially have a sub-command.</span>
+                    <span class="kw">for</span> <span class="ident">command_name</span> <span class="kw">in</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span> {
+                        <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">command_name</span>) {
+                            <span class="ident">name</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">command_name</span>.<span class="ident">len</span>());
+                            <span class="kw">break</span>;
+                        }
+                    }
+
+                    <span class="comment">// We check all sub-command names in order to see if one variant</span>
+                    <span class="comment">// has been issued to the help-system.</span>
+                    <span class="kw">let</span> <span class="ident">name_str</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">as_str</span>();
+                    <span class="kw">let</span> <span class="ident">sub_command_found</span> <span class="op">=</span> <span class="ident">command</span>
+                        .<span class="ident">options</span>
+                        .<span class="ident">sub_commands</span>
+                        .<span class="ident">iter</span>()
+                        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="ident">n</span>.<span class="ident">options</span>.<span class="ident">names</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">name_str</span>))
+                        .<span class="ident">cloned</span>();
+
+                    <span class="comment">// If we found a sub-command, we replace the parent with</span>
+                    <span class="comment">// it. This allows the help-system to extract information</span>
+                    <span class="comment">// from the sub-command.</span>
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">sub_command</span>) <span class="op">=</span> <span class="ident">sub_command_found</span> {
+                        <span class="ident">command</span> <span class="op">=</span> <span class="ident">sub_command</span>;
+                        <span class="prelude-val">Some</span>(<span class="ident">sub_command</span>.<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>])
+                    } <span class="kw">else</span> {
+                        <span class="prelude-val">None</span>
+                    }
+                }
             } <span class="kw">else</span> {
                 <span class="ident">find_any_command_matches</span>(
                     <span class="kw-2">&amp;</span><span class="ident">command</span>,
