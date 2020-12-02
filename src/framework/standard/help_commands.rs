@@ -56,7 +56,7 @@
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
     Args, CommandGroup, CommandOptions, Check,
-    CheckResult, has_correct_roles, HelpBehaviour,
+    has_correct_roles, HelpBehaviour,
     HelpOptions, has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
@@ -404,7 +404,7 @@ async fn check_command_behaviour(
 
             let mut args = Args::new("", &[]);
 
-            if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {
+            if (check.function)(ctx, msg, &mut args, options).await.is_err() {
                 return help_options.lacking_conditions;
             }
         }

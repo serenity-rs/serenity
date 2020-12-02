@@ -13,8 +13,8 @@ use serenity::{
     async_trait,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
-        Args, CheckResult, CommandOptions, CommandResult, CommandGroup,
-        DispatchError, HelpOptions, help_commands, StandardFramework,
+        Args, CommandOptions, CommandResult, CommandGroup,
+        DispatchError, HelpOptions, help_commands, Reason, StandardFramework,
         macros::{command, group, help, check, hook},
     },
     http::Http,
@@ -335,22 +335,25 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // not called.
 #[check]
 #[name = "Owner"]
-async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> Result<(), Reason> {
     // Replace 7 with your ID to make this check pass.
     //
-    // `true` will convert into `CheckResult::Success`,
+    // 1. If you want to pass a reason alongside failure you can do:
+    // `Reason::User("Lacked admin permission.".to_string())`,
     //
-    // `false` will convert into `CheckResult::Failure(Reason::Unknown)`,
+    // 2. If you want to mark it as something you want to log only:
+    // `Reason::Log("User lacked admin permission.".to_string())`,
     //
-    // and if you want to pass a reason alongside failure you can do:
-    // `CheckResult::new_user("Lacked admin permission.")`,
+    // 3. If the check's failure origin is unknown you can mark it as such:
+    // `Reason::Unknown`
     //
-    // if you want to mark it as something you want to log only:
-    // `CheckResult::new_log("User lacked admin permission.")`,
-    //
-    // and if the check's failure origin is unknown you can mark it as such (same as using `false.into`):
-    // `CheckResult::new_unknown()`
-    (msg.author.id == 7).into()
+    // 4. If you want log for your system and for the user, use:
+    // `Reason::UserAndLog { user, log }`
+    if msg.author.id == 7 {
+        return Err(Reason::User("Lacked owner permission".to_string()));
+    }
+
+    Ok(())
 }
 
 #[command]
