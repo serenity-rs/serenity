@@ -461,14 +461,13 @@ impl Message {
     /// Returns `None` if the message is within the limit, otherwise returns
     /// `Some` with an inner value of how many unicode code points the message
     /// is over.
-    pub fn overflow_length(content: &str) -> Option<u64> {
+    pub fn overflow_length(content: &str) -> Option<usize> {
         // Check if the content is over the maximum number of unicode code
         // points.
-        let count = content.chars().count() as i64;
-        let diff = count - i64::from(constants::MESSAGE_CODE_LIMIT);
+        let count = content.chars().count();
 
-        if diff > 0 {
-            Some(diff as u64)
+        if count > constants::MESSAGE_CODE_LIMIT {
+            Some(count - constants::MESSAGE_CODE_LIMIT)
         } else {
             None
         }
@@ -842,11 +841,10 @@ impl Message {
             total += title.len();
         }
 
-        if total <= constants::EMBED_MAX_LENGTH as usize {
+        if total <= constants::EMBED_MAX_LENGTH {
             Ok(())
         } else {
-            let overflow = total as u64 - u64::from(constants::EMBED_MAX_LENGTH);
-
+            let overflow = total - constants::EMBED_MAX_LENGTH;
             Err(Error::Model(ModelError::EmbedTooLarge(overflow)))
         }
     }
