@@ -3,8 +3,7 @@ use crate::framework::standard::{Args, CommandOptions};
 use crate::model::channel::Message;
 use futures::future::BoxFuture;
 use std::error::Error;
-use std::fmt;
-use std::fmt::{Debug, Display};
+use std::fmt::{self, Debug, Display};
 
 /// This type describes why a check has failed.
 ///
