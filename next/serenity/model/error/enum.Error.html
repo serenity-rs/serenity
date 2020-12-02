@@ -4,14 +4,14 @@
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/serenity/model/error.rs.html#68-135" title="goto source code">[src]</a></span><span class="in-band">Enum <a href="../../index.html">serenity</a>::<wbr><a href="../index.html">model</a>::<wbr><a href="index.html">error</a>::<wbr><a class="enum" href="">Error</a></span></h1><div class="docblock type-decl hidden-by-usual-hider"><pre class="rust enum"><span class="docblock attributes top-attr">#[non_exhaustive]</span>pub enum Error {
     BulkDeleteAmount,
     DeleteMessageDaysAmount(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>),
-    EmbedTooLarge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>),
+    EmbedTooLarge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>),
     GuildNotFound,
     RoleNotFound,
     Hierarchy,
     InvalidPermissions(<a class="struct" href="../../../serenity/model/permissions/struct.Permissions.html" title="struct serenity::model::permissions::Permissions">Permissions</a>),
     InvalidUser,
     ItemMissing,
-    MessageTooLong(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>),
+    MessageTooLong(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>),
     MessagingBot,
     InvalidChannelType,
     NameTooShort,
@@ -62,7 +62,7 @@ re-ban all members with an odd discriminator:</p>
 number of messages.</p>
 </div><div id="variant.DeleteMessageDaysAmount" class="variant small-section-header"><a href="#variant.DeleteMessageDaysAmount" class="anchor field"></a><code>DeleteMessageDaysAmount(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>)</code></div><div class="docblock"><p>When attempting to delete a number of days' worth of messages that is
 not allowed.</p>
-</div><div id="variant.EmbedTooLarge" class="variant small-section-header"><a href="#variant.EmbedTooLarge" class="anchor field"></a><code>EmbedTooLarge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>)</code></div><div class="docblock"><p>Indicates that the textual content of an embed exceeds the maximum
+</div><div id="variant.EmbedTooLarge" class="variant small-section-header"><a href="#variant.EmbedTooLarge" class="anchor field"></a><code>EmbedTooLarge(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code></div><div class="docblock"><p>Indicates that the textual content of an embed exceeds the maximum
 length.</p>
 </div><div id="variant.GuildNotFound" class="variant small-section-header"><a href="#variant.GuildNotFound" class="anchor field"></a><code>GuildNotFound</code></div><div class="docblock"><p>An indication that a <a href="../guild/struct.Guild.html">guild</a> could not be found by
 <a href="../id/struct.GuildId.html">Id</a> in the <a href="../../cache/struct.Cache.html"><code>Cache</code></a>.</p>
@@ -80,9 +80,9 @@ required.</p>
 </div><div id="variant.InvalidUser" class="variant small-section-header"><a href="#variant.InvalidUser" class="anchor field"></a><code>InvalidUser</code></div><div class="docblock"><p>An indicator that the <a href="../user/struct.CurrentUser.html">current user</a> cannot perform an action.</p>
 </div><div id="variant.ItemMissing" class="variant small-section-header"><a href="#variant.ItemMissing" class="anchor field"></a><code>ItemMissing</code></div><div class="docblock"><p>An indicator that an item is missing from the <a href="../../cache/struct.Cache.html"><code>Cache</code></a>, and the action
 can not be continued.</p>
-</div><div id="variant.MessageTooLong" class="variant small-section-header"><a href="#variant.MessageTooLong" class="anchor field"></a><code>MessageTooLong(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>)</code></div><div class="docblock"><p>Indicates that a <a href="../channel/struct.Message.html"><code>Message</code></a>s content was too long and will not
-successfully send, as the length is over 2000 codepoints, or 4000 bytes.</p>
-<p>The number of bytes larger than the limit is provided.</p>
+</div><div id="variant.MessageTooLong" class="variant small-section-header"><a href="#variant.MessageTooLong" class="anchor field"></a><code>MessageTooLong(<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.usize.html">usize</a>)</code></div><div class="docblock"><p>Indicates that a <a href="../channel/struct.Message.html"><code>Message</code></a>s content was too long and will not
+successfully send, as the length is over 2000 codepoints.</p>
+<p>The number of code points larger than the limit is provided.</p>
 </div><div id="variant.MessagingBot" class="variant small-section-header"><a href="#variant.MessagingBot" class="anchor field"></a><code>MessagingBot</code></div><div class="docblock"><p>Indicates that the current user is attempting to Direct Message another
 bot user, which is disallowed by the API.</p>
 </div><div id="variant.InvalidChannelType" class="variant small-section-header"><a href="#variant.InvalidChannelType" class="anchor field"></a><code>InvalidChannelType</code></div><div class="docblock"><p>An indicator that the <a href="../channel/enum.ChannelType.html"><code>ChannelType</code></a> cannot perform an action.</p>

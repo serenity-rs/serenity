@@ -149,6 +149,14 @@
 <span id="146">146</span>
 <span id="147">147</span>
 <span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">UserId</span>, <span class="ident">RoleId</span>};
 
@@ -167,7 +175,7 @@
     <span class="ident">Roles</span>,
 }
 
-<span class="doccomment">/// A builder to manage the allowed mentions on a message, </span>
+<span class="doccomment">/// A builder to manage the allowed mentions on a message,</span>
 <span class="doccomment">/// used by the [`ChannelId::send_message`] method.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # Examples</span>
@@ -288,6 +296,14 @@
         } <span class="kw">else</span> {
             <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;roles&quot;</span>, <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="macro">vec</span><span class="macro">!</span>[]));
         }
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// Makes the reply mention/ping the user.</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">replied_user</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">mention_user</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;replied_user&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="ident">mention_user</span>));
+
         <span class="self">self</span>
     }
 }

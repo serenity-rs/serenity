@@ -590,13 +590,13 @@
 
     <span class="doccomment">/// Dispatched when a message is deleted.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the channel&#39;s id and the message&#39;s id.</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">_deleted_message_id</span>: <span class="ident">MessageId</span>) {}
+    <span class="doccomment">/// Provides the guild&#39;s id, the channel&#39;s id and the message&#39;s id.</span>
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message_delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">_deleted_message_id</span>: <span class="ident">MessageId</span>, <span class="ident">_guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) {}
 
     <span class="doccomment">/// Dispatched when multiple messages were deleted at once.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the channel&#39;s id and the deleted messages&#39; ids.</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message_delete_bulk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">_multiple_deleted_messages_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>) {}
+    <span class="doccomment">/// Provides the guild&#39;s id, channel&#39;s id and the deleted messages&#39; ids.</span>
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message_delete_bulk</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">_multiple_deleted_messages_ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>, <span class="ident">_guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>) {}
 
     <span class="doccomment">/// Dispatched when a message is updated.</span>
     <span class="doccomment">///</span>

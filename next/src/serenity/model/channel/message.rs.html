@@ -1061,6 +1061,55 @@
 <span id="1058">1058</span>
 <span id="1059">1059</span>
 <span id="1060">1060</span>
+<span id="1061">1061</span>
+<span id="1062">1062</span>
+<span id="1063">1063</span>
+<span id="1064">1064</span>
+<span id="1065">1065</span>
+<span id="1066">1066</span>
+<span id="1067">1067</span>
+<span id="1068">1068</span>
+<span id="1069">1069</span>
+<span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
+<span id="1076">1076</span>
+<span id="1077">1077</span>
+<span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1073,8 +1122,6 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">EditMessage</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">json</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1527,14 +1574,13 @@
     <span class="doccomment">/// Returns `None` if the message is within the limit, otherwise returns</span>
     <span class="doccomment">/// `Some` with an inner value of how many unicode code points the message</span>
     <span class="doccomment">/// is over.</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overflow_length</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">overflow_length</span>(<span class="ident">content</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">usize</span><span class="op">&gt;</span> {
         <span class="comment">// Check if the content is over the maximum number of unicode code</span>
         <span class="comment">// points.</span>
-        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>() <span class="kw">as</span> <span class="ident">i64</span>;
-        <span class="kw">let</span> <span class="ident">diff</span> <span class="op">=</span> <span class="ident">count</span> <span class="op">-</span> <span class="ident">i64</span>::<span class="ident">from</span>(<span class="ident">constants</span>::<span class="ident">MESSAGE_CODE_LIMIT</span>);
+        <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">content</span>.<span class="ident">chars</span>().<span class="ident">count</span>();
 
-        <span class="kw">if</span> <span class="ident">diff</span> <span class="op">&gt;</span> <span class="number">0</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">diff</span> <span class="kw">as</span> <span class="ident">u64</span>)
+        <span class="kw">if</span> <span class="ident">count</span> <span class="op">&gt;</span> <span class="ident">constants</span>::<span class="ident">MESSAGE_CODE_LIMIT</span> {
+            <span class="prelude-val">Some</span>(<span class="ident">count</span> <span class="op">-</span> <span class="ident">constants</span>::<span class="ident">MESSAGE_CODE_LIMIT</span>)
         } <span class="kw">else</span> {
             <span class="prelude-val">None</span>
         }
@@ -1621,8 +1667,7 @@
         })
     }
 
-    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form</span>
-    <span class="doccomment">/// of: `@&lt;USER_ID&gt;: YOUR_CONTENT`.</span>
+    <span class="doccomment">/// Uses Discord&#39;s inline reply to a user without pinging them.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// User mentions are generally around 20 or 21 characters long.</span>
     <span class="doccomment">///</span>
@@ -1643,11 +1688,64 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
     <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
     <span class="doccomment">/// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">length_over</span>) <span class="op">=</span> <span class="ident">Message</span>::<span class="ident">overflow_length</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>.<span class="ident">to_string</span>()) {
-            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">MessageTooLong</span>(<span class="ident">length_over</span>)));
-        }
+        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="ident">await</span>
+    }
 
+    <span class="doccomment">/// Uses Discord&#39;s inline reply to a user with a ping.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Send Messages] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
+    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
+    <span class="doccomment">/// the required permissions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
+    <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
+    <span class="doccomment">/// over the limit.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
+    <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
+    <span class="doccomment">/// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reply_ping</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="ident">await</span>
+    }
+
+    <span class="doccomment">/// Replies to the user, mentioning them prior to the content in the form</span>
+    <span class="doccomment">/// of: `@&lt;USER_ID&gt; YOUR_CONTENT`.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// User mentions are generally around 20 or 21 characters long.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Requires the [Send Messages] permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns a</span>
+    <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
+    <span class="doccomment">/// the required permissions.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns a [`ModelError::MessageTooLong`] if the content of the message</span>
+    <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
+    <span class="doccomment">/// over the limit.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
+    <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
+    <span class="doccomment">/// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES</span>
+    <span class="attribute">#[<span class="ident">inline</span>]</span>
+    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reply_mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="ident">await</span>
+    }
+
+    <span class="doccomment">/// `inlined` decides whether this reply is inlinded and whether it pings.</span>
+    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">_reply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>, <span class="ident">inlined</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
@@ -1662,14 +1760,15 @@
             }
         }
 
-        <span class="kw">let</span> <span class="ident">gen</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>);
+        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">builder</span><span class="op">|</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ping_user</span>) <span class="op">=</span> <span class="ident">inlined</span> {
+                <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>
+                    .<span class="ident">reference_message</span>(<span class="self">self</span>)
+                    .<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">replied_user</span>(<span class="ident">ping_user</span>));
+            }
 
-        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
-            <span class="string">&quot;content&quot;</span>: <span class="ident">gen</span>,
-            <span class="string">&quot;tts&quot;</span>: <span class="bool-val">false</span>,
-        });
-
-        <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">send_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">await</span>
+            <span class="ident">builder</span>.<span class="ident">content</span>(<span class="ident">content</span>)
+        }).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Delete all embeds in this message</span>
@@ -1855,11 +1954,10 @@
             <span class="ident">total</span> <span class="op">+</span><span class="op">=</span> <span class="ident">title</span>.<span class="ident">len</span>();
         }
 
-        <span class="kw">if</span> <span class="ident">total</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">constants</span>::<span class="ident">EMBED_MAX_LENGTH</span> <span class="kw">as</span> <span class="ident">usize</span> {
+        <span class="kw">if</span> <span class="ident">total</span> <span class="op">&lt;</span><span class="op">=</span> <span class="ident">constants</span>::<span class="ident">EMBED_MAX_LENGTH</span> {
             <span class="prelude-val">Ok</span>(())
         } <span class="kw">else</span> {
-            <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">total</span> <span class="kw">as</span> <span class="ident">u64</span> <span class="op">-</span> <span class="ident">u64</span>::<span class="ident">from</span>(<span class="ident">constants</span>::<span class="ident">EMBED_MAX_LENGTH</span>);
-
+            <span class="kw">let</span> <span class="ident">overflow</span> <span class="op">=</span> <span class="ident">total</span> <span class="op">-</span> <span class="ident">constants</span>::<span class="ident">EMBED_MAX_LENGTH</span>;
             <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">EmbedTooLarge</span>(<span class="ident">overflow</span>)))
         }
     }
