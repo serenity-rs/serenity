@@ -1,14 +1,14 @@
 //! A set of constants used by the library.
 
 /// The maximum length of the textual size of an embed.
-pub const EMBED_MAX_LENGTH: u16 = 6000;
+pub const EMBED_MAX_LENGTH: usize = 6000;
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
 pub const GATEWAY_VERSION: u8 = 8;
 /// The large threshold to send on identify.
 pub const LARGE_THRESHOLD: u8 = 250;
 /// The maximum unicode code points allowed within a message by Discord.
-pub const MESSAGE_CODE_LIMIT: u16 = 2000;
+pub const MESSAGE_CODE_LIMIT: usize = 2000;
 /// The [UserAgent] sent along with every request.
 ///
 /// [UserAgent]: ../../reqwest/header/constant.USER_AGENT.html
