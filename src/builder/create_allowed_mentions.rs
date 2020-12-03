@@ -15,7 +15,7 @@ pub enum ParseValue {
     Roles,
 }
 
-/// A builder to manage the allowed mentions on a message, 
+/// A builder to manage the allowed mentions on a message,
 /// used by the [`ChannelId::send_message`] method.
 ///
 /// # Examples
@@ -136,6 +136,14 @@ impl CreateAllowedMentions {
         } else {
             self.0.insert("roles", Value::Array(vec![]));
         }
+        self
+    }
+
+    /// Makes the reply mention/ping the user.
+    #[inline]
+    pub fn replied_user(&mut self, mention_user: bool) -> &mut Self {
+        self.0.insert("replied_user", Value::Bool(mention_user));
+
         self
     }
 }

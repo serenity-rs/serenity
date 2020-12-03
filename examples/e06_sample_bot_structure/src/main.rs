@@ -40,7 +40,7 @@ use commands::{
     owner::*,
 };
 
-struct ShardManagerContainer;
+pub struct ShardManagerContainer;
 
 impl TypeMapKey for ShardManagerContainer {
     type Value = Arc<Mutex<ShardManager>>;
