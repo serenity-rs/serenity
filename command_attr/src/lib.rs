@@ -1,8 +1,5 @@
 #![deny(rust_2018_idioms)]
 #![deny(broken_intra_doc_links)]
-// FIXME: Remove this in a foreseeable future.
-// Currently exists for backwards compatibility to previous Rust versions.
-#![recursion_limit = "128"]
 
 #[allow(unused_extern_crates)]
 extern crate proc_macro;
