@@ -10,6 +10,7 @@ use std::{
         Result as FmtResult,
         Write as FmtWrite
     },
+    cmp::Ordering
 };
 
 use crate::internal::prelude::*;
@@ -378,9 +379,9 @@ impl ReactionType {
         }
     }
 
-    /// Helper function to allow comparing unicode emojis without having to
-    /// perform any allocation. Will always return false if the reaction was
-    /// not a unicode reaction.
+    /// Helper function to allow testing equality of unicode emojis without
+    /// having to perform any allocation.
+    /// Will always return false if the reaction was not a unicode reaction.
     pub fn unicode_eq(&self, other: &str) -> bool {
 
         if let ReactionType::Unicode(unicode) = &self {
@@ -388,6 +389,20 @@ impl ReactionType {
         } else {
             // Always return false if not a unicode reaction
             false
+        }
+
+    }
+
+    /// Helper function to allow comparing unicode emojis without having
+    /// to perform any allocation.
+    /// Will return None if the reaction was not a unicode reaction.
+    pub fn unicode_partial_cmp(&self, other: &str) -> Option<Ordering> {
+
+        if let ReactionType::Unicode(unicode) = &self {
+            Some(unicode.as_str().cmp(other))
+        } else {
+            // Always return None if not a unicode reaction
+            None
         }
 
     }
