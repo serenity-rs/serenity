@@ -285,10 +285,6 @@
 <span id="282">282</span>
 <span id="283">283</span>
 <span id="284">284</span>
-<span id="285">285</span>
-<span id="286">286</span>
-<span id="287">287</span>
-<span id="288">288</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Representations of voice information.</span>
 
@@ -313,11 +309,7 @@
     <span class="doccomment">/// A recognizable name of the location of the voice region.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Whether the voice region is optimal for use by the current user.</span>
-    <span class="kw">pub</span> <span class="ident">optional</span>: <span class="ident">bool</span>,
-    <span class="doccomment">/// an example hostname.</span>
-    <span class="kw">pub</span> <span class="ident">sample_hostname</span>: <span class="ident">String</span>,
-    <span class="doccomment">/// An example port.</span>
-    <span class="kw">pub</span> <span class="ident">sample_port</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">optimal</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Indicator of whether the voice region is only for VIP guilds.</span>
     <span class="kw">pub</span> <span class="ident">vip</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
