@@ -837,6 +837,20 @@
 <span id="834">834</span>
 <span id="835">835</span>
 <span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="comment">// FIXME: Remove this in a foreseeable future.</span>
@@ -1421,9 +1435,10 @@
 <span class="doccomment">/// | `#[owner_privilege]` &lt;/br&gt; `#[owner_privilege(b)]`   | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |</span>
 <span class="doccomment">/// | `#[help_available]` &lt;/br&gt; `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |</span>
 <span class="doccomment">/// | `#[checks(identifiers)]`                             | Preconditions that must met before the command&#39;s execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |</span>
-<span class="doccomment">/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.&lt;/br&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).     |</span>
+<span class="doccomment">/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.&lt;/br&gt; These can be found at [Discord&#39;s official documentation](https://discord.com/developers/docs/topics/permissions).        |</span>
 <span class="doccomment">/// | `#[default_command(cmd)]`                            | A command to execute if none of the group&#39;s prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |</span>
 <span class="doccomment">/// | `#[description(desc)]` &lt;/br&gt; `#[description = desc]` | The group&#39;s description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |</span>
+<span class="doccomment">/// | `#[summary(desc)]` &lt;/br&gt; `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// Similarly to [`command`], this macro generates static instances of the group</span>
 <span class="doccomment">/// and its options. The identifiers of these instances are based off the name of the struct to differentiate</span>
@@ -1467,6 +1482,17 @@
                     <span class="ident">options</span>.<span class="ident">description</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">arg</span>));
                 }
             }
+            <span class="string">&quot;summary&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="kw">let</span> <span class="ident">arg</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err</span><span class="macro">!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
+
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">desc</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">summary</span>.<span class="number">0</span> {
+                    <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
+
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">desc</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="ident">arg</span>.<span class="ident">trim_matches</span>(<span class="string">&#39; &#39;</span>));
+                } <span class="kw">else</span> {
+                    <span class="ident">options</span>.<span class="ident">summary</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">arg</span>));
+                }
+            }
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">match_options</span><span class="macro">!</span>(<span class="ident">name</span>, <span class="ident">values</span>, <span class="ident">options</span>, <span class="ident">span</span> <span class="op">=</span><span class="op">&gt;</span> [
                 <span class="ident">prefixes</span>;
                 <span class="ident">only_in</span>;
@@ -1494,6 +1520,7 @@
         <span class="ident">checks</span>,
         <span class="ident">default_command</span>,
         <span class="ident">description</span>,
+        <span class="ident">summary</span>,
         <span class="ident">commands</span>,
         <span class="ident">sub_groups</span>,
     } <span class="op">=</span> <span class="ident">options</span>;
@@ -1536,6 +1563,7 @@
             <span class="ident">checks</span>: #<span class="ident">checks</span>,
             <span class="ident">default_command</span>: #<span class="ident">default_command</span>,
             <span class="ident">description</span>: #<span class="ident">description</span>,
+            <span class="ident">summary</span>: #<span class="ident">summary</span>,
             <span class="ident">commands</span>: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#<span class="ident">commands</span>),<span class="kw-2">*</span>],
             <span class="ident">sub_groups</span>: <span class="kw-2">&amp;</span>[#(<span class="kw-2">&amp;</span>#<span class="ident">sub_groups</span>),<span class="kw-2">*</span>],
         };
