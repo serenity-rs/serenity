@@ -26,6 +26,7 @@ use async_trait::async_trait;
 /// can have channel-specific permission overrides in addition to guild-level
 /// permissions.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
     pub id: RoleId,
@@ -70,8 +71,6 @@ pub struct Role {
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

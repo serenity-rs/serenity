@@ -213,16 +213,16 @@ impl FromStr for EmojiIdentifier {
 ///
 /// This is pulled from the Discord status page.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct AffectedComponent {
     pub name: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// An incident retrieved from the Discord status page.
 ///
 /// This is not necessarily a representation of an ongoing incident.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Incident {
     pub created_at: String,
     pub id: String,
@@ -235,8 +235,6 @@ pub struct Incident {
     pub short_link: String,
     pub status: String,
     pub updated_at: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// An update to an incident from the Discord status page.
@@ -244,6 +242,7 @@ pub struct Incident {
 /// This will typically state what new information has been discovered about an
 /// incident.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct IncidentUpdate {
     pub affected_components: Vec<AffectedComponent>,
     pub body: String,
@@ -253,8 +252,6 @@ pub struct IncidentUpdate {
     pub incident_id: String,
     pub status: IncidentStatus,
     pub updated_at: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// The type of status update during a service incident.
@@ -272,14 +269,13 @@ pub enum IncidentStatus {
 /// A Discord status maintenance message. This can be either for active
 /// maintenances or for scheduled maintenances.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Maintenance {
     pub description: String,
     pub id: String,
     pub name: String,
     pub start: String,
     pub stop: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(test)]
@@ -317,7 +313,6 @@ mod test {
                 user_limit: None,
                 nsfw: false,
                 slow_mode_rate: Some(0),
-                _nonexhaustive: (),
             });
             let emoji = Emoji {
                 animated: false,
@@ -326,7 +321,6 @@ mod test {
                 managed: true,
                 require_colons: true,
                 roles: vec![],
-                _nonexhaustive: (),
             };
             let role = Role {
                 id: RoleId(2),
@@ -338,7 +332,6 @@ mod test {
                 name: "fake role".to_string(),
                 permissions: Permissions::empty(),
                 position: 1,
-                _nonexhaustive: (),
             };
             let user = User {
                 id: UserId(6),
@@ -346,7 +339,6 @@ mod test {
                 bot: false,
                 discriminator: 4132,
                 name: "fake".to_string(),
-                _nonexhaustive: (),
             };
             let member = Member {
                 deaf: false,
@@ -356,7 +348,6 @@ mod test {
                 nick: None,
                 roles: vec![],
                 user: user.clone(),
-                _nonexhaustive: (),
             };
 
             assert_eq!(ChannelId(1).mention(), "<#1>");

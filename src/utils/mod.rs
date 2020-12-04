@@ -839,7 +839,6 @@ mod test {
             bot: false,
             discriminator: 0000,
             name: "Crab".to_string(),
-            _nonexhaustive: (),
         };
 
         let mut guild = Guild {
@@ -876,7 +875,6 @@ mod test {
             banner: None,
             vanity_url_code: Some("bruhmoment1".to_string()),
             preferred_locale: "en-US".to_string(),
-            _nonexhaustive: (),
         };
 
         let member = Member {
@@ -887,7 +885,6 @@ mod test {
             nick: Some("Ferris".to_string()),
             roles: Vec::new(),
             user: user.clone(),
-            _nonexhaustive: (),
         };
 
         let role = Role {
@@ -900,7 +897,6 @@ mod test {
             name: "ferris-club-member".to_string(),
             permissions: Permissions::all(),
             position: 0,
-            _nonexhaustive: (),
         };
 
         let channel = GuildChannel {
@@ -918,7 +914,6 @@ mod test {
             user_limit: None,
             nsfw: false,
             slow_mode_rate: Some(0),
-            _nonexhaustive: (),
         };
 
         let cache = Arc::new(Cache::default());

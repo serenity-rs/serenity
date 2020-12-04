@@ -48,6 +48,7 @@ pub struct Ban {
 
 /// Information about a Discord guild, such as channels, emojis, etc.
 #[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
 pub struct Guild {
     /// Id of a voice channel that's considered the AFK channel.
     pub afk_channel_id: Option<ChannelId>,
@@ -170,8 +171,6 @@ pub struct Guild {
     /// The preferred locale of this guild only set if guild has the "DISCOVERABLE"
     /// feature, defaults to en-US.
     pub preferred_locale: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -1946,7 +1945,6 @@ impl<'de> Deserialize<'de> for Guild {
             banner,
             vanity_url_code,
             preferred_locale,
-            _nonexhaustive: (),
         })
     }
 }
@@ -2291,7 +2289,6 @@ mod test {
                 bot: true,
                 discriminator: 1432,
                 name: "test".to_string(),
-                _nonexhaustive: (),
             }
         }
 
@@ -2311,7 +2308,6 @@ mod test {
                 nick: Some("aaaa".to_string()),
                 roles: vec1,
                 user: u,
-                _nonexhaustive: (),
             }
         }
 
@@ -2366,7 +2362,6 @@ mod test {
                 banner: None,
                 vanity_url_code: Some("bruhmoment".to_string()),
                 preferred_locale: "en-US".to_string(),
-                _nonexhaustive: (),
             }
         }
 

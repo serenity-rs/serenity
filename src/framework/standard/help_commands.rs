@@ -126,6 +126,7 @@ pub struct SuggestedCommandName {
 
 /// A single command containing all related pieces of information.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Command<'a> {
     pub name: &'static str,
     pub group_name: &'static str,
@@ -137,7 +138,6 @@ pub struct Command<'a> {
     pub usage: Option<&'static str>,
     pub usage_sample: Vec<&'static str>,
     pub checks: Vec<String>,
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Contains possible suggestions in case a command could not be found
@@ -600,7 +600,6 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     usage: options.usage,
                     usage_sample: options.examples.to_vec(),
                     sub_commands: sub_command_names,
-                    _nonexhaustive: (),
                 },
             });
         }

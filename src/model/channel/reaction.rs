@@ -23,6 +23,7 @@ use std::str::FromStr;
 
 /// An emoji reaction to a message.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Reaction {
     /// The [`Channel`] of the associated [`Message`].
     ///
@@ -46,8 +47,6 @@ pub struct Reaction {
     ///
     /// [`Guild`]: ../guild/struct.Guild.html
     pub guild_id: Option<GuildId>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -383,7 +382,7 @@ impl ReactionType {
     /// perform any allocation. Will always return false if the reaction was
     /// not a unicode reaction.
     pub fn unicode_eq(&self, other: &str) -> bool {
-        
+
         if let ReactionType::Unicode(unicode) = &self {
             unicode == other
         } else {

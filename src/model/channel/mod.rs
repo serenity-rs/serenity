@@ -444,7 +444,6 @@ mod test {
                 user_limit: None,
                 nsfw: false,
                 slow_mode_rate: Some(0),
-                _nonexhaustive: (),
             }
         }
 
@@ -460,9 +459,7 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "ab".to_string(),
-                    _nonexhaustive: (),
                 },
-                _nonexhaustive: (),
             }
         }
 
