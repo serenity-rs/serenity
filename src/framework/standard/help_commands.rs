@@ -1453,11 +1453,20 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
         "**{}**: {}",
         help_options.grouped_label, command.group_name
     );
+
     let _ = writeln!(
         result,
         "**{}**: {}",
         help_options.available_text, command.availability
     );
+
+    if !command.sub_commands.is_empty() {
+        let _ = writeln!(
+            result,
+            "**{}**: {}",
+            help_options.sub_commands_label, format!("`{}`", command.sub_commands.join("`, `"))
+        );
+     }
 
     result
 }
