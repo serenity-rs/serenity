@@ -1,4 +1,5 @@
 #![deny(rust_2018_idioms)]
+#![deny(broken_intra_doc_links)]
 // FIXME: Remove this in a foreseeable future.
 // Currently exists for backwards compatibility to previous Rust versions.
 #![recursion_limit = "128"]
@@ -282,7 +283,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[max_levenshtein_distance(n)]`                                                                                                              | How much should the help command search for a similiar name.</br> Indicator for a nested guild. The prefix will be repeated based on what kind of level the item sits. A sub-group would be level two, a sub-sub-group would be level three.     | `n` is a 64-bit, unsigned integer.                                                                         |
 /// | `#[indention_prefix(s)]` </br> `#[indention_prefix = s]`                                                                                      | The prefix used to express how deeply nested a command or group is.                                                                                                                                                                              | `s` is a string                                                                                            |
 ///
-/// [`command`]: attr.command.html
+/// [`command`]: macro@command
 #[proc_macro_attribute]
 pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut fun = parse_macro_input!(input as CommandFun);
@@ -592,7 +593,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// used in the help command for display and browsing of the group.
 /// It may also be passed as an argument to the macro. For example: `#[group("Banana Phone")]`.
 ///
-/// [`command`]: #fn.command.html
+/// [`command`]: macro@command
 
 #[proc_macro_attribute]
 pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {

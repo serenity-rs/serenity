@@ -11,7 +11,7 @@ pub const LARGE_THRESHOLD: u8 = 250;
 pub const MESSAGE_CODE_LIMIT: usize = 2000;
 /// The [UserAgent] sent along with every request.
 ///
-/// [UserAgent]: ../../reqwest/header/constant.USER_AGENT.html
+/// [UserAgent]: ::reqwest::header::USER_AGENT
 pub const USER_AGENT: &str = concat!(
     "DiscordBot (https://github.com/serenity-rs/serenity, ",
     env!("CARGO_PKG_VERSION"),

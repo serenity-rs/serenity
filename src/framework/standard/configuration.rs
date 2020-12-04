@@ -91,9 +91,9 @@ impl From<(bool, bool, bool)> for WithWhiteSpace {
 /// # }
 /// ```
 ///
-/// [`Client`]: ../../client/struct.Client.html
-/// [`StandardFramework`]: struct.StandardFramework.html
-/// [default implementation]: #impl-Default
+/// [`Client`]: crate::Client
+/// [`StandardFramework`]: super::StandardFramework
+/// [default implementation]: Self::default
 pub struct Configuration {
     #[doc(hidden)]
     pub allow_dm: bool,
@@ -359,7 +359,7 @@ impl Configuration {
     /// nickname. It has no real meaning for your bot, and the library
     /// encourages you to ignore differentiating between the two.
     ///
-    /// [`prefix`]: #method.prefix
+    /// [`prefix`]: Self::prefix
     pub fn on_mention(&mut self, id_to_mention: Option<UserId>) -> &mut Self {
         self.on_mention = id_to_mention.map(|id| id.to_string());
 
@@ -444,7 +444,7 @@ impl Configuration {
     ///     .prefixes(vec!["!", ">", "+"]));
     /// ```
     ///
-    /// [`prefix`]: #method.prefix
+    /// [`prefix`]: Self::prefix
     #[inline]
     pub fn prefixes<T, It>(&mut self, prefixes: It) -> &mut Self
     where
@@ -508,7 +508,7 @@ impl Configuration {
     ///     .delimiters(vec![", ", " "]));
     /// ```
     ///
-    /// [`delimiter`]: #method.delimiter
+    /// [`delimiter`]: Self::delimiter
     pub fn delimiters<T, It>(&mut self, delimiters: It) -> &mut Self
     where
         T: Into<Delimiter>,

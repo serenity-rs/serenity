@@ -271,12 +271,12 @@ pub struct AuditLogs {
 pub struct AuditLogEntry {
     /// Determines to what entity an [`action`] was used on.
     ///
-    /// [`action`]: #structfield.action
+    /// [`action`]: Self::action
     #[serde(with = "option_u64_handler")]
     pub target_id: Option<u64>,
     /// Determines what action was done on a [`target_id`]
     ///
-    /// [`target_id`]: #structfield.target_id
+    /// [`target_id`]: Self::target_id
     #[serde(
         with = "action_handler",
         rename = "action_type"

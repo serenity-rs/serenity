@@ -75,7 +75,7 @@
 //! # }
 //! ```
 //!
-//! [`ClientBuilder::framework`]: ../client/struct.ClientBuilder.html#method.framework
+//! [`ClientBuilder::framework`]: crate::client::ClientBuilder::framework
 
 #[cfg(feature = "standard_framework")]
 pub mod standard;

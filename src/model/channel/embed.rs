@@ -52,7 +52,7 @@ pub struct Embed {
     /// For example, if the embed [`kind`] is `"video"`, the provider might
     /// contain information about YouTube.
     ///
-    /// [`kind`]: #structfield.kind
+    /// [`kind`]: Self::kind
     pub provider: Option<EmbedProvider>,
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,
@@ -66,7 +66,7 @@ pub struct Embed {
     ///
     /// This is present if the [`kind`] is `"video"`.
     ///
-    /// [`kind`]: #structfield.kind
+    /// [`kind`]: Self::kind
     pub video: Option<EmbedVideo>,
 }
 
@@ -76,7 +76,7 @@ impl Embed {
     ///
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
-    /// [`Webhook::execute`]: ../webhook/struct.Webhook.html
+    /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     ///
     /// # Examples
     ///
@@ -140,8 +140,8 @@ impl EmbedField {
     /// **Note**: Refer to the [`name`] and [`value`] documentation for maximum
     /// lengths.
     ///
-    /// [`name`]: #structfield.name
-    /// [`value`]: #structfield.value
+    /// [`name`]: Self::name
+    /// [`value`]: Self::value
     pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
         where T: Into<String>, U: Into<String> {
         Self::_new(name.into(), value.into(), inline)

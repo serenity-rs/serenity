@@ -104,8 +104,6 @@ use async_trait::async_trait;
 /// cache.update(&mut update_message).await;
 /// # }
 /// ```
-///
-/// [`Cache::update`]: struct.Cache.html#method.update
 #[async_trait]
 pub trait CacheUpdate {
     /// The return type of an update.

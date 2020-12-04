@@ -103,7 +103,7 @@ impl CurrentUser {
     /// # }
     /// ```
     ///
-    /// [`EditProfile`]: ../../builder/struct.EditProfile.html
+    /// [`EditProfile`]: crate::builder::EditProfile
     pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
     where F: FnOnce(&mut EditProfile) -> &mut EditProfile
     {
@@ -129,8 +129,8 @@ impl CurrentUser {
     /// This will call [`avatar_url`] first, and if that returns `None`, it
     /// then falls back to [`default_avatar_url`].
     ///
-    /// [`avatar_url`]: #method.avatar_url
-    /// [`default_avatar_url`]: #method.default_avatar_url
+    /// [`avatar_url`]: Self::avatar_url
+    /// [`default_avatar_url`]: Self::default_avatar_url
     #[inline]
     pub fn face(&self) -> String {
         self.avatar_url()
@@ -245,8 +245,7 @@ impl CurrentUser {
     ///
     /// May return [`Error::Format`] while writing url to the buffer.
     ///
-    /// [`Error::Format`]: ../../enum.Error.html#variant.Format
-    /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
+    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
     pub async fn invite_url(&self, http: impl AsRef<Http>, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
         let client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
@@ -315,7 +314,7 @@ impl CurrentUser {
 ///
 /// The has of the avatar can be retrieved via calling [`name`] on the enum.
 ///
-/// [`name`]: #method.name
+/// [`name`]: Self::name
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
 pub enum DefaultAvatar {
@@ -348,8 +347,8 @@ impl DefaultAvatar {
 /// - [`DoNotDisturb`];
 /// - [`Invisible`].
 ///
-/// [`DoNotDisturb`]: #variant.DoNotDisturb
-/// [`Invisible`]: #variant.Invisible
+/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+/// [`Invisible`]: OnlineStatus::Invisible
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
 pub enum OnlineStatus {
@@ -391,7 +390,7 @@ pub struct User {
     /// The account's discriminator to differentiate the user from others with
     /// the same [`name`]. The name+discriminator pair is always unique.
     ///
-    /// [`name`]: #structfield.name
+    /// [`name`]: Self::name
     #[serde(deserialize_with = "deserialize_u16")]
     pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
@@ -447,7 +446,7 @@ impl User {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
-    /// [current user]: struct.CurrentUser.html
+    /// [current user]: CurrentUser
     #[inline]
     pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         if self.bot {
@@ -533,10 +532,6 @@ impl User {
     ///
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
-    ///
-    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
-    /// [`User::dm`]: struct.User.html#method.dm
     pub async fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
         where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
         self.create_dm_channel(&cache_http)
@@ -562,8 +557,7 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
-    /// [direct_message]: #method.direct_message
+    /// [direct_message]: Self::direct_message
     #[inline]
     pub async fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
@@ -576,8 +570,8 @@ impl User {
     /// This will call [`avatar_url`] first, and if that returns `None`, it
     /// then falls back to [`default_avatar_url`].
     ///
-    /// [`avatar_url`]: #method.avatar_url
-    /// [`default_avatar_url`]: #method.default_avatar_url
+    /// [`avatar_url`]: Self::avatar_url
+    /// [`default_avatar_url`]: Self::default_avatar_url
     pub fn face(&self) -> String {
         self.avatar_url()
             .unwrap_or_else(|| self.default_avatar_url())
@@ -599,11 +593,7 @@ impl User {
     /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`GuildId`]: ../id/struct.GuildId.html
-    /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [`Cache`]: ../../cache/struct.Cache.html
+    /// [`Cache`]: crate::cache::Cache
     #[inline]
     pub async fn has_role(
         &self,
@@ -771,7 +761,7 @@ impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
-    /// [current user]: ../user/struct.CurrentUser.html
+    /// [current user]: CurrentUser
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         #[cfg(feature = "cache")]
         {
@@ -792,8 +782,6 @@ impl UserId {
     }
 
     /// Attempts to find a [`User`] by its Id in the cache.
-    ///
-    /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn to_user_cached(self, cache: impl AsRef<Cache>) -> Option<User> {
@@ -805,8 +793,6 @@ impl UserId {
     ///
     /// **Note**: If the cache is not enabled,
     /// REST API will be used only.
-    ///
-    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]

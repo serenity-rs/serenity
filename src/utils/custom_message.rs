@@ -6,8 +6,7 @@ use serde_json::Value;
 /// This can be useful for emitting a manual [`dispatch`] to the framework,
 /// but you don't have a message in hand, or just have a fragment of its data.
 ///
-/// [`Message`]: ../model/channel/struct.Message.html
-/// [`dispatch`]: ../framework/trait.Framework.html#tymethod.dispatch
+/// [`dispatch`]: crate::framework::Framework::dispatch
 #[derive(Debug, Clone)]
 pub struct CustomMessage {
     msg: Message,
@@ -48,8 +47,6 @@ impl CustomMessage {
     /// Assign the dummy message its author.
     ///
     /// If not used, the default value is a dummy [`User`].
-    ///
-    /// [`User`]: ../model/user/struct.User.html
     #[inline]
     pub fn author(&mut self, user: User) -> &mut Self {
         self.msg.author = user;
@@ -113,8 +110,6 @@ impl CustomMessage {
     /// Assign the dummy message its type.
     ///
     /// If not used, the default value is [`MessageType::Regular`].
-    ///
-    /// [`MessageType::Regular`]: ../model/channel/enum.MessageType.html#variant.Regular
     #[inline]
     pub fn kind(&mut self, kind: MessageType) -> &mut Self {
         self.msg.kind = kind;
@@ -126,7 +121,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is `None` (not all messages are sent in guilds).
     ///
-    /// [author]: #method.author
+    /// [author]: Self::author
     #[inline]
     pub fn member(&mut self, member: PartialMember) -> &mut Self {
         self.msg.member = Some(member);

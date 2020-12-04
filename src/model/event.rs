@@ -1,4 +1,5 @@
 //! All the events this library handles.
+
 use chrono::{DateTime, Utc};
 use serde::de::Error as DeError;
 use serde::ser::{
@@ -28,10 +29,6 @@ use async_trait::async_trait;
 ///
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
-///
-/// [`Channel`]: ../channel/enum.Channel.html
-/// [`Guild`]: ../guild/struct.Guild.html
-/// [`PrivateChannel`]: ../channel/struct.PrivateChannel.html
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct ChannelCreateEvent {
@@ -1467,30 +1464,25 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::channel_create`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`EventHandler::channel_create`]: ../../client/trait.EventHandler.html#method.channel_create
+    /// [`EventHandler::channel_create`]: crate::client::EventHandler::channel_create
     ChannelCreate(ChannelCreateEvent),
     /// A [`Channel`] has been deleted.
     ///
     /// Fires the [`EventHandler::channel_delete`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`EventHandler::channel_delete`]: ../../client/trait.EventHandler.html#method.channel_delete
+    /// [`EventHandler::channel_delete`]: crate::client::EventHandler::channel_delete
     ChannelDelete(ChannelDeleteEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
     /// Fires the [`EventHandler::channel_pins_update`] event.
     ///
-    /// [`Channel`]: ../enum.Channel.html
-    /// [`EventHandler::channel_pins_update`]:
-    /// ../../client/trait.EventHandler.html#method.channel_pins_update
+    /// [`EventHandler::channel_pins_update`]: crate::client::EventHandler::channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
     /// A [`Channel`] has been updated.
     ///
     /// Fires the [`EventHandler::channel_update`] event.
     ///
-    /// [`EventHandler::channel_update`]: ../../client/trait.EventHandler.html#method.channel_update
-    /// [`User`]: ../struct.User.html
+    /// [`EventHandler::channel_update`]: crate::client::EventHandler::channel_update
     ChannelUpdate(ChannelUpdateEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
@@ -1513,15 +1505,13 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::invite_create`] event handler.
     ///
-    /// [`Invite`]: invite/struct.Invite.html
-    /// [`EventHandler::invite_create`]: ../../client/trait.EventHandler.html#method.invite_create
+    /// [`EventHandler::invite_create`]: crate::client::EventHandler::invite_create
     InviteCreate(InviteCreateEvent),
     /// An [`Invite`] was deleted.
     ///
     /// Fires the [`EventHandler::invite_delete`] event handler.
     ///
-    /// [`Invite`]: invite/struct.Invite.html
-    /// [`EventHandler::invite_delete`]: ../../client/trait.EventHandler.html#method.invite_delete
+    /// [`EventHandler::invite_delete`]: crate::client::EventHandler::invite_delete
     InviteDelete(InviteDeleteEvent),
     MessageCreate(MessageCreateEvent),
     MessageDelete(MessageDeleteEvent),
@@ -1536,22 +1526,19 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
-    /// [`EventHandler::reaction_add`]: ../../client/trait.EventHandler.html#method.reaction_add
+    /// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
     /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
-    /// [`EventHandler::reaction_remove`]:
-    /// ../../client/trait.EventHandler.html#method.reaction_remove
+    /// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
     /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
-    /// [`Message`]: struct.Message.html
-    /// [`Reaction`]: struct.Reaction.html
-    /// [`EventHandler::reaction_remove_all`]: ../../client/trait.EventHandler.html#method.reaction_remove_all
+    /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
@@ -1568,9 +1555,6 @@ pub enum Event {
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
     WebhookUpdate(WebhookUpdateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
@@ -1633,12 +1617,6 @@ impl Event {
 /// present and containing a value of `true`, will cause a
 /// [`GuildUnavailableEvent`] to be returned. Otherwise, all other event types
 /// correlate to the deserialization of their appropriate event.
-///
-/// [`EventType::ChannelCreate`]: enum.EventType.html#variant.ChannelCreate
-/// [`EventType::GuildCreate`]: enum.EventType.html#variant.GuildCreate
-/// [`EventType::GuildDelete`]: enum.EventType.html#variant.GuildDelete
-/// [`ChannelCreateEvent`]: struct.ChannelCreateEvent.html
-/// [`GuildUnavailableEvent`]: struct.GuildUnavailableEvent.html
 pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
     Ok(match kind {
         EventType::ChannelCreate => Event::ChannelCreate(serde_json::from_value(v)?),
@@ -1750,232 +1728,156 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 /// A Deserialization implementation is provided for deserializing raw event
 /// dispatch type strings to this enum, e.g. deserializing `"CHANNEL_CREATE"` to
 /// [`EventType::ChannelCreate`].
-///
-/// [`EventType::ChannelCreate`]: enum.EventType.html#variant.ChannelCreate
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum EventType {
     /// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
-    ///
-    /// [`ChannelCreateEvent`]: struct.ChannelCreateEvent.html
     ChannelCreate,
     /// Indicator that a channel delete payload was received.
     ///
     /// This maps to [`ChannelDeleteEvent`].
-    ///
-    /// [`ChannelDeleteEvent`]: struct.ChannelDeleteEvent.html
     ChannelDelete,
     /// Indicator that a channel pins update payload was received.
     ///
     /// This maps to [`ChannelPinsUpdateEvent`].
-    ///
-    /// [`ChannelPinsUpdateEvent`]: struct.ChannelPinsUpdateEvent.html
     ChannelPinsUpdate,
     /// Indicator that a channel update payload was received.
     ///
     /// This maps to [`ChannelUpdateEvent`].
-    ///
-    /// [`ChannelUpdateEvent`]: struct.ChannelUpdateEvent.html
     ChannelUpdate,
     /// Indicator that a guild ban addition payload was received.
     ///
     /// This maps to [`GuildBanAddEvent`].
-    ///
-    /// [`GuildBanAddEvent`]: struct.GuildBanAddEvent.html
     GuildBanAdd,
     /// Indicator that a guild ban removal payload was received.
     ///
     /// This maps to [`GuildBanRemoveEvent`].
-    ///
-    /// [`GuildBanRemoveEvent`]: struct.GuildBanRemoveEvent.html
     GuildBanRemove,
     /// Indicator that a guild create payload was received.
     ///
     /// This maps to [`GuildCreateEvent`].
-    ///
-    /// [`GuildCreateEvent`]: struct.GuildCreateEvent.html
     GuildCreate,
     /// Indicator that a guild delete payload was received.
     ///
     /// This maps to [`GuildDeleteEvent`].
-    ///
-    /// [`GuildDeleteEvent`]: struct.GuildDeleteEvent.html
     GuildDelete,
     /// Indicator that a guild emojis update payload was received.
     ///
     /// This maps to [`GuildEmojisUpdateEvent`].
-    ///
-    /// [`GuildEmojisUpdateEvent`]: struct.GuildEmojisUpdateEvent.html
     GuildEmojisUpdate,
     /// Indicator that a guild integrations update payload was received.
     ///
     /// This maps to [`GuildIntegrationsUpdateEvent`].
-    ///
-    /// [`GuildIntegrationsUpdateEvent`]: struct.GuildIntegrationsUpdateEvent.html
     GuildIntegrationsUpdate,
     /// Indicator that a guild member add payload was received.
     ///
     /// This maps to [`GuildMemberAddEvent`].
-    ///
-    /// [`GuildMemberAddEvent`]: struct.GuildMemberAddEvent.html
     GuildMemberAdd,
     /// Indicator that a guild member remove payload was received.
     ///
     /// This maps to [`GuildMemberRemoveEvent`].
-    ///
-    /// [`GuildMemberRemoveEvent`]: struct.GuildMemberRemoveEvent.html
     GuildMemberRemove,
     /// Indicator that a guild member update payload was received.
     ///
     /// This maps to [`GuildMemberUpdateEvent`].
-    ///
-    /// [`GuildMemberUpdateEvent`]: struct.GuildMemberUpdateEvent.html
     GuildMemberUpdate,
     /// Indicator that a guild members chunk payload was received.
     ///
     /// This maps to [`GuildMembersChunkEvent`].
-    ///
-    /// [`GuildMembersChunkEvent`]: struct.GuildMembersChunkEvent.html
     GuildMembersChunk,
     /// Indicator that a guild role create payload was received.
     ///
     /// This maps to [`GuildRoleCreateEvent`].
-    ///
-    /// [`GuildRoleCreateEvent`]: struct.GuildRoleCreateEvent.html
     GuildRoleCreate,
     /// Indicator that a guild role delete payload was received.
     ///
     /// This maps to [`GuildRoleDeleteEvent`].
-    ///
-    /// [`GuildRoleDeleteEvent`]: struct.GuildRoleDeleteEvent.html
     GuildRoleDelete,
     /// Indicator that a guild role update payload was received.
     ///
     /// This maps to [`GuildRoleUpdateEvent`].
-    ///
-    /// [`GuildRoleUpdateEvent`]: struct.GuildRoleUpdateEvent.html
     GuildRoleUpdate,
     /// Indicator that a guild unavailable payload was received.
     ///
     /// This maps to [`GuildUnavailableEvent`].
-    ///
-    /// [`GuildUnavailableEvent`]: struct.GuildUnavailableEvent.html
     GuildUnavailable,
     /// Indicator that a guild update payload was received.
     ///
     /// This maps to [`GuildUpdateEvent`].
-    ///
-    /// [`GuildUpdateEvent`]: struct.GuildUpdateEvent.html
     GuildUpdate,
     /// Indicator that an invite was created.
     ///
     /// This maps to [`InviteCreateEvent`].
-    ///
-    /// [`InviteCreateEvent`]: struct.InviteCreateEvent.html
     InviteCreate,
     /// Indicator that an invite was deleted.
     ///
     /// This maps to [`InviteDeleteEvent`].
-    ///
-    /// [`InviteDeleteEvent`]: struct.InviteDeleteEvent.html
     InviteDelete,
     /// Indicator that a message create payload was received.
     ///
     /// This maps to [`MessageCreateEvent`].
-    ///
-    /// [`MessageCreateEvent`]: struct.MessageCreateEvent.html
     MessageCreate,
     /// Indicator that a message delete payload was received.
     ///
     /// This maps to [`MessageDeleteEvent`].
-    ///
-    /// [`MessageDeleteEvent`]: struct.MessageDeleteEvent.html
     MessageDelete,
     /// Indicator that a message delete bulk payload was received.
     ///
     /// This maps to [`MessageDeleteBulkEvent`].
-    ///
-    /// [`MessageDeleteBulkEvent`]: struct.MessageDeleteBulkEvent.html
     MessageDeleteBulk,
     /// Indicator that a message update payload was received.
     ///
     /// This maps to [`MessageUpdateEvent`].
-    ///
-    /// [`MessageUpdateEvent`]: struct.MessageUpdateEvent.html
     MessageUpdate,
     /// Indicator that a presence update payload was received.
     ///
     /// This maps to [`PresenceUpdateEvent`].
-    ///
-    /// [`PresenceUpdateEvent`]: struct.PresenceUpdateEvent.html
     PresenceUpdate,
     /// Indicator that a presences replace payload was received.
     ///
     /// This maps to [`PresencesReplaceEvent`].
-    ///
-    /// [`PresencesReplaceEvent`]: struct.PresencesReplaceEvent.html
     PresencesReplace,
     /// Indicator that a reaction add payload was received.
     ///
     /// This maps to [`ReactionAddEvent`].
-    ///
-    /// [`ReactionAddEvent`]: struct.ReactionAddEvent.html
     ReactionAdd,
     /// Indicator that a reaction remove payload was received.
     ///
     /// This maps to [`ReactionRemoveEvent`].
-    ///
-    /// [`ReactionRemoveEvent`]: struct.ResumedEvent.html
     ReactionRemove,
     /// Indicator that a reaction remove all payload was received.
     ///
     /// This maps to [`ReactionRemoveAllEvent`].
-    ///
-    /// [`ReactionRemoveAllEvent`]: struct.ReactionRemoveAllEvent.html
     ReactionRemoveAll,
     /// Indicator that a ready payload was received.
     ///
     /// This maps to [`ReadyEvent`].
-    ///
-    /// [`ReadyEvent`]: struct.ReadyEvent.html
     Ready,
     /// Indicator that a resumed payload was received.
     ///
     /// This maps to [`ResumedEvent`].
-    ///
-    /// [`ResumedEvent`]: struct.ResumedEvent.html
     Resumed,
     /// Indicator that a typing start payload was received.
     ///
     /// This maps to [`TypingStartEvent`].
-    ///
-    /// [`TypingStartEvent`]: struct.TypingStartEvent.html
     TypingStart,
     /// Indicator that a user update payload was received.
     ///
     /// This maps to [`UserUpdateEvent`].
-    ///
-    /// [`UserUpdateEvent`]: struct.UserUpdateEvent.html
     UserUpdate,
     /// Indicator that a voice state payload was received.
     ///
     /// This maps to [`VoiceStateUpdateEvent`].
-    ///
-    /// [`VoiceStateUpdateEvent`]: struct.VoiceStateUpdateEvent.html
     VoiceStateUpdate,
     /// Indicator that a voice server update payload was received.
     ///
     /// This maps to [`VoiceServerUpdateEvent`].
-    ///
-    /// [`VoiceServerUpdateEvent`]: struct.VoiceServerUpdateEvent.html
     VoiceServerUpdate,
     /// Indicator that a webhook update payload was received.
     ///
     /// This maps to [`WebhookUpdateEvent`].
-    ///
-    /// [`WebhookUpdateEvent`]: struct.WebhookUpdateEvent.html
     WebhookUpdate,
     /// An unknown event was received over the gateway.
     ///

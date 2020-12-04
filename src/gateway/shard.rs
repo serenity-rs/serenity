@@ -63,11 +63,11 @@ use crate::internal::ws_impl::create_native_tls_client;
 ///
 /// See the documentation for [`new`] on how to use this.
 ///
-/// [`Client`]: ../client/struct.Client.html
-/// [`new`]: #method.new
+/// [`Client`]: crate::Client
+/// [`new`]: Self::new
 /// [`receive`]: #method.receive
 /// [docs]: https://discord.com/developers/docs/topics/gateway#sharding
-/// [module docs]: index.html#sharding
+/// [module docs]: crate::gateway#sharding
 pub struct Shard {
     pub client: WsStream,
     current_presence: CurrentPresence,
@@ -78,7 +78,7 @@ pub struct Shard {
     ///
     /// This can be used to calculate [`latency`].
     ///
-    /// [`latency`]: fn.latency.html
+    /// [`latency`]: fn@Self::latency
     heartbeat_instants: (Option<Instant>, Option<Instant>),
     heartbeat_interval: Option<u64>,
     /// This is used by the heartbeater to determine whether the last
@@ -214,8 +214,6 @@ impl Shard {
     ///
     /// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending
     /// a heartbeat.
-    ///
-    /// [`GatewayError::HeartbeatFailed`]: enum.GatewayError.html#variant.HeartbeatFailed
     #[instrument(skip(self))]
     pub async fn heartbeat(&mut self) -> Result<()> {
         match self.client.send_heartbeat(&self.shard_info, Some(self.seq)).await {
@@ -648,8 +646,7 @@ impl Shard {
     /// Note that, if the shard is already in a stage of
     /// [`ConnectionStage::Connecting`], then no action will be performed.
     ///
-    /// [`ConnectionStage::Connecting`]: ../gateway/enum.ConnectionStage.html#variant.Connecting
-    /// [`session_id`]: ../gateway/struct.Shard.html#method.session_id
+    /// [`session_id`]: Self::session_id
     pub fn should_reconnect(&mut self) -> Option<ReconnectType> {
         if self.stage == ConnectionStage::Connecting {
             return None;
@@ -725,9 +722,9 @@ impl Shard {
     /// # }
     /// ```
     ///
-    /// [`Event::GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`Member`]: ../model/guild/struct.Member.html
+    /// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk
+    /// [`Guild`]: crate::model::guild::Guild
+    /// [`Member`]: crate::model::guild::Member
     #[instrument(skip(self))]
     pub async fn chunk_guild(
         &mut self,

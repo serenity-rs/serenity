@@ -4,7 +4,7 @@ use std::collections::HashMap;
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
 ///
-/// [`CurrentUser::edit`]: ../model/user/struct.CurrentUser.html#method.edit
+/// [`CurrentUser::edit`]: crate::model::user::CurrentUser::edit
 #[derive(Clone, Debug, Default)]
 pub struct EditProfile(pub HashMap<&'static str, Value>);
 
@@ -46,7 +46,7 @@ impl EditProfile {
     /// # }
     /// ```
     ///
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [`utils::read_image`]: crate::utils::read_image
     pub fn avatar(&mut self, avatar: Option<&str>) -> &mut Self {
         let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
 
@@ -63,7 +63,7 @@ impl EditProfile {
     ///
     /// **Note**: This can only be used by user accounts.
     ///
-    /// [provided]: #method.password
+    /// [provided]: Self::password
     pub fn email(&mut self, email: &str) -> &mut Self {
         self.0.insert("email", Value::String(email.to_string()));
         self
@@ -74,7 +74,7 @@ impl EditProfile {
     /// Note that when modifying the password, the current password must also be
     /// [provided].
     ///
-    /// [provided]: #method.password
+    /// [provided]: Self::password
     pub fn new_password(&mut self, new_password: &str) -> &mut Self {
         self.0.insert("new_password", Value::String(new_password.to_string()));
         self
@@ -83,8 +83,8 @@ impl EditProfile {
     /// Used for providing the current password as verification when
     /// [modifying the password] or [modifying the associated email address].
     ///
-    /// [modifying the password]: #method.new_password
-    /// [modifying the associated email address]: #method.email
+    /// [modifying the password]: Self::new_password
+    /// [modifying the associated email address]: Self::email
     pub fn password(&mut self, password: &str) -> &mut Self {
         self.0.insert("password", Value::String(password.to_string()));
         self

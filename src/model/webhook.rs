@@ -37,8 +37,6 @@ pub struct Webhook {
     /// The default avatar.
     ///
     /// This can be modified via [`ExecuteWebhook::avatar_url`].
-    ///
-    /// [`ExecuteWebhook::avatar_url`]: ../../builder/struct.ExecuteWebhook.html#method.avatar_url
     pub avatar: Option<String>,
     /// The Id of the channel that owns the webhook.
     pub channel_id: ChannelId,
@@ -47,8 +45,6 @@ pub struct Webhook {
     /// The default name of the webhook.
     ///
     /// This can be modified via [`ExecuteWebhook::username`].
-    ///
-    /// [`ExecuteWebhook::username`]: ../../builder/struct.ExecuteWebhook.html#method.username
     pub name: Option<String>,
     /// The webhook's secure token.
     pub token: String,
@@ -77,8 +73,6 @@ impl Webhook {
     ///
     /// As this calls the [`Http::delete_webhook_with_token`] function,
     /// authentication is not required.
-    ///
-    /// [`Http::delete_webhook_with_token`]: ../../http/client/struct.Http.html#method.delete_webhook_with_token
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_webhook_with_token(self.id.0, &self.token).await
@@ -133,9 +127,6 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Http::edit_webhook`]: ../../http/client/struct.Http.html#method.edit_webhook
-    /// [`Http::edit_webhook_with_token`]: ../../http/client/struct.Http.html#method.edit_webhook_with_token
     pub async fn edit(&mut self, http: impl AsRef<Http>, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
@@ -249,8 +240,6 @@ impl Webhook {
     ///
     /// As this calls the [`Http::get_webhook_with_token`] function,
     /// authentication is not required.
-    ///
-    /// [`Http::get_webhook_with_token`]: ../../http/client/struct.Http.html#method.get_webhook_with_token
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         match http.as_ref().get_webhook_with_token(self.id.0, &self.token).await {
             Ok(replacement) => {
@@ -278,8 +267,7 @@ impl WebhookId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [`Webhook`]: struct.Webhook.html
-    /// [Manage Webhooks]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
     #[inline]
     pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
         http.as_ref().get_webhook(self.0).await

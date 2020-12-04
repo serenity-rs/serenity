@@ -173,8 +173,6 @@ pub struct MessageCollectorBuilder<'a> {
 
 impl<'a> MessageCollectorBuilder<'a> {
     /// A future that builds a [`MessageCollector`] based on the settings.
-    ///
-    /// [`MessageCollector`]: ../struct.MessageCollector.html
     pub fn new(shard_messenger: impl AsRef<ShardMessenger>) -> Self {
         Self {
             filter: Some(FilterOptions::default()),

@@ -38,7 +38,7 @@ pub struct Member {
     ///
     /// Can't be longer than 32 characters.
     pub nick: Option<String>,
-    /// Vector of Ids of [`Role`](struct.Role.html)s given to the member.
+    /// Vector of Ids of [`Role`]s given to the member.
     pub roles: Vec<RoleId>,
     /// Attached User struct.
     pub user: User,
@@ -51,8 +51,7 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn add_role(&mut self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
         self._add_role(&http, role_id.into()).await
@@ -78,8 +77,7 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.extend_from_slice(role_ids);
 
@@ -107,8 +105,7 @@ impl Member {
     /// Returns a [`ModelError::GuildNotFound`] if the guild could not be
     /// found.
     ///
-    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
-    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn ban(&self, http: impl AsRef<Http>, dmd: u8) -> Result<()> {
         self.ban_with_reason(&http, dmd, "").await
@@ -116,7 +113,7 @@ impl Member {
 
     /// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.
     ///
-    /// [`ban`]: #method.ban
+    /// [`ban`]: Self::ban
     #[inline]
     pub async fn ban_with_reason(&self, http: impl AsRef<Http>, dmd: u8, reason: impl AsRef<str>) -> Result<()> {
         self.guild_id.ban_with_reason(http, self.user.id, dmd, reason).await
@@ -184,8 +181,7 @@ impl Member {
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
     ///
-    /// [`Guild::edit_member`]: struct.Guild.html#method.edit_member
-    /// [`EditMember`]: ../../builder/struct.EditMember.html
+    /// [`EditMember`]: crate::builder::EditMember
     pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
     where F: FnOnce(&mut EditMember) -> &mut EditMember
     {
@@ -263,9 +259,7 @@ impl Member {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform the kick.
     ///
-    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS
+    /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
         self.kick_with_reason(cache_http, "").await
@@ -296,7 +290,7 @@ impl Member {
     ///
     /// Same as [`kick`]
     ///
-    /// [`kick`]: #method.kick
+    /// [`kick`]: Self::kick
     pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -320,7 +314,7 @@ impl Member {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn move_to_voice_channel(
         &self,
         http: impl AsRef<Http>,
@@ -333,7 +327,7 @@ impl Member {
     ///
     /// Requires the [Move Members] permission.
     ///
-    /// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS
+    /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<()> {
         self.guild_id.disconnect_member(http, self.user.id).await
     }
@@ -356,9 +350,6 @@ impl Member {
     ///
     /// And/or returns [`ModelError::ItemMissing`] if the "default channel" of the guild is not
     /// found.
-    ///
-    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
-    /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
     #[cfg(feature = "cache")]
     pub async fn permissions(&self, cache_http: impl CacheHttp + AsRef<Cache>) -> Result<Permissions> {
         let guild = match cache_http.as_ref().guild(self.guild_id).await {
@@ -374,8 +365,7 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_role(&mut self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
         let role_id = role_id.into();
 
@@ -397,8 +387,7 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
         self.roles.retain(|r| !role_ids.contains(r));
 
@@ -442,9 +431,7 @@ impl Member {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform bans.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`User`]: ../user/struct.User.html
-    /// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id.0, self.user.id.0).await
@@ -485,9 +472,6 @@ impl Display for Member {
 /// A partial amount of data for a member.
 ///
 /// This is used in [`Message`]s from [`Guild`]s.
-///
-/// [`Guild`]: struct.Guild.html
-/// [`Message`]: ../channel/struct.Message.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct PartialMember {

@@ -55,8 +55,6 @@ pub struct Message {
     /// The user that sent the message.
     pub author: User,
     /// The Id of the [`Channel`] that the message was sent to.
-    ///
-    /// [`Channel`]: enum.Channel.html
     pub channel_id: ChannelId,
     /// The content of the message.
     pub content: String,
@@ -66,8 +64,6 @@ pub struct Message {
     pub embeds: Vec<Embed>,
     /// The Id of the [`Guild`] that the message was sent in. This value will
     /// only be present if this message was received over the gateway.
-    ///
-    /// [`Guild`]: ../guild/struct.Guild.html
     pub guild_id: Option<GuildId>,
     /// Indicator of the type of message this is, i.e. whether it is a regular
     /// message or a system message.
@@ -79,8 +75,6 @@ pub struct Message {
     /// Indicator of whether the message mentions everyone.
     pub mention_everyone: bool,
     /// Array of [`Role`]s' Ids mentioned in the message.
-    ///
-    /// [`Role`]: ../guild/struct.Role.html
     pub mention_roles: Vec<RoleId>,
     /// Channels specifically mentioned in this message.
     #[serde(default = "Vec::new")]
@@ -145,9 +139,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -175,9 +167,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reactions(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -203,9 +193,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`Reaction`]: struct.Reaction.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_reaction_emoji(
         &self,
         cache_http: impl CacheHttp,
@@ -257,10 +245,8 @@ impl Message {
     /// is over [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
-    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
+    /// [`EditMessage`]: crate::builder::EditMessage
+    /// [`the limit`]: crate::builder::EditMessage::content
     #[cfg(feature = "utils")]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
     where F: FnOnce(&mut EditMessage) -> &mut EditMessage
@@ -371,10 +357,7 @@ impl Message {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [`Message`]: struct.Message.html
-    /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn reaction_users(
         &self,
@@ -393,7 +376,7 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     ///
-    /// [`guild_id`]: #structfield.guild_id
+    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
        cache.as_ref().guild(self.guild_id?).await
@@ -407,7 +390,7 @@ impl Message {
     ///
     /// Requires the `cache` feature be enabled.
     ///
-    /// [`guild_id`]: #method.guild_id
+    /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild_field<Ret, Fun>(&self, cache: impl AsRef<Cache>, field_accessor: Fun) -> Option<Ret>
     where Ret: Clone, Fun: FnOnce(&Guild) -> Ret
@@ -434,8 +417,7 @@ impl Message {
     ///
     /// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.
     ///
-    /// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing
-    /// [`guild_id`]: #structfield.guild_id
+    /// [`guild_id`]: Self::guild_id
     pub async fn member(&self, cache_http: impl CacheHttp) -> Result<Member> {
         let guild_id = match self.guild_id {
             Some(guild_id) => guild_id,
@@ -482,8 +464,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES.html
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn pin(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -511,11 +492,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have the
     /// required [permissions].
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [Add Reactions]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
-    /// [permissions]: ../permissions/index.html
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
+    /// [permissions]: super::permissions
     #[inline]
     pub async fn react(&self, cache_http: impl CacheHttp, reaction_type: impl Into<ReactionType>) -> Result<Reaction> {
         self._react(cache_http, &reaction_type.into()).await
@@ -570,9 +548,7 @@ impl Message {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
     pub async fn reply(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
         self._reply(cache_http, content, Some(false)).await
@@ -594,9 +570,7 @@ impl Message {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
     pub async fn reply_ping(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
         self._reply(cache_http, content, Some(true)).await
@@ -621,9 +595,7 @@ impl Message {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
     pub async fn reply_mention(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
         self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
@@ -666,9 +638,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[cfg(feature = "utils")]
     pub async fn suppress_embeds(&mut self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
@@ -695,8 +665,6 @@ impl Message {
     }
 
     /// Checks whether the message mentions passed [`UserId`].
-    ///
-    /// [`UserId`]: ../id/struct.UserId.html
     #[inline]
     pub fn mentions_user_id(&self, id: impl Into<UserId>) -> bool {
         let id = id.into();
@@ -704,8 +672,6 @@ impl Message {
     }
 
     /// Checks whether the message mentions passed [`User`].
-    ///
-    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub fn mentions_user(&self, user: &User) -> bool {
         self.mentions_user_id(user.id)
@@ -734,8 +700,7 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
-    /// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn unpin(&self, cache_http: impl CacheHttp) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -869,8 +834,8 @@ impl<'a> From<&'a Message> for MessageId {
 /// Multiple of the same [reaction type] are sent into one `MessageReaction`,
 /// with an associated [`count`].
 ///
-/// [`count`]: #structfield.count
-/// [reaction type]: enum.ReactionType.html
+/// [`count`]: Self::count
+/// [reaction type]: ReactionType
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct MessageReaction {

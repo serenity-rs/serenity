@@ -14,15 +14,13 @@ use std::fmt;
 pub struct ApplicationInfo {
     /// The bot user associated with the application. See [`BotApplication`] for
     /// more information.
-    ///
-    /// [`BotApplication`]: struct.BotApplication.html
     pub bot: Option<BotApplication>,
     /// Indicator of whether the bot is public.
     ///
     /// If a bot is public, anyone may invite it to their [`Guild`]. While a bot
     /// is private, only the owner may add it to a guild.
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Guild`]: super::guild::Guild
     #[serde(default = "default_true")]
     pub bot_public: bool,
     /// Indicator of whether the bot requires an OAuth2 code grant.
