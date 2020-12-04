@@ -1615,6 +1615,15 @@
 <span id="1612">1612</span>
 <span id="1613">1613</span>
 <span id="1614">1614</span>
+<span id="1615">1615</span>
+<span id="1616">1616</span>
+<span id="1617">1617</span>
+<span id="1618">1618</span>
+<span id="1619">1619</span>
+<span id="1620">1620</span>
+<span id="1621">1621</span>
+<span id="1622">1622</span>
+<span id="1623">1623</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -3071,11 +3080,20 @@
         <span class="string">&quot;**{}**: {}&quot;</span>,
         <span class="ident">help_options</span>.<span class="ident">grouped_label</span>, <span class="ident">command</span>.<span class="ident">group_name</span>
     );
+
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(
         <span class="ident">result</span>,
         <span class="string">&quot;**{}**: {}&quot;</span>,
         <span class="ident">help_options</span>.<span class="ident">available_text</span>, <span class="ident">command</span>.<span class="ident">availability</span>
     );
+
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">command</span>.<span class="ident">sub_commands</span>.<span class="ident">is_empty</span>() {
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(
+            <span class="ident">result</span>,
+            <span class="string">&quot;**{}**: {}&quot;</span>,
+            <span class="ident">help_options</span>.<span class="ident">sub_commands_label</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;`{}`&quot;</span>, <span class="ident">command</span>.<span class="ident">sub_commands</span>.<span class="ident">join</span>(<span class="string">&quot;`, `&quot;</span>))
+        );
+     }
 
     <span class="ident">result</span>
 }
