@@ -225,6 +225,7 @@ pub struct GroupOptions {
     pub checks: &'static [&'static Check],
     pub default_command: Option<&'static Command>,
     pub description: Option<&'static str>,
+    pub summary: Option<&'static str>,
     pub commands: &'static [&'static Command],
     pub sub_groups: &'static [&'static CommandGroup],
 }

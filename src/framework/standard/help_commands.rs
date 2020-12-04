@@ -113,6 +113,7 @@ pub struct GroupCommandsPair {
     pub name: &'static str,
     pub prefixes: Vec<&'static str>,
     pub command_names: Vec<String>,
+    pub summary: Option<&'static str>,
     pub sub_groups: Vec<GroupCommandsPair>,
 }
 
@@ -831,6 +832,7 @@ async fn create_single_group(
     ).await;
 
     group_with_cmds.name = group.name;
+    group_with_cmds.summary = group.options.summary;
 
     group_with_cmds
 }
@@ -1022,6 +1024,13 @@ fn flatten_group_to_string(
         );
     }
 
+    let mut summary_or_prefixes = false;
+
+    if let Some(group_summary) = group.summary {
+        let _ = writeln!(group_text, "{}*{}*", &repeated_indent_str, group_summary);
+        summary_or_prefixes = true;
+    }
+
     if !group.prefixes.is_empty() {
         let _ = writeln!(group_text,
             "{}{}: `{}`",
@@ -1029,7 +1038,12 @@ fn flatten_group_to_string(
             help_options.group_prefix,
             group.prefixes.join("`, `"),
         );
+        summary_or_prefixes = true;
     };
+
+    if summary_or_prefixes {
+        let _ = write!(group_text, "\n");
+    }
 
     let mut joined_commands = group
         .command_names

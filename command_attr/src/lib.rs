@@ -581,9 +581,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`   | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
 /// | `#[help_available]` </br> `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
 /// | `#[checks(identifiers)]`                             | Preconditions that must met before the command's execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |
-/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discord.com/developers/docs/topics/permissions).     |
+/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discord.com/developers/docs/topics/permissions).        |
 /// | `#[default_command(cmd)]`                            | A command to execute if none of the group's prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |
 /// | `#[description(desc)]` </br> `#[description = desc]` | The group's description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |
+/// | `#[summary(desc)]` </br> `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
 ///
 /// Similarly to [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the name of the struct to differentiate
@@ -627,6 +628,17 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                     options.description = AsOption(Some(arg));
                 }
             }
+            "summary" => {
+                let arg: String = propagate_err!(attributes::parse(values));
+
+                if let Some(desc) = &mut options.summary.0 {
+                    use std::fmt::Write;
+
+                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
+                } else {
+                    options.summary = AsOption(Some(arg));
+                }
+            }
             _ => match_options!(name, values, options, span => [
                 prefixes;
                 only_in;
@@ -654,6 +666,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         checks,
         default_command,
         description,
+        summary,
         commands,
         sub_groups,
     } = options;
@@ -696,6 +709,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
             checks: #checks,
             default_command: #default_command,
             description: #description,
+            summary: #summary,
             commands: &[#(&#commands),*],
             sub_groups: &[#(&#sub_groups),*],
         };
