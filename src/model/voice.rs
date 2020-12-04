@@ -21,11 +21,7 @@ pub struct VoiceRegion {
     /// A recognizable name of the location of the voice region.
     pub name: String,
     /// Whether the voice region is optimal for use by the current user.
-    pub optional: bool,
-    /// an example hostname.
-    pub sample_hostname: String,
-    /// An example port.
-    pub sample_port: u64,
+    pub optimal: bool,
     /// Indicator of whether the voice region is only for VIP guilds.
     pub vip: bool,
     #[serde(skip)]
