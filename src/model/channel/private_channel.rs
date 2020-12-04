@@ -21,6 +21,7 @@ use std::sync::Arc;
 
 /// A Direct Message text channel with another user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct PrivateChannel {
     /// The unique Id of the private channel.
     ///
@@ -44,8 +45,6 @@ pub struct PrivateChannel {
             serialize_with = "serialize_single_recipient",
             rename = "recipients")]
     pub recipient: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

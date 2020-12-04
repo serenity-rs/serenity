@@ -23,6 +23,7 @@ use crate::http::CacheHttp;
 /// or via an integration. Emojis created using the API only work within the
 /// guild it was created in.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Emoji {
     /// Whether the emoji is animated.
     #[serde(default)]
@@ -44,8 +45,6 @@ pub struct Emoji {
     ///
     /// [`Role`]: struct.Role.html
     pub roles: Vec<RoleId>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

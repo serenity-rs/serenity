@@ -45,6 +45,7 @@ use crate::client::bridge::gateway::ShardMessenger;
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Message {
     /// The unique Id of the message. Can be used to calculate the creation date
     /// of the message.
@@ -113,8 +114,6 @@ pub struct Message {
     pub flags: Option<MessageFlags>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -550,7 +549,6 @@ impl Message {
             message_id: self.id,
             user_id,
             guild_id: self.guild_id,
-            _nonexhaustive: (),
         })
     }
 
@@ -874,6 +872,7 @@ impl<'a> From<&'a Message> for MessageId {
 /// [`count`]: #structfield.count
 /// [reaction type]: enum.ReactionType.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageReaction {
     /// The amount of the type of reaction that have been sent for the
     /// associated message.
@@ -883,8 +882,6 @@ pub struct MessageReaction {
     /// The type of reaction.
     #[serde(rename = "emoji")]
     pub reaction_type: ReactionType,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Differentiates between regular and different types of system messages.
@@ -993,6 +990,7 @@ impl MessageActivityKind {
 
 /// Rich Presence application information.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageApplication {
     /// ID of the application.
     pub id: u64,
@@ -1004,24 +1002,22 @@ pub struct MessageApplication {
     pub icon: Option<String>,
     /// Name of the application.
     pub name: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Rich Presence activity information.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageActivity {
     /// Kind of message activity.
     #[serde(rename = "type")]
     pub kind: MessageActivityKind,
     /// `party_id` from a Rich Presence event.
     pub party_id: Option<String>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Reference data sent with crossposted messages.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageReference {
     /// ID of the originating message.
     pub message_id: Option<MessageId>,
@@ -1029,8 +1025,6 @@ pub struct MessageReference {
     pub channel_id: ChannelId,
     /// ID of the originating message's guild.
     pub guild_id: Option<GuildId>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 impl From<&Message> for MessageReference {
@@ -1039,7 +1033,6 @@ impl From<&Message> for MessageReference {
             message_id: Some(m.id),
             channel_id: m.channel_id,
             guild_id: m.guild_id,
-            _nonexhaustive: ()
         }
     }
 }
@@ -1050,7 +1043,6 @@ impl From<(ChannelId, MessageId)> for MessageReference {
             message_id: Some(pair.1),
             channel_id: pair.0,
             guild_id: None,
-            _nonexhaustive: ()
         }
     }
 }

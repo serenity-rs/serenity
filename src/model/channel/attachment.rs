@@ -9,6 +9,7 @@ use crate::internal::prelude::*;
 ///
 /// [`Embed`]: struct.Embed.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: AttachmentId,
@@ -25,8 +26,6 @@ pub struct Attachment {
     pub url: String,
     /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u64>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

@@ -11,6 +11,7 @@ use std::fmt;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct VoiceRegion {
     /// Whether it is a custom voice region, which is used for events.
     pub custom: bool,
@@ -28,12 +29,11 @@ pub struct VoiceRegion {
     pub sample_port: u64,
     /// Indicator of whether the voice region is only for VIP guilds.
     pub vip: bool,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// A user's state within a voice channel.
 #[derive(Clone, Serialize)]
+#[non_exhaustive]
 pub struct VoiceState {
     pub channel_id: Option<ChannelId>,
     pub deaf: bool,
@@ -48,8 +48,6 @@ pub struct VoiceState {
     pub suppress: bool,
     pub token: Option<String>,
     pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 
@@ -95,6 +93,7 @@ impl<'de> Deserialize<'de> for VoiceState {
         }
 
         #[derive(Deserialize)]
+        #[non_exhaustive]
         struct PartialMember {
             deaf: bool,
             joined_at: Option<DateTime<Utc>>,
@@ -102,8 +101,6 @@ impl<'de> Deserialize<'de> for VoiceState {
             nick: Option<String>,
             roles: Vec<RoleId>,
             user: User,
-            #[serde(skip)]
-            _nonexhaustive: (),
         }
 
         struct VoiceStateVisitor;
@@ -174,7 +171,6 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     nick: partial_member.nick,
                                     roles: partial_member.roles,
                                     user: partial_member.user,
-                                    _nonexhaustive: ()
                                 });
                             }
                         }
@@ -262,7 +258,6 @@ impl<'de> Deserialize<'de> for VoiceState {
                     suppress,
                     token,
                     user_id,
-                    _nonexhaustive: ()
                 })
             }
         }

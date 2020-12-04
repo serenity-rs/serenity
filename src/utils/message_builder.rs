@@ -1327,7 +1327,6 @@ mod test {
                 managed: false,
                 require_colons: true,
                 roles: vec![],
-                _nonexhaustive: (),
             })
             .build();
         let content_mentions = MessageBuilder::new()

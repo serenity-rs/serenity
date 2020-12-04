@@ -31,6 +31,7 @@ use crate::http::{Http, CacheHttp};
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
@@ -40,8 +41,6 @@ pub struct CurrentUser {
     pub mfa_enabled: bool,
     #[serde(rename = "username")] pub name: String,
     pub verified: Option<bool>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -379,6 +378,7 @@ impl Default for OnlineStatus {
 
 /// Information about a user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// creation date.
@@ -398,8 +398,6 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 impl Default for User {
@@ -416,7 +414,6 @@ impl Default for User {
             bot: true,
             discriminator: 1432,
             name: "test".to_string(),
-            _nonexhaustive: (),
         }
     }
 }
@@ -833,7 +830,6 @@ impl From<CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name,
-            _nonexhaustive: (),
         }
     }
 }
@@ -846,7 +842,6 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
-            _nonexhaustive: (),
         }
     }
 }

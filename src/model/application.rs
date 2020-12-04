@@ -10,6 +10,7 @@ use std::fmt;
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
 #[derive(Clone, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ApplicationInfo {
     /// The bot user associated with the application. See [`BotApplication`] for
     /// more information.
@@ -49,8 +50,6 @@ pub struct ApplicationInfo {
     ///
     /// This is not equivalent to the application's bot user's token.
     pub secret: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 impl fmt::Debug for ApplicationInfo {
@@ -73,6 +72,7 @@ impl fmt::Debug for ApplicationInfo {
 
 /// Information about an application with an application's bot user.
 #[derive(Clone, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct BotApplication {
     /// The unique Id of the bot user.
     pub id: UserId,
@@ -95,8 +95,6 @@ pub struct BotApplication {
     /// **Note**: Keep this information private, as untrusted sources can use it
     /// to perform any action with a bot user.
     pub token: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 
@@ -114,6 +112,7 @@ impl fmt::Debug for BotApplication {
 
 /// Information about the current application and its owner.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CurrentApplicationInfo {
     pub description: String,
     pub icon: Option<String>,
@@ -124,8 +123,6 @@ pub struct CurrentApplicationInfo {
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
     pub team: Option<Team>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Information about the Team group of the application.

@@ -28,6 +28,7 @@ use crate::http::Http;
 /// channels. They do not necessarily require a bot user or authentication to
 /// use.
 #[derive(Clone, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Webhook {
     /// The unique Id.
     ///
@@ -55,8 +56,6 @@ pub struct Webhook {
     ///
     /// **Note**: This is not received when getting a webhook by its token.
     pub user: Option<User>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 impl fmt::Debug for Webhook {
