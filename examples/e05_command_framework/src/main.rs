@@ -66,6 +66,8 @@ struct General;
 // Set a description to appear if a user wants to display a single group
 // e.g. via help using the group-name or one of its prefixes.
 #[description = "A group with commands providing an emoji as response."]
+// Summary only appears when listing multiple groups.
+#[summary = "Do emoji fun!"]
 // Sets a command that will be executed if only a group-prefix was passed.
 #[default_command(bird)]
 #[commands(cat, dog)]
@@ -83,6 +85,8 @@ struct Math;
 #[owners_only]
 // Limit all commands to be guild-restricted.
 #[only_in(guilds)]
+// Summary only appears when listing multiple groups.
+#[summary = "Commands for server owners"]
 #[commands(slow_mode)]
 struct Owner;
 
@@ -93,7 +97,7 @@ struct Owner;
 // This replaces the information that a user can pass
 // a command-name as argument to gain specific information about it.
 #[individual_command_tip =
-"Hello! こんにちは！Hola! Bonjour! 您好!\n\
+"Hello! こんにちは！Hola! Bonjour! 您好! 안녕하세요~\n\n\
 If you want more information about a specific command, just pass the command as argument."]
 // Some arguments require a `{}` in order to replace it with contextual information.
 // In this case our `{}` refers to a command's name.

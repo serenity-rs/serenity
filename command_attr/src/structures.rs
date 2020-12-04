@@ -635,6 +635,7 @@ pub struct GroupOptions {
     pub checks: Checks,
     pub default_command: AsOption<Ident>,
     pub description: AsOption<String>,
+    pub summary: AsOption<String>,
     pub commands: Vec<Ident>,
     pub sub_groups: Vec<Ident>,
 }
