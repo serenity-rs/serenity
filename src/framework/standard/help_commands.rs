@@ -1039,7 +1039,7 @@ fn flatten_group_to_string(
     };
 
     if summary_or_prefixes {
-        let _ = write!(group_text, "\n");
+        let _ = writeln!(group_text,);
     }
 
     let mut joined_commands = group
