@@ -57,6 +57,7 @@ the invocation would be <code>!foo bar</code>.</p>
 <tr><td><code>#[required_permissions(perms)]</code></td><td>Set of permissions the user must possess.</td><td><code>perms</code> is a comma separated list of permission names.</br> These can be found at <a href="https://discord.com/developers/docs/topics/permissions">Discord's official documentation</a>.</td></tr>
 <tr><td><code>#[default_command(cmd)]</code></td><td>A command to execute if none of the group's prefixes are given.</td><td><code>cmd</code> is an identifier referencing a function marked by the <code>#[command]</code> macro</td></tr>
 <tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The group's description or summary.</td><td><code>desc</code> is a string describing the group.</td></tr>
+<tr><td><code>#[summary(desc)]</code> </br> <code>#[summary = desc]</code></td><td>A summary group description displayed when shown multiple groups.</td><td><code>desc</code> is a string summaryly describing the group.</td></tr>
 </tbody></table>
 <p>Similarly to <a href="#fn.command.html"><code>command</code></a>, this macro generates static instances of the group
 and its options. The identifiers of these instances are based off the name of the struct to differentiate

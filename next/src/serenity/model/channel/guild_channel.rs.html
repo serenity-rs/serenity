@@ -968,7 +968,6 @@
 <span id="965">965</span>
 <span id="966">966</span>
 <span id="967">967</span>
-<span id="968">968</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -1022,6 +1021,7 @@
 <span class="doccomment">/// News channels are a subset of text channels and lack slow mode hence</span>
 <span class="doccomment">/// `slow_mode_rate` will be `None`.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildChannel</span> {
     <span class="doccomment">/// The unique Id of the channel.</span>
     <span class="doccomment">///</span>
@@ -1086,8 +1086,6 @@
     <span class="doccomment">/// channels.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;rate_limit_per_user&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">slow_mode_rate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>

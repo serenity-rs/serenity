@@ -170,9 +170,6 @@
 <span id="167">167</span>
 <span id="168">168</span>
 <span id="169">169</span>
-<span id="170">170</span>
-<span id="171">171</span>
-<span id="172">172</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models about OAuth2 applications.</span>
 
@@ -186,6 +183,7 @@
 <span class="doccomment">/// Information about a user&#39;s application. An application does not necessarily</span>
 <span class="doccomment">/// have an associated bot user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationInfo</span> {
     <span class="doccomment">/// The bot user associated with the application. See [`BotApplication`] for</span>
     <span class="doccomment">/// more information.</span>
@@ -225,8 +223,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is not equivalent to the application&#39;s bot user&#39;s token.</span>
     <span class="kw">pub</span> <span class="ident">secret</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">ApplicationInfo</span> {
@@ -249,6 +245,7 @@
 
 <span class="doccomment">/// Information about an application with an application&#39;s bot user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BotApplication</span> {
     <span class="doccomment">/// The unique Id of the bot user.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
@@ -271,8 +268,6 @@
     <span class="doccomment">/// **Note**: Keep this information private, as untrusted sources can use it</span>
     <span class="doccomment">/// to perform any action with a bot user.</span>
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 
@@ -290,6 +285,7 @@
 
 <span class="doccomment">/// Information about the current application and its owner.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CurrentApplicationInfo</span> {
     <span class="kw">pub</span> <span class="ident">description</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -300,8 +296,6 @@
     <span class="kw">pub</span> <span class="ident">bot_public</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">bot_require_code_grant</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">team</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Information about the Team group of the application.</span>

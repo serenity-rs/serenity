@@ -2389,11 +2389,6 @@
 <span id="2386">2386</span>
 <span id="2387">2387</span>
 <span id="2388">2388</span>
-<span id="2389">2389</span>
-<span id="2390">2390</span>
-<span id="2391">2391</span>
-<span id="2392">2392</span>
-<span id="2393">2393</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -2445,6 +2440,7 @@
 
 <span class="doccomment">/// Information about a Discord guild, such as channels, emojis, etc.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Guild</span> {
     <span class="doccomment">/// Id of a voice channel that&#39;s considered the AFK channel.</span>
     <span class="kw">pub</span> <span class="ident">afk_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
@@ -2567,8 +2563,6 @@
     <span class="doccomment">/// The preferred locale of this guild only set if guild has the &quot;DISCOVERABLE&quot;</span>
     <span class="doccomment">/// feature, defaults to en-US.</span>
     <span class="kw">pub</span> <span class="ident">preferred_locale</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -4343,7 +4337,6 @@
             <span class="ident">banner</span>,
             <span class="ident">vanity_url_code</span>,
             <span class="ident">preferred_locale</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -4688,7 +4681,6 @@
                 <span class="ident">bot</span>: <span class="bool-val">true</span>,
                 <span class="ident">discriminator</span>: <span class="number">1432</span>,
                 <span class="ident">name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">_nonexhaustive</span>: (),
             }
         }
 
@@ -4708,7 +4700,6 @@
                 <span class="ident">nick</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;aaaa&quot;</span>.<span class="ident">to_string</span>()),
                 <span class="ident">roles</span>: <span class="ident">vec1</span>,
                 <span class="ident">user</span>: <span class="ident">u</span>,
-                <span class="ident">_nonexhaustive</span>: (),
             }
         }
 
@@ -4763,7 +4754,6 @@
                 <span class="ident">banner</span>: <span class="prelude-val">None</span>,
                 <span class="ident">vanity_url_code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;bruhmoment&quot;</span>.<span class="ident">to_string</span>()),
                 <span class="ident">preferred_locale</span>: <span class="string">&quot;en-US&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">_nonexhaustive</span>: (),
             }
         }
 

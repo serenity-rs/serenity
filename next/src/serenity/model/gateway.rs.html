@@ -595,21 +595,6 @@
 <span id="592">592</span>
 <span id="593">593</span>
 <span id="594">594</span>
-<span id="595">595</span>
-<span id="596">596</span>
-<span id="597">597</span>
-<span id="598">598</span>
-<span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -626,6 +611,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This is only applicable to bot users.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">BotGateway</span> {
     <span class="doccomment">/// Information describing how many gateway sessions you can initiate within</span>
     <span class="doccomment">/// a ratelimit period.</span>
@@ -635,12 +621,11 @@
     <span class="kw">pub</span> <span class="ident">shards</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The gateway to connect to.</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Representation of an activity that a [`User`] is performing.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Activity</span> {
     <span class="doccomment">/// The ID of the application for the activity.</span>
     <span class="kw">pub</span> <span class="ident">application_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ApplicationId</span><span class="op">&gt;</span>,
@@ -672,8 +657,6 @@
     <span class="doccomment">/// [`ActivityType::Streaming`]: enum.ActivityType.html#variant.Streaming</span>
     <span class="doccomment">/// [`kind`]: #structfield.kind</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -718,7 +701,6 @@
             <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
             <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 
@@ -765,7 +747,6 @@
             <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
             <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">Some</span>(<span class="ident">url</span>.<span class="ident">to_string</span>()),
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 
@@ -809,7 +790,6 @@
             <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
             <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 
@@ -853,7 +833,6 @@
             <span class="ident">emoji</span>: <span class="prelude-val">None</span>,
             <span class="ident">timestamps</span>: <span class="prelude-val">None</span>,
             <span class="ident">url</span>: <span class="prelude-val">None</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 }
@@ -926,13 +905,13 @@
             <span class="ident">emoji</span>,
             <span class="ident">timestamps</span>,
             <span class="ident">url</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
 
 <span class="doccomment">/// The assets for an activity.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityAssets</span> {
     <span class="doccomment">/// The ID for a large asset of the activity, usually a snowflake.</span>
     <span class="kw">pub</span> <span class="ident">large_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -942,8 +921,6 @@
     <span class="kw">pub</span> <span class="ident">small_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Text displayed when hovering over the small image of the activity.</span>
     <span class="kw">pub</span> <span class="ident">small_text</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="macro">bitflags</span><span class="macro">!</span> {
@@ -967,17 +944,17 @@
 
 <span class="doccomment">/// Information about an activity&#39;s party.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityParty</span> {
     <span class="doccomment">/// The ID of the party.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Used to show the party&#39;s current and maximum size.</span>
     <span class="kw">pub</span> <span class="ident">size</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span>[<span class="ident">u64</span>; <span class="number">2</span>]<span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Secrets for an activity.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivitySecrets</span> {
     <span class="doccomment">/// The secret for joining a party.</span>
     <span class="kw">pub</span> <span class="ident">join</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -986,8 +963,6 @@
     <span class="kw">pub</span> <span class="ident">match_</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The secret for spectating an activity.</span>
     <span class="kw">pub</span> <span class="ident">spectate</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Representation of an emoji used in a custom status</span>
@@ -1051,11 +1026,10 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`BotGateway`]: struct.BotGateway.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gateway</span> {
     <span class="doccomment">/// The gateway to connect to.</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Information detailing the current active status of a [`User`].</span>
@@ -1072,6 +1046,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
     <span class="doccomment">/// [`User`]&#39;s current activities.</span>
     <span class="doccomment">///</span>
@@ -1088,7 +1063,6 @@
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
     <span class="doccomment">/// The associated user instance.</span>
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Presence</span> {
@@ -1146,7 +1120,6 @@
             <span class="ident">status</span>,
             <span class="ident">user</span>,
             <span class="ident">user_id</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -1181,6 +1154,7 @@
 
 <span class="doccomment">/// An initial set of information given after IDENTIFYing to the gateway.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ready</span> {
     <span class="kw">pub</span> <span class="ident">guilds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildStatus</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_presences&quot;</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_presences&quot;</span>)]</span>
@@ -1194,13 +1168,12 @@
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">CurrentUser</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;v&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">version</span>: <span class="ident">u64</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Information describing how many gateway sessions you can initiate within a</span>
 <span class="doccomment">/// ratelimit period.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">SessionStartLimit</span> {
     <span class="doccomment">/// The number of sessions that you can still initiate within the current</span>
     <span class="doccomment">/// ratelimit period.</span>
@@ -1209,16 +1182,13 @@
     <span class="kw">pub</span> <span class="ident">reset_after</span>: <span class="ident">u64</span>,
     <span class="doccomment">/// The total number of session starts within the ratelimit period allowed.</span>
     <span class="kw">pub</span> <span class="ident">total</span>: <span class="ident">u64</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 <span class="doccomment">/// Timestamps of when a user started and/or is ending their activity.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ActivityTimestamps</span> {
     <span class="kw">pub</span> <span class="ident">end</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">start</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "serenity";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

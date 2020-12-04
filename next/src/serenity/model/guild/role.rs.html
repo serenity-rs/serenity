@@ -232,7 +232,6 @@
 <span id="229">229</span>
 <span id="230">230</span>
 <span id="231">231</span>
-<span id="232">232</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
@@ -262,6 +261,7 @@
 <span class="doccomment">/// can have channel-specific permission overrides in addition to guild-level</span>
 <span class="doccomment">/// permissions.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Role</span> {
     <span class="doccomment">/// The Id of the role. Can be used to calculate the role&#39;s creation date.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">RoleId</span>,
@@ -306,8 +306,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The `@everyone` role is usually either `-1` or `0`.</span>
     <span class="kw">pub</span> <span class="ident">position</span>: <span class="ident">i64</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>

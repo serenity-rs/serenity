@@ -131,8 +131,6 @@
 <span id="128">128</span>
 <span id="129">129</span>
 <span id="130">130</span>
-<span id="131">131</span>
-<span id="132">132</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
@@ -147,6 +145,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`GuildChannel`]: struct.GuildChannel.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelCategory</span> {
     <span class="doccomment">/// Id of this category.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ChannelId</span>,
@@ -173,8 +172,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`GuildChannel`]: struct.GuildChannel.html</span>
     <span class="kw">pub</span> <span class="ident">permission_overwrites</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -253,7 +250,6 @@
                 <span class="ident">name</span>,
                 <span class="ident">position</span>,
                 <span class="ident">kind</span>,
-                <span class="ident">_nonexhaustive</span>: (),
             };
         })
     }

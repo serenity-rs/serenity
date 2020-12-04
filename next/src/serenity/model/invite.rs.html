@@ -411,11 +411,6 @@
 <span id="408">408</span>
 <span id="409">409</span>
 <span id="410">410</span>
-<span id="411">411</span>
-<span id="412">412</span>
-<span id="413">413</span>
-<span id="414">414</span>
-<span id="415">415</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models for server and channel invites.</span>
 
@@ -442,6 +437,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Information can not be accessed for guilds the current user is banned from.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Invite</span> {
     <span class="doccomment">/// The approximate number of [`Member`]s in the related [`Guild`].</span>
     <span class="doccomment">///</span>
@@ -478,8 +474,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="kw">pub</span> <span class="ident">inviter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">InviteUser</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -615,13 +609,12 @@
 
 <span class="doccomment">/// A minimal amount of information about the inviter (person who created the invite).</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteUser</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;username&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u16&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="ident">u16</span>,
     <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// InviteUser implements a Deref to UserId so it gains the convenience methods</span>
@@ -637,17 +630,17 @@
 }
 
 <span class="doccomment">/// A minimal amount of information about the channel an invite points to.</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteChannel</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">ChannelType</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// A minimal amount of information about the guild an invite points to.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteGuild</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -655,8 +648,6 @@
     <span class="kw">pub</span> <span class="ident">splash_hash</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">text_channel_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">voice_channel_count</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -712,6 +703,7 @@
 <span class="doccomment">/// [`Invite`]: struct.Invite.html</span>
 <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">RichInvite</span> {
     <span class="doccomment">/// A representation of the minimal amount of information needed about the</span>
     <span class="doccomment">/// channel being invited to.</span>
@@ -745,8 +737,6 @@
     <span class="kw">pub</span> <span class="ident">temporary</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// The amount of times that an invite has been used.</span>
     <span class="kw">pub</span> <span class="ident">uses</span>: <span class="ident">u64</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
