@@ -261,9 +261,6 @@
 <span id="258">258</span>
 <span id="259">259</span>
 <span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">Shard</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -311,17 +308,17 @@
     <span class="doccomment">/// A copy of [`Client::data`] to be given to runners for contextual</span>
     <span class="doccomment">/// dispatching.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::data`]: ../../struct.Client.html#structfield.data</span>
+    <span class="doccomment">/// [`Client::data`]: crate::Client::data</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A reference to an `EventHandler`, such as the one given to the</span>
     <span class="doccomment">/// [`Client`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: ../../struct.Client.html</span>
+    <span class="doccomment">/// [`Client`]: crate::Client</span>
     <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A reference to an `RawEventHandler`, such as the one given to the</span>
     <span class="doccomment">/// [`Client`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: ../../struct.Client.html</span>
+    <span class="doccomment">/// [`Client`]: crate::Client</span>
     <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A copy of the framework</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
@@ -333,7 +330,7 @@
     <span class="doccomment">/// A copy of the sender channel to communicate with the</span>
     <span class="doccomment">/// [`ShardManagerMonitor`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html</span>
+    <span class="doccomment">/// [`ShardManagerMonitor`]: super::ShardManagerMonitor</span>
     <span class="kw">pub</span> <span class="ident">manager_tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">ShardManagerMessage</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The shards that are queued for booting.</span>
     <span class="doccomment">///</span>
@@ -371,10 +368,7 @@
     <span class="doccomment">/// **Note**: This should be run in its own thread due to the blocking</span>
     <span class="doccomment">/// nature of the loop.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardQueuerMessage`]: enum.ShardQueuerMessage.html</span>
-    <span class="doccomment">/// [`ShardQueuerMessage::Shutdown`]: enum.ShardQueuerMessage.html#variant.Shutdown</span>
-    <span class="doccomment">/// [`ShardQueuerMessage::Start`]: enum.ShardQueuerMessage.html#variant.Start</span>
-    <span class="doccomment">/// [`rx`]: #structfield.rx</span>
+    <span class="doccomment">/// [`rx`]: Self::rx</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="comment">// The duration to timeout from reads over the Rx channel. This can be</span>

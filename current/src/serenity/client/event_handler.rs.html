@@ -350,8 +350,6 @@
 <span id="347">347</span>
 <span id="348">348</span>
 <span id="349">349</span>
-<span id="350">350</span>
-<span id="351">351</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
@@ -603,8 +601,6 @@
     <span class="doccomment">/// Provides the old message if available,</span>
     <span class="doccomment">/// the new message as an option in case of cache inconsistencies,</span>
     <span class="doccomment">/// and the raw [`MessageUpdateEvent`] as a fallback.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MessageUpdateEvent`]: ../model/event/struct.MessageUpdateEvent.html</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_old_if_available</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>, <span class="ident">_new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>, <span class="ident">_event</span>: <span class="ident">MessageUpdateEvent</span>) {}
 

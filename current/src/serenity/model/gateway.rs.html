@@ -586,15 +586,6 @@
 <span id="583">583</span>
 <span id="584">584</span>
 <span id="585">585</span>
-<span id="586">586</span>
-<span id="587">587</span>
-<span id="588">588</span>
-<span id="589">589</span>
-<span id="590">590</span>
-<span id="591">591</span>
-<span id="592">592</span>
-<span id="593">593</span>
-<span id="594">594</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models pertaining to the gateway.</span>
 
@@ -654,8 +645,7 @@
     <span class="kw">pub</span> <span class="ident">timestamps</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ActivityTimestamps</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Stream URL if [`kind`] is [`ActivityType::Streaming`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ActivityType::Streaming`]: enum.ActivityType.html#variant.Streaming</span>
-    <span class="doccomment">/// [`kind`]: #structfield.kind</span>
+    <span class="doccomment">/// [`kind`]: Self::kind</span>
     <span class="kw">pub</span> <span class="ident">url</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
 }
 
@@ -1023,8 +1013,6 @@
 <span class="doccomment">/// A representation of the data retrieved from the gateway endpoint.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// For the bot-specific gateway, refer to [`BotGateway`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`BotGateway`]: struct.BotGateway.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Gateway</span> {
@@ -1033,8 +1021,6 @@
 }
 
 <span class="doccomment">/// Information detailing the current active status of a [`User`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientStatus</span> {
     <span class="kw">pub</span> <span class="ident">desktop</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">OnlineStatus</span><span class="op">&gt;</span>,
@@ -1043,14 +1029,10 @@
 }
 
 <span class="doccomment">/// Information detailing the current online status of a [`User`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Presence</span> {
     <span class="doccomment">/// [`User`]&#39;s current activities.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: struct.User.html</span>
     <span class="kw">pub</span> <span class="ident">activities</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The devices a user are currently active on, if available.</span>
     <span class="kw">pub</span> <span class="ident">client_status</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ClientStatus</span><span class="op">&gt;</span>,
@@ -1058,7 +1040,7 @@
     <span class="kw">pub</span> <span class="ident">last_modified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The user&#39;s online status.</span>
     <span class="kw">pub</span> <span class="ident">status</span>: <span class="ident">OnlineStatus</span>,
-    <span class="doccomment">/// The Id of the [`User`](../user/struct.User.html). Can be used to calculate the user&#39;s creation</span>
+    <span class="doccomment">/// The Id of the [`User`]. Can be used to calculate the user&#39;s creation</span>
     <span class="doccomment">/// date.</span>
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
     <span class="doccomment">/// The associated user instance.</span>

@@ -957,20 +957,6 @@
 <span id="954">954</span>
 <span id="955">955</span>
 <span id="956">956</span>
-<span id="957">957</span>
-<span id="958">958</span>
-<span id="959">959</span>
-<span id="960">960</span>
-<span id="961">961</span>
-<span id="962">962</span>
-<span id="963">963</span>
-<span id="964">964</span>
-<span id="965">965</span>
-<span id="966">966</span>
-<span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -1077,7 +1063,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditProfile`]: ../../builder/struct.EditProfile.html</span>
+    <span class="doccomment">/// [`EditProfile`]: crate::builder::EditProfile</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditProfile</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditProfile</span>
     {
@@ -1103,8 +1089,8 @@
     <span class="doccomment">/// This will call [`avatar_url`] first, and if that returns `None`, it</span>
     <span class="doccomment">/// then falls back to [`default_avatar_url`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`avatar_url`]: #method.avatar_url</span>
-    <span class="doccomment">/// [`default_avatar_url`]: #method.default_avatar_url</span>
+    <span class="doccomment">/// [`avatar_url`]: Self::avatar_url</span>
+    <span class="doccomment">/// [`default_avatar_url`]: Self::default_avatar_url</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">face</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span>()
@@ -1219,8 +1205,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// May return [`Error::Format`] while writing url to the buffer.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Format`]: ../../enum.Error.html#variant.Format</span>
-    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest</span>
+    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">invite_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">bits</span> <span class="op">=</span> <span class="ident">permissions</span>.<span class="ident">bits</span>();
         <span class="kw">let</span> <span class="ident">client_id</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_current_application_info</span>().<span class="ident">await</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">id</span>)<span class="question-mark">?</span>;
@@ -1289,7 +1274,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The has of the avatar can be retrieved via calling [`name`] on the enum.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`name`]: #method.name</span>
+<span class="doccomment">/// [`name`]: Self::name</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Hash</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DefaultAvatar</span> {
@@ -1322,8 +1307,8 @@
 <span class="doccomment">/// - [`DoNotDisturb`];</span>
 <span class="doccomment">/// - [`Invisible`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`DoNotDisturb`]: #variant.DoNotDisturb</span>
-<span class="doccomment">/// [`Invisible`]: #variant.Invisible</span>
+<span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
+<span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">OnlineStatus</span> {
@@ -1365,7 +1350,7 @@
     <span class="doccomment">/// The account&#39;s discriminator to differentiate the user from others with</span>
     <span class="doccomment">/// the same [`name`]. The name+discriminator pair is always unique.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`name`]: #structfield.name</span>
+    <span class="doccomment">/// [`name`]: Self::name</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_u16&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">discriminator</span>: <span class="ident">u16</span>,
     <span class="doccomment">/// The account&#39;s username. Changing username will trigger a discriminator</span>
@@ -1421,7 +1406,7 @@
     <span class="doccomment">/// Creates a direct message channel between the [current user] and the</span>
     <span class="doccomment">/// user. This can also retrieve the channel if one already exists.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [current user]: struct.CurrentUser.html</span>
+    <span class="doccomment">/// [current user]: CurrentUser</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_dm_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">bot</span> {
@@ -1507,10 +1492,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a [`ModelError::MessagingBot`] if the user being direct messaged</span>
     <span class="doccomment">/// is a bot user.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot</span>
-    <span class="doccomment">/// [`PrivateChannel`]: struct.PrivateChannel.html</span>
-    <span class="doccomment">/// [`User::dm`]: struct.User.html#method.dm</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">direct_message</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="kw">for</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">create_dm_channel</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>)
@@ -1536,8 +1517,7 @@
     <span class="doccomment">/// Returns a [`ModelError::MessagingBot`] if the user being direct messaged</span>
     <span class="doccomment">/// is a bot user.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot</span>
-    <span class="doccomment">/// [direct_message]: #method.direct_message</span>
+    <span class="doccomment">/// [direct_message]: Self::direct_message</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dm</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="kw">for</span> <span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateMessage</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -1550,8 +1530,8 @@
     <span class="doccomment">/// This will call [`avatar_url`] first, and if that returns `None`, it</span>
     <span class="doccomment">/// then falls back to [`default_avatar_url`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`avatar_url`]: #method.avatar_url</span>
-    <span class="doccomment">/// [`default_avatar_url`]: #method.default_avatar_url</span>
+    <span class="doccomment">/// [`avatar_url`]: Self::avatar_url</span>
+    <span class="doccomment">/// [`default_avatar_url`]: Self::default_avatar_url</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">face</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="self">self</span>.<span class="ident">avatar_url</span>()
             .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="self">self</span>.<span class="ident">default_avatar_url</span>())
@@ -1573,11 +1553,7 @@
     <span class="doccomment">/// let _ = message.author.has_role(guild_id, role_id);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`GuildId`]: ../id/struct.GuildId.html</span>
-    <span class="doccomment">/// [`PartialGuild`]: ../guild/struct.PartialGuild.html</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
-    <span class="doccomment">/// [`Cache`]: ../../cache/struct.Cache.html</span>
+    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">has_role</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1745,7 +1721,7 @@
     <span class="doccomment">/// Creates a direct message channel between the [current user] and the</span>
     <span class="doccomment">/// user. This can also retrieve the channel if one already exists.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [current user]: ../user/struct.CurrentUser.html</span>
+    <span class="doccomment">/// [current user]: CurrentUser</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_dm_channel</span>(<span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1766,8 +1742,6 @@
     }
 
     <span class="doccomment">/// Attempts to find a [`User`] by its Id in the cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">to_user_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
@@ -1779,8 +1753,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: If the cache is not enabled,</span>
     <span class="doccomment">/// REST API will be used only.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">to_user</span>(<span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>

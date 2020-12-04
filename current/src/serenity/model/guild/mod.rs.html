@@ -2305,90 +2305,6 @@
 <span id="2302">2302</span>
 <span id="2303">2303</span>
 <span id="2304">2304</span>
-<span id="2305">2305</span>
-<span id="2306">2306</span>
-<span id="2307">2307</span>
-<span id="2308">2308</span>
-<span id="2309">2309</span>
-<span id="2310">2310</span>
-<span id="2311">2311</span>
-<span id="2312">2312</span>
-<span id="2313">2313</span>
-<span id="2314">2314</span>
-<span id="2315">2315</span>
-<span id="2316">2316</span>
-<span id="2317">2317</span>
-<span id="2318">2318</span>
-<span id="2319">2319</span>
-<span id="2320">2320</span>
-<span id="2321">2321</span>
-<span id="2322">2322</span>
-<span id="2323">2323</span>
-<span id="2324">2324</span>
-<span id="2325">2325</span>
-<span id="2326">2326</span>
-<span id="2327">2327</span>
-<span id="2328">2328</span>
-<span id="2329">2329</span>
-<span id="2330">2330</span>
-<span id="2331">2331</span>
-<span id="2332">2332</span>
-<span id="2333">2333</span>
-<span id="2334">2334</span>
-<span id="2335">2335</span>
-<span id="2336">2336</span>
-<span id="2337">2337</span>
-<span id="2338">2338</span>
-<span id="2339">2339</span>
-<span id="2340">2340</span>
-<span id="2341">2341</span>
-<span id="2342">2342</span>
-<span id="2343">2343</span>
-<span id="2344">2344</span>
-<span id="2345">2345</span>
-<span id="2346">2346</span>
-<span id="2347">2347</span>
-<span id="2348">2348</span>
-<span id="2349">2349</span>
-<span id="2350">2350</span>
-<span id="2351">2351</span>
-<span id="2352">2352</span>
-<span id="2353">2353</span>
-<span id="2354">2354</span>
-<span id="2355">2355</span>
-<span id="2356">2356</span>
-<span id="2357">2357</span>
-<span id="2358">2358</span>
-<span id="2359">2359</span>
-<span id="2360">2360</span>
-<span id="2361">2361</span>
-<span id="2362">2362</span>
-<span id="2363">2363</span>
-<span id="2364">2364</span>
-<span id="2365">2365</span>
-<span id="2366">2366</span>
-<span id="2367">2367</span>
-<span id="2368">2368</span>
-<span id="2369">2369</span>
-<span id="2370">2370</span>
-<span id="2371">2371</span>
-<span id="2372">2372</span>
-<span id="2373">2373</span>
-<span id="2374">2374</span>
-<span id="2375">2375</span>
-<span id="2376">2376</span>
-<span id="2377">2377</span>
-<span id="2378">2378</span>
-<span id="2379">2379</span>
-<span id="2380">2380</span>
-<span id="2381">2381</span>
-<span id="2382">2382</span>
-<span id="2383">2383</span>
-<span id="2384">2384</span>
-<span id="2385">2385</span>
-<span id="2386">2386</span>
-<span id="2387">2387</span>
-<span id="2388">2388</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -2508,25 +2424,17 @@
     <span class="doccomment">/// if the [`member_count`] is greater than the `LARGE_THRESHOLD` set by</span>
     <span class="doccomment">/// the library.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ReadyEvent`]: ../event/struct.ReadyEvent.html</span>
-    <span class="doccomment">/// [`member_count`]: #structfield.member_count</span>
+    <span class="doccomment">/// [`member_count`]: Self::member_count</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Member</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of whether the guild requires multi-factor authentication for</span>
     <span class="doccomment">/// [`Role`]s or [`User`]s with moderation permissions.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: struct.Role.html</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="kw">pub</span> <span class="ident">mfa_level</span>: <span class="ident">MfaLevel</span>,
     <span class="doccomment">/// The name of the guild.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// The Id of the [`User`] who owns the guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="kw">pub</span> <span class="ident">owner_id</span>: <span class="ident">UserId</span>,
     <span class="doccomment">/// A mapping of [`User`]s&#39; Ids to their current presences.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Presence</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The region that the voice servers that the guild uses are located in.</span>
@@ -2544,8 +2452,6 @@
     <span class="doccomment">/// Indicator of the current verification level of the guild.</span>
     <span class="kw">pub</span> <span class="ident">verification_level</span>: <span class="ident">VerificationLevel</span>,
     <span class="doccomment">/// A mapping of [`User`]s to their current voice state.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_gen_map&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">voice_states</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">VoiceState</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The server&#39;s description</span>
@@ -2669,11 +2575,7 @@
     <span class="doccomment">/// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of</span>
     <span class="doccomment">/// days&#39; worth of messages to delete is over the maximum.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ban</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">dmd</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_ban_with_reason</span>(<span class="ident">cache_http</span>, <span class="ident">user</span>.<span class="ident">into</span>(), <span class="ident">dmd</span>, <span class="string">&quot;&quot;</span>).<span class="ident">await</span>
@@ -2681,8 +2583,7 @@
 
     <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`ban`]: #method.ban</span>
+    <span class="doccomment">/// [`ban`]: Self::ban</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ban_with_reason</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2719,9 +2620,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Ban`]: struct.Ban.html</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">bans</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ban</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -2738,8 +2637,6 @@
     }
 
     <span class="doccomment">/// Retrieves a list of [`AuditLogs`] for the guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`AuditLogs`]: audit_log/struct.AuditLogs.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">audit_logs</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2753,8 +2650,6 @@
     }
 
     <span class="doccomment">/// Gets all of the guild&#39;s channels over the REST API.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">channels</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>).<span class="ident">await</span>
@@ -2780,10 +2675,8 @@
     <span class="doccomment">/// let _guild = Guild::create_guild(&amp;http, &quot;test&quot;, Region::UsWest, None).await;</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
-    <span class="doccomment">/// [`PartialGuild`]: struct.PartialGuild.html</span>
-    <span class="doccomment">/// [`Shard`]: ../../gateway/struct.Shard.html</span>
-    <span class="doccomment">/// [US West region]: enum.Region.html#variant.UsWest</span>
+    <span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
+    <span class="doccomment">/// [US West region]: Region::UsWest</span>
     <span class="doccomment">/// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">region</span>: <span class="ident">Region</span>, <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
@@ -2816,9 +2709,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: ../channel/enum.Channel.html</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS</span>
+    <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -2850,9 +2741,9 @@
     <span class="doccomment">/// how to read an image from the filesystem and encode it as base64. Most</span>
     <span class="doccomment">/// of the example can be applied similarly for this method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar</span>
-    <span class="doccomment">/// [`utils::read_image`]: ../../utils/fn.read_image.html</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar</span>
+    <span class="doccomment">/// [`utils::read_image`]: crate::utils::read_image</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">image</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_emoji</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">name</span>, <span class="ident">image</span>).<span class="ident">await</span>
@@ -2862,7 +2753,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_integration</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>, <span class="ident">kind</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">create_integration</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">integration_id</span>, <span class="ident">kind</span>).<span class="ident">await</span>
@@ -2887,9 +2778,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`Role`]: struct.Role.html</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_role</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>
     {
@@ -2916,8 +2805,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the `cache` is enabled, then returns a [`ModelError::InvalidUser`]</span>
     <span class="doccomment">/// if the current user is not the guild owner.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -2937,8 +2824,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Emojis] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: struct.Emoji.html</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">delete_emoji</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">emoji_id</span>).<span class="ident">await</span>
@@ -2948,7 +2834,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_integration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">delete_integration</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">integration_id</span>).<span class="ident">await</span>
@@ -2961,9 +2847,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Roles] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: struct.Role.html</span>
-    <span class="doccomment">/// [`Role::delete`]: struct.Role.html#method.delete</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">delete_role</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">role_id</span>).<span class="ident">await</span>
@@ -2995,8 +2879,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditGuild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditGuild</span>
     {
@@ -3040,9 +2923,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Emojis] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: struct.Emoji.html</span>
-    <span class="doccomment">/// [`Emoji::edit`]: struct.Emoji.html#method.edit</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">edit_emoji</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">emoji_id</span>, <span class="ident">name</span>).<span class="ident">await</span>
@@ -3080,8 +2961,7 @@
     <span class="doccomment">/// if the current user does not have permission to change their own</span>
     <span class="doccomment">/// nickname.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME</span>
+    <span class="doccomment">/// [Change Nickname]: Permissions::CHANGE_NICKNAME</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_nickname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -3109,7 +2989,7 @@
     <span class="doccomment">/// guild.edit_role(&amp;context, RoleId(7), |r| r.hoist(true));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_role</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>
@@ -3129,8 +3009,7 @@
     <span class="doccomment">/// guild.edit_role_position(&amp;context, RoleId(8), 2);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: struct.Role.html</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_role_position</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -3161,7 +3040,7 @@
     <span class="doccomment">/// If both user IDs are the same, `None` is returned. If one of the users</span>
     <span class="doccomment">/// is the guild owner, their ID is returned.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`position`]: struct.Role.html#structfield.position</span>
+    <span class="doccomment">/// [`position`]: Role::position</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">greater_member_hierarchy</span>(
@@ -3236,16 +3115,12 @@
     }
 
     <span class="doccomment">/// Gets all [`Emoji`]s of this guild via HTTP.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: struct.Emoji.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">emojis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">emojis</span>(<span class="ident">http</span>).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Gets an [`Emoji`] of this guild by its ID via HTTP.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: struct.Emoji.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="ident">EmojiId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">emoji</span>(<span class="ident">http</span>, <span class="ident">emoji_id</span>).<span class="ident">await</span>
@@ -3268,8 +3143,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">invites</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -3294,8 +3168,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Kick Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
-    <span class="doccomment">/// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS</span>
+    <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">kick</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">kick</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">user_id</span>).<span class="ident">await</span>
@@ -3318,9 +3191,6 @@
     }
 
     <span class="doccomment">/// Gets a user&#39;s [`Member`] for the guild by Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">member</span>(<span class="ident">cache_http</span>, <span class="ident">user_id</span>).<span class="ident">await</span>
@@ -3331,8 +3201,6 @@
     <span class="doccomment">/// Optionally pass in the `limit` to limit the number of results. Maximum</span>
     <span class="doccomment">/// value is 1000. Optionally pass in `after` to offset the results by a</span>
     <span class="doccomment">/// [`User`]&#39;s Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -3373,8 +3241,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// - **username**: &quot;zey&quot;</span>
     <span class="doccomment">/// - **username and discriminator**: &quot;zey#5479&quot;</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">member_named</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Member</span><span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">name</span>, <span class="ident">discrim</span>) <span class="op">=</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">pos</span>) <span class="op">=</span> <span class="ident">name</span>.<span class="ident">rfind</span>(<span class="string">&#39;#&#39;</span>) {
             <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">split_at</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>);
@@ -3429,9 +3295,6 @@
     <span class="doccomment">/// However, since the read-locks are dropped after borrowing the name,</span>
     <span class="doccomment">/// the names might have been changed by the user, the sorted list cannot</span>
     <span class="doccomment">/// account for this.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members_starting_with</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">case_sensitive</span>: <span class="ident">bool</span>, <span class="ident">sorted</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">starts_with</span>(<span class="ident">prefix</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">case_sensitive</span>: <span class="ident">bool</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
             <span class="ident">case_sensitive</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">starts_with</span>(<span class="ident">prefix</span>)
@@ -3498,9 +3361,6 @@
     <span class="doccomment">/// However, since the read-locks are dropped after borrowing the name,</span>
     <span class="doccomment">/// the names might have been changed by the user, the sorted list cannot</span>
     <span class="doccomment">/// account for this.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members_containing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">substring</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">case_sensitive</span>: <span class="ident">bool</span>, <span class="ident">sorted</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="kw">fn</span> <span class="ident">contains</span>(<span class="ident">substring</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">case_sensitive</span>: <span class="ident">bool</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
             <span class="ident">case_sensitive</span> <span class="op">&amp;&amp;</span> <span class="ident">name</span>.<span class="ident">contains</span>(<span class="ident">substring</span>)
@@ -3563,9 +3423,6 @@
     <span class="doccomment">/// However, since the read-locks are dropped after borrowing the name,</span>
     <span class="doccomment">/// the names might have been changed by the user, the sorted list cannot</span>
     <span class="doccomment">/// account for this.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members_username_containing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">substring</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">case_sensitive</span>: <span class="ident">bool</span>, <span class="ident">sorted</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">iter</span>(<span class="self">self</span>.<span class="ident">members</span>
             .<span class="ident">values</span>())
@@ -3627,9 +3484,6 @@
     <span class="doccomment">/// However, since the read-locks are dropped after borrowing the name,</span>
     <span class="doccomment">/// the names might have been changed by the user, the sorted list cannot</span>
     <span class="doccomment">/// account for this.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members_nick_containing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">substring</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">case_sensitive</span>: <span class="ident">bool</span>, <span class="ident">sorted</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="ident">Member</span>, <span class="ident">String</span>)<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">iter</span>(<span class="self">self</span>.<span class="ident">members</span>
             .<span class="ident">values</span>())
@@ -3666,8 +3520,6 @@
     <span class="doccomment">/// first. If not found it will resort to an http request.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Cache is still required to look up roles.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">member_permissions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
@@ -3721,15 +3573,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Move Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS</span>
+    <span class="doccomment">/// [Move Members]: Permissions::MOVE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">move_member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">move_member</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">user_id</span>, <span class="ident">channel_id</span>).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Calculate a [`User`]&#39;s permissions in a given channel in the guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_permissions_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Permissions</span> {
         <span class="self">self</span>.<span class="ident">_user_permissions_in</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="ident">user_id</span>.<span class="ident">into</span>())
@@ -3853,8 +3703,6 @@
 
     <span class="doccomment">/// Calculate a [`Role`]&#39;s permissions in a given channel in the guild.</span>
     <span class="doccomment">/// Returns `None` if given `role_id` cannot be found.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role_permissions_in</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>, <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Permissions</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_role_permissions_in</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>(), <span class="ident">role_id</span>.<span class="ident">into</span>())
@@ -3911,10 +3759,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`GuildPrune`]: struct.GuildPrune.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
-    <span class="doccomment">/// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS</span>
+    <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -3974,7 +3819,7 @@
     <span class="doccomment">/// retrieve the total number of shards in use. If you already have the</span>
     <span class="doccomment">/// total, consider using [`utils::shard_id`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`utils::shard_id`]: ../../utils/fn.shard_id.html</span>
+    <span class="doccomment">/// [`utils::shard_id`]: crate::utils::shard_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
@@ -4016,7 +3861,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_integration_sync</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">start_integration_sync</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="ident">integration_id</span>).<span class="ident">await</span>
@@ -4033,10 +3878,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`GuildPrune`]: struct.GuildPrune.html</span>
-    <span class="doccomment">/// [`Member`]: struct.Member.html</span>
-    <span class="doccomment">/// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS</span>
+    <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">days</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -4061,9 +3903,7 @@
     <span class="doccomment">/// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]</span>
     <span class="doccomment">/// if the current user does not have permission to perform bans.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unban</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -4083,7 +3923,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">vanity_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">vanity_url</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>).<span class="ident">await</span>
@@ -4093,7 +3933,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Webhooks] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS</span>
+    <span class="doccomment">/// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">webhooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">webhooks</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>).<span class="ident">await</span>
@@ -4135,8 +3975,6 @@
     <span class="doccomment">/// #    Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">role_by_name</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">role_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Role</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="ident">role_name</span> <span class="op">=</span><span class="op">=</span> <span class="ident">role</span>.<span class="ident">name</span>)
     }
@@ -4461,8 +4299,6 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildUnavailable</span> {
     <span class="doccomment">/// The Id of the [`Guild`] that may be unavailable.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="doccomment">/// Indicator of whether the guild is unavailable.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -4482,8 +4318,6 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">GuildStatus</span> {
     <span class="doccomment">/// Retrieves the Id of the inner [`Guild`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GuildId</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">GuildStatus</span>::<span class="ident">Offline</span>(<span class="ident">offline</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">offline</span>.<span class="ident">id</span>,
@@ -4626,8 +4460,6 @@
 
 <span class="doccomment">/// The level to set as criteria prior to a user being able to send</span>
 <span class="doccomment">/// messages in a [`Guild`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">VerificationLevel</span> {

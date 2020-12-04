@@ -483,15 +483,15 @@
 <span class="doccomment">/// A context will only live for the event it was dispatched for. After the</span>
 <span class="doccomment">/// event handler finished, it is destroyed and will not be re-used.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: ../gateway/struct.Shard.html</span>
-<span class="doccomment">/// [`http`]: ../http/index.html</span>
-<span class="doccomment">/// [`set_activity`]: #method.set_activity</span>
+<span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
+<span class="doccomment">/// [`http`]: crate::http</span>
+<span class="doccomment">/// [`set_activity`]: Self::set_activity</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Context</span> {
     <span class="doccomment">/// A clone of [`Client::data`]. Refer to its documentation for more</span>
     <span class="doccomment">/// information.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::data`]: struct.Client.html#structfield.data</span>
+    <span class="doccomment">/// [`Client::data`]: super::Client::data</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The messenger to communicate with the shard runner.</span>
     <span class="kw">pub</span> <span class="ident">shard</span>: <span class="ident">ShardMessenger</span>,
@@ -580,7 +580,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online</span>
+    <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">online</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -617,7 +617,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle</span>
+    <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">idle</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -654,7 +654,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb</span>
+    <span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dnd</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -690,8 +690,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready</span>
-    <span class="doccomment">/// [`Invisible`]: ../model/user/enum.OnlineStatus.html#variant.Invisible</span>
+    <span class="doccomment">/// [`Event::Ready`]: crate::model::event::Event::Ready</span>
+    <span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">invisible</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -728,9 +728,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::Resumed`]: ../model/event/enum.Event.html#variant.Resumed</span>
-    <span class="doccomment">/// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online</span>
-    <span class="doccomment">/// [`set_presence`]: #method.set_presence</span>
+    <span class="doccomment">/// [`Event::Resumed`]: crate::model::event::Event::Resumed</span>
+    <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
+    <span class="doccomment">/// [`set_presence`]: Self::set_presence</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reset_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
@@ -771,7 +771,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Online`]: ../model/user/enum.OnlineStatus.html#variant.Online</span>
+    <span class="doccomment">/// [`Online`]: OnlineStatus::Online</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="ident">Activity</span>) {
@@ -837,8 +837,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DoNotDisturb`]: ../model/user/enum.OnlineStatus.html#variant.DoNotDisturb</span>
-    <span class="doccomment">/// [`Idle`]: ../model/user/enum.OnlineStatus.html#variant.Idle</span>
+    <span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
+    <span class="doccomment">/// [`Idle`]: OnlineStatus::Idle</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">set_presence</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>, <span class="ident">status</span>: <span class="ident">OnlineStatus</span>) {

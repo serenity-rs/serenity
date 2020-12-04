@@ -1495,7 +1495,7 @@
 <span class="doccomment">/// and memory-efficient representations of each path that functions exist for</span>
 <span class="doccomment">/// in the [`http`] module.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`http`]: ../index.html</span>
+<span class="doccomment">/// [`http`]: crate::http</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Route</span> {
@@ -1503,31 +1503,31 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/invites` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdInvites</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/messages` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdMessages</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/messages/bulk-delete` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdMessagesBulkDelete</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/messages/:message_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="comment">// This route is a unique case. The ratelimit for message _deletions_ is</span>
     <span class="comment">// different than the overall route ratelimit.</span>
     <span class="comment">//</span>
@@ -1542,14 +1542,14 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdMessagesIdAck</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/messages/:message_id/reactions`</span>
     <span class="doccomment">/// path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdMessagesIdReactions</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the</span>
     <span class="doccomment">/// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`</span>
@@ -1557,37 +1557,37 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdMessagesIdReactionsUserIdType</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/permissions/:target_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdPermissionsOverwriteId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/pins` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdPins</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/pins/:message_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdPinsMessageId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/typing` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdTyping</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/channels/:channel_id/webhooks` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`ChannelId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../../model/id/struct.ChannelId.html</span>
+    <span class="doccomment">/// [`ChannelId`]: crate::model::id::ChannelId</span>
     <span class="ident">ChannelsIdWebhooks</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/gateway` path.</span>
     <span class="ident">Gateway</span>,
@@ -1599,133 +1599,133 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/bans` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdBans</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/audit-logs` path.</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdAuditLogs</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/bans/:user_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdBansUserId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/channels/:channel_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdChannels</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/embed` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdEmbed</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/emojis` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdEmojis</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdEmojisId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/integrations` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdIntegrations</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/integrations/:integration_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdIntegrationsId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`</span>
     <span class="doccomment">/// path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdIntegrationsIdSync</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/invites` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdInvites</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/members` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdMembers</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/members/:user_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdMembersId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdMembersIdRolesId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/members/@me/nick` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdMembersMeNick</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/prune` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdPrune</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/regions` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdRegions</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/roles` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdRoles</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/roles/:role_id` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdRolesId</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/vanity-url` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdVanityUrl</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/guilds/:guild_id/webhooks` path.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// The data is the relevant [`GuildId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildId`]: ../../model/id/struct.GuildId.html</span>
+    <span class="doccomment">/// [`GuildId`]: crate::model::id::GuildId</span>
     <span class="ident">GuildsIdWebhooks</span>(<span class="ident">u64</span>),
     <span class="doccomment">/// Route for the `/invites/:code` path.</span>
     <span class="ident">InvitesCode</span>,

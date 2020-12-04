@@ -857,9 +857,6 @@
 <span id="854">854</span>
 <span id="855">855</span>
 <span id="856">856</span>
-<span id="857">857</span>
-<span id="858">858</span>
-<span id="859">859</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -926,11 +923,11 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// See the documentation for [`new`] on how to use this.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: ../client/struct.Client.html</span>
-<span class="doccomment">/// [`new`]: #method.new</span>
+<span class="doccomment">/// [`Client`]: crate::Client</span>
+<span class="doccomment">/// [`new`]: Self::new</span>
 <span class="doccomment">/// [`receive`]: #method.receive</span>
 <span class="doccomment">/// [docs]: https://discord.com/developers/docs/topics/gateway#sharding</span>
-<span class="doccomment">/// [module docs]: index.html#sharding</span>
+<span class="doccomment">/// [module docs]: crate::gateway#sharding</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Shard</span> {
     <span class="kw">pub</span> <span class="ident">client</span>: <span class="ident">WsStream</span>,
     <span class="ident">current_presence</span>: <span class="ident">CurrentPresence</span>,
@@ -941,7 +938,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This can be used to calculate [`latency`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`latency`]: fn.latency.html</span>
+    <span class="doccomment">/// [`latency`]: fn@Self::latency</span>
     <span class="ident">heartbeat_instants</span>: (<span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Instant</span><span class="op">&gt;</span>),
     <span class="ident">heartbeat_interval</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// This is used by the heartbeater to determine whether the last</span>
@@ -1077,8 +1074,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns [`GatewayError::HeartbeatFailed`] if there was an error sending</span>
     <span class="doccomment">/// a heartbeat.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GatewayError::HeartbeatFailed`]: enum.GatewayError.html#variant.HeartbeatFailed</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">heartbeat</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">client</span>.<span class="ident">send_heartbeat</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">shard_info</span>, <span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">seq</span>)).<span class="ident">await</span> {
@@ -1511,8 +1506,7 @@
     <span class="doccomment">/// Note that, if the shard is already in a stage of</span>
     <span class="doccomment">/// [`ConnectionStage::Connecting`], then no action will be performed.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ConnectionStage::Connecting`]: ../gateway/enum.ConnectionStage.html#variant.Connecting</span>
-    <span class="doccomment">/// [`session_id`]: ../gateway/struct.Shard.html#method.session_id</span>
+    <span class="doccomment">/// [`session_id`]: Self::session_id</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">should_reconnect</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ReconnectType</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">stage</span> <span class="op">=</span><span class="op">=</span> <span class="ident">ConnectionStage</span>::<span class="ident">Connecting</span> {
             <span class="kw">return</span> <span class="prelude-val">None</span>;
@@ -1588,9 +1582,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::GuildMembersChunk`]: ../model/event/enum.Event.html#variant.GuildMembersChunk</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Member`]: ../model/guild/struct.Member.html</span>
+    <span class="doccomment">/// [`Event::GuildMembersChunk`]: crate::model::event::Event::GuildMembersChunk</span>
+    <span class="doccomment">/// [`Guild`]: crate::model::guild::Guild</span>
+    <span class="doccomment">/// [`Member`]: crate::model::guild::Member</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">chunk_guild</span>(
         <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>,

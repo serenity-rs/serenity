@@ -113,10 +113,6 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
@@ -156,20 +152,16 @@
 <span class="doccomment">/// });</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`PartialGuild::create_role`]: ../model/guild/struct.PartialGuild.html#method.create_role</span>
-<span class="doccomment">/// [`Guild::create_role`]: ../model/guild/struct.Guild.html#method.create_role</span>
-<span class="doccomment">/// [`Guild::edit_role`]: ../model/guild/struct.Guild.html#method.edit_role</span>
-<span class="doccomment">/// [`GuildId::create_role`]: ../model/id/struct.GuildId.html#method.create_role</span>
-<span class="doccomment">/// [`GuildId::edit_role`]: ../model/id/struct.GuildId.html#method.edit_role</span>
-<span class="doccomment">/// [`Role`]: ../model/guild/struct.Role.html</span>
-<span class="doccomment">/// [`Role::edit`]: ../model/guild/struct.Role.html#method.edit</span>
+<span class="doccomment">/// [`PartialGuild::create_role`]: crate::model::guild::PartialGuild::create_role</span>
+<span class="doccomment">/// [`Guild::create_role`]: crate::model::guild::Guild::create_role</span>
+<span class="doccomment">/// [`Guild::edit_role`]: crate::model::guild::Guild::edit_role</span>
+<span class="doccomment">/// [`GuildId::create_role`]: crate::model::id::GuildId::create_role</span>
+<span class="doccomment">/// [`GuildId::edit_role`]: crate::model::id::GuildId::edit_role</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditRole</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">EditRole</span> {
     <span class="doccomment">/// Creates a new builder with the values of the given [`Role`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../model/guild/struct.Role.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">role</span>: <span class="kw-2">&amp;</span><span class="ident">Role</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">with_capacity</span>(<span class="number">8</span>);
 

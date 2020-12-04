@@ -281,7 +281,7 @@
     <span class="doccomment">/// For example, if the embed [`kind`] is `&quot;video&quot;`, the provider might</span>
     <span class="doccomment">/// contain information about YouTube.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`kind`]: #structfield.kind</span>
+    <span class="doccomment">/// [`kind`]: Self::kind</span>
     <span class="kw">pub</span> <span class="ident">provider</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedProvider</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Thumbnail information of the embed.</span>
     <span class="kw">pub</span> <span class="ident">thumbnail</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedThumbnail</span><span class="op">&gt;</span>,
@@ -295,7 +295,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is present if the [`kind`] is `&quot;video&quot;`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`kind`]: #structfield.kind</span>
+    <span class="doccomment">/// [`kind`]: Self::kind</span>
     <span class="kw">pub</span> <span class="ident">video</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">EmbedVideo</span><span class="op">&gt;</span>,
 }
 
@@ -305,7 +305,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should only be useful in conjunction with [`Webhook::execute`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Webhook::execute`]: ../webhook/struct.Webhook.html</span>
+    <span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -369,8 +369,8 @@
     <span class="doccomment">/// **Note**: Refer to the [`name`] and [`value`] documentation for maximum</span>
     <span class="doccomment">/// lengths.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`name`]: #structfield.name</span>
-    <span class="doccomment">/// [`value`]: #structfield.value</span>
+    <span class="doccomment">/// [`name`]: Self::name</span>
+    <span class="doccomment">/// [`value`]: Self::value</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="ident">name</span>: <span class="ident">T</span>, <span class="ident">value</span>: <span class="ident">U</span>, <span class="ident">inline</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>, <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">Self</span>::<span class="ident">_new</span>(<span class="ident">name</span>.<span class="ident">into</span>(), <span class="ident">value</span>.<span class="ident">into</span>(), <span class="ident">inline</span>)

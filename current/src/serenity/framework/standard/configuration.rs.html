@@ -676,9 +676,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: ../../client/struct.Client.html</span>
-<span class="doccomment">/// [`StandardFramework`]: struct.StandardFramework.html</span>
-<span class="doccomment">/// [default implementation]: #impl-Default</span>
+<span class="doccomment">/// [`Client`]: crate::Client</span>
+<span class="doccomment">/// [`StandardFramework`]: super::StandardFramework</span>
+<span class="doccomment">/// [default implementation]: Self::default</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Configuration</span> {
     <span class="attribute">#[<span class="ident">doc</span>(<span class="ident">hidden</span>)]</span>
     <span class="kw">pub</span> <span class="ident">allow_dm</span>: <span class="ident">bool</span>,
@@ -944,7 +944,7 @@
     <span class="doccomment">/// nickname. It has no real meaning for your bot, and the library</span>
     <span class="doccomment">/// encourages you to ignore differentiating between the two.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`prefix`]: #method.prefix</span>
+    <span class="doccomment">/// [`prefix`]: Self::prefix</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">on_mention</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">id_to_mention</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">on_mention</span> <span class="op">=</span> <span class="ident">id_to_mention</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="ident">to_string</span>());
 
@@ -1029,7 +1029,7 @@
     <span class="doccomment">///     .prefixes(vec![&quot;!&quot;, &quot;&gt;&quot;, &quot;+&quot;]));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`prefix`]: #method.prefix</span>
+    <span class="doccomment">/// [`prefix`]: Self::prefix</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">prefixes</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">prefixes</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
@@ -1093,7 +1093,7 @@
     <span class="doccomment">///     .delimiters(vec![&quot;, &quot;, &quot; &quot;]));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`delimiter`]: #method.delimiter</span>
+    <span class="doccomment">/// [`delimiter`]: Self::delimiter</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">delimiters</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">delimiters</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Delimiter</span><span class="op">&gt;</span>,

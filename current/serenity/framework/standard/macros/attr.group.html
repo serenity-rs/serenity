@@ -59,7 +59,7 @@ the invocation would be <code>!foo bar</code>.</p>
 <tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The group's description or summary.</td><td><code>desc</code> is a string describing the group.</td></tr>
 <tr><td><code>#[summary(desc)]</code> </br> <code>#[summary = desc]</code></td><td>A summary group description displayed when shown multiple groups.</td><td><code>desc</code> is a string summaryly describing the group.</td></tr>
 </tbody></table>
-<p>Similarly to <a href="#fn.command.html"><code>command</code></a>, this macro generates static instances of the group
+<p>Similarly to <a href="../../../../serenity/framework/standard/macros/attr.command.html"><code>command</code></a>, this macro generates static instances of the group
 and its options. The identifiers of these instances are based off the name of the struct to differentiate
 this group from others. This name is given as the default value of the group's <code>name</code> field,
 used in the help command for display and browsing of the group.

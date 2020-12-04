@@ -172,38 +172,8 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-<span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
-<span id="180">180</span>
-<span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
-<span id="201">201</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="doccomment">//! The client gateway bridge is support essential for the [`client`][client] module.</span>
+<span class="doccomment">//! The client gateway bridge is support essential for the [`client`] module.</span>
 <span class="doccomment">//!</span>
 <span class="doccomment">//! This is made available for user use if one wishes to be lower-level or avoid</span>
 <span class="doccomment">//! the higher functionality of the [`Client`].</span>
@@ -243,15 +213,9 @@
 <span class="doccomment">//! For almost every - if not every - use case, you only need to _possibly_ be</span>
 <span class="doccomment">//! concerned about the [`ShardManager`] in this module.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [client]: ../../index.html</span>
-<span class="doccomment">//! [`Client`]: ../../struct.Client.html</span>
-<span class="doccomment">//! [`Shard`]: ../../../gateway/struct.Shard.html</span>
-<span class="doccomment">//! [`ShardManager`]: struct.ShardManager.html</span>
-<span class="doccomment">//! [`ShardManager::restart`]: struct.ShardManager.html#method.restart</span>
-<span class="doccomment">//! [`ShardManager::shutdown`]: struct.ShardManager.html#method.shutdown</span>
-<span class="doccomment">//! [`ShardManagerMessage`]: enum.ShardManagerMessage.html</span>
-<span class="doccomment">//! [`ShardQueue`]: struct.ShardQueuer.html</span>
-<span class="doccomment">//! [`ShardRunner`]: struct.ShardRunner.html</span>
+<span class="doccomment">//! [`client`]: crate::client</span>
+<span class="doccomment">//! [`Client`]: crate::Client</span>
+<span class="doccomment">//! [`Shard`]: crate::gateway::Shard</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">event</span>;
 
@@ -282,31 +246,20 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">ConnectionStage</span>;
 
 <span class="doccomment">/// A message either for a [`ShardManager`] or a [`ShardRunner`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
-<span class="doccomment">/// [`ShardRunner`]: struct.ShardRunner.html</span>
 <span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardClientMessage</span> {
     <span class="doccomment">/// A message intended to be worked with by a [`ShardManager`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
     <span class="ident">Manager</span>(<span class="ident">ShardManagerMessage</span>),
     <span class="doccomment">/// A message intended to be worked with by a [`ShardRunner`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardRunner`]: struct.ShardRunner.html</span>
     <span class="ident">Runner</span>(<span class="ident">ShardRunnerMessage</span>),
 }
 
 <span class="doccomment">/// A message for a [`ShardManager`] relating to an operation with a shard.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardManagerMessage</span> {
     <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should restart a shard.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html</span>
     <span class="ident">Restart</span>(<span class="ident">ShardId</span>),
     <span class="doccomment">/// An update from a shard runner,</span>
     <span class="ident">ShardUpdate</span> {
@@ -316,14 +269,9 @@
     },
     <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard</span>
     <span class="doccomment">/// without bringing it back up.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html</span>
     <span class="ident">Shutdown</span>(<span class="ident">ShardId</span>, <span class="ident">u16</span>),
     <span class="doccomment">/// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards</span>
     <span class="doccomment">/// and end its monitoring process for the [`ShardManager`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
-    <span class="doccomment">/// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html</span>
     <span class="ident">ShutdownAll</span>,
     <span class="doccomment">/// Indicator that a [`ShardManager`] has initiated a shutdown, and for the</span>
     <span class="doccomment">/// component that receives this to also shutdown with no further action</span>
@@ -331,33 +279,28 @@
     <span class="ident">ShutdownInitiated</span>,
     <span class="doccomment">/// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to</span>
     <span class="doccomment">/// move toward the next one.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardRunner`]: struct.ShardRunner.html</span>
     <span class="ident">ShutdownFinished</span>(<span class="ident">ShardId</span>),
     <span class="doccomment">/// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.</span>
     <span class="doccomment">/// Emitted when a shard receives an [`InvalidAuthentication`] Error</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidAuthentication`]: ../../../gateway/enum.GatewayError.html#variant.InvalidAuthentication</span>
+    <span class="doccomment">/// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication</span>
     <span class="ident">ShardInvalidAuthentication</span>,
     <span class="doccomment">/// Indicator that a shard provided undocumented gateway intents.</span>
     <span class="doccomment">/// Emitted when a shard received an [`InvalidGatewayIntents`] error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.InvalidGatewayIntents</span>
+    <span class="doccomment">/// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents</span>
     <span class="ident">ShardInvalidGatewayIntents</span>,
     <span class="doccomment">/// If a connection has been established but privileged gateway intents</span>
     <span class="doccomment">/// were provided without enabling them prior.</span>
     <span class="doccomment">/// Emitted when a shard received a [`DisallowedGatewayIntents`] error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DisallowedGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.DisallowedGatewayIntents</span>
+    <span class="doccomment">/// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents</span>
     <span class="ident">ShardDisallowedGatewayIntents</span>,
 }
 
 <span class="doccomment">/// A message to be sent to the [`ShardQueuer`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This should usually be wrapped in a [`ShardClientMessage`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardClientMessage`]: enum.ShardClientMessage.html</span>
-<span class="doccomment">/// [`ShardQueuer`]: struct.ShardQueuer.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ShardQueuerMessage</span> {
     <span class="doccomment">/// Message to start a shard, where the 0-index element is the ID of the</span>
@@ -384,9 +327,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The [`ShardId`] is not included because, as it stands, you probably already</span>
 <span class="doccomment">/// know the Id if you obtained this.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardId`]: struct.ShardId.html</span>
-<span class="doccomment">/// [`ShardRunner`]: struct.ShardRunner.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunnerInfo</span> {
     <span class="doccomment">/// The latency between when a heartbeat was sent and when the</span>

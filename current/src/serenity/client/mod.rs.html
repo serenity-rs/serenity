@@ -958,33 +958,6 @@
 <span id="955">955</span>
 <span id="956">956</span>
 <span id="957">957</span>
-<span id="958">958</span>
-<span id="959">959</span>
-<span id="960">960</span>
-<span id="961">961</span>
-<span id="962">962</span>
-<span id="963">963</span>
-<span id="964">964</span>
-<span id="965">965</span>
-<span id="966">966</span>
-<span id="967">967</span>
-<span id="968">968</span>
-<span id="969">969</span>
-<span id="970">970</span>
-<span id="971">971</span>
-<span id="972">972</span>
-<span id="973">973</span>
-<span id="974">974</span>
-<span id="975">975</span>
-<span id="976">976</span>
-<span id="977">977</span>
-<span id="978">978</span>
-<span id="979">979</span>
-<span id="980">980</span>
-<span id="981">981</span>
-<span id="982">982</span>
-<span id="983">983</span>
-<span id="984">984</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
@@ -1002,9 +975,7 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Click [here][Client examples] for an example on how to use a `Client`.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`Client`]: struct.Client.html#examples</span>
-<span class="doccomment">//! [`Context`]: struct.Context.html</span>
-<span class="doccomment">//! [Client examples]: struct.Client.html#examples</span>
+<span class="doccomment">//! [Client examples]: Client#examples</span>
 
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">bridge</span>;
 
@@ -1059,9 +1030,6 @@
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
 
 <span class="doccomment">/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: #struct.Client.html</span>
-<span class="doccomment">/// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ClientBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">data</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span>,
@@ -1088,8 +1056,8 @@
     <span class="doccomment">/// a framework via the [`framework`] or [`framework_arc`] method,</span>
     <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework`]: #method.framework</span>
-    <span class="doccomment">/// [`framework_arc`]: #method.framework_arc</span>
+    <span class="doccomment">/// [`framework`]: Self::framework</span>
+    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">TypeMap</span>::<span class="ident">new</span>()),
@@ -1127,8 +1095,7 @@
     <span class="doccomment">/// A `TypeMap` must not be constructed manually: [`type_map_insert`]</span>
     <span class="doccomment">/// can be used to insert one type at a time.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`type_map_insert`]: #method.type_map_insert</span>
-    <span class="doccomment">/// [`TypeMap`]: ../utils/struct.TypeMap.html</span>
+    <span class="doccomment">/// [`type_map_insert`]: Self::type_map_insert</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_map</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">type_map</span>: <span class="ident">TypeMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">data</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">type_map</span>);
 
@@ -1139,9 +1106,6 @@
     <span class="doccomment">/// be available in [`Context::data`].</span>
     <span class="doccomment">/// This method can be called multiple times in order to populate the</span>
     <span class="doccomment">/// [`TypeMap`] with `value`s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context::data`]: #struct.Context</span>
-    <span class="doccomment">/// [`TypeMap`]: ../utils/struct.TypeMap.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">type_map_insert</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">TypeMapKey</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">T</span>::<span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">data</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">data</span> {
             <span class="ident">data</span>.<span class="ident">insert</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>(<span class="ident">value</span>);
@@ -1177,7 +1141,7 @@
     <span class="doccomment">/// If a reference to the framework is required for manual dispatch,</span>
     <span class="doccomment">/// use the [`framework_arc`]-method instead.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework_arc`]: #method.framework_arc</span>
+    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framework</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">framework</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1192,7 +1156,7 @@
     <span class="doccomment">/// extra control.</span>
     <span class="doccomment">/// You can provide a clone and keep the original to manually dispatch.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework`]: #method.framework</span>
+    <span class="doccomment">/// [`framework`]: Self::framework</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">framework_arc</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">framework</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">framework</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">framework</span>);
@@ -1208,7 +1172,7 @@
     <span class="doccomment">/// If a reference to the voice_manager is required for manual dispatch,</span>
     <span class="doccomment">/// use the [`voice_manager_arc`]-method instead.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`voice_manager_arc`]: #method.voice_manager_arc</span>
+    <span class="doccomment">/// [`voice_manager_arc`]: Self::voice_manager_arc</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">voice_manager</span><span class="op">&lt;</span><span class="ident">V</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">voice_manager</span>: <span class="ident">V</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span> <span class="ident">V</span>: <span class="ident">VoiceGatewayManager</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> <span class="op">+</span> <span class="lifetime">&#39;static</span>,
@@ -1367,10 +1331,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: ../gateway/struct.Shard.html</span>
-<span class="doccomment">/// [`EventHandler::message`]: trait.EventHandler.html#method.message</span>
-<span class="doccomment">/// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate</span>
-<span class="doccomment">/// [sharding docs]: ../gateway/index.html#sharding</span>
+<span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
+<span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
+<span class="doccomment">/// [sharding docs]: crate::gateway#sharding</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Client</span> {
     <span class="doccomment">/// A TypeMap which requires types to be Send + Sync. This is a map that</span>
@@ -1453,11 +1416,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to [example 05] for an example on using the `data` field.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context::data`]: struct.Context.html#structfield.data</span>
-    <span class="doccomment">/// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate</span>
-    <span class="doccomment">/// [`Event::MessageDelete`]: ../model/event/enum.Event.html#variant.MessageDelete</span>
-    <span class="doccomment">/// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk</span>
-    <span class="doccomment">/// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate</span>
+    <span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
+    <span class="doccomment">/// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete</span>
+    <span class="doccomment">/// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk</span>
+    <span class="doccomment">/// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate</span>
     <span class="doccomment">/// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework</span>
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A HashMap of all shards instantiated by the Client.</span>
@@ -1535,9 +1497,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client::start_shard`]: #method.start_shard</span>
-    <span class="doccomment">/// [`Client::start_shards`]: #method.start_shards</span>
     <span class="kw">pub</span> <span class="ident">shard_manager</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">ShardManager</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">shard_manager_worker</span>: <span class="ident">ShardManagerMonitor</span>,
     <span class="doccomment">/// The voice manager for the client.</span>
@@ -1562,9 +1521,6 @@
 <span class="kw">impl</span> <span class="ident">Client</span> {
     <span class="doccomment">/// Returns a builder implementing [`Future`]. You can chain the builder methods and then await</span>
     <span class="doccomment">/// in order to finish the [`Client`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: #struct.Client.html</span>
-    <span class="doccomment">/// [`Future`]: https://doc.rust-lang.org/std/future/trait.Future.html</span>
     <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span><span class="op">=</span><span class="string">&quot;0.9.0&quot;</span>, <span class="ident">note</span><span class="op">=</span><span class="string">&quot;please use `builder` instead&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">new_ret_no_self</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -1611,8 +1567,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [gateway docs]: ../gateway/index.html#sharding</span>
-
+    <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="number">0</span>, <span class="number">0</span>, <span class="number">1</span>]).<span class="ident">await</span>
@@ -1659,8 +1614,7 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown</span>
-    <span class="doccomment">/// [gateway docs]: ../gateway/index.html#sharding</span>
+    <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_autosharded</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> (<span class="ident">x</span>, <span class="ident">y</span>) <span class="op">=</span> {
@@ -1736,10 +1690,9 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown</span>
-    <span class="doccomment">/// [`start`]: #method.start</span>
-    <span class="doccomment">/// [`start_autosharded`]: #method.start_autosharded</span>
-    <span class="doccomment">/// [gateway docs]: ../gateway/index.html#sharding</span>
+    <span class="doccomment">/// [`start`]: Self::start</span>
+    <span class="doccomment">/// [`start_autosharded`]: Self::start_autosharded</span>
+    <span class="doccomment">/// [gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_shard</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard</span>: <span class="ident">u64</span>, <span class="ident">shards</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="ident">shard</span>, <span class="ident">shard</span>, <span class="ident">shards</span>]).<span class="ident">await</span>
@@ -1786,10 +1739,9 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown</span>
-    <span class="doccomment">/// [`start_shard`]: #method.start_shard</span>
-    <span class="doccomment">/// [`start_shard_range`]: #method.start_shard_range</span>
-    <span class="doccomment">/// [Gateway docs]: ../gateway/index.html#sharding</span>
+    <span class="doccomment">/// [`start_shard`]: Self::start_shard</span>
+    <span class="doccomment">/// [`start_shard_range`]: Self::start_shard_range</span>
+    <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_shards</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">total_shards</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="number">0</span>, <span class="ident">total_shards</span> <span class="op">-</span> <span class="number">1</span>, <span class="ident">total_shards</span>]).<span class="ident">await</span>
@@ -1837,11 +1789,9 @@
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown</span>
-    <span class="doccomment">/// [`start_shard`]: #method.start_shard</span>
-    <span class="doccomment">/// [`start_shards`]: #method.start_shards</span>
-    <span class="doccomment">/// [Gateway docs]: ../gateway/index.html#sharding</span>
+    <span class="doccomment">/// [`start_shard`]: Self::start_shard</span>
+    <span class="doccomment">/// [`start_shards`]: Self::start_shards</span>
+    <span class="doccomment">/// [Gateway docs]: crate::gateway#sharding</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_shard_range</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">range</span>: [<span class="ident">u64</span>; <span class="number">2</span>], <span class="ident">total_shards</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">start_connection</span>([<span class="ident">range</span>[<span class="number">0</span>], <span class="ident">range</span>[<span class="number">1</span>], <span class="ident">total_shards</span>]).<span class="ident">await</span>
@@ -1858,8 +1808,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to</span>
     <span class="doccomment">/// an error.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_connection</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">shard_data</span>: [<span class="ident">u64</span>; <span class="number">3</span>]) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;voice&quot;</span>)]</span>
@@ -1942,8 +1890,6 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.</span>
 <span class="doccomment">/// The type of failure is not specified.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ClientError::InvalidToken`]: enum.ClientError.html#variant.InvalidToken</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">validate_token</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">token</span>.<span class="ident">as_ref</span>();
 

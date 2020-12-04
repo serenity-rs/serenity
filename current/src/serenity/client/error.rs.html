@@ -70,10 +70,10 @@
 <span class="doccomment">/// This is always wrapped within the library&#39;s generic [`Error::Client`]</span>
 <span class="doccomment">/// variant.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: struct.Client.html</span>
-<span class="doccomment">/// [`Error`]: ../enum.Error.html</span>
-<span class="doccomment">/// [`Error::Client`]: ../enum.Error.html#variant.Client</span>
-<span class="doccomment">/// [`GuildId::ban`]: ../model/id/struct.GuildId.html#method.ban</span>
+<span class="doccomment">/// [`Client`]: super::Client</span>
+<span class="doccomment">/// [`Error`]: crate::Error</span>
+<span class="doccomment">/// [`Error::Client`]: crate::Error::Client</span>
+<span class="doccomment">/// [`GuildId::ban`]: crate::model::id::GuildId::ban</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">enum_variant_names</span>)]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
@@ -81,7 +81,7 @@
     <span class="doccomment">/// When the token provided is invalid. This is returned when validating a</span>
     <span class="doccomment">/// token through the [`validate_token`] function.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`validate_token`]: fn.validate_token.html</span>
+    <span class="doccomment">/// [`validate_token`]: super::validate_token</span>
     <span class="ident">InvalidToken</span>,
     <span class="doccomment">/// When a shard has completely failed to reboot after resume and/or</span>
     <span class="doccomment">/// reconnect attempts.</span>

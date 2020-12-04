@@ -758,12 +758,12 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogEntry</span> {
     <span class="doccomment">/// Determines to what entity an [`action`] was used on.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`action`]: #structfield.action</span>
+    <span class="doccomment">/// [`action`]: Self::action</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;option_u64_handler&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">target_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Determines what action was done on a [`target_id`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`target_id`]: #structfield.target_id</span>
+    <span class="doccomment">/// [`target_id`]: Self::target_id</span>
     <span class="attribute">#[<span class="ident">serde</span>(
         <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;action_handler&quot;</span>,
         <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;action_type&quot;</span>

@@ -623,13 +623,6 @@
 <span id="620">620</span>
 <span id="621">621</span>
 <span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">InterMessage</span>, <span class="ident">ReconnectType</span>, <span class="ident">Shard</span>, <span class="ident">ShardAction</span>, <span class="ident">GatewayError</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -665,8 +658,6 @@
 <span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">trace</span>, <span class="ident">error</span>, <span class="ident">debug</span>, <span class="ident">warn</span>, <span class="ident">info</span>, <span class="ident">instrument</span>};
 
 <span class="doccomment">/// A runner for managing a [`Shard`] and its respective WebSocket client.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: ../../../gateway/struct.Shard.html</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunner</span> {
     <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -735,10 +726,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// 6. Go back to 1.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GatewayEvent`]: ../../../model/event/enum.GatewayEvent.html</span>
-    <span class="doccomment">/// [`Shard`]: ../../../gateway/struct.Shard.html</span>
-    <span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
-    <span class="doccomment">/// [`ShardRunnerMessage`]: enum.ShardRunnerMessage.html</span>
+    <span class="doccomment">/// [`ShardManager`]: super::ShardManager</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">info</span><span class="macro">!</span>(<span class="string">&quot;[ShardRunner {:?}] Running&quot;</span>, <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
@@ -1246,8 +1234,6 @@
 }
 
 <span class="doccomment">/// Options to be passed to [`ShardRunner::new`].</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardRunner::new`]: struct.ShardRunner.html#method.new</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardRunnerOptions</span> {
     <span class="kw">pub</span> <span class="ident">data</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,

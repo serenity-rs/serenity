@@ -851,8 +851,10 @@
 <span id="848">848</span>
 <span id="849">849</span>
 <span id="850">850</span>
+<span id="851">851</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
 <span class="comment">// FIXME: Remove this in a foreseeable future.</span>
 <span class="comment">// Currently exists for backwards compatibility to previous Rust versions.</span>
 <span class="attribute">#![<span class="ident">recursion_limit</span> <span class="op">=</span> <span class="string">&quot;128&quot;</span>]</span>
@@ -1136,7 +1138,7 @@
 <span class="doccomment">/// | `#[max_levenshtein_distance(n)]`                                                                                                              | How much should the help command search for a similiar name.&lt;/br&gt; Indicator for a nested guild. The prefix will be repeated based on what kind of level the item sits. A sub-group would be level two, a sub-sub-group would be level three.     | `n` is a 64-bit, unsigned integer.                                                                         |</span>
 <span class="doccomment">/// | `#[indention_prefix(s)]` &lt;/br&gt; `#[indention_prefix = s]`                                                                                      | The prefix used to express how deeply nested a command or group is.                                                                                                                                                                              | `s` is a string                                                                                            |</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`command`]: attr.command.html</span>
+<span class="doccomment">/// [`command`]: macro@command</span>
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">help</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">fun</span> <span class="op">=</span> <span class="macro">parse_macro_input</span><span class="macro">!</span>(<span class="ident">input</span> <span class="kw">as</span> <span class="ident">CommandFun</span>);
@@ -1446,7 +1448,7 @@
 <span class="doccomment">/// used in the help command for display and browsing of the group.</span>
 <span class="doccomment">/// It may also be passed as an argument to the macro. For example: `#[group(&quot;Banana Phone&quot;)]`.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`command`]: #fn.command.html</span>
+<span class="doccomment">/// [`command`]: macro@command</span>
 
 <span class="attribute">#[<span class="ident">proc_macro_attribute</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group</span>(<span class="ident">attr</span>: <span class="ident">TokenStream</span>, <span class="ident">input</span>: <span class="ident">TokenStream</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">TokenStream</span> {

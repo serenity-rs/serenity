@@ -99,18 +99,18 @@
     <span class="ident">ChunkGuild</span> {
         <span class="doccomment">/// The IDs of the [`Guild`] to chunk.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// [`Guild`]: ../../../model/guild/struct.Guild.html</span>
+        <span class="doccomment">/// [`Guild`]: crate::model::guild::Guild</span>
         <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
         <span class="doccomment">/// The maximum number of members to receive [`GuildMembersChunkEvent`]s</span>
         <span class="doccomment">/// for.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html</span>
+        <span class="doccomment">/// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent</span>
         <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u16</span><span class="op">&gt;</span>,
         <span class="doccomment">/// A filter to apply to the returned members.</span>
         <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="doccomment">/// Optional nonce to identify [`GuildMembersChunkEvent`] responses.</span>
         <span class="doccomment">///</span>
-        <span class="doccomment">/// [`GuildMembersChunkEvent`]: ../../../model/event/struct.GuildMembersChunkEvent.html</span>
+        <span class="doccomment">/// [`GuildMembersChunkEvent`]: crate::model::event::GuildMembersChunkEvent</span>
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     },
     <span class="doccomment">/// Indicates that the client is to close with the given status code and</span>
@@ -120,7 +120,7 @@
     <span class="doccomment">/// Prefer to use the [`ShardManager`] to shutdown WebSocket clients if you</span>
     <span class="doccomment">/// are intending to send a 1000 close code.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManager`]: struct.ShardManager.html</span>
+    <span class="doccomment">/// [`ShardManager`]: super::ShardManager</span>
     <span class="ident">Close</span>(<span class="ident">u16</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>),
     <span class="doccomment">/// Indicates that the client is to send a custom WebSocket message.</span>
     <span class="ident">Message</span>(<span class="ident">Message</span>),

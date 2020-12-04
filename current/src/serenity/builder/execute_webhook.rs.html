@@ -290,9 +290,9 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Webhook`]: ../model/webhook/struct.Webhook.html</span>
-<span class="doccomment">/// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute</span>
-<span class="doccomment">/// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook</span>
+<span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
+<span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
+<span class="doccomment">/// [`execute_webhook`]: crate::http::client::Http::execute_webhook</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>, <span class="kw">pub</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span>);
 
@@ -352,7 +352,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`embeds`]: #method.embeds</span>
+    <span class="doccomment">/// [`embeds`]: Self::embeds</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">content</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">content</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;content&quot;</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">content</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
@@ -389,8 +389,8 @@
     <span class="doccomment">/// Refer to the [struct-level documentation] for an example on how to use</span>
     <span class="doccomment">/// embeds.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Embed::fake`]: ../model/channel/struct.Embed.html#method.fake</span>
-    <span class="doccomment">/// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute</span>
+    <span class="doccomment">/// [`Embed::fake`]: crate::model::channel::Embed::fake</span>
+    <span class="doccomment">/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute</span>
     <span class="doccomment">/// [struct-level documentation]: #examples</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;embeds&quot;</span>, <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">embeds</span>));
@@ -471,8 +471,8 @@
     <span class="doccomment">/// let executor = ExecuteWebhook::default();</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Webhook`]: ../model/webhook/struct.Webhook.html</span>
-    <span class="doccomment">/// [`tts`]: #method.tts</span>
+    <span class="doccomment">/// [`Webhook`]: crate::model::webhook::Webhook</span>
+    <span class="doccomment">/// [`tts`]: Self::tts</span>
     <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ExecuteWebhook</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;tts&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="bool-val">false</span>));

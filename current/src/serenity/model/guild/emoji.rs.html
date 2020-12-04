@@ -233,7 +233,6 @@
 <span id="230">230</span>
 <span id="231">231</span>
 <span id="232">232</span>
-<span id="233">233</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{
     <span class="ident">Display</span>,
@@ -272,7 +271,7 @@
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="doccomment">/// Whether the emoji is managed via an [`Integration`] service.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Integration`]: struct.Integration.html</span>
+    <span class="doccomment">/// [`Integration`]: super::Integration</span>
     <span class="kw">pub</span> <span class="ident">managed</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Whether the emoji name needs to be surrounded by colons in order to be</span>
     <span class="doccomment">/// used by the client.</span>
@@ -280,7 +279,7 @@
     <span class="doccomment">/// A list of [`Role`]s that are allowed to use the emoji. If there are no</span>
     <span class="doccomment">/// roles specified, then usage is unrestricted.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: struct.Role.html</span>
+    <span class="doccomment">/// [`Role`]: super::Role</span>
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
 }
 
@@ -292,8 +291,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Only user accounts may use this method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]:</span>
-    <span class="doccomment">/// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -341,7 +339,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Only user accounts may use this method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">cache</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>().<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">ItemMissing</span>))<span class="question-mark">?</span>;
@@ -365,7 +363,7 @@
 
     <span class="doccomment">/// Finds the [`Guild`] that owns the emoji by looking through the Cache.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
+    <span class="doccomment">/// [`Guild`]: super::Guild</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>

@@ -220,7 +220,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message</span>
+<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateAllowedMentions</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -230,8 +230,8 @@
     <span class="doccomment">/// If users or roles is specified, [`users`] and [`roles`] will not work.\</span>
     <span class="doccomment">/// If you use either, do not specify it&#39;s same type here.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`users`]: struct.CreateAllowedMentions.html#method.users</span>
-    <span class="doccomment">/// [`roles`]: struct.CreateAllowedMentions.html#method.roles</span>
+    <span class="doccomment">/// [`users`]: Self::users</span>
+    <span class="doccomment">/// [`roles`]: Self::roles</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">ParseValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_mut</span>(<span class="string">&quot;parse&quot;</span>) {
@@ -247,8 +247,8 @@
     <span class="doccomment">/// If parse is empty, the message will not mention anyone, unless they are specified on</span>
     <span class="doccomment">/// [`users`] or [`roles`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`users`]: struct.CreateAllowedMentions.html#method.users</span>
-    <span class="doccomment">/// [`roles`]: struct.CreateAllowedMentions.html#method.roles</span>
+    <span class="doccomment">/// [`users`]: Self::users</span>
+    <span class="doccomment">/// [`roles`]: Self::roles</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">empty_parse</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">val</span>) <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">get_mut</span>(<span class="string">&quot;parse&quot;</span>) {
