@@ -1145,14 +1145,6 @@
 <span id="1142">1142</span>
 <span id="1143">1143</span>
 <span id="1144">1144</span>
-<span id="1145">1145</span>
-<span id="1146">1146</span>
-<span id="1147">1147</span>
-<span id="1148">1148</span>
-<span id="1149">1149</span>
-<span id="1150">1150</span>
-<span id="1151">1151</span>
-<span id="1152">1152</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2162,7 +2154,6 @@
                     <span class="ident">bot</span>: <span class="bool-val">false</span>,
                     <span class="ident">discriminator</span>: <span class="number">1</span>,
                     <span class="ident">name</span>: <span class="string">&quot;user 1&quot;</span>.<span class="ident">to_owned</span>(),
-                    <span class="ident">_nonexhaustive</span>: (),
                 },
                 <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>(<span class="number">2</span>),
                 <span class="ident">guild_id</span>: <span class="prelude-val">Some</span>(<span class="ident">GuildId</span>(<span class="number">1</span>)),
@@ -2186,9 +2177,7 @@
                 <span class="ident">message_reference</span>: <span class="prelude-val">None</span>,
                 <span class="ident">flags</span>: <span class="prelude-val">None</span>,
                 <span class="ident">referenced_message</span>: <span class="prelude-val">None</span>,
-                <span class="ident">_nonexhaustive</span>: (),
             },
-            <span class="ident">_nonexhaustive</span>: (),
         };
         <span class="comment">// Check that the channel cache doesn&#39;t exist.</span>
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="ident">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>));
@@ -2232,14 +2221,12 @@
             <span class="ident">user_limit</span>: <span class="prelude-val">None</span>,
             <span class="ident">nsfw</span>: <span class="bool-val">false</span>,
             <span class="ident">slow_mode_rate</span>: <span class="prelude-val">Some</span>(<span class="number">0</span>),
-            <span class="ident">_nonexhaustive</span>: (),
         };
 
         <span class="comment">// Add a channel delete event to the cache, the cached messages for that</span>
         <span class="comment">// channel should now be gone.</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">delete</span> <span class="op">=</span> <span class="ident">ChannelDeleteEvent</span> {
             <span class="ident">channel</span>: <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="ident">guild_channel</span>.<span class="ident">clone</span>()),
-            <span class="ident">_nonexhaustive</span>: (),
         };
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">delete</span>).<span class="ident">await</span>.<span class="ident">is_none</span>());
         <span class="macro">assert</span><span class="macro">!</span>(<span class="op">!</span><span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">read</span>().<span class="ident">await</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">delete</span>.<span class="ident">channel</span>.<span class="ident">id</span>()));
@@ -2282,9 +2269,7 @@
                     <span class="ident">banner</span>: <span class="prelude-val">None</span>,
                     <span class="ident">vanity_url_code</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;bruhmoment&quot;</span>.<span class="ident">to_string</span>()),
                     <span class="ident">preferred_locale</span>: <span class="string">&quot;en-US&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">_nonexhaustive</span>: (),
                 },
-                <span class="ident">_nonexhaustive</span>: (),
             }
         };
         <span class="macro">assert</span><span class="macro">!</span>(<span class="ident">cache</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">guild_create</span>).<span class="ident">await</span>.<span class="ident">is_none</span>());
@@ -2295,7 +2280,6 @@
                 <span class="ident">id</span>: <span class="ident">GuildId</span>(<span class="number">1</span>),
                 <span class="ident">unavailable</span>: <span class="bool-val">false</span>,
             },
-            <span class="ident">_nonexhaustive</span>: (),
         };
 
         <span class="comment">// The guild existed in the cache, so the cache&#39;s guild is returned by the</span>

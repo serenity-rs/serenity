@@ -607,12 +607,6 @@
 <span id="604">604</span>
 <span id="605">605</span>
 <span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
@@ -1150,27 +1144,23 @@
                     <span class="ident">inline</span>: <span class="bool-val">false</span>,
                     <span class="ident">name</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
                     <span class="ident">value</span>: <span class="string">&quot;b&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">_nonexhaustive</span>: (),
                 },
                 <span class="ident">EmbedField</span> {
                     <span class="ident">inline</span>: <span class="bool-val">true</span>,
                     <span class="ident">name</span>: <span class="string">&quot;c&quot;</span>.<span class="ident">to_string</span>(),
                     <span class="ident">value</span>: <span class="string">&quot;z&quot;</span>.<span class="ident">to_string</span>(),
-                    <span class="ident">_nonexhaustive</span>: (),
                 },
             ],
             <span class="ident">footer</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedFooter</span> {
                 <span class="ident">icon_url</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>()),
                 <span class="ident">proxy_icon_url</span>: <span class="prelude-val">None</span>,
                 <span class="ident">text</span>: <span class="string">&quot;This is a hakase footer&quot;</span>.<span class="ident">to_string</span>(),
-                <span class="ident">_nonexhaustive</span>: (),
             }),
             <span class="ident">image</span>: <span class="prelude-val">Some</span>(<span class="ident">EmbedImage</span> {
                 <span class="ident">height</span>: <span class="number">213</span>,
                 <span class="ident">proxy_url</span>: <span class="string">&quot;a&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">url</span>: <span class="string">&quot;https://i.imgur.com/XfWpfCV.gif&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">width</span>: <span class="number">224</span>,
-                <span class="ident">_nonexhaustive</span>: (),
             }),
             <span class="ident">kind</span>: <span class="string">&quot;rich&quot;</span>.<span class="ident">to_string</span>(),
             <span class="ident">provider</span>: <span class="prelude-val">None</span>,
@@ -1182,9 +1172,7 @@
                 <span class="ident">height</span>: <span class="number">213</span>,
                 <span class="ident">url</span>: <span class="string">&quot;https://i.imgur.com/XfWpfCV.mp4&quot;</span>.<span class="ident">to_string</span>(),
                 <span class="ident">width</span>: <span class="number">224</span>,
-                <span class="ident">_nonexhaustive</span>: (),
             }),
-            <span class="ident">_nonexhaustive</span>: (),
         };
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateEmbed</span>::<span class="ident">from</span>(<span class="ident">embed</span>);

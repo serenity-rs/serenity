@@ -971,11 +971,6 @@
 <span id="968">968</span>
 <span id="969">969</span>
 <span id="970">970</span>
-<span id="971">971</span>
-<span id="972">972</span>
-<span id="973">973</span>
-<span id="974">974</span>
-<span id="975">975</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -1010,6 +1005,7 @@
 
 <span class="doccomment">/// Information about the current user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CurrentUser</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
     <span class="kw">pub</span> <span class="ident">avatar</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -1019,8 +1015,6 @@
     <span class="kw">pub</span> <span class="ident">mfa_enabled</span>: <span class="ident">bool</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;username&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">verified</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1358,6 +1352,7 @@
 
 <span class="doccomment">/// Information about a user.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">User</span> {
     <span class="doccomment">/// The unique Id of the user. Can be used to calculate the account&#39;s</span>
     <span class="doccomment">/// creation date.</span>
@@ -1377,8 +1372,6 @@
     <span class="doccomment">/// change if the username+discriminator pair becomes non-unique.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;username&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">User</span> {
@@ -1395,7 +1388,6 @@
             <span class="ident">bot</span>: <span class="bool-val">true</span>,
             <span class="ident">discriminator</span>: <span class="number">1432</span>,
             <span class="ident">name</span>: <span class="string">&quot;test&quot;</span>.<span class="ident">to_string</span>(),
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 }
@@ -1812,7 +1804,6 @@
             <span class="ident">discriminator</span>: <span class="ident">user</span>.<span class="ident">discriminator</span>,
             <span class="ident">id</span>: <span class="ident">user</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">user</span>.<span class="ident">name</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 }
@@ -1825,7 +1816,6 @@
             <span class="ident">discriminator</span>: <span class="ident">user</span>.<span class="ident">discriminator</span>,
             <span class="ident">id</span>: <span class="ident">user</span>.<span class="ident">id</span>,
             <span class="ident">name</span>: <span class="ident">user</span>.<span class="ident">name</span>.<span class="ident">clone</span>(),
-            <span class="ident">_nonexhaustive</span>: (),
         }
     }
 }

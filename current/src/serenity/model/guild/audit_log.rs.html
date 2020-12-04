@@ -484,9 +484,6 @@
 <span id="481">481</span>
 <span id="482">482</span>
 <span id="483">483</span>
-<span id="484">484</span>
-<span id="485">485</span>
-<span id="486">486</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{
@@ -749,14 +746,15 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogs</span> {
     <span class="kw">pub</span> <span class="ident">entries</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">AuditLogEntryId</span>, <span class="ident">AuditLogEntry</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">webhooks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">users</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AuditLogEntry</span> {
     <span class="doccomment">/// Determines to what entity an [`action`] was used on.</span>
     <span class="doccomment">///</span>
@@ -781,11 +779,10 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">AuditLogEntryId</span>,
     <span class="doccomment">/// Some optional data assosiated with this entry.</span>
     <span class="kw">pub</span> <span class="ident">options</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Options</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Options</span> {
     <span class="doccomment">/// Number of days after which inactive members were kicked.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>, <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;option_u64_handler&quot;</span>)]</span>
@@ -808,8 +805,6 @@
     <span class="doccomment">/// Name of the role if type is &quot;role&quot;</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
     <span class="kw">pub</span> <span class="ident">role_name</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">mod</span> <span class="ident">option_u64_handler</span> {
@@ -965,7 +960,6 @@
                         .<span class="ident">collect</span>(),
                     <span class="ident">webhooks</span>: <span class="ident">webhooks</span>.<span class="ident">unwrap</span>(),
                     <span class="ident">users</span>: <span class="ident">users</span>.<span class="ident">unwrap</span>(),
-                    <span class="ident">_nonexhaustive</span>: (),
                 })
             }
         }

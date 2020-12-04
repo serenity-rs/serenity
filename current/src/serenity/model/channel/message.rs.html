@@ -1102,14 +1102,6 @@
 <span id="1099">1099</span>
 <span id="1100">1100</span>
 <span id="1101">1101</span>
-<span id="1102">1102</span>
-<span id="1103">1103</span>
-<span id="1104">1104</span>
-<span id="1105">1105</span>
-<span id="1106">1106</span>
-<span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1158,6 +1150,7 @@
 <span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a</span>
 <span class="doccomment">/// private channel.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Message</span> {
     <span class="doccomment">/// The unique Id of the message. Can be used to calculate the creation date</span>
     <span class="doccomment">/// of the message.</span>
@@ -1226,8 +1219,6 @@
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The message that was replied to using this message.</span>
     <span class="kw">pub</span> <span class="ident">referenced_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// Boxed to avoid recusion</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1663,7 +1654,6 @@
             <span class="ident">message_id</span>: <span class="self">self</span>.<span class="ident">id</span>,
             <span class="ident">user_id</span>,
             <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 
@@ -1987,6 +1977,7 @@
 <span class="doccomment">/// [`count`]: #structfield.count</span>
 <span class="doccomment">/// [reaction type]: enum.ReactionType.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageReaction</span> {
     <span class="doccomment">/// The amount of the type of reaction that have been sent for the</span>
     <span class="doccomment">/// associated message.</span>
@@ -1996,8 +1987,6 @@
     <span class="doccomment">/// The type of reaction.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;emoji&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">reaction_type</span>: <span class="ident">ReactionType</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Differentiates between regular and different types of system messages.</span>
@@ -2106,6 +2095,7 @@
 
 <span class="doccomment">/// Rich Presence application information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageApplication</span> {
     <span class="doccomment">/// ID of the application.</span>
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u64</span>,
@@ -2117,24 +2107,22 @@
     <span class="kw">pub</span> <span class="ident">icon</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Name of the application.</span>
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Rich Presence activity information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageActivity</span> {
     <span class="doccomment">/// Kind of message activity.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">MessageActivityKind</span>,
     <span class="doccomment">/// `party_id` from a Rich Presence event.</span>
     <span class="kw">pub</span> <span class="ident">party_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Reference data sent with crossposted messages.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageReference</span> {
     <span class="doccomment">/// ID of the originating message.</span>
     <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
@@ -2142,8 +2130,6 @@
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="doccomment">/// ID of the originating message&#39;s guild.</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageReference</span> {
@@ -2152,7 +2138,6 @@
             <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">m</span>.<span class="ident">id</span>),
             <span class="ident">channel_id</span>: <span class="ident">m</span>.<span class="ident">channel_id</span>,
             <span class="ident">guild_id</span>: <span class="ident">m</span>.<span class="ident">guild_id</span>,
-            <span class="ident">_nonexhaustive</span>: ()
         }
     }
 }
@@ -2163,7 +2148,6 @@
             <span class="ident">message_id</span>: <span class="prelude-val">Some</span>(<span class="ident">pair</span>.<span class="number">1</span>),
             <span class="ident">channel_id</span>: <span class="ident">pair</span>.<span class="number">0</span>,
             <span class="ident">guild_id</span>: <span class="prelude-val">None</span>,
-            <span class="ident">_nonexhaustive</span>: ()
         }
     }
 }

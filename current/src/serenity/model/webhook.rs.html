@@ -288,7 +288,6 @@
 <span id="285">285</span>
 <span id="286">286</span>
 <span id="287">287</span>
-<span id="288">288</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Webhook model and implementations.</span>
 
@@ -320,6 +319,7 @@
 <span class="doccomment">/// channels. They do not necessarily require a bot user or authentication to</span>
 <span class="doccomment">/// use.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Webhook</span> {
     <span class="doccomment">/// The unique Id.</span>
     <span class="doccomment">///</span>
@@ -347,8 +347,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This is not received when getting a webhook by its token.</span>
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Webhook</span> {

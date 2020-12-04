@@ -234,7 +234,6 @@
 <span id="231">231</span>
 <span id="232">232</span>
 <span id="233">233</span>
-<span id="234">234</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{
     <span class="ident">Display</span>,
@@ -261,6 +260,7 @@
 <span class="doccomment">/// or via an integration. Emojis created using the API only work within the</span>
 <span class="doccomment">/// guild it was created in.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Emoji</span> {
     <span class="doccomment">/// Whether the emoji is animated.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
@@ -282,8 +282,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Role`]: struct.Role.html</span>
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>

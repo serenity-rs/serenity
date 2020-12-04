@@ -2141,51 +2141,6 @@
 <span id="2138">2138</span>
 <span id="2139">2139</span>
 <span id="2140">2140</span>
-<span id="2141">2141</span>
-<span id="2142">2142</span>
-<span id="2143">2143</span>
-<span id="2144">2144</span>
-<span id="2145">2145</span>
-<span id="2146">2146</span>
-<span id="2147">2147</span>
-<span id="2148">2148</span>
-<span id="2149">2149</span>
-<span id="2150">2150</span>
-<span id="2151">2151</span>
-<span id="2152">2152</span>
-<span id="2153">2153</span>
-<span id="2154">2154</span>
-<span id="2155">2155</span>
-<span id="2156">2156</span>
-<span id="2157">2157</span>
-<span id="2158">2158</span>
-<span id="2159">2159</span>
-<span id="2160">2160</span>
-<span id="2161">2161</span>
-<span id="2162">2162</span>
-<span id="2163">2163</span>
-<span id="2164">2164</span>
-<span id="2165">2165</span>
-<span id="2166">2166</span>
-<span id="2167">2167</span>
-<span id="2168">2168</span>
-<span id="2169">2169</span>
-<span id="2170">2170</span>
-<span id="2171">2171</span>
-<span id="2172">2172</span>
-<span id="2173">2173</span>
-<span id="2174">2174</span>
-<span id="2175">2175</span>
-<span id="2176">2176</span>
-<span id="2177">2177</span>
-<span id="2178">2178</span>
-<span id="2179">2179</span>
-<span id="2180">2180</span>
-<span id="2181">2181</span>
-<span id="2182">2182</span>
-<span id="2183">2183</span>
-<span id="2184">2184</span>
-<span id="2185">2185</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
@@ -2222,17 +2177,16 @@
 <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
 <span class="doccomment">/// [`PrivateChannel`]: ../channel/struct.PrivateChannel.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelCreateEvent</span> {
     <span class="doccomment">/// The channel that was created.</span>
     <span class="kw">pub</span> <span class="ident">channel</span>: <span class="ident">Channel</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ChannelCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">channel</span>: <span class="ident">Channel</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -2307,9 +2261,9 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">channel</span>: <span class="ident">Channel</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
@@ -2360,7 +2314,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">channel</span>: <span class="ident">Channel</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -2373,12 +2326,11 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelPinsUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">last_pin_timestamp</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">DateTime</span><span class="op">&lt;</span><span class="ident">Utc</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2404,9 +2356,9 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ChannelUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">channel</span>: <span class="ident">Channel</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2448,7 +2400,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">channel</span>: <span class="ident">Channel</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -2461,25 +2412,23 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildBanAddEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildBanRemoveEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildCreateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="ident">Guild</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2513,7 +2462,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild</span>: <span class="ident">Guild</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -2526,9 +2474,9 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="ident">GuildUnavailable</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2558,7 +2506,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild</span>: <span class="ident">GuildUnavailable</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -2571,11 +2518,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildEmojisUpdateEvent</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_emojis&quot;</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_emojis&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">emojis</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2593,17 +2539,16 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildIntegrationsUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMemberAddEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">member</span>: <span class="ident">Member</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2640,7 +2585,6 @@
             <span class="ident">guild_id</span>,
             <span class="ident">member</span>: <span class="ident">Member</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
                 .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -2661,11 +2605,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMemberRemoveEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2684,13 +2627,12 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMemberUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">nick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">user</span>: <span class="ident">User</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2729,7 +2671,6 @@
                         <span class="ident">nick</span>: <span class="self">self</span>.<span class="ident">nick</span>.<span class="ident">clone</span>(),
                         <span class="ident">roles</span>: <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>(),
                         <span class="ident">user</span>: <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">clone</span>(),
-                        <span class="ident">_nonexhaustive</span>: (),
                     },
                 );
             }
@@ -2742,14 +2683,13 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildMembersChunkEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">members</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">Member</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">chunk_index</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span> <span class="ident">chunk_count</span>: <span class="ident">u32</span>,
     <span class="kw">pub</span> <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2824,17 +2764,15 @@
             <span class="ident">chunk_index</span>,
             <span class="ident">chunk_count</span>,
             <span class="ident">nonce</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleCreateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">role</span>: <span class="ident">Role</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2879,17 +2817,15 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">role</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">role_id</span>: <span class="ident">RoleId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2908,11 +2844,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildRoleUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">role</span>: <span class="ident">Role</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2957,12 +2892,12 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">role</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteCreateEvent</span> {
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
@@ -2971,24 +2906,20 @@
     <span class="kw">pub</span> <span class="ident">max_age</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">max_uses</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">temporary</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InviteDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">code</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildUnavailableEvent</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;id&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3005,9 +2936,9 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild</span>: <span class="ident">PartialGuild</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3035,7 +2966,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild</span>: <span class="ident">PartialGuild</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3048,9 +2978,9 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageCreateEvent</span> {
     <span class="kw">pub</span> <span class="ident">message</span>: <span class="ident">Message</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3095,7 +3025,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">message</span>: <span class="ident">Message</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3108,24 +3037,23 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageDeleteBulkEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">ids</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;id&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">MessageId</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
@@ -3143,8 +3071,6 @@
     <span class="kw">pub</span> <span class="ident">mention_roles</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">attachments</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Attachment</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3195,11 +3121,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PresenceUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">presence</span>: <span class="ident">Presence</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip_serializing</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3240,7 +3165,6 @@
                             <span class="ident">nick</span>: <span class="prelude-val">None</span>,
                             <span class="ident">user</span>: <span class="ident">user</span>.<span class="ident">clone</span>(),
                             <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
-                            <span class="ident">_nonexhaustive</span>: (),
                         });
                     }
                 }
@@ -3274,15 +3198,14 @@
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">presence</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PresencesReplaceEvent</span> {
     <span class="kw">pub</span> <span class="ident">presences</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Presence</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3311,7 +3234,6 @@
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">presences</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3330,16 +3252,15 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionAddEvent</span> {
     <span class="kw">pub</span> <span class="ident">reaction</span>: <span class="ident">Reaction</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionAddEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">reaction</span>: <span class="ident">Reaction</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3352,16 +3273,15 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionRemoveEvent</span> {
     <span class="kw">pub</span> <span class="ident">reaction</span>: <span class="ident">Reaction</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionRemoveEvent</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">reaction</span>: <span class="ident">Reaction</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3374,19 +3294,18 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionRemoveAllEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// The &quot;Ready&quot; event, containing initial ready cache</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReadyEvent</span> {
     <span class="kw">pub</span> <span class="ident">ready</span>: <span class="ident">Ready</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3437,7 +3356,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">ready</span>: <span class="ident">Ready</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3450,34 +3368,31 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResumedEvent</span> {
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;_trace&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">trace</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">TypingStartEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">timestamp</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="ident">UserId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UnknownEvent</span> {
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">value</span>: <span class="ident">Value</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">UserUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">current_user</span>: <span class="ident">CurrentUser</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3495,7 +3410,6 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">current_user</span>: <span class="ident">CurrentUser</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3508,13 +3422,12 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VoiceServerUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">endpoint</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">VoiceServerUpdateEvent</span> {
@@ -3528,10 +3441,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">VoiceStateUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">voice_state</span>: <span class="ident">VoiceState</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -3580,7 +3493,6 @@
             <span class="ident">guild_id</span>,
             <span class="ident">voice_state</span>: <span class="ident">VoiceState</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
                 .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
@@ -3603,11 +3515,10 @@
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">WebhookUpdateEvent</span> {
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">large_enum_variant</span>)]</span>
@@ -3972,7 +3883,6 @@
         <span class="ident">EventType</span>::<span class="ident">Other</span>(<span class="ident">kind</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">Unknown</span>(<span class="ident">UnknownEvent</span> {
             <span class="ident">kind</span>,
             <span class="ident">value</span>: <span class="ident">v</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         }),
     })
 }

@@ -1623,7 +1623,6 @@
 <span id="1620">1620</span>
 <span id="1621">1621</span>
 <span id="1622">1622</span>
-<span id="1623">1623</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1753,6 +1752,7 @@
 
 <span class="doccomment">/// A single command containing all related pieces of information.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
     <span class="kw">pub</span> <span class="ident">group_name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>,
@@ -1764,7 +1764,6 @@
     <span class="kw">pub</span> <span class="ident">usage</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">usage_sample</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">checks</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="doccomment">/// Contains possible suggestions in case a command could not be found</span>
@@ -2227,7 +2226,6 @@
                     <span class="ident">usage</span>: <span class="ident">options</span>.<span class="ident">usage</span>,
                     <span class="ident">usage_sample</span>: <span class="ident">options</span>.<span class="ident">examples</span>.<span class="ident">to_vec</span>(),
                     <span class="ident">sub_commands</span>: <span class="ident">sub_command_names</span>,
-                    <span class="ident">_nonexhaustive</span>: (),
                 },
             });
         }

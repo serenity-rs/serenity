@@ -758,8 +758,6 @@
 <span id="755">755</span>
 <span id="756">756</span>
 <span id="757">757</span>
-<span id="758">758</span>
-<span id="759">759</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 
@@ -785,6 +783,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// [`Guild`]: struct.Guild.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Serialize</span>)]</span>
+<span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">PartialGuild</span> {
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">GuildId</span>,
     <span class="kw">pub</span> <span class="ident">afk_channel_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>,
@@ -814,8 +813,6 @@
     <span class="kw">pub</span> <span class="ident">premium_subscription_count</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">banner</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">vanity_url_code</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">skip</span>)]</span>
-    <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">_nonexhaustive</span>: (),
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
@@ -1516,7 +1513,6 @@
             <span class="ident">premium_subscription_count</span>,
             <span class="ident">banner</span>,
             <span class="ident">vanity_url_code</span>,
-            <span class="ident">_nonexhaustive</span>: (),
         })
     }
 }
