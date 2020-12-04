@@ -859,50 +859,6 @@
 <span id="856">856</span>
 <span id="857">857</span>
 <span id="858">858</span>
-<span id="859">859</span>
-<span id="860">860</span>
-<span id="861">861</span>
-<span id="862">862</span>
-<span id="863">863</span>
-<span id="864">864</span>
-<span id="865">865</span>
-<span id="866">866</span>
-<span id="867">867</span>
-<span id="868">868</span>
-<span id="869">869</span>
-<span id="870">870</span>
-<span id="871">871</span>
-<span id="872">872</span>
-<span id="873">873</span>
-<span id="874">874</span>
-<span id="875">875</span>
-<span id="876">876</span>
-<span id="877">877</span>
-<span id="878">878</span>
-<span id="879">879</span>
-<span id="880">880</span>
-<span id="881">881</span>
-<span id="882">882</span>
-<span id="883">883</span>
-<span id="884">884</span>
-<span id="885">885</span>
-<span id="886">886</span>
-<span id="887">887</span>
-<span id="888">888</span>
-<span id="889">889</span>
-<span id="890">890</span>
-<span id="891">891</span>
-<span id="892">892</span>
-<span id="893">893</span>
-<span id="894">894</span>
-<span id="895">895</span>
-<span id="896">896</span>
-<span id="897">897</span>
-<span id="898">898</span>
-<span id="899">899</span>
-<span id="900">900</span>
-<span id="901">901</span>
-<span id="902">902</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
@@ -962,10 +918,7 @@
     <span class="doccomment">/// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of</span>
     <span class="doccomment">/// days&#39; worth of messages to delete is over the maximum.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::DeleteMessageDaysAmount`]: ../error/enum.Error.html#variant.DeleteMessageDaysAmount</span>
-    <span class="doccomment">/// [`Guild::ban`]: ../guild/struct.Guild.html#method.ban</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ban</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>, <span class="ident">dmd</span>: <span class="ident">u8</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_ban_with_reason</span>(<span class="ident">http</span>, <span class="ident">user</span>.<span class="ident">into</span>(), <span class="ident">dmd</span>, <span class="string">&quot;&quot;</span>).<span class="ident">await</span>
@@ -973,8 +926,7 @@
 
     <span class="doccomment">/// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`ban`]: #method.ban</span>
+    <span class="doccomment">/// [`ban`]: Self::ban</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ban_with_reason</span>(
         <span class="self">self</span>,
@@ -1002,7 +954,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Ban Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">bans</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Ban</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_bans</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
@@ -1022,8 +974,6 @@
     }
 
     <span class="doccomment">/// Gets all of the guild&#39;s channels over the REST API.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channels</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">channels</span> <span class="op">=</span> <span class="ident">HashMap</span>::<span class="ident">new</span>();
 
@@ -1060,9 +1010,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildChannel`]: ../channel/struct.GuildChannel.html</span>
-    <span class="doccomment">/// [`Http::create_channel`]: ../../http/client/struct.Http.html#method.create_channel</span>
-    <span class="doccomment">/// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS</span>
+    <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_channel</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateChannel</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">CreateChannel</span>::<span class="ident">default</span>();
@@ -1086,10 +1034,8 @@
     <span class="doccomment">/// how to read an image from the filesystem and encode it as base64. Most</span>
     <span class="doccomment">/// of the example can be applied similarly for this method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EditProfile::avatar`]: ../../builder/struct.EditProfile.html#method.avatar</span>
-    <span class="doccomment">/// [`Guild::create_emoji`]: ../guild/struct.Guild.html#method.create_emoji</span>
-    <span class="doccomment">/// [`utils::read_image`]: ../../utils/fn.read_image.html</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_emoji</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">image</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
@@ -1104,7 +1050,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_integration</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>, <span class="ident">kind</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">integration_id</span> <span class="op">=</span> <span class="ident">integration_id</span>.<span class="ident">into</span>();
@@ -1122,8 +1068,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild::create_role`]: ../guild/struct.Guild.html#method.create_role</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_role</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span> {
@@ -1146,8 +1091,6 @@
     <span class="doccomment">/// Refer to [`Guild::delete`] for more information.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the current user to be the owner of the guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild::delete`]: ../guild/struct.Guild.html#method.delete</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
@@ -1157,8 +1100,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Emojis] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_emoji</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">emoji_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="ident">await</span>
@@ -1168,7 +1110,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_integration</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_guild_integration</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">integration_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="ident">await</span>
@@ -1181,9 +1123,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Roles] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
-    <span class="doccomment">/// [`Role::delete`]: ../guild/struct.Role.html#method.delete</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_role</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_role</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="ident">await</span>
@@ -1196,8 +1136,7 @@
     <span class="doccomment">/// **Note**: Requires the current user to have the [Manage Guild]</span>
     <span class="doccomment">/// permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild::edit`]: ../guild/struct.Guild.html#method.edit</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditGuild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditGuild</span>
@@ -1216,9 +1155,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Emojis] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [`Emoji::edit`]: ../guild/struct.Emoji.html#method.edit</span>
-    <span class="doccomment">/// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_emoji</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">EmojiId</span><span class="op">&gt;</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
@@ -1257,7 +1194,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Change Nickname] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Change Nickname]: ../permissions/struct.Permissions.html#associatedconstant.CHANGE_NICKNAME</span>
+    <span class="doccomment">/// [Change Nickname]: Permissions::CHANGE_NICKNAME</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_nickname</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_nickname</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">new_nickname</span>).<span class="ident">await</span>
@@ -1277,8 +1214,7 @@
     <span class="doccomment">/// GuildId(7).edit_role(&amp;context, RoleId(8), |r| r.hoist(true));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_role</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>
@@ -1302,16 +1238,13 @@
     <span class="doccomment">/// GuildId(7).edit_role_position(&amp;context, RoleId(8), 2);</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
-    <span class="doccomment">/// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_role_position</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">role_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>, <span class="ident">position</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_role_position</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">role_id</span>.<span class="ident">into</span>().<span class="number">0</span>, <span class="ident">position</span>).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Tries to find the [`Guild`] by its Id in the cache.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">to_guild_cached</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
@@ -1322,25 +1255,18 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: This will not be a [`Guild`], as the REST API does not send</span>
     <span class="doccomment">/// all data with a guild retrieval.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`PartialGuild`]: ../guild/struct.PartialGuild.html</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">to_partial_guild</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">PartialGuild</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Gets all [`Emoji`]s of this guild via HTTP.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: struct.Emoji.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">emojis</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emojis</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
     }
 
     <span class="doccomment">/// Gets an [`Emoji`] of this guild by its ID via HTTP.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: struct.Emoji.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">emoji_id</span>: <span class="ident">EmojiId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_emoji</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">emoji_id</span>.<span class="number">0</span>).<span class="ident">await</span>
@@ -1358,7 +1284,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">invites</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_invites</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
@@ -1368,8 +1294,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Kick Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: ../guild/struct.Member.html</span>
-    <span class="doccomment">/// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS</span>
+    <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">kick</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">kick_member</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="ident">await</span>
@@ -1390,9 +1315,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If the cache feature is enabled the cache will be checked</span>
     <span class="doccomment">/// first. If not found it will resort to an http request.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Member`]: ../guild/struct.Member.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="ident">user_id</span>.<span class="ident">into</span>();
@@ -1414,8 +1336,6 @@
     <span class="doccomment">/// Optionally pass in the `limit` to limit the number of results. Maximum</span>
     <span class="doccomment">/// value is 1000. Optionally pass in `after` to offset the results by a</span>
     <span class="doccomment">/// [`User`]&#39;s Id.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>, <span class="ident">after</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_members</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">limit</span>, <span class="ident">after</span>.<span class="ident">into</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>)).<span class="ident">await</span>
@@ -1452,7 +1372,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`members`]: #method.members</span>
+    <span class="doccomment">/// [`members`]: Self::members</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">members_iter</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">MembersIter</span>::<span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span>::<span class="ident">stream</span>(<span class="ident">http</span>, <span class="self">self</span>)
@@ -1462,7 +1382,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Move Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS</span>
+    <span class="doccomment">/// [Move Members]: Permissions::MOVE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">move_member</span>(
         <span class="self">self</span>,
@@ -1490,7 +1410,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Move Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Move Members]: ../permissions/struct.Permissions.html#associatedconstant.MOVE_MEMBERS</span>
+    <span class="doccomment">/// [Move Members]: Permissions::MOVE_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">disconnect_member</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Map</span>::<span class="ident">new</span>();
@@ -1506,8 +1426,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Kick Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: ../guild/struct.Member.html</span>
-    <span class="doccomment">/// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS</span>
+    <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">prune_count</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
@@ -1547,8 +1466,6 @@
     <span class="doccomment">/// **Note**: When the cache is enabled, this function unlocks the cache to</span>
     <span class="doccomment">/// retrieve the total number of shards in use. If you already have the</span>
     <span class="doccomment">/// total, consider using [`utils::shard_id`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`utils::shard_id`]: ../../utils/fn.shard_id.html</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">shard_id</span>(<span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
@@ -1586,7 +1503,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_integration_sync</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">integration_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">IntegrationId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">start_integration_sync</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">integration_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="ident">await</span>
@@ -1598,9 +1515,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Kick Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildPrune`]: ../guild/struct.GuildPrune.html</span>
-    <span class="doccomment">/// [`Member`]: ../guild/struct.Member.html</span>
-    <span class="doccomment">/// [Kick Members]: ../permissions/struct.Permissions.html#associatedconstant.KICK_MEMBERS</span>
+    <span class="doccomment">/// [Kick Members]: Permissions::KICK_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">start_prune</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">days</span>: <span class="ident">u16</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildPrune</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
@@ -1614,8 +1529,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Ban Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [Ban Members]: ../permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unban</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">user_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">remove_ban</span>(<span class="self">self</span>.<span class="number">0</span>, <span class="ident">user_id</span>.<span class="ident">into</span>().<span class="number">0</span>).<span class="ident">await</span>
@@ -1625,7 +1539,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Guild]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">vanity_url</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_vanity_url</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
@@ -1635,7 +1549,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Webhooks] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS</span>
+    <span class="doccomment">/// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">webhooks</span>(<span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_guild_webhooks</span>(<span class="self">self</span>.<span class="number">0</span>).<span class="ident">await</span>
@@ -1706,9 +1620,7 @@
     <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">live_guild</span>: <span class="kw-2">&amp;</span><span class="ident">Guild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">GuildId</span> { <span class="ident">live_guild</span>.<span class="ident">id</span> }
 }
 
-<span class="doccomment">/// A helper class returned by [`GuildId.members_iter()`]</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`GuildId.members_iter()`]: #method.members_iter</span>
+<span class="doccomment">/// A helper class returned by [`GuildId::members_iter`]</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MembersIter</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span> {
@@ -1790,7 +1702,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`members`]: #method.members</span>
+    <span class="doccomment">/// [`members`]: GuildId::members</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">init_state</span> <span class="op">=</span> <span class="ident">MembersIter</span>::<span class="ident">new</span>(<span class="ident">guild_id</span>, <span class="ident">http</span>);
 

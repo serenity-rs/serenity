@@ -138,7 +138,7 @@
 
 <span class="doccomment">/// A file uploaded with a message. Not to be confused with [`Embed`]s.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Embed`]: struct.Embed.html</span>
+<span class="doccomment">/// [`Embed`]: super::Embed</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Attachment</span> {
@@ -240,9 +240,9 @@
     <span class="doccomment">/// Returns an [`Error::Http`] when there is a problem retrieving the</span>
     <span class="doccomment">/// attachment.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Http`]: ../../enum.Error.html#variant.Http</span>
-    <span class="doccomment">/// [`Error::Io`]: ../../enum.Error.html#variant.Io</span>
-    <span class="doccomment">/// [`Message`]: struct.Message.html</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::Error::Http</span>
+    <span class="doccomment">/// [`Error::Io`]: crate::Error::Io</span>
+    <span class="doccomment">/// [`Message`]: super::Message</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">download</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reqwest</span> <span class="op">=</span> <span class="ident">ReqwestClient</span>::<span class="ident">new</span>();
 

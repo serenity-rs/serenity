@@ -1067,41 +1067,6 @@
 <span id="1064">1064</span>
 <span id="1065">1065</span>
 <span id="1066">1066</span>
-<span id="1067">1067</span>
-<span id="1068">1068</span>
-<span id="1069">1069</span>
-<span id="1070">1070</span>
-<span id="1071">1071</span>
-<span id="1072">1072</span>
-<span id="1073">1073</span>
-<span id="1074">1074</span>
-<span id="1075">1075</span>
-<span id="1076">1076</span>
-<span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
-<span id="1080">1080</span>
-<span id="1081">1081</span>
-<span id="1082">1082</span>
-<span id="1083">1083</span>
-<span id="1084">1084</span>
-<span id="1085">1085</span>
-<span id="1086">1086</span>
-<span id="1087">1087</span>
-<span id="1088">1088</span>
-<span id="1089">1089</span>
-<span id="1090">1090</span>
-<span id="1091">1091</span>
-<span id="1092">1092</span>
-<span id="1093">1093</span>
-<span id="1094">1094</span>
-<span id="1095">1095</span>
-<span id="1096">1096</span>
-<span id="1097">1097</span>
-<span id="1098">1098</span>
-<span id="1099">1099</span>
-<span id="1100">1100</span>
-<span id="1101">1101</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1160,8 +1125,6 @@
     <span class="doccomment">/// The user that sent the message.</span>
     <span class="kw">pub</span> <span class="ident">author</span>: <span class="ident">User</span>,
     <span class="doccomment">/// The Id of the [`Channel`] that the message was sent to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: enum.Channel.html</span>
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="doccomment">/// The content of the message.</span>
     <span class="kw">pub</span> <span class="ident">content</span>: <span class="ident">String</span>,
@@ -1171,8 +1134,6 @@
     <span class="kw">pub</span> <span class="ident">embeds</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Embed</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The Id of the [`Guild`] that the message was sent in. This value will</span>
     <span class="doccomment">/// only be present if this message was received over the gateway.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of the type of message this is, i.e. whether it is a regular</span>
     <span class="doccomment">/// message or a system message.</span>
@@ -1184,8 +1145,6 @@
     <span class="doccomment">/// Indicator of whether the message mentions everyone.</span>
     <span class="kw">pub</span> <span class="ident">mention_everyone</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Array of [`Role`]s&#39; Ids mentioned in the message.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Role`]: ../guild/struct.Role.html</span>
     <span class="kw">pub</span> <span class="ident">mention_roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Channels specifically mentioned in this message.</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;Vec::new&quot;</span>)]</span>
@@ -1250,9 +1209,7 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required permissions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1280,9 +1237,7 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required permissions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`Reaction`]: struct.Reaction.html</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_reactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1308,9 +1263,7 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required permissions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`Reaction`]: struct.Reaction.html</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_reaction_emoji</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
@@ -1362,10 +1315,8 @@
     <span class="doccomment">/// is over [`the limit`], containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser</span>
-    <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
-    <span class="doccomment">/// [`EditMessage`]: ../../builder/struct.EditMessage.html</span>
-    <span class="doccomment">/// [`the limit`]: ../../builder/struct.EditMessage.html#method.content</span>
+    <span class="doccomment">/// [`EditMessage`]: crate::builder::EditMessage</span>
+    <span class="doccomment">/// [`the limit`]: crate::builder::EditMessage::content</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>
@@ -1476,10 +1427,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Read Message History] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [`Message`]: struct.Message.html</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY</span>
+    <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reaction_users</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -1498,7 +1446,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `cache` feature be enabled.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_id`]: #structfield.guild_id</span>
+    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="ident">await</span>
@@ -1512,7 +1460,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the `cache` feature be enabled.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_id`]: #method.guild_id</span>
+    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">field_accessor</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
     <span class="kw">where</span> <span class="ident">Ret</span>: <span class="ident">Clone</span>, <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>
@@ -1539,8 +1487,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ModelError::ItemMissing`] is returned if [`guild_id`] is `None`.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::ItemMissing`]: ../error/enum.Error.html#variant.ItemMissing</span>
-    <span class="doccomment">/// [`guild_id`]: #structfield.guild_id</span>
+    <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
             <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">guild_id</span>,
@@ -1587,8 +1534,7 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required permissions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES.html</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">pin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1616,11 +1562,8 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have the</span>
     <span class="doccomment">/// required [permissions].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [Add Reactions]:</span>
-    <span class="doccomment">/// ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS</span>
-    <span class="doccomment">/// [permissions]: ../permissions/index.html</span>
+    <span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>
+    <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">react</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_react</span>(<span class="ident">cache_http</span>, <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">into</span>()).<span class="ident">await</span>
@@ -1675,9 +1618,7 @@
     <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
-    <span class="doccomment">/// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES</span>
+    <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="ident">await</span>
@@ -1699,9 +1640,7 @@
     <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
-    <span class="doccomment">/// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES</span>
+    <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reply_ping</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="ident">await</span>
@@ -1726,9 +1665,7 @@
     <span class="doccomment">/// is over the above limit, containing the number of unicode code points</span>
     <span class="doccomment">/// over the limit.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong</span>
-    <span class="doccomment">/// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES</span>
+    <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">reply_mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="ident">await</span>
@@ -1771,9 +1708,7 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required permissions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`ModelError::InvalidUser`]: ../error/enum.Error.html#variant.InvalidUser</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">suppress_embeds</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -1800,8 +1735,6 @@
     }
 
     <span class="doccomment">/// Checks whether the message mentions passed [`UserId`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId`]: ../id/struct.UserId.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentions_user_id</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">id</span>.<span class="ident">into</span>();
@@ -1809,8 +1742,6 @@
     }
 
     <span class="doccomment">/// Checks whether the message mentions passed [`User`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">mentions_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">user</span>: <span class="kw-2">&amp;</span><span class="ident">User</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">mentions_user_id</span>(<span class="ident">user</span>.<span class="ident">id</span>)
@@ -1839,8 +1770,7 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required permissions.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unpin</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1974,8 +1904,8 @@
 <span class="doccomment">/// Multiple of the same [reaction type] are sent into one `MessageReaction`,</span>
 <span class="doccomment">/// with an associated [`count`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`count`]: #structfield.count</span>
-<span class="doccomment">/// [reaction type]: enum.ReactionType.html</span>
+<span class="doccomment">/// [`count`]: Self::count</span>
+<span class="doccomment">/// [reaction type]: ReactionType</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageReaction</span> {

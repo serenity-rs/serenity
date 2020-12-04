@@ -84,8 +84,6 @@
 <span id="81">81</span>
 <span id="82">82</span>
 <span id="83">83</span>
-<span id="84">84</span>
-<span id="85">85</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::{<span class="ident">Args</span>, <span class="ident">CommandOptions</span>};
@@ -101,8 +99,6 @@
 <span class="doccomment">/// It solely serves as a way to inform a user about why a check</span>
 <span class="doccomment">/// has failed and for the developer to log given failure (e.g. bugs or statistics)</span>
 <span class="doccomment">/// occurring in [`Check`]s.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Check`]: struct.Check.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Reason</span> {

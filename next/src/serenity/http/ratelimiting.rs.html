@@ -486,10 +486,6 @@
 <span id="483">483</span>
 <span id="484">484</span>
 <span id="485">485</span>
-<span id="486">486</span>
-<span id="487">487</span>
-<span id="488">488</span>
-<span id="489">489</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the</span>
 <span class="doccomment">//! different _types_ of routes - such as getting the current user&#39;s channels -</span>
@@ -570,9 +566,9 @@
 <span class="doccomment">/// through the API, so it can&#39;t be pre-emptively ratelimited. This only affects</span>
 <span class="doccomment">/// the largest of bots.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`limit`]: struct.Ratelimit.html#method.limit</span>
-<span class="doccomment">/// [`remaining`]: struct.Ratelimit.html#method.remaining</span>
-<span class="doccomment">/// [`reset`]: struct.Ratelimit.html#method.reset</span>
+<span class="doccomment">/// [`limit`]: Ratelimit::limit</span>
+<span class="doccomment">/// [`remaining`]: Ratelimit::remaining</span>
+<span class="doccomment">/// [`reset`]: Ratelimit::reset</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ratelimiter</span> {
     <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
     <span class="ident">global</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span>()<span class="op">&gt;</span><span class="op">&gt;</span>,
@@ -638,9 +634,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Ratelimit`]: struct.Ratelimit.html</span>
-    <span class="doccomment">/// [`Route`]: ../routing/enum.Route.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">routes</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">Route</span>, <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">Ratelimit</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">routes</span>)
     }
@@ -734,8 +727,7 @@
 <span class="doccomment">/// **Note**: You should _not_ mutate any of the fields, as this can help cause</span>
 <span class="doccomment">/// 429s.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Http`]: ../client/struct.Http.html#structfield.routes</span>
-<span class="doccomment">/// [`Route`]: ../routing/enum.Route.html</span>
+<span class="doccomment">/// [`Http`]: super::Http</span>
 <span class="doccomment">/// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Ratelimit</span> {

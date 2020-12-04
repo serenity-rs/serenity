@@ -194,13 +194,6 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">ModelError</span>;
@@ -236,8 +229,6 @@
 <span class="doccomment">/// type, rather than the usual 2 (`Result&lt;T, Error&gt;`). This is because all</span>
 <span class="doccomment">/// functions that return a result return serenity&#39;s [`Error`], so this is</span>
 <span class="doccomment">/// implied, and a &quot;simpler&quot; result is used.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Error`]: enum.Error.html</span>
 <span class="kw">pub</span> <span class="kw">type</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">Error</span><span class="op">&gt;</span>;
 
 <span class="doccomment">/// A common error enum returned by most of the library&#39;s functionality within a</span>
@@ -247,11 +238,8 @@
 <span class="doccomment">/// enums, are both wrapped around this in the form of the [`Client`] and</span>
 <span class="doccomment">/// [`Gateway`] variants.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Client`]: #variant.Client</span>
-<span class="doccomment">/// [`ClientError`]: client/enum.ClientError.html</span>
-<span class="doccomment">/// [`Gateway`]: #variant.Gateway</span>
-<span class="doccomment">/// [`GatewayError`]: gateway/enum.GatewayError.html</span>
-<span class="doccomment">/// [`Result`]: type.Result.html</span>
+<span class="doccomment">/// [`Client`]: Error::Client</span>
+<span class="doccomment">/// [`Gateway`]: Error::Gateway</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">Error</span> {
@@ -265,7 +253,7 @@
     <span class="ident">Json</span>(<span class="ident">JsonError</span>),
     <span class="doccomment">/// An error from the [`model`] module.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`model`]: model/index.html</span>
+    <span class="doccomment">/// [`model`]: crate::model</span>
     <span class="ident">Model</span>(<span class="ident">ModelError</span>),
     <span class="doccomment">/// An error occurred while parsing an integer.</span>
     <span class="ident">Num</span>(<span class="ident">ParseIntError</span>),
@@ -278,14 +266,12 @@
     <span class="doccomment">/// Some other error. This is only used for &quot;Expected value &lt;TYPE&gt;&quot; errors,</span>
     <span class="doccomment">/// when a more detailed error can not be easily provided via the</span>
     <span class="doccomment">/// [`Error::Decode`] variant.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Error::Decode`]: #variant.Decode</span>
     <span class="ident">Other</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>),
     <span class="doccomment">/// An error from the `url` crate.</span>
     <span class="ident">Url</span>(<span class="ident">String</span>),
     <span class="doccomment">/// A [client] error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [client]: client/index.html</span>
+    <span class="doccomment">/// [client]: crate::client</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
     <span class="ident">Client</span>(<span class="ident">ClientError</span>),
     <span class="doccomment">/// An error from the `gateway` module.</span>
@@ -293,7 +279,7 @@
     <span class="ident">Gateway</span>(<span class="ident">GatewayError</span>),
     <span class="doccomment">/// An error from the [`http`] module.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`http`]: http/index.html</span>
+    <span class="doccomment">/// [`http`]: crate::http</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="ident">Http</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HttpError</span><span class="op">&gt;</span>),
     <span class="doccomment">/// An error occuring in rustls</span>

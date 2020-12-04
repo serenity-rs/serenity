@@ -1886,53 +1886,6 @@
 <span id="1883">1883</span>
 <span id="1884">1884</span>
 <span id="1885">1885</span>
-<span id="1886">1886</span>
-<span id="1887">1887</span>
-<span id="1888">1888</span>
-<span id="1889">1889</span>
-<span id="1890">1890</span>
-<span id="1891">1891</span>
-<span id="1892">1892</span>
-<span id="1893">1893</span>
-<span id="1894">1894</span>
-<span id="1895">1895</span>
-<span id="1896">1896</span>
-<span id="1897">1897</span>
-<span id="1898">1898</span>
-<span id="1899">1899</span>
-<span id="1900">1900</span>
-<span id="1901">1901</span>
-<span id="1902">1902</span>
-<span id="1903">1903</span>
-<span id="1904">1904</span>
-<span id="1905">1905</span>
-<span id="1906">1906</span>
-<span id="1907">1907</span>
-<span id="1908">1908</span>
-<span id="1909">1909</span>
-<span id="1910">1910</span>
-<span id="1911">1911</span>
-<span id="1912">1912</span>
-<span id="1913">1913</span>
-<span id="1914">1914</span>
-<span id="1915">1915</span>
-<span id="1916">1916</span>
-<span id="1917">1917</span>
-<span id="1918">1918</span>
-<span id="1919">1919</span>
-<span id="1920">1920</span>
-<span id="1921">1921</span>
-<span id="1922">1922</span>
-<span id="1923">1923</span>
-<span id="1924">1924</span>
-<span id="1925">1925</span>
-<span id="1926">1926</span>
-<span id="1927">1927</span>
-<span id="1928">1928</span>
-<span id="1929">1929</span>
-<span id="1930">1930</span>
-<span id="1931">1931</span>
-<span id="1932">1932</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>;
 <span class="kw">use</span> <span class="ident">reqwest</span>::{
@@ -2016,10 +1969,7 @@
     <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission and respect of role</span>
     <span class="doccomment">/// hierarchy.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Member`]: ../../model/guild/struct.Member.html</span>
-    <span class="doccomment">/// [`Role`]: ../../model/guild/struct.Role.html</span>
-    <span class="doccomment">/// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">add_member_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -2036,9 +1986,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires that you have the [Ban Members] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`User`]: ../../model/user/struct.User.html</span>
-    <span class="doccomment">/// [Ban Members]: ../../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS</span>
+    <span class="doccomment">/// [Ban Members]: Permissions::BAN_MEMBERS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ban_user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">delete_message_days</span>: <span class="ident">u8</span>, <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -2059,8 +2007,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This should rarely be used for bots, although it is a good indicator that a</span>
     <span class="doccomment">/// long-running command is still being processed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: ../../model/channel/enum.Channel.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">broadcast_typing</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -2075,10 +2021,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Channels] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-channel</span>
-    <span class="doccomment">/// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS</span>
+    <span class="doccomment">/// [Manage Channels]: Permissions::MANAGE_CHANNELS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -2096,9 +2040,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Emojis] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_emoji`]: ../../model/guild/struct.Guild.html#method.create_emoji</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [Manage Emojis]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS</span>
+    <span class="doccomment">/// [`create_emoji`]: Guild::create_emoji</span>
+    <span class="doccomment">/// [Manage Emojis]: Permissions::MANAGE_EMOJIS</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_emoji</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Emoji</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
@@ -2136,11 +2079,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`PartialGuild`]: ../../model/guild/struct.PartialGuild.html</span>
-    <span class="doccomment">/// [`Shard`]: ../../gateway/struct.Shard.html</span>
+    <span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
     <span class="doccomment">/// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge</span>
-    <span class="doccomment">/// [US West Region]: ../../model/guild/enum.Region.html#variant.UsWest</span>
+    <span class="doccomment">/// [US West Region]: Region::UsWest</span>
     <span class="doccomment">/// [documentation on this endpoint]:</span>
     <span class="doccomment">/// https://discord.com/developers/docs/resources/guild#create-guild</span>
     <span class="doccomment">/// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild</span>
@@ -2158,9 +2099,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Manage Guild] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Integration`]: ../../model/guild/struct.Integration.html</span>
-    <span class="doccomment">/// [Manage Guild]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD</span>
+    <span class="doccomment">/// [Manage Guild]: Permissions::MANAGE_GUILD</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-integration</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_guild_integration</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">integration_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
@@ -2178,9 +2117,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Requires the [Create Invite] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html</span>
-    <span class="doccomment">/// [`RichInvite`]: ../../model/invite/struct.RichInvite.html</span>
-    <span class="doccomment">/// [Create Invite]: ../../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE</span>
+    <span class="doccomment">/// [Create Invite]: Permissions::CREATE_INVITE</span>
     <span class="doccomment">/// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_invite</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">RichInvite</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
@@ -2277,8 +2214,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">create_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -2371,9 +2306,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Message`]: ../../model/channel/struct.Message.html</span>
-    <span class="doccomment">/// [`Reaction`]: ../../model/channel/struct.Reaction.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_message_reactions</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">message_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -2465,8 +2397,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Webhook`]: ../../model/webhook/struct.Webhook.html</span>
-    <span class="doccomment">/// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html</span>
+    <span class="doccomment">/// [`delete_webhook_with_token`]: Self::delete_webhook_with_token</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -2495,8 +2426,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Webhook`]: ../../model/webhook/struct.Webhook.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_webhook_with_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -2554,8 +2483,6 @@
     }
 
     <span class="doccomment">/// Edits a [`Guild`]&#39;s embed setting.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_guild_embed</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildEmbed</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -2593,8 +2520,6 @@
     <span class="doccomment">/// Edits the current user&#39;s nickname for the provided [`Guild`] via its Id.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Pass `None` to reset the nickname.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_nickname</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">new_nickname</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({ <span class="string">&quot;nick&quot;</span>: <span class="ident">new_nickname</span> });
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>)<span class="question-mark">?</span>;
@@ -2694,8 +2619,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`create_webhook`]: fn.create_webhook.html</span>
-    <span class="doccomment">/// [`edit_webhook_with_token`]: fn.edit_webhook_with_token.html</span>
+    <span class="doccomment">/// [`create_webhook`]: Self::create_webhook</span>
+    <span class="doccomment">/// [`edit_webhook_with_token`]: Self::edit_webhook_with_token</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">to_string</span>().<span class="ident">as_bytes</span>()),
@@ -2730,7 +2655,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`edit_webhook`]: fn.edit_webhook.html</span>
+    <span class="doccomment">/// [`edit_webhook`]: Self::edit_webhook</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">edit_webhook_with_token</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>, <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">map</span>: <span class="kw-2">&amp;</span><span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">body</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">to_vec</span>(<span class="ident">map</span>)<span class="question-mark">?</span>;
 
@@ -2788,8 +2713,6 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: ../../model/channel/enum.Channel.html</span>
-    <span class="doccomment">/// [`Message`]: ../../model/channel/struct.Message.html</span>
     <span class="doccomment">/// [Discord docs]: https://discord.com/developers/docs/resources/webhook#querystring-params</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">execute_webhook</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
@@ -2827,8 +2750,6 @@
     <span class="doccomment">/// Returns an</span>
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]</span>
     <span class="doccomment">/// if the files are too large to send.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">execute_webhook_with_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">webhook_id</span>: <span class="ident">u64</span>,
@@ -2998,8 +2919,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">get_channel_webhooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -3186,8 +3105,6 @@
     }
 
     <span class="doccomment">/// Retrieves a list of roles in a [`Guild`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">get_guild_roles</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">value</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -3225,8 +3142,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">get_guild_webhooks</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -3441,7 +3356,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`get_webhook_with_token`]: fn.get_webhook_with_token.html</span>
+    <span class="doccomment">/// [`get_webhook_with_token`]: Self::get_webhook_with_token</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">get_webhook</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">webhook_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">fire</span>(<span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -3512,8 +3427,6 @@
     <span class="doccomment">/// Returns an</span>
     <span class="doccomment">/// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]</span>
     <span class="doccomment">/// if the files are too large to send.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">send_files</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">T</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>, <span class="ident">files</span>: <span class="ident">It</span>, <span class="ident">map</span>: <span class="ident">JsonMap</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">uri</span> <span class="op">=</span> <span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/channels/{}/messages&quot;</span>, <span class="ident">channel_id</span>);
@@ -3625,10 +3538,7 @@
     <span class="doccomment">/// **Note**: Requires the [Manage Roles] permission and respect of role</span>
     <span class="doccomment">/// hierarchy.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Member`]: ../../model/guild/struct.Member.html</span>
-    <span class="doccomment">/// [`Role`]: ../../model/guild/struct.Role.html</span>
-    <span class="doccomment">/// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES</span>
+    <span class="doccomment">/// [Manage Roles]: Permissions::MANAGE_ROLES</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">remove_member_role</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">u64</span>, <span class="ident">role_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">wind</span>(<span class="number">204</span>, <span class="ident">Request</span> {
             <span class="ident">body</span>: <span class="prelude-val">None</span>,
@@ -3700,10 +3610,6 @@
     <span class="doccomment">/// # Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: ../../model/channel/enum.Channel.html</span>
-    <span class="doccomment">/// [`Typing`]: ../typing/struct.Typing.html</span>
-    <span class="doccomment">/// [`Typing::stop`]: ../typing/struct.Typing.html#method.stop</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">start_typing</span>(<span class="self">self</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">channel_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Typing</span><span class="op">&gt;</span> {
         <span class="ident">Typing</span>::<span class="ident">start</span>(<span class="self">self</span>.<span class="ident">clone</span>(), <span class="ident">channel_id</span>)
     }
@@ -3758,7 +3664,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`request`]: fn.request.html</span>
+    <span class="doccomment">/// [`request`]: Self::request</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">fire</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">DeserializeOwned</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">response</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">request</span>(<span class="ident">req</span>).<span class="ident">await</span><span class="question-mark">?</span>;
 
@@ -3804,7 +3710,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`fire`]: fn.fire.html</span>
+    <span class="doccomment">/// [`fire`]: Self::fire</span>
     <span class="attribute">#[<span class="ident">instrument</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">request</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">req</span>: <span class="ident">Request</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ReqwestResponse</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">ratelimiting_req</span> <span class="op">=</span> <span class="ident">RatelimitedRequest</span>::<span class="ident">from</span>(<span class="ident">req</span>);

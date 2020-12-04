@@ -113,10 +113,6 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
-<span id="113">113</span>
-<span id="114">114</span>
-<span id="115">115</span>
-<span id="116">116</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
@@ -134,8 +130,6 @@
 <span class="doccomment">/// The monitor is essentially responsible for running in its own task and</span>
 <span class="doccomment">/// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or</span>
 <span class="doccomment">/// shutdown everything entirely.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardManagerMessage`]: enum.ShardManagerMessage.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardManagerMonitor</span> {
     <span class="doccomment">/// An clone of the Arc to the manager itself.</span>
@@ -150,15 +144,15 @@
     <span class="doccomment">/// Returned when a shard received an [`InvalidAuthentication`] error.</span>
     <span class="doccomment">/// An invalid token has been specified.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidAuthentication`]: ../../../gateway/enum.GatewayError.html#variant.InvalidAuthentication</span>
+    <span class="doccomment">/// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication</span>
     <span class="ident">InvalidToken</span>,
     <span class="doccomment">/// Returned when a shard received an [`InvalidGatewayIntents`] error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`InvalidGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.InvalidGatewayIntents</span>
+    <span class="doccomment">/// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents</span>
     <span class="ident">InvalidGatewayIntents</span>,
     <span class="doccomment">/// Returned when a shard received a [`DisallowedGatewayIntents`] error.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DisallowedGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.DisallowedGatewayIntents</span>
+    <span class="doccomment">/// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents</span>
     <span class="ident">DisallowedGatewayIntents</span>,
 }
 
@@ -175,8 +169,6 @@
     <span class="doccomment">/// - a [`ShardManagerMessage::ShutdownAll`] has been received</span>
     <span class="doccomment">/// - an error is returned while receiving a message from the</span>
     <span class="doccomment">/// channel (probably indicating that the shard manager should stop anyway)</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ShardManagerMessage::ShutdownAll`]: enum.ShardManagerMessage.html#variant.ShutdownAll</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Starting shard manager worker&quot;</span>);

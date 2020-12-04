@@ -1,7 +1,7 @@
 <!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `gateway` mod in crate `serenity`."><meta name="keywords" content="rust, rustlang, rust-lang, gateway"><title>serenity::gateway - Rust</title><link rel="stylesheet" type="text/css" href="../../normalize.css"><link rel="stylesheet" type="text/css" href="../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../ayu.css" disabled ><script id="default-settings"></script><script src="../../storage.js"></script><noscript><link rel="stylesheet" href="../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../rust-logo.png' alt='logo'></div></a><p class="location">Module gateway</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#structs">Structs</a></li><li><a href="#enums">Enums</a></li><li><a href="#traits">Traits</a></li><li><a href="#types">Type Definitions</a></li></ul></div><p class="location"><a href="../index.html">serenity</a></p><script>window.sidebarCurrent = {name: "gateway", ty: "mod", relpath: "../"};</script><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><span class="help-button">?</span>
-                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/serenity/gateway/mod.rs.html#1-200" title="goto source code">[src]</a></span><span class="in-band">Module <a href="../index.html">serenity</a>::<wbr><a class="mod" href="">gateway</a></span></h1><div class="docblock"><p>The gateway module contains the pieces - primarily the <code>Shard</code> -
+                <a id="settings-menu" href="../../settings.html"><img src="../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../src/serenity/gateway/mod.rs.html#1-181" title="goto source code">[src]</a></span><span class="in-band">Module <a href="../index.html">serenity</a>::<wbr><a class="mod" href="">gateway</a></span></h1><div class="docblock"><p>The gateway module contains the pieces - primarily the <code>Shard</code> -
 responsible for maintaing a WebSocket connection with Discord.</p>
 <p>A shard is an interface for the lower-level receiver and sender. It provides
 what can otherwise be thought of as &quot;sugar methods&quot;. A shard represents a
@@ -19,18 +19,18 @@ want some or all shards to be in the same process, allowing for a shared
 State. This is possible through this library.</p>
 <p>See <a href="https://discordapp.com/developers/docs/topics/gateway#sharding">Discord's documentation</a> for more information.</p>
 <p>If you are not using a bot account or do not require sharding - such as for
-a small bot - then use <a href="../client/struct.Client.html#method.start"><code>Client::start</code></a>.</p>
+a small bot - then use <a href="../../serenity/client/struct.Client.html#method.start"><code>Client::start</code></a>.</p>
 <p>There are a few methods of sharding available:</p>
 <ul>
-<li><a href="../client/struct.Client.html#method.start_autosharded"><code>Client::start_autosharded</code></a>: retrieves the number of shards Discord
+<li><a href="../../serenity/client/struct.Client.html#method.start_autosharded"><code>Client::start_autosharded</code></a>: retrieves the number of shards Discord
 recommends using from the API, and then automatically starts that number of
 shards.</li>
-<li><a href="../client/struct.Client.html#method.start_shard"><code>Client::start_shard</code></a>: starts a single shard for use in the instance,
+<li><a href="../../serenity/client/struct.Client.html#method.start_shard"><code>Client::start_shard</code></a>: starts a single shard for use in the instance,
 handled by the instance of the Client. Use this if you only want 1 shard
 handled by this instance.</li>
-<li><a href="../client/struct.Client.html#method.start_shards"><code>Client::start_shards</code></a>: starts all shards in this instance. This is best
+<li><a href="../../serenity/client/struct.Client.html#method.start_shards"><code>Client::start_shards</code></a>: starts all shards in this instance. This is best
 for when you want a completely shared State.</li>
-<li><a href="../client/struct.Client.html#method.start_shard_range"><code>Client::start_shard_range</code></a>: start a range of shards within this
+<li><a href="../../serenity/client/struct.Client.html#method.start_shard_range"><code>Client::start_shard_range</code></a>: start a range of shards within this
 instance. This should be used when you, for example, want to split 10 shards
 across 3 instances.</li>
 </ul>
@@ -40,7 +40,7 @@ gateway. The shard allows for sending and receiving messages over the
 websocket, such as setting the active activity, reconnecting, syncing
 guilds, and more.</p>
 </td></tr></table><h2 id="enums" class="section-header"><a href="#enums">Enums</a></h2>
-<table><tr class="module-item"><td><a class="enum" href="enum.ConnectionStage.html" title="serenity::gateway::ConnectionStage enum">ConnectionStage</a></td><td class="docblock-short"><p>Indicates the current connection stage of a <a href="struct.Shard.html"><code>Shard</code></a>.</p>
+<table><tr class="module-item"><td><a class="enum" href="enum.ConnectionStage.html" title="serenity::gateway::ConnectionStage enum">ConnectionStage</a></td><td class="docblock-short"><p>Indicates the current connection stage of a <a href="../../serenity/gateway/struct.Shard.html" title="Shard"><code>Shard</code></a>.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.GatewayError.html" title="serenity::gateway::GatewayError enum">GatewayError</a></td><td class="docblock-short"><p>An error that occurred while attempting to deal with the gateway.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.InterMessage.html" title="serenity::gateway::InterMessage enum">InterMessage</a></td><td class="docblock-short"><p>A message to be passed around within the library.</p>
 </td></tr><tr class="module-item"><td><a class="enum" href="enum.ReconnectType.html" title="serenity::gateway::ReconnectType enum">ReconnectType</a></td><td class="docblock-short"><p>The type of reconnection that should be performed.</p>

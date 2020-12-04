@@ -260,10 +260,6 @@
 <span id="257">257</span>
 <span id="258">258</span>
 <span id="259">259</span>
-<span id="260">260</span>
-<span id="261">261</span>
-<span id="262">262</span>
-<span id="263">263</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -279,9 +275,9 @@
 <span class="doccomment">/// [`ShardRunner`]. This can be used for actions such as setting the activity</span>
 <span class="doccomment">/// via [`set_activity`] or shutting down via [`shutdown_clean`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ShardRunner`]: struct.ShardRunner.html</span>
-<span class="doccomment">/// [`set_activity`]: #method.set_activity</span>
-<span class="doccomment">/// [`shutdown_clean`]: #method.shutdown_clean</span>
+<span class="doccomment">/// [`ShardRunner`]: super::ShardRunner</span>
+<span class="doccomment">/// [`set_activity`]: Self::set_activity</span>
+<span class="doccomment">/// [`shutdown_clean`]: Self::shutdown_clean</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ShardMessenger</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
@@ -292,7 +288,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If you are using the [`Client`], you do not need to do this.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: ../../struct.Client.html</span>
+    <span class="doccomment">/// [`Client`]: crate::Client</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">tx</span>: <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
@@ -358,10 +354,6 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::GuildMembersChunk`]: ../../../model/event/enum.Event.html#variant.GuildMembersChunk</span>
-    <span class="doccomment">/// [`Guild`]: ../../../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Member`]: ../../../model/guild/struct.Member.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">chunk_guild</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
@@ -472,9 +464,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`DoNotDisturb`]: ../../../model/user/enum.OnlineStatus.html#variant.DoNotDisturb</span>
-    <span class="doccomment">/// [`Invisible`]: ../../../model/user/enum.OnlineStatus.html#variant.Invisible</span>
-    <span class="doccomment">/// [`Offline`]: ../../../model/user/enum.OnlineStatus.html#variant.Offline</span>
+    <span class="doccomment">/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb</span>
+    <span class="doccomment">/// [`Invisible`]: OnlineStatus::Invisible</span>
+    <span class="doccomment">/// [`Offline`]: OnlineStatus::Offline</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_status</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw-2">mut</span> <span class="ident">online_status</span>: <span class="ident">OnlineStatus</span>) {
         <span class="kw">if</span> <span class="ident">online_status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Offline</span> {
             <span class="ident">online_status</span> <span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>;
@@ -497,7 +489,7 @@
     <span class="doccomment">/// wanting to, for example, send a presence update, prefer the usage of</span>
     <span class="doccomment">/// the [`set_presence`] method.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`set_presence`]: #method.set_presence</span>
+    <span class="doccomment">/// [`set_presence`]: Self::set_presence</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">websocket_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="ident">Message</span>) {
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Message</span>(<span class="ident">message</span>));
     }

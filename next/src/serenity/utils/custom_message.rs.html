@@ -273,11 +273,6 @@
 <span id="270">270</span>
 <span id="271">271</span>
 <span id="272">272</span>
-<span id="273">273</span>
-<span id="274">274</span>
-<span id="275">275</span>
-<span id="276">276</span>
-<span id="277">277</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
@@ -287,8 +282,7 @@
 <span class="doccomment">/// This can be useful for emitting a manual [`dispatch`] to the framework,</span>
 <span class="doccomment">/// but you don&#39;t have a message in hand, or just have a fragment of its data.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Message`]: ../model/channel/struct.Message.html</span>
-<span class="doccomment">/// [`dispatch`]: ../framework/trait.Framework.html#tymethod.dispatch</span>
+<span class="doccomment">/// [`dispatch`]: crate::framework::Framework::dispatch</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CustomMessage</span> {
     <span class="ident">msg</span>: <span class="ident">Message</span>,
@@ -329,8 +323,6 @@
     <span class="doccomment">/// Assign the dummy message its author.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is a dummy [`User`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../model/user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user</span>: <span class="ident">User</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">author</span> <span class="op">=</span> <span class="ident">user</span>;
@@ -394,8 +386,6 @@
     <span class="doccomment">/// Assign the dummy message its type.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is [`MessageType::Regular`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`MessageType::Regular`]: ../model/channel/enum.MessageType.html#variant.Regular</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">MessageType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">kind</span> <span class="op">=</span> <span class="ident">kind</span>;
@@ -407,7 +397,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// If not used, the default value is `None` (not all messages are sent in guilds).</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [author]: #method.author</span>
+    <span class="doccomment">/// [author]: Self::author</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">member</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">member</span>: <span class="ident">PartialMember</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">msg</span>.<span class="ident">member</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>);

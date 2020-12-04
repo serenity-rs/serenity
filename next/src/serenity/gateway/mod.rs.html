@@ -182,25 +182,6 @@
 <span id="179">179</span>
 <span id="180">180</span>
 <span id="181">181</span>
-<span id="182">182</span>
-<span id="183">183</span>
-<span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
-<span id="187">187</span>
-<span id="188">188</span>
-<span id="189">189</span>
-<span id="190">190</span>
-<span id="191">191</span>
-<span id="192">192</span>
-<span id="193">193</span>
-<span id="194">194</span>
-<span id="195">195</span>
-<span id="196">196</span>
-<span id="197">197</span>
-<span id="198">198</span>
-<span id="199">199</span>
-<span id="200">200</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The gateway module contains the pieces - primarily the `Shard` -</span>
 <span class="doccomment">//! responsible for maintaing a WebSocket connection with Discord.</span>
@@ -242,12 +223,12 @@
 <span class="doccomment">//! instance. This should be used when you, for example, want to split 10 shards</span>
 <span class="doccomment">//! across 3 instances.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`Client`]: ../client/struct.Client.html</span>
-<span class="doccomment">//! [`Client::start`]: ../client/struct.Client.html#method.start</span>
-<span class="doccomment">//! [`Client::start_autosharded`]: ../client/struct.Client.html#method.start_autosharded</span>
-<span class="doccomment">//! [`Client::start_shard`]: ../client/struct.Client.html#method.start_shard</span>
-<span class="doccomment">//! [`Client::start_shard_range`]: ../client/struct.Client.html#method.start_shard_range</span>
-<span class="doccomment">//! [`Client::start_shards`]: ../client/struct.Client.html#method.start_shards</span>
+<span class="doccomment">//! [`Client`]: crate::Client</span>
+<span class="doccomment">//! [`Client::start`]: crate::Client::start</span>
+<span class="doccomment">//! [`Client::start_autosharded`]: crate::Client::start_autosharded</span>
+<span class="doccomment">//! [`Client::start_shard`]: crate::Client::start_shard</span>
+<span class="doccomment">//! [`Client::start_shard_range`]: crate::Client::start_shard_range</span>
+<span class="doccomment">//! [`Client::start_shards`]: crate::Client::start_shards</span>
 <span class="doccomment">//! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding</span>
 
 <span class="kw">mod</span> <span class="ident">error</span>;
@@ -279,39 +260,25 @@
 <span class="doccomment">/// Indicates the current connection stage of a [`Shard`].</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// This can be useful for knowing which shards are currently &quot;down&quot;/&quot;up&quot;.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ConnectionStage</span> {
     <span class="doccomment">/// Indicator that the [`Shard`] is normally connected and is not in, e.g.,</span>
     <span class="doccomment">/// a resume phase.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
     <span class="ident">Connected</span>,
     <span class="doccomment">/// Indicator that the [`Shard`] is connecting and is in, e.g., a resume</span>
     <span class="doccomment">/// phase.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
     <span class="ident">Connecting</span>,
     <span class="doccomment">/// Indicator that the [`Shard`] is fully disconnected and is not in a</span>
     <span class="doccomment">/// reconnecting phase.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
     <span class="ident">Disconnected</span>,
     <span class="doccomment">/// Indicator that the [`Shard`] is currently initiating a handshake.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
     <span class="ident">Handshake</span>,
     <span class="doccomment">/// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting</span>
     <span class="doccomment">/// a READY packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
     <span class="ident">Identifying</span>,
     <span class="doccomment">/// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a</span>
     <span class="doccomment">/// RESUMED packet.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Shard`]: struct.Shard.html</span>
     <span class="ident">Resuming</span>,
 }
 
@@ -344,11 +311,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// assert!(!ConnectionStage::Connected.is_connecting());</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ConnectionStage::Connecting`]: #variant.Connecting</span>
-    <span class="doccomment">/// [`ConnectionStage::Handshake`]: #variant.Handshake</span>
-    <span class="doccomment">/// [`ConnectionStage::Identifying`]: #variant.Identifying</span>
-    <span class="doccomment">/// [`ConnectionStage::Resuming`]: #variant.Resuming</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">is_connecting</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="kw">use</span> <span class="self">self</span>::<span class="ident">ConnectionStage</span>::<span class="kw-2">*</span>;
 

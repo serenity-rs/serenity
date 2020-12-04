@@ -146,8 +146,8 @@
 <span class="doccomment">/// # }</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html</span>
-<span class="doccomment">/// [`GuildChannel::edit`]: ../model/channel/struct.GuildChannel.html#method.edit</span>
+<span class="doccomment">/// [`GuildChannel`]: crate::model::channel::GuildChannel</span>
+<span class="doccomment">/// [`GuildChannel::edit`]: crate::model::channel::GuildChannel::edit</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">EditChannel</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -156,7 +156,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice</span>
+    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">bitrate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">bitrate</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;bitrate&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">bitrate</span>)));
         <span class="self">self</span>
@@ -182,7 +182,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [text] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [text]: ../model/channel/enum.ChannelType.html#variant.Text</span>
+    <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">topic</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">topic</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;topic&quot;</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">topic</span>.<span class="ident">to_string</span>()));
         <span class="self">self</span>
@@ -192,7 +192,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [text] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [text]: ../model/channel/enum.ChannelType.html#variant.Text</span>
+    <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">nsfw</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">nsfw</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;nsfw&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="ident">nsfw</span>));
 
@@ -203,7 +203,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice</span>
+    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">user_limit</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">user_limit</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;user_limit&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">user_limit</span>)));
         <span class="self">self</span>
@@ -213,8 +213,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is for [text] and [voice] channels only.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [text]: ../model/channel/enum.ChannelType.html#variant.Text</span>
-    <span class="doccomment">/// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice</span>
+    <span class="doccomment">/// [text]: crate::model::channel::ChannelType::Text</span>
+    <span class="doccomment">/// [voice]: crate::model::channel::ChannelType::Voice</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">category</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">category</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">_category</span>(<span class="ident">category</span>.<span class="ident">into</span>());

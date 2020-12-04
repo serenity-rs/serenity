@@ -600,13 +600,6 @@
 <span id="597">597</span>
 <span id="598">598</span>
 <span id="599">599</span>
-<span id="600">600</span>
-<span id="601">601</span>
-<span id="602">602</span>
-<span id="603">603</span>
-<span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Developer note:</span>
 <span class="doccomment">//!</span>
@@ -620,9 +613,8 @@
 <span class="doccomment">//!</span>
 <span class="doccomment">//! Documentation for embeds can be found [here].</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message</span>
-<span class="doccomment">//! [`CreateEmbed`]: struct.CreateEmbed.html</span>
-<span class="doccomment">//! [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds</span>
+<span class="doccomment">//! [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
+<span class="doccomment">//! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds</span>
 <span class="doccomment">//! [here]: https://discord.com/developers/docs/resources/channel#embed-object</span>
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -646,9 +638,9 @@
 <span class="doccomment">/// Refer to the documentation for [`ChannelId::send_message`] for a very in-depth</span>
 <span class="doccomment">/// example on how to use this.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message</span>
-<span class="doccomment">/// [`Embed`]: ../model/channel/struct.Embed.html</span>
-<span class="doccomment">/// [`ExecuteWebhook::embeds`]: struct.ExecuteWebhook.html#method.embeds</span>
+<span class="doccomment">/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message</span>
+<span class="doccomment">/// [`Embed`]: crate::model::channel::Embed</span>
+<span class="doccomment">/// [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbed</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -657,8 +649,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the documentation for [`CreateEmbedAuthor`] for more</span>
     <span class="doccomment">/// information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CreateEmbedAuthor`]: struct.CreateEmbedAuthor.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">author</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedAuthor</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedAuthor</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">author</span> <span class="op">=</span> <span class="ident">CreateEmbedAuthor</span>::<span class="ident">default</span>();
@@ -678,7 +668,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is an alias of [`colour`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`colour`]: #method.colour</span>
+    <span class="doccomment">/// [`colour`]: Self::colour</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">Colour</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -706,7 +696,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is an alias of [`colour`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`colour`]: #method.colour</span>
+    <span class="doccomment">/// [`colour`]: Self::colour</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">color</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">colour</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -762,7 +752,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// This is sugar to reduce the need of calling [`field`] manually multiple times.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`field`]: #method.field</span>
+    <span class="doccomment">/// [`field`]: Self::field</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">fields</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">It</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">fields</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span>(<span class="ident">T</span>, <span class="ident">U</span>, <span class="ident">bool</span>)<span class="op">&gt;</span>,
               <span class="ident">T</span>: <span class="ident">ToString</span>,
@@ -778,8 +768,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the documentation for [`CreateEmbedFooter`] for more</span>
     <span class="doccomment">/// information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CreateEmbedFooter`]: struct.CreateEmbedFooter.html</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">footer</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
         <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedFooter</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateEmbedFooter</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_embed_footer</span> <span class="op">=</span> <span class="ident">CreateEmbedFooter</span>::<span class="ident">default</span>();
@@ -950,9 +938,9 @@
     <span class="doccomment">/// Note however, you have to be sure you set an attachment (with [`ChannelId::send_files`])</span>
     <span class="doccomment">/// with the provided filename. Or else this won&#39;t work.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId::send_files`]: ../model/id/struct.ChannelId.html#send_files</span>
+    <span class="doccomment">/// [`ChannelId::send_files`]: crate::model::id::ChannelId::send_files</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`image`]: #method.image</span>
+    <span class="doccomment">/// [`image`]: Self::image</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">attachment</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">ToString</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">filename</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">filename</span> <span class="op">=</span> <span class="ident">filename</span>.<span class="ident">to_string</span>();
@@ -1046,9 +1034,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Requires that you specify a [`name`].</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Embed`]: ../model/channel/struct.Embed.html</span>
-<span class="doccomment">/// [`CreateEmbed::author`]: struct.CreateEmbed.html#method.author</span>
-<span class="doccomment">/// [`name`]: #method.name</span>
+<span class="doccomment">/// [`Embed`]: crate::model::channel::Embed</span>
+<span class="doccomment">/// [`name`]: Self::name</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedAuthor</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
@@ -1077,8 +1064,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// This does not require any field be set.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Embed`]: ../model/channel/struct.Embed.html</span>
-<span class="doccomment">/// [`CreateEmbed::footer`]: struct.CreateEmbed.html#method.footer</span>
+<span class="doccomment">/// [`Embed`]: crate::model::channel::Embed</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateEmbedFooter</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 

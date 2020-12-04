@@ -842,7 +842,6 @@
 <span id="839">839</span>
 <span id="840">840</span>
 <span id="841">841</span>
-<span id="842">842</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -937,7 +936,7 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// Refer to the [module-level documentation] for more information.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [module-level documentation]: index.html</span>
+<span class="doccomment">/// [module-level documentation]: self</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Default</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StandardFramework</span> {
     <span class="ident">groups</span>: <span class="ident">Vec</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>, <span class="ident">Map</span>)<span class="op">&gt;</span>,
@@ -963,8 +962,8 @@
     <span class="doccomment">/// framework check if a [`Event::MessageCreate`] should be processed by</span>
     <span class="doccomment">/// itself.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EventHandler::message`]: ../../client/trait.EventHandler.html#method.message</span>
-    <span class="doccomment">/// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate</span>
+    <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
+    <span class="doccomment">/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate</span>
     <span class="kw">pub</span> <span class="ident">initialized</span>: <span class="ident">bool</span>,
 }
 
@@ -1001,10 +1000,9 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Client`]: ../../client/struct.Client.html</span>
-    <span class="doccomment">/// [`Configuration::default`]: struct.Configuration.html#method.default</span>
-    <span class="doccomment">/// [`prefix`]: struct.Configuration.html#method.prefix</span>
-    <span class="doccomment">/// [allowing whitespace between prefixes]: struct.Configuration.html#method.with_whitespace</span>
+    <span class="doccomment">/// [`Client`]: crate::Client</span>
+    <span class="doccomment">/// [`prefix`]: Configuration::prefix</span>
+    <span class="doccomment">/// [allowing whitespace between prefixes]: Configuration::with_whitespace</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">configure</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Configuration</span>,
@@ -1224,7 +1222,7 @@
     <span class="doccomment">/// Note: does _not_ return `Self` like many other commands. This is because</span>
     <span class="doccomment">/// it&#39;s not intended to be chained as the other commands are.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`group`]: #method.group</span>
+    <span class="doccomment">/// [`group`]: Self::group</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">group_add</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>) {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
             <span class="ident">Map</span>::<span class="ident">Prefixless</span>(

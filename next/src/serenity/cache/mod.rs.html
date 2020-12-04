@@ -1108,43 +1108,6 @@
 <span id="1105">1105</span>
 <span id="1106">1106</span>
 <span id="1107">1107</span>
-<span id="1108">1108</span>
-<span id="1109">1109</span>
-<span id="1110">1110</span>
-<span id="1111">1111</span>
-<span id="1112">1112</span>
-<span id="1113">1113</span>
-<span id="1114">1114</span>
-<span id="1115">1115</span>
-<span id="1116">1116</span>
-<span id="1117">1117</span>
-<span id="1118">1118</span>
-<span id="1119">1119</span>
-<span id="1120">1120</span>
-<span id="1121">1121</span>
-<span id="1122">1122</span>
-<span id="1123">1123</span>
-<span id="1124">1124</span>
-<span id="1125">1125</span>
-<span id="1126">1126</span>
-<span id="1127">1127</span>
-<span id="1128">1128</span>
-<span id="1129">1129</span>
-<span id="1130">1130</span>
-<span id="1131">1131</span>
-<span id="1132">1132</span>
-<span id="1133">1133</span>
-<span id="1134">1134</span>
-<span id="1135">1135</span>
-<span id="1136">1136</span>
-<span id="1137">1137</span>
-<span id="1138">1138</span>
-<span id="1139">1139</span>
-<span id="1140">1140</span>
-<span id="1141">1141</span>
-<span id="1142">1142</span>
-<span id="1143">1143</span>
-<span id="1144">1144</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -1175,14 +1138,8 @@
 <span class="doccomment">//! while needing to hit the REST API as little as possible, then the answer</span>
 <span class="doccomment">//! is &quot;yes&quot;.</span>
 <span class="doccomment">//!</span>
-<span class="doccomment">//! [`Shard`]: ../gateway/struct.Shard.html</span>
-<span class="doccomment">//! [`Emoji`]: ../model/guild/struct.Emoji.html</span>
-<span class="doccomment">//! [`Guild`]: ../model/guild/struct.Guild.html</span>
-<span class="doccomment">//! [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit</span>
-<span class="doccomment">//! [`Message`]: ../model/channel/struct.Message.html</span>
-<span class="doccomment">//! [`GuildChannel`]: ../model/channel/struct.GuildChannel.html</span>
-<span class="doccomment">//! [`Role`]: ../model/guild/struct.Role.html</span>
-<span class="doccomment">//! [`http`]: ../http/index.html</span>
+<span class="doccomment">//! [`Shard`]: crate::gateway::Shard</span>
+<span class="doccomment">//! [`http`]: crate::http</span>
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -1246,8 +1203,8 @@
 <span class="doccomment">///</span>
 <span class="doccomment">/// The cache will clone all values when calling its methods.</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Shard`]: ../gateway/struct.Shard.html</span>
-<span class="doccomment">/// [`http`]: ../http/index.html</span>
+<span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
+<span class="doccomment">/// [`http`]: crate::http</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Cache</span> {
@@ -1257,18 +1214,11 @@
     <span class="doccomment">/// When a [`Event::GuildDelete`] or [`Event::GuildUnavailable`] is</span>
     <span class="doccomment">/// received and processed by the cache, the relevant channels are also</span>
     <span class="doccomment">/// removed from this map.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html</span>
-    <span class="doccomment">/// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">channels</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">GuildChannel</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of channel categories.</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">categories</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">ChannelCategory</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of guilds with full data available. This includes data like</span>
     <span class="doccomment">/// [`Role`]s and [`Emoji`]s that are not available through the REST API.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: ../model/guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [`Role`]: ../model/guild/struct.Role.html</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">guilds</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">GuildId</span>, <span class="ident">Guild</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">messages</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">MessageCache</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of users&#39; presences. This is updated in real-time. Note that</span>
@@ -1286,9 +1236,6 @@
     <span class="doccomment">/// Additionally, guilds are always unavailable for bot users when a Ready</span>
     <span class="doccomment">/// is received. Guilds are &quot;sent in&quot; over time through the receiving of</span>
     <span class="doccomment">/// [`Event::GuildCreate`]s.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Event::GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate</span>
-    <span class="doccomment">/// [`Event::GuildUnavailable`]: ../model/event/enum.Event.html#variant.GuildUnavailable</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">unavailable_guilds</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The current user &quot;logged in&quot; and for which events are being received</span>
     <span class="doccomment">/// for.</span>
@@ -1297,9 +1244,6 @@
     <span class="doccomment">/// such as whether it is a bot, whether the user is verified, etc.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the documentation for [`CurrentUser`] for more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CurrentUser`]: ../model/user/struct.CurrentUser.html</span>
-    <span class="doccomment">/// [`User`]: ../model/user/struct.User.html</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">user</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">CurrentUser</span><span class="op">&gt;</span>,
     <span class="doccomment">/// A map of users that the current user sees.</span>
     <span class="doccomment">///</span>
@@ -1315,13 +1259,6 @@
     <span class="doccomment">/// Note, however, that users are _not_ removed from the map on removal</span>
     <span class="doccomment">/// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other</span>
     <span class="doccomment">/// structs such as members or recipients may still exist.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`GuildMemberAddEvent`]: ../model/event/struct.GuildMemberAddEvent.html</span>
-    <span class="doccomment">/// [`GuildMemberRemoveEvent`]: ../model/event/struct.GuildMemberRemoveEvent.html</span>
-    <span class="doccomment">/// [`GuildMemberUpdateEvent`]: ../model/event/struct.GuildMemberUpdateEvent.html</span>
-    <span class="doccomment">/// [`GuildMembersChunkEvent`]: ../model/event/struct.GuildMembersChunkEvent.html</span>
-    <span class="doccomment">/// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html</span>
-    <span class="doccomment">/// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html</span>
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">users</span>: <span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">UserId</span>, <span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Queue of message IDs for each channel.</span>
     <span class="doccomment">///</span>
@@ -1405,9 +1342,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Member`]: ../model/guild/struct.Member.html</span>
-    <span class="doccomment">/// [`Shard::chunk_guild`]: ../gateway/struct.Shard.html#method.chunk_guild</span>
-    <span class="doccomment">/// [`User`]: ../model/user/struct.User.html</span>
+    <span class="doccomment">/// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unknown_members</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">total</span> <span class="op">=</span> <span class="number">0</span>;
 
@@ -1444,8 +1379,6 @@
     <span class="doccomment">/// println!(&quot;There are {} private channels&quot;, amount);</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`PrivateChannel`]: ../model/channel/struct.PrivateChannel.html</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">private_channels</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">ChannelId</span>, <span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">private_channels</span>.<span class="ident">read</span>().<span class="ident">await</span>.<span class="ident">clone</span>()
     }
@@ -1476,9 +1409,8 @@
     <span class="doccomment">/// }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Context`]: ../client/struct.Context.html</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`Shard`]: ../gateway/struct.Shard.html</span>
+    <span class="doccomment">/// [`Context`]: crate::client::Context</span>
+    <span class="doccomment">/// [`Shard`]: crate::gateway::Shard</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">chain</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="ident">await</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>();
         <span class="self">self</span>.<span class="ident">guilds</span>
@@ -1500,13 +1432,11 @@
     <span class="doccomment">/// - [`GuildChannel`]: [`guild_channel`] or [`channels`]</span>
     <span class="doccomment">/// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: ../model/channel/enum.Channel.html</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`channels`]: #structfield.channels</span>
-    <span class="doccomment">/// [`guild_channel`]: #method.guild_channel</span>
-    <span class="doccomment">/// [`private_channel`]: #method.private_channel</span>
-    <span class="doccomment">/// [`groups`]: #structfield.groups</span>
-    <span class="doccomment">/// [`private_channels`]: #structfield.private_channels</span>
+    <span class="doccomment">/// [`channels`]: Self::channels</span>
+    <span class="doccomment">/// [`guild_channel`]: Self::guild_channel</span>
+    <span class="doccomment">/// [`private_channel`]: Self::private_channel</span>
+    <span class="doccomment">/// [`groups`]: Self::groups</span>
+    <span class="doccomment">/// [`private_channels`]: Self::private_channels</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="ident">await</span>
@@ -1529,7 +1459,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// In order to clone only a field of the guild, use [`guild_field`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`guild_field`]: #method.guild_field</span>
+    <span class="doccomment">/// [`guild_field`]: Self::guild_field</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1637,10 +1567,8 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ChannelId`]: ../model/id/struct.ChannelId.html</span>
     <span class="doccomment">/// [`Client::on_message`]: ../client/struct.Client.html#method.on_message</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`channel`]: #method.channel</span>
+    <span class="doccomment">/// [`channel`]: Self::channel</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_channel</span><span class="op">&lt;</span><span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">id</span>: <span class="ident">C</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_guild_channel</span>(<span class="ident">id</span>.<span class="ident">into</span>()).<span class="ident">await</span>
@@ -1737,8 +1665,7 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Client::on_message`]: ../client/struct.Client.html#method.on_message</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`members`]: ../model/guild/struct.Guild.html#structfield.members</span>
+    <span class="doccomment">/// [`members`]: crate::model::guild::Guild::members</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">member</span><span class="op">&lt;</span><span class="ident">G</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">guild_id</span>: <span class="ident">G</span>, <span class="ident">user_id</span>: <span class="ident">U</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">G</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>, <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
@@ -1860,8 +1787,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`EventHandler::message`]: ../client/trait.EventHandler.html#method.message</span>
-    <span class="doccomment">/// [`Channel`]: ../model/channel/struct.Channel.html</span>
+    <span class="doccomment">/// [`EventHandler::message`]: crate::client::EventHandler::message</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message</span><span class="op">&lt;</span><span class="ident">C</span>, <span class="ident">M</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="ident">C</span>, <span class="ident">message_id</span>: <span class="ident">M</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">C</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>, <span class="ident">M</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span> {
@@ -1901,7 +1827,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`private_channels`]: #structfield.private_channels</span>
+    <span class="doccomment">/// [`private_channels`]: Self::private_channels</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">private_channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ChannelId</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">PrivateChannel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_private_channel</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>()).<span class="ident">await</span>
@@ -1916,8 +1842,8 @@
     <span class="doccomment">/// **Note**: This will clone the entire role. Instead, retrieve the guild</span>
     <span class="doccomment">/// and retrieve from the guild&#39;s [`roles`] map to avoid this.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../model/guild/struct.Guild.html</span>
-    <span class="doccomment">/// [`roles`]: ../model/guild/struct.Guild.html#structfield.roles</span>
+    <span class="doccomment">/// [`Guild`]: crate::model::guild::Guild</span>
+    <span class="doccomment">/// [`roles`]: crate::model::guild::Guild::roles</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -1977,8 +1903,8 @@
     <span class="doccomment">/// The only advantage of this method is that you can pass in anything that</span>
     <span class="doccomment">/// is indirectly a [`UserId`].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`UserId`]: ../model/id/struct.UserId.html</span>
-    <span class="doccomment">/// [`users`]: #structfield.users</span>
+    <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
+    <span class="doccomment">/// [`users`]: Self::users</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// # Examples</span>
     <span class="doccomment">///</span>
@@ -2084,8 +2010,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to the [`CacheUpdate` examples].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`CacheUpdate`]: trait.CacheUpdate.html</span>
-    <span class="doccomment">/// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples</span>
+    <span class="doccomment">/// [`CacheUpdate`]: CacheUpdate</span>
+    <span class="doccomment">/// [`CacheUpdate` examples]: CacheUpdate#examples</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">e</span>))]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">CacheUpdate</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">e</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="ident">e</span>.<span class="ident">update</span>(<span class="self">self</span>).<span class="ident">await</span>

@@ -463,9 +463,9 @@
 <span class="doccomment">/// assert!(blitz_blue &gt; fooyoo);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// [`Role`]: ../model/guild/struct.Role.html</span>
-<span class="doccomment">/// [`DARK_TEAL`]: #associatedconstant.DARK_TEAL</span>
-<span class="doccomment">/// [`g`]: #method.g</span>
+<span class="doccomment">/// [`Role`]: crate::model::guild::Role</span>
+<span class="doccomment">/// [`DARK_TEAL`]: Self::DARK_TEAL</span>
+<span class="doccomment">/// [`g`]: Self::g</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Eq</span>, <span class="ident">Ord</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Colour</span>(<span class="kw">pub</span> <span class="ident">u32</span>);
 
@@ -485,7 +485,7 @@
     <span class="doccomment">/// assert_eq!(colour.tuple(), (100, 76, 67));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`tuple`]: #method.tuple</span>
+    <span class="doccomment">/// [`tuple`]: Self::tuple</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">value</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Colour</span> { <span class="ident">Colour</span>(<span class="ident">value</span>) }
 
@@ -567,9 +567,9 @@
     <span class="doccomment">/// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));</span>
     <span class="doccomment">/// ```</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`r`]: #method.r</span>
-    <span class="doccomment">/// [`g`]: #method.g</span>
-    <span class="doccomment">/// [`b`]: #method.b</span>
+    <span class="doccomment">/// [`r`]: Self::r</span>
+    <span class="doccomment">/// [`g`]: Self::g</span>
+    <span class="doccomment">/// [`b`]: Self::b</span>
     <span class="kw">pub</span> <span class="kw">const</span> <span class="kw">fn</span> <span class="ident">tuple</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> (<span class="ident">u8</span>, <span class="ident">u8</span>, <span class="ident">u8</span>) { (<span class="self">self</span>.<span class="ident">r</span>(), <span class="self">self</span>.<span class="ident">g</span>(), <span class="self">self</span>.<span class="ident">b</span>()) }
 
     <span class="doccomment">/// Returns a hexadecimal string of this Colour.</span>

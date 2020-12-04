@@ -451,7 +451,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILDS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILDS]: #associatedconstant.GUILDS</span>
+    <span class="doccomment">/// [GUILDS]: Self::GUILDS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guilds</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILDS</span>)
     }
@@ -459,7 +459,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_MEMBERS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MEMBERS]: #associatedconstant.GUILD_MEMBERS</span>
+    <span class="doccomment">/// [GUILD_MEMBERS]: Self::GUILD_MEMBERS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_members</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_MEMBERS</span>)
     }
@@ -467,7 +467,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_BANS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_BANS]: #associatedconstant.GUILD_BANS</span>
+    <span class="doccomment">/// [GUILD_BANS]: Self::GUILD_BANS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_bans</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_BANS</span>)
     }
@@ -475,7 +475,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_EMOJIS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_EMOJIS]: #associatedconstant.GUILD_EMOJIS</span>
+    <span class="doccomment">/// [GUILD_EMOJIS]: Self::GUILD_EMOJIS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_emojis</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_EMOJIS</span>)
     }
@@ -483,7 +483,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_INTEGRATIONS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_INTEGRATIONS]: #associatedconstant.GUILD_INTEGRATIONS</span>
+    <span class="doccomment">/// [GUILD_INTEGRATIONS]: Self::GUILD_INTEGRATIONS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_integrations</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_INTEGRATIONS</span>)
     }
@@ -491,7 +491,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_WEBHOOKS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_WEBHOOKS]: #associatedconstant.GUILD_WEBHOOKS</span>
+    <span class="doccomment">/// [GUILD_WEBHOOKS]: Self::GUILD_WEBHOOKS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_webhooks</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_WEBHOOKS</span>)
     }
@@ -499,7 +499,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_INVITES] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_INVITES]: #associatedconstant.GUILD_INVITES</span>
+    <span class="doccomment">/// [GUILD_INVITES]: Self::GUILD_INVITES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_invites</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_INVITES</span>)
     }
@@ -507,7 +507,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_VOICE_STATES] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_VOICE_STATES]: #associatedconstant.GUILD_VOICE_STATES</span>
+    <span class="doccomment">/// [GUILD_VOICE_STATES]: Self::GUILD_VOICE_STATES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_voice_states</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_VOICE_STATES</span>)
     }
@@ -515,7 +515,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_PRESENCES] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_PRESENCES]: #associatedconstant.GUILD_PRESENCES</span>
+    <span class="doccomment">/// [GUILD_PRESENCES]: Self::GUILD_PRESENCES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_presences</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_PRESENCES</span>)
     }
@@ -523,7 +523,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS]: #associatedconstant.GUILD_MESSAGE_REACTIONS</span>
+    <span class="doccomment">/// [GUILD_MESSAGE_REACTIONS]: Self::GUILD_MESSAGE_REACTIONS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_reactions</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_MESSAGE_REACTIONS</span>)
     }
@@ -531,7 +531,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [GUILD_MESSAGE_TYPING] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [GUILD_MESSAGE_TYPING]: #associatedconstant.GUILD_MESSAGE_TYPING</span>
+    <span class="doccomment">/// [GUILD_MESSAGE_TYPING]: Self::GUILD_MESSAGE_TYPING</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_message_typing</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">GUILD_MESSAGE_TYPING</span>)
     }
@@ -539,7 +539,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [DIRECT_MESSAGES] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [DIRECT_MESSAGES]: #associatedconstant.DIRECT_MESSAGES</span>
+    <span class="doccomment">/// [DIRECT_MESSAGES]: Self::DIRECT_MESSAGES</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_messages</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">DIRECT_MESSAGES</span>)
     }
@@ -547,7 +547,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS]: #associatedconstant.DIRECT_MESSAGE_REACTIONS</span>
+    <span class="doccomment">/// [DIRECT_MESSAGE_REACTIONS]: Self::DIRECT_MESSAGE_REACTIONS</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_reactions</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">DIRECT_MESSAGE_REACTIONS</span>)
     }
@@ -555,7 +555,7 @@
     <span class="doccomment">/// Shorthand for checking that the set of intents contains the</span>
     <span class="doccomment">/// [DIRECT_MESSAGE_TYPING] intent.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [DIRECT_MESSAGE_TYPING]: #associatedconstant.DIRECT_MESSAGE_TYPING</span>
+    <span class="doccomment">/// [DIRECT_MESSAGE_TYPING]: Self::DIRECT_MESSAGE_TYPING</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">direct_message_typing</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
         <span class="self">self</span>.<span class="ident">contains</span>(<span class="self">Self</span>::<span class="ident">DIRECT_MESSAGE_TYPING</span>)
     }

@@ -168,8 +168,6 @@
 <span id="165">165</span>
 <span id="166">166</span>
 <span id="167">167</span>
-<span id="168">168</span>
-<span id="169">169</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models about OAuth2 applications.</span>
 
@@ -187,15 +185,13 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ApplicationInfo</span> {
     <span class="doccomment">/// The bot user associated with the application. See [`BotApplication`] for</span>
     <span class="doccomment">/// more information.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`BotApplication`]: struct.BotApplication.html</span>
     <span class="kw">pub</span> <span class="ident">bot</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BotApplication</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Indicator of whether the bot is public.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If a bot is public, anyone may invite it to their [`Guild`]. While a bot</span>
     <span class="doccomment">/// is private, only the owner may add it to a guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
+    <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
     <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span> <span class="op">=</span> <span class="string">&quot;default_true&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">bot_public</span>: <span class="ident">bool</span>,
     <span class="doccomment">/// Indicator of whether the bot requires an OAuth2 code grant.</span>

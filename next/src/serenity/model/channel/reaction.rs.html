@@ -605,34 +605,6 @@
 <span id="602">602</span>
 <span id="603">603</span>
 <span id="604">604</span>
-<span id="605">605</span>
-<span id="606">606</span>
-<span id="607">607</span>
-<span id="608">608</span>
-<span id="609">609</span>
-<span id="610">610</span>
-<span id="611">611</span>
-<span id="612">612</span>
-<span id="613">613</span>
-<span id="614">614</span>
-<span id="615">615</span>
-<span id="616">616</span>
-<span id="617">617</span>
-<span id="618">618</span>
-<span id="619">619</span>
-<span id="620">620</span>
-<span id="621">621</span>
-<span id="622">622</span>
-<span id="623">623</span>
-<span id="624">624</span>
-<span id="625">625</span>
-<span id="626">626</span>
-<span id="627">627</span>
-<span id="628">628</span>
-<span id="629">629</span>
-<span id="630">630</span>
-<span id="631">631</span>
-<span id="632">632</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>, <span class="ident">MapAccess</span>, <span class="ident">Visitor</span>};
@@ -663,26 +635,16 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Reaction</span> {
     <span class="doccomment">/// The [`Channel`] of the associated [`Message`].</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Channel`]: enum.Channel.html</span>
-    <span class="doccomment">/// [`Message`]: struct.Message.html</span>
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="doccomment">/// The reactive emoji used.</span>
     <span class="kw">pub</span> <span class="ident">emoji</span>: <span class="ident">ReactionType</span>,
     <span class="doccomment">/// The Id of the [`Message`] that was reacted to.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Message`]: struct.Message.html</span>
     <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
     <span class="doccomment">/// The Id of the [`User`] that sent the reaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Set to `None` by [`Message::react`] when cache is not available.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [`Message::react`]: struct.Message.html#method.react</span>
     <span class="kw">pub</span> <span class="ident">user_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The optional Id of the [`Guild`] where the reaction was sent.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
 }
 
@@ -696,7 +658,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Requires the [Read Message History] permission.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY</span>
+    <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="ident">await</span>
@@ -714,9 +676,8 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required [permissions].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
-    <span class="doccomment">/// [permissions]: ../permissions/index.html</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Silences a warning when compiling without the `cache` feature.</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
@@ -755,9 +716,8 @@
     <span class="doccomment">/// [`ModelError::InvalidPermissions`] if the current user does not have</span>
     <span class="doccomment">/// the required [permissions].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES</span>
-    <span class="doccomment">/// [permissions]: ../permissions/index.html</span>
+    <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
+    <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -784,8 +744,7 @@
     <span class="doccomment">/// your own message cache or otherwise having the message available if</span>
     <span class="doccomment">/// possible.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY</span>
-    <span class="doccomment">/// [`Message`]: struct.Message.html</span>
+    <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="self">self</span>.<span class="ident">message_id</span>).<span class="ident">await</span>
@@ -833,12 +792,8 @@
     <span class="doccomment">/// Returns a [`ModelError::InvalidPermissions`] if the current user does</span>
     <span class="doccomment">/// not have the required [permissions].</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// [`ModelError::InvalidPermissions`]: ../error/enum.Error.html#variant.InvalidPermissions</span>
-    <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [`Message`]: struct.Message.html</span>
-    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
-    <span class="doccomment">/// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY</span>
-    <span class="doccomment">/// [permissions]: ../permissions/index.html</span>
+    <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
+    <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">users</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
                        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -875,22 +830,15 @@
 }
 
 <span class="doccomment">/// The type of a [`Reaction`] sent.</span>
-<span class="doccomment">///</span>
-<span class="doccomment">/// [`Reaction`]: struct.Reaction.html</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Hash</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ReactionType</span> {
     <span class="doccomment">/// A reaction with a [`Guild`]s custom [`Emoji`], which is unique to the</span>
     <span class="doccomment">/// guild.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
-    <span class="doccomment">/// [`Guild`]: ../guild/struct.Guild.html</span>
     <span class="ident">Custom</span> {
         <span class="doccomment">/// Whether the emoji is animated.</span>
         <span class="ident">animated</span>: <span class="ident">bool</span>,
         <span class="doccomment">/// The Id of the custom [`Emoji`].</span>
-        <span class="doccomment">///</span>
-        <span class="doccomment">/// [`Emoji`]: ../guild/struct.Emoji.html</span>
         <span class="ident">id</span>: <span class="ident">EmojiId</span>,
         <span class="doccomment">/// The name of the custom emoji. This is primarily used for decoration</span>
         <span class="doccomment">/// and distinguishing the emoji client-side.</span>
@@ -1241,10 +1189,6 @@
     <span class="doccomment">/// the documentation for [emoji&#39;s formatter][`Emoji::fmt`] on how this is</span>
     <span class="doccomment">/// displayed. Otherwise, if the type is a</span>
     <span class="doccomment">/// [unicode][`ReactionType::Unicode`], then the inner unicode is displayed.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`Emoji::fmt`]: ../guild/struct.Emoji.html#method.fmt</span>
-    <span class="doccomment">/// [`ReactionType::Custom`]: enum.ReactionType.html#variant.Custom</span>
-    <span class="doccomment">/// [`ReactionType::Unicode`]: enum.ReactionType.html#variant.Unicode</span>
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">FmtResult</span> {
         <span class="kw">match</span> <span class="kw-2">*</span><span class="self">self</span> {
             <span class="ident">ReactionType</span>::<span class="ident">Custom</span> {
