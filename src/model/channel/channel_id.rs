@@ -762,8 +762,8 @@ impl<'a> From<&'a GuildChannel> for ChannelId {
 #[derive(Clone, Debug)]
 #[cfg(feature = "model")]
 pub struct MessagesIter<H: AsRef<Http>> {
-    channel_id: ChannelId,
     http: H,
+    channel_id: ChannelId,
     buffer: Vec<Message>,
     before: Option<MessageId>,
     tried_fetch: bool,
@@ -771,29 +771,32 @@ pub struct MessagesIter<H: AsRef<Http>> {
 
 #[cfg(feature = "model")]
 impl<H: AsRef<Http>> MessagesIter<H> {
-    fn new(channel_id: ChannelId, http: H) -> MessagesIter<H> {
+    fn new(http: H, channel_id: ChannelId) -> MessagesIter<H> {
         MessagesIter {
-            channel_id,
             http,
+            channel_id,
             buffer: Vec::new(),
             before: None,
             tried_fetch: false,
         }
     }
 
-    /// Fills the `self.buffer` cache of Messages.
+    /// Fills the `self.buffer` cache with [`Message`]s.
     ///
-    /// This drops any messages that were currently in the buffer, so it should
-    /// only be called when `self.buffer` is empty. Additionally, this updates
+    /// This drops any messages that were currently in the buffer. Ideally, it
+    /// should only be called when `self.buffer` is empty. Additionally, this updates
     /// `self.before` so that the next call does not return duplicate items.
-    /// If there are no more messages to be fetched, then this marks
-    /// `self.before` as None, indicating that no more calls ought to be made.
+    ///
+    /// If there are no more messages to be fetched, then this sets `self.before`
+    /// as `None`, indicating that no more calls ought to be made.
     ///
     /// If this method is called with `self.before` as None, the last 100
     /// (or lower) messages sent in the channel are added in the buffer.
     ///
-    /// The messages are sorted such that the  newest message is the first
+    /// The messages are sorted such that the newest message is the first
     /// element of the buffer and the newest message is the last.
+    ///
+    /// [`Message`]: crate::model::channel::Message
     async fn refresh(&mut self) -> Result<()> {
         // Number of messages to fetch.
         let grab_size = 100;
@@ -804,11 +807,13 @@ impl<H: AsRef<Http>> MessagesIter<H> {
             if let Some(before) = self.before {
                 b.before(before);
             }
+
             b.limit(grab_size)
         }).await?;
 
-        self.before = self.buffer.get(0)
-            .map(|message| message.id);
+        self.buffer.reverse();
+
+        self.before = self.buffer.first().map(|m| m.id);
 
         self.tried_fetch = true;
 
@@ -851,7 +856,7 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     ///
     /// [`messages`]: ChannelId::messages
     pub fn stream(http: impl AsRef<Http>, channel_id: ChannelId) -> impl Stream<Item=Result<Message>> {
-        let init_state = MessagesIter::new(channel_id, http);
+        let init_state = MessagesIter::new(http, channel_id);
 
         futures::stream::unfold(init_state, |mut state| async {
             if state.buffer.is_empty() && state.before.is_some() || !state.tried_fetch {
