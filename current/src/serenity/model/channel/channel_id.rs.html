@@ -868,6 +868,11 @@
 <span id="865">865</span>
 <span id="866">866</span>
 <span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
@@ -1633,8 +1638,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessagesIter</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="ident">http</span>: <span class="ident">H</span>,
+    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
     <span class="ident">buffer</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>,
     <span class="ident">before</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageId</span><span class="op">&gt;</span>,
     <span class="ident">tried_fetch</span>: <span class="ident">bool</span>,
@@ -1642,29 +1647,32 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">H</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span><span class="op">&gt;</span> <span class="ident">MessagesIter</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">channel_id</span>: <span class="ident">ChannelId</span>, <span class="ident">http</span>: <span class="ident">H</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessagesIter</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">http</span>: <span class="ident">H</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessagesIter</span><span class="op">&lt;</span><span class="ident">H</span><span class="op">&gt;</span> {
         <span class="ident">MessagesIter</span> {
-            <span class="ident">channel_id</span>,
             <span class="ident">http</span>,
+            <span class="ident">channel_id</span>,
             <span class="ident">buffer</span>: <span class="ident">Vec</span>::<span class="ident">new</span>(),
             <span class="ident">before</span>: <span class="prelude-val">None</span>,
             <span class="ident">tried_fetch</span>: <span class="bool-val">false</span>,
         }
     }
 
-    <span class="doccomment">/// Fills the `self.buffer` cache of Messages.</span>
+    <span class="doccomment">/// Fills the `self.buffer` cache with [`Message`]s.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// This drops any messages that were currently in the buffer, so it should</span>
-    <span class="doccomment">/// only be called when `self.buffer` is empty. Additionally, this updates</span>
+    <span class="doccomment">/// This drops any messages that were currently in the buffer. Ideally, it</span>
+    <span class="doccomment">/// should only be called when `self.buffer` is empty. Additionally, this updates</span>
     <span class="doccomment">/// `self.before` so that the next call does not return duplicate items.</span>
-    <span class="doccomment">/// If there are no more messages to be fetched, then this marks</span>
-    <span class="doccomment">/// `self.before` as None, indicating that no more calls ought to be made.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If there are no more messages to be fetched, then this sets `self.before`</span>
+    <span class="doccomment">/// as `None`, indicating that no more calls ought to be made.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// If this method is called with `self.before` as None, the last 100</span>
     <span class="doccomment">/// (or lower) messages sent in the channel are added in the buffer.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// The messages are sorted such that the  newest message is the first</span>
+    <span class="doccomment">/// The messages are sorted such that the newest message is the first</span>
     <span class="doccomment">/// element of the buffer and the newest message is the last.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Message`]: crate::model::channel::Message</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Number of messages to fetch.</span>
         <span class="kw">let</span> <span class="ident">grab_size</span> <span class="op">=</span> <span class="number">100</span>;
@@ -1675,11 +1683,13 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">before</span> {
                 <span class="ident">b</span>.<span class="ident">before</span>(<span class="ident">before</span>);
             }
+
             <span class="ident">b</span>.<span class="ident">limit</span>(<span class="ident">grab_size</span>)
         }).<span class="ident">await</span><span class="question-mark">?</span>;
 
-        <span class="self">self</span>.<span class="ident">before</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">get</span>(<span class="number">0</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">message</span><span class="op">|</span> <span class="ident">message</span>.<span class="ident">id</span>);
+        <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">reverse</span>();
+
+        <span class="self">self</span>.<span class="ident">before</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buffer</span>.<span class="ident">first</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">id</span>);
 
         <span class="self">self</span>.<span class="ident">tried_fetch</span> <span class="op">=</span> <span class="bool-val">true</span>;
 
@@ -1722,7 +1732,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`messages`]: ChannelId::messages</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">stream</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw">impl</span> <span class="ident">Stream</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span> {
-        <span class="kw">let</span> <span class="ident">init_state</span> <span class="op">=</span> <span class="ident">MessagesIter</span>::<span class="ident">new</span>(<span class="ident">channel_id</span>, <span class="ident">http</span>);
+        <span class="kw">let</span> <span class="ident">init_state</span> <span class="op">=</span> <span class="ident">MessagesIter</span>::<span class="ident">new</span>(<span class="ident">http</span>, <span class="ident">channel_id</span>);
 
         <span class="ident">futures</span>::<span class="ident">stream</span>::<span class="ident">unfold</span>(<span class="ident">init_state</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">state</span><span class="op">|</span> <span class="ident">async</span> {
             <span class="kw">if</span> <span class="ident">state</span>.<span class="ident">buffer</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">state</span>.<span class="ident">before</span>.<span class="ident">is_some</span>() <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">state</span>.<span class="ident">tried_fetch</span> {
