@@ -846,6 +846,9 @@
 <span id="843">843</span>
 <span id="844">844</span>
 <span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
@@ -974,12 +977,15 @@
                     .<span class="ident">push</span>(<span class="macro">propagate_err</span><span class="macro">!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>)));
             }
             <span class="string">&quot;description&quot;</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">arg</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err</span><span class="macro">!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">arg</span>: <span class="ident">String</span> <span class="op">=</span> <span class="macro">propagate_err</span><span class="macro">!</span>(<span class="ident">attributes</span>::<span class="ident">parse</span>(<span class="ident">values</span>));
+                <span class="kw">if</span> <span class="ident">arg</span>.<span class="ident">starts_with</span>(<span class="string">&#39; &#39;</span>) {
+                    <span class="ident">arg</span>.<span class="ident">remove</span>(<span class="number">0</span>);
+                }
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">desc</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">options</span>.<span class="ident">description</span>.<span class="number">0</span> {
                     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
 
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">desc</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="ident">arg</span>.<span class="ident">trim_matches</span>(<span class="string">&#39; &#39;</span>));
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">desc</span>, <span class="string">&quot;\n{}&quot;</span>, <span class="ident">arg</span>);
                 } <span class="kw">else</span> {
                     <span class="ident">options</span>.<span class="ident">description</span> <span class="op">=</span> <span class="ident">AsOption</span>(<span class="prelude-val">Some</span>(<span class="ident">arg</span>));
                 }
