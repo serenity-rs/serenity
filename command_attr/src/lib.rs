@@ -130,12 +130,15 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     .push(propagate_err!(attributes::parse(values)));
             }
             "description" => {
-                let arg: String = propagate_err!(attributes::parse(values));
+                let mut arg: String = propagate_err!(attributes::parse(values));
+                if arg.starts_with(' ') {
+                    arg.remove(0);
+                }
 
                 if let Some(desc) = &mut options.description.0 {
                     use std::fmt::Write;
 
-                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
+                    let _ = write!(desc, "\n{}", arg);
                 } else {
                     options.description = AsOption(Some(arg));
                 }
