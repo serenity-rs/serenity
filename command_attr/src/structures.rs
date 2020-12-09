@@ -391,7 +391,7 @@ pub struct Colour(pub u32);
 
 impl Colour {
     pub fn from_str(s: &str) -> Option<Self> {
-        Some(Colour(match s.to_uppercase().as_str() {
+        let hex = match s.to_uppercase().as_str() {
             "BLITZ_BLUE" => 0x6FC6E2,
             "BLUE" => 0x3498DB,
             "BLURPLE" => 0x7289DA,
@@ -420,8 +420,18 @@ impl Colour {
             "ROHRKATZE_BLUE" => 0x7596FF,
             "ROSEWATER" => 0xF6DBD8,
             "TEAL" => 0x1ABC9C,
-            _ => return None,
-        }))
+            _ => {
+                let s = s.strip_prefix('#')?;
+
+                if s.len() != 6 {
+                    return None;
+                }
+
+                u32::from_str_radix(s, 16).ok()?
+            },
+        };
+
+        Some(Colour(hex))
     }
 }
 
