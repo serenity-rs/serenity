@@ -35,6 +35,10 @@ use tokio::{
     fs::File,
 };
 use crate::http::routing::Route;
+use percent_encoding::{
+    utf8_percent_encode,
+    NON_ALPHANUMERIC
+};
 
 pub struct Http {
     pub(crate) client: Arc<Client>,
@@ -109,7 +113,7 @@ impl Http {
             headers: None,
             route: RouteInfo::GuildBanUser {
                 delete_message_days: Some(delete_message_days),
-                reason: Some(reason),
+                reason: Some(&utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string()),
                 guild_id,
                 user_id,
             },
@@ -1555,7 +1559,7 @@ impl Http {
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
-                reason,
+                reason: &utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string(),
             },
         }).await
     }

@@ -87,6 +87,9 @@ version = "0.3"
 default-features = false
 features = ["std"]
 
+[dependencies.percent-encoding]
+version = "2.1"
+
 [dev-dependencies.http_crate]
 version = "0.2"
 package = "http"
