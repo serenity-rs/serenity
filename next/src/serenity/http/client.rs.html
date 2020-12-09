@@ -1886,6 +1886,10 @@
 <span id="1883">1883</span>
 <span id="1884">1884</span>
 <span id="1885">1885</span>
+<span id="1886">1886</span>
+<span id="1887">1887</span>
+<span id="1888">1888</span>
+<span id="1889">1889</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>;
 <span class="kw">use</span> <span class="ident">reqwest</span>::{
@@ -1924,6 +1928,10 @@
     <span class="ident">fs</span>::<span class="ident">File</span>,
 };
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">routing</span>::<span class="ident">Route</span>;
+<span class="kw">use</span> <span class="ident">percent_encoding</span>::{
+    <span class="ident">utf8_percent_encode</span>,
+    <span class="ident">NON_ALPHANUMERIC</span>
+};
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Http</span> {
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="ident">client</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Client</span><span class="op">&gt;</span>,
@@ -1993,7 +2001,7 @@
             <span class="ident">headers</span>: <span class="prelude-val">None</span>,
             <span class="ident">route</span>: <span class="ident">RouteInfo</span>::<span class="ident">GuildBanUser</span> {
                 <span class="ident">delete_message_days</span>: <span class="prelude-val">Some</span>(<span class="ident">delete_message_days</span>),
-                <span class="ident">reason</span>: <span class="prelude-val">Some</span>(<span class="ident">reason</span>),
+                <span class="ident">reason</span>: <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">utf8_percent_encode</span>(<span class="ident">reason</span>, <span class="ident">NON_ALPHANUMERIC</span>).<span class="ident">to_string</span>()),
                 <span class="ident">guild_id</span>,
                 <span class="ident">user_id</span>,
             },
@@ -3406,7 +3414,7 @@
             <span class="ident">route</span>: <span class="ident">RouteInfo</span>::<span class="ident">KickMember</span> {
                 <span class="ident">guild_id</span>,
                 <span class="ident">user_id</span>,
-                <span class="ident">reason</span>,
+                <span class="ident">reason</span>: <span class="kw-2">&amp;</span><span class="ident">utf8_percent_encode</span>(<span class="ident">reason</span>, <span class="ident">NON_ALPHANUMERIC</span>).<span class="ident">to_string</span>(),
             },
         }).<span class="ident">await</span>
     }
