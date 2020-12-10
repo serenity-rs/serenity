@@ -506,12 +506,14 @@ pub async fn command(
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
                 if !is_unrecognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options).await?;
                     return res;
                 }
 
                 let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
                 if !is_unrecognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options).await?;
                     return res;
                 }
 
