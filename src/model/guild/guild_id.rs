@@ -317,7 +317,7 @@ impl GuildId {
     /// guild.edit_member(&context, user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
-    pub async fn edit_member<F>(self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<()>
+    pub async fn edit_member<F>(self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<Member>
         where F: FnOnce(&mut EditMember) -> &mut EditMember {
         let mut edit_member = EditMember::default();
         f(&mut edit_member);
@@ -527,7 +527,7 @@ impl GuildId {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>
-    ) -> Result<()> {
+    ) -> Result<Member> {
         let mut map = Map::new();
         map.insert(
             "channel_id".to_string(),
@@ -550,7 +550,7 @@ impl GuildId {
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
-    pub async fn disconnect_member(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
+    pub async fn disconnect_member(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<Member> {
         let mut map = Map::new();
         map.insert(
             "channel_id".to_string(),

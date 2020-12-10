@@ -622,7 +622,7 @@ impl Guild {
     }
 
     /// Edits the properties of member of the guild, such as muting or
-    /// nicknaming them.
+    /// nicknaming them. Returns the new member.
     ///
     /// Refer to `EditMember`'s documentation for a full list of methods and
     /// permission restrictions.
@@ -635,7 +635,7 @@ impl Guild {
     /// guild.edit_member(user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
     #[inline]
-    pub async fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<()>
+    pub async fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<Member>
     where F: FnOnce(&mut EditMember) -> &mut EditMember
     {
         self.id.edit_member(&http, user_id, f).await
@@ -1267,7 +1267,7 @@ impl Guild {
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
-    pub async fn move_member(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, channel_id: impl Into<ChannelId>) -> Result<()> {
+    pub async fn move_member(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, channel_id: impl Into<ChannelId>) -> Result<Member> {
         self.id.move_member(&http, user_id, channel_id).await
     }
 
