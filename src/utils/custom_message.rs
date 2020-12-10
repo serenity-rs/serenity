@@ -269,6 +269,5 @@ fn dummy_message() -> Message {
         flags: None,
         stickers: Vec::new(),
         referenced_message: None,
-        _nonexhaustive: (),
     }
 }

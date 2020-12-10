@@ -111,8 +111,6 @@ pub struct Message {
     pub stickers: Vec<Sticker>,
     /// The message that was replied to using this message.
     pub referenced_message: Option<Box<Message>>, // Boxed to avoid recusion
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]

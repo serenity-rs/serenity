@@ -4,6 +4,7 @@ use crate::model::id::{StickerId, StickerPackId};
 ///
 /// Bots currently can only receive messages with stickers, not send
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Sticker {
     /// The unique ID given to this sticker.
     pub id: StickerId,
@@ -21,8 +22,6 @@ pub struct Sticker {
     pub preview_asset: Option<String>,
     /// The type of sticker format.
     pub format_type: StickerFormatType,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Differentiates between sticker formats
