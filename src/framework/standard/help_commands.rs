@@ -485,8 +485,21 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     // it. This allows the help-system to extract information
                     // from the sub-command.
                     if let Some(ref sub_command) = sub_command_found {
-                        command = sub_command;
-                        Some(sub_command.options.names[0])
+                        // Check parent command's behaviour and permission first
+                        // before we consider the sub-command overwrite it.
+                        if HelpBehaviour::Nothing == check_command_behaviour(
+                            ctx,
+                            msg,
+                            &command.options,
+                            group.options.checks,
+                            &owners,
+                            &help_options,
+                        ).await {
+                            command = sub_command;
+                            Some(sub_command.options.names[0])
+                        } else {
+                            break;
+                        }
                     } else {
                         None
                     }
