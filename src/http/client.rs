@@ -612,7 +612,7 @@ impl Http {
     pub async fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
         let body = serde_json::to_vec(map)?;
 
-        self.wind(204, Request {
+        self.wind(200, Request {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditMember { guild_id, user_id },
