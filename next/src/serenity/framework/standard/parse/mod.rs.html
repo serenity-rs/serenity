@@ -534,6 +534,8 @@
 <span id="531">531</span>
 <span id="532">532</span>
 <span id="533">533</span>
+<span id="534">534</span>
+<span id="535">535</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
@@ -1043,12 +1045,14 @@
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">handle_group</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">subgroups</span>).<span class="ident">await</span>;
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">is_unrecognised</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>) {
+                    <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="ident">await</span><span class="question-mark">?</span>;
                     <span class="kw">return</span> <span class="ident">res</span>;
                 }
 
                 <span class="kw">let</span> <span class="ident">res</span> <span class="op">=</span> <span class="ident">handle_command</span>(<span class="ident">stream</span>, <span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="ident">commands</span>, <span class="ident">group</span>).<span class="ident">await</span>;
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">is_unrecognised</span>(<span class="kw-2">&amp;</span><span class="ident">res</span>) {
+                    <span class="ident">check_discrepancy</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">config</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>).<span class="ident">await</span><span class="question-mark">?</span>;
                     <span class="kw">return</span> <span class="ident">res</span>;
                 }
 
