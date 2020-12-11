@@ -15,6 +15,7 @@ use serenity::{
     framework::standard::{
         Args, CommandOptions, CommandResult, CommandGroup,
         DispatchError, HelpOptions, help_commands, Reason, StandardFramework,
+        buckets::LimitedFor,
         macros::{command, group, help, check, hook},
     },
     http::Http,
@@ -257,8 +258,8 @@ async fn main() {
         .on_dispatch_error(dispatch_error)
     // Can't be used more than once per 5 seconds:
         .bucket("emoji", |b| b.delay(5)).await
-    // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
-        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2)).await
+    // Can't be used more than 2 times per 30 seconds, with a 5 second delay applying per channel.
+        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2).limit_for(LimitedFor::Channel)).await
     // The `#[group]` macro generates `static` instances of the options set for the group.
     // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
     // #name is turned all uppercase

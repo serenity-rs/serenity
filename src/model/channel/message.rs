@@ -750,6 +750,12 @@ impl Message {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
+    /// Retrieves the message channel's category ID if the channel has such.
+    #[cfg(feature = "cache")]
+    pub async fn category_id(&self, cache: impl AsRef<Cache>) -> Option<ChannelId> {
+        cache.as_ref().channel_category_id(self.channel_id).await
+    }
+
     pub(crate) fn check_content_length(map: &JsonMap) -> Result<()> {
         if let Some(content) = map.get("content") {
             if let Value::String(ref content) = *content {

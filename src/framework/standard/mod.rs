@@ -12,7 +12,7 @@ pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
 pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
-use structures::buckets::{Bucket, Ratelimit};
+use structures::buckets::Bucket;
 pub use structures::buckets::BucketBuilder;
 
 use parse::{ParseError, Invoke};
@@ -201,23 +201,9 @@ impl StandardFramework {
 
         f(&mut builder);
 
-        let BucketBuilder {
-            delay,
-            time_span,
-            limit,
-            check,
-        } = builder;
-
         self.buckets.lock().await.insert(
             name.to_string(),
-            Bucket {
-                ratelimit: Ratelimit {
-                    delay,
-                    limit: Some((time_span, limit)),
-                },
-                users: HashMap::new(),
-                check,
-            },
+            builder.construct(),
         );
 
         self
@@ -291,17 +277,9 @@ impl StandardFramework {
             let mut buckets = self.buckets.lock().await;
 
             if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
-                let rate_limit = bucket.take(msg.author.id.0);
 
-                let apply = match bucket.check.as_ref() {
-                    Some(check) => (check)(ctx, msg.guild_id, msg.channel_id, msg.author.id).await,
-                    None => true,
-                };
-
-                if let Some(rate_limit)= rate_limit {
-                    if apply {
-                        return Some(DispatchError::Ratelimited(rate_limit))
-                    }
+                if let Some(rate_limit) = bucket.take(ctx, msg).await {
+                    return Some(DispatchError::Ratelimited(rate_limit))
                 }
             }
         }
