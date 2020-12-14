@@ -283,19 +283,26 @@ impl Configuration {
         self
     }
 
-    /// Sets the prefix to respond to dynamically based on conditions.
+    /// Sets the prefix to respond to dynamically, in addition to the one
+    /// configured with [`prefix`] or [`prefixes`].
     ///
-    /// Return `None` to not have a special prefix for the dispatch, and to
-    /// instead use the inherited prefix.
+    /// Return `None` to not have a special prefix for the dispatch and to
+    /// instead use the configured prefix from [`prefix`] or [`prefixes`].
     ///
     /// This method can be called many times to add more dynamic prefix hooks.
     ///
     /// **Note**: Defaults to no dynamic prefix check.
     ///
+    /// **Note**: If using dynamic_prefix *without* [`prefix`] or [`prefixes`],
+    /// there will still be the default framework prefix of `"~"`. You can disable
+    /// the default prefix by setting the prefix to an empty string `""` with
+    /// [`prefix`].
+    ///
     /// # Examples
     ///
     /// If the Id of the channel is divisible by 5, return a prefix of `"!"`,
-    /// otherwise return a prefix of `"~"`.
+    /// otherwise return a prefix of `"*"`. The default framework prefix `"~"`
+    /// will always be valid in addition to the one returned by dynamic_prefix.
     ///
     /// ```rust,no_run
     /// # use serenity::prelude::*;
@@ -306,10 +313,33 @@ impl Configuration {
     ///         Some(if msg.channel_id.0 % 5 == 0 {
     ///             "!"
     ///         } else {
-    ///             "~"
+    ///             "*"
     ///         }.to_string())
     ///     })));
     /// ```
+    ///
+    /// This will only use the prefix `"!"` or `"*"` depending on channel ID.
+    ///
+    /// ```rust,no_run
+    /// # use serenity::prelude::*;
+    /// use serenity::framework::StandardFramework;
+    ///
+    /// let framework = StandardFramework::new()
+    ///     .configure(|c| c
+    ///        .dynamic_prefix(|_, msg| Box::pin(async move {
+    ///             Some(if msg.channel_id.0 % 5 == 0 {
+    ///                 "!"
+    ///             } else {
+    ///                 "*"
+    ///             }.to_string())
+    ///         }))
+    ///         // This disables the default prefix "~"
+    ///         .prefix("") 
+    ///     );
+    /// ```
+    ///
+    ///  [`prefix`]: Self::prefix
+    ///  [`prefixes`]: Self::prefixes
     #[inline]
     pub fn dynamic_prefix(&mut self, dynamic_prefix: DynamicPrefixHook) -> &mut Self {
         self.dynamic_prefixes.push(dynamic_prefix);
