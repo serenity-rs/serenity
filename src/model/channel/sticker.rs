@@ -29,18 +29,18 @@ pub struct Sticker {
 #[non_exhaustive]
 pub enum StickerFormatType {
     /// A PNG format sticker.
-    PNG = 1,
+    Png = 1,
     /// An APNG format animated sticker.
-    APNG = 2,
+    Apng = 2,
     /// A LOTTIE format animated sticker.
-    LOTTIE = 3,
+    Lottie = 3,
 }
 
 enum_number!(
     StickerFormatType {
-        PNG,
-        APNG,
-        LOTTIE,
+        Png,
+        Apng,
+        Lottie,
     }
 );
 
@@ -49,9 +49,9 @@ impl StickerFormatType {
         use self::StickerFormatType::*;
 
         match self {
-            PNG => 1,
-            APNG => 2,
-            LOTTIE => 3,
+            Png => 1,
+            Apng => 2,
+            Lottie => 3,
         }
     }
 }
