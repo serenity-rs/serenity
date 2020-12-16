@@ -820,28 +820,6 @@
 <span id="817">817</span>
 <span id="818">818</span>
 <span id="819">819</span>
-<span id="820">820</span>
-<span id="821">821</span>
-<span id="822">822</span>
-<span id="823">823</span>
-<span id="824">824</span>
-<span id="825">825</span>
-<span id="826">826</span>
-<span id="827">827</span>
-<span id="828">828</span>
-<span id="829">829</span>
-<span id="830">830</span>
-<span id="831">831</span>
-<span id="832">832</span>
-<span id="833">833</span>
-<span id="834">834</span>
-<span id="835">835</span>
-<span id="836">836</span>
-<span id="837">837</span>
-<span id="838">838</span>
-<span id="839">839</span>
-<span id="840">840</span>
-<span id="841">841</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -857,7 +835,7 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">WithWhiteSpace</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">Ratelimit</span>};
+<span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::<span class="ident">Bucket</span>;
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::<span class="ident">BucketBuilder</span>;
 
 <span class="kw">use</span> <span class="ident">parse</span>::{<span class="ident">ParseError</span>, <span class="ident">Invoke</span>};
@@ -1046,23 +1024,9 @@
 
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>);
 
-        <span class="kw">let</span> <span class="ident">BucketBuilder</span> {
-            <span class="ident">delay</span>,
-            <span class="ident">time_span</span>,
-            <span class="ident">limit</span>,
-            <span class="ident">check</span>,
-        } <span class="op">=</span> <span class="ident">builder</span>;
-
         <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">insert</span>(
             <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">Bucket</span> {
-                <span class="ident">ratelimit</span>: <span class="ident">Ratelimit</span> {
-                    <span class="ident">delay</span>,
-                    <span class="ident">limit</span>: <span class="prelude-val">Some</span>((<span class="ident">time_span</span>, <span class="ident">limit</span>)),
-                },
-                <span class="ident">users</span>: <span class="ident">HashMap</span>::<span class="ident">new</span>(),
-                <span class="ident">check</span>,
-            },
+            <span class="ident">builder</span>.<span class="ident">construct</span>(),
         );
 
         <span class="self">self</span>
@@ -1136,17 +1100,9 @@
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
 
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>)) {
-                <span class="kw">let</span> <span class="ident">rate_limit</span> <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>);
 
-                <span class="kw">let</span> <span class="ident">apply</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bucket</span>.<span class="ident">check</span>.<span class="ident">as_ref</span>() {
-                    <span class="prelude-val">Some</span>(<span class="ident">check</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>.<span class="ident">guild_id</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>).<span class="ident">await</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-                };
-
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit</span>)<span class="op">=</span> <span class="ident">rate_limit</span> {
-                    <span class="kw">if</span> <span class="ident">apply</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">Ratelimited</span>(<span class="ident">rate_limit</span>))
-                    }
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span> {
+                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">Ratelimited</span>(<span class="ident">rate_limit</span>))
                 }
             }
         }
