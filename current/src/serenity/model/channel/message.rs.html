@@ -1073,6 +1073,9 @@
 <span id="1070">1070</span>
 <span id="1071">1071</span>
 <span id="1072">1072</span>
+<span id="1073">1073</span>
+<span id="1074">1074</span>
+<span id="1075">1075</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1182,6 +1185,9 @@
     <span class="kw">pub</span> <span class="ident">message_reference</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageReference</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Bit flags describing extra features of the message.</span>
     <span class="kw">pub</span> <span class="ident">flags</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">MessageFlags</span><span class="op">&gt;</span>,
+    <span class="doccomment">/// Array of stickers sent with the message.</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">stickers</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Sticker</span><span class="op">&gt;</span>,
     <span class="doccomment">/// The message that was replied to using this message.</span>
     <span class="kw">pub</span> <span class="ident">referenced_message</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>, <span class="comment">// Boxed to avoid recusion</span>
 }

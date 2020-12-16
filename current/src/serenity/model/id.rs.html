@@ -147,6 +147,16 @@
 <span id="144">144</span>
 <span id="145">145</span>
 <span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of newtypes defining type-strong IDs.</span>
 
@@ -281,6 +291,14 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">AttachmentId</span>(<span class="ident">u64</span>);
 
+<span class="doccomment">/// An identifier for a sticker.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+
+<span class="doccomment">/// An identifier for a sticker pack.</span>
+<span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Copy</span>, <span class="ident">Clone</span>, <span class="ident">Default</span>, <span class="ident">Debug</span>, <span class="ident">Eq</span>, <span class="ident">Hash</span>, <span class="ident">PartialEq</span>, <span class="ident">PartialOrd</span>, <span class="ident">Ord</span>, <span class="ident">Serialize</span>)]</span>
+<span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">StickerPackId</span>(<span class="kw">pub</span> <span class="ident">u64</span>);
+
 <span class="macro">id_u64</span><span class="macro">!</span> {
     <span class="ident">AttachmentId</span>;
     <span class="ident">ApplicationId</span>;
@@ -290,6 +308,8 @@
     <span class="ident">IntegrationId</span>;
     <span class="ident">MessageId</span>;
     <span class="ident">RoleId</span>;
+    <span class="ident">StickerId</span>;
+    <span class="ident">StickerPackId</span>;
     <span class="ident">UserId</span>;
     <span class="ident">WebhookId</span>;
     <span class="ident">AuditLogEntryId</span>;
