@@ -71,7 +71,7 @@ pub enum Error {
     /// *This only exists for the `GuildId::ban` and `Member::ban` functions. For their cases,
     /// it's the "reason".*
     ExceededLimit(String, u32),
-    /// Input is not in the specified range
+    /// The input is not in the specified range.
     /// Returned by `GuildId::members`, `Guild::members` and `PartialGuild::members`
     ///
     /// (param_name, value, range_min, range_max)
