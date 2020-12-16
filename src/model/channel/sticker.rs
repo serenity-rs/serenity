@@ -1,8 +1,8 @@
 use crate::model::id::{StickerId, StickerPackId};
 
-/// A sticker sent with a message
+/// A sticker sent with a message.
 ///
-/// Bots currently can only receive messages with stickers, not send
+/// Bots currently can only receive messages with stickers, not send.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Sticker {
@@ -24,7 +24,7 @@ pub struct Sticker {
     pub format_type: StickerFormatType,
 }
 
-/// Differentiates between sticker formats
+/// Differentiates between sticker formats.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 pub enum StickerFormatType {
