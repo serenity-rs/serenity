@@ -8,6 +8,7 @@ mod message;
 mod private_channel;
 mod reaction;
 mod channel_category;
+mod sticker;
 
 pub use self::attachment::*;
 pub use self::channel_id::*;
@@ -17,6 +18,7 @@ pub use self::message::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
+pub use self::sticker::*;
 
 use crate::model::prelude::*;
 use serde::de::Error as DeError;

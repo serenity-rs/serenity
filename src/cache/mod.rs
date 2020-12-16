@@ -997,6 +997,7 @@ mod test {
                 application: None,
                 message_reference: None,
                 flags: None,
+                stickers: vec![],
                 referenced_message: None,
             },
         };
