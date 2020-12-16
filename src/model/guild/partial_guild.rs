@@ -286,7 +286,7 @@ impl PartialGuild {
     /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id])).await;
     /// ```
     #[inline]
-    pub async fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<()>
+    pub async fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<Member>
     where F: FnOnce(&mut EditMember) -> &mut EditMember
     {
         self.id.edit_member(&http, user_id, f).await
@@ -413,7 +413,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
         channel_id: impl Into<ChannelId>
-    ) -> Result<()> {
+    ) -> Result<Member> {
         self.id.move_member(&http, user_id, channel_id).await
     }
 

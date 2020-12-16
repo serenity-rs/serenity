@@ -78,7 +78,7 @@ impl Member {
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn add_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<Vec<RoleId>> {
         self.roles.extend_from_slice(role_ids);
 
         let mut builder = EditMember::default();
@@ -86,7 +86,7 @@ impl Member {
         let map = utils::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
-            Ok(()) => Ok(()),
+            Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.retain(|r| !role_ids.contains(r));
 
@@ -182,7 +182,7 @@ impl Member {
     /// methods, as well as usage of this.
     ///
     /// [`EditMember`]: crate::builder::EditMember
-    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
+    pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Member>
     where F: FnOnce(&mut EditMember) -> &mut EditMember
     {
         let mut edit_member = EditMember::default();
@@ -319,7 +319,7 @@ impl Member {
         &self,
         http: impl AsRef<Http>,
         channel: impl Into<ChannelId>
-    ) -> Result<()> {
+    ) -> Result<Member> {
         self.guild_id.move_member(http, self.user.id, channel).await
     }
 
@@ -328,7 +328,7 @@ impl Member {
     /// Requires the [Move Members] permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
-    pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<()> {
+    pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<Member> {
         self.guild_id.disconnect_member(http, self.user.id).await
     }
 
@@ -383,12 +383,13 @@ impl Member {
         }
     }
 
-    /// Removes one or multiple [`Role`]s from the member.
+    /// Removes one or multiple [`Role`]s from the member. Returns the member's
+    /// new roles.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
-    pub async fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<()> {
+    pub async fn remove_roles(&mut self, http: impl AsRef<Http>, role_ids: &[RoleId]) -> Result<Vec<RoleId>> {
         self.roles.retain(|r| !role_ids.contains(r));
 
         let mut builder = EditMember::default();
@@ -396,7 +397,7 @@ impl Member {
         let map = utils::hashmap_to_json_map(builder.0);
 
         match http.as_ref().edit_member(self.guild_id.0, self.user.id.0, &map).await {
-            Ok(()) => Ok(()),
+            Ok(member) => Ok(member.roles),
             Err(why) => {
                 self.roles.extend_from_slice(role_ids);
 

@@ -609,14 +609,20 @@ impl Http {
     }
 
     /// Does specific actions to a member.
-    pub async fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
+    pub async fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<Member> {
         let body = serde_json::to_vec(map)?;
 
-        self.wind(204, Request {
+        let mut value = self.request(Request {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditMember { guild_id, user_id },
-        }).await
+        }).await?.json::<Value>().await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+        }
+
+        serde_json::from_value::<Member>(value).map_err(From::from)
     }
 
     /// Edits a message by Id.
