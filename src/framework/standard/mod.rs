@@ -12,11 +12,13 @@ pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
 pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
-use structures::buckets::Bucket;
+use structures::buckets::{Bucket, BucketAction};
 pub use structures::buckets::BucketBuilder;
 
 use parse::{ParseError, Invoke};
 use parse::map::{CommandMap, GroupMap, Map};
+
+use self::buckets::RevertBucket;
 
 use super::Framework;
 use crate::client::Context;
@@ -273,14 +275,31 @@ impl StandardFramework {
             return Some(DispatchError::BlockedChannel);
         }
 
-        {
-            let mut buckets = self.buckets.lock().await;
+        // Try passing the command's bucket.
+        // We exit the loop if no command ratelimit has been hit or we
+        // early-return when ratelimits cancel the framework invocation.
+        // Otherwise, we delay and loop again to check if we passed the bucket.
+        loop {
+            let mut duration = None;
 
-            if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
+            {
+                let mut buckets = self.buckets.lock().await;
 
-                if let Some(rate_limit) = bucket.take(ctx, msg).await {
-                    return Some(DispatchError::Ratelimited(rate_limit))
+                if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
+
+                    if let Some(bucket_action) = bucket.take(ctx, msg).await {
+
+                        duration = match bucket_action {
+                            BucketAction::CancelWith(duration) => return Some(DispatchError::Ratelimited(duration)),
+                            BucketAction::DelayFor(duration) => Some(duration),
+                        };
+                    }
                 }
+            }
+
+            match duration {
+                Some(duration) => tokio::time::delay_for(duration).await,
+                None => break,
             }
         }
 
@@ -706,6 +725,15 @@ impl Framework for StandardFramework {
                 }
 
                 let res = (command.fun)(&mut ctx, &msg, args).await;
+
+                // Check if the command wants to revert the bucket by giving back a ticket.
+                if matches!(res, Err(ref e) if e.is::<RevertBucket>()) {
+                    let mut buckets = self.buckets.lock().await;
+
+                    if let Some(ref mut bucket) = command.options.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
+                        bucket.give(&ctx, &msg).await;
+                    }
+                }
 
                 if let Some(after) = &self.after {
                     after(&mut ctx, &msg, name, res).await;

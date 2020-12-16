@@ -19,6 +19,13 @@ pub(crate) struct UnitRatelimit {
     pub tickets: u32,
 }
 
+#[derive(Default)]
+pub(crate) struct UnitRatelimitTimes {
+    pub last_time: Option<Instant>,
+    pub set_time: Option<Instant>,
+}
+
+/// A bucket offers fine-grained control over the execution of commands.
 pub(crate) enum Bucket {
     /// The bucket will collect tickets for every invocation of a command.
     Global(TicketCounter),
@@ -38,7 +45,7 @@ pub(crate) enum Bucket {
 
 impl Bucket {
     #[inline]
-    pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<Duration> {
+    pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<BucketAction> {
         match self {
             Self::Global(counter) => counter.take(ctx, msg, 0).await,
             Self::User(counter) => counter.take(ctx, msg, msg.author.id.0).await,
@@ -61,16 +68,65 @@ impl Bucket {
                 },
         }
     }
+
+    #[inline]
+    pub async fn give(&mut self, ctx: &Context, msg: &Message) {
+        match self {
+            Self::Global(counter) => counter.give(ctx, msg, 0).await,
+            Self::User(counter) => counter.give(ctx, msg, msg.author.id.0).await,
+            Self::Guild(counter) => {
+                if let Some(guild_id) = msg.guild_id {
+                    counter.give(ctx, msg, guild_id.0).await
+                }
+            }
+            Self::Channel(counter) => counter.give(ctx, msg, msg.channel_id.0).await,
+            // This requires the cache, as messages do not contain their channel's
+            // category.
+            #[cfg(feature = "cache")]
+            Self::Category(counter) =>
+                if let Some(category_id) = msg.category_id(ctx).await {
+                    counter.give(ctx, msg, category_id.0).await
+                }
+            }
+        }
 }
 
+/// Keeps track of who owns how many tickets and when they accessed the last
+/// time.
 pub(crate) struct TicketCounter {
     pub ratelimit: Ratelimit,
     pub tickets_for: HashMap<u64, UnitRatelimit>,
     pub check: Option<Check>,
+    pub await_ratelimits: bool,
+}
+
+/// A bucket may return results based on how it set up.
+///
+/// By default, it will return `CancelWith` when a limit is hit.
+/// This is intended to cancel the command invocation and propagate the
+/// duration to the user.
+///
+/// If the bucket is set to await durations, it will suggest to wait
+/// for the bucket by returning `DelayFor` and then delay for the duration,
+/// and then try taking a ticket again.
+pub enum BucketAction {
+    CancelWith(Duration),
+    DelayFor(Duration),
 }
 
 impl TicketCounter {
-    pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<Duration> {
+    /// Tries to check whether the invocation is permitted by the ticket counter
+    /// and figuratively speaking if a ticket can be taken; it does not return a
+    /// a ticket but a duration until a ticket can be taken.
+    ///
+    /// The duration will be wrapped in an action for the caller to perform
+    /// if wanted. This may inform them to directly cancel trying to take
+    /// or delay the take until later.
+    ///
+    /// However there is no contract: It does not matter what
+    /// the caller ends up doing, receiving some action eventually means
+    /// no ticket can be taken and the duration must elapse.
+    pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<BucketAction> {
         if let Some(ref check) = self.check {
 
             if !(check)(ctx, msg).await {
@@ -84,13 +140,22 @@ impl TicketCounter {
         } = self;
         let ticket_owner = tickets_for.entry(id).or_default();
 
+        // Check if too many tickets have been taken already.
+        // If all tickets are exhausted, return the needed delay
+        // for this invocation.
         if let Some((timespan, limit)) = ratelimit.limit {
+
             if (ticket_owner.tickets + 1) > limit {
+
                 if let Some(res) = ticket_owner
                     .set_time
                     .and_then(|x| (x + timespan).checked_duration_since(now))
                 {
-                    return Some(res);
+                    return Some(if self.await_ratelimits {
+                        BucketAction::DelayFor(res)
+                    } else {
+                        BucketAction::CancelWith(res)
+                    })
                 } else {
                     ticket_owner.tickets = 0;
                     ticket_owner.set_time = Some(now);
@@ -98,11 +163,19 @@ impl TicketCounter {
             }
         }
 
-        if let Some(res) = ticket_owner
+        // Check if `ratelimit.delay`-time passed between the last and
+        // the current invocation
+        // If the time did not pass, return the needed delay for this
+        // invocation.
+        if let Some(ratelimit) = ticket_owner
             .last_time
             .and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
-            return Some(res);
+            return Some(if self.await_ratelimits {
+                BucketAction::DelayFor(ratelimit)
+            } else {
+                BucketAction::CancelWith(ratelimit)
+            })
         } else {
             ticket_owner.tickets += 1;
             ticket_owner.last_time = Some(now);
@@ -110,7 +183,54 @@ impl TicketCounter {
 
         None
     }
+
+    /// Reverts the last ticket step performed by returning a ticket for the
+    /// matching ticket holder.
+    /// Only call this if the mutable owner already took a ticket in this
+    /// atomic execution of calling `take` and `give`.
+    pub async fn give(&mut self, ctx: &Context, msg: &Message, id: u64) {
+        if let Some(ref check) = self.check {
+
+            if !(check)(ctx, msg).await {
+                return
+            }
+        }
+
+        if let Some(ticket_owner) = self.tickets_for.get_mut(&id) {
+
+            // Let's remove a ticket if there is one.
+            if ticket_owner.tickets > 0 {
+                ticket_owner.tickets -= 1;
+            }
+
+            let delay = self.ratelimit.delay;
+            // Substract one step of time that would have to pass.
+            // This tries to bypass a problem of keeping track of when tickets
+            // were taken.
+            // When a ticket is taken, the bucket sets `last_time`, by
+            // substracting the delay once, we allow for one more ticket to be
+            // taken.
+            // If we would reset the value to `None`, we risk resetting the
+            // bucket.
+            ticket_owner.last_time = ticket_owner
+                .last_time
+                .and_then(|i| i.checked_sub(delay));
+        }
+    }
 }
+
+/// An error struct that can be returned from a command to set the
+/// bucket one step back.
+#[derive(Debug)]
+pub struct RevertBucket;
+
+impl std::fmt::Display for RevertBucket {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        write!(f, "RevertBucket")
+    }
+}
+
+impl std::error::Error for RevertBucket {}
 
 /// Decides what a bucket will use to collect tickets for.
 pub enum LimitedFor {
@@ -144,6 +264,7 @@ pub struct BucketBuilder {
     pub(crate) limit: u32,
     pub(crate) check: Option<Check>,
     pub(crate) limited_for: LimitedFor,
+    pub(crate) await_ratelimits: bool,
 }
 
 impl BucketBuilder {
@@ -240,6 +361,18 @@ impl BucketBuilder {
         self
     }
 
+    /// If this is set to `true`, the invocation of the command will be delayed
+    /// and won't return a duration to wait to dispatch erros, but actually
+    /// await until the duration has been elapsed.
+    ///
+    /// By default, ratelimits will become dispatch errors.
+    #[inline]
+    pub fn await_ratelimits(&mut self) -> &mut Self {
+        self.await_ratelimits = true;
+
+        self
+    }
+
     /// Constructs the bucket.
     #[inline]
     pub(crate) fn construct(self) -> Bucket {
@@ -250,6 +383,7 @@ impl BucketBuilder {
             },
             tickets_for: HashMap::new(),
             check: self.check,
+            await_ratelimits: self.await_ratelimits,
         };
 
         match self.limited_for {

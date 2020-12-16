@@ -15,7 +15,7 @@ use serenity::{
     framework::standard::{
         Args, CommandOptions, CommandResult, CommandGroup,
         DispatchError, HelpOptions, help_commands, Reason, StandardFramework,
-        buckets::LimitedFor,
+        buckets::{RevertBucket, LimitedFor},
         macros::{command, group, help, check, hook},
     },
     http::Http,
@@ -259,7 +259,9 @@ async fn main() {
     // Can't be used more than once per 5 seconds:
         .bucket("emoji", |b| b.delay(5)).await
     // Can't be used more than 2 times per 30 seconds, with a 5 second delay applying per channel.
-        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2).limit_for(LimitedFor::Channel)).await
+    // Optionally `await_ratelimits` will delay until the command can be executed instead of
+    // cancelling the command invocation.
+        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2).limit_for(LimitedFor::Channel).await_ratelimits()).await
     // The `#[group]` macro generates `static` instances of the options set for the group.
     // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
     // #name is turned all uppercase
@@ -467,7 +469,8 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, ":cat:").await?;
 
-    Ok(())
+    // We can return one ticket to the bucket undoing the ratelimit.
+    Err(RevertBucket.into())
 }
 
 #[command]
