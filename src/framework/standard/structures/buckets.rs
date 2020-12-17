@@ -169,7 +169,7 @@ impl TicketCounter {
                 }
             }
         }
-        dbg!(0);
+
         // Check if `ratelimit.delay`-time passed between the last and
         // the current invocation
         // If the time did not pass, return the needed delay for this
@@ -178,14 +178,12 @@ impl TicketCounter {
             .last_time
             .and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
-            dbg!(3);
             return Some(if self.await_ratelimits {
                 BucketAction::DelayFor(ratelimit)
             } else {
                 BucketAction::CancelWith(ratelimit)
             })
         } else {
-            dbg!(1);
             ticket_owner.tickets += 1;
             ticket_owner.last_time = Some(now);
         }
@@ -198,7 +196,6 @@ impl TicketCounter {
     /// Only call this if the mutable owner already took a ticket in this
     /// atomic execution of calling `take` and `give`.
     pub async fn give(&mut self, ctx: &Context, msg: &Message, id: u64) {
-        dbg!("aa");
         if let Some(ref check) = self.check {
 
             if !(check)(ctx, msg).await {
