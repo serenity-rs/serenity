@@ -116,11 +116,11 @@ pub enum BucketAction {
 
 impl TicketCounter {
     /// Tries to check whether the invocation is permitted by the ticket counter
-    /// and figuratively speaking if a ticket can be taken; it does not return a
+    /// and if a ticket can be taken; it does not return a
     /// a ticket but a duration until a ticket can be taken.
     ///
     /// The duration will be wrapped in an action for the caller to perform
-    /// if wanted. This may inform them to directly cancel trying to take
+    /// if wanted. This may inform them to directly cancel trying to take a ticket
     /// or delay the take until later.
     ///
     /// However there is no contract: It does not matter what
@@ -198,7 +198,7 @@ impl TicketCounter {
 
         if let Some(ticket_owner) = self.tickets_for.get_mut(&id) {
 
-            // Let's remove a ticket if there is one.
+            // Remove a ticket if one is available.
             if ticket_owner.tickets > 0 {
                 ticket_owner.tickets -= 1;
             }
@@ -208,9 +208,9 @@ impl TicketCounter {
             // This tries to bypass a problem of keeping track of when tickets
             // were taken.
             // When a ticket is taken, the bucket sets `last_time`, by
-            // substracting the delay once, we allow for one more ticket to be
+            // substracting the delay, once a ticket is allowed to be
             // taken.
-            // If we would reset the value to `None`, we risk resetting the
+            // If the value is set to `None` this could possibly reset the
             // bucket.
             ticket_owner.last_time = ticket_owner
                 .last_time
@@ -360,7 +360,7 @@ impl BucketBuilder {
     }
 
     /// If this is set to `true`, the invocation of the command will be delayed
-    /// and won't return a duration to wait to dispatch erros, but actually
+    /// and won't return a duration to wait to dispatch errors, but actually
     /// await until the duration has been elapsed.
     ///
     /// By default, ratelimits will become dispatch errors.
