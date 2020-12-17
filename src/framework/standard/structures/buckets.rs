@@ -71,12 +71,22 @@ impl Bucket {
     }
 }
 
-#[derive(Default)]
 pub struct BucketBuilder {
     pub(crate) delay: Duration,
     pub(crate) time_span: Duration,
     pub(crate) limit: u32,
     pub(crate) check: Option<Check>,
+}
+
+impl Default for BucketBuilder {
+    fn default() -> Self {
+        Self {
+            delay: Duration::default(),
+            time_span: Duration::default(),
+            limit: 1,
+            check: None,
+        }
+    }
 }
 
 impl BucketBuilder {
