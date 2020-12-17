@@ -208,7 +208,7 @@ impl TicketCounter {
             // This tries to bypass a problem of keeping track of when tickets
             // were taken.
             // When a ticket is taken, the bucket sets `last_time`, by
-            // substracting the delay once, we allow for one more ticket to be
+            // substracting the delay, once a ticket is allowed to be
             // taken.
             // If we would reset the value to `None`, we risk resetting the
             // bucket.
