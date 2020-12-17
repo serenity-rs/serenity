@@ -210,7 +210,7 @@ impl TicketCounter {
             // When a ticket is taken, the bucket sets `last_time`, by
             // substracting the delay, once a ticket is allowed to be
             // taken.
-            // If we would reset the value to `None`, we risk resetting the
+            // If the value is set to `None` this could possibly reset the
             // bucket.
             ticket_owner.last_time = ticket_owner
                 .last_time
