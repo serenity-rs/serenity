@@ -51,13 +51,22 @@ impl Bucket {
         }
     }
 }
-
-#[derive(Default)]
 pub struct BucketBuilder {
     pub(crate) delay: i64,
     pub(crate) time_span: i64,
     pub(crate) limit: i32,
     pub(crate) check: Option<Box<Check>>,
+}
+
+impl Default for BucketBuilder {
+    fn default() -> Self {
+        Self {
+            delay: 0,
+            time_span: 0,
+            limit: 1,
+            check: None,
+        }
+    }
 }
 
 impl BucketBuilder {
