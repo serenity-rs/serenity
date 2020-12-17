@@ -362,7 +362,7 @@ impl BucketBuilder {
     }
 
     /// If this is set to `true`, the invocation of the command will be delayed
-    /// and won't return a duration to wait to dispatch erros, but actually
+    /// and won't return a duration to wait to dispatch errors, but actually
     /// await until the duration has been elapsed.
     ///
     /// By default, ratelimits will become dispatch errors.
