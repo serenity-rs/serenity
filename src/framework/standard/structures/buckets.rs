@@ -264,7 +264,6 @@ impl Default for LimitedFor {
     }
 }
 
-#[derive(Default)]
 pub struct BucketBuilder {
     pub(crate) delay: Duration,
     pub(crate) time_span: Duration,
@@ -272,6 +271,19 @@ pub struct BucketBuilder {
     pub(crate) check: Option<Check>,
     pub(crate) limited_for: LimitedFor,
     pub(crate) await_ratelimits: bool,
+}
+
+impl Default for BucketBuilder {
+    fn default() -> Self {
+        Self {
+            delay: Duration::default(),
+            time_span: Duration::default(),
+            limit: 1,
+            check: None,
+            limited_for: LimitedFor::default(),
+            await_ratelimits: false,
+        }
+    }
 }
 
 impl BucketBuilder {
