@@ -198,7 +198,7 @@ impl TicketCounter {
 
         if let Some(ticket_owner) = self.tickets_for.get_mut(&id) {
 
-            // Let's remove a ticket if there is one.
+            // Remove a ticket if one is available.
             if ticket_owner.tickets > 0 {
                 ticket_owner.tickets -= 1;
             }
