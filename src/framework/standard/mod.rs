@@ -276,7 +276,7 @@ impl StandardFramework {
         }
 
         // Try passing the command's bucket.
-        // We exit the loop if no command ratelimit has been hit or we
+        // exiting the loop if no command ratelimit has been hit or
         // early-return when ratelimits cancel the framework invocation.
         // Otherwise, we delay and loop again to check if we passed the bucket.
         loop {
