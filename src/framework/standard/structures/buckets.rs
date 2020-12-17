@@ -12,11 +12,20 @@ pub(crate) struct Ratelimit {
     pub limit: Option<(Duration, u32)>,
 }
 
-#[derive(Default)]
 pub(crate) struct MemberRatelimit {
     pub last_time: Option<Instant>,
-    pub set_time: Option<Instant>,
+    pub set_time: Instant,
     pub tickets: u32,
+}
+
+impl MemberRatelimit {
+    fn new(creation_time: Instant) -> Self {
+        Self {
+            last_time: None,
+            set_time: creation_time,
+            tickets: 0,
+        }
+    }
 }
 
 pub(crate) struct Bucket {
@@ -31,18 +40,19 @@ impl Bucket {
         let Self {
             users, ratelimit, ..
         } = self;
-        let user = users.entry(user_id).or_default();
+        let user = users.entry(user_id).or_insert_with(|| MemberRatelimit::new(now));
 
         if let Some((timespan, limit)) = ratelimit.limit {
+
             if (user.tickets + 1) > limit {
-                if let Some(res) = user
-                    .set_time
-                    .and_then(|x| (x + timespan).checked_duration_since(now))
+
+                if let Some(res) =
+                    (user.set_time + timespan).checked_duration_since(now)
                 {
                     return Some(res);
                 } else {
                     user.tickets = 0;
-                    user.set_time = Some(now);
+                    user.set_time = now;
                 }
             }
         }
