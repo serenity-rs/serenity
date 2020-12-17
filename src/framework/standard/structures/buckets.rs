@@ -116,7 +116,7 @@ pub enum BucketAction {
 
 impl TicketCounter {
     /// Tries to check whether the invocation is permitted by the ticket counter
-    /// and figuratively speaking if a ticket can be taken; it does not return a
+    /// and if a ticket can be taken; it does not return a
     /// a ticket but a duration until a ticket can be taken.
     ///
     /// The duration will be wrapped in an action for the caller to perform
