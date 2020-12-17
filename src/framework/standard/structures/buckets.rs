@@ -120,7 +120,7 @@ impl TicketCounter {
     /// a ticket but a duration until a ticket can be taken.
     ///
     /// The duration will be wrapped in an action for the caller to perform
-    /// if wanted. This may inform them to directly cancel trying to take
+    /// if wanted. This may inform them to directly cancel trying to take a ticket
     /// or delay the take until later.
     ///
     /// However there is no contract: It does not matter what
