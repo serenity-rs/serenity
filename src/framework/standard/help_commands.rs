@@ -444,19 +444,67 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
 
         let mut found_group_prefix: bool = false;
         for command in group.options.commands {
-            let command = *command;
+            let mut command = *command;
 
             let search_command_name_matched = if group.options.prefixes.is_empty() {
                 if starts_with_whole_word(&name, &group.name) {
                     name.drain(..=group.name.len());
                 }
 
-                command
+                let command_found = command
                     .options
                     .names
                     .iter()
                     .find(|n| **n == name)
-                    .cloned()
+                    .cloned();
+
+                if command_found.is_some() {
+                    command_found
+                } else {
+                    // Since the command could not be found in the group, we now will identify
+                    // if the command is actually using a sub-command.
+                    // We iterate all command names and check if one matches, if it does,
+                    // we potentially have a sub-command.
+                    for command_name in command.options.names {
+                        if starts_with_whole_word(&name, &command_name) {
+                            name.drain(..=command_name.len());
+                            break;
+                        }
+                    }
+
+                    // We check all sub-command names in order to see if one variant
+                    // has been issued to the help-system.
+                    let name_str = name.as_str();
+                    let sub_command_found = command
+                        .options
+                        .sub_commands
+                        .iter()
+                        .find(|n| n.options.names.contains(&name_str))
+                        .cloned();
+
+                    // If we found a sub-command, we replace the parent with
+                    // it. This allows the help-system to extract information
+                    // from the sub-command.
+                    if let Some(ref sub_command) = sub_command_found {
+                        // Check parent command's behaviour and permission first
+                        // before we consider the sub-command overwrite it.
+                        if HelpBehaviour::Nothing == check_command_behaviour(
+                            ctx,
+                            msg,
+                            &command.options,
+                            group.options.checks,
+                            &owners,
+                            &help_options,
+                        ).await {
+                            command = sub_command;
+                            Some(sub_command.options.names[0])
+                        } else {
+                            break;
+                        }
+                    } else {
+                        None
+                    }
+                }
             } else {
                 find_any_command_matches(
                     &command,

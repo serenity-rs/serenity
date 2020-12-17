@@ -55,7 +55,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(about, am_i_admin, say, commands, ping, latency, some_long_command)]
+#[commands(about, am_i_admin, say, commands, ping, latency, some_long_command, upper_command)]
 struct General;
 
 #[group]
@@ -522,6 +522,26 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
     };
 
     msg.channel_id.say(&ctx.http, say_content).await?;
+
+    Ok(())
+}
+
+// A command can have sub-commands, just like in command lines tools.
+// Imagine `cargo help` and `cargo help run`.
+#[command("upper")]
+#[sub_commands(sub)]
+async fn upper_command(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    msg.reply(&ctx.http, "This is the main function!").await?;
+
+    Ok(())
+}
+
+// This will only be called if preceded by the `upper`-command.
+#[command]
+#[aliases("sub-command", "secret")]
+#[description("This is `upper`'s sub-command.")]
+async fn sub(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    msg.reply(&ctx.http, "This is a sub function!").await?;
 
     Ok(())
 }
