@@ -1304,21 +1304,20 @@ impl Guild {
         // Create a base set of permissions, starting with `@everyone`s.
         let mut permissions = everyone.permissions;
 
-        let member = match self.members.get(&user_id) {
-            Some(member) => member,
-            None => return everyone.permissions,
-        };
+        let member = self.members.get(&user_id);
 
-        for &role in &member.roles {
-            if let Some(role) = self.roles.get(&role) {
-                permissions |= role.permissions;
-            } else {
-                warn!(
-                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
-                    member.user.id,
-                    self.id,
-                    role
-                );
+        if let Some(member) = &member {
+            for &role in &member.roles {
+                if let Some(role) = self.roles.get(&role) {
+                    permissions |= role.permissions;
+                } else {
+                    warn!(
+                        "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                        member.user.id,
+                        self.id,
+                        role
+                    );
+                }
             }
         }
 
@@ -1346,25 +1345,42 @@ impl Guild {
             // First apply the denied permission overwrites for each, then apply
             // the allowed.
 
-            let mut data = Vec::with_capacity(member.roles.len());
+            if let Some(member) = member {
+                let mut data = Vec::with_capacity(member.roles.len());
 
-            // Roles
-            for overwrite in &channel.permission_overwrites {
-                if let PermissionOverwriteType::Role(role) = overwrite.kind {
-                    if role.0 != self.id.0 && !member.roles.contains(&role) {
-                        continue;
-                    }
+                // Roles
+                for overwrite in &channel.permission_overwrites {
+                    if let PermissionOverwriteType::Role(role) = overwrite.kind {
+                        if role.0 != self.id.0 && !member.roles.contains(&role) {
+                            continue;
+                        }
 
-                    if let Some(role) = self.roles.get(&role) {
-                        data.push((role.position, overwrite.deny, overwrite.allow));
+                        if let Some(role) = self.roles.get(&role) {
+                            data.push((role.position, overwrite.deny, overwrite.allow));
+                        }
                     }
                 }
-            }
 
-            data.sort_by(|a, b| a.0.cmp(&b.0));
+                data.sort_by(|a, b| a.0.cmp(&b.0));
 
-            for overwrite in data {
-                permissions = (permissions & !overwrite.1) | overwrite.2;
+                for overwrite in data {
+                    permissions = (permissions & !overwrite.1) | overwrite.2;
+                }
+            } else {
+                // Apply @everyone overwrites even if member's role list is unavailable
+                let everyone_overwrite = channel
+                    .permission_overwrites
+                    .iter()
+                    .find(|overwrite| match &overwrite.kind {
+                        PermissionOverwriteType::Role(role) => {
+                            role.0 == self.id.0
+                        }
+                        _ => false
+                    });
+
+                if let Some(overwrite) = everyone_overwrite {
+                    permissions = (permissions & !overwrite.deny) | overwrite.allow;
+                }
             }
 
             // Member
