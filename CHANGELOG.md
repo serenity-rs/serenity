@@ -3836,7 +3836,8 @@ Initial commit.
 [0.9.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.1...v0.9.0-rc.2
 [0.9.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.0...v0.9.0-rc.1
 [0.9.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.8.8...v0.9.0-rc.0
-[0.8.8]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.8
+[0.8.9]: https://github.com/serenity-rs/serenity/compare/v0.8.8...v0.8.9
+[0.8.8]: https://github.com/serenity-rs/serenity/compare/v0.8.7...v0.8.8
 [0.8.7]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/serenity-rs/serenity/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/serenity-rs/serenity/compare/v0.8.4...v0.8.5
