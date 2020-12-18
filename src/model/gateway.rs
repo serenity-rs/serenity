@@ -54,6 +54,17 @@ pub struct Activity {
     pub emoji: Option<ActivityEmoji>,
     /// Unix timestamps for the start and/or end times of the activity.
     pub timestamps: Option<ActivityTimestamps>,
+    /// The sync ID of the activity. Mainly used by the Spotify activity
+    /// type which uses this parameter to store the track ID.
+    #[cfg(feature = "unstable")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+    pub sync_id: Option<String>,
+    /// The session ID of the activity. Reserved for specific activity
+    /// types, such as the Activity that is transmitted when a user is
+    /// listening to Spotify.
+    #[cfg(feature = "unstable")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+    pub session_id: Option<String>,
     /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
     ///
     /// [`kind`]: Self::kind
@@ -101,6 +112,10 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
+            #[cfg(feature = "unstable")]
+            sync_id: None,
+            #[cfg(feature = "unstable")]
+            session_id: None,
             url: None,
         }
     }
@@ -147,6 +162,10 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
+            #[cfg(feature = "unstable")]
+            sync_id: None,
+            #[cfg(feature = "unstable")]
+            session_id: None,
             url: Some(url.to_string()),
         }
     }
@@ -190,6 +209,10 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
+            #[cfg(feature = "unstable")]
+            sync_id: None,
+            #[cfg(feature = "unstable")]
+            session_id: None,
             url: None,
         }
     }
@@ -233,6 +256,10 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
+            #[cfg(feature = "unstable")]
+            sync_id: None,
+            #[cfg(feature = "unstable")]
+            session_id: None,
             url: None,
         }
     }
@@ -241,54 +268,79 @@ impl Activity {
 impl<'de> Deserialize<'de> for Activity {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
+
         let application_id = match map.remove("application_id") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let assets = match map.remove("assets") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let details = match map.remove("details") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let flags = match map.remove("flags") {
             Some(v) => serde_json::from_value::<Option<u64>>(v)
                 .map_err(DeError::custom)?
                 .map(ActivityFlags::from_bits_truncate),
             None => None,
         };
+
         let instance = match map.remove("instance") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let kind = map.remove("type")
             .and_then(|v| ActivityType::deserialize(v).ok())
             .unwrap_or(ActivityType::Playing);
+
         let name = map.remove("name")
             .and_then(|v| String::deserialize(v).ok())
             .unwrap_or_else(String::new);
+
         let party = match map.remove("party") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let secrets = match map.remove("secrets") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let state = match map.remove("state") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let emoji = match map.remove("emoji") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
         let timestamps = match map.remove("timestamps") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
+
+        #[cfg(feature = "unstable")]
+        let sync_id = match map.remove("sync_id") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
+        #[cfg(feature = "unstable")]
+        let session_id = match map.remove("session_id") {
+            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            None => None,
+        };
+
         let url = map.remove("url")
             .and_then(|v| serde_json::from_value::<String>(v).ok());
 
@@ -305,6 +357,10 @@ impl<'de> Deserialize<'de> for Activity {
             state,
             emoji,
             timestamps,
+            #[cfg(feature = "unstable")]
+            sync_id,
+            #[cfg(feature = "unstable")]
+            session_id,
             url,
         })
     }

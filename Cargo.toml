@@ -95,45 +95,15 @@ version = "0.2"
 package = "http"
 
 [features]
-default = [
-    "builder",
-    "cache",
-    "client",
-    "framework",
-    "gateway",
-    "model",
-    "http",
-    "standard_framework",
-    "utils",
-    "rustls_backend",
-]
-default_native_tls = [
-    "builder",
-    "cache",
-    "client",
-    "framework",
-    "gateway",
-    "model",
-    "http",
-    "standard_framework",
-    "utils",
-    "native_tls_backend",
-]
+default = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils", "rustls_backend"]
+default_native_tls = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils", "native_tls_backend"]
 builder = ["utils"]
 cache = []
 collector = ["gateway", "model", "tokio/stream"]
-client = [
-    "http",
-    "typemap_rev"
-]
+client = ["http", "typemap_rev"]
 extras = []
 framework = ["client", "model", "utils"]
-gateway = [
-    "flate2",
-    "http",
-    "url",
-    "utils",
-]
+gateway = ["flate2", "http", "url", "utils"]
 http = ["url", "bytes"]
 absolute_ratelimits = ["http"]
 rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls"]
@@ -141,6 +111,7 @@ native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"
 model = ["builder", "http"]
 voice-model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
+unstable = []
 utils = ["base64"]
 voice = ["client", "model"]
 
