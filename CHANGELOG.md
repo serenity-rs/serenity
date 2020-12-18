@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.3] - 2020-12-18
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Lakelezz]
+- [@SadiinsoSnowfall]
+
+### Added
+
+- [command_attr/framework] Support custom colours in the help command attributes ([@acdenisSK]) [c:1cc66b3]
+
+### Fixed
+
+- [framework] Fix invocation by defaulting ticket limit to 1. ([@Lakelezz]) [c:1047eac]
+- [framework] Fix handling sub-commands in the help-system. Adds an example command with sub-command to the command framework example as well. ([@Lakelezz]) [c:fac94f2]
+- [framework] Fix not setting `set_time` by default. ([@Lakelezz]) [c:5399d44]
+- [framework] Check for discrepancies in prefixless groups ([@acdenisSK]) [c:75feff2]
+- [command_attr/framework] Remove only one leading space in command descriptions ([@acdenisSK]) [c:8f5a2e9]
+- [model] Reverse the message buffer before returning messages from it ([@acdenisSK]) [c:1dba16a]
+- [model] Fix incorrect documentation for the `MessageTooLong` error ([@SadiinsoSnowfall]) [c:8b42790]
+
 ## [0.9.2] - 2020-11-28
 
 Thanks to the following for their contributions:
@@ -3803,6 +3825,9 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+<!-- COMPARISONS -->
+
+[0.9.3]: https://github.com/serenity-rs/serenity/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/serenity-rs/serenity/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.4...v0.9.0
@@ -3873,6 +3898,7 @@ Initial commit.
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
 
+<!-- AUTHORS -->
 
 [@7596ff]: https://github.com/7596ff
 [@Alch-Emi]: https://github.com/Alch-Emi
@@ -4004,6 +4030,17 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+<!-- COMMITS -->
+
+[c:1cc66b3]: https://github.com/serenity/serenity/commit/1cc66b3d4ba70f75823cb59c5db4e4b0ef162ac7
+[c:1047eac]: https://github.com/serenity/serenity/commit/1047eac908eb28c69691292db8e35e089985a09e
+[c:fac94f2]: https://github.com/serenity/serenity/commit/fac94f2559abe1cfdafe0ca998e011ba08a1e84c
+[c:5399d44]: https://github.com/serenity/serenity/commit/5399d443f4e9962b5a40fd9635eb6e3441600769
+[c:75feff2]: https://github.com/serenity/serenity/commit/75feff2869fcb4a59b19a40794182e497925d37f
+[c:8f5a2e9]: https://github.com/serenity/serenity/commit/8f5a2e9e6073ba85519f531e8f2c6324bc07ca3b
+[c:1dba16a]: https://github.com/serenity/serenity/commit/1dba16a7281a6c367e636f71abd89772ab6d74ab
+[c:8b42790]: https://github.com/serenity/serenity/commit/8b42790306e9165acd3e092c71a3d280353185a4
 
 [c:bc78991]: https://github.com/serenity-rs/serenity/commit/bc78991f7cdbdeaeba308785a42953423f5e89aa
 [c:85e5722]: https://github.com/serenity-rs/serenity/commit/85e5722c997d5cc024cb3f687a8fda3a368db2cd
