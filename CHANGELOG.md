@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.8.9] - 2020-12-18
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+- [@SadiinsoSnowfall]
+
+### Fixed
+
+- [framework] Fix invocation by defaulting ticket limit to 1. ([@Lakelezz]) [c:eaead53]
+- [framework] Fix handling sub-commands in the help-system. Adds an example command with sub-command to the command framework example as well. ([@Lakelezz]) [c:b96529e]
+- [model] Fix incorrect documentation for the `MessageTooLong` error ([@SadiinsoSnowfall]) [c:bb04fad]
+
 ## [0.8.8] - 2020-11-28
 
 Thanks to the following for their contributions:
@@ -3648,6 +3661,7 @@ Initial commit.
 [@PvdBerg1998]: https://github.com/PvdBerg1998
 [@Roughsketch]: https://github.com/Roughsketch
 [@rsaihe]: https://github.com/rsaihe
+[@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@SOF3]: https://github.com/SOF3
 [@Scetch]: https://github.com/Scetch
 [@s0lst1ce]: https://github.com/s0lst1ce
@@ -3672,6 +3686,10 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+[c:eaead53]: https://github.com/serenity/serenity/commit/eaead536db0327fde24c87aebe28470633db4a4c
+[c:b96529e]: https://github.com/serenity/serenity/commit/b96529e92b8d79cb580e15a90506e6637e6809aa
+[c:bb04fad]: https://github.com/serenity/serenity/commit/bb04fad0a8716472a5ba5f7429c18c123f9e650f
 
 [c:72f287c]: https://github.com/serenity-rs/serenity/commit/72f287c5b4ebbd9e9fbaae9afec99187387db0dd
 
