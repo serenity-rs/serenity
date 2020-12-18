@@ -303,6 +303,13 @@ impl Guild {
         self.id.ban_with_reason(cache_http.http(), user, dmd, reason).await
     }
 
+    /// Returns the formatted URL of the guild's banner image, if one exists.
+    pub fn banner_url(&self) -> Option<String> {
+        self.banner
+            .as_ref()
+            .map(|banner| format!(cdn!("/banners/{}/{}.webp?size=1024"), self.id, banner))
+    }
+
     /// Retrieves a list of [`Ban`]s for the guild.
     ///
     /// **Note**: Requires the [Ban Members] permission.
@@ -800,10 +807,20 @@ impl Guild {
     }
 
     /// Returns the formatted URL of the guild's icon, if one exists.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon
             .as_ref()
-            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+            .map(|icon| {
+                 let ext = if icon.starts_with("a_") {
+                    "gif"
+                } else {
+                    "webp"
+                };
+
+                format!(cdn!("/icons/{}/{}.{}"), self.id, icon, ext)
+            })
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -1974,10 +1991,20 @@ pub struct GuildInfo {
 #[cfg(any(feature = "model", feature = "utils"))]
 impl GuildInfo {
     /// Returns the formatted URL of the guild's icon, if the guild has an icon.
+    ///
+    /// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.
     pub fn icon_url(&self) -> Option<String> {
         self.icon
             .as_ref()
-            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+            .map(|icon| {
+                 let ext = if icon.starts_with("a_") {
+                    "gif"
+                } else {
+                    "webp"
+                };
+
+                format!(cdn!("/icons/{}/{}.{}"), self.id, icon, ext)
+            })
     }
 }
 
