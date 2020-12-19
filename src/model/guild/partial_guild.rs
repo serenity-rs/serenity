@@ -389,9 +389,12 @@ impl PartialGuild {
 
     /// Gets a list of the guild's members.
     ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
+    /// Optionally pass in the `limit` to limit the number of results. 
+    /// Minimum value is 1, maximum and default value is 1000.
+    /// <br>
+    /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
+    ///
+    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub async fn members(
         &self,

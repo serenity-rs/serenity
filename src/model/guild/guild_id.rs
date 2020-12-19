@@ -471,9 +471,12 @@ impl GuildId {
 
     /// Gets a list of the guild's members.
     ///
-    /// Optionally pass in the `limit` to limit the number of results. Maximum
-    /// value is 1000. Optionally pass in `after` to offset the results by a
-    /// [`User`]'s Id.
+    /// Optionally pass in the `limit` to limit the number of results. 
+    /// Minimum value is 1, maximum and default value is 1000.
+    /// <br>
+    /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
+    ///
+    /// [`User`]: ../user/struct.User.html
     #[inline]
     pub async fn members(self, http: impl AsRef<Http>, limit: Option<u64>, after: impl Into<Option<UserId>>) -> Result<Vec<Member>> {
         http.as_ref().get_guild_members(self.0, limit, after.into().map(|x| x.0)).await
