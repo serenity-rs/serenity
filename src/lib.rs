@@ -51,6 +51,7 @@
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
 //! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(rust_2018_idioms)]
 #![deny(broken_intra_doc_links)]
 #![type_length_limit="3294819"] // needed so ShardRunner::run compiles with instrument.
