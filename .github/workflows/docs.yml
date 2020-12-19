@@ -39,9 +39,9 @@ jobs:
 
       - name: Build docs
         env:
-          RUSTDOCFLAGS: -D broken_intra_doc_links
+          RUSTDOCFLAGS: --cfg docsrs -D broken_intra_doc_links
         run: |
-          cargo doc --no-deps --features collector,voice
+          cargo doc --no-deps --features collector,voice,unstable
           cargo doc --no-deps -p command_attr
 
       - name: Prepare docs

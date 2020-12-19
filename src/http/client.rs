@@ -35,6 +35,10 @@ use tokio::{
     fs::File,
 };
 use crate::http::routing::Route;
+use percent_encoding::{
+    utf8_percent_encode,
+    NON_ALPHANUMERIC
+};
 
 pub struct Http {
     pub(crate) client: Arc<Client>,
@@ -80,10 +84,7 @@ impl Http {
     /// **Note**: Requires the [Manage Roles] permission and respect of role
     /// hierarchy.
     ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`Member`]: ../../model/guild/struct.Member.html
-    /// [`Role`]: ../../model/guild/struct.Role.html
-    /// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_member_role(&self, guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -100,16 +101,14 @@ impl Http {
     ///
     /// **Note**: Requires that you have the [Ban Members] permission.
     ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`User`]: ../../model/user/struct.User.html
-    /// [Ban Members]: ../../model/permissions/struct.Permissions.html#associatedconstant.BAN_MEMBERS
+    /// [Ban Members]: Permissions::BAN_MEMBERS
     pub async fn ban_user(&self, guild_id: u64, user_id: u64, delete_message_days: u8, reason: &str) -> Result<()> {
         self.wind(204, Request {
             body: None,
             headers: None,
             route: RouteInfo::GuildBanUser {
                 delete_message_days: Some(delete_message_days),
-                reason: Some(reason),
+                reason: Some(&utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string()),
                 guild_id,
                 user_id,
             },
@@ -123,8 +122,6 @@ impl Http {
     ///
     /// This should rarely be used for bots, although it is a good indicator that a
     /// long-running command is still being processed.
-    ///
-    /// [`Channel`]: ../../model/channel/enum.Channel.html
     pub async fn broadcast_typing(&self, channel_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -139,10 +136,8 @@ impl Http {
     ///
     /// **Note**: Requires the [Manage Channels] permission.
     ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-channel
-    /// [Manage Channels]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_channel(&self, guild_id: u64, map: &JsonMap) -> Result<GuildChannel> {
         let body = serde_json::to_vec(map)?;
 
@@ -160,9 +155,8 @@ impl Http {
     ///
     /// **Note**: Requires the [Manage Emojis] permission.
     ///
-    /// [`create_emoji`]: ../../model/guild/struct.Guild.html#method.create_emoji
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [Manage Emojis]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [`create_emoji`]: Guild::create_emoji
+    /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     pub async fn create_emoji(&self, guild_id: u64, map: &Value) -> Result<Emoji> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
@@ -200,11 +194,9 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`PartialGuild`]: ../../model/guild/struct.PartialGuild.html
-    /// [`Shard`]: ../../gateway/struct.Shard.html
+    /// [`Shard`]: crate::gateway::Shard
     /// [GameBridge]: https://discord.com/developers/docs/topics/gamebridge
-    /// [US West Region]: ../../model/guild/enum.Region.html#variant.UsWest
+    /// [US West Region]: Region::UsWest
     /// [documentation on this endpoint]:
     /// https://discord.com/developers/docs/resources/guild#create-guild
     /// [whitelist]: https://discord.com/developers/docs/resources/guild#create-guild
@@ -222,9 +214,7 @@ impl Http {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`Integration`]: ../../model/guild/struct.Integration.html
-    /// [Manage Guild]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_GUILD
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [docs]: https://discord.com/developers/docs/resources/guild#create-guild-integration
     pub async fn create_guild_integration(&self, guild_id: u64, integration_id: u64, map: &Value) -> Result<()> {
         self.wind(204, Request {
@@ -242,9 +232,7 @@ impl Http {
     ///
     /// **Note**: Requires the [Create Invite] permission.
     ///
-    /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
-    /// [`RichInvite`]: ../../model/invite/struct.RichInvite.html
-    /// [Create Invite]: ../../model/permissions/struct.Permissions.html#associatedconstant.CREATE_INVITE
+    /// [Create Invite]: Permissions::CREATE_INVITE
     /// [docs]: https://discord.com/developers/docs/resources/channel#create-channel-invite
     pub async fn create_invite(&self, channel_id: u64, map: &JsonMap) -> Result<RichInvite> {
         let body = serde_json::to_vec(map)?;
@@ -341,8 +329,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     pub async fn create_webhook(&self, channel_id: u64, map: &Value) -> Result<Webhook> {
         let body = serde_json::to_vec(map)?;
 
@@ -435,9 +421,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Message`]: ../../model/channel/struct.Message.html
-    /// [`Reaction`]: ../../model/channel/struct.Reaction.html
     pub async fn delete_message_reactions(&self, channel_id: u64, message_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -529,8 +512,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
-    /// [`delete_webhook_with_token`]: fn.delete_webhook_with_token.html
+    /// [`delete_webhook_with_token`]: Self::delete_webhook_with_token
     pub async fn delete_webhook(&self, webhook_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -559,8 +541,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Webhook`]: ../../model/webhook/struct.Webhook.html
     pub async fn delete_webhook_with_token(&self, webhook_id: u64, token: &str) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -618,8 +598,6 @@ impl Http {
     }
 
     /// Edits a [`Guild`]'s embed setting.
-    ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
     pub async fn edit_guild_embed(&self, guild_id: u64, map: &Value) -> Result<GuildEmbed> {
         let body = serde_json::to_vec(map)?;
 
@@ -631,14 +609,20 @@ impl Http {
     }
 
     /// Does specific actions to a member.
-    pub async fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<()> {
+    pub async fn edit_member(&self, guild_id: u64, user_id: u64, map: &JsonMap) -> Result<Member> {
         let body = serde_json::to_vec(map)?;
 
-        self.wind(204, Request {
+        let mut value = self.request(Request {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditMember { guild_id, user_id },
-        }).await
+        }).await?.json::<Value>().await?;
+
+        if let Some(map) = value.as_object_mut() {
+            map.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+        }
+
+        serde_json::from_value::<Member>(value).map_err(From::from)
     }
 
     /// Edits a message by Id.
@@ -657,8 +641,6 @@ impl Http {
     /// Edits the current user's nickname for the provided [`Guild`] via its Id.
     ///
     /// Pass `None` to reset the nickname.
-    ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
     pub async fn edit_nickname(&self, guild_id: u64, new_nickname: Option<&str>) -> Result<()> {
         let map = json!({ "nick": new_nickname });
         let body = serde_json::to_vec(&map)?;
@@ -758,8 +740,8 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`create_webhook`]: fn.create_webhook.html
-    /// [`edit_webhook_with_token`]: fn.edit_webhook_with_token.html
+    /// [`create_webhook`]: Self::create_webhook
+    /// [`edit_webhook_with_token`]: Self::edit_webhook_with_token
     pub async fn edit_webhook(&self, webhook_id: u64, map: &Value) -> Result<Webhook> {
         self.fire(Request {
             body: Some(map.to_string().as_bytes()),
@@ -794,7 +776,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`edit_webhook`]: fn.edit_webhook.html
+    /// [`edit_webhook`]: Self::edit_webhook
     pub async fn edit_webhook_with_token(&self, webhook_id: u64, token: &str, map: &JsonMap) -> Result<Webhook> {
         let body = serde_json::to_vec(map)?;
 
@@ -852,8 +834,6 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`Channel`]: ../../model/channel/enum.Channel.html
-    /// [`Message`]: ../../model/channel/struct.Message.html
     /// [Discord docs]: https://discord.com/developers/docs/resources/webhook#querystring-params
     pub async fn execute_webhook(
         &self,
@@ -891,8 +871,6 @@ impl Http {
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the files are too large to send.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn execute_webhook_with_files<'a, T, It: IntoIterator<Item=T>>(
         &self,
         webhook_id: u64,
@@ -1062,8 +1040,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`GuildChannel`]: ../../model/channel/struct.GuildChannel.html
     pub async fn get_channel_webhooks(&self, channel_id: u64) -> Result<Vec<Webhook>> {
         self.fire(Request {
             body: None,
@@ -1256,8 +1232,6 @@ impl Http {
     }
 
     /// Retrieves a list of roles in a [`Guild`].
-    ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
     pub async fn get_guild_roles(&self, guild_id: u64) -> Result<Vec<Role>> {
         let mut value = self.request(Request {
             body: None,
@@ -1295,8 +1269,6 @@ impl Http {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
     pub async fn get_guild_webhooks(&self, guild_id: u64) -> Result<Vec<Webhook>> {
         self.fire(Request {
             body: None,
@@ -1511,7 +1483,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`get_webhook_with_token`]: fn.get_webhook_with_token.html
+    /// [`get_webhook_with_token`]: Self::get_webhook_with_token
     pub async fn get_webhook(&self, webhook_id: u64) -> Result<Webhook> {
         self.fire(Request {
             body: None,
@@ -1561,7 +1533,7 @@ impl Http {
             route: RouteInfo::KickMember {
                 guild_id,
                 user_id,
-                reason,
+                reason: &utf8_percent_encode(reason, NON_ALPHANUMERIC).to_string(),
             },
         }).await
     }
@@ -1582,8 +1554,6 @@ impl Http {
     /// Returns an
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the files are too large to send.
-    ///
-    /// [`HttpError::UnsuccessfulRequest`]: enum.HttpError.html#variant.UnsuccessfulRequest
     pub async fn send_files<'a, T, It: IntoIterator<Item=T>>(&self, channel_id: u64, files: It, map: JsonMap) -> Result<Message>
         where T: Into<AttachmentType<'a>> {
         let uri = api!("/channels/{}/messages", channel_id);
@@ -1695,10 +1665,7 @@ impl Http {
     /// **Note**: Requires the [Manage Roles] permission and respect of role
     /// hierarchy.
     ///
-    /// [`Guild`]: ../../model/guild/struct.Guild.html
-    /// [`Member`]: ../../model/guild/struct.Member.html
-    /// [`Role`]: ../../model/guild/struct.Role.html
-    /// [Manage Roles]: ../../model/permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_member_role(&self, guild_id: u64, user_id: u64, role_id: u64) -> Result<()> {
         self.wind(204, Request {
             body: None,
@@ -1770,10 +1737,6 @@ impl Http {
     /// # Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Channel`]: ../../model/channel/enum.Channel.html
-    /// [`Typing`]: ../typing/struct.Typing.html
-    /// [`Typing::stop`]: ../typing/struct.Typing.html#method.stop
     pub fn start_typing(self: &Arc<Self>, channel_id: u64) -> Result<Typing> {
         Typing::start(self.clone(), channel_id)
     }
@@ -1828,7 +1791,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`request`]: fn.request.html
+    /// [`request`]: Self::request
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
 
@@ -1874,7 +1837,7 @@ impl Http {
     /// # }
     /// ```
     ///
-    /// [`fire`]: fn.fire.html
+    /// [`fire`]: Self::fire
     #[instrument]
     pub async fn request(&self, req: Request<'_>) -> Result<ReqwestResponse> {
         let ratelimiting_req = RatelimitedRequest::from(req);

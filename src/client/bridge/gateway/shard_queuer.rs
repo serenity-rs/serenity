@@ -44,17 +44,17 @@ pub struct ShardQueuer {
     /// A copy of [`Client::data`] to be given to runners for contextual
     /// dispatching.
     ///
-    /// [`Client::data`]: ../../struct.Client.html#structfield.data
+    /// [`Client::data`]: crate::Client::data
     pub data: Arc<RwLock<TypeMap>>,
     /// A reference to an `EventHandler`, such as the one given to the
     /// [`Client`].
     ///
-    /// [`Client`]: ../../struct.Client.html
+    /// [`Client`]: crate::Client
     pub event_handler: Option<Arc<dyn EventHandler>>,
     /// A reference to an `RawEventHandler`, such as the one given to the
     /// [`Client`].
     ///
-    /// [`Client`]: ../../struct.Client.html
+    /// [`Client`]: crate::Client
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
@@ -66,7 +66,7 @@ pub struct ShardQueuer {
     /// A copy of the sender channel to communicate with the
     /// [`ShardManagerMonitor`].
     ///
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
+    /// [`ShardManagerMonitor`]: super::ShardManagerMonitor
     pub manager_tx: Sender<ShardManagerMessage>,
     /// The shards that are queued for booting.
     ///
@@ -104,10 +104,7 @@ impl ShardQueuer {
     /// **Note**: This should be run in its own thread due to the blocking
     /// nature of the loop.
     ///
-    /// [`ShardQueuerMessage`]: enum.ShardQueuerMessage.html
-    /// [`ShardQueuerMessage::Shutdown`]: enum.ShardQueuerMessage.html#variant.Shutdown
-    /// [`ShardQueuerMessage::Start`]: enum.ShardQueuerMessage.html#variant.Start
-    /// [`rx`]: #structfield.rx
+    /// [`rx`]: Self::rx
     #[instrument(skip(self))]
     pub async fn run(&mut self) {
         // The duration to timeout from reads over the Rx channel. This can be

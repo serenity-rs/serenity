@@ -55,7 +55,7 @@ impl ChannelId {
     /// # }
     /// ```
     ///
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
     pub async fn broadcast_typing(self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().broadcast_typing(self.0).await
@@ -83,11 +83,7 @@ impl ChannelId {
     ///
     /// Requires the [Manage Channels] permission.
     ///
-    /// [`GuildChannel::create_permission`]: ../channel/struct.GuildChannel.html#method.create_permission
-    /// [`Member`]: ../guild/struct.Member.html
-    /// [`PermissionOverwrite`]: ../channel/struct.PermissionOverwrite.html
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_permission(self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
@@ -112,10 +108,7 @@ impl ChannelId {
     /// Requires the [Add Reactions] permission, _if_ the current user is the
     /// first user to perform a react with a certain emoji.
     ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [`Message`]: ../channel/struct.Message.html
-    /// [`Message::react`]: ../channel/struct.Message.html#method.react
-    /// [Add Reactions]: ../permissions/struct.Permissions.html#associatedconstant.ADD_REACTIONS
+    /// [Add Reactions]: Permissions::ADD_REACTIONS
     #[inline]
     pub async fn create_reaction(
         self,
@@ -139,9 +132,7 @@ impl ChannelId {
     /// Requires the [Manage Messages] permission, if the current user is not
     /// the author of the message.
     ///
-    /// [`Message`]: ../channel/struct.Message.html
-    /// [`Message::delete`]: ../channel/struct.Message.html#method.delete
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_message(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
         http.as_ref().delete_message(self.0, message_id.into().0).await
@@ -161,8 +152,7 @@ impl ChannelId {
     /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
     /// delete either 0 or more than 100 messages.
     ///
-    /// [`ModelError::BulkDeleteAmount`]: ../error/enum.Error.html#variant.BulkDeleteAmount
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_messages<T, It>(self, http: impl AsRef<Http>, message_ids: It) -> Result<()>
     where T: AsRef<MessageId>, It: IntoIterator<Item=T>,
     {
@@ -190,7 +180,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     pub async fn delete_permission(
         self,
         http: impl AsRef<Http>,
@@ -210,8 +200,7 @@ impl ChannelId {
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
     ///
-    /// [`Reaction`]: ../channel/struct.Reaction.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reaction(
         self,
@@ -233,8 +222,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Messages] permission.
     ///
-    /// [`Reaction`]: ../channel/struct.Reaction.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn delete_reaction_emoji(
         self,
@@ -271,8 +259,7 @@ impl ChannelId {
     /// # }
     /// ```
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[cfg(feature = "utils")]
     #[inline]
     pub async fn edit<F>(self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
@@ -301,10 +288,8 @@ impl ChannelId {
     /// is over the [`the limit`], containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [`EditMessage`]: ../../builder/struct.EditMessage.html
-    /// [`Message`]: ../channel/struct.Message.html
-    /// [`the limit`]: ../../builder/struct.EditMessage.html#method.content
+    /// [`EditMessage`]: crate::builder::EditMessage
+    /// [`the limit`]: crate::builder::EditMessage::content
     #[cfg(feature = "utils")]
     #[inline]
     pub async fn edit_message<F>(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>, f: F) -> Result<Message>
@@ -327,8 +312,6 @@ impl ChannelId {
     }
 
     /// Attempts to find a [`Channel`] by its Id in the cache.
-    ///
-    /// [`Channel`]: ../channel/enum.Channel.html
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn to_channel_cached(self, cache: impl AsRef<Cache>) -> Option<Channel> {
@@ -340,8 +323,6 @@ impl ChannelId {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
-    ///
-    /// [`Channel`]: ../channel/enum.Channel.html
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
         #[cfg(feature = "cache")]
@@ -360,7 +341,7 @@ impl ChannelId {
     ///
     /// Requires the [Manage Channels] permission.
     ///
-    /// [Manage Channels]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
         http.as_ref().get_channel_invites(self.0).await
@@ -370,7 +351,7 @@ impl ChannelId {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn message(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<Message> {
         http
@@ -390,8 +371,8 @@ impl ChannelId {
     ///
     /// Requires the [Read Message History] permission.
     ///
-    /// [`GetMessages`]: ../../builder/struct.GetMessages.html
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [`GetMessages`]: crate::builder::GetMessages
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn messages<F>(self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
     where F: FnOnce(&mut GetMessages) -> &mut GetMessages
     {
@@ -457,7 +438,7 @@ impl ChannelId {
     /// # }
     /// ```
     ///
-    /// [`messages`]: ../id/struct.ChannelId.html#method.messages
+    /// [`messages`]: Self::messages
     pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item=Result<Message>> {
         MessagesIter::<H>::stream(http, self)
     }
@@ -475,16 +456,12 @@ impl ChannelId {
     }
 
     /// Pins a [`Message`] to the channel.
-    ///
-    /// [`Message`]: ../channel/struct.Message.html
     #[inline]
     pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
         http.as_ref().pin_message(self.0, message_id.into().0).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
-    ///
-    /// [`Message`]: ../channel/struct.Message.html
     #[inline]
     pub async fn pins(self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         http.as_ref().get_pins(self.0).await
@@ -502,10 +479,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
-    /// [`Emoji`]: ../guild/struct.Emoji.html
-    /// [`Message`]: ../channel/struct.Message.html
-    /// [`User`]: ../user/struct.User.html
-    /// [Read Message History]: ../permissions/struct.Permissions.html#associatedconstant.READ_MESSAGE_HISTORY
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
@@ -531,9 +505,6 @@ impl ChannelId {
     /// Returns a [`ModelError::MessageTooLong`] if the content of the message
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
-    ///
-    /// [`ChannelId`]: struct.ChannelId.html
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
     #[inline]
     pub async fn say(self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
         self.send_message(&http, |m| m.content(content)).await
@@ -608,12 +579,10 @@ impl ChannelId {
     /// [`HttpError::UnsuccessfulRequest(ErrorResponse)`][`HttpError::UnsuccessfulRequest`]
     /// if the file(s) are too large to send.
     ///
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
-    /// [`CreateMessage::content`]: ../../builder/struct.CreateMessage.html#method.content
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [Attach Files]: ../permissions/struct.Permissions.html#associatedconstant.ATTACH_FILES
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
+    /// [`CreateMessage::content`]: crate::builder::CreateMessage::content
+    /// [Attach Files]: Permissions::ATTACH_FILES
+    /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub async fn send_files<'a, F, T, It>(self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
@@ -644,10 +613,8 @@ impl ChannelId {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`ModelError::MessageTooLong`]: ../error/enum.Error.html#variant.MessageTooLong
-    /// [`CreateMessage`]: ../../builder/struct.CreateMessage.html
-    /// [Send Messages]: ../permissions/struct.Permissions.html#associatedconstant.SEND_MESSAGES
+    /// [`CreateMessage`]: crate::builder::CreateMessage
+    /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub async fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
         where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
@@ -708,9 +675,6 @@ impl ChannelId {
     /// # Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Typing`]: ../../http/typing/struct.Typing.html
-    /// [`Typing::stop`]: ../../http/typing/struct.Typing.html#method.stop
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
         http.start_typing(self.0)
     }
@@ -719,8 +683,7 @@ impl ChannelId {
     ///
     /// Requires the [Manage Messages] permission.
     ///
-    /// [`Message`]: ../channel/struct.Message.html
-    /// [Manage Messages]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_MESSAGES
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn unpin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
         http.as_ref().unpin_message(self.0, message_id.into().0).await
@@ -730,7 +693,7 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
-    /// [Manage Webhooks]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_WEBHOOKS
+    /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_channel_webhooks(self.0).await
@@ -796,13 +759,11 @@ impl<'a> From<&'a GuildChannel> for ChannelId {
 }
 
 /// A helper class returned by [`ChannelId::messages_iter`]
-///
-/// [`ChannelId::messages_iter`]: ../id/struct.ChannelId.html#method.messages_iter
 #[derive(Clone, Debug)]
 #[cfg(feature = "model")]
 pub struct MessagesIter<H: AsRef<Http>> {
-    channel_id: ChannelId,
     http: H,
+    channel_id: ChannelId,
     buffer: Vec<Message>,
     before: Option<MessageId>,
     tried_fetch: bool,
@@ -810,29 +771,32 @@ pub struct MessagesIter<H: AsRef<Http>> {
 
 #[cfg(feature = "model")]
 impl<H: AsRef<Http>> MessagesIter<H> {
-    fn new(channel_id: ChannelId, http: H) -> MessagesIter<H> {
+    fn new(http: H, channel_id: ChannelId) -> MessagesIter<H> {
         MessagesIter {
-            channel_id,
             http,
+            channel_id,
             buffer: Vec::new(),
             before: None,
             tried_fetch: false,
         }
     }
 
-    /// Fills the `self.buffer` cache of Messages.
+    /// Fills the `self.buffer` cache with [`Message`]s.
     ///
-    /// This drops any messages that were currently in the buffer, so it should
-    /// only be called when `self.buffer` is empty. Additionally, this updates
+    /// This drops any messages that were currently in the buffer. Ideally, it
+    /// should only be called when `self.buffer` is empty. Additionally, this updates
     /// `self.before` so that the next call does not return duplicate items.
-    /// If there are no more messages to be fetched, then this marks
-    /// `self.before` as None, indicating that no more calls ought to be made.
+    ///
+    /// If there are no more messages to be fetched, then this sets `self.before`
+    /// as `None`, indicating that no more calls ought to be made.
     ///
     /// If this method is called with `self.before` as None, the last 100
     /// (or lower) messages sent in the channel are added in the buffer.
     ///
-    /// The messages are sorted such that the  newest message is the first
+    /// The messages are sorted such that the newest message is the first
     /// element of the buffer and the newest message is the last.
+    ///
+    /// [`Message`]: crate::model::channel::Message
     async fn refresh(&mut self) -> Result<()> {
         // Number of messages to fetch.
         let grab_size = 100;
@@ -843,11 +807,13 @@ impl<H: AsRef<Http>> MessagesIter<H> {
             if let Some(before) = self.before {
                 b.before(before);
             }
+
             b.limit(grab_size)
         }).await?;
 
-        self.before = self.buffer.get(0)
-            .map(|message| message.id);
+        self.buffer.reverse();
+
+        self.before = self.buffer.first().map(|m| m.id);
 
         self.tried_fetch = true;
 
@@ -888,9 +854,9 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// # }
     /// ```
     ///
-    /// [`messages`]: ../id/struct.ChannelId.html#method.messages
+    /// [`messages`]: ChannelId::messages
     pub fn stream(http: impl AsRef<Http>, channel_id: ChannelId) -> impl Stream<Item=Result<Message>> {
-        let init_state = MessagesIter::new(channel_id, http);
+        let init_state = MessagesIter::new(http, channel_id);
 
         futures::stream::unfold(init_state, |mut state| async {
             if state.buffer.is_empty() && state.before.is_some() || !state.tried_fetch {

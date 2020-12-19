@@ -49,14 +49,11 @@
 //!
 //! The same can be accomplished with no embeds by substituting `with_embeds`
 //! with the [`plain`] function.
-//!
-//! [`plain`]: fn.plain.html
-//! [`with_embeds`]: fn.with_embeds.html
 
 #[cfg(all(feature = "cache", feature = "http"))]
 use super::{
     Args, CommandGroup, CommandOptions, Check,
-    CheckResult, has_correct_roles, HelpBehaviour,
+    has_correct_roles, HelpBehaviour,
     HelpOptions, has_correct_permissions, OnlyIn,
     structures::Command as InternalCommand,
 };
@@ -113,6 +110,7 @@ pub struct GroupCommandsPair {
     pub name: &'static str,
     pub prefixes: Vec<&'static str>,
     pub command_names: Vec<String>,
+    pub summary: Option<&'static str>,
     pub sub_groups: Vec<GroupCommandsPair>,
 }
 
@@ -126,6 +124,7 @@ pub struct SuggestedCommandName {
 
 /// A single command containing all related pieces of information.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct Command<'a> {
     pub name: &'static str,
     pub group_name: &'static str,
@@ -137,7 +136,6 @@ pub struct Command<'a> {
     pub usage: Option<&'static str>,
     pub usage_sample: Vec<&'static str>,
     pub checks: Vec<String>,
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Contains possible suggestions in case a command could not be found
@@ -404,7 +402,7 @@ async fn check_command_behaviour(
 
             let mut args = Args::new("", &[]);
 
-            if let CheckResult::Failure(_) = (check.function)(ctx, msg, &mut args, options).await {
+            if (check.function)(ctx, msg, &mut args, options).await.is_err() {
                 return help_options.lacking_conditions;
             }
         }
@@ -445,19 +443,67 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
 
         let mut found_group_prefix: bool = false;
         for command in group.options.commands {
-            let command = *command;
+            let mut command = *command;
 
             let search_command_name_matched = if group.options.prefixes.is_empty() {
                 if starts_with_whole_word(&name, &group.name) {
                     name.drain(..=group.name.len());
                 }
 
-                command
+                let command_found = command
                     .options
                     .names
                     .iter()
                     .find(|n| **n == name)
-                    .cloned()
+                    .cloned();
+
+                if command_found.is_some() {
+                    command_found
+                } else {
+                    // Since the command could not be found in the group, we now will identify
+                    // if the command is actually using a sub-command.
+                    // We iterate all command names and check if one matches, if it does,
+                    // we potentially have a sub-command.
+                    for command_name in command.options.names {
+                        if starts_with_whole_word(&name, &command_name) {
+                            name.drain(..=command_name.len());
+                            break;
+                        }
+                    }
+
+                    // We check all sub-command names in order to see if one variant
+                    // has been issued to the help-system.
+                    let name_str = name.as_str();
+                    let sub_command_found = command
+                        .options
+                        .sub_commands
+                        .iter()
+                        .find(|n| n.options.names.contains(&name_str))
+                        .cloned();
+
+                    // If we found a sub-command, we replace the parent with
+                    // it. This allows the help-system to extract information
+                    // from the sub-command.
+                    if let Some(ref sub_command) = sub_command_found {
+                        // Check parent command's behaviour and permission first
+                        // before we consider the sub-command overwrite it.
+                        if HelpBehaviour::Nothing == check_command_behaviour(
+                            ctx,
+                            msg,
+                            &command.options,
+                            group.options.checks,
+                            &owners,
+                            &help_options,
+                        ).await {
+                            command = sub_command;
+                            Some(sub_command.options.names[0])
+                        } else {
+                            break;
+                        }
+                    } else {
+                        None
+                    }
+                }
             } else {
                 find_any_command_matches(
                     &command,
@@ -565,7 +611,6 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     usage: options.usage,
                     usage_sample: options.examples.to_vec(),
                     sub_commands: sub_command_names,
-                    _nonexhaustive: (),
                 },
             });
         }
@@ -797,6 +842,7 @@ async fn create_single_group(
     ).await;
 
     group_with_cmds.name = group.name;
+    group_with_cmds.summary = group.options.summary;
 
     group_with_cmds
 }
@@ -988,6 +1034,13 @@ fn flatten_group_to_string(
         );
     }
 
+    let mut summary_or_prefixes = false;
+
+    if let Some(group_summary) = group.summary {
+        let _ = writeln!(group_text, "{}*{}*", &repeated_indent_str, group_summary);
+        summary_or_prefixes = true;
+    }
+
     if !group.prefixes.is_empty() {
         let _ = writeln!(group_text,
             "{}{}: `{}`",
@@ -995,7 +1048,12 @@ fn flatten_group_to_string(
             help_options.group_prefix,
             group.prefixes.join("`, `"),
         );
+        summary_or_prefixes = true;
     };
+
+    if summary_or_prefixes {
+        let _ = writeln!(group_text);
+    }
 
     let mut joined_commands = group
         .command_names
@@ -1418,11 +1476,20 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
         "**{}**: {}",
         help_options.grouped_label, command.group_name
     );
+
     let _ = writeln!(
         result,
         "**{}**: {}",
         help_options.available_text, command.availability
     );
+
+    if !command.sub_commands.is_empty() {
+        let _ = writeln!(
+            result,
+            "**{}**: {}",
+            help_options.sub_commands_label, format!("`{}`", command.sub_commands.join("`, `"))
+        );
+     }
 
     result
 }

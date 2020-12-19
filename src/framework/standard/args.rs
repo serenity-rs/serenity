@@ -286,8 +286,6 @@ impl Args {
     /// // We shall not see `the quick brown` again.
     /// assert_eq!(args.rest(), "fox jumps over the lazy");
     /// ```
-    ///
-    /// [`Args`]: #struct.Args.html
     pub fn new(message: &str, possible_delimiters: &[Delimiter]) -> Self {
         let delims = possible_delimiters
             .iter()
@@ -434,8 +432,8 @@ impl Args {
     /// assert_eq!(args.current(), None);
     /// ```
     ///
-    /// [`trimmed`]: #method.trimmed
-    /// [`quoted`]: #method.quoted
+    /// [`trimmed`]: Self::trimmed
+    /// [`quoted`]: Self::quoted
     #[inline]
     pub fn current(&self) -> Option<&str> {
         if self.is_empty() {
@@ -481,7 +479,7 @@ impl Args {
     ///
     /// Refer to [`trimmed`]'s examples.
     ///
-    /// [`trimmed`]: #method.trimmed
+    /// [`trimmed`]: Self::trimmed
     pub fn untrimmed(&mut self) -> &mut Self {
         match self.state {
             State::Trimmed => self.state = State::None,
@@ -536,7 +534,7 @@ impl Args {
     ///
     /// Refer to [`quoted`]'s examples.
     ///
-    /// [`quoted`]: #method.quoted
+    /// [`quoted`]: Self::quoted
     pub fn unquoted(&mut self) -> &mut Self {
         match self.state {
             State::Quoted => self.state = State::None,
@@ -562,8 +560,8 @@ impl Args {
     /// assert_eq!(args.current(), Some("4"));
     /// ```
     ///
-    /// [`trimmed`]: #method.trimmed
-    /// [`quoted`]: #method.quoted
+    /// [`trimmed`]: Self::trimmed
+    /// [`quoted`]: Self::quoted
     #[inline]
     pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
         T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
@@ -588,8 +586,8 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     ///
-    /// [`parse`]: #method.parse
-    /// [`advance`]: #method.advance
+    /// [`parse`]: Self::parse
+    /// [`advance`]: Self::advance
     #[inline]
     pub fn single<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.parse::<T>()?;
@@ -643,8 +641,8 @@ impl Args {
     /// assert!(args.is_empty());
     /// ```
     ///
-    /// [`trimmed`]: struct.Iter.html#method.trimmed
-    /// [`quoted`]: struct.Iter.html#method.quoted
+    /// [`trimmed`]: Iter::trimmed
+    /// [`quoted`]: Iter::quoted
     #[inline]
     pub fn iter<T: FromStr>(&mut self) -> Iter<'_, T> {
         Iter {

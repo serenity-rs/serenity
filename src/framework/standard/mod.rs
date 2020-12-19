@@ -12,11 +12,13 @@ pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
 pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
-use structures::buckets::{Bucket, Ratelimit};
+use structures::buckets::{Bucket, BucketAction};
 pub use structures::buckets::BucketBuilder;
 
 use parse::{ParseError, Invoke};
 use parse::map::{CommandMap, GroupMap, Map};
+
+use self::buckets::RevertBucket;
 
 use super::Framework;
 use crate::client::Context;
@@ -91,7 +93,7 @@ type PrefixOnlyHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'f
 ///
 /// Refer to the [module-level documentation] for more information.
 ///
-/// [module-level documentation]: index.html
+/// [module-level documentation]: self
 #[derive(Default)]
 pub struct StandardFramework {
     groups: Vec<(&'static CommandGroup, Map)>,
@@ -117,8 +119,8 @@ pub struct StandardFramework {
     /// framework check if a [`Event::MessageCreate`] should be processed by
     /// itself.
     ///
-    /// [`EventHandler::message`]: ../../client/trait.EventHandler.html#method.message
-    /// [`Event::MessageCreate`]: ../../model/event/enum.Event.html#variant.MessageCreate
+    /// [`EventHandler::message`]: crate::client::EventHandler::message
+    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
     pub initialized: bool,
 }
 
@@ -155,10 +157,9 @@ impl StandardFramework {
     /// # }
     /// ```
     ///
-    /// [`Client`]: ../../client/struct.Client.html
-    /// [`Configuration::default`]: struct.Configuration.html#method.default
-    /// [`prefix`]: struct.Configuration.html#method.prefix
-    /// [allowing whitespace between prefixes]: struct.Configuration.html#method.with_whitespace
+    /// [`Client`]: crate::Client
+    /// [`prefix`]: Configuration::prefix
+    /// [allowing whitespace between prefixes]: Configuration::with_whitespace
     pub fn configure<F>(mut self, f: F) -> Self
     where
         F: FnOnce(&mut Configuration) -> &mut Configuration,
@@ -202,23 +203,9 @@ impl StandardFramework {
 
         f(&mut builder);
 
-        let BucketBuilder {
-            delay,
-            time_span,
-            limit,
-            check,
-        } = builder;
-
         self.buckets.lock().await.insert(
             name.to_string(),
-            Bucket {
-                ratelimit: Ratelimit {
-                    delay,
-                    limit: Some((time_span, limit)),
-                },
-                users: HashMap::new(),
-                check,
-            },
+            builder.construct(),
         );
 
         self
@@ -288,30 +275,39 @@ impl StandardFramework {
             return Some(DispatchError::BlockedChannel);
         }
 
-        {
-            let mut buckets = self.buckets.lock().await;
+        // Try passing the command's bucket.
+        // exiting the loop if no command ratelimit has been hit or
+        // early-return when ratelimits cancel the framework invocation.
+        // Otherwise, delay and loop again to check if we passed the bucket.
+        loop {
+            let mut duration = None;
 
-            if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
-                let rate_limit = bucket.take(msg.author.id.0);
+            {
+                let mut buckets = self.buckets.lock().await;
 
-                let apply = match bucket.check.as_ref() {
-                    Some(check) => (check)(ctx, msg.guild_id, msg.channel_id, msg.author.id).await,
-                    None => true,
-                };
+                if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
 
-                if let Some(rate_limit)= rate_limit {
-                    if apply {
-                        return Some(DispatchError::Ratelimited(rate_limit))
+                    if let Some(bucket_action) = bucket.take(ctx, msg).await {
+
+                        duration = match bucket_action {
+                            BucketAction::CancelWith(duration) => return Some(DispatchError::Ratelimited(duration)),
+                            BucketAction::DelayFor(duration) => Some(duration),
+                        };
                     }
                 }
+            }
+
+            match duration {
+                Some(duration) => tokio::time::delay_for(duration).await,
+                None => break,
             }
         }
 
         for check in group.checks.iter().chain(command.checks.iter()) {
             let res = (check.function)(ctx, msg, args, command).await;
 
-            if let CheckResult::Failure(r) = res {
-                return Some(DispatchError::CheckFailed(check.name, r));
+            if let Result::Err(reason) = res {
+                return Some(DispatchError::CheckFailed(check.name, reason));
             }
         }
 
@@ -378,7 +374,7 @@ impl StandardFramework {
     /// Note: does _not_ return `Self` like many other commands. This is because
     /// it's not intended to be chained as the other commands are.
     ///
-    /// [`group`]: #method.group
+    /// [`group`]: Self::group
     pub fn group_add(&mut self, group: &'static CommandGroup) {
         let map = if group.options.prefixes.is_empty() {
             Map::Prefixless(
@@ -729,6 +725,15 @@ impl Framework for StandardFramework {
                 }
 
                 let res = (command.fun)(&mut ctx, &msg, args).await;
+
+                // Check if the command wants to revert the bucket by giving back a ticket.
+                if matches!(res, Err(ref e) if e.is::<RevertBucket>()) {
+                    let mut buckets = self.buckets.lock().await;
+
+                    if let Some(ref mut bucket) = command.options.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
+                        bucket.give(&ctx, &msg).await;
+                    }
+                }
 
                 if let Some(after) = &self.after {
                     after(&mut ctx, &msg, name, res).await;

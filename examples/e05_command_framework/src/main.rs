@@ -13,8 +13,9 @@ use serenity::{
     async_trait,
     client::bridge::gateway::{ShardId, ShardManager},
     framework::standard::{
-        Args, CheckResult, CommandOptions, CommandResult, CommandGroup,
-        DispatchError, HelpOptions, help_commands, StandardFramework,
+        Args, CommandOptions, CommandResult, CommandGroup,
+        DispatchError, HelpOptions, help_commands, Reason, StandardFramework,
+        buckets::{RevertBucket, LimitedFor},
         macros::{command, group, help, check, hook},
     },
     http::Http,
@@ -55,7 +56,7 @@ impl EventHandler for Handler {
 }
 
 #[group]
-#[commands(about, am_i_admin, say, commands, ping, latency, some_long_command)]
+#[commands(about, am_i_admin, say, commands, ping, latency, some_long_command, upper_command)]
 struct General;
 
 #[group]
@@ -66,6 +67,8 @@ struct General;
 // Set a description to appear if a user wants to display a single group
 // e.g. via help using the group-name or one of its prefixes.
 #[description = "A group with commands providing an emoji as response."]
+// Summary only appears when listing multiple groups.
+#[summary = "Do emoji fun!"]
 // Sets a command that will be executed if only a group-prefix was passed.
 #[default_command(bird)]
 #[commands(cat, dog)]
@@ -83,6 +86,8 @@ struct Math;
 #[owners_only]
 // Limit all commands to be guild-restricted.
 #[only_in(guilds)]
+// Summary only appears when listing multiple groups.
+#[summary = "Commands for server owners"]
 #[commands(slow_mode)]
 struct Owner;
 
@@ -93,7 +98,7 @@ struct Owner;
 // This replaces the information that a user can pass
 // a command-name as argument to gain specific information about it.
 #[individual_command_tip =
-"Hello! こんにちは！Hola! Bonjour! 您好!\n\
+"Hello! こんにちは！Hola! Bonjour! 您好! 안녕하세요~\n\n\
 If you want more information about a specific command, just pass the command as argument."]
 // Some arguments require a `{}` in order to replace it with contextual information.
 // In this case our `{}` refers to a command's name.
@@ -253,8 +258,10 @@ async fn main() {
         .on_dispatch_error(dispatch_error)
     // Can't be used more than once per 5 seconds:
         .bucket("emoji", |b| b.delay(5)).await
-    // Can't be used more than 2 times per 30 seconds, with a 5 second delay:
-        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2)).await
+    // Can't be used more than 2 times per 30 seconds, with a 5 second delay applying per channel.
+    // Optionally `await_ratelimits` will delay until the command can be executed instead of
+    // cancelling the command invocation.
+        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2).limit_for(LimitedFor::Channel).await_ratelimits()).await
     // The `#[group]` macro generates `static` instances of the options set for the group.
     // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
     // #name is turned all uppercase
@@ -335,22 +342,25 @@ async fn say(ctx: &Context, msg: &Message, args: Args) -> CommandResult {
 // not called.
 #[check]
 #[name = "Owner"]
-async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> CheckResult {
+async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOptions) -> Result<(), Reason> {
     // Replace 7 with your ID to make this check pass.
     //
-    // `true` will convert into `CheckResult::Success`,
+    // 1. If you want to pass a reason alongside failure you can do:
+    // `Reason::User("Lacked admin permission.".to_string())`,
     //
-    // `false` will convert into `CheckResult::Failure(Reason::Unknown)`,
+    // 2. If you want to mark it as something you want to log only:
+    // `Reason::Log("User lacked admin permission.".to_string())`,
     //
-    // and if you want to pass a reason alongside failure you can do:
-    // `CheckResult::new_user("Lacked admin permission.")`,
+    // 3. If the check's failure origin is unknown you can mark it as such:
+    // `Reason::Unknown`
     //
-    // if you want to mark it as something you want to log only:
-    // `CheckResult::new_log("User lacked admin permission.")`,
-    //
-    // and if the check's failure origin is unknown you can mark it as such (same as using `false.into`):
-    // `CheckResult::new_unknown()`
-    (msg.author.id == 7).into()
+    // 4. If you want log for your system and for the user, use:
+    // `Reason::UserAndLog { user, log }`
+    if msg.author.id == 7 {
+        return Err(Reason::User("Lacked owner permission".to_string()));
+    }
+
+    Ok(())
 }
 
 #[command]
@@ -459,7 +469,8 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 async fn cat(ctx: &Context, msg: &Message) -> CommandResult {
     msg.channel_id.say(&ctx.http, ":cat:").await?;
 
-    Ok(())
+    // We can return one ticket to the bucket undoing the ratelimit.
+    Err(RevertBucket.into())
 }
 
 #[command]
@@ -522,6 +533,26 @@ async fn slow_mode(ctx: &Context, msg: &Message, mut args: Args) -> CommandResul
     };
 
     msg.channel_id.say(&ctx.http, say_content).await?;
+
+    Ok(())
+}
+
+// A command can have sub-commands, just like in command lines tools.
+// Imagine `cargo help` and `cargo help run`.
+#[command("upper")]
+#[sub_commands(sub)]
+async fn upper_command(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    msg.reply(&ctx.http, "This is the main function!").await?;
+
+    Ok(())
+}
+
+// This will only be called if preceded by the `upper`-command.
+#[command]
+#[aliases("sub-command", "secret")]
+#[description("This is `upper`'s sub-command.")]
+async fn sub(ctx: &Context, msg: &Message, _args: Args) -> CommandResult {
+    msg.reply(&ctx.http, "This is a sub function!").await?;
 
     Ok(())
 }

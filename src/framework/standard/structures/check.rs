@@ -1,21 +1,17 @@
-use std::fmt::Debug;
-use std::fmt;
-use crate::model::channel::Message;
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
+use crate::model::channel::Message;
 use futures::future::BoxFuture;
+use std::error::Error;
+use std::fmt::{self, Debug, Display};
 
-/// This type describes why a check has failed and occurs on
-/// [`CheckResult::Failure`].
+/// This type describes why a check has failed.
 ///
 /// **Note**:
 /// The bot-developer is supposed to process this `enum` as the framework is not.
 /// It solely serves as a way to inform a user about why a check
 /// has failed and for the developer to log given failure (e.g. bugs or statistics)
 /// occurring in [`Check`]s.
-///
-/// [`Check`]: struct.Check.html
-/// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub enum Reason {
@@ -29,94 +25,14 @@ pub enum Reason {
     UserAndLog { user: String, log: String },
 }
 
-/// Returned from [`Check`]s.
-/// If `Success`, the [`Check`] is considered as passed.
-/// If `Failure`, the [`Check`] is considered as failed and can return further
-/// information on the cause via [`Reason`].
-///
-/// [`Check`]: struct.Check.html
-/// [`Reason`]: enum.Reason.html
-#[derive(Clone, Debug)]
-pub enum CheckResult {
-   Success,
-   Failure(Reason),
-}
-
-impl CheckResult {
-    /// Creates a new [`CheckResult::Failure`] with [`Reason::User`].
-    ///
-    /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::User`]: enum.Reason.html#variant.User
-    pub fn new_user<D>(d: D) -> Self
-        where D: fmt::Display {
-        CheckResult::Failure(Reason::User(d.to_string()))
-    }
-
-    /// Creates a new [`CheckResult::Failure`] with [`Reason::Log`].
-    ///
-    /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::Log`]: enum.Reason.html#variant.Log
-    pub fn new_log<D>(d: D) -> Self
-        where D: fmt::Display {
-        CheckResult::Failure(Reason::Log(d.to_string()))
-    }
-
-    /// Creates a new [`CheckResult::Failure`] with [`Reason::Unknown`].
-    ///
-    /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::Unknown`]: enum.Reason.html#variant.Unknown
-    pub fn new_unknown() -> Self {
-        CheckResult::Failure(Reason::Unknown)
-    }
-
-    /// Creates a new [`CheckResult::Failure`] with [`Reason::UserAndLog`].
-    ///
-    /// [`CheckResult::Failure`]: enum.CheckResult.html#variant.Failure
-    /// [`Reason::UserAndLog`]: enum.Reason.html#variant.UserAndLog
-    pub fn new_user_and_log<D>(user: D, log: D) -> Self
-        where D: fmt::Display {
-        CheckResult::Failure(Reason::UserAndLog {
-            user: user.to_string(),
-            log: log.to_string(),
-        })
-    }
-
-    /// Returns `true` if [`CheckResult`] is [`CheckResult::Success`] and
-    /// `false` if not.
-    ///
-    /// [`CheckResult`]: enum.CheckResult.html
-    /// [`CheckResult::Success`]: enum.CheckResult.html#variant.Success
-    pub fn is_success(&self) -> bool {
-        if let CheckResult::Success = self {
-            return true;
-        }
-
-        false
-    }
-}
-
-impl From<bool> for CheckResult {
-    fn from(succeeded: bool) -> Self {
-        if succeeded {
-            CheckResult::Success
-        } else {
-            CheckResult::Failure(Reason::Unknown)
-        }
-    }
-}
-
-impl From<Reason> for CheckResult {
-    fn from(reason: Reason) -> Self {
-        CheckResult::Failure(reason)
-    }
-}
+impl Error for Reason {}
 
 pub type CheckFunction = for<'fut> fn(
     &'fut Context,
     &'fut Message,
     &'fut mut Args,
     &'fut CommandOptions,
-) -> BoxFuture<'fut, CheckResult>;
+) -> BoxFuture<'fut, Result<(), Reason>>;
 
 /// A check can be part of a command or group and will be executed to
 /// determine whether a user is permitted to use related item.
@@ -144,6 +60,19 @@ impl Debug for Check {
             .field("check_in_help", &self.check_in_help)
             .field("display_in_help", &self.display_in_help)
             .finish()
+    }
+}
+
+impl Display for Reason {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            Self::Unknown => write!(f, "Unknown"),
+            Self::User(reason) => write!(f, "User {}", reason),
+            Self::Log(reason) => write!(f, "Log {}", reason),
+            Self::UserAndLog { user, log } => {
+                write!(f, "UserAndLog {{user: {}, log: {}}}", user, log)
+            }
+        }
     }
 }
 

@@ -91,7 +91,7 @@ use crate::client::bridge::voice::VoiceGatewayManager;
 /// # }
 /// ```
 ///
-/// [`Client`]: ../../struct.Client.html
+/// [`Client`]: crate::Client
 #[derive(Debug)]
 pub struct ShardManager {
     monitor_tx: Sender<ShardManagerMessage>,
@@ -173,8 +173,6 @@ impl ShardManager {
     ///
     /// This will communicate shard boots with the [`ShardQueuer`] so that they
     /// are properly queued.
-    ///
-    /// [`ShardQueuer`]: struct.ShardQueuer.html
     #[instrument(skip(self))]
     pub fn initialize(&mut self) -> Result<()> {
         let shard_to = self.shard_index + self.shard_init;
@@ -235,9 +233,8 @@ impl ShardManager {
     /// # }
     /// ```
     ///
-    /// [`ShardQueuer`]: struct.ShardQueuer.html
-    /// [`ShardRunner`]: struct.ShardRunner.html
-    /// [`initialize`]: #method.initialize
+    /// [`ShardRunner`]: super::ShardRunner
+    /// [`initialize`]: Self::initialize
     #[instrument(skip(self))]
     pub async fn restart(&mut self, shard_id: ShardId) {
         info!("Restarting shard {}", shard_id);
@@ -251,8 +248,7 @@ impl ShardManager {
     /// Returns the [`ShardId`]s of the shards that have been instantiated and
     /// currently have a valid [`ShardRunner`].
     ///
-    /// [`ShardId`]: struct.ShardId.html
-    /// [`ShardRunner`]: struct.ShardRunner.html
+    /// [`ShardRunner`]: super::ShardRunner
     #[instrument(skip(self))]
     pub async fn shards_instantiated(&self) -> Vec<ShardId> {
         self.runners.lock().await.keys().cloned().collect()
@@ -300,7 +296,7 @@ impl ShardManager {
     /// If you only need to shutdown a select number of shards, prefer looping
     /// over the [`shutdown`] method.
     ///
-    /// [`shutdown`]: #method.shutdown
+    /// [`shutdown`]: Self::shutdown
     #[instrument(skip(self))]
     pub async fn shutdown_all(&mut self) {
         let keys = {
@@ -338,8 +334,7 @@ impl Drop for ShardManager {
     /// This shuts down all active [`ShardRunner`]s and attempts to tell the
     /// [`ShardQueuer`] to shutdown.
     ///
-    /// [`ShardQueuer`]: struct.ShardQueuer.html
-    /// [`ShardRunner`]: struct.ShardRunner.html
+    /// [`ShardRunner`]: super::ShardRunner
     fn drop(&mut self) {
         let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown);
         let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);

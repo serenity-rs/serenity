@@ -77,9 +77,9 @@ use tracing::{debug, instrument};
 /// through the API, so it can't be pre-emptively ratelimited. This only affects
 /// the largest of bots.
 ///
-/// [`limit`]: struct.Ratelimit.html#method.limit
-/// [`remaining`]: struct.Ratelimit.html#method.remaining
-/// [`reset`]: struct.Ratelimit.html#method.reset
+/// [`limit`]: Ratelimit::limit
+/// [`remaining`]: Ratelimit::remaining
+/// [`reset`]: Ratelimit::reset
 pub struct Ratelimiter {
     client: Arc<Client>,
     global: Arc<Mutex<()>>,
@@ -145,9 +145,6 @@ impl Ratelimiter {
     /// #     Ok(())
     /// # }
     /// ```
-    ///
-    /// [`Ratelimit`]: struct.Ratelimit.html
-    /// [`Route`]: ../routing/enum.Route.html
     pub fn routes(&self) -> Arc<RwLock<HashMap<Route, Arc<Mutex<Ratelimit>>>>> {
         Arc::clone(&self.routes)
     }
@@ -241,8 +238,7 @@ impl Ratelimiter {
 /// **Note**: You should _not_ mutate any of the fields, as this can help cause
 /// 429s.
 ///
-/// [`Http`]: ../client/struct.Http.html#structfield.routes
-/// [`Route`]: ../routing/enum.Route.html
+/// [`Http`]: super::Http
 /// [Discord docs]: https://discord.com/developers/docs/topics/rate-limits
 #[derive(Debug)]
 pub struct Ratelimit {

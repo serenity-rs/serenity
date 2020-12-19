@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.3] - 2020-12-18
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+- [@Lakelezz]
+- [@SadiinsoSnowfall]
+
+### Added
+
+- [command_attr/framework] Support custom colours in the help command attributes ([@acdenisSK]) [c:1cc66b3]
+
+### Fixed
+
+- [framework] Fix invocation by defaulting ticket limit to 1. ([@Lakelezz]) [c:1047eac]
+- [framework] Fix handling sub-commands in the help-system. Adds an example command with sub-command to the command framework example as well. ([@Lakelezz]) [c:fac94f2]
+- [framework] Fix not setting `set_time` by default. ([@Lakelezz]) [c:5399d44]
+- [framework] Check for discrepancies in prefixless groups ([@acdenisSK]) [c:75feff2]
+- [command_attr/framework] Remove only one leading space in command descriptions ([@acdenisSK]) [c:8f5a2e9]
+- [model] Reverse the message buffer before returning messages from it ([@acdenisSK]) [c:1dba16a]
+- [model] Fix incorrect documentation for the `MessageTooLong` error ([@SadiinsoSnowfall]) [c:8b42790]
+
+## [0.9.2] - 2020-11-28
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Changed
+
+- [misc] Update the version in lib.rs to rely on any patch version in 0.9 ([@acdenisSK]) [c:85e5722]
+- [misc] Credit the real author of the Serenity.await commit ([@acdenisSK]) [c:757e0d6]
+
+### Fixed
+
+- [framework] Avoid cloning the entire guild object upon a command invocation ([@acdenisSK]) [c:bc78991]
+- [model] Only add roles that the member does not possess when calling `Member::add_roles` ([@acdenisSK]) [c:e6fd09b]
+
 ## [0.9.1] - 2020-11-08
 
 Thanks to the following for their contributions:
@@ -272,6 +310,29 @@ Thanks to the following for their contributions:
 - [misc] Remove Zeyla Hellyer as an author of Serenity ([@acdenisSK]) [c:9cfc410]
 - [misc] Remove the matches developmental dependency ([@acdenisSK]) [c:2418edd]
 - [misc] Remove usages of mem::replace where its return value is unused ([@acdenisSK]) [c:3135e0f]
+
+## [0.8.9] - 2020-12-18
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+- [@SadiinsoSnowfall]
+
+### Fixed
+
+- [framework] Fix invocation by defaulting ticket limit to 1. ([@Lakelezz]) [c:eaead53]
+- [framework] Fix handling sub-commands in the help-system. Adds an example command with sub-command to the command framework example as well. ([@Lakelezz]) [c:b96529e]
+- [model] Fix incorrect documentation for the `MessageTooLong` error ([@SadiinsoSnowfall]) [c:bb04fad]
+
+## [0.8.8] - 2020-11-28
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Changed
+
+- [framework] Backport changes in the framework discrepancy check from 0.9.x ([@acdenisSK]) [c:72f287c]
 
 ## [0.8.7] - 2020-08-11
 
@@ -3764,13 +3825,19 @@ rest::get_guilds(GuildPagination::After(GuildId(777)), 50);
 
 Initial commit.
 
+<!-- COMPARISONS -->
+
+[0.9.3]: https://github.com/serenity-rs/serenity/compare/v0.9.2...v0.9.3
+[0.9.2]: https://github.com/serenity-rs/serenity/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
 [0.9.0]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.4...v0.9.0
 [0.9.0-rc.4]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.3...v0.9.0-rc.4
 [0.9.0-rc.3]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.2...v0.9.0-rc.3
 [0.9.0-rc.2]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.1...v0.9.0-rc.2
 [0.9.0-rc.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0-rc.0...v0.9.0-rc.1
-[0.9.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.8.7...v0.9.0-rc.0
+[0.9.0-rc.0]: https://github.com/serenity-rs/serenity/compare/v0.8.8...v0.9.0-rc.0
+[0.8.9]: https://github.com/serenity-rs/serenity/compare/v0.8.8...v0.8.9
+[0.8.8]: https://github.com/serenity-rs/serenity/compare/v0.8.7...v0.8.8
 [0.8.7]: https://github.com/serenity-rs/serenity/compare/v0.8.6...v0.8.7
 [0.8.6]: https://github.com/serenity-rs/serenity/compare/v0.8.5...v0.8.6
 [0.8.5]: https://github.com/serenity-rs/serenity/compare/v0.8.4...v0.8.5
@@ -3832,6 +3899,7 @@ Initial commit.
 [issue:56]: https://github.com/serenity-rs/serenity/issues/56
 [rust-websocket:issue:137]: https://github.com/cyderize/rust-websocket/issues/137
 
+<!-- AUTHORS -->
 
 [@7596ff]: https://github.com/7596ff
 [@Alch-Emi]: https://github.com/Alch-Emi
@@ -3933,6 +4001,7 @@ Initial commit.
 [@rsaihe]: https://github.com/rsaihe
 [@Qeenon]: https://github.com/Qeenon
 [@qm3ster]: https://github.com/qm3ster
+[@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@SOF3]: https://github.com/SOF3
 [@Scetch]: https://github.com/Scetch
 [@s0lst1ce]: https://github.com/s0lst1ce
@@ -3962,6 +4031,22 @@ Initial commit.
 [@zack37]: https://github.com/zack37
 [@zeyla]: https://github.com/zeyla
 
+
+<!-- COMMITS -->
+
+[c:1cc66b3]: https://github.com/serenity/serenity/commit/1cc66b3d4ba70f75823cb59c5db4e4b0ef162ac7
+[c:1047eac]: https://github.com/serenity/serenity/commit/1047eac908eb28c69691292db8e35e089985a09e
+[c:fac94f2]: https://github.com/serenity/serenity/commit/fac94f2559abe1cfdafe0ca998e011ba08a1e84c
+[c:5399d44]: https://github.com/serenity/serenity/commit/5399d443f4e9962b5a40fd9635eb6e3441600769
+[c:75feff2]: https://github.com/serenity/serenity/commit/75feff2869fcb4a59b19a40794182e497925d37f
+[c:8f5a2e9]: https://github.com/serenity/serenity/commit/8f5a2e9e6073ba85519f531e8f2c6324bc07ca3b
+[c:1dba16a]: https://github.com/serenity/serenity/commit/1dba16a7281a6c367e636f71abd89772ab6d74ab
+[c:8b42790]: https://github.com/serenity/serenity/commit/8b42790306e9165acd3e092c71a3d280353185a4
+
+[c:bc78991]: https://github.com/serenity-rs/serenity/commit/bc78991f7cdbdeaeba308785a42953423f5e89aa
+[c:85e5722]: https://github.com/serenity-rs/serenity/commit/85e5722c997d5cc024cb3f687a8fda3a368db2cd
+[c:757e0d6]: https://github.com/serenity-rs/serenity/commit/757e0d60067553ea49fa0dc180c6e64843a7ea13
+[c:e6fd09b]: https://github.com/serenity-rs/serenity/commit/e6fd09b15550654a6f2dd16742b9703539d0ff03
 
 [c:7ea8098]: https://github.com/serenity-rs/serenity/commit/7ea80988604ce1a9c772dabd8b150b5f89ca355c
 [c:182ee78]: https://github.com/serenity-rs/serenity/commit/182ee78f685595d43b951dab2d0f8a59c9a3f84d
@@ -4087,6 +4172,11 @@ Initial commit.
 [c:2418edd]: https://github.com/serenity-rs/serenity/commit/2418edd02ca7bcf4f0763216cc7e986a77b6aede
 [c:3135e0f]: https://github.com/serenity-rs/serenity/commit/3135e0f3ccaf80d4ac8eabbed4040ed10e8a7863
 
+[c:eaead53]: https://github.com/serenity/serenity/commit/eaead536db0327fde24c87aebe28470633db4a4c
+[c:b96529e]: https://github.com/serenity/serenity/commit/b96529e92b8d79cb580e15a90506e6637e6809aa
+[c:bb04fad]: https://github.com/serenity/serenity/commit/bb04fad0a8716472a5ba5f7429c18c123f9e650f
+
+[c:72f287c]: https://github.com/serenity-rs/serenity/commit/72f287c5b4ebbd9e9fbaae9afec99187387db0dd
 
 [c:6b1021f]: https://github.com/serenity-rs/serenity/commit/6b1021f85ea8590b2aa50e4ea986b598575c6abb
 [c:9f848af]: https://github.com/serenity-rs/serenity/commit/9f848aff0fda841d7ca827447ac115bcb0d18d1a

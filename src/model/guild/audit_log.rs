@@ -259,23 +259,24 @@ pub struct Change {
 }
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub struct AuditLogs {
     pub entries: HashMap<AuditLogEntryId, AuditLogEntry>,
     pub webhooks: Vec<Webhook>,
     pub users: Vec<User>,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct AuditLogEntry {
     /// Determines to what entity an [`action`] was used on.
     ///
-    /// [`action`]: #structfield.action
+    /// [`action`]: Self::action
     #[serde(with = "option_u64_handler")]
     pub target_id: Option<u64>,
     /// Determines what action was done on a [`target_id`]
     ///
-    /// [`target_id`]: #structfield.target_id
+    /// [`target_id`]: Self::target_id
     #[serde(
         with = "action_handler",
         rename = "action_type"
@@ -291,11 +292,10 @@ pub struct AuditLogEntry {
     pub id: AuditLogEntryId,
     /// Some optional data assosiated with this entry.
     pub options: Option<Options>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Options {
     /// Number of days after which inactive members were kicked.
     #[serde(default, with = "option_u64_handler")]
@@ -318,8 +318,6 @@ pub struct Options {
     /// Name of the role if type is "role"
     #[serde(default)]
     pub role_name: Option<String>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 mod option_u64_handler {
@@ -475,7 +473,6 @@ impl<'de> Deserialize<'de> for AuditLogs {
                         .collect(),
                     webhooks: webhooks.unwrap(),
                     users: users.unwrap(),
-                    _nonexhaustive: (),
                 })
             }
         }

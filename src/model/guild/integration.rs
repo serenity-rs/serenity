@@ -2,6 +2,7 @@ use super::*;
 
 /// Various information about integrations.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Integration {
     pub id: IntegrationId,
     pub account: IntegrationAccount,
@@ -14,8 +15,6 @@ pub struct Integration {
     pub synced_at: u64,
     pub syncing: bool,
     pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 impl From<Integration> for IntegrationId {
@@ -25,9 +24,8 @@ impl From<Integration> for IntegrationId {
 
 /// Integration account object.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct IntegrationAccount {
     pub id: String,
     pub name: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }

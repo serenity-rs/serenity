@@ -15,7 +15,7 @@ pub enum ParseValue {
     Roles,
 }
 
-/// A builder to manage the allowed mentions on a message, 
+/// A builder to manage the allowed mentions on a message,
 /// used by the [`ChannelId::send_message`] method.
 ///
 /// # Examples
@@ -60,7 +60,7 @@ pub enum ParseValue {
 ///
 /// ```
 ///
-/// [`ChannelId::send_message`]: ../model/id/struct.ChannelId.html#method.send_message
+/// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
 #[derive(Clone, Debug)]
 pub struct CreateAllowedMentions(pub HashMap<&'static str, Value>);
 
@@ -70,8 +70,8 @@ impl CreateAllowedMentions {
     /// If users or roles is specified, [`users`] and [`roles`] will not work.\
     /// If you use either, do not specify it's same type here.
     ///
-    /// [`users`]: struct.CreateAllowedMentions.html#method.users
-    /// [`roles`]: struct.CreateAllowedMentions.html#method.roles
+    /// [`users`]: Self::users
+    /// [`roles`]: Self::roles
     #[inline]
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
         if let Some(val) = self.0.get_mut("parse") {
@@ -87,8 +87,8 @@ impl CreateAllowedMentions {
     /// If parse is empty, the message will not mention anyone, unless they are specified on
     /// [`users`] or [`roles`].
     ///
-    /// [`users`]: struct.CreateAllowedMentions.html#method.users
-    /// [`roles`]: struct.CreateAllowedMentions.html#method.roles
+    /// [`users`]: Self::users
+    /// [`roles`]: Self::roles
     #[inline]
     pub fn empty_parse(&mut self) -> &mut Self {
         if let Some(val) = self.0.get_mut("parse") {
@@ -136,6 +136,14 @@ impl CreateAllowedMentions {
         } else {
             self.0.insert("roles", Value::Array(vec![]));
         }
+        self
+    }
+
+    /// Makes the reply mention/ping the user.
+    #[inline]
+    pub fn replied_user(&mut self, mention_user: bool) -> &mut Self {
+        self.0.insert("replied_user", Value::Bool(mention_user));
+
         self
     }
 }

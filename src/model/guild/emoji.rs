@@ -23,6 +23,7 @@ use crate::http::CacheHttp;
 /// or via an integration. Emojis created using the API only work within the
 /// guild it was created in.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Emoji {
     /// Whether the emoji is animated.
     #[serde(default)]
@@ -34,7 +35,7 @@ pub struct Emoji {
     pub name: String,
     /// Whether the emoji is managed via an [`Integration`] service.
     ///
-    /// [`Integration`]: struct.Integration.html
+    /// [`Integration`]: super::Integration
     pub managed: bool,
     /// Whether the emoji name needs to be surrounded by colons in order to be
     /// used by the client.
@@ -42,10 +43,8 @@ pub struct Emoji {
     /// A list of [`Role`]s that are allowed to use the emoji. If there are no
     /// roles specified, then usage is unrestricted.
     ///
-    /// [`Role`]: struct.Role.html
+    /// [`Role`]: super::Role
     pub roles: Vec<RoleId>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -56,8 +55,7 @@ impl Emoji {
     ///
     /// **Note**: Only user accounts may use this method.
     ///
-    /// [Manage Emojis]:
-    /// ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
     ///
     /// # Examples
     ///
@@ -105,7 +103,7 @@ impl Emoji {
     ///
     /// **Note**: Only user accounts may use this method.
     ///
-    /// [Manage Emojis]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_EMOJIS
+    /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
     #[cfg(feature = "cache")]
     pub async fn edit(&mut self, cache_http: impl CacheHttp, name: &str) -> Result<()> {
         let cache = cache_http.cache().ok_or(Error::Model(ModelError::ItemMissing))?;
@@ -129,7 +127,7 @@ impl Emoji {
 
     /// Finds the [`Guild`] that owns the emoji by looking through the Cache.
     ///
-    /// [`Guild`]: struct.Guild.html
+    /// [`Guild`]: super::Guild
     ///
     /// # Examples
     ///

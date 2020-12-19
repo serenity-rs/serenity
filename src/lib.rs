@@ -39,21 +39,21 @@
 //! serenity = "0.9"
 //! ```
 //!
-//! [`Cache`]: cache/struct.Cache.html
-//! [`Client::builder`]: client/struct.Client.html#method.builder
+//! [`Context`]: crate::client::Context
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
-//! [`Context`]: client/struct.Context.html
-//! [`Event`]: model/event/enum.Event.html
-//! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
-//! [`Shard`]: gateway/struct.Shard.html
+//! [`Event`]: crate::model::event::Event
+//! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+//! [`Shard`]: crate::gateway::Shard
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
-//! [cache docs]: cache/index.html
-//! [client's module-level documentation]: client/index.html
+//! [cache docs]: crate::cache
+//! [client's module-level documentation]: crate::client
 //! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
-//! [gateway docs]: gateway/index.html
+//! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(rust_2018_idioms)]
+#![deny(broken_intra_doc_links)]
 #![type_length_limit="3294819"] // needed so ShardRunner::run compiles with instrument.
 
 #[macro_use]

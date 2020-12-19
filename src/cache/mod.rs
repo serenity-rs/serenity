@@ -27,14 +27,8 @@
 //! while needing to hit the REST API as little as possible, then the answer
 //! is "yes".
 //!
-//! [`Shard`]: ../gateway/struct.Shard.html
-//! [`Emoji`]: ../model/guild/struct.Emoji.html
-//! [`Guild`]: ../model/guild/struct.Guild.html
-//! [`Guild::edit`]: ../model/guild/struct.Guild.html#method.edit
-//! [`Message`]: ../model/channel/struct.Message.html
-//! [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-//! [`Role`]: ../model/guild/struct.Role.html
-//! [`http`]: ../http/index.html
+//! [`Shard`]: crate::gateway::Shard
+//! [`http`]: crate::http
 
 use std::str::FromStr;
 use crate::model::prelude::*;
@@ -98,8 +92,8 @@ impl<F: FromStr> FromStrAndCache for F {
 ///
 /// The cache will clone all values when calling its methods.
 ///
-/// [`Shard`]: ../gateway/struct.Shard.html
-/// [`http`]: ../http/index.html
+/// [`Shard`]: crate::gateway::Shard
+/// [`http`]: crate::http
 #[derive(Debug)]
 #[non_exhaustive]
 pub struct Cache {
@@ -109,18 +103,11 @@ pub struct Cache {
     /// When a [`Event::GuildDelete`] or [`Event::GuildUnavailable`] is
     /// received and processed by the cache, the relevant channels are also
     /// removed from this map.
-    ///
-    /// [`Event::GuildDelete`]: ../model/event/struct.GuildDeleteEvent.html
-    /// [`Event::GuildUnavailable`]: ../model/event/struct.GuildUnavailableEvent.html
-    /// [`Guild`]: ../model/guild/struct.Guild.html
     pub(crate) channels: RwLock<HashMap<ChannelId, GuildChannel>>,
     /// A map of channel categories.
     pub(crate) categories: RwLock<HashMap<ChannelId, ChannelCategory>>,
     /// A map of guilds with full data available. This includes data like
     /// [`Role`]s and [`Emoji`]s that are not available through the REST API.
-    ///
-    /// [`Emoji`]: ../model/guild/struct.Emoji.html
-    /// [`Role`]: ../model/guild/struct.Role.html
     pub(crate) guilds: RwLock<HashMap<GuildId, Guild>>,
     pub(crate) messages: RwLock<MessageCache>,
     /// A map of users' presences. This is updated in real-time. Note that
@@ -138,9 +125,6 @@ pub struct Cache {
     /// Additionally, guilds are always unavailable for bot users when a Ready
     /// is received. Guilds are "sent in" over time through the receiving of
     /// [`Event::GuildCreate`]s.
-    ///
-    /// [`Event::GuildCreate`]: ../model/event/enum.Event.html#variant.GuildCreate
-    /// [`Event::GuildUnavailable`]: ../model/event/enum.Event.html#variant.GuildUnavailable
     pub(crate) unavailable_guilds: RwLock<HashSet<GuildId>>,
     /// The current user "logged in" and for which events are being received
     /// for.
@@ -149,9 +133,6 @@ pub struct Cache {
     /// such as whether it is a bot, whether the user is verified, etc.
     ///
     /// Refer to the documentation for [`CurrentUser`] for more information.
-    ///
-    /// [`CurrentUser`]: ../model/user/struct.CurrentUser.html
-    /// [`User`]: ../model/user/struct.User.html
     pub(crate) user: RwLock<CurrentUser>,
     /// A map of users that the current user sees.
     ///
@@ -167,13 +148,6 @@ pub struct Cache {
     /// Note, however, that users are _not_ removed from the map on removal
     /// events such as [`GuildMemberRemove`][`GuildMemberRemoveEvent`], as other
     /// structs such as members or recipients may still exist.
-    ///
-    /// [`GuildMemberAddEvent`]: ../model/event/struct.GuildMemberAddEvent.html
-    /// [`GuildMemberRemoveEvent`]: ../model/event/struct.GuildMemberRemoveEvent.html
-    /// [`GuildMemberUpdateEvent`]: ../model/event/struct.GuildMemberUpdateEvent.html
-    /// [`GuildMembersChunkEvent`]: ../model/event/struct.GuildMembersChunkEvent.html
-    /// [`PresenceUpdateEvent`]: ../model/event/struct.PresenceUpdateEvent.html
-    /// [`ReadyEvent`]: ../model/event/struct.ReadyEvent.html
     pub(crate) users: RwLock<HashMap<UserId, User>>,
     /// Queue of message IDs for each channel.
     ///
@@ -257,9 +231,7 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`Member`]: ../model/guild/struct.Member.html
-    /// [`Shard::chunk_guild`]: ../gateway/struct.Shard.html#method.chunk_guild
-    /// [`User`]: ../model/user/struct.User.html
+    /// [`Shard::chunk_guild`]: crate::gateway::Shard::chunk_guild
     pub async fn unknown_members(&self) -> u64 {
         let mut total = 0;
 
@@ -296,8 +268,6 @@ impl Cache {
     /// println!("There are {} private channels", amount);
     /// # }
     /// ```
-    ///
-    /// [`PrivateChannel`]: ../model/channel/struct.PrivateChannel.html
     pub async fn private_channels(&self) -> HashMap<ChannelId, PrivateChannel> {
         self.private_channels.read().await.clone()
     }
@@ -328,9 +298,8 @@ impl Cache {
     /// }
     /// ```
     ///
-    /// [`Context`]: ../client/struct.Context.html
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`Shard`]: ../gateway/struct.Shard.html
+    /// [`Context`]: crate::client::Context
+    /// [`Shard`]: crate::gateway::Shard
     pub async fn guilds(&self) -> Vec<GuildId> {
         let chain = self.unavailable_guilds.read().await.clone().into_iter();
         self.guilds
@@ -352,13 +321,11 @@ impl Cache {
     /// - [`GuildChannel`]: [`guild_channel`] or [`channels`]
     /// - [`PrivateChannel`]: [`private_channel`] or [`private_channels`]
     ///
-    /// [`Channel`]: ../model/channel/enum.Channel.html
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`channels`]: #structfield.channels
-    /// [`guild_channel`]: #method.guild_channel
-    /// [`private_channel`]: #method.private_channel
-    /// [`groups`]: #structfield.groups
-    /// [`private_channels`]: #structfield.private_channels
+    /// [`channels`]: Self::channels
+    /// [`guild_channel`]: Self::guild_channel
+    /// [`private_channel`]: Self::private_channel
+    /// [`groups`]: Self::groups
+    /// [`private_channels`]: Self::private_channels
     #[inline]
     pub async fn channel<C: Into<ChannelId>>(&self, id: C) -> Option<Channel> {
         self._channel(id.into()).await
@@ -381,7 +348,7 @@ impl Cache {
     ///
     /// In order to clone only a field of the guild, use [`guild_field`].
     ///
-    /// [`guild_field`]: #method.guild_field
+    /// [`guild_field`]: Self::guild_field
     ///
     /// # Examples
     ///
@@ -489,10 +456,8 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`channel`]: #method.channel
+    /// [`channel`]: Self::channel
     #[inline]
     pub async fn guild_channel<C: Into<ChannelId>>(&self, id: C) -> Option<GuildChannel> {
         self._guild_channel(id.into()).await
@@ -589,8 +554,7 @@ impl Cache {
     /// ```
     ///
     /// [`Client::on_message`]: ../client/struct.Client.html#method.on_message
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`members`]: ../model/guild/struct.Guild.html#structfield.members
+    /// [`members`]: crate::model::guild::Guild::members
     #[inline]
     pub async fn member<G, U>(&self, guild_id: G, user_id: U) -> Option<Member>
         where G: Into<GuildId>, U: Into<UserId> {
@@ -712,8 +676,7 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`EventHandler::message`]: ../client/trait.EventHandler.html#method.message
-    /// [`Channel`]: ../model/channel/struct.Channel.html
+    /// [`EventHandler::message`]: crate::client::EventHandler::message
     #[inline]
     pub async fn message<C, M>(&self, channel_id: C, message_id: M) -> Option<Message>
         where C: Into<ChannelId>, M: Into<MessageId> {
@@ -753,7 +716,7 @@ impl Cache {
     /// # }
     /// ```
     ///
-    /// [`private_channels`]: #structfield.private_channels
+    /// [`private_channels`]: Self::private_channels
     #[inline]
     pub async fn private_channel(&self, channel_id: impl Into<ChannelId>) -> Option<PrivateChannel> {
         self._private_channel(channel_id.into()).await
@@ -768,8 +731,8 @@ impl Cache {
     /// **Note**: This will clone the entire role. Instead, retrieve the guild
     /// and retrieve from the guild's [`roles`] map to avoid this.
     ///
-    /// [`Guild`]: ../model/guild/struct.Guild.html
-    /// [`roles`]: ../model/guild/struct.Guild.html#structfield.roles
+    /// [`Guild`]: crate::model::guild::Guild
+    /// [`roles`]: crate::model::guild::Guild::roles
     ///
     /// # Examples
     ///
@@ -829,8 +792,8 @@ impl Cache {
     /// The only advantage of this method is that you can pass in anything that
     /// is indirectly a [`UserId`].
     ///
-    /// [`UserId`]: ../model/id/struct.UserId.html
-    /// [`users`]: #structfield.users
+    /// [`UserId`]: crate::model::id::UserId
+    /// [`users`]: Self::users
     ///
     /// # Examples
     ///
@@ -891,6 +854,12 @@ impl Cache {
         self.categories.read().await.len()
     }
 
+   /// Returns the optional category ID of a channel.
+   #[inline]
+   pub async fn channel_category_id(&self, channel_id: ChannelId) -> Option<ChannelId> {
+       self.categories.read().await.get(&channel_id).map(|category| category.id)
+   }
+
     /// This method clones and returns the user used by the bot.
     #[inline]
     pub async fn current_user(&self) -> CurrentUser {
@@ -936,8 +905,8 @@ impl Cache {
     ///
     /// Refer to the [`CacheUpdate` examples].
     ///
-    /// [`CacheUpdate`]: trait.CacheUpdate.html
-    /// [`CacheUpdate` examples]: trait.CacheUpdate.html#examples
+    /// [`CacheUpdate`]: CacheUpdate
+    /// [`CacheUpdate` examples]: CacheUpdate#examples
     #[instrument(skip(self, e))]
     pub async fn update<E: CacheUpdate>(&self, e: &mut E) -> Option<E::Output> {
         e.update(self).await
@@ -1006,7 +975,6 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "user 1".to_owned(),
-                    _nonexhaustive: (),
                 },
                 channel_id: ChannelId(2),
                 guild_id: Some(GuildId(1)),
@@ -1029,10 +997,9 @@ mod test {
                 application: None,
                 message_reference: None,
                 flags: None,
+                stickers: vec![],
                 referenced_message: None,
-                _nonexhaustive: (),
             },
-            _nonexhaustive: (),
         };
         // Check that the channel cache doesn't exist.
         assert!(!cache.messages.read().await.contains_key(&event.message.channel_id));
@@ -1076,14 +1043,12 @@ mod test {
             user_limit: None,
             nsfw: false,
             slow_mode_rate: Some(0),
-            _nonexhaustive: (),
         };
 
         // Add a channel delete event to the cache, the cached messages for that
         // channel should now be gone.
         let mut delete = ChannelDeleteEvent {
             channel: Channel::Guild(guild_channel.clone()),
-            _nonexhaustive: (),
         };
         assert!(cache.update(&mut delete).await.is_none());
         assert!(!cache.messages.read().await.contains_key(&delete.channel.id()));
@@ -1126,9 +1091,7 @@ mod test {
                     banner: None,
                     vanity_url_code: Some("bruhmoment".to_string()),
                     preferred_locale: "en-US".to_string(),
-                    _nonexhaustive: (),
                 },
-                _nonexhaustive: (),
             }
         };
         assert!(cache.update(&mut guild_create).await.is_none());
@@ -1139,7 +1102,6 @@ mod test {
                 id: GuildId(1),
                 unavailable: false,
             },
-            _nonexhaustive: (),
         };
 
         // The guild existed in the cache, so the cache's guild is returned by the

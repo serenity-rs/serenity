@@ -32,8 +32,6 @@ use crate::internal::ws_impl::RustlsError;
 /// type, rather than the usual 2 (`Result<T, Error>`). This is because all
 /// functions that return a result return serenity's [`Error`], so this is
 /// implied, and a "simpler" result is used.
-///
-/// [`Error`]: enum.Error.html
 pub type Result<T> = StdResult<T, Error>;
 
 /// A common error enum returned by most of the library's functionality within a
@@ -43,11 +41,8 @@ pub type Result<T> = StdResult<T, Error>;
 /// enums, are both wrapped around this in the form of the [`Client`] and
 /// [`Gateway`] variants.
 ///
-/// [`Client`]: #variant.Client
-/// [`ClientError`]: client/enum.ClientError.html
-/// [`Gateway`]: #variant.Gateway
-/// [`GatewayError`]: gateway/enum.GatewayError.html
-/// [`Result`]: type.Result.html
+/// [`Client`]: Error::Client
+/// [`Gateway`]: Error::Gateway
 #[derive(Debug)]
 #[non_exhaustive]
 pub enum Error {
@@ -61,7 +56,7 @@ pub enum Error {
     Json(JsonError),
     /// An error from the [`model`] module.
     ///
-    /// [`model`]: model/index.html
+    /// [`model`]: crate::model
     Model(ModelError),
     /// An error occurred while parsing an integer.
     Num(ParseIntError),
@@ -79,14 +74,12 @@ pub enum Error {
     /// Some other error. This is only used for "Expected value <TYPE>" errors,
     /// when a more detailed error can not be easily provided via the
     /// [`Error::Decode`] variant.
-    ///
-    /// [`Error::Decode`]: #variant.Decode
     Other(&'static str),
     /// An error from the `url` crate.
     Url(String),
     /// A [client] error.
     ///
-    /// [client]: client/index.html
+    /// [client]: crate::client
     #[cfg(feature = "client")]
     Client(ClientError),
     /// An error from the `gateway` module.
@@ -94,7 +87,7 @@ pub enum Error {
     Gateway(GatewayError),
     /// An error from the [`http`] module.
     ///
-    /// [`http`]: http/index.html
+    /// [`http`]: crate::http
     #[cfg(feature = "http")]
     Http(Box<HttpError>),
     /// An error occuring in rustls

@@ -84,7 +84,7 @@ pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>)
 /// assert_eq!(utils::parse_invite(url), "0cDvIgU2voY8RSYL");
 /// ```
 ///
-/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
+/// [`RichInvite`]: crate::model::invite::RichInvite
 pub fn parse_invite(code: &str) -> &str {
     let code = code.trim_start_matches("http://").trim_start_matches("https://");
     let lower = code.to_lowercase();
@@ -124,7 +124,7 @@ pub fn parse_invite(code: &str) -> &str {
 /// assert!(parse_username("<@!11494131541789a90b1c2").is_none());
 /// ```
 ///
-/// [`User`]: ../model/user/struct.User.html
+/// [`User`]: crate::model::user::User
 pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
     let mention = mention.as_ref();
 
@@ -165,7 +165,7 @@ pub fn parse_username(mention: impl AsRef<str>) -> Option<u64> {
 /// assert!(parse_role("<@&136107769680887808").is_none());
 /// ```
 ///
-/// [`Role`]: ../model/guild/struct.Role.html
+/// [`Role`]: crate::model::guild::Role
 pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
     let mention = mention.as_ref();
 
@@ -204,7 +204,7 @@ pub fn parse_role(mention: impl AsRef<str>) -> Option<u64> {
 /// assert!(parse_channel("<#81384788765712384").is_none());
 /// ```
 ///
-/// [`Channel`]: ../model/channel/enum.Channel.html
+/// [`Channel`]: crate::model::channel::Channel
 pub fn parse_channel(mention: impl AsRef<str>) -> Option<u64> {
     let mention = mention.as_ref();
 
@@ -278,7 +278,7 @@ pub fn parse_mention(mention: impl AsRef<str>) -> Option<u64> {
 /// assert!(parse_emoji("<:smugAnimeFace:302516740095606785").is_none());
 /// ```
 ///
-/// [`Emoji`]: ../model/guild/struct.Emoji.html
+/// [`Emoji`]: crate::model::guild::Emoji
 pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
     let mention = mention.as_ref();
 
@@ -340,7 +340,7 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
 /// let image = utils::read_image("./cat.png").expect("Failed to read image");
 /// ```
 ///
-/// [`EditProfile::avatar`]: ../builder/struct.EditProfile.html#method.avatar
+/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
 #[inline]
 pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
     _read_image(path.as_ref())
@@ -454,8 +454,6 @@ pub fn parse_quotes(s: impl AsRef<str>) -> Vec<String> {
 pub fn shard_id(guild_id: impl Into<u64>, shard_count: u64) -> u64 { (guild_id.into() >> 22) % shard_count }
 
 /// Struct that allows to alter [`content_safe`]'s behaviour.
-///
-/// [`content_safe`]: fn.content_safe.html
 #[cfg(feature = "cache")]
 #[derive(Clone, Debug)]
 pub struct ContentSafeOptions {
@@ -477,8 +475,6 @@ impl ContentSafeOptions {
     /// [`content_safe`] will replace role mentions (`<@&{id}>`) with its name
     /// prefixed with `@` (`@rolename`) or with `@deleted-role` if the
     /// identifier is invalid.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn clean_role(mut self, b: bool) -> Self {
         self.clean_role = b;
 
@@ -488,8 +484,6 @@ impl ContentSafeOptions {
     /// If set to true, [`content_safe`] will replace user mentions
     /// (`<@!{id}>` or `<@{id}>`) with the user's name prefixed with `@`
     /// (`@username`) or with `@invalid-user` if the identifier is invalid.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn clean_user(mut self, b: bool) -> Self {
         self.clean_user = b;
 
@@ -500,8 +494,6 @@ impl ContentSafeOptions {
     /// (`<#{id}>`) with the channel's name prefixed with `#`
     /// (`#channelname`) or with `#deleted-channel` if the identifier is
     /// invalid.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn clean_channel(mut self, b: bool) -> Self {
         self.clean_channel = b;
 
@@ -511,8 +503,6 @@ impl ContentSafeOptions {
     /// If set to true, if [`content_safe`] replaces a user mention it will
     /// add their four digit discriminator with a preceeding `#`,
     /// turning `@username` to `@username#discriminator`.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn show_discriminator(mut self, b: bool) -> Self {
         self.show_discriminator = b;
 
@@ -521,8 +511,6 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace a user mention with the user's
     /// display name in passed `guild`.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn display_as_member_from<G: Into<GuildId>>(mut self, guild: G) -> Self {
         self.guild_reference = Some(guild.into());
 
@@ -531,8 +519,6 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace `@here` with a non-pinging
     /// alternative.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn clean_here(mut self, b: bool) -> Self {
         self.clean_here = b;
 
@@ -541,8 +527,6 @@ impl ContentSafeOptions {
 
     /// If set, [`content_safe`] will replace `@everyone` with a non-pinging
     /// alternative.
-    ///
-    /// [`content_safe`]: fn.content_safe.html
     pub fn clean_everyone(mut self, b: bool) -> Self {
         self.clean_everyone = b;
 
@@ -743,8 +727,7 @@ async fn clean_users(
 /// # }
 /// ```
 ///
-/// [`ContentSafeOptions`]: struct.ContentSafeOptions.html
-/// [`Cache`]: ../cache/struct.Cache.html
+/// [`Cache`]: crate::cache::Cache
 #[cfg(feature = "cache")]
 pub async fn content_safe(cache: impl AsRef<Cache>, s: impl AsRef<str>, options: &ContentSafeOptions) -> String {
     let mut content = s.as_ref().to_string();
@@ -839,7 +822,6 @@ mod test {
             bot: false,
             discriminator: 0000,
             name: "Crab".to_string(),
-            _nonexhaustive: (),
         };
 
         let mut guild = Guild {
@@ -876,7 +858,6 @@ mod test {
             banner: None,
             vanity_url_code: Some("bruhmoment1".to_string()),
             preferred_locale: "en-US".to_string(),
-            _nonexhaustive: (),
         };
 
         let member = Member {
@@ -887,7 +868,6 @@ mod test {
             nick: Some("Ferris".to_string()),
             roles: Vec::new(),
             user: user.clone(),
-            _nonexhaustive: (),
         };
 
         let role = Role {
@@ -900,7 +880,6 @@ mod test {
             name: "ferris-club-member".to_string(),
             permissions: Permissions::all(),
             position: 0,
-            _nonexhaustive: (),
         };
 
         let channel = GuildChannel {
@@ -918,7 +897,6 @@ mod test {
             user_limit: None,
             nsfw: false,
             slow_mode_rate: Some(0),
-            _nonexhaustive: (),
         };
 
         let cache = Arc::new(Cache::default());

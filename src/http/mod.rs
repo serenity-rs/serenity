@@ -20,8 +20,8 @@
 //! instance methods where possible, as they each offer different
 //! levels of a high-level interface to the HTTP module.
 //!
-//! [`Client`]: ../client/struct.Client.html
-//! [model]: ../model/index.html
+//! [`Client`]: crate::Client
+//! [model]: crate::model
 
 pub mod client;
 pub mod error;
@@ -64,10 +64,6 @@ use crate::CacheAndHttp;
 /// If you are calling a function that expects `impl CacheHttp` as argument
 /// and you wish to utilise the `cache`-feature but you got no access to a
 /// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
-///
-/// [`Cache`]: ../cache/struct.Cache.html
-/// [`Http`]: client/struct.Http.html
-/// [`Context`]: ../client/struct.Context.html
 pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
     #[cfg(feature = "cache")]
@@ -203,7 +199,7 @@ impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
 /// Representation of the method of a query to send for the [`get_guilds`]
 /// function.
 ///
-/// [`get_guilds`]: fn.get_guilds.html
+/// [`get_guilds`]: Http::get_guilds
 #[non_exhaustive]
 pub enum GuildPagination {
     /// The Id to get the guilds after.

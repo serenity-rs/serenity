@@ -1,7 +1,7 @@
 //! A set of constants used by the library.
 
 /// The maximum length of the textual size of an embed.
-pub const EMBED_MAX_LENGTH: u16 = 6000;
+pub const EMBED_MAX_LENGTH: usize = 6000;
 
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
@@ -11,14 +11,14 @@ pub const GATEWAY_VERSION: u8 = 8;
 pub const LARGE_THRESHOLD: u8 = 250;
 
 /// The maximum unicode code points allowed within a message by Discord.
-pub const MESSAGE_CODE_LIMIT: u16 = 2000;
+pub const MESSAGE_CODE_LIMIT: usize = 2000;
 
 /// The maximum number of members the bot can fetch at once
 pub const MEMBER_FETCH_LIMIT: u64 = 1000;
 
 /// The [UserAgent] sent along with every request.
 ///
-/// [UserAgent]: ../../reqwest/header/constant.USER_AGENT.html
+/// [UserAgent]: ::reqwest::header::USER_AGENT
 pub const USER_AGENT: &str = concat!(
     "DiscordBot (https://github.com/serenity-rs/serenity, ",
     env!("CARGO_PKG_VERSION"),

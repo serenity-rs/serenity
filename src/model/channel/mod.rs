@@ -8,6 +8,7 @@ mod message;
 mod private_channel;
 mod reaction;
 mod channel_category;
+mod sticker;
 
 pub use self::attachment::*;
 pub use self::channel_id::*;
@@ -17,6 +18,7 @@ pub use self::message::*;
 pub use self::private_channel::*;
 pub use self::reaction::*;
 pub use self::channel_category::*;
+pub use self::sticker::*;
 
 use crate::model::prelude::*;
 use serde::de::Error as DeError;
@@ -45,18 +47,13 @@ use crate::http::CacheHttp;
 pub enum Channel {
     /// A [text] or [voice] channel within a [`Guild`].
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [text]: enum.ChannelType.html#variant.Text
-    /// [voice]: enum.ChannelType.html#variant.Voice
+    /// [text]: ChannelType::Text
+    /// [voice]: ChannelType::Voice
     Guild(GuildChannel),
     /// A private channel to another [`User`]. No other users may access the
     /// channel. For multi-user "private channels", use a group.
-    ///
-    /// [`User`]: ../user/struct.User.html
     Private(PrivateChannel),
     /// A category of [`GuildChannel`]s
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Category(ChannelCategory),
 }
 
@@ -200,9 +197,6 @@ impl Channel {
 
     /// Retrieves the Id of the inner [`GuildChannel`], or
     /// [`PrivateChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
     #[inline]
     pub fn id(&self) -> ChannelId {
         match self {
@@ -216,9 +210,6 @@ impl Channel {
     /// [`ChannelCategory`].
     ///
     /// If other channel types are used it will return None.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`CategoryChannel`]: struct.ChannelCategory.html
     #[inline]
     pub fn position(&self) -> Option<i64> {
         match self {
@@ -272,9 +263,6 @@ impl Display for Channel {
     /// - [`PrivateChannel`]s: the recipient's name;
     /// - [`GuildChannel`]s: a string mentioning the channel that users who can
     /// see the channel can click on.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
     fn fmt(&self, f: &mut Formatter<'_>) -> FmtResult {
         match self {
             Channel::Guild(ch) => Display::fmt(&ch.id.mention(), f),
@@ -289,32 +277,20 @@ impl Display for Channel {
 #[non_exhaustive]
 pub enum ChannelType {
     /// An indicator that the channel is a text [`GuildChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Text = 0,
     /// An indicator that the channel is a [`PrivateChannel`].
-    ///
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
     Private = 1,
     /// An indicator that the channel is a voice [`GuildChannel`].
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Voice = 2,
     /// An indicator that the channel is the channel of a [`ChannelCategory`].
-    ///
-    /// [`ChannelCategory`]: struct.ChannelCategory.html
     Category = 4,
     /// An indicator that the channel is a `NewsChannel`.
     ///
     /// Note: `NewsChannel` is serialized into a [`GuildChannel`]
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     News = 5,
     /// An indicator that the channel is a `StoreChannel`
     ///
     /// Note: `StoreChannel` is serialized into a [`GuildChannel`]
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     Store = 6,
 }
 
@@ -410,9 +386,7 @@ impl Serialize for PermissionOverwrite {
 
 /// The type of edit being made to a Channel's permissions.
 ///
-/// This is for use with methods such as `GuildChannel::create_permission`.
-///
-/// [`GuildChannel::create_permission`]: struct.GuildChannel.html#method.create_permission
+/// This is for use with methods such as [`GuildChannel::create_permission`].
 #[derive(Copy, Clone, Debug, Eq, PartialEq)]
 #[non_exhaustive]
 pub enum PermissionOverwriteType {
@@ -444,7 +418,6 @@ mod test {
                 user_limit: None,
                 nsfw: false,
                 slow_mode_rate: Some(0),
-                _nonexhaustive: (),
             }
         }
 
@@ -460,9 +433,7 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "ab".to_string(),
-                    _nonexhaustive: (),
                 },
-                _nonexhaustive: (),
             }
         }
 

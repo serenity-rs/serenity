@@ -26,6 +26,7 @@ use async_trait::async_trait;
 /// can have channel-specific permission overrides in addition to guild-level
 /// permissions.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Role {
     /// The Id of the role. Can be used to calculate the role's creation date.
     pub id: RoleId,
@@ -45,8 +46,7 @@ pub struct Role {
     /// In the client, this causes [`Member`]s in the role to be seen above
     /// those in roles with a lower [`position`].
     ///
-    /// [`Member`]: struct.Member.html
-    /// [`position`]: #structfield.position
+    /// [`position`]: Self::position
     pub hoist: bool,
     /// Indicator of whether the role is managed by an integration service.
     pub managed: bool,
@@ -63,15 +63,13 @@ pub struct Role {
     ///
     /// See the [`permissions`] module for more information.
     ///
-    /// [`permissions`]: ../permissions/index.html
+    /// [`permissions`]: super::permissions
     pub permissions: Permissions,
     /// The role's position in the position list. Roles are considered higher in
     /// hierarchy if their position is higher.
     ///
     /// The `@everyone` role is usually either `-1` or `0`.
     pub position: i64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -80,7 +78,7 @@ impl Role {
     ///
     /// **Note** Requires the [Manage Roles] permission.
     ///
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_role(self.guild_id.0, self.id.0).await
@@ -106,8 +104,7 @@ impl Role {
     /// });
     /// ```
     ///
-    /// [`Role`]: struct.Role.html
-    /// [Manage Roles]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_ROLES
+    /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn edit(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut EditRole) -> &mut EditRole) -> Result<Role> {
         self.guild_id.edit_role(http, self.id, f).await
@@ -119,8 +116,6 @@ impl Role {
     ///
     /// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache
     /// that contains the role.
-    ///
-    /// [`ModelError::GuildNotFound`]: ../error/enum.Error.html#variant.GuildNotFound
     #[cfg(feature = "cache")]
     #[deprecated(note = "replaced with the `guild_id` field", since = "0.9.0")]
     pub async fn find_guild(&self, cache: impl AsRef<Cache>) -> Result<GuildId> {
@@ -185,8 +180,6 @@ impl PartialOrd for Role {
 #[cfg(feature = "model")]
 impl RoleId {
     /// Tries to find the [`Role`] by its Id in the cache.
-    ///
-    /// [`Role`]: ../guild/struct.Role.html
     #[cfg(feature = "cache")]
     pub async fn to_role_cached(self, cache: impl AsRef<Cache>) -> Option<Role> {
         for guild in cache.as_ref().guilds.read().await.values() {

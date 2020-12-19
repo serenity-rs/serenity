@@ -119,7 +119,7 @@ pub struct RoleId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct UserId(pub u64);
 
-/// An identifier for a [`Webhook`](../webhook/struct.Webhook.html).
+/// An identifier for a [`Webhook`][super::webhook::Webhook]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct WebhookId(pub u64);
 
@@ -131,6 +131,14 @@ pub struct AuditLogEntryId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct AttachmentId(u64);
 
+/// An identifier for a sticker.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct StickerId(pub u64);
+
+/// An identifier for a sticker pack.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct StickerPackId(pub u64);
+
 id_u64! {
     AttachmentId;
     ApplicationId;
@@ -140,6 +148,8 @@ id_u64! {
     IntegrationId;
     MessageId;
     RoleId;
+    StickerId;
+    StickerPackId;
     UserId;
     WebhookId;
     AuditLogEntryId;

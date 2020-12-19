@@ -150,8 +150,6 @@ fn to_lowercase<'a>(config: &Configuration, s: &'a str) -> Cow<'a, str> {
 /// Parse a mention in the message that is of either the direct (`<@id>`) or nickname (`<@!id>`) syntax,
 /// and compare the encoded `id` with the id from [`Configuration::on_mention`] for a match.
 /// Returns `Some(<id>)` on success, `None` otherwise.
-///
-/// [`Configuration::on_mention`]: ../struct.Configuration.html#method.on_mention
 pub fn mention<'a>(stream: &mut Stream<'a>, config: &Configuration) -> Option<&'a str> {
     let on_mention = config.on_mention.as_deref()?;
 
@@ -221,9 +219,6 @@ async fn find_prefix<'a>(
 /// - Nothing
 ///
 /// In all cases, whitespace after the prefix is cleared.
-///
-/// [`Configuration::dynamic_prefix`]: ../struct.Configuration.html#method.dynamic_prefix
-/// [`Configuration::prefix`]: ../struct.Configuration.html#method.prefix
 #[allow(clippy::needless_lifetimes)] // Clippy and the compiler disagree
 pub async fn prefix<'a>(
     ctx: &Context,
@@ -511,12 +506,14 @@ pub async fn command(
                 let res = handle_group(stream, ctx, msg, config, subgroups).await;
 
                 if !is_unrecognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options).await?;
                     return res;
                 }
 
                 let res = handle_command(stream, ctx, msg, config, commands, group).await;
 
                 if !is_unrecognised(&res) {
+                    check_discrepancy(ctx, msg, config, &group.options).await?;
                     return res;
                 }
 

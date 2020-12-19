@@ -47,9 +47,9 @@ use std::{
 /// # }
 /// ```
 ///
-/// [`build`]: #method.build
-/// [`emoji`]: #method.emoji
-/// [`user`]: #method.user
+/// [`build`]: Self::build
+/// [`emoji`]: Self::emoji
+/// [`user`]: Self::user
 #[derive(Clone, Debug, Default)]
 pub struct MessageBuilder(pub String);
 
@@ -129,10 +129,9 @@ impl MessageBuilder {
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
     /// ```
     ///
-    /// [`Channel`]: ../model/channel/enum.Channel.html
-    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
-    /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-    /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
+    /// [`Channel`]: crate::model::channel::Channel
+    /// [`GuildChannel`]: crate::model::channel::GuildChannel
+    /// [Display implementation]: ChannelId#impl-Display
     #[inline]
     pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
         self._channel(channel.into())
@@ -182,7 +181,7 @@ impl MessageBuilder {
     /// # }
     /// ```
     ///
-    /// [Display implementation]: ../model/guild/struct.Emoji.html#method.fmt
+    /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
         let _ = write!(self.0, "{}", emoji);
 
@@ -190,8 +189,6 @@ impl MessageBuilder {
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
-    ///
-    /// [`Mentionable`]: ../model/misc/trait.Mentionable.html
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
         let _ = write!(self.0, "{}", item.mention());
 
@@ -864,9 +861,8 @@ impl MessageBuilder {
     /// Refer to `RoleId`'s [Display implementation] for more information on how
     /// this is formatted.
     ///
-    /// [`Role`]: ../model/guild/struct.Role.html
-    /// [`RoleId`]: ../model/id/struct.RoleId.html
-    /// [Display implementation]: ../model/id/struct.RoleId.html#method.fmt-1
+    /// [`Role`]: crate::model::guild::Role
+    /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
         let _ = write!(self.0, "{}", role.into().mention());
 
@@ -881,9 +877,8 @@ impl MessageBuilder {
     /// Refer to `UserId`'s [Display implementation] for more information on how
     /// this is formatted.
     ///
-    /// [`User`]: ../model/user/struct.User.html
-    /// [`UserId`]: ../model/id/struct.UserId.html
-    /// [Display implementation]: ../model/id/struct.UserId.html#method.fmt-1
+    /// [`User`]: crate::model::user::User
+    /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
         let _ = write!(self.0, "{}", user.into().mention());
 
@@ -935,9 +930,8 @@ impl Display for MessageBuilder {
 /// {}
 /// ```
 ///
-/// [`MessageBuilder`]: struct.MessageBuilder.html
-/// [`push_named_link`]: #tymethod.push_named_link
-/// [`push_named_link_safe`]: #tymethod.push_named_link_safe
+/// [`push_named_link`]: Self::push_named_link
+/// [`push_named_link_safe`]: Self::push_named_link_safe
 pub trait EmbedMessageBuilding {
     /// Pushes a named link to a message, intended for use in embeds.
     ///
@@ -987,7 +981,7 @@ pub trait EmbedMessageBuilding {
     /// {}
     /// ```
     ///
-    /// [`push_named_link`]: #tymethod.push_named_link
+    /// [`push_named_link`]: Self::push_named_link
     fn push_named_link_safe<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self;
 }
 
@@ -1327,7 +1321,6 @@ mod test {
                 managed: false,
                 require_colons: true,
                 roles: vec![],
-                _nonexhaustive: (),
             })
             .build();
         let content_mentions = MessageBuilder::new()

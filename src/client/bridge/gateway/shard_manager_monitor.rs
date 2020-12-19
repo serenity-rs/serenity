@@ -14,8 +14,6 @@ use futures::{
 /// The monitor is essentially responsible for running in its own task and
 /// receiving [`ShardManagerMessage`]s, such as whether to shutdown a shard or
 /// shutdown everything entirely.
-///
-/// [`ShardManagerMessage`]: enum.ShardManagerMessage.html
 #[derive(Debug)]
 pub struct ShardManagerMonitor {
     /// An clone of the Arc to the manager itself.
@@ -30,15 +28,15 @@ pub enum ShardManagerError {
     /// Returned when a shard received an [`InvalidAuthentication`] error.
     /// An invalid token has been specified.
     ///
-    /// [`InvalidAuthentication`]: ../../../gateway/enum.GatewayError.html#variant.InvalidAuthentication
+    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
     InvalidToken,
     /// Returned when a shard received an [`InvalidGatewayIntents`] error.
     ///
-    /// [`InvalidGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.InvalidGatewayIntents
+    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
     InvalidGatewayIntents,
     /// Returned when a shard received a [`DisallowedGatewayIntents`] error.
     ///
-    /// [`DisallowedGatewayIntents`]: ../../../gateway/enum.GatewayError.html#variant.DisallowedGatewayIntents
+    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
     DisallowedGatewayIntents,
 }
 
@@ -55,8 +53,6 @@ impl ShardManagerMonitor {
     /// - a [`ShardManagerMessage::ShutdownAll`] has been received
     /// - an error is returned while receiving a message from the
     /// channel (probably indicating that the shard manager should stop anyway)
-    ///
-    /// [`ShardManagerMessage::ShutdownAll`]: enum.ShardManagerMessage.html#variant.ShutdownAll
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
         debug!("Starting shard manager worker");

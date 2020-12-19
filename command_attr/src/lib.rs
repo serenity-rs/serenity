@@ -1,10 +1,5 @@
 #![deny(rust_2018_idioms)]
-// FIXME: Remove this in a foreseeable future.
-// Currently exists for backwards compatibility to previous Rust versions.
-#![recursion_limit = "128"]
-
-#[allow(unused_extern_crates)]
-extern crate proc_macro;
+#![deny(broken_intra_doc_links)]
 
 use proc_macro::TokenStream;
 use proc_macro2::Span;
@@ -130,12 +125,15 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     .push(propagate_err!(attributes::parse(values)));
             }
             "description" => {
-                let arg: String = propagate_err!(attributes::parse(values));
+                let mut arg: String = propagate_err!(attributes::parse(values));
+                if arg.starts_with(' ') {
+                    arg.remove(0);
+                }
 
                 if let Some(desc) = &mut options.description.0 {
                     use std::fmt::Write;
 
-                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
+                    let _ = write!(desc, "\n{}", arg);
                 } else {
                     options.description = AsOption(Some(arg));
                 }
@@ -277,12 +275,12 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[lacking_role(s)]` </br> `#[lacking_role = s]`                                                                                              | If a user lacks required roles, this will treat how commands will be displayed.                                                                                                                                                                  | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
 /// | `#[lacking_ownership(s)]` </br> `#[lacking_ownership = s]`                                                                                    | If a user lacks ownership, this will treat how these commands will be displayed.                                                                                                                                                                 | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
 /// | `#[lacking_permissions(s)]` </br> `#[lacking_permissions = s]`                                                                                | If a user lacks permissions, this will treat how commands will be displayed.                                                                                                                                                                     | `s` is a string. Accepts `strike` (strikethroughs), `hide` (will not be listed) or `nothing`(leave be).    |
-/// | `#[embed_error_colour(n)]`                                                                                                                    | Colour that the help-embed will use upon an error.                                                                                                                                                                                               | `n` is a name to one of the provided constants of the `Colour` struct.                                     |
-/// | `#[embed_success_colour(n)]`                                                                                                                  | Colour that the help-embed will use normally.                                                                                                                                                                                                    | `n` is a name to one of the provided constants of the `Colour` struct.                                     |
+/// | `#[embed_error_colour(n)]`                                                                                                                    | Colour that the help-embed will use upon an error.                                                                                                                                                                                               | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |
+/// | `#[embed_success_colour(n)]`                                                                                                                  | Colour that the help-embed will use normally.                                                                                                                                                                                                    | `n` is a name to one of the provided constants of the `Colour` struct or an RGB value `#RRGGBB`.           |
 /// | `#[max_levenshtein_distance(n)]`                                                                                                              | How much should the help command search for a similiar name.</br> Indicator for a nested guild. The prefix will be repeated based on what kind of level the item sits. A sub-group would be level two, a sub-sub-group would be level three.     | `n` is a 64-bit, unsigned integer.                                                                         |
 /// | `#[indention_prefix(s)]` </br> `#[indention_prefix = s]`                                                                                      | The prefix used to express how deeply nested a command or group is.                                                                                                                                                                              | `s` is a string                                                                                            |
 ///
-/// [`command`]: attr.command.html
+/// [`command`]: macro@command
 #[proc_macro_attribute]
 pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     let mut fun = parse_macro_input!(input as CommandFun);
@@ -581,9 +579,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// | `#[owner_privilege]` </br> `#[owner_privilege(b)]`   | If owners can bypass certain options.                                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
 /// | `#[help_available]` </br> `#[help_available(b)]`     | If the group should be displayed in the help message.                              | `b` is a boolean. If no boolean is provided, the value is assumed to be `true`.                                                                                                      |
 /// | `#[checks(identifiers)]`                             | Preconditions that must met before the command's execution.                        | `identifiers` is a comma separated list of identifiers referencing functions marked by the `#[check]` macro                                                                          |
-/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discord.com/developers/docs/topics/permissions).     |
+/// | `#[required_permissions(perms)]`                     | Set of permissions the user must possess.                                          | `perms` is a comma separated list of permission names.</br> These can be found at [Discord's official documentation](https://discord.com/developers/docs/topics/permissions).        |
 /// | `#[default_command(cmd)]`                            | A command to execute if none of the group's prefixes are given.                    | `cmd` is an identifier referencing a function marked by the `#[command]` macro                                                                                                       |
 /// | `#[description(desc)]` </br> `#[description = desc]` | The group's description or summary.                                                | `desc` is a string describing the group.                                                                                                                                             |
+/// | `#[summary(desc)]` </br> `#[summary = desc]`         | A summary group description displayed when shown multiple groups.                  | `desc` is a string summaryly describing the group.                                                                                                                                   |
 ///
 /// Similarly to [`command`], this macro generates static instances of the group
 /// and its options. The identifiers of these instances are based off the name of the struct to differentiate
@@ -591,7 +590,7 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
 /// used in the help command for display and browsing of the group.
 /// It may also be passed as an argument to the macro. For example: `#[group("Banana Phone")]`.
 ///
-/// [`command`]: #fn.command.html
+/// [`command`]: macro@command
 
 #[proc_macro_attribute]
 pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
@@ -627,6 +626,17 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                     options.description = AsOption(Some(arg));
                 }
             }
+            "summary" => {
+                let arg: String = propagate_err!(attributes::parse(values));
+
+                if let Some(desc) = &mut options.summary.0 {
+                    use std::fmt::Write;
+
+                    let _ = write!(desc, "\n{}", arg.trim_matches(' '));
+                } else {
+                    options.summary = AsOption(Some(arg));
+                }
+            }
             _ => match_options!(name, values, options, span => [
                 prefixes;
                 only_in;
@@ -654,6 +664,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         checks,
         default_command,
         description,
+        summary,
         commands,
         sub_groups,
     } = options;
@@ -696,6 +707,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
             checks: #checks,
             default_command: #default_command,
             description: #description,
+            summary: #summary,
             commands: &[#(&#commands),*],
             sub_groups: &[#(&#sub_groups),*],
         };
@@ -750,7 +762,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
     propagate_err!(create_declaration_validations(&mut fun, DeclarFor::Check));
 
-    let res = parse_quote!(serenity::framework::standard::CheckResult);
+    let res = parse_quote!(std::result::Result<(), serenity::framework::standard::Reason>);
     create_return_type_validation(&mut fun, res);
 
     let n = fun.name.clone();

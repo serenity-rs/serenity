@@ -7,8 +7,9 @@ use crate::internal::prelude::*;
 
 /// A file uploaded with a message. Not to be confused with [`Embed`]s.
 ///
-/// [`Embed`]: struct.Embed.html
+/// [`Embed`]: super::Embed
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Attachment {
     /// The unique ID given to this attachment.
     pub id: AttachmentId,
@@ -25,8 +26,6 @@ pub struct Attachment {
     pub url: String,
     /// If the attachment is an image, then the width of the image is provided.
     pub width: Option<u64>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -110,9 +109,9 @@ impl Attachment {
     /// Returns an [`Error::Http`] when there is a problem retrieving the
     /// attachment.
     ///
-    /// [`Error::Http`]: ../../enum.Error.html#variant.Http
-    /// [`Error::Io`]: ../../enum.Error.html#variant.Io
-    /// [`Message`]: struct.Message.html
+    /// [`Error::Http`]: crate::Error::Http
+    /// [`Error::Io`]: crate::Error::Io
+    /// [`Message`]: super::Message
     pub async fn download(&self) -> Result<Vec<u8>> {
         let reqwest = ReqwestClient::new();
 

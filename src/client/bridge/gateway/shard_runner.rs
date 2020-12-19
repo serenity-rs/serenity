@@ -32,8 +32,6 @@ use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
 use tracing::{trace, error, debug, warn, info, instrument};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
-///
-/// [`Shard`]: ../../../gateway/struct.Shard.html
 pub struct ShardRunner {
     data: Arc<RwLock<TypeMap>>,
     event_handler: Option<Arc<dyn EventHandler>>,
@@ -102,10 +100,7 @@ impl ShardRunner {
     ///
     /// 6. Go back to 1.
     ///
-    /// [`GatewayEvent`]: ../../../model/event/enum.GatewayEvent.html
-    /// [`Shard`]: ../../../gateway/struct.Shard.html
-    /// [`ShardManager`]: struct.ShardManager.html
-    /// [`ShardRunnerMessage`]: enum.ShardRunnerMessage.html
+    /// [`ShardManager`]: super::ShardManager
     #[instrument(skip(self))]
     pub async fn run(&mut self) -> Result<()> {
         info!("[ShardRunner {:?}] Running", self.shard.shard_info());
@@ -613,8 +608,6 @@ impl ShardRunner {
 }
 
 /// Options to be passed to [`ShardRunner::new`].
-///
-/// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
 pub struct ShardRunnerOptions {
     pub data: Arc<RwLock<TypeMap>>,
     pub event_handler: Option<Arc<dyn EventHandler>>,

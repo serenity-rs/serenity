@@ -248,8 +248,6 @@ pub trait EventHandler: Send + Sync {
     /// Provides the old message if available,
     /// the new message as an option in case of cache inconsistencies,
     /// and the raw [`MessageUpdateEvent`] as a fallback.
-    ///
-    /// [`MessageUpdateEvent`]: ../model/event/struct.MessageUpdateEvent.html
     #[cfg(feature = "cache")]
     async fn message_update(&self, _ctx: Context, _old_if_available: Option<Message>, _new: Option<Message>, _event: MessageUpdateEvent) {}
 

@@ -42,7 +42,9 @@ pub struct CommandOptions {
     /// Command description, used by other commands.
     pub desc: Option<&'static str>,
     /// Delimiters used to split the arguments of the command by.
-    /// If empty, the [global delimiters](struct.Configuration.html#method.delimiters) are used.
+    /// If empty, the [global delimiters] are used.
+    ///
+    /// [global delimiters]: super::Configuration::delimiters
     pub delimiters: &'static [&'static str],
     /// Command usage schema, used by other commands.
     pub usage: Option<&'static str>,
@@ -225,6 +227,7 @@ pub struct GroupOptions {
     pub checks: &'static [&'static Check],
     pub default_command: Option<&'static Command>,
     pub description: Option<&'static str>,
+    pub summary: Option<&'static str>,
     pub commands: &'static [&'static Command],
     pub sub_groups: &'static [&'static CommandGroup],
 }
