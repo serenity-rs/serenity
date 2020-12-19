@@ -723,6 +723,9 @@
 <span id="720">720</span>
 <span id="721">721</span>
 <span id="722">722</span>
+<span id="723">723</span>
+<span id="724">724</span>
+<span id="725">725</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
 
@@ -1115,9 +1118,12 @@
 
     <span class="doccomment">/// Gets a list of the guild&#39;s members.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// Optionally pass in the `limit` to limit the number of results. Maximum</span>
-    <span class="doccomment">/// value is 1000. Optionally pass in `after` to offset the results by a</span>
-    <span class="doccomment">/// [`User`]&#39;s Id.</span>
+    <span class="doccomment">/// Optionally pass in the `limit` to limit the number of results. </span>
+    <span class="doccomment">/// Minimum value is 1, maximum and default value is 1000.</span>
+    <span class="doccomment">/// &lt;br&gt;</span>
+    <span class="doccomment">/// Optionally pass in `after` to offset the results by a [`User`]&#39;s Id.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`User`]: ../user/struct.User.html</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">members</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
