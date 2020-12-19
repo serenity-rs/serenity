@@ -1,8 +1,8 @@
-[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.48.0+ badge]][rust 1.48.0+ link]
-
 # serenity
 
 ![serenity logo][logo]
+
+[![ci-badge][]][ci] [![docs-badge][]][docs] [![guild-badge][]][guild] [![crates.io version]][crates.io link] [![rust 1.48.0+ badge]][rust 1.48.0+ link]
 
 Serenity is a Rust library for the Discord API.
 
@@ -34,7 +34,7 @@ accurate as possible - Discord hosts [official documentation][discord docs]. If
 you need to be sure that some information piece is accurate, refer to their
 docs.
 
-# Example Bot
+## Example Bot
 
 A basic ping-pong bot looks like:
 
@@ -95,7 +95,7 @@ async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
 Full examples, detailing and explaining usage of the basic functionality of the
 library, can be found in the [`examples`] directory.
 
-# Installation
+## Installation
 
 Add the following to your `Cargo.toml` file:
 
@@ -106,7 +106,7 @@ serenity = "0.9"
 
 Serenity supports a minimum of Rust 1.48.
 
-# Features
+## Features
 
 Features can be enabled or disabled by configuring the library through
 Cargo.toml:
@@ -139,6 +139,7 @@ enough level that optional parameters can be provided at will via a JsonMap.
 - **model**: Method implementations for models, acting as helper methods over
 the HTTP functions.
 - **standard_framework**: A standard, default implementation of the Framework
+- **unstable**: Library & API features that are unstable for use.
 - **utils**: Utility functions for common use cases by users.
 - **voice**: Enables registering a voice plugin to the client, which will handle actual voice connections from Discord.
 [lavalink-rs][project:lavalink-rs] or [Songbird][project:songbird] are recommended voice plugins.
@@ -156,7 +157,6 @@ one if you do not use the default features:
 TLS implementation.
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
 and OpenSSL on other platforms.
-
 
 If you want all of the default features except for `cache` for example, you can
 list all but that:
@@ -178,13 +178,13 @@ features = [
 version = "0.9"
 ```
 
-# Dependencies
+## Dependencies
 
 If you use the `native_tls_backend` and you are not developing on macOS or Windows, you will need:
 
 - openssl
 
-# Projects extending Serenity
+## Projects extending Serenity
 
 - [lavalink-rs][project:lavalink-rs]: An interface to [Lavalink][repo:lavalink], an audio sending node based on [Lavaplayer][repo:lavaplayer]
 - [Songbird][project:songbird]: An async Rust library for the Discord voice API.

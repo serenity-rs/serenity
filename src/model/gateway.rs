@@ -73,7 +73,7 @@ pub struct Activity {
 
 #[cfg(feature = "model")]
 impl Activity {
-    /// Creates a `Activity` struct that appears as a `Playing <name>` status.
+    /// Creates an `Activity` struct that appears as a `Playing <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -170,7 +170,7 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Listening to <name>` status.
+    /// Creates an `Activity` struct that appears as a `Listening to <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -217,7 +217,56 @@ impl Activity {
         }
     }
 
-    /// Creates a `Activity` struct that appears as a `Competing in <name>` status.
+    /// Creates an `Activity` struct that appears as a `Watching <name>` status.
+    ///
+    /// **Note**: Maximum `name` length is 128.
+    ///
+    /// # Examples
+    ///
+    /// Create a command that sets the current cometing status:
+    ///
+    /// ```rust,no_run
+    /// use serenity::model::gateway::Activity;
+    /// use serenity::model::channel::Message;
+    /// # #[cfg(feature = "framework")]
+    /// use serenity::framework::standard::{Args, CommandResult, macros::command};
+    /// # #[cfg(feature = "client")]
+    /// use serenity::client::Context;
+    ///
+    /// # #[cfg(feature = "framework")]
+    /// #[command]
+    /// async fn watch(ctx: &Context, _msg: &Message, args: Args) -> CommandResult {
+    ///     let name = args.message();
+    ///     ctx.set_activity(Activity::watching(&name)).await;
+    ///
+    ///     Ok(())
+    /// }
+    /// ```
+    #[cfg(feature = "unstable")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+    pub fn watching(name: &str) -> Activity {
+        Activity {
+            application_id: None,
+            assets: None,
+            details: None,
+            flags: None,
+            instance: None,
+            kind: ActivityType::Watching,
+            name: name.to_string(),
+            party: None,
+            secrets: None,
+            state: None,
+            emoji: None,
+            timestamps: None,
+            #[cfg(feature = "unstable")]
+            sync_id: None,
+            #[cfg(feature = "unstable")]
+            session_id: None,
+            url: None,
+        }
+    }
+
+    /// Creates an `Activity` struct that appears as a `Competing in <name>` status.
     ///
     /// **Note**: Maximum `name` length is 128.
     ///
@@ -443,7 +492,11 @@ pub enum ActivityType {
     Streaming = 1,
     /// An indicator that the user is listening to something.
     Listening = 2,
-    /// An indicator that the user uses custum statuses
+    /// An indicator that the user is watching something.
+    #[cfg(feature = "unstable")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+    Watching = 3,
+    /// An indicator that the user has a custom status set.
     Custom = 4,
     /// An indicator that the user is competing somewhere.
     Competing = 5,
@@ -454,6 +507,7 @@ enum_number!(
         Playing,
         Streaming,
         Listening,
+        Watching,
         Custom,
         Competing,
     }
@@ -467,6 +521,9 @@ impl ActivityType {
             Playing => 0,
             Streaming => 1,
             Listening => 2,
+            #[cfg(feature = "unstable")]
+            #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+            Watching => 3,
             Custom => 4,
             Competing => 5,
         }
