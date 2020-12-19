@@ -2321,6 +2321,33 @@
 <span id="2318">2318</span>
 <span id="2319">2319</span>
 <span id="2320">2320</span>
+<span id="2321">2321</span>
+<span id="2322">2322</span>
+<span id="2323">2323</span>
+<span id="2324">2324</span>
+<span id="2325">2325</span>
+<span id="2326">2326</span>
+<span id="2327">2327</span>
+<span id="2328">2328</span>
+<span id="2329">2329</span>
+<span id="2330">2330</span>
+<span id="2331">2331</span>
+<span id="2332">2332</span>
+<span id="2333">2333</span>
+<span id="2334">2334</span>
+<span id="2335">2335</span>
+<span id="2336">2336</span>
+<span id="2337">2337</span>
+<span id="2338">2338</span>
+<span id="2339">2339</span>
+<span id="2340">2340</span>
+<span id="2341">2341</span>
+<span id="2342">2342</span>
+<span id="2343">2343</span>
+<span id="2344">2344</span>
+<span id="2345">2345</span>
+<span id="2346">2346</span>
+<span id="2347">2347</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -2625,6 +2652,13 @@
         }
 
         <span class="self">self</span>.<span class="ident">id</span>.<span class="ident">ban_with_reason</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="ident">user</span>, <span class="ident">dmd</span>, <span class="ident">reason</span>).<span class="ident">await</span>
+    }
+
+    <span class="doccomment">/// Returns the formatted URL of the guild&#39;s banner image, if one exists.</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">banner_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">banner</span>
+            .<span class="ident">as_ref</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">banner</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/banners/{}/{}.webp?size=1024&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">banner</span>))
     }
 
     <span class="doccomment">/// Retrieves a list of [`Ban`]s for the guild.</span>
@@ -3124,10 +3158,20 @@
     }
 
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s icon, if one exists.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">icon</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/icons/{}/{}.webp&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> {
+                 <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">icon</span>.<span class="ident">starts_with</span>(<span class="string">&quot;a_&quot;</span>) {
+                    <span class="string">&quot;gif&quot;</span>
+                } <span class="kw">else</span> {
+                    <span class="string">&quot;webp&quot;</span>
+                };
+
+                <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
+            })
     }
 
     <span class="doccomment">/// Gets all [`Emoji`]s of this guild via HTTP.</span>
@@ -4298,10 +4342,20 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">any</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
 <span class="kw">impl</span> <span class="ident">GuildInfo</span> {
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s icon, if the guild has an icon.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will produce a WEBP image URL, or GIF if the guild has a GIF icon.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">icon_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">icon</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/icons/{}/{}.webp&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> {
+                 <span class="kw">let</span> <span class="ident">ext</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">icon</span>.<span class="ident">starts_with</span>(<span class="string">&quot;a_&quot;</span>) {
+                    <span class="string">&quot;gif&quot;</span>
+                } <span class="kw">else</span> {
+                    <span class="string">&quot;webp&quot;</span>
+                };
+
+                <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/icons/{}/{}.{}&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>, <span class="ident">ext</span>)
+            })
     }
 }
 
