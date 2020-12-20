@@ -12,7 +12,7 @@ use crate::internal::prelude::*;
 pub struct Interaction {
     pub id: InteractionId,
     #[serde(rename = "type")]
-    pub interaction_type: InteractionType,
+    pub kind: InteractionType,
     pub data: Option<ApplicationCommandInteractionData>,
     pub guild_id: GuildId,
     pub channel_id: ChannelId,
@@ -106,4 +106,3 @@ pub struct ApplicationCommandOptionChoice {
     pub name: String,
     pub value: Value
 }
-
