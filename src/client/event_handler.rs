@@ -339,6 +339,11 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the guild's id and the channel's id the webhook belongs in.
     async fn webhook_update(&self, _ctx: Context, _guild_id: GuildId, _belongs_to_channel_id: ChannelId) {}
+
+    /// Dispatched when an user used a slash command.
+    ///
+    /// Provides the created Interaction
+    async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
 }
 
 /// This core trait for handling raw events

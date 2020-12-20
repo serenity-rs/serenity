@@ -732,5 +732,12 @@ async fn handle_event(
                 event_handler.webhook_update(context, event.guild_id, event.channel_id).await;
             });
         },
+        DispatchEvent::Model(Event::InteractionCreate(event)) => {
+            let event_handler = Arc::clone(event_handler);
+
+            tokio::spawn(async move {
+                event_handler.interaction_create(context, event.interaction).await;
+            });
+        },
     }
 }

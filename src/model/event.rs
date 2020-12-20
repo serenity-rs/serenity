@@ -1374,6 +1374,27 @@ pub struct WebhookUpdateEvent {
     pub guild_id: GuildId,
 }
 
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct InteractionCreateEvent {
+    pub interaction: Interaction,
+}
+
+impl<'de> Deserialize<'de> for InteractionCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self {
+            interaction: Interaction::deserialize(deserializer)?,
+        })
+    }
+}
+
+impl Serialize for InteractionCreateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Interaction::serialize(&self.interaction, serializer)
+    }
+}
+
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
 #[non_exhaustive]
@@ -1556,6 +1577,8 @@ pub enum Event {
     VoiceServerUpdate(VoiceServerUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
+    /// An user used a slash command.
+    InteractionCreate(InteractionCreateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
 }
@@ -1601,6 +1624,7 @@ impl Event {
             Self::VoiceStateUpdate(_) => EventType::VoiceStateUpdate,
             Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
             Self::WebhookUpdate(_) => EventType::WebhookUpdate,
+            Self::InteractionCreate(_) => EventType::InteractionCreate,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
     }
@@ -1714,6 +1738,7 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             Event::VoiceStateUpdate(serde_json::from_value(v)?)
         },
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
+        EventType::InteractionCreate => Event::InteractionCreate(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
             value: v,
@@ -1879,6 +1904,10 @@ pub enum EventType {
     ///
     /// This maps to [`WebhookUpdateEvent`].
     WebhookUpdate,
+    /// Indicator that a slash command was received.
+    ///
+    /// This maps to [`InteractionCreateEvent`].
+    InteractionCreate,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
@@ -1929,6 +1958,7 @@ impl EventType {
     const VOICE_SERVER_UPDATE: &'static str = "VOICE_SERVER_UPDATE";
     const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
     const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
+    const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
     /// the information to recover the original event name for these events, in which
@@ -1971,6 +2001,7 @@ impl EventType {
             Self::VoiceServerUpdate => Some(Self::VOICE_SERVER_UPDATE),
             Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
             Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
+            Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
             // to recover the name here, so we return `None` instead.
@@ -2032,6 +2063,7 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::VOICE_SERVER_UPDATE => EventType::VoiceServerUpdate,
                     EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
                     EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
+                    EventType::INTERACTION_CREATE => EventType::InteractionCreate,
                     other => EventType::Other(other.to_owned()),
                 })
             }
