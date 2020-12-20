@@ -258,6 +258,42 @@ pub enum Route {
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
     WebhooksId(u64),
+    /// Route for the `/webhooks/:application_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    WebhooksApplicationId(u64),
+    /// Route for the `/interactions/:interaction_id` path.
+    ///
+    /// The data is the relevant [`InteractionId`].
+    ///
+    /// [`InteractionId`]: crate::model::id::InteractionId
+    InteractionsId(u64),
+    /// Route for the `/applications/:application_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    ApplicationsIdCommands(u64),
+    /// Route for the `/applications/:application_id/commands/:command_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    ApplicationsIdCommandsId(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    ApplicationsIdGuildsIdCommands(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    ApplicationsIdGuildsIdCommandsId(u64),
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
@@ -638,6 +674,59 @@ impl Route {
         -> String where D: Display {
         format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait)
     }
+
+    pub fn webhook_original_interaction_response<D: Display>(
+        application_id: u64,
+        token: D
+    ) -> String {
+        format!(api!("/webhooks/{}/{}/messages/@original"), application_id, token)
+    }
+
+    pub fn webhook_followup_message<D: Display>(
+        application_id: u64,
+        token: D,
+        message_id: u64,
+    ) -> String {
+        format!(api!("/webhooks/{}/{}/messages/{}"), application_id, token, message_id)
+    }
+
+    pub fn webhook_followup_messages<D: Display>(
+        application_id: u64,
+        token: D,
+        wait: bool,
+    ) -> String {
+        format!(api!("/webhooks/{}/{}?wait={}"), application_id, token, wait)
+    }
+    
+    pub fn interaction_response<D: Display>(
+        application_id: u64,
+        token: D,
+    ) -> String {
+        format!(api!("/webhooks/{}/{}/callback"), application_id, token)
+    }
+
+    pub fn application_command(application_id: u64, command_id: u64) -> String {
+        format!(api!("applications/{}/commands/{}"), application_id, command_id)
+    }
+
+    pub fn application_commands(application_id: u64) -> String {
+        format!(api!("applications/{}/commands"), application_id)
+    }
+
+    pub fn application_guild_command(
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64
+    ) -> String {
+        format!(api!("applications/{}/guilds/{}/commands/{}"), application_id, guild_id, command_id)
+    }
+
+    pub fn application_guild_commands(
+        application_id: u64,
+        guild_id: u64,
+    ) -> String {
+        format!(api!("applications/{}/guilds/{}/commands"), application_id, guild_id)
+    }
 }
 
 #[derive(Clone, Debug)]
@@ -663,10 +752,26 @@ pub enum RouteInfo<'a> {
     CreateEmoji {
         guild_id: u64,
     },
+    CreateFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        wait: bool
+    },
+    CreateGlobalApplicationCommand {
+        application_id: u64,
+    },
     CreateGuild,
+    CreateGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+    },
     CreateGuildIntegration {
         guild_id: u64,
         integration_id: u64,
+    },
+    CreateInteractionResponse {
+        interaction_id: u64,
+        interaction_token: &'a str,
     },
     CreateInvite {
         channel_id: u64,
@@ -697,8 +802,22 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         emoji_id: u64,
     },
+    DeleteFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        message_id: u64,
+    },
+    DeleteGlobalApplicationCommand {
+        application_id: u64,
+        command_id: u64,
+    },
     DeleteGuild {
         guild_id: u64,
+    },
+    DeleteGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
     },
     DeleteGuildIntegration {
         guild_id: u64,
@@ -722,6 +841,10 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
         reaction: &'a str,
+    },
+    DeleteOriginalInteractionResponse {
+        application_id: u64,
+        interaction_token: &'a str,
     },
     DeletePermission {
         channel_id: u64,
@@ -751,8 +874,22 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         emoji_id: u64,
     },
+    EditFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        message_id: u64,
+    },
+    EditGlobalApplicationCommand {
+        application_id: u64,
+        command_id: u64,
+    },
     EditGuild {
         guild_id: u64,
+    },
+    EditGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
     },
     EditGuildChannels {
         guild_id: u64,
@@ -770,6 +907,10 @@ pub enum RouteInfo<'a> {
     },
     EditNickname {
         guild_id: u64,
+    },
+    EditOriginalInteractionResponse {
+        application_id: u64,
+        interaction_token: &'a str,
     },
     EditProfile,
     EditRole {
@@ -825,7 +966,14 @@ pub enum RouteInfo<'a> {
         emoji_id: u64,
     },
     GetGateway,
+    GetGlobalApplicationCommands {
+        application_id: u64,
+    },
     GetGuild {
+        guild_id: u64,
+    },
+    GetGuildApplicationCommands {
+        application_id: u64,
         guild_id: u64,
     },
     GetGuildEmbed {
@@ -983,15 +1131,41 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmojis(guild_id),
                 Cow::from(Route::guild_emojis(guild_id)),
             ),
+            RouteInfo::CreateFollowupMessage {
+                application_id,
+                interaction_token,
+                wait
+            } => (
+                LightMethod::Post,
+                Route::WebhooksId(application_id),
+                Cow::from(Route::webhook_followup_messages(
+                    application_id, interaction_token, wait
+                )),
+            ),
+            RouteInfo::CreateGlobalApplicationCommand { application_id } => (
+                LightMethod::Post,
+                Route::ApplicationsIdCommands(application_id),
+                Cow::from(Route::application_commands(application_id))
+            ),
             RouteInfo::CreateGuild => (
                 LightMethod::Post,
                 Route::Guilds,
                 Cow::from(Route::guilds()),
             ),
+            RouteInfo::CreateGuildApplicationCommand { application_id, guild_id } => (
+                LightMethod::Post,
+                Route::ApplicationsIdGuildsIdCommands(application_id),
+                Cow::from(Route::application_guild_commands(application_id, guild_id))
+            ),
             RouteInfo::CreateGuildIntegration { guild_id, integration_id } => (
                 LightMethod::Post,
                 Route::GuildsIdIntegrationsId(guild_id),
                 Cow::from(Route::guild_integration(guild_id, integration_id)),
+            ),
+            RouteInfo::CreateInteractionResponse { interaction_id, interaction_token } => (
+                LightMethod::Post,
+                Route::InteractionsId(interaction_id),
+                Cow::from(Route::interaction_response(interaction_id, interaction_token)),
             ),
             RouteInfo::CreateInvite { channel_id } => (
                 LightMethod::Post,
@@ -1043,10 +1217,40 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmojisId(guild_id),
                 Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
+            RouteInfo::DeleteFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id
+            } => (
+                LightMethod::Delete,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_followup_message(
+                    application_id,
+                    interaction_token,
+                    message_id
+                )),
+            ),
+            RouteInfo::DeleteGlobalApplicationCommand {
+                application_id,
+                command_id
+            } => (
+                LightMethod::Delete,
+                Route::ApplicationsIdCommandsId(application_id),
+                Cow::from(Route::application_command(application_id, command_id)),
+            ),
             RouteInfo::DeleteGuild { guild_id } => (
                 LightMethod::Delete,
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild(guild_id)),
+            ),
+            RouteInfo::DeleteGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id
+            } => (
+                LightMethod::Delete,
+                Route::ApplicationsIdGuildsIdCommandsId(application_id),
+                Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
             RouteInfo::DeleteGuildIntegration { guild_id, integration_id } => (
                 LightMethod::Delete,
@@ -1084,6 +1288,17 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::ChannelsIdMessagesBulkDelete(channel_id),
                 Cow::from(Route::channel_messages_bulk_delete(channel_id)),
+            ),
+            RouteInfo::DeleteOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            } => (
+                LightMethod::Delete,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_original_interaction_response(
+                    application_id,
+                    interaction_token,
+                )),
             ),
             RouteInfo::DeletePermission { channel_id, target_id } => (
                 LightMethod::Delete,
@@ -1130,10 +1345,44 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmojisId(guild_id),
                 Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
+            RouteInfo::EditFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id,
+            } => (
+                LightMethod::Patch,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_followup_message(
+                    application_id,
+                    interaction_token,
+                    message_id)
+                ),
+            ),
+            RouteInfo::EditGlobalApplicationCommand {
+                application_id,
+                command_id,
+            } => (
+                LightMethod::Patch,
+                Route::ApplicationsIdCommandsId(application_id),
+                Cow::from(Route::application_command(application_id, command_id)),
+            ),
             RouteInfo::EditGuild { guild_id } => (
                 LightMethod::Patch,
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild(guild_id)),
+            ),
+            RouteInfo::EditGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Patch,
+                Route::ApplicationsIdGuildsIdCommandsId(application_id),
+                Cow::from(Route::application_guild_command(
+                    application_id,
+                    guild_id,
+                    command_id)
+                ),
             ),
             RouteInfo::EditGuildChannels { guild_id } => (
                 LightMethod::Patch,
@@ -1159,6 +1408,17 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdMembersMeNick(guild_id),
                 Cow::from(Route::guild_nickname(guild_id)),
+            ),
+            RouteInfo::EditOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            } => (
+                LightMethod::Patch,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_original_interaction_response(
+                    application_id,
+                    interaction_token
+                )),
             ),
             RouteInfo::EditProfile => (
                 LightMethod::Patch,
@@ -1271,10 +1531,23 @@ impl<'a> RouteInfo<'a> {
                 Route::Gateway,
                 Cow::from(Route::gateway()),
             ),
+            RouteInfo::GetGlobalApplicationCommands { application_id } => (
+                LightMethod::Get,
+                Route::ApplicationsIdCommands(application_id),
+                Cow::from(Route::application_commands(application_id)),
+            ),
             RouteInfo::GetGuild { guild_id } => (
                 LightMethod::Get,
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild(guild_id)),
+            ),
+            RouteInfo::GetGuildApplicationCommands {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommands(application_id),
+                Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
             RouteInfo::GetGuildEmbed { guild_id } => (
                 LightMethod::Get,
