@@ -22,4 +22,5 @@ pub use super::permissions::*;
 pub use super::user::*;
 pub use super::voice::*;
 pub use super::webhook::*;
+pub use super::interactions::*;
 pub use super::*;

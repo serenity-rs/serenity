@@ -36,6 +36,7 @@ pub mod prelude;
 pub mod user;
 pub mod voice;
 pub mod webhook;
+pub mod interactions;
 
 #[cfg(feature = "voice-model")]
 pub use serenity_voice_model as voice_gateway;
