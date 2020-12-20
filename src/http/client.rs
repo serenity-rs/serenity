@@ -451,7 +451,7 @@ impl Http {
         }).await
     }
 
-    /// Deletes a followup message for an Interaction.
+    /// Deletes a followup message for an interaction.
     pub async fn delete_followup_message(
         &self,
         application_id: u64,
@@ -593,7 +593,7 @@ impl Http {
         }).await
     }
 
-    /// Deletes the initial Interaction response.
+    /// Deletes the initial interaction response.
     pub async fn delete_original_interaction_response(
         &self,
         application_id: u64,
@@ -733,7 +733,7 @@ impl Http {
         }).await
     }
 
-    /// Edits a followup message for an Interaction.
+    /// Edits a follow-up message for an interaction.
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///
@@ -885,7 +885,7 @@ impl Http {
         }).await
     }
 
-    /// Edits the initial Interaction response.
+    /// Edits the initial interaction response.
     ///
     /// Refer to Discord's [docs] for Edit Webhook Message for field information.
     ///

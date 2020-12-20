@@ -1577,7 +1577,7 @@ pub enum Event {
     VoiceServerUpdate(VoiceServerUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
-    /// An user used a slash command.
+    /// A user used a slash command.
     InteractionCreate(InteractionCreateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),

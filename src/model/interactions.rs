@@ -1,12 +1,12 @@
-//! Interactions information-related models
+//! Interactions information-related models.
 
 use super::prelude::*;
 use crate::internal::prelude::*;
 
-/// Information about an Interaction
+/// Information about an interaction.
 ///
-/// An interaction is the base "thing" that is sent when a user invokes a command, and is the same
-/// for Slash Commands and other future interaction types.
+/// An interaction is sent when a user invokes a slash command and is the same
+/// for slash commands and other future interaction types.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Interaction {
@@ -27,34 +27,33 @@ pub struct Interaction {
 #[repr(u8)]
 pub enum InteractionType {
     Ping = 1,
-    ApplicationCommand = 2
+    ApplicationCommand = 2,
 }
 
-/// The command data payload
+/// The command data payload.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionData {
     pub id: CommandId,
     pub name: String,
     #[serde(default)]
-    pub options: Vec<ApplicationCommandInteractionDataOption>
+    pub options: Vec<ApplicationCommandInteractionDataOption>,
 }
 
-/// A set of a param and value from the user.
+/// A set of a parameter and a value from the user.
 ///
-/// All options have names, and an option can either be a parameter and input value--in which case
-/// `value` will be set--or it can denote a subcommand or group--in which case it will contain a
-/// top-level key and another array of `options`.
+/// All options have names and an option can either be a parameter and input `value` or it can denote a sub-command or group, in which case it will contain a
+/// top-level key and another vector of `options`.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
     pub name: String,
     pub value: Option<ApplicationCommandOptionType>,
     #[serde(default)]
-    pub options: Vec<ApplicationCommandInteractionDataOption>
+    pub options: Vec<ApplicationCommandInteractionDataOption>,
 }
 
-/// The base "command" model that belongs to an application.
+/// The base command model that belongs to an application.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommand {
@@ -63,10 +62,10 @@ pub struct ApplicationCommand {
     pub name: String,
     pub description: String,
     #[serde(default)]
-    pub options: Vec<ApplicationCommandOption>
+    pub options: Vec<ApplicationCommandOption>,
 }
 
-/// The parameters for a command
+/// The parameters for a command.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandOption {
@@ -81,10 +80,10 @@ pub struct ApplicationCommandOption {
     #[serde(default)]
     pub choices: Vec<ApplicationCommandOptionChoice>,
     #[serde(default)]
-    pub options: Vec<ApplicationCommandOption>
+    pub options: Vec<ApplicationCommandOption>,
 }
 
-/// The type of an application command option
+/// The type of an application command option.
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
 #[non_exhaustive]
 #[repr(u8)]
@@ -96,13 +95,13 @@ pub enum ApplicationCommandOptionType {
     Boolean = 5,
     User = 6,
     Channel = 7,
-    Role = 8
+    Role = 8,
 }
 
-/// The only valid values a user can pick in a command option
+/// The only valid values a user can pick in a command option.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct ApplicationCommandOptionChoice {
     pub name: String,
-    pub value: Value
+    pub value: Value,
 }
