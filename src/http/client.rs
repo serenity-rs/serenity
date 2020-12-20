@@ -167,7 +167,9 @@ impl Http {
 
     /// Create a followup message for an Interaction.
     ///
-    /// Functions the same as [`self::execute_webhook`]
+    /// Functions the same as [`execute_webhook`]
+    ///
+    /// [`execute_webhook`]: Self::execute_webhook
     pub async fn create_followup_message(
         &self,
         application_id: u64,
@@ -733,7 +735,9 @@ impl Http {
 
     /// Edits a followup message for an Interaction.
     ///
-    /// Functions the same as [`self::edit_webhook_message`]
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     pub async fn edit_followup_message(
         &self,
         application_id: u64,
@@ -883,7 +887,9 @@ impl Http {
 
     /// Edits the initial Interaction response.
     ///
-    /// Functions the same as [`self::edit_webhook_message`]
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     pub async fn edit_original_interaction_response(
         &self,
         application_id: u64,
