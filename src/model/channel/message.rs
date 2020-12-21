@@ -886,8 +886,10 @@ pub enum MessageType {
     NitroTier2 = 10,
     /// An indicator that the guild has reached nitro tier 3
     NitroTier3 = 11,
-    // /// An message reply.
+    /// A message reply.
     InlineReply = 19,
+    /// A slash command
+    ApplicationCommand = 20,
 }
 
 enum_number!(
@@ -905,6 +907,7 @@ enum_number!(
         NitroTier2,
         NitroTier3,
         InlineReply,
+        ApplicationCommand,
     }
 );
 
@@ -926,6 +929,7 @@ impl MessageType {
             NitroTier2 => 10,
             NitroTier3 => 11,
             InlineReply => 19,
+            ApplicationCommand => 20,
         }
     }
 }
