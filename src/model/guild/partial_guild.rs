@@ -420,6 +420,24 @@ impl PartialGuild {
         self.id.move_member(&http, user_id, channel_id).await
     }
 
+    /// Calculate a [`Member`]'s permissions in a given channel in the guild.
+    #[inline]
+    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Result<Permissions> {
+        Guild::_user_permissions_in(
+            channel,
+            member,
+            &self.roles,
+            self.owner_id,
+            self.id
+        )
+    }
+
+    /// Calculate a [`Role`]'s permissions in a given channel in the guild.
+    #[inline]
+    pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
+        Guild::_role_permissions_in(channel, role, self.id)
+    }
+
     /// Gets the number of [`Member`]s that would be pruned with the given
     /// number of days.
     ///

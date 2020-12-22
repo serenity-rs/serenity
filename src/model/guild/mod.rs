@@ -1293,22 +1293,39 @@ impl Guild {
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
+    #[inline]
     pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Result<Permissions> {
+        Self::_user_permissions_in(
+            channel,
+            member,
+            &self.roles,
+            self.owner_id,
+            self.id
+        )
+    }
+
+    /// Helper function that can also be used from `PartialGuild`.
+    pub(crate) fn _user_permissions_in(
+        channel: &GuildChannel, 
+        member: &Member, 
+        roles: &HashMap<RoleId, Role>,
+        owner_id: UserId,
+        guild_id: GuildId
+    ) -> Result<Permissions> {
 
 
         // The owner has all permissions in all cases.
-        if member.user.id == self.owner_id {
-            return Ok(self.remove_unnecessary_voice_permissions(channel, Permissions::all()));
+        if member.user.id == owner_id {
+            return Ok(Self::remove_unnecessary_voice_permissions(channel, Permissions::all()));
         }
 
         // Start by retrieving the @everyone role's permissions.
-        let everyone = match self.roles.get(&RoleId(self.id.0)) {
+        let everyone = match roles.get(&RoleId(guild_id.0)) {
             Some(everyone) => everyone,
             None => {
                 error!(
-                    "(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'",
-                    self.id,
-                    self.name
+                    "(╯°□°）╯︵ ┻━┻ @everyone role missing in {}",
+                    guild_id,
                 );
                 return Err(Error::Model(ModelError::RoleNotFound));
             },
@@ -1318,13 +1335,13 @@ impl Guild {
         let mut permissions = everyone.permissions;
 
         for &role in &member.roles {
-            if let Some(role) = self.roles.get(&role) {
+            if let Some(role) = roles.get(&role) {
                 permissions |= role.permissions;
             } else {
                 error!(
                     "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
                     member.user.id,
-                    self.id,
+                    guild_id,
                     role
                 );
                 return Err(Error::Model(ModelError::RoleNotFound));
@@ -1333,7 +1350,7 @@ impl Guild {
 
         // Administrators have all permissions in any channel.
         if permissions.contains(Permissions::ADMINISTRATOR) {
-            return Ok(self.remove_unnecessary_voice_permissions(channel, Permissions::all()));
+            return Ok(Self::remove_unnecessary_voice_permissions(channel, Permissions::all()));
         }
 
         // Apply the permission overwrites for the channel for each of the
@@ -1348,11 +1365,11 @@ impl Guild {
         // Roles
         for overwrite in &channel.permission_overwrites {
             if let PermissionOverwriteType::Role(role) = overwrite.kind {
-                if role.0 != self.id.0 && !member.roles.contains(&role) {
+                if role.0 != guild_id.0 && !member.roles.contains(&role) {
                     continue;
                 }
 
-                if let Some(role) = self.roles.get(&role) {
+                if let Some(role) = roles.get(&role) {
                     data.push((role.position, overwrite.deny, overwrite.allow));
                 }
             }
@@ -1374,28 +1391,36 @@ impl Guild {
         }
 
         // The default channel is always readable.
-        if channel.id.0 == self.id.0 {
+        if channel.id.0 == guild_id.0 {
             permissions |= Permissions::READ_MESSAGES;
         }
 
-        self.remove_unusable_permissions(&mut permissions);
+        Self::remove_unusable_permissions(&mut permissions);
 
         Ok(permissions)
     }
 
     /// Calculate a [`Role`]'s permissions in a given channel in the guild.
-    /// Returns `None` if given `role_id` cannot be found.
     #[inline]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
+        Self::_role_permissions_in(channel, role, self.id)
+    }
+
+    /// Helper function that can also be used from `PartialGuild`.
+    pub(crate) fn _role_permissions_in(
+        channel: &GuildChannel,
+        role: &Role,
+        guild_id: GuildId
+    ) -> Result<Permissions> {
         // Fail if the role or channel is not from this guild.
-        if role.guild_id != self.id || channel.guild_id != self.id {
+        if role.guild_id != guild_id || channel.guild_id != guild_id {
             return Err(Error::Model(ModelError::WrongGuild));
         }
 
         let mut permissions = role.permissions;
 
         if permissions.contains(Permissions::ADMINISTRATOR) {
-            return Ok(self.remove_unnecessary_voice_permissions(channel, Permissions::all()));
+            return Ok(Self::remove_unnecessary_voice_permissions(channel, Permissions::all()));
         }
 
         for overwrite in &channel.permission_overwrites {
@@ -1408,7 +1433,7 @@ impl Guild {
             }
         }
 
-        self.remove_unusable_permissions(&mut permissions);
+        Self::remove_unusable_permissions(&mut permissions);
 
         Ok(permissions)
     }
@@ -1441,7 +1466,7 @@ impl Guild {
         self.id.prune_count(cache_http.http(), days).await
     }
 
-    pub(crate) fn remove_unusable_permissions(&self, permissions: &mut Permissions) {
+    pub(crate) fn remove_unusable_permissions(permissions: &mut Permissions) {
         // No SEND_MESSAGES => no message-sending-related actions
         // If the member does not have the `SEND_MESSAGES` permission, then
         // throw out message-able permissions.
@@ -1464,7 +1489,7 @@ impl Guild {
         }
     }
 
-    pub(crate) fn remove_unnecessary_voice_permissions(&self, channel: &GuildChannel, mut permissions: Permissions) -> Permissions {
+    pub(crate) fn remove_unnecessary_voice_permissions(channel: &GuildChannel, mut permissions: Permissions) -> Permissions {
         // If this is a text channel, then throw out voice permissions.
         if channel.kind == ChannelType::Text {
             permissions &= !(Permissions::CONNECT
