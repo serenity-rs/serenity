@@ -194,6 +194,12 @@
 <span id="191">191</span>
 <span id="192">192</span>
 <span id="193">193</span>
+<span id="194">194</span>
+<span id="195">195</span>
+<span id="196">196</span>
+<span id="197">197</span>
+<span id="198">198</span>
+<span id="199">199</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">ModelError</span>;
@@ -263,6 +269,11 @@
     <span class="doccomment">/// *This only exists for the `GuildId::ban` and `Member::ban` functions. For their cases,</span>
     <span class="doccomment">/// it&#39;s the &quot;reason&quot;.*</span>
     <span class="ident">ExceededLimit</span>(<span class="ident">String</span>, <span class="ident">u32</span>),
+    <span class="doccomment">/// The input is not in the specified range.</span>
+    <span class="doccomment">/// Returned by `GuildId::members`, `Guild::members` and `PartialGuild::members`</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// (param_name, value, range_min, range_max)</span>
+    <span class="ident">NotInRange</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">u64</span>, <span class="ident">u64</span>, <span class="ident">u64</span>),
     <span class="doccomment">/// Some other error. This is only used for &quot;Expected value &lt;TYPE&gt;&quot; errors,</span>
     <span class="doccomment">/// when a more detailed error can not be easily provided via the</span>
     <span class="doccomment">/// [`Error::Decode`] variant.</span>
@@ -345,6 +356,7 @@
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Error</span>::<span class="ident">Decode</span>(<span class="ident">msg</span>, <span class="kw">_</span>) <span class="op">|</span> <span class="ident">Error</span>::<span class="ident">Other</span>(<span class="ident">msg</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="ident">msg</span>),
             <span class="ident">Error</span>::<span class="ident">ExceededLimit</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Input exceeded a limit&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">NotInRange</span>(..) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Input is not in the specified range&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">Format</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),
             <span class="ident">Error</span>::<span class="ident">Json</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="ident">Display</span>::<span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="ident">inner</span>, <span class="ident">f</span>),

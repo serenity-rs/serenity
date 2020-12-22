@@ -180,18 +180,32 @@
 <span id="177">177</span>
 <span id="178">178</span>
 <span id="179">179</span>
+<span id="180">180</span>
+<span id="181">181</span>
+<span id="182">182</span>
+<span id="183">183</span>
+<span id="184">184</span>
+<span id="185">185</span>
+<span id="186">186</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of constants used by the library.</span>
 
 <span class="doccomment">/// The maximum length of the textual size of an embed.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">EMBED_MAX_LENGTH</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">6000</span>;
+
 <span class="doccomment">/// The gateway version used by the library. The gateway URI is retrieved via</span>
 <span class="doccomment">/// the REST API.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">GATEWAY_VERSION</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">8</span>;
+
 <span class="doccomment">/// The large threshold to send on identify.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">LARGE_THRESHOLD</span>: <span class="ident">u8</span> <span class="op">=</span> <span class="number">250</span>;
+
 <span class="doccomment">/// The maximum unicode code points allowed within a message by Discord.</span>
 <span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MESSAGE_CODE_LIMIT</span>: <span class="ident">usize</span> <span class="op">=</span> <span class="number">2000</span>;
+
+<span class="doccomment">/// The maximum number of members the bot can fetch at once</span>
+<span class="kw">pub</span> <span class="kw">const</span> <span class="ident">MEMBER_FETCH_LIMIT</span>: <span class="ident">u64</span> <span class="op">=</span> <span class="number">1000</span>;
+
 <span class="doccomment">/// The [UserAgent] sent along with every request.</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// [UserAgent]: ::reqwest::header::USER_AGENT</span>

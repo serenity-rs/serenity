@@ -1489,6 +1489,8 @@
     <span class="ident">borrow</span>::<span class="ident">Cow</span>,
     <span class="ident">fmt</span>::{<span class="ident">Display</span>, <span class="ident">Write</span>},
 };
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>;
+
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">LightMethod</span>;
 
 <span class="doccomment">/// A representation of all routes registered within the library. These are safe</span>
@@ -2006,9 +2008,7 @@
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;after={}&quot;</span>, <span class="ident">after</span>);
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>) <span class="op">=</span> <span class="ident">limit</span> {
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>);
-        }
+        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">s</span>, <span class="string">&quot;&amp;limit={}&quot;</span>, <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="ident">constants</span>::<span class="ident">MEMBER_FETCH_LIMIT</span>));
 
         <span class="ident">s</span>
     }

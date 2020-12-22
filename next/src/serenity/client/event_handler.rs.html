@@ -340,16 +340,6 @@
 <span id="337">337</span>
 <span id="338">338</span>
 <span id="339">339</span>
-<span id="340">340</span>
-<span id="341">341</span>
-<span id="342">342</span>
-<span id="343">343</span>
-<span id="344">344</span>
-<span id="345">345</span>
-<span id="346">346</span>
-<span id="347">347</span>
-<span id="348">348</span>
-<span id="349">349</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
@@ -396,16 +386,6 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides said pin&#39;s data.</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channel_pins_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_pin</span>: <span class="ident">ChannelPinsUpdateEvent</span>) {}
-
-    <span class="doccomment">/// Dispatched when a user is added to a `Group`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the group&#39;s id and the user&#39;s data.</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channel_recipient_addition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_group_id</span>: <span class="ident">ChannelId</span>, <span class="ident">_user</span>: <span class="ident">User</span>) {}
-
-    <span class="doccomment">/// Dispatched when a user is removed to a `Group`.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Provides the group&#39;s id and the user&#39;s data.</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channel_recipient_removal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_group_id</span>: <span class="ident">ChannelId</span>, <span class="ident">_user</span>: <span class="ident">User</span>) {}
 
     <span class="doccomment">/// Dispatched when a channel is updated.</span>
     <span class="doccomment">///</span>
@@ -479,7 +459,7 @@
     <span class="doccomment">/// Dispatched when a user joins a guild.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id and the user&#39;s member data.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_member_addition</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">_new_member</span>: <span class="ident">Member</span>) {}
@@ -487,7 +467,7 @@
     <span class="doccomment">/// Dispatched when a user&#39;s membership ends by leaving, getting kicked, or being banned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id, the user&#39;s data, and the user&#39;s member data if available.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -496,7 +476,7 @@
     <span class="doccomment">/// Dispatched when a user&#39;s membership ends by leaving, getting kicked, or being banned.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the guild&#39;s id, the user&#39;s data.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
@@ -505,7 +485,7 @@
     <span class="doccomment">/// Dispatched when a member is updated (e.g their nickname is updated).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the member&#39;s old data (if available) and the new data.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -514,7 +494,7 @@
     <span class="doccomment">/// Dispatched when a member is updated (e.g their nickname is updated).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the new data.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild members&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
@@ -631,7 +611,7 @@
     <span class="doccomment">/// Dispatched when a user&#39;s presence is updated (e.g off -&gt; on).</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// Provides the presence&#39;s new data.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Note: This event will not trigger unless the &quot;guild presences&quot; privileged intent</span>
     <span class="doccomment">/// is enabled on the bot application page.</span>
     <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">presence_update</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">_ctx</span>: <span class="ident">Context</span>, <span class="ident">_new_data</span>: <span class="ident">PresenceUpdateEvent</span>) {}
