@@ -44,16 +44,6 @@ pub trait EventHandler: Send + Sync {
     /// Provides said pin's data.
     async fn channel_pins_update(&self, _ctx: Context, _pin: ChannelPinsUpdateEvent) {}
 
-    /// Dispatched when a user is added to a `Group`.
-    ///
-    /// Provides the group's id and the user's data.
-    async fn channel_recipient_addition(&self, _ctx: Context, _group_id: ChannelId, _user: User) {}
-
-    /// Dispatched when a user is removed to a `Group`.
-    ///
-    /// Provides the group's id and the user's data.
-    async fn channel_recipient_removal(&self, _ctx: Context, _group_id: ChannelId, _user: User) {}
-
     /// Dispatched when a channel is updated.
     ///
     /// Provides the old channel data, and the new data.
@@ -126,7 +116,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user joins a guild.
     ///
     /// Provides the guild's id and the user's member data.
-    /// 
+    ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     async fn guild_member_addition(&self, _ctx: Context, _guild_id: GuildId, _new_member: Member) {}
@@ -134,7 +124,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
     /// Provides the guild's id, the user's data, and the user's member data if available.
-    /// 
+    ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     #[cfg(feature = "cache")]
@@ -143,7 +133,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user's membership ends by leaving, getting kicked, or being banned.
     ///
     /// Provides the guild's id, the user's data.
-    /// 
+    ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     #[cfg(not(feature = "cache"))]
@@ -152,7 +142,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
     /// Provides the member's old data (if available) and the new data.
-    /// 
+    ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     #[cfg(feature = "cache")]
@@ -161,7 +151,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a member is updated (e.g their nickname is updated).
     ///
     /// Provides the new data.
-    /// 
+    ///
     /// Note: This event will not trigger unless the "guild members" privileged intent
     /// is enabled on the bot application page.
     #[cfg(not(feature = "cache"))]
@@ -278,7 +268,7 @@ pub trait EventHandler: Send + Sync {
     /// Dispatched when a user's presence is updated (e.g off -> on).
     ///
     /// Provides the presence's new data.
-    /// 
+    ///
     /// Note: This event will not trigger unless the "guild presences" privileged intent
     /// is enabled on the bot application page.
     async fn presence_update(&self, _ctx: Context, _new_data: PresenceUpdateEvent) {}
