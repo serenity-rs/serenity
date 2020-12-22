@@ -146,8 +146,10 @@ impl Member {
     pub async fn default_channel(&self, cache: impl AsRef<Cache>) -> Option<GuildChannel> {
         let guild = self.guild_id.to_guild_cached(cache).await?;
 
-        for (cid, channel) in &guild.channels {
-            if guild.user_permissions_in(*cid, self.user.id).read_messages() {
+        let member = guild.members.get(&self.user.id)?;
+
+        for channel in guild.channels.values() {
+            if guild.user_permissions_in(channel, member).ok()?.read_messages() {
                 return Some(channel.clone());
             }
         }
