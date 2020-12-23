@@ -108,6 +108,18 @@ impl fmt::Debug for BotApplication {
     }
 }
 
+/// Partial information about the given application.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PartialCurrentApplicationInfo {
+    /// The unique Id of the user.
+    pub id: UserId,
+    /// The flags associated with the application.
+    ///
+    /// These flags are unknown and are not yet documented in the Discord API
+    /// documentation.
+    pub flags: u64,
+}
+
 /// Information about the current application and its owner.
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]

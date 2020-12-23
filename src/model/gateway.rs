@@ -605,6 +605,7 @@ impl Serialize for Presence {
 #[derive(Clone, Debug, Deserialize, Serialize)]
 #[non_exhaustive]
 pub struct Ready {
+    pub application: PartialCurrentApplicationInfo,
     pub guilds: Vec<GuildStatus>,
     #[serde(default, serialize_with = "serialize_presences", deserialize_with = "deserialize_presences")]
     pub presences: HashMap<UserId, Presence>,
