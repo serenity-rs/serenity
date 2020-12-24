@@ -56,14 +56,14 @@ pub struct Activity {
     pub timestamps: Option<ActivityTimestamps>,
     /// The sync ID of the activity. Mainly used by the Spotify activity
     /// type which uses this parameter to store the track ID.
-    #[cfg(feature = "unstable")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub sync_id: Option<String>,
     /// The session ID of the activity. Reserved for specific activity
     /// types, such as the Activity that is transmitted when a user is
     /// listening to Spotify.
-    #[cfg(feature = "unstable")]
-    #[cfg_attr(docsrs, doc(cfg(feature = "unstable")))]
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub session_id: Option<String>,
     /// The Stream URL if [`kind`] is [`ActivityType::Streaming`].
     ///
@@ -112,9 +112,9 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             sync_id: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
         }
@@ -162,9 +162,9 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             sync_id: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: Some(url.to_string()),
         }
@@ -209,9 +209,9 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             sync_id: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
         }
@@ -256,9 +256,9 @@ impl Activity {
             state: None,
             emoji: None,
             timestamps: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             sync_id: None,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             session_id: None,
             url: None,
         }
@@ -329,13 +329,13 @@ impl<'de> Deserialize<'de> for Activity {
             None => None,
         };
 
-        #[cfg(feature = "unstable")]
+        #[cfg(feature = "unstable_discord_api")]
         let sync_id = match map.remove("sync_id") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
-        #[cfg(feature = "unstable")]
+        #[cfg(feature = "unstable_discord_api")]
         let session_id = match map.remove("session_id") {
             Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
@@ -357,9 +357,9 @@ impl<'de> Deserialize<'de> for Activity {
             state,
             emoji,
             timestamps,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             sync_id,
-            #[cfg(feature = "unstable")]
+            #[cfg(feature = "unstable_discord_api")]
             session_id,
             url,
         })
