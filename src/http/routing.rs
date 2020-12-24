@@ -918,6 +918,8 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         emoji_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
     EditFollowupMessage {
         application_id: u64,
         interaction_token: &'a str,
