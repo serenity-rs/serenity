@@ -7,6 +7,9 @@ use std::time::{Duration, Instant};
 type Check =
     for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, bool>;
 
+type DelayHook =
+    for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
+
 pub(crate) struct Ratelimit {
     pub delay: Duration,
     pub limit: Option<(Duration, u32)>,
@@ -15,6 +18,8 @@ pub(crate) struct UnitRatelimit {
     pub last_time: Option<Instant>,
     pub set_time: Instant,
     pub tickets: u32,
+    pub awaiting: u32,
+    pub is_first_try: bool,
 }
 
 impl UnitRatelimit {
@@ -23,6 +28,8 @@ impl UnitRatelimit {
             last_time: None,
             set_time: creation_time,
             tickets: 0,
+            awaiting: 0,
+            is_first_try: true,
         }
     }
 }
@@ -53,7 +60,7 @@ pub(crate) enum Bucket {
 
 impl Bucket {
     #[inline]
-    pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<BucketAction> {
+    pub async fn take(&mut self, ctx: &Context, msg: &Message) -> Option<RateLimitInfo> {
         match self {
             Self::Global(counter) => counter.take(ctx, msg, 0).await,
             Self::User(counter) => counter.take(ctx, msg, msg.author.id.0).await,
@@ -105,21 +112,55 @@ pub(crate) struct TicketCounter {
     pub ratelimit: Ratelimit,
     pub tickets_for: HashMap<u64, UnitRatelimit>,
     pub check: Option<Check>,
-    pub await_ratelimits: bool,
+    pub delay_action: Option<DelayHook>,
+    pub await_ratelimits: u32,
 }
 
-/// A bucket may return results based on how it set up.
-///
-/// By default, it will return `CancelWith` when a limit is hit.
-/// This is intended to cancel the command invocation and propagate the
-/// duration to the user.
-///
-/// If the bucket is set to await durations, it will suggest to wait
-/// for the bucket by returning `DelayFor` and then delay for the duration,
-/// and then try taking a ticket again.
-pub enum BucketAction {
-    CancelWith(Duration),
-    DelayFor(Duration),
+/// Contains information about a rate limit.
+#[derive(Debug)]
+pub struct RateLimitInfo {
+    /// Time to elapse in order to invoke a command again.
+    pub rate_limit: Duration,
+    /// Amount of active delays by this target.
+    pub active_delays: u32,
+    /// Maximum delays that this target can invoke.
+    pub max_delays: u32,
+    /// Whether this is the first time the rate limit info has been
+    /// returned for this target without the rate limit to elapse.
+    pub is_first_try: bool,
+    /// How the command invocation has been treated by the framework.
+    pub action: RateLimitAction,
+}
+
+/// Action taken for the command invocation.
+#[derive(Debug)]
+pub enum RateLimitAction {
+    /// Invocation has been delayed.
+    Delayed,
+    /// Tried to delay invocation but maximum of delays reached.
+    FailedDelay,
+    /// Cancelled the invocation due to time or ticket reasons.
+    Cancelled,
+}
+
+impl RateLimitInfo {
+    /// Gets the duration of the rate limit in seconds.
+    #[inline]
+    pub fn as_secs(&self) -> u64 {
+        self.rate_limit.as_secs()
+    }
+
+    /// Gets the duration of the rate limit in milliseconds.
+    #[inline]
+    pub fn as_millis(&self) -> u128 {
+        self.rate_limit.as_millis()
+    }
+
+    /// Gets the duration of the rate limit in microseconds.
+    #[inline]
+    pub fn as_micros(&self) -> u128 {
+        self.rate_limit.as_micros()
+    }
 }
 
 impl TicketCounter {
@@ -134,7 +175,7 @@ impl TicketCounter {
     /// However there is no contract: It does not matter what
     /// the caller ends up doing, receiving some action eventually means
     /// no ticket can be taken and the duration must elapse.
-    pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<BucketAction> {
+    pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<RateLimitInfo> {
         if let Some(ref check) = self.check {
 
             if !(check)(ctx, msg).await {
@@ -146,6 +187,7 @@ impl TicketCounter {
         let Self {
             tickets_for, ratelimit, ..
         } = self;
+
         let ticket_owner = tickets_for.entry(id)
             .or_insert_with(|| UnitRatelimit::new(now));
 
@@ -155,13 +197,42 @@ impl TicketCounter {
         if let Some((timespan, limit)) = ratelimit.limit {
 
             if (ticket_owner.tickets + 1) > limit {
-                if let Some(res) = (ticket_owner
+                if let Some(ratelimit) = (ticket_owner
                     .set_time + timespan).checked_duration_since(now)
                 {
-                    return Some(if self.await_ratelimits {
-                        BucketAction::DelayFor(res)
+                    let was_first_try = ticket_owner.is_first_try;
+
+                    // Are delay limits left?
+                    let action = if self.await_ratelimits >= ticket_owner.awaiting + 1 {
+                        ticket_owner.awaiting += 1;
+
+                        if let Some(delay_action) = self.delay_action {
+                            let ctx = ctx.clone();
+                            let msg = msg.clone();
+
+                            tokio::spawn(async move {
+                                delay_action(&ctx, &msg).await;
+                            });
+                        }
+
+                        RateLimitAction::Delayed
+                    // Is this bucket utilising delay limits?
+                    } else if self.await_ratelimits > 0 {
+                        ticket_owner.is_first_try = false;
+
+                        RateLimitAction::FailedDelay
                     } else {
-                        BucketAction::CancelWith(res)
+                        ticket_owner.is_first_try = false;
+
+                        RateLimitAction::Cancelled
+                    };
+
+                    return Some(RateLimitInfo {
+                        rate_limit: ratelimit,
+                        active_delays: ticket_owner.awaiting,
+                        max_delays: self.await_ratelimits,
+                        action,
+                        is_first_try: was_first_try,
                     })
                 } else {
                     ticket_owner.tickets = 0;
@@ -178,13 +249,42 @@ impl TicketCounter {
             .last_time
             .and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
-            return Some(if self.await_ratelimits {
-                BucketAction::DelayFor(ratelimit)
+            let was_first_try = ticket_owner.is_first_try;
+
+            // Are delay limits left?
+            let action = if self.await_ratelimits >= ticket_owner.awaiting + 1 {
+                ticket_owner.awaiting += 1;
+
+                if let Some(delay_action) = self.delay_action {
+                    let ctx = ctx.clone();
+                    let msg = msg.clone();
+
+                    tokio::spawn(async move {
+                        delay_action(&ctx, &msg).await;
+                    });
+                }
+
+                RateLimitAction::Delayed
+            // Is this bucket utilising delay limits?
+            } else if self.await_ratelimits > 0 {
+                ticket_owner.is_first_try = false;
+
+                RateLimitAction::FailedDelay
             } else {
-                BucketAction::CancelWith(ratelimit)
+                RateLimitAction::Cancelled
+            };
+
+            return Some(RateLimitInfo {
+                rate_limit: ratelimit,
+                active_delays: ticket_owner.awaiting,
+                max_delays: self.await_ratelimits,
+                action,
+                is_first_try: was_first_try,
             })
         } else {
+            ticket_owner.awaiting = ticket_owner.awaiting.checked_sub(1).unwrap_or(0);
             ticket_owner.tickets += 1;
+            ticket_owner.is_first_try = true;
             ticket_owner.last_time = Some(now);
         }
 
@@ -240,6 +340,7 @@ impl std::fmt::Display for RevertBucket {
 impl std::error::Error for RevertBucket {}
 
 /// Decides what a bucket will use to collect tickets for.
+#[derive(Debug)]
 pub enum LimitedFor {
     /// The bucket will collect tickets for every invocation of a command.
     Global,
@@ -269,8 +370,9 @@ pub struct BucketBuilder {
     pub(crate) time_span: Duration,
     pub(crate) limit: u32,
     pub(crate) check: Option<Check>,
+    pub(crate) delay_action: Option<DelayHook>,
     pub(crate) limited_for: LimitedFor,
-    pub(crate) await_ratelimits: bool,
+    pub(crate) await_ratelimits: u32,
 }
 
 impl Default for BucketBuilder {
@@ -280,8 +382,9 @@ impl Default for BucketBuilder {
             time_span: Duration::default(),
             limit: 1,
             check: None,
+            delay_action: None,
             limited_for: LimitedFor::default(),
-            await_ratelimits: false,
+            await_ratelimits: 0,
         }
     }
 }
@@ -364,8 +467,16 @@ impl BucketBuilder {
     /// Middleware confirming (or denying) that the bucket is eligible to apply.
     /// For instance, to limit the bucket to just one user.
     #[inline]
-    pub fn check(&mut self, f: Check) -> &mut Self {
-        self.check = Some(f);
+    pub fn check(&mut self, check: Check) -> &mut Self {
+        self.check = Some(check);
+
+        self
+    }
+
+    /// This function will be called once a user's invocation has been delayed.
+    #[inline]
+    pub fn delay_action(&mut self, action: DelayHook) -> &mut Self {
+        self.delay_action = Some(action);
 
         self
     }
@@ -378,14 +489,14 @@ impl BucketBuilder {
         self
     }
 
-    /// If this is set to `true`, the invocation of the command will be delayed
-    /// and won't return a duration to wait to dispatch errors, but actually
-    /// await until the duration has been elapsed.
+    /// If this is set to an `amount` greater than `0`, the invocation of the
+    /// command will be delayed `amount` times instead of stopping command
+    /// dispatch.
     ///
-    /// By default, ratelimits will become dispatch errors.
+    /// By default this value is `0` and rate limits will cancel instead.
     #[inline]
-    pub fn await_ratelimits(&mut self) -> &mut Self {
-        self.await_ratelimits = true;
+    pub fn await_ratelimits(&mut self, amount: u32) -> &mut Self {
+        self.await_ratelimits = amount;
 
         self
     }
@@ -400,6 +511,7 @@ impl BucketBuilder {
             },
             tickets_for: HashMap::new(),
             check: self.check,
+            delay_action: self.delay_action,
             await_ratelimits: self.await_ratelimits,
         };
 

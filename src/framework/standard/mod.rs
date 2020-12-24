@@ -12,13 +12,13 @@ pub use args::{Args, Delimiter, Error as ArgError, Iter, RawArguments};
 pub use configuration::{Configuration, WithWhiteSpace};
 pub use structures::*;
 
-use structures::buckets::{Bucket, BucketAction};
+use structures::buckets::{Bucket, RateLimitAction};
 pub use structures::buckets::BucketBuilder;
 
 use parse::{ParseError, Invoke};
 use parse::map::{CommandMap, GroupMap, Map};
 
-use self::buckets::RevertBucket;
+use self::buckets::{RateLimitInfo, RevertBucket};
 
 use super::Framework;
 use crate::client::Context;
@@ -53,9 +53,8 @@ use crate::model::{guild::Role, id::RoleId};
 pub enum DispatchError {
     /// When a custom function check has failed.
     CheckFailed(&'static str, Reason),
-    /// When the command requester has exceeded a ratelimit bucket. The attached
-    /// value is the time a requester has to wait to run the command again.
-    Ratelimited(Duration),
+    /// When the command caller has exceeded a ratelimit bucket.
+    Ratelimited(RateLimitInfo),
     /// When the requested command is disabled in bot configuration.
     CommandDisabled(String),
     /// When the user is blocked in bot configuration.
@@ -287,11 +286,12 @@ impl StandardFramework {
 
                 if let Some(ref mut bucket) = command.bucket.as_ref().and_then(|b| buckets.get_mut(*b)) {
 
-                    if let Some(bucket_action) = bucket.take(ctx, msg).await {
+                    if let Some(rate_limit_info) = bucket.take(ctx, msg).await {
 
-                        duration = match bucket_action {
-                            BucketAction::CancelWith(duration) => return Some(DispatchError::Ratelimited(duration)),
-                            BucketAction::DelayFor(duration) => Some(duration),
+                        duration = match rate_limit_info.action {
+                            RateLimitAction::Cancelled | RateLimitAction::FailedDelay =>
+                                return Some(DispatchError::Ratelimited(rate_limit_info)),
+                            RateLimitAction::Delayed => Some(rate_limit_info.rate_limit),
                         };
                     }
                 }
