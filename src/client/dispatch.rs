@@ -732,6 +732,8 @@ async fn handle_event(
                 event_handler.webhook_update(context, event.guild_id, event.channel_id).await;
             });
         },
+        #[cfg(feature = "unstable_discord_api")]
+        #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
         DispatchEvent::Model(Event::InteractionCreate(event)) => {
             let event_handler = Arc::clone(event_handler);
 

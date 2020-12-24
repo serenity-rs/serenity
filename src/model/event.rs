@@ -1374,12 +1374,16 @@ pub struct WebhookUpdateEvent {
     pub guild_id: GuildId,
 }
 
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct InteractionCreateEvent {
     pub interaction: Interaction,
 }
 
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
 impl<'de> Deserialize<'de> for InteractionCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
@@ -1388,6 +1392,8 @@ impl<'de> Deserialize<'de> for InteractionCreateEvent {
     }
 }
 
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
 impl Serialize for InteractionCreateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
@@ -1578,6 +1584,8 @@ pub enum Event {
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
     WebhookUpdate(WebhookUpdateEvent),
     /// A user used a slash command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
     InteractionCreate(InteractionCreateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
@@ -1624,6 +1632,8 @@ impl Event {
             Self::VoiceStateUpdate(_) => EventType::VoiceStateUpdate,
             Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
             Self::WebhookUpdate(_) => EventType::WebhookUpdate,
+            #[cfg(feature = "unstable_discord_api")]
+            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             Self::InteractionCreate(_) => EventType::InteractionCreate,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
@@ -1738,6 +1748,8 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             Event::VoiceStateUpdate(serde_json::from_value(v)?)
         },
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
         EventType::InteractionCreate => Event::InteractionCreate(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
@@ -1907,6 +1919,8 @@ pub enum EventType {
     /// Indicator that a slash command was received.
     ///
     /// This maps to [`InteractionCreateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
     InteractionCreate,
     /// An unknown event was received over the gateway.
     ///
@@ -1958,6 +1972,8 @@ impl EventType {
     const VOICE_SERVER_UPDATE: &'static str = "VOICE_SERVER_UPDATE";
     const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
     const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
     const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
@@ -2001,6 +2017,8 @@ impl EventType {
             Self::VoiceServerUpdate => Some(Self::VOICE_SERVER_UPDATE),
             Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
             Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
+            #[cfg(feature = "unstable_discord_api")]
+            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
@@ -2063,6 +2081,8 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::VOICE_SERVER_UPDATE => EventType::VoiceServerUpdate,
                     EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
                     EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
                     EventType::INTERACTION_CREATE => EventType::InteractionCreate,
                     other => EventType::Other(other.to_owned()),
                 })

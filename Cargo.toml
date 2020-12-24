@@ -112,6 +112,7 @@ model = ["builder", "http"]
 voice-model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 unstable = []
+unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
 
