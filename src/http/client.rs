@@ -165,6 +165,66 @@ impl Http {
         }).await
     }
 
+    /// Create a follow-up message for an Interaction.
+    ///
+    /// Functions the same as [`execute_webhook`]
+    ///
+    /// [`execute_webhook`]: Self::execute_webhook
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn create_followup_message(
+        &self,
+        application_id: u64,
+        interaction_token: &str,
+        wait: bool,
+        map: &JsonMap
+    ) -> Result<Option<Message>> {
+        let body = serde_json::to_vec(map)?;
+
+        let mut headers = Headers::new();
+        headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
+    
+        let response = self.request(Request {
+            body: Some(&body),
+            headers: Some(headers),
+            route: RouteInfo::CreateFollowupMessage { application_id, interaction_token, wait },
+        }).await?;
+
+        if response.status() == StatusCode::NO_CONTENT {
+            return Ok(None);
+        }
+
+        response
+            .json::<Message>()
+            .await
+            .map(Some)
+            .map_err(From::from)
+    }
+
+    /// Creates a new global command.
+    ///
+    /// New global commands will be available in all guilds after 1 hour.
+    ///
+    /// Refer to Discord's [docs] for field information.
+    ///
+    /// **note:** Creating a command with the same name as an existing command for your application
+    /// will overwrite the old command.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn create_global_application_command(
+        &self,
+        application_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGlobalApplicationCommand { application_id }
+        }).await
+    }
+
     /// Creates a guild with the data provided.
     ///
     /// Only a [`PartialGuild`] will be immediately returned, and a full [`Guild`]
@@ -208,6 +268,28 @@ impl Http {
         }).await
     }
 
+    /// Creates a new guild command.
+    ///
+    /// New guild commands will be available in the guild immediately.
+    ///
+    /// Refer to Discord's [docs] for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn create_guild_application_command(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateGuildApplicationCommand { application_id, guild_id },
+        }).await
+    }
+
     /// Creates an [`Integration`] for a [`Guild`].
     ///
     /// Refer to Discord's [docs] for field information.
@@ -221,6 +303,26 @@ impl Http {
             body: Some(map.to_string().as_bytes()),
             headers: None,
             route: RouteInfo::CreateGuildIntegration { guild_id, integration_id },
+        }).await
+    }
+
+    /// Creates a response to an [`Interaction`] from the gateway.
+    ///
+    /// Refer to Discord's [docs] for the object it takes.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn create_interaction_response(
+        &self,
+        interaction_id: u64,
+        interaction_token: &str,
+        map: &Value
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::CreateInteractionResponse { interaction_id, interaction_token },
         }).await
     }
 
@@ -357,12 +459,70 @@ impl Http {
         }).await
     }
 
+    /// Deletes a follow-up message for an interaction.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn delete_followup_message(
+        &self,
+        application_id: u64,
+        interaction_token: &str,
+        message_id: u64,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id
+            },
+        }).await
+    }
+
+    /// Deletes a global command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn delete_global_application_command(
+        &self,
+        application_id: u64,
+        command_id: u64,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteGlobalApplicationCommand {
+                application_id,
+                command_id,
+            },
+        }).await
+    }
+
     /// Deletes a guild, only if connected account owns it.
     pub async fn delete_guild(&self, guild_id: u64) -> Result<PartialGuild> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::DeleteGuild { guild_id },
+        }).await
+    }
+
+    /// Deletes a guild command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn delete_guild_application_command(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            },
         }).await
     }
 
@@ -443,6 +603,24 @@ impl Http {
                 reaction: &reaction_type.as_data(),
                 channel_id,
                 message_id,
+            },
+        }).await
+    }
+
+    /// Deletes the initial interaction response.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn delete_original_interaction_response(
+        &self,
+        application_id: u64,
+        interaction_token: &str,
+    ) -> Result<()> {
+        self.wind(204, Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::DeleteOriginalInteractionResponse {
+                application_id,
+                interaction_token,
             },
         }).await
     }
@@ -571,6 +749,56 @@ impl Http {
         }).await
     }
 
+    /// Edits a follow-up message for an interaction.
+    ///
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn edit_followup_message(
+        &self,
+        application_id: u64,
+        interaction_token: &str,
+        message_id: u64,
+        map: &Value,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id,
+            },
+        }).await
+    }
+
+    /// Edits a global command.
+    ///
+    /// Updates will be available in all guilds after 1 hour.
+    ///
+    /// Refer to Discord's [docs] for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn edit_global_application_command(
+        &self,
+        application_id: u64,
+        command_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGlobalApplicationCommand {
+                application_id,
+                command_id,
+            },
+        }).await
+    }
+
     /// Changes guild information.
     pub async fn edit_guild(&self, guild_id: u64, map: &JsonMap) -> Result<PartialGuild> {
         let body = serde_json::to_vec(map)?;
@@ -579,6 +807,33 @@ impl Http {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditGuild { guild_id },
+        }).await
+    }
+
+    /// Edits a guild command.
+    ///
+    /// Updates for guild commands will be available immediately.
+    ///
+    /// Refer to Discord's [docs] for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn edit_guild_application_command(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
+        map: &Value,
+    ) -> Result<ApplicationCommand> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            },
         }).await
     }
 
@@ -649,6 +904,29 @@ impl Http {
             body: Some(&body),
             headers: None,
             route: RouteInfo::EditNickname { guild_id },
+        }).await
+    }
+
+    /// Edits the initial interaction response.
+    ///
+    /// Refer to Discord's [docs] for Edit Webhook Message for field information.
+    ///
+    /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn edit_original_interaction_response(
+        &self,
+        application_id: u64,
+        interaction_token: &str,
+        map: &Value,
+    ) -> Result<Message> {
+        self.fire(Request {
+            body: Some(map.to_string().as_bytes()),
+            headers: None,
+            route: RouteInfo::EditOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            },
         }).await
     }
 
@@ -1113,12 +1391,41 @@ impl Http {
         }).await
     }
 
+    /// Fetches all of the global commands for your application.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn get_global_application_commands(
+        &self,
+        application_id: u64,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGlobalApplicationCommands { application_id },
+        }).await
+    }
+
     /// Gets guild information.
     pub async fn get_guild(&self, guild_id: u64) -> Result<PartialGuild> {
         self.fire(Request {
             body: None,
             headers: None,
             route: RouteInfo::GetGuild { guild_id },
+        }).await
+    }
+
+    /// Fetches all of the guild commands for your application for a specific guild.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub async fn get_guild_application_commands(
+        &self,
+        application_id: u64,
+        guild_id: u64,
+    ) -> Result<Vec<ApplicationCommand>> {
+        self.fire(Request {
+            body: None,
+            headers: None,
+            route: RouteInfo::GetGuildApplicationCommands { application_id, guild_id },
         }).await
     }
 
