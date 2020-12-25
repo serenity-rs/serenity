@@ -135,6 +135,7 @@ async fn my_help(
     let _ = help_commands::with_embeds(context, msg, args, help_options, groups, owners).await;
     Ok(())
 }
+
 #[hook]
 async fn before(ctx: &Context, msg: &Message, command_name: &str) -> bool {
     println!("Got command '{}' by user '{}'", command_name, msg.author.name);
@@ -168,14 +169,23 @@ async fn normal_message(_ctx: &Context, msg: &Message) {
     println!("Message is not a command '{}'", msg.content);
 }
 
+#[hook]
+async fn delay_action(ctx: &Context, msg: &Message) {
+    // You may want to handle a Discord rate limit if this fails.
+    let _ = msg.react(ctx, '⏱').await;
+}
 
 #[hook]
 async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
-    if let DispatchError::Ratelimited(duration) = error {
-        let _ = msg
-            .channel_id
-            .say(&ctx.http, &format!("Try this again in {} seconds.", duration.as_secs()))
-            .await;
+    if let DispatchError::Ratelimited(info) = error {
+
+        // We notify them only once.
+        if info.is_first_try {
+            let _ = msg
+                .channel_id
+                .say(&ctx.http, &format!("Try this again in {} seconds.", info.as_secs()))
+                .await;
+        }
     }
 }
 
@@ -184,11 +194,14 @@ async fn dispatch_error(ctx: &Context, msg: &Message, error: DispatchError) {
 use serenity::{futures::future::BoxFuture, FutureExt};
 fn _dispatch_error_no_macro<'fut>(ctx: &'fut mut Context, msg: &'fut Message, error: DispatchError) -> BoxFuture<'fut, ()> {
     async move {
-        if let DispatchError::Ratelimited(duration) = error {
-            let _ = msg
-                .channel_id
-                .say(&ctx.http, &format!("Try this again in {} seconds.", duration.as_secs()))
-                .await;
+        if let DispatchError::Ratelimited(info) = error {
+
+            if info.is_first_try {
+                let _ = msg
+                    .channel_id
+                    .say(&ctx.http, &format!("Try this again in {} seconds.", info.as_secs()))
+                    .await;
+            }
         };
     }.boxed()
 }
@@ -261,7 +274,14 @@ async fn main() {
     // Can't be used more than 2 times per 30 seconds, with a 5 second delay applying per channel.
     // Optionally `await_ratelimits` will delay until the command can be executed instead of
     // cancelling the command invocation.
-        .bucket("complicated", |b| b.delay(5).time_span(30).limit(2).limit_for(LimitedFor::Channel).await_ratelimits()).await
+        .bucket("complicated", |b| b.limit(2).time_span(30).delay(5)
+            // The target each bucket will apply to.
+            .limit_for(LimitedFor::Channel)
+            // The maximum amount of command invocations that can be delayed per target.
+            // Setting this to 0 (default) will never await/delay commands and cancel the invocation.
+            .await_ratelimits(1)
+            // A function to call when a rate limit leads to a delay.
+            .delay_action(delay_action)).await
     // The `#[group]` macro generates `static` instances of the options set for the group.
     // They're made in the pattern: `#name_GROUP` for the group instance and `#name_GROUP_OPTIONS`.
     // #name is turned all uppercase
