@@ -229,38 +229,40 @@ pub async fn user_has_perms(
 ) -> Result<bool> {
     let cache = cache.as_ref();
 
-    let guild_id = match guild_id {
-        Some(id) => id,
-        None => {
-            let channel = match cache.channel(channel_id).await {
-                Some(channel) => channel,
-                None => return Err(Error::Model(ModelError::ItemMissing)),
-            };
+    let channel = match cache.channel(channel_id).await {
+        Some(channel) => channel,
+        None => return Err(Error::Model(ModelError::ChannelNotFound)),
+    };
 
-            match channel {
-                Channel::Guild(channel) => channel.guild_id,
-                Channel::Private(_) | Channel::Category(_) => {
-                    // Both users in DMs, all users in groups, and maybe all channels in categories
-                    // will have the same permissions.
-                    //
-                    // The only exception to this is when the current user is blocked by
-                    // the recipient in a DM channel, preventing the current user
-                    // from sending messages.
-                    //
-                    // Since serenity can't _reasonably_ check and keep track of these,
-                    // just assume that all permissions are granted and return `true`.
-                    return Ok(true);
-                },
-            }
+    // Both users in DMs, all users in groups, and maybe all channels in categories
+    // will have the same permissions.
+    //
+    // The only exception to this is when the current user is blocked by
+    // the recipient in a DM channel, preventing the current user
+    // from sending messages.
+    //
+    // Since serenity can't _reasonably_ check and keep track of these,
+    // just assume that all permissions are granted and return `true`.
+    let (guild_id, guild_channel) = match channel {
+        Channel::Guild(channel) => (channel.guild_id, channel),
+        Channel::Category(_) => return Ok(true),
+        Channel::Private(_) => match guild_id {
+            Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
+            None => return Ok(true),
         }
     };
 
     let guild = match cache.guild(guild_id).await {
         Some(guild) => guild,
-        None => return Err(Error::Model(ModelError::ItemMissing)),
+        None => return Err(Error::Model(ModelError::GuildNotFound)),
     };
 
-    let perms = guild.user_permissions_in(channel_id, cache.current_user().await.id);
+    let member = match guild.members.get(&cache.current_user().await.id) {
+        Some(member) => member,
+        None => return Err(Error::Model(ModelError::MemberNotFound)),
+    };
+
+    let perms = guild.user_permissions_in(&guild_channel, member)?;
 
     permissions.remove(perms);
 

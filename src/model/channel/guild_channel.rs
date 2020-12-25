@@ -554,7 +554,8 @@ impl GuildChannel {
     #[inline]
     pub async fn permissions_for_user(&self, cache: impl AsRef<Cache>, user_id: impl Into<UserId>) -> Result<Permissions> {
         let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
-        Ok(guild.user_permissions_in(self.id, user_id))
+        let member = guild.members.get(&user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))?;
+        guild.user_permissions_in(self, member)
     }
 
     /// Calculates the permissions of a role.
@@ -573,7 +574,8 @@ impl GuildChannel {
     #[inline]
     pub async fn permissions_for_role(&self, cache: impl AsRef<Cache>, role_id: impl Into<RoleId>) -> Result<Permissions> {
         let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
-        guild.role_permissions_in(self.id, role_id).ok_or(Error::Model(ModelError::GuildNotFound))
+        let role = guild.roles.get(&role_id.into()).ok_or(Error::Model(ModelError::RoleNotFound))?;
+        guild.role_permissions_in(self, role)
     }
 
     /// Pins a [`Message`] to the channel.
