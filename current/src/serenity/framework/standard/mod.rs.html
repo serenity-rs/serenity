@@ -847,7 +847,6 @@
 <span id="844">844</span>
 <span id="845">845</span>
 <span id="846">846</span>
-<span id="847">847</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -863,13 +862,13 @@
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">WithWhiteSpace</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
 
-<span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">BucketAction</span>};
+<span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">RateLimitAction</span>};
 <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::<span class="ident">BucketBuilder</span>;
 
 <span class="kw">use</span> <span class="ident">parse</span>::{<span class="ident">ParseError</span>, <span class="ident">Invoke</span>};
 <span class="kw">use</span> <span class="ident">parse</span>::<span class="ident">map</span>::{<span class="ident">CommandMap</span>, <span class="ident">GroupMap</span>, <span class="ident">Map</span>};
 
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">buckets</span>::<span class="ident">RevertBucket</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">buckets</span>::{<span class="ident">RateLimitInfo</span>, <span class="ident">RevertBucket</span>};
 
 <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Framework</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
@@ -880,7 +879,6 @@
 
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">Duration</span>;
 
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
@@ -904,9 +902,8 @@
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">DispatchError</span> {
     <span class="doccomment">/// When a custom function check has failed.</span>
     <span class="ident">CheckFailed</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Reason</span>),
-    <span class="doccomment">/// When the command requester has exceeded a ratelimit bucket. The attached</span>
-    <span class="doccomment">/// value is the time a requester has to wait to run the command again.</span>
-    <span class="ident">Ratelimited</span>(<span class="ident">Duration</span>),
+    <span class="doccomment">/// When the command caller has exceeded a ratelimit bucket.</span>
+    <span class="ident">Ratelimited</span>(<span class="ident">RateLimitInfo</span>),
     <span class="doccomment">/// When the requested command is disabled in bot configuration.</span>
     <span class="ident">CommandDisabled</span>(<span class="ident">String</span>),
     <span class="doccomment">/// When the user is blocked in bot configuration.</span>
@@ -1138,11 +1135,12 @@
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>)) {
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">bucket_action</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span> {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span> {
 
-                        <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">bucket_action</span> {
-                            <span class="ident">BucketAction</span>::<span class="ident">CancelWith</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">Ratelimited</span>(<span class="ident">duration</span>)),
-                            <span class="ident">BucketAction</span>::<span class="ident">DelayFor</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">duration</span>),
+                        <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rate_limit_info</span>.<span class="ident">action</span> {
+                            <span class="ident">RateLimitAction</span>::<span class="ident">Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction</span>::<span class="ident">FailedDelay</span> <span class="op">=</span><span class="op">&gt;</span>
+                                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">Ratelimited</span>(<span class="ident">rate_limit_info</span>)),
+                            <span class="ident">RateLimitAction</span>::<span class="ident">Delayed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>.<span class="ident">rate_limit</span>),
                         };
                     }
                 }

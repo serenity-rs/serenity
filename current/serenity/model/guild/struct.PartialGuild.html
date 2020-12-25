@@ -34,7 +34,7 @@ days' worth of messages (<code>dmd</code>) between the range 0 and 7.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <p>Ban a member and remove all messages they've sent in the last 4 days:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="comment">// assumes a `user` and `guild` have already been bound</span>
 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">ban</span>(<span class="ident">user</span>, <span class="number">4</span>);</pre></div>
 <h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
@@ -50,7 +50,7 @@ days' worth of messages to delete is over the maximum.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
 <p>Create a voice channel in a guild with the name <code>test</code>:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">ChannelType</span>;
 
 <span class="ident">guild</span>.<span class="ident">create_channel</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">name</span>(<span class="string">&quot;test&quot;</span>).<span class="ident">kind</span>(<span class="ident">ChannelType</span>::<span class="ident">Voice</span>));</pre></div>
@@ -95,7 +95,7 @@ permission restrictions.</p>
 <h1 id="examples-3" class="section-header"><a href="#examples-3">Examples</a></h1>
 <p>Mute a member and set their roles to just one role with a predefined Id:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">model</span>::<span class="ident">GuildId</span>;
 
 <span class="ident">GuildId</span>(<span class="number">7</span>).<span class="ident">edit_member</span>(<span class="ident">user_id</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">mute</span>(<span class="bool-val">true</span>).<span class="ident">roles</span>(<span class="kw-2">&amp;</span><span class="macro">vec</span><span class="macro">!</span>[<span class="ident">role_id</span>])).<span class="ident">await</span>;</pre></div>

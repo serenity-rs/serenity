@@ -80,7 +80,7 @@ is a bot user.</p>
 <h1 id="examples-2" class="section-header"><a href="#examples-2">Examples</a></h1>
 <p>Sending a message:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="comment">// assuming you are in a context</span>
 
 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">dm</span>(<span class="string">&quot;Hello!&quot;</span>);</pre></div>
@@ -99,7 +99,7 @@ given <a href="../../../serenity/model/guild/struct.Role.html" title="Role"><cod
 <h1 id="examples-4" class="section-header"><a href="#examples-4">Examples</a></h1>
 <p>Check if a guild has a <a href="../../../serenity/model/guild/struct.Role.html" title="Role"><code>Role</code></a> by Id:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="comment">// Assumes a &#39;guild_id&#39; and `role_id` have already been bound</span>
 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">has_role</span>(<span class="ident">guild_id</span>, <span class="ident">role_id</span>);</pre></div>
 </div><h4 id="method.refresh" class="method"><code>pub async fn <a href="#method.refresh" class="fnname">refresh</a>&lt;'_&gt;(&amp;'_ mut self, cache_http: impl <a class="trait" href="../../../serenity/http/trait.CacheHttp.html" title="trait serenity::http::CacheHttp">CacheHttp</a>) -&gt; <a class="type" href="../../../serenity/type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.unit.html">()</a>&gt;</code><a class="srclink" href="../../../src/serenity/model/user.rs.html#650-654" title="goto source code">[src]</a></h4><div class="docblock"><p>Refreshes the information about the user.</p>
