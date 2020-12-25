@@ -847,6 +847,26 @@
 <span id="844">844</span>
 <span id="845">845</span>
 <span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
+<span id="851">851</span>
+<span id="852">852</span>
+<span id="853">853</span>
+<span id="854">854</span>
+<span id="855">855</span>
+<span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
+<span id="863">863</span>
+<span id="864">864</span>
+<span id="865">865</span>
+<span id="866">866</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -1671,7 +1691,27 @@
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">required_permissions</span>().<span class="ident">is_empty</span>() {
         <span class="bool-val">true</span>
     } <span class="kw">else</span> <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">message</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="ident">await</span> {
-        <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="ident">message</span>.<span class="ident">channel_id</span>, <span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>);
+        <span class="kw">let</span> <span class="ident">channel</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">channel_id</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">channel</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
+        };
+        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">message</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
+            <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">member</span>,
+            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="bool-val">false</span>,
+        };
+
+        <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">guild</span>.<span class="ident">user_permissions_in</span>(<span class="ident">channel</span>, <span class="ident">member</span>) {
+            <span class="prelude-val">Ok</span>(<span class="ident">perms</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">perms</span>,
+            <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">tracing</span>::<span class="macro">error</span><span class="macro">!</span>(
+                    <span class="string">&quot;(╯°□°）╯︵ ┻━┻ error getting permissions for user {} in channel {}: {}&quot;</span>,
+                    <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>,
+                    <span class="ident">channel</span>.<span class="ident">id</span>,
+                    <span class="ident">e</span>
+                );
+                <span class="kw">return</span> <span class="bool-val">false</span>;
+            }
+        };
 
         <span class="ident">perms</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>())
     } <span class="kw">else</span> {

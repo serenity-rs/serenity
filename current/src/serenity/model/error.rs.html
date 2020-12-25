@@ -157,6 +157,29 @@
 <span id="154">154</span>
 <span id="155">155</span>
 <span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
+<span id="179">179</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
@@ -249,6 +272,20 @@
     <span class="doccomment">/// [`RoleId`]: super::id::RoleId</span>
     <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
     <span class="ident">RoleNotFound</span>,
+    <span class="doccomment">/// An indication that a [member][`Member`] could not be found by</span>
+    <span class="doccomment">/// [Id][`UserId`] in the [`Cache`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Member`]: super::guild::Member</span>
+    <span class="doccomment">/// [`UserId`]: super::id::UserId</span>
+    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
+    <span class="ident">MemberNotFound</span>,
+    <span class="doccomment">/// An indication that a [channel][`Channel`] could not be found by</span>
+    <span class="doccomment">/// [Id][`ChannelId`] in the [`Cache`].</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Channel`]: super::channel::Channel</span>
+    <span class="doccomment">/// [`ChannelId`]: super::id::ChannelId</span>
+    <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
+    <span class="ident">ChannelNotFound</span>,
     <span class="doccomment">/// Indicates that there are hierarchy problems restricting an action.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// For example, when banning a user, if the other user has a role with an</span>
@@ -272,6 +309,10 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`Cache`]: crate::cache::Cache</span>
     <span class="ident">ItemMissing</span>,
+    <span class="doccomment">/// Indicates that a member, role or channel from the wrong [`Guild`] was provided.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Guild`]: super::guild::Guild</span>
+    <span class="ident">WrongGuild</span>,
     <span class="doccomment">/// Indicates that a [`Message`]s content was too long and will not</span>
     <span class="doccomment">/// successfully send, as the length is over 2000 codepoints.</span>
     <span class="doccomment">///</span>
@@ -300,11 +341,16 @@
             <span class="ident">Error</span>::<span class="ident">EmbedTooLarge</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Embed too large.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">GuildNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Guild not found in the cache.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">RoleNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role not found in the cache.&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">MemberNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Member not found in the cache.&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">ChannelNotFound</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Channel not found in the cache.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">Hierarchy</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Role hierarchy prevents this action.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">InvalidChannelType</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The channel cannot perform the action.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">InvalidPermissions</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Invalid permissions.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">InvalidUser</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The current user cannot perform the action.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">ItemMissing</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;The required item is missing from the cache.&quot;</span>),
+            <span class="ident">Error</span>::<span class="ident">WrongGuild</span> <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Provided member or channel is from the wrong guild.&quot;</span>)
+            }
             <span class="ident">Error</span>::<span class="ident">MessageTooLong</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Message too large.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">MessagingBot</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Attempted to message another bot user.&quot;</span>),
             <span class="ident">Error</span>::<span class="ident">NameTooShort</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">f</span>.<span class="ident">write_str</span>(<span class="string">&quot;Name is under the character limit.&quot;</span>),
