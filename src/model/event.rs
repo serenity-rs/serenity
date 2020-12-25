@@ -1633,7 +1633,6 @@ impl Event {
             Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
             Self::WebhookUpdate(_) => EventType::WebhookUpdate,
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             Self::InteractionCreate(_) => EventType::InteractionCreate,
             Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
         }
@@ -1749,7 +1748,6 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         },
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
         #[cfg(feature = "unstable_discord_api")]
-        #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
         EventType::InteractionCreate => Event::InteractionCreate(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
             kind,
@@ -2018,7 +2016,6 @@ impl EventType {
             Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
             Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
             // GuildUnavailable is a synthetic event type, corresponding to either
             // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
@@ -2082,7 +2079,6 @@ impl<'de> Deserialize<'de> for EventType {
                     EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
                     EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
                     #[cfg(feature = "unstable_discord_api")]
-                    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
                     EventType::INTERACTION_CREATE => EventType::InteractionCreate,
                     other => EventType::Other(other.to_owned()),
                 })

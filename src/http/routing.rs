@@ -785,7 +785,7 @@ pub enum RouteInfo<'a> {
     CreateFollowupMessage {
         application_id: u64,
         interaction_token: &'a str,
-        wait: bool
+        wait: bool,
     },
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
@@ -1188,11 +1188,10 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild_emojis(guild_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::CreateFollowupMessage {
                 application_id,
                 interaction_token,
-                wait
+                wait,
             } => (
                 LightMethod::Post,
                 Route::WebhooksId(application_id),
@@ -1201,7 +1200,6 @@ impl<'a> RouteInfo<'a> {
                 )),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::CreateGlobalApplicationCommand { application_id } => (
                 LightMethod::Post,
                 Route::ApplicationsIdCommands(application_id),
@@ -1213,7 +1211,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guilds()),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::CreateGuildApplicationCommand { application_id, guild_id } => (
                 LightMethod::Post,
                 Route::ApplicationsIdGuildsIdCommands(application_id),
@@ -1225,7 +1222,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild_integration(guild_id, integration_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::CreateInteractionResponse { interaction_id, interaction_token } => (
                 LightMethod::Post,
                 Route::InteractionsId(interaction_id),
@@ -1282,7 +1278,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::DeleteFollowupMessage {
                 application_id,
                 interaction_token,
@@ -1297,7 +1292,6 @@ impl<'a> RouteInfo<'a> {
                 )),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::DeleteGlobalApplicationCommand {
                 application_id,
                 command_id
@@ -1312,11 +1306,10 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild(guild_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::DeleteGuildApplicationCommand {
                 application_id,
                 guild_id,
-                command_id
+                command_id,
             } => (
                 LightMethod::Delete,
                 Route::ApplicationsIdGuildsIdCommandsId(application_id),
@@ -1360,7 +1353,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::channel_messages_bulk_delete(channel_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::DeleteOriginalInteractionResponse {
                 application_id,
                 interaction_token,
@@ -1418,7 +1410,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::EditFollowupMessage {
                 application_id,
                 interaction_token,
@@ -1433,7 +1424,6 @@ impl<'a> RouteInfo<'a> {
                 ),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::EditGlobalApplicationCommand {
                 application_id,
                 command_id,
@@ -1448,7 +1438,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild(guild_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::EditGuildApplicationCommand {
                 application_id,
                 guild_id,
@@ -1488,7 +1477,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild_nickname(guild_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::EditOriginalInteractionResponse {
                 application_id,
                 interaction_token,
@@ -1612,7 +1600,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::gateway()),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::GetGlobalApplicationCommands { application_id } => (
                 LightMethod::Get,
                 Route::ApplicationsIdCommands(application_id),
@@ -1624,7 +1611,6 @@ impl<'a> RouteInfo<'a> {
                 Cow::from(Route::guild(guild_id)),
             ),
             #[cfg(feature = "unstable_discord_api")]
-            #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
             RouteInfo::GetGuildApplicationCommands {
                 application_id,
                 guild_id,

@@ -18,7 +18,7 @@ pub struct Interaction {
     pub channel_id: ChannelId,
     pub member: Member,
     pub token: String,
-    pub version: i32
+    pub version: u8,
 }
 
 /// The type of an Interaction
