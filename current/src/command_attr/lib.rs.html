@@ -1089,7 +1089,7 @@
         #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> (#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
             <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
 
-            <span class="ident">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+            <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
         }
     })
     .<span class="ident">into</span>()
@@ -1361,7 +1361,7 @@
         <span class="kw">pub</span> <span class="kw">fn</span> #<span class="ident">nn</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
             <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
 
-            <span class="ident">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+            <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
         }
     })
     .<span class="ident">into</span>()
@@ -1648,7 +1648,7 @@
         #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">n</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
             <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
 
-            <span class="ident">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+            <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
         }
     })
     .<span class="ident">into</span>()
@@ -1675,7 +1675,7 @@
                 #<span class="ident">visibility</span> <span class="kw">fn</span> #<span class="ident">fun_name</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span>(#(#<span class="ident">args</span>),<span class="kw-2">*</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, #<span class="ident">ret</span><span class="op">&gt;</span> {
                     <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
 
-                    <span class="ident">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
+                    <span class="kw">async</span> <span class="kw">move</span> { #(#<span class="ident">body</span>)<span class="op">*</span> }.<span class="ident">boxed</span>()
                 }
             })
                 .<span class="ident">into</span>()
@@ -1691,7 +1691,7 @@
                 <span class="op">|</span>#<span class="ident">args</span><span class="op">|</span> #<span class="ident">ret</span> {
                     <span class="kw">use</span> ::<span class="ident">serenity</span>::<span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">FutureExt</span>;
 
-                    <span class="ident">async</span> <span class="kw">move</span> { #<span class="ident">body</span> }.<span class="ident">boxed</span>()
+                    <span class="kw">async</span> <span class="kw">move</span> { #<span class="ident">body</span> }.<span class="ident">boxed</span>()
                 }
             }).<span class="ident">into</span>()
         },

@@ -737,6 +737,14 @@
 <span id="734">734</span>
 <span id="735">735</span>
 <span id="736">736</span>
+<span id="737">737</span>
+<span id="738">738</span>
+<span id="739">739</span>
+<span id="740">740</span>
+<span id="741">741</span>
+<span id="742">742</span>
+<span id="743">743</span>
+<span id="744">744</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
@@ -772,13 +780,13 @@
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">CacheUpdate</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
-    <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">update</span>(<span class="ident">event</span>).<span class="ident">await</span>
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span>: <span class="ident">CacheUpdate</span> <span class="op">+</span> <span class="ident">fmt</span>::<span class="ident">Debug</span><span class="op">&gt;</span>(<span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>, <span class="ident">event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">E</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
+    <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">update</span>(<span class="ident">event</span>).<span class="kw">await</span>
 }
 
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">_cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>, <span class="ident">_event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="ident">_cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>, <span class="ident">_event</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">E</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
     <span class="prelude-val">None</span>
 }
 
@@ -813,69 +821,69 @@
 
 <span class="kw">impl</span> <span class="ident">DispatchEvent</span> {
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>, <span class="ident">cache_and_http</span>))]</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_and_http</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelCreate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelDelete</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildCreate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildDelete</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildEmojisUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberAdd</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberRemove</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMembersChunk</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleCreate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleDelete</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildUnavailable</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="comment">// Already handled by the framework check macro</span>
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageCreate</span>(<span class="kw">_</span>)) <span class="op">=</span><span class="op">&gt;</span> {},
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">PresencesReplace</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">PresenceUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">Ready</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">UserUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="self">Self</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">VoiceStateUpdate</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                <span class="ident">update</span>(<span class="ident">cache_and_http</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             },
             <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> (),
         }
@@ -887,18 +895,18 @@
     <span class="comment">// #[allow(unused_variables)]</span>
     <span class="kw-2">mut</span> <span class="ident">event</span>: <span class="ident">DispatchEvent</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">raw_event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">raw_event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">runner_tx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
     <span class="ident">shard_id</span>: <span class="ident">u64</span>,
     <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, ()<span class="op">&gt;</span> {
-    <span class="ident">async</span> <span class="kw">move</span> {
+    <span class="kw">async</span> <span class="kw">move</span> {
         <span class="kw">match</span> (<span class="ident">event_handler</span>, <span class="ident">raw_event_handler</span>) {
             (<span class="prelude-val">None</span>, <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>).<span class="ident">await</span>;
+                <span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>).<span class="kw">await</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageCreate</span>(<span class="ident">event</span>)) <span class="op">=</span> <span class="ident">event</span> {
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
@@ -910,8 +918,8 @@
 
                         <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">framework</span>);
 
-                        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                            <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">message</span>).<span class="ident">await</span>;
+                        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                            <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">message</span>).<span class="kw">await</span>;
                         });
                     }
                 }
@@ -919,7 +927,7 @@
             (<span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">h</span>), <span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">match</span> <span class="ident">event</span> {
                     <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageCreate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                        <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+                        <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>))]</span>
                         <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>(<span class="ident">data</span>, <span class="ident">runner_tx</span>, <span class="ident">shard_id</span>, <span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>.<span class="ident">http</span>);
@@ -930,14 +938,14 @@
                             <span class="ident">context</span>.<span class="ident">clone</span>(),
                             <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
                             <span class="ident">h</span>,
-                        ).<span class="ident">await</span>;
+                        ).<span class="kw">await</span>;
 
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
                         {
                             <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">framework</span>);
 
-                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                                <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">message</span>).<span class="ident">await</span>;
+                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                                <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">message</span>).<span class="kw">await</span>;
                             });
                         }
                     },
@@ -949,12 +957,12 @@
                             <span class="ident">runner_tx</span>,
                             <span class="ident">shard_id</span>,
                             <span class="ident">cache_and_http</span>,
-                        ).<span class="ident">await</span>;
+                        ).<span class="kw">await</span>;
                     }
                 }
             },
             (<span class="prelude-val">None</span>, <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">rh</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>).<span class="ident">await</span>;
+                <span class="ident">event</span>.<span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>).<span class="kw">await</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">event</span>) <span class="op">=</span> <span class="ident">event</span> {
                     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">rh</span>);
@@ -966,23 +974,23 @@
 
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>))]</span>
                     <span class="comment">// No clone needed, as there will be no framework disaptch.</span>
-                    <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
 
                     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
                     {
                         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Event</span>::<span class="ident">MessageCreate</span>(<span class="kw-2">ref</span> <span class="ident">msg_event</span>) <span class="op">=</span> <span class="ident">event</span> {
                             <span class="comment">// Must clone in order to dispatch the framework too.</span>
                             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span> <span class="ident">msg_event</span>.<span class="ident">message</span>.<span class="ident">clone</span>();
-                            <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>).<span class="ident">await</span>;
+                            <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>).<span class="kw">await</span>;
 
                             <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">framework</span>);
 
-                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                                <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="ident">await</span>;
+                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                                <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="kw">await</span>;
                             });
                         } <span class="kw">else</span> {
                             <span class="comment">// Avoid cloning, if there is no framework-dispatch.</span>
-                            <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                            <span class="ident">event_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
                         }
                     }
                 }
@@ -996,7 +1004,7 @@
                 <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>(<span class="ident">data</span>, <span class="ident">runner_tx</span>, <span class="ident">shard_id</span>, <span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>.<span class="ident">http</span>, <span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>.<span class="ident">cache</span>);
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="kw-2">ref</span> <span class="ident">event</span>) <span class="op">=</span> <span class="ident">event</span> {
-                    <span class="ident">raw_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>.<span class="ident">clone</span>()).<span class="ident">await</span>;
+                    <span class="ident">raw_handler</span>.<span class="ident">raw_event</span>(<span class="ident">context</span>.<span class="ident">clone</span>(), <span class="ident">event</span>.<span class="ident">clone</span>()).<span class="kw">await</span>;
                 }
 
                 <span class="kw">match</span> <span class="ident">event</span> {
@@ -1005,14 +1013,14 @@
                             <span class="ident">context</span>.<span class="ident">clone</span>(),
                             <span class="ident">event</span>.<span class="ident">message</span>.<span class="ident">clone</span>(),
                             <span class="ident">handler</span>,
-                        ).<span class="ident">await</span>;
+                        ).<span class="kw">await</span>;
 
                         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
                         {
                             <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">framework</span>);
                             <span class="kw">let</span> <span class="ident">message</span> <span class="op">=</span>  <span class="ident">event</span>.<span class="ident">message</span>;
-                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                                <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="ident">await</span>;
+                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                                <span class="ident">framework</span>.<span class="ident">dispatch</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="kw">await</span>;
                             });
                         }
                     },
@@ -1024,17 +1032,17 @@
                             <span class="ident">runner_tx</span>,
                             <span class="ident">shard_id</span>,
                             <span class="ident">cache_and_http</span>,
-                        ).<span class="ident">await</span>,
+                        ).<span class="kw">await</span>,
                 }
             },
         }
     }.<span class="ident">boxed</span>()
 }
 
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dispatch_message</span>(
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch_message</span>(
     <span class="ident">context</span>: <span class="ident">Context</span>,
     <span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Message</span>,
-    <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>,
+    <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>,
 ) {
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
     {
@@ -1043,17 +1051,17 @@
 
     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-        <span class="ident">event_handler</span>.<span class="ident">message</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="ident">await</span>;
+    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+        <span class="ident">event_handler</span>.<span class="ident">message</span>(<span class="ident">context</span>, <span class="ident">message</span>).<span class="kw">await</span>;
     });
 }
 <span class="comment">// Once we can use `Box` as part of a pattern, we will reconsider boxing.</span>
 <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
 <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="ident">event</span>, <span class="ident">data</span>, <span class="ident">event_handler</span>, <span class="ident">cache_and_http</span>))]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">handle_event</span>(
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">handle_event</span>(
     <span class="ident">event</span>: <span class="ident">DispatchEvent</span>,
     <span class="ident">data</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">RwLock</span><span class="op">&lt;</span><span class="ident">TypeMap</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>,
+    <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span>,
     <span class="ident">runner_tx</span>: <span class="kw-2">&amp;</span><span class="ident">Sender</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span>,
     <span class="ident">shard_id</span>: <span class="ident">u64</span>,
     <span class="ident">cache_and_http</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span>,
@@ -1067,25 +1075,25 @@
         <span class="ident">DispatchEvent</span>::<span class="ident">Client</span>(<span class="ident">ClientEvent</span>::<span class="ident">ShardStageUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">shard_stage_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">shard_stage_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         }
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelCreate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">channel</span> {
                 <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="ident">event_handler</span>.<span class="ident">channel_create</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="ident">await</span>;
+                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="ident">event_handler</span>.<span class="ident">channel_create</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="kw">await</span>;
                     });
                 },
                 <span class="ident">Channel</span>::<span class="ident">Category</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="ident">event_handler</span>.<span class="ident">category_create</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="ident">await</span>;
+                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="ident">event_handler</span>.<span class="ident">category_create</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="kw">await</span>;
                     });
                 },
                 <span class="comment">// Private channel create events are no longer sent to bots in the v8 gateway.</span>
@@ -1093,22 +1101,22 @@
             }
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelDelete</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
             <span class="kw">match</span> <span class="ident">event</span>.<span class="ident">channel</span> {
                 <span class="ident">Channel</span>::<span class="ident">Private</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> {},
                 <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="ident">event_handler</span>.<span class="ident">channel_delete</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="ident">await</span>;
+                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="ident">event_handler</span>.<span class="ident">channel_delete</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="kw">await</span>;
                     });
                 },
                 <span class="ident">Channel</span>::<span class="ident">Category</span>(<span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="ident">event_handler</span>.<span class="ident">category_delete</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="ident">await</span>;
+                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="ident">event_handler</span>.<span class="ident">category_delete</span>(<span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">channel</span>).<span class="kw">await</span>;
                     });
                 },
             }
@@ -1116,226 +1124,226 @@
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelPinsUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">channel_pins_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">channel_pins_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ChannelUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="kw">let</span> <span class="ident">old_channel</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">channel</span>(<span class="ident">event</span>.<span class="ident">channel</span>.<span class="ident">id</span>()).<span class="ident">await</span>;
-                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="kw">let</span> <span class="ident">old_channel</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">channel</span>(<span class="ident">event</span>.<span class="ident">channel</span>.<span class="ident">id</span>()).<span class="kw">await</span>;
+                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
-                    <span class="ident">event_handler</span>.<span class="ident">channel_update</span>(<span class="ident">context</span>, <span class="ident">old_channel</span>, <span class="ident">event</span>.<span class="ident">channel</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">channel_update</span>(<span class="ident">context</span>, <span class="ident">old_channel</span>, <span class="ident">event</span>.<span class="ident">channel</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
-                    <span class="ident">event_handler</span>.<span class="ident">channel_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">channel_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildBanAdd</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_ban_addition</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_ban_addition</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildBanRemove</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
 
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_ban_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_ban_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildCreate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="kw">let</span> <span class="ident">_is_new</span> <span class="op">=</span> {
-                <span class="op">!</span><span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="ident">await</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">guild</span>.<span class="ident">id</span>)
+                <span class="op">!</span><span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">guild</span>.<span class="ident">id</span>)
             };
 
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             {
                 <span class="kw">let</span> <span class="ident">context</span> <span class="op">=</span> <span class="ident">context</span>.<span class="ident">clone</span>();
 
-                <span class="kw">if</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="ident">await</span>.<span class="ident">is_empty</span>() {
+                <span class="kw">if</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">unavailable_guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">is_empty</span>() {
                     <span class="kw">let</span> <span class="ident">guild_amount</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>
                         .<span class="ident">guilds</span>
                         .<span class="ident">read</span>()
-                        .<span class="ident">await</span>
+                        .<span class="kw">await</span>
                         .<span class="ident">iter</span>()
                         .<span class="ident">map</span>(<span class="op">|</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="ident">id</span>)
                         .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>();
                     <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="ident">event_handler</span>.<span class="ident">cache_ready</span>(<span class="ident">context</span>, <span class="ident">guild_amount</span>).<span class="ident">await</span>;
+                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="ident">event_handler</span>.<span class="ident">cache_ready</span>(<span class="ident">context</span>, <span class="ident">guild_amount</span>).<span class="kw">await</span>;
                     });
                 }
             }
 
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">guild_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>, <span class="ident">_is_new</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>, <span class="ident">_is_new</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildDelete</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_full</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_full</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">guild_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>, <span class="ident">_full</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>, <span class="ident">_full</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildEmojisUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_emojis_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">emojis</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_emojis_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">emojis</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildIntegrationsUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_integrations_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_integrations_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberAdd</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_member_addition</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">member</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_member_addition</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">member</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberRemove</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_member</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_member</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">guild_member_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>, <span class="ident">_member</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_member_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>, <span class="ident">_member</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_member_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_member_removal</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMemberUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">_after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span> <span class="op">=</span> <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>.<span class="ident">id</span>).<span class="ident">await</span>
+                <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">member</span>(<span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">user</span>.<span class="ident">id</span>).<span class="kw">await</span>
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
             }};
 
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="ident">_after</span> {
-                        <span class="ident">event_handler</span>.<span class="ident">guild_member_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">after</span>).<span class="ident">await</span>;
+                        <span class="ident">event_handler</span>.<span class="ident">guild_member_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">after</span>).<span class="kw">await</span>;
                     }
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_member_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_member_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildMembersChunk</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_members_chunk</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_members_chunk</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleCreate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_role_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_role_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleDelete</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_role</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_role</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">guild_role_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role_id</span>, <span class="ident">_role</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_role_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role_id</span>, <span class="ident">_role</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_role_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role_id</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_role_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role_id</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildRoleUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_role_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">role</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildUnavailable</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">guild_unavailable</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">guild_unavailable</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">GuildUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
                     <span class="kw">let</span> <span class="ident">before</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>
                         .<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">event</span>.<span class="ident">guild</span>.<span class="ident">id</span>)
-                        .<span class="ident">await</span>;
+                        .<span class="kw">await</span>;
 
-                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
-                    <span class="ident">event_handler</span>.<span class="ident">guild_update</span>(<span class="ident">context</span>, <span class="ident">before</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_update</span>(<span class="ident">context</span>, <span class="ident">before</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
-                    <span class="ident">event_handler</span>.<span class="ident">guild_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">guild_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">InviteCreate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">invite_create</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">invite_create</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">InviteDelete</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">invite_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">invite_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="comment">// Already handled by the framework check macro</span>
@@ -1343,133 +1351,141 @@
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageDeleteBulk</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">message_delete_bulk</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">ids</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">message_delete_bulk</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">ids</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageDelete</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">message_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">message_id</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">message_delete</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">message_id</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">MessageUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="kw">let</span> <span class="ident">_after</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">message</span>(<span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">id</span>).<span class="ident">await</span>;
-                    <span class="ident">event_handler</span>.<span class="ident">message_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">_after</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="kw">let</span> <span class="ident">_after</span> <span class="op">=</span> <span class="ident">cache_and_http</span>.<span class="ident">cache</span>.<span class="ident">message</span>(<span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">id</span>).<span class="kw">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">message_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>, <span class="ident">_after</span>, <span class="ident">event</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">message_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">message_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">PresencesReplace</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">presence_replace</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">presences</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">presence_replace</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">presences</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">PresenceUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
 
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">presence_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">presence_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ReactionAdd</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">reaction_add</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">reaction</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">reaction_add</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">reaction</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ReactionRemove</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">reaction_remove</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">reaction</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">reaction_remove</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">reaction</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">ReactionRemoveAll</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">reaction_remove_all</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">message_id</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">reaction_remove_all</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>, <span class="ident">event</span>.<span class="ident">message_id</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">Ready</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">ready</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">ready</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">ready</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">ready</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">Resumed</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">resume</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">resume</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">TypingStart</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">typing_start</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">typing_start</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">Unknown</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">unknown</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">kind</span>, <span class="ident">event</span>.<span class="ident">value</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">unknown</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">kind</span>, <span class="ident">event</span>.<span class="ident">value</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">UserUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">user_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>.<span class="ident">expect</span>(<span class="string">&quot;missing old user&quot;</span>), <span class="ident">event</span>.<span class="ident">current_user</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">user_update</span>(<span class="ident">context</span>, <span class="ident">_before</span>.<span class="ident">expect</span>(<span class="string">&quot;missing old user&quot;</span>), <span class="ident">event</span>.<span class="ident">current_user</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">user_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">current_user</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">user_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">current_user</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">VoiceServerUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">voice_server_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">voice_server_update</span>(<span class="ident">context</span>, <span class="ident">event</span>).<span class="kw">await</span>;
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">VoiceStateUpdate</span>(<span class="kw-2">mut</span> <span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="ident">_before</span> <span class="op">=</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="ident">cache_and_http</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">event</span>).<span class="kw">await</span>;
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
                 <span class="macro">feature_cache</span><span class="macro">!</span> {{
-                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">_before</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                 } <span class="kw">else</span> {
-                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="ident">await</span>;
+                    <span class="ident">event_handler</span>.<span class="ident">voice_state_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">voice_state</span>).<span class="kw">await</span>;
                 }}
             });
         },
         <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">WebhookUpdate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
 
-            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                <span class="ident">event_handler</span>.<span class="ident">webhook_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>).<span class="ident">await</span>;
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">webhook_update</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">guild_id</span>, <span class="ident">event</span>.<span class="ident">channel_id</span>).<span class="kw">await</span>;
+            });
+        },
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+        <span class="ident">DispatchEvent</span>::<span class="ident">Model</span>(<span class="ident">Event</span>::<span class="ident">InteractionCreate</span>(<span class="ident">event</span>)) <span class="op">=</span><span class="op">&gt;</span> {
+            <span class="kw">let</span> <span class="ident">event_handler</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="ident">event_handler</span>);
+
+            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                <span class="ident">event_handler</span>.<span class="ident">interaction_create</span>(<span class="ident">context</span>, <span class="ident">event</span>.<span class="ident">interaction</span>).<span class="kw">await</span>;
             });
         },
     }

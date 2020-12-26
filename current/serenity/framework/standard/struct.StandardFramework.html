@@ -34,8 +34,8 @@ the default values.</p>
         .<span class="ident">with_whitespace</span>(<span class="bool-val">true</span>)
         .<span class="ident">prefix</span>(<span class="string">&quot;~&quot;</span>));
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="ident">framework</span>(<span class="ident">framework</span>).<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
-</div><h4 id="method.bucket" class="method"><code>pub async fn <a href="#method.bucket" class="fnname">bucket</a>&lt;F, '_&gt;(self, name: &amp;'_ <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, f: F) -&gt; Self <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(&amp;mut <a class="struct" href="../../../serenity/framework/standard/buckets/struct.BucketBuilder.html" title="struct serenity::framework::standard::buckets::BucketBuilder">BucketBuilder</a>) -&gt; &amp;mut <a class="struct" href="../../../serenity/framework/standard/buckets/struct.BucketBuilder.html" title="struct serenity::framework::standard::buckets::BucketBuilder">BucketBuilder</a>,&nbsp;</span></code><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#196-210" title="goto source code">[src]</a></h4><div class="docblock"><p>Defines a bucket with <code>delay</code> between each command, and the <code>limit</code> of uses
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="ident">framework</span>(<span class="ident">framework</span>).<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
+</div><h4 id="method.bucket" class="method"><code>pub async fn <a href="#method.bucket" class="fnname">bucket</a>&lt;F&gt;(self, name: &amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>, f: F) -&gt; Self <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(&amp;mut <a class="struct" href="../../../serenity/framework/standard/buckets/struct.BucketBuilder.html" title="struct serenity::framework::standard::buckets::BucketBuilder">BucketBuilder</a>) -&gt; &amp;mut <a class="struct" href="../../../serenity/framework/standard/buckets/struct.BucketBuilder.html" title="struct serenity::framework::standard::buckets::BucketBuilder">BucketBuilder</a>,&nbsp;</span></code><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#196-210" title="goto source code">[src]</a></h4><div class="docblock"><p>Defines a bucket with <code>delay</code> between each command, and the <code>limit</code> of uses
 per <code>time_span</code>.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
 <p>Create and use a bucket that limits a command to 3 uses per 10 seconds with
@@ -48,13 +48,13 @@ a 2 second delay inbetween invocations:</p>
 <span class="attribute">#[<span class="ident">command</span>]</span>
 <span class="comment">// Registers the bucket `basic` to this command.</span>
 <span class="attribute">#[<span class="ident">bucket</span> <span class="op">=</span> <span class="string">&quot;basic&quot;</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">nothing</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">nothing</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">StandardFramework</span>::<span class="ident">new</span>()
     .<span class="ident">bucket</span>(<span class="string">&quot;basic&quot;</span>, <span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">b</span>.<span class="ident">delay</span>(<span class="number">2</span>).<span class="ident">time_span</span>(<span class="number">10</span>).<span class="ident">limit</span>(<span class="number">3</span>))
-    .<span class="ident">await</span>;</pre></div>
+    .<span class="kw">await</span>;</pre></div>
 </div><h4 id="method.group" class="method"><code>pub fn <a href="#method.group" class="fnname">group</a>(self, group: &amp;'static <a class="struct" href="../../../serenity/framework/standard/struct.CommandGroup.html" title="struct serenity::framework::standard::CommandGroup">CommandGroup</a>) -&gt; Self</code><a class="srclink" href="../../../src/serenity/framework/standard/mod.rs.html#362-367" title="goto source code">[src]</a></h4><div class="docblock"><p>Adds a group which can organize several related commands.
 Groups are taken into account when using
 <code>serenity::framework::standard::help_commands</code>.</p>
@@ -72,15 +72,15 @@ Groups are taken into account when using
 
 <span class="comment">// For information regarding this macro, learn more about it in its documentation in `command_attr`.</span>
 <span class="attribute">#[<span class="ident">command</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ping</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
-    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;pong!&quot;</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ping</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
+    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;pong!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">pong</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
-    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;ping!&quot;</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">pong</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
+    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;ping!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
     <span class="prelude-val">Ok</span>(())
 }
@@ -113,17 +113,17 @@ another.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="attribute">#[<span class="ident">hook</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dispatch_error_hook</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">error</span>: <span class="ident">DispatchError</span>) {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch_error_hook</span>(<span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">error</span>: <span class="ident">DispatchError</span>) {
     <span class="kw">match</span> <span class="ident">error</span> {
         <span class="ident">DispatchError</span>::<span class="ident">NotEnoughArguments</span> { <span class="ident">min</span>, <span class="ident">given</span> } <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Need {} arguments, but only got {}.&quot;</span>, <span class="ident">min</span>, <span class="ident">given</span>);
 
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="kw">await</span>;
         },
         <span class="ident">DispatchError</span>::<span class="ident">TooManyArguments</span> { <span class="ident">max</span>, <span class="ident">given</span> } <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Max arguments allowed is {}, but got {}.&quot;</span>, <span class="ident">max</span>, <span class="ident">given</span>);
 
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="ident">s</span>).<span class="kw">await</span>;
         },
         <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Unhandled dispatch error.&quot;</span>),
     }
@@ -142,7 +142,7 @@ If that function returns true, the command will be executed.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="attribute">#[<span class="ident">hook</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">before_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">cmd_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">before_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">cmd_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Running command {}&quot;</span>, <span class="ident">cmd_name</span>);
     <span class="bool-val">true</span>
 }
@@ -155,8 +155,8 @@ If that function returns true, the command will be executed.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="attribute">#[<span class="ident">hook</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">before_hook</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">cmd_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">ctx</span>).<span class="ident">await</span> {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">before_hook</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">cmd_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Ok</span>(<span class="ident">channel</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
         <span class="comment">//  Don&#39;t run unless in nsfw channel</span>
         <span class="kw">if</span> <span class="op">!</span><span class="ident">channel</span>.<span class="ident">is_nsfw</span>() {
             <span class="kw">return</span> <span class="bool-val">false</span>;
@@ -181,7 +181,7 @@ Fourth argument exists if command returned an error which you can handle.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="attribute">#[<span class="ident">hook</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">after_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">cmd_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">error</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandError</span><span class="op">&gt;</span>) {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">after_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">cmd_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">error</span>: <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandError</span><span class="op">&gt;</span>) {
     <span class="comment">//  Print out an error if it happened</span>
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">error</span> {
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error in {}: {:?}&quot;</span>, <span class="ident">cmd_name</span>, <span class="ident">why</span>);
@@ -199,7 +199,7 @@ Fourth argument exists if command returned an error which you can handle.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="attribute">#[<span class="ident">hook</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">unrecognised_command_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">unrecognised_command_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">unrecognised_command_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">unrecognised_command_name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;A user named {:?} tried to executute an unknown command: {}&quot;</span>,
         <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">name</span>, <span class="ident">unrecognised_command_name</span>
     );
@@ -216,7 +216,7 @@ Fourth argument exists if command returned an error which you can handle.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="attribute">#[<span class="ident">hook</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">normal_message_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">normal_message_hook</span>(<span class="kw">_</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Received a generic message: {:?}&quot;</span>, <span class="ident">msg</span>.<span class="ident">content</span>);
 }
 

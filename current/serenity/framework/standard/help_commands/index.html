@@ -26,7 +26,7 @@ embeds:</p>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {}
 
 <span class="attribute">#[<span class="ident">help</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">my_help</span>(
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">my_help</span>(
    <span class="ident">context</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>,
    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
    <span class="ident">args</span>: <span class="ident">Args</span>,
@@ -34,7 +34,7 @@ embeds:</p>
    <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
    <span class="ident">owners</span>: <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">help_commands</span>::<span class="ident">with_embeds</span>(<span class="ident">context</span>, <span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help_options</span>, <span class="ident">groups</span>, <span class="ident">owners</span>).<span class="ident">await</span>;
+    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">help_commands</span>::<span class="ident">with_embeds</span>(<span class="ident">context</span>, <span class="ident">msg</span>, <span class="ident">args</span>, <span class="ident">help_options</span>, <span class="ident">groups</span>, <span class="ident">owners</span>).<span class="kw">await</span>;
     <span class="prelude-val">Ok</span>(())
 }
 

@@ -17,7 +17,7 @@ payload of <a href="../../serenity/model/webhook/struct.Webhook.html#method.exec
 
 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="number">245037420704169985</span>;
 <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="string">&quot;ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV&quot;</span>;
-<span class="kw">let</span> <span class="ident">webhook</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">get_webhook_with_token</span>(<span class="ident">id</span>, <span class="ident">token</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="ident">webhook</span> <span class="op">=</span> <span class="ident">http</span>.<span class="ident">get_webhook_with_token</span>(<span class="ident">id</span>, <span class="ident">token</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="kw">let</span> <span class="ident">website</span> <span class="op">=</span> <span class="ident">Embed</span>::<span class="ident">fake</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
     <span class="ident">e</span>.<span class="ident">title</span>(<span class="string">&quot;The Rust Language Website&quot;</span>)
@@ -35,7 +35,7 @@ payload of <a href="../../serenity/model/webhook/struct.Webhook.html#method.exec
 <span class="ident">webhook</span>.<span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="ident">w</span><span class="op">|</span> {
     <span class="ident">w</span>.<span class="ident">content</span>(<span class="string">&quot;Here&#39;s some information on Rust:&quot;</span>).<span class="ident">embeds</span>(<span class="macro">vec</span><span class="macro">!</span>[<span class="ident">website</span>, <span class="ident">resources</span>])
 })
-.<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+.<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><h3 id="impl" class="impl"><code class="in-band">impl&lt;'a&gt; <a class="struct" href="../../serenity/builder/struct.ExecuteWebhook.html" title="struct serenity::builder::ExecuteWebhook">ExecuteWebhook</a>&lt;'a&gt;</code><a href="#impl" class="anchor"></a><a class="srclink" href="../../src/serenity/builder/execute_webhook.rs.html#56-214" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.avatar_url" class="method"><code>pub fn <a href="#method.avatar_url" class="fnname">avatar_url</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/alloc/string/trait.ToString.html" title="trait alloc::string::ToString">ToString</a>&gt;(&amp;mut self, avatar_url: S) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/execute_webhook.rs.html#79-82" title="goto source code">[src]</a></h4><div class="docblock"><p>Override the default avatar of the webhook with an image URL.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
 <p>Overriding the default avatar:</p>
@@ -46,7 +46,7 @@ payload of <a href="../../serenity/model/webhook/struct.Webhook.html#method.exec
 <span class="ident">webhook</span>.<span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="ident">w</span><span class="op">|</span> {
     <span class="ident">w</span>.<span class="ident">avatar_url</span>(<span class="ident">avatar_url</span>).<span class="ident">content</span>(<span class="string">&quot;Here&#39;s a webhook&quot;</span>)
 })
-.<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+.<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.content" class="method"><code>pub fn <a href="#method.content" class="fnname">content</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/alloc/string/trait.ToString.html" title="trait alloc::string::ToString">ToString</a>&gt;(&amp;mut self, content: S) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/execute_webhook.rs.html#113-116" title="goto source code">[src]</a></h4><div class="docblock"><p>Set the content of the message.</p>
 <p>Note that when setting at least one embed via <a href="../../serenity/builder/struct.ExecuteWebhook.html#method.embeds"><code>embeds</code></a>, this may be
 omitted.</p>
@@ -57,7 +57,7 @@ omitted.</p>
 <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">webhook</span>.<span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="ident">w</span><span class="op">|</span> {
     <span class="ident">w</span>.<span class="ident">content</span>(<span class="string">&quot;foo&quot;</span>)
 })
-.<span class="ident">await</span>;
+.<span class="kw">await</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">execution</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err sending webhook: {:?}&quot;</span>, <span class="ident">why</span>);
@@ -81,7 +81,7 @@ embeds.</p>
 <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">webhook</span>.<span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="ident">w</span><span class="op">|</span> {
     <span class="ident">w</span>.<span class="ident">content</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">tts</span>(<span class="bool-val">true</span>)
 })
-.<span class="ident">await</span>;
+.<span class="kw">await</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">execution</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err sending webhook: {:?}&quot;</span>, <span class="ident">why</span>);
@@ -94,7 +94,7 @@ embeds.</p>
 <span class="kw">let</span> <span class="ident">execution</span> <span class="op">=</span> <span class="ident">webhook</span>.<span class="ident">execute</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="bool-val">false</span>, <span class="op">|</span><span class="ident">w</span><span class="op">|</span> {
     <span class="ident">w</span>.<span class="ident">content</span>(<span class="string">&quot;hello&quot;</span>).<span class="ident">username</span>(<span class="string">&quot;hakase&quot;</span>)
 })
-.<span class="ident">await</span>;
+.<span class="kw">await</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">execution</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Err sending webhook: {:?}&quot;</span>, <span class="ident">why</span>);

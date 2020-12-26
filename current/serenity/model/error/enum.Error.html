@@ -36,13 +36,13 @@ re-ban all members with an odd discriminator:</p>
 
 <span class="attribute">#[<span class="ident">serenity</span>::<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">guild_ban_removal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">user</span>: <span class="ident">User</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_ban_removal</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">user</span>: <span class="ident">User</span>) {
         <span class="comment">// If the user has an even discriminator, don&#39;t re-ban them.</span>
         <span class="kw">if</span> <span class="ident">user</span>.<span class="ident">discriminator</span> <span class="op">%</span> <span class="number">2</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="kw">return</span>;
         }
 
-        <span class="kw">match</span> <span class="ident">guild_id</span>.<span class="ident">ban</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="ident">user</span>, <span class="number">8</span>).<span class="ident">await</span> {
+        <span class="kw">match</span> <span class="ident">guild_id</span>.<span class="ident">ban</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="ident">user</span>, <span class="number">8</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(()) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// Ban successful.</span>
             },
@@ -56,9 +56,9 @@ re-ban all members with an odd discriminator:</p>
     }
 }
 <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;DISCORD_BOT_TOKEN&quot;</span>)<span class="question-mark">?</span>;
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="ident">client</span>.<span class="ident">start</span>().<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+<span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h2 id="variants" class="variants small-section-header">
                    Variants (Non-exhaustive)<a href="#variants" class="anchor"></a></h2>
 <div class="docblock non-exhaustive non-exhaustive-enum">Non-exhaustive enums could have additional variants added in future. Therefore, when matching against variants of non-exhaustive enums, an extra wildcard arm must be added to account for any future variants.</div><div id="variant.BulkDeleteAmount" class="variant small-section-header"><a href="#variant.BulkDeleteAmount" class="anchor field"></a><code>BulkDeleteAmount</code></div><div class="docblock"><p>When attempting to delete below or above the minimum and maximum allowed

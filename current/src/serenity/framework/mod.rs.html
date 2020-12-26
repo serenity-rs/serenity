@@ -218,7 +218,7 @@
 <span class="doccomment">/// so that you may run your commands in separate threads.</span>
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">Framework</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">Message</span>);
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Context</span>, <span class="kw">_</span>: <span class="ident">Message</span>);
 }
 
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
@@ -226,8 +226,8 @@
 <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">dispatch</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">dispatch</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span>;
     }
 }
 
@@ -236,8 +236,8 @@
 <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">Framework</span> <span class="op">+</span> <span class="question-mark">?</span><span class="ident">Sized</span>
 {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
-        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">dispatch</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span>;
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">ctx</span>: <span class="ident">Context</span>, <span class="ident">msg</span>: <span class="ident">Message</span>) {
+        (<span class="kw-2">*</span><span class="kw-2">*</span><span class="self">self</span>).<span class="ident">dispatch</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span>;
     }
 }
 </pre></div>

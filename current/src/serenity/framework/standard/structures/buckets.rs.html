@@ -593,24 +593,24 @@
 
 <span class="kw">impl</span> <span class="ident">Bucket</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateLimitInfo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateLimitInfo</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Global</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="number">0</span>).<span class="ident">await</span>,
-            <span class="self">Self</span>::<span class="ident">User</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="ident">await</span>,
+            <span class="self">Self</span>::<span class="ident">Global</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="number">0</span>).<span class="kw">await</span>,
+            <span class="self">Self</span>::<span class="ident">User</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="kw">await</span>,
             <span class="self">Self</span>::<span class="ident">Guild</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-                    <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="number">0</span>).<span class="ident">await</span>
+                    <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="number">0</span>).<span class="kw">await</span>
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
                 }
             }
-            <span class="self">Self</span>::<span class="ident">Channel</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span>).<span class="ident">await</span>,
+            <span class="self">Self</span>::<span class="ident">Channel</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span>).<span class="kw">await</span>,
             <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s</span>
             <span class="comment">// category.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="self">Self</span>::<span class="ident">Category</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="ident">await</span> {
-                    <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="ident">await</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
+                    <span class="ident">counter</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="kw">await</span>
                 } <span class="kw">else</span> {
                     <span class="prelude-val">None</span>
                 },
@@ -618,22 +618,22 @@
     }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) {
         <span class="kw">match</span> <span class="self">self</span> {
-            <span class="self">Self</span>::<span class="ident">Global</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="number">0</span>).<span class="ident">await</span>,
-            <span class="self">Self</span>::<span class="ident">User</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="ident">await</span>,
+            <span class="self">Self</span>::<span class="ident">Global</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="number">0</span>).<span class="kw">await</span>,
+            <span class="self">Self</span>::<span class="ident">User</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>.<span class="number">0</span>).<span class="kw">await</span>,
             <span class="self">Self</span>::<span class="ident">Guild</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild_id</span> {
-                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="number">0</span>).<span class="ident">await</span>
+                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">guild_id</span>.<span class="number">0</span>).<span class="kw">await</span>
                 }
             }
-            <span class="self">Self</span>::<span class="ident">Channel</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span>).<span class="ident">await</span>,
+            <span class="self">Self</span>::<span class="ident">Channel</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span>).<span class="kw">await</span>,
             <span class="comment">// This requires the cache, as messages do not contain their channel&#39;s</span>
             <span class="comment">// category.</span>
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
             <span class="self">Self</span>::<span class="ident">Category</span>(<span class="ident">counter</span>) <span class="op">=</span><span class="op">&gt;</span>
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="ident">await</span> {
-                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="ident">await</span>
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">category_id</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">category_id</span>(<span class="ident">ctx</span>).<span class="kw">await</span> {
+                    <span class="ident">counter</span>.<span class="ident">give</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">category_id</span>.<span class="number">0</span>).<span class="kw">await</span>
                 }
             }
         }
@@ -708,10 +708,10 @@
     <span class="doccomment">/// However there is no contract: It does not matter what</span>
     <span class="doccomment">/// the caller ends up doing, receiving some action eventually means</span>
     <span class="doccomment">/// no ticket can be taken and the duration must elapse.</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateLimitInfo</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">take</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">RateLimitInfo</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">check</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">check</span> {
 
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span> {
+            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
                 <span class="kw">return</span> <span class="prelude-val">None</span>
             }
         }
@@ -743,8 +743,8 @@
                             <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">clone</span>();
                             <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">clone</span>();
 
-                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                                <span class="ident">delay_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="ident">await</span>;
+                            <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                                <span class="ident">delay_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
                             });
                         }
 
@@ -792,8 +792,8 @@
                     <span class="kw">let</span> <span class="ident">ctx</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">clone</span>();
                     <span class="kw">let</span> <span class="ident">msg</span> <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">clone</span>();
 
-                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-                        <span class="ident">delay_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="ident">await</span>;
+                    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+                        <span class="ident">delay_action</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
                     });
                 }
 
@@ -828,10 +828,10 @@
     <span class="doccomment">/// matching ticket holder.</span>
     <span class="doccomment">/// Only call this if the mutable owner already took a ticket in this</span>
     <span class="doccomment">/// atomic execution of calling `take` and `give`.</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">id</span>: <span class="ident">u64</span>) {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>, <span class="ident">id</span>: <span class="ident">u64</span>) {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="ident">check</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">check</span> {
 
-            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="ident">await</span> {
+            <span class="kw">if</span> <span class="op">!</span>(<span class="ident">check</span>)(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
                 <span class="kw">return</span>
             }
         }

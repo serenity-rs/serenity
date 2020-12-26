@@ -21,7 +21,7 @@ the uploader had their file named.</p>
 </div><span id="structfield.width" class="structfield small-section-header"><a href="#structfield.width" class="anchor field"></a><code>width: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>&gt;</code></span><div class="docblock"><p>If the attachment is an image, then the width of the image is provided.</p>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><h3 id="impl" class="impl"><code class="in-band">impl <a class="struct" href="../../../serenity/model/channel/struct.Attachment.html" title="struct serenity::model::channel::Attachment">Attachment</a></code><a href="#impl" class="anchor"></a><a class="srclink" href="../../../src/serenity/model/channel/attachment.rs.html#32-127" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.dimensions" class="method"><code>pub fn <a href="#method.dimensions" class="fnname">dimensions</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">(</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a>, <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u64.html">u64</a><a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.tuple.html">)</a>&gt;</code><a class="srclink" href="../../../src/serenity/model/channel/attachment.rs.html#35-38" title="goto source code">[src]</a></h4><div class="docblock"><p>If this attachment is an image, then a tuple of the width and height
 in pixels is returned.</p>
-</div><h4 id="method.download" class="method"><code>pub async fn <a href="#method.download" class="fnname">download</a>&lt;'_&gt;(&amp;'_ self) -&gt; <a class="type" href="../../../serenity/type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;</code><a class="srclink" href="../../../src/serenity/model/channel/attachment.rs.html#115-126" title="goto source code">[src]</a></h4><div class="docblock"><p>Downloads the attachment, returning back a vector of bytes.</p>
+</div><h4 id="method.download" class="method"><code>pub async fn <a href="#method.download" class="fnname">download</a>(&amp;self) -&gt; <a class="type" href="../../../serenity/type.Result.html" title="type serenity::Result">Result</a>&lt;<a class="struct" href="https://doc.rust-lang.org/nightly/alloc/vec/struct.Vec.html" title="struct alloc::vec::Vec">Vec</a>&lt;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.u8.html">u8</a>&gt;&gt;</code><a class="srclink" href="../../../src/serenity/model/channel/attachment.rs.html#115-126" title="goto source code">[src]</a></h4><div class="docblock"><p>Downloads the attachment, returning back a vector of bytes.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <p>Download all of the attachments associated with a <a href="../../../serenity/model/channel/struct.Message.html"><code>Message</code></a>:</p>
 
@@ -37,46 +37,46 @@ in pixels is returned.</p>
 
 <span class="attribute">#[<span class="ident">serenity</span>::<span class="ident">async_trait</span>]</span>
 <span class="kw">impl</span> <span class="ident">EventHandler</span> <span class="kw">for</span> <span class="ident">Handler</span> {
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Message</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">context</span>: <span class="ident">Context</span>, <span class="kw-2">mut</span> <span class="ident">message</span>: <span class="ident">Message</span>) {
         <span class="kw">for</span> <span class="ident">attachment</span> <span class="kw">in</span> <span class="ident">message</span>.<span class="ident">attachments</span> {
-            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attachment</span>.<span class="ident">download</span>().<span class="ident">await</span> {
+            <span class="kw">let</span> <span class="ident">content</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">attachment</span>.<span class="ident">download</span>().<span class="kw">await</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">content</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">content</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error downloading attachment: {:?}&quot;</span>, <span class="ident">why</span>);
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="string">&quot;Error downloading attachment&quot;</span>).<span class="ident">await</span>;
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="string">&quot;Error downloading attachment&quot;</span>).<span class="kw">await</span>;
 
                     <span class="kw">return</span>;
                 },
             };
 
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">File</span>::<span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="ident">attachment</span>.<span class="ident">filename</span>).<span class="ident">await</span> {
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">file</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">File</span>::<span class="ident">create</span>(<span class="kw-2">&amp;</span><span class="ident">attachment</span>.<span class="ident">filename</span>).<span class="kw">await</span> {
                 <span class="prelude-val">Ok</span>(<span class="ident">file</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">file</span>,
                 <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error creating file: {:?}&quot;</span>, <span class="ident">why</span>);
-                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="string">&quot;Error creating file&quot;</span>).<span class="ident">await</span>;
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="string">&quot;Error creating file&quot;</span>).<span class="kw">await</span>;
 
                     <span class="kw">return</span>;
                 },
             };
 
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">file</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>).<span class="ident">await</span> {
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">file</span>.<span class="ident">write</span>(<span class="kw-2">&amp;</span><span class="ident">content</span>).<span class="kw">await</span> {
                 <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error writing to file: {:?}&quot;</span>, <span class="ident">why</span>);
 
                 <span class="kw">return</span>;
             }
 
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Saved {:?}&quot;</span>, <span class="ident">attachment</span>.<span class="ident">filename</span>)).<span class="ident">await</span>;
+            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">context</span>, <span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;Saved {:?}&quot;</span>, <span class="ident">attachment</span>.<span class="ident">filename</span>)).<span class="kw">await</span>;
         }
     }
 
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Context</span>, <span class="ident">ready</span>: <span class="ident">Ready</span>) {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ready</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="kw">_</span>: <span class="ident">Context</span>, <span class="ident">ready</span>: <span class="ident">Ready</span>) {
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{} is connected!&quot;</span>, <span class="ident">ready</span>.<span class="ident">user</span>.<span class="ident">name</span>);
     }
 }
 <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">env</span>::<span class="ident">var</span>(<span class="string">&quot;DISCORD_TOKEN&quot;</span>)<span class="question-mark">?</span>;
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-<span class="ident">client</span>.<span class="ident">start</span>().<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+<span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 <h1 id="errors" class="section-header"><a href="#errors">Errors</a></h1>
 <p>Returns an <a href="../../../serenity/prelude/enum.SerenityError.html#variant.Io"><code>Error::Io</code></a> when there is a problem reading the contents
 of the HTTP response.</p>

@@ -243,15 +243,15 @@
     <span class="doccomment">/// [`Error::Http`]: crate::Error::Http</span>
     <span class="doccomment">/// [`Error::Io`]: crate::Error::Io</span>
     <span class="doccomment">/// [`Message`]: super::Message</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">download</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">download</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">reqwest</span> <span class="op">=</span> <span class="ident">ReqwestClient</span>::<span class="ident">new</span>();
 
         <span class="prelude-val">Ok</span>(<span class="ident">reqwest</span>
            .<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">url</span>)
            .<span class="ident">send</span>()
-           .<span class="ident">await</span><span class="question-mark">?</span>
+           .<span class="kw">await</span><span class="question-mark">?</span>
            .<span class="ident">bytes</span>()
-           .<span class="ident">await</span><span class="question-mark">?</span>
+           .<span class="kw">await</span><span class="question-mark">?</span>
            .<span class="ident">into_iter</span>()
            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span><span class="op">&gt;</span>())
     }

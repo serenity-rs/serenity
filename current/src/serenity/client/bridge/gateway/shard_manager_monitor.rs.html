@@ -170,18 +170,18 @@
     <span class="doccomment">/// - an error is returned while receiving a message from the</span>
     <span class="doccomment">/// channel (probably indicating that the shard manager should stop anyway)</span>
     <span class="attribute">#[<span class="ident">instrument</span>(<span class="ident">skip</span>(<span class="self">self</span>))]</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">run</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;Starting shard manager worker&quot;</span>);
 
-        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="ident">await</span> {
+        <span class="kw">while</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">value</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">rx</span>.<span class="ident">next</span>().<span class="kw">await</span> {
             <span class="kw">match</span> <span class="ident">value</span> {
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">Restart</span>(<span class="ident">shard_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">restart</span>(<span class="ident">shard_id</span>).<span class="ident">await</span>;
+                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">restart</span>(<span class="ident">shard_id</span>).<span class="kw">await</span>;
                     <span class="kw">let</span> <span class="kw">_</span>  <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardUpdate</span> { <span class="ident">id</span>, <span class="ident">latency</span>, <span class="ident">stage</span> } <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runners</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
+                    <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
+                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runners</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">runner</span>) <span class="op">=</span> <span class="ident">runners</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>) {
                         <span class="ident">runner</span>.<span class="ident">latency</span> <span class="op">=</span> <span class="ident">latency</span>;
@@ -189,11 +189,11 @@
                     }
                 }
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>).<span class="ident">await</span>;
+                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>).<span class="kw">await</span>;
                     <span class="kw">let</span> <span class="kw">_</span>  <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShutdownAll</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">shutdown_all</span>().<span class="ident">await</span>;
+                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
 
                     <span class="kw">break</span>;
                 },
@@ -208,16 +208,16 @@
                     }
                 }
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardInvalidAuthentication</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">shutdown_all</span>().<span class="ident">await</span>;
+                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError</span>::<span class="ident">InvalidToken</span>);
                 },
 
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardInvalidGatewayIntents</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">shutdown_all</span>().<span class="ident">await</span>;
+                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError</span>::<span class="ident">InvalidGatewayIntents</span>);
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardDisallowedGatewayIntents</span> <span class="op">=</span><span class="op">&gt;</span> {
-                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="ident">await</span>.<span class="ident">shutdown_all</span>().<span class="ident">await</span>;
+                    <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError</span>::<span class="ident">DisallowedGatewayIntents</span>);
                 },
             }
