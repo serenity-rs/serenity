@@ -660,8 +660,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="ident">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">channel</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Channel</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">to_channel</span>(<span class="ident">cache_http</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes the reaction, but only if the current user is the user who made</span>
@@ -678,7 +678,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="doccomment">/// [permissions]: super::permissions</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="comment">// Silences a warning when compiling without the `cache` feature.</span>
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">user_id</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">id</span><span class="op">|</span> <span class="ident">id</span>.<span class="number">0</span>);
@@ -686,14 +686,14 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_id</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">await</span>.<span class="ident">id</span>) {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">user_id</span>.<span class="ident">is_some</span>() <span class="op">&amp;&amp;</span> <span class="self">self</span>.<span class="ident">user_id</span> <span class="op">=</span><span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>) {
                     <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
                 }
 
                 <span class="kw">if</span> <span class="ident">user_id</span>.<span class="ident">is_some</span>() {
                     <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="prelude-val">None</span>, <span class="ident">req</span>).<span class="ident">await</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
+                    <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="prelude-val">None</span>, <span class="ident">req</span>).<span class="kw">await</span>.<span class="ident">unwrap_or</span>(<span class="bool-val">true</span>) {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                     }
                 }
@@ -703,7 +703,7 @@
         <span class="ident">cache_http</span>
             .<span class="ident">http</span>()
             .<span class="ident">delete_reaction</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">message_id</span>.<span class="number">0</span>, <span class="ident">user_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emoji</span>)
-            .<span class="ident">await</span>
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Deletes all reactions from the message with this emoji.</span>
@@ -718,13 +718,13 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Messages]: Permissions::MANAGE_MESSAGES</span>
     <span class="doccomment">/// [permissions]: super::permissions</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">delete_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_all</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="ident">await</span><span class="question-mark">?</span> {
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                 }
             }
@@ -733,7 +733,7 @@
             .<span class="ident">http</span>()
             .<span class="ident">as_ref</span>()
             .<span class="ident">delete_message_reaction_emoji</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">message_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">emoji</span>)
-            .<span class="ident">await</span>
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Retrieves the [`Message`] associated with this reaction.</span>
@@ -746,8 +746,8 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="self">self</span>.<span class="ident">message_id</span>).<span class="ident">await</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="self">self</span>.<span class="ident">message_id</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Retrieves the user that made the reaction.</span>
@@ -755,20 +755,20 @@
     <span class="doccomment">/// If the cache is enabled, this will search for the already-cached user.</span>
     <span class="doccomment">/// If not - or the user was not found - this will perform a request over</span>
     <span class="doccomment">/// the REST API for the user.</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">user_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">id</span>.<span class="ident">to_user</span>(<span class="ident">cache_http</span>).<span class="ident">await</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">id</span>.<span class="ident">to_user</span>(<span class="ident">cache_http</span>).<span class="kw">await</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="comment">// This can happen if only Http was passed to Message::react, even though</span>
                 <span class="comment">// &quot;cache&quot; was enabled.</span>
                 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
                 {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">User</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="ident">await</span>));
+                        <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">User</span>::<span class="ident">from</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>));
                     }
                 }
 
-                <span class="prelude-val">Ok</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">get_current_user</span>().<span class="ident">await</span><span class="question-mark">?</span>.<span class="ident">into</span>())
+                <span class="prelude-val">Ok</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">get_current_user</span>().<span class="kw">await</span><span class="question-mark">?</span>.<span class="ident">into</span>())
             }
         }
     }
@@ -795,17 +795,17 @@
     <span class="doccomment">/// [Read Message History]: Permissions::READ_MESSAGE_HISTORY</span>
     <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">users</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">users</span><span class="op">&lt;</span><span class="ident">R</span>, <span class="ident">U</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>,
                        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
                        <span class="ident">reaction_type</span>: <span class="ident">R</span>,
                        <span class="ident">limit</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span>,
                        <span class="ident">after</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">U</span><span class="op">&gt;</span>)
                        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>
         <span class="kw">where</span> <span class="ident">R</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>, <span class="ident">U</span>: <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">_users</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">into</span>(), <span class="ident">limit</span>, <span class="ident">after</span>.<span class="ident">map</span>(<span class="ident">Into</span>::<span class="ident">into</span>)).<span class="ident">await</span>
+        <span class="self">self</span>.<span class="ident">_users</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">into</span>(), <span class="ident">limit</span>, <span class="ident">after</span>.<span class="ident">map</span>(<span class="ident">Into</span>::<span class="ident">into</span>)).<span class="kw">await</span>
     }
 
-    <span class="ident">async</span> <span class="kw">fn</span> <span class="ident">_users</span>(
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_users</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">reaction_type</span>: <span class="kw-2">&amp;</span><span class="ident">ReactionType</span>,
@@ -825,7 +825,7 @@
             <span class="ident">reaction_type</span>,
             <span class="ident">limit</span>,
             <span class="ident">after</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">u</span><span class="op">|</span> <span class="ident">u</span>.<span class="number">0</span>),
-        ).<span class="ident">await</span>
+        ).<span class="kw">await</span>
     }
 }
 

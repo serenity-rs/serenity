@@ -29,16 +29,16 @@ passing to communicate with that task.</p>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">data1</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="number">0</span>));
     <span class="kw">let</span> <span class="ident">data2</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">data1</span>);
 
-    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">data2</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
+    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">data2</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
         <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
     });
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">data1</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">data1</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
     <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 }</pre></div>
 
@@ -47,14 +47,14 @@ passing to communicate with that task.</p>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="number">0</span>));
 
     <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">5</span> {
         <span class="kw">let</span> <span class="ident">my_count</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">clone</span>(<span class="kw-2">&amp;</span><span class="ident">count</span>);
-        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+        <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="kw">for</span> <span class="kw">_</span> <span class="kw">in</span> <span class="number">0</span>..<span class="number">10</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">my_count</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">my_count</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
                 <span class="kw-2">*</span><span class="ident">lock</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
                 <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{}&quot;</span>, <span class="ident">lock</span>);
             }
@@ -62,7 +62,7 @@ passing to communicate with that task.</p>
     }
 
     <span class="kw">loop</span> {
-        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">count</span>.<span class="ident">lock</span>().<span class="ident">await</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">50</span> {
+        <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">count</span>.<span class="ident">lock</span>().<span class="kw">await</span> <span class="op">&gt;</span><span class="op">=</span> <span class="number">50</span> {
             <span class="kw">break</span>;
         }
     }
@@ -102,10 +102,10 @@ When the lock has been acquired, function returns a <a href="https://docs.rs/tok
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="number">1</span>);
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>().<span class="ident">await</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
     <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">2</span>;
 }</pre></div>
 </div><h4 id="method.lock_owned" class="method"><code>pub async fn <a href="#method.lock_owned" class="fnname">lock_owned</a>(self: <a class="struct" href="https://doc.rust-lang.org/nightly/alloc/sync/struct.Arc.html" title="struct alloc::sync::Arc">Arc</a>&lt;<a class="struct" href="../../serenity/prelude/struct.Mutex.html" title="struct serenity::prelude::Mutex">Mutex</a>&lt;T&gt;&gt;) -&gt; <a class="struct" href="https://docs.rs/tokio/0.2.24/tokio/sync/mutex/struct.OwnedMutexGuard.html" title="struct tokio::sync::mutex::OwnedMutexGuard">OwnedMutexGuard</a>&lt;T&gt;</code><a class="srclink" href="https://docs.rs/tokio/0.2.24/src/tokio/sync/mutex.rs.html#270-273" title="goto source code">[src]</a></h4><div class="docblock"><p>Locks this mutex, causing the current task to yield until the lock has
@@ -122,10 +122,10 @@ the <code>Mutex</code> alive by holding an <code>Arc</code>.</p>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="number">1</span>));
 
-    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">clone</span>().<span class="ident">lock_owned</span>().<span class="ident">await</span>;
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">clone</span>().<span class="ident">lock_owned</span>().<span class="kw">await</span>;
     <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">2</span>;
 }</pre></div>
 </div><h4 id="method.try_lock" class="method"><code>pub fn <a href="#method.try_lock" class="fnname">try_lock</a>(&amp;self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/result/enum.Result.html" title="enum core::result::Result">Result</a>&lt;<a class="struct" href="https://docs.rs/tokio/0.2.24/tokio/sync/mutex/struct.MutexGuard.html" title="struct tokio::sync::mutex::MutexGuard">MutexGuard</a>&lt;'_, T&gt;, <a class="struct" href="https://docs.rs/tokio/0.2.24/tokio/sync/mutex/struct.TryLockError.html" title="struct tokio::sync::mutex::TryLockError">TryLockError</a>&gt;</code><a class="srclink" href="https://docs.rs/tokio/0.2.24/src/tokio/sync/mutex.rs.html#300-305" title="goto source code">[src]</a></h4><div class="docblock"><p>Attempts to acquire the lock, and returns <a href="https://docs.rs/tokio/0.2.24/tokio/sync/mutex/struct.TryLockError.html"><code>TryLockError</code></a> if the
@@ -160,7 +160,7 @@ keeps the <code>Mutex</code> alive by holding an <code>Arc</code>.</p>
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">mutex</span> <span class="op">=</span> <span class="ident">Mutex</span>::<span class="ident">new</span>(<span class="number">1</span>);
 
     <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">mutex</span>.<span class="ident">into_inner</span>();

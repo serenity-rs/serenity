@@ -27,7 +27,7 @@ from the cwd and encode it in base64 to send to Discord.</p>
 <span class="ident">guild</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">g</span><span class="op">|</span> {
     <span class="ident">g</span>.<span class="ident">icon</span>(<span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="ident">base64_icon</span>))
 })
-.<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+.<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.name" class="method"><code>pub fn <a href="#method.name" class="fnname">name</a>&lt;S:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/alloc/string/trait.ToString.html" title="trait alloc::string::ToString">ToString</a>&gt;(&amp;mut self, name: S) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/edit_guild.rs.html#93-96" title="goto source code">[src]</a></h4><div class="docblock"><p>Set the name of the guild.</p>
 <p><strong>Note</strong>: Must be between (and including) 2-100 chracters.</p>
 </div><h4 id="method.owner" class="method"><code>pub fn <a href="#method.owner" class="fnname">owner</a>&lt;U:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../../serenity/model/id/struct.UserId.html" title="struct serenity::model::id::UserId">UserId</a>&gt;&gt;(&amp;mut self, user_id: U) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/edit_guild.rs.html#102-105" title="goto source code">[src]</a></h4><div class="docblock"><p>Transfers the ownership of the guild to another user by Id.</p>
@@ -44,7 +44,7 @@ from the cwd and encode it in base64 to send to Discord.</p>
 <span class="ident">guild</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
     <span class="ident">g</span>.<span class="ident">region</span>(<span class="ident">Region</span>::<span class="ident">UsWest</span>)
 })
-.<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+.<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.splash" class="method"><code>pub fn <a href="#method.splash" class="fnname">splash</a>(&amp;mut self, splash: <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;&amp;<a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.str.html">str</a>&gt;) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../src/serenity/builder/edit_guild.rs.html#146-150" title="goto source code">[src]</a></h4><div class="docblock"><p>Set the splash image of the guild on the invitation page.</p>
 <p>Requires that the guild have the <code>INVITE_SPLASH</code> feature enabled.
 You can check this through a guild's <a href="../../serenity/model/guild/struct.Guild.html#structfield.features"><code>features</code></a> list.</p>
@@ -63,7 +63,7 @@ information on each variant.</p>
 <span class="kw">let</span> <span class="ident">edit</span> <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">g</span><span class="op">|</span> {
     <span class="ident">g</span>.<span class="ident">verification_level</span>(<span class="ident">VerificationLevel</span>::<span class="ident">High</span>)
 })
-.<span class="ident">await</span>;
+.<span class="kw">await</span>;
 
 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Err</span>(<span class="ident">why</span>) <span class="op">=</span> <span class="ident">edit</span> {
     <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Error setting verification level: {:?}&quot;</span>, <span class="ident">why</span>);

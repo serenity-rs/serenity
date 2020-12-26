@@ -22,7 +22,7 @@ whether to treat mentions like a command prefix, etc.</p>
 <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">StandardFramework</span>::<span class="ident">new</span>()
     .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">on_mention</span>(<span class="prelude-val">Some</span>(<span class="ident">UserId</span>(<span class="number">5</span>))).<span class="ident">prefix</span>(<span class="string">&quot;~&quot;</span>));
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="ident">framework</span>(<span class="ident">framework</span>).<span class="ident">await</span><span class="question-mark">?</span>;</pre></div>
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="kw-2">&amp;</span><span class="ident">token</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="ident">framework</span>(<span class="ident">framework</span>).<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h2 id="implementations" class="small-section-header">Implementations<a href="#implementations" class="anchor"></a></h2><h3 id="impl" class="impl"><code class="in-band">impl <a class="struct" href="../../../serenity/framework/standard/struct.Configuration.html" title="struct serenity::framework::standard::Configuration">Configuration</a></code><a href="#impl" class="anchor"></a><a class="srclink" href="../../../src/serenity/framework/standard/configuration.rs.html#132-584" title="goto source code">[src]</a></h3><div class="impl-items"><h4 id="method.allow_dm" class="method"><code>pub fn <a href="#method.allow_dm" class="fnname">allow_dm</a>(&amp;mut self, allow_dm: <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.bool.html">bool</a>) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../../src/serenity/framework/standard/configuration.rs.html#136-140" title="goto source code">[src]</a></h4><div class="docblock"><p>If set to false, bot will ignore any private messages.</p>
 <p><strong>Note</strong>: Defaults to <code>true</code>.</p>
 </div><h4 id="method.with_whitespace" class="method"><code>pub fn <a href="#method.with_whitespace" class="fnname">with_whitespace</a>&lt;I:&nbsp;<a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;<a class="struct" href="../../../serenity/framework/standard/struct.WithWhiteSpace.html" title="struct serenity::framework::standard::WithWhiteSpace">WithWhiteSpace</a>&gt;&gt;(&amp;mut self, with: I) -&gt; <a class="primitive" href="https://doc.rust-lang.org/nightly/std/primitive.reference.html">&amp;mut </a>Self</code><a class="srclink" href="../../../src/serenity/framework/standard/configuration.rs.html#164-168" title="goto source code">[src]</a></h4><div class="docblock"><p>Whether to allow whitespace being optional between a prefix/group-prefix/command and
@@ -31,13 +31,13 @@ a command.</p>
 <h1 id="examples-1" class="section-header"><a href="#examples-1">Examples</a></h1>
 <p>Setting <code>false</code> for prefixes will <em>only</em> allow this scenario to occur:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="op">!</span><span class="ident">about</span>
 
 <span class="comment">// bot processes and executes the &quot;about&quot; command if it exists</span></pre></div>
 <p>while setting it to <code>true</code> will <em>also</em> allow this scenario to occur:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="op">!</span> <span class="ident">about</span>
 
 <span class="comment">// bot processes and executes the &quot;about&quot; command if it exists</span></pre></div>
@@ -91,8 +91,8 @@ If set to false, it will only test part of the message by the <em>length</em> of
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">standard</span>::<span class="ident">macros</span>::{<span class="ident">group</span>, <span class="ident">command</span>};
 
 <span class="attribute">#[<span class="ident">command</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">ping</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
-    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;Pong!&quot;</span>).<span class="ident">await</span><span class="question-mark">?</span>;
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">ping</span>(<span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="ident">Context</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CommandResult</span> {
+    <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="ident">say</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>.<span class="ident">http</span>, <span class="string">&quot;Pong!&quot;</span>).<span class="kw">await</span><span class="question-mark">?</span>;
     <span class="prelude-val">Ok</span>(())
 }
 
@@ -127,7 +127,7 @@ valid in addition to the one returned by dynamic_prefix.</p>
 <span class="kw">use</span> <span class="ident">serenity</span>::<span class="ident">framework</span>::<span class="ident">StandardFramework</span>;
 
 <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">StandardFramework</span>::<span class="ident">new</span>()
-    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">dynamic_prefix</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">msg</span><span class="op">|</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">async</span> <span class="kw">move</span> {
+    .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>.<span class="ident">dynamic_prefix</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">msg</span><span class="op">|</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
         <span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span> <span class="op">%</span> <span class="number">5</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
             <span class="string">&quot;!&quot;</span>
         } <span class="kw">else</span> {
@@ -142,7 +142,7 @@ with the default prefix <code>&quot;~&quot;</code> disabled.</p>
 
 <span class="kw">let</span> <span class="ident">framework</span> <span class="op">=</span> <span class="ident">StandardFramework</span>::<span class="ident">new</span>()
     .<span class="ident">configure</span>(<span class="op">|</span><span class="ident">c</span><span class="op">|</span> <span class="ident">c</span>
-       .<span class="ident">dynamic_prefix</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">msg</span><span class="op">|</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">async</span> <span class="kw">move</span> {
+       .<span class="ident">dynamic_prefix</span>(<span class="op">|</span><span class="kw">_</span>, <span class="ident">msg</span><span class="op">|</span> <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="kw">async</span> <span class="kw">move</span> {
             <span class="prelude-val">Some</span>(<span class="kw">if</span> <span class="ident">msg</span>.<span class="ident">channel_id</span>.<span class="number">0</span> <span class="op">%</span> <span class="number">5</span> <span class="op">=</span><span class="op">=</span> <span class="number">0</span> {
                 <span class="string">&quot;!&quot;</span>
             } <span class="kw">else</span> {
@@ -165,7 +165,7 @@ other bots including itself.</p>
 <p>Setting this to an ID will allow the following types of mentions to be
 responded to:</p>
 
-<div class='information'><div class='tooltip ignore'>ⓘ<span class='tooltiptext'>This example is not tested</span></div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
+<div class='information'><div class='tooltip ignore'>ⓘ</div></div><div class="example-wrap"><pre class="rust rust-example-rendered ignore">
 <span class="op">&lt;</span>@<span class="number">245571012924538880</span><span class="op">&gt;</span> <span class="ident">about</span>
 <span class="op">&lt;</span>@<span class="op">!</span><span class="number">245571012924538880</span><span class="op">&gt;</span> <span class="ident">about</span></pre></div>
 <p>The former is a direct mention, while the latter is a nickname mention,

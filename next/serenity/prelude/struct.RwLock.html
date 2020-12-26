@@ -28,20 +28,20 @@ for the <code>write</code> methods) to allow access to the content of the lock.<
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="number">5</span>);
 
     <span class="comment">// many reader locks can be held at once</span>
     {
-        <span class="kw">let</span> <span class="ident">r1</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">read</span>().<span class="ident">await</span>;
-        <span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">read</span>().<span class="ident">await</span>;
+        <span class="kw">let</span> <span class="ident">r1</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">read</span>().<span class="kw">await</span>;
+        <span class="kw">let</span> <span class="ident">r2</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">r1</span>, <span class="number">5</span>);
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">r2</span>, <span class="number">5</span>);
     } <span class="comment">// read locks are dropped at this point</span>
 
     <span class="comment">// only one write lock may be held, however</span>
     {
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="ident">await</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">w</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="kw-2">*</span><span class="ident">w</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">w</span>, <span class="number">6</span>);
     } <span class="comment">// write lock is dropped here</span>
@@ -63,18 +63,18 @@ this method returns.</p>
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
     <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">Arc</span>::<span class="ident">new</span>(<span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="number">1</span>));
     <span class="kw">let</span> <span class="ident">c_lock</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">clone</span>();
 
-    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">read</span>().<span class="ident">await</span>;
+    <span class="kw">let</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">read</span>().<span class="kw">await</span>;
     <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">n</span>, <span class="number">1</span>);
 
-    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="ident">async</span> <span class="kw">move</span> {
+    <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
         <span class="comment">// While main has an active read lock, we acquire one too.</span>
-        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">c_lock</span>.<span class="ident">read</span>().<span class="ident">await</span>;
+        <span class="kw">let</span> <span class="ident">r</span> <span class="op">=</span> <span class="ident">c_lock</span>.<span class="ident">read</span>().<span class="kw">await</span>;
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="kw-2">*</span><span class="ident">r</span>, <span class="number">1</span>);
-    }).<span class="ident">await</span>.<span class="ident">expect</span>(<span class="string">&quot;The spawned task has paniced&quot;</span>);
+    }).<span class="kw">await</span>.<span class="ident">expect</span>(<span class="string">&quot;The spawned task has paniced&quot;</span>);
 
     <span class="comment">// Drop the guard after the spawned task finishes.</span>
     <span class="ident">drop</span>(<span class="ident">n</span>);
@@ -90,10 +90,10 @@ when dropped.</p>
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">RwLock</span>;
 
 <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">main</span>]</span>
-<span class="ident">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
+<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">main</span>() {
   <span class="kw">let</span> <span class="ident">lock</span> <span class="op">=</span> <span class="ident">RwLock</span>::<span class="ident">new</span>(<span class="number">1</span>);
 
-  <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="ident">await</span>;
+  <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">n</span> <span class="op">=</span> <span class="ident">lock</span>.<span class="ident">write</span>().<span class="kw">await</span>;
   <span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span> <span class="number">2</span>;
 }</pre></div>
 </div><h4 id="method.into_inner" class="method"><code>pub fn <a href="#method.into_inner" class="fnname">into_inner</a>(self) -&gt; T</code><a class="srclink" href="https://docs.rs/tokio/0.2.24/src/tokio/sync/rwlock.rs.html#516-521" title="goto source code">[src]</a></h4><div class="docblock"><p>Consumes the lock, returning the underlying data.</p>
