@@ -2005,7 +2005,7 @@ impl From<u64> for GuildContainer {
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.splash_hash
+        self.splash
             .as_ref()
             .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
     }
