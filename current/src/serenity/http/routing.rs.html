@@ -2558,13 +2558,13 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_command</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">command_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;applications/{}/commands/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">command_id</span>)
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/applications/{}/commands/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">command_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
     <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">application_commands</span>(<span class="ident">application_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;applications/{}/commands&quot;</span>), <span class="ident">application_id</span>)
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/applications/{}/commands&quot;</span>), <span class="ident">application_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -2574,7 +2574,7 @@
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
         <span class="ident">command_id</span>: <span class="ident">u64</span>
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;applications/{}/guilds/{}/commands/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>)
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands/{}&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>, <span class="ident">command_id</span>)
     }
 
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
@@ -2583,7 +2583,7 @@
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
         <span class="ident">guild_id</span>: <span class="ident">u64</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
-        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;applications/{}/guilds/{}/commands&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
+        <span class="macro">format</span><span class="macro">!</span>(<span class="macro">api</span><span class="macro">!</span>(<span class="string">&quot;/applications/{}/guilds/{}/commands&quot;</span>), <span class="ident">application_id</span>, <span class="ident">guild_id</span>)
     }
 }
 
