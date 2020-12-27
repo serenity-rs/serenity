@@ -1558,9 +1558,9 @@ impl Guild {
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon
+        self.splash
             .as_ref()
-            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
     }
 
     /// Starts an integration sync for the given integration Id.
@@ -2005,9 +2005,9 @@ impl From<u64> for GuildContainer {
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon
+        self.splash_hash
             .as_ref()
-            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
     }
 }
 
