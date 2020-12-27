@@ -484,7 +484,7 @@ impl GuildId {
 
     /// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// This is accomplished and equivalent to repeated calls to [`members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
     /// necessary.
     ///
@@ -813,7 +813,7 @@ impl<H: AsRef<Http>> MembersIter<H> {
 
     /// Streams over all the members in a guild.
     ///
-    /// This is accomplished and equivilent to repeated calls to [`members`].
+    /// This is accomplished and equivalent to repeated calls to [`members`].
     /// A buffer of at most 1,000 members is used to reduce the number of calls
     /// necessary.
     ///
