@@ -728,13 +728,13 @@ impl Route {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
     pub fn application_command(application_id: u64, command_id: u64) -> String {
-        format!(api!("applications/{}/commands/{}"), application_id, command_id)
+        format!(api!("/applications/{}/commands/{}"), application_id, command_id)
     }
 
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
     pub fn application_commands(application_id: u64) -> String {
-        format!(api!("applications/{}/commands"), application_id)
+        format!(api!("/applications/{}/commands"), application_id)
     }
 
     #[cfg(feature = "unstable_discord_api")]
@@ -744,7 +744,7 @@ impl Route {
         guild_id: u64,
         command_id: u64
     ) -> String {
-        format!(api!("applications/{}/guilds/{}/commands/{}"), application_id, guild_id, command_id)
+        format!(api!("/applications/{}/guilds/{}/commands/{}"), application_id, guild_id, command_id)
     }
 
     #[cfg(feature = "unstable_discord_api")]
@@ -753,7 +753,7 @@ impl Route {
         application_id: u64,
         guild_id: u64,
     ) -> String {
-        format!(api!("applications/{}/guilds/{}/commands"), application_id, guild_id)
+        format!(api!("/applications/{}/guilds/{}/commands"), application_id, guild_id)
     }
 }
 
