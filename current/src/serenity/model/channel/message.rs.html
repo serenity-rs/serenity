@@ -1078,8 +1078,6 @@
 <span id="1075">1075</span>
 <span id="1076">1076</span>
 <span id="1077">1077</span>
-<span id="1078">1078</span>
-<span id="1079">1079</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1806,9 +1804,7 @@
 
     <span class="doccomment">/// Tries to return author&#39;s nickname in the current channel&#39;s guild.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**:</span>
-    <span class="doccomment">/// If message was sent in a private channel, then the function will return</span>
-    <span class="doccomment">/// `None`.</span>
+    <span class="doccomment">/// Refer to [`User::nick_in()`] inside and `None` outside of a guild.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">author_nick</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">nick_in</span>(<span class="ident">cache_http</span>, <span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="kw">await</span>
