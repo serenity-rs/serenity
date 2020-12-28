@@ -26,6 +26,7 @@ Thanks to the following for their contributions:
 - [@Th3-M4jor]
 - [@ThatsNoMoon]
 - [@thebongy]
+- [@Wolvereness]
 
 ### Added
 
@@ -53,6 +54,7 @@ Thanks to the following for their contributions:
 
 ### Changed
 
+- [model] Point to `User::nick_in` in `Message::author_nick`'s documentation ([@Wolvereness]) [c:51dc943]
 - [model] Improve permission checking ([@ThatsNoMoon]) [c:dbb3669]
 - [model] Change signatures of `Emoji` methods to require `Cache` and `Http`. ([@Lakelezz]) [c:6aa2841]
 - [model] Check @ everyone and user permission overwrites for uncached users ([@ThatsNoMoon]) [c:12d1b22]
@@ -81,6 +83,7 @@ Thanks to the following for their contributions:
 
 ### Fixed
 
+- [model] Use guild splash hash for splash_url() instead of icon hash ([@drklee3]) [c:d3ab6a7]
 - [model/http] Handle 200 Response when modifying Members on API v8 ([@drklee3]) [c:8471f5b]
 - [framework] Check for discrepancies in prefixless groups ([@acdenisSK]) [c:692e984]
 - [framework] Check a sub-command's parent first. ([@Lakelezz]) [c:20043d4]
@@ -4133,6 +4136,7 @@ Initial commit.
 [@u5surf]: https://github.com/u5surf
 [@vityafx]: https://github.com/vityafx
 [@vivianhellyer]: https://github.com/vivianhellyer
+[@Wolvereness]: https://github.com/Wolvereness
 [@xentec]: https://github.com/xentec
 [@xacrimon]: https://github.com/xacrimon
 [@xSke]: https://github.com/xSke
@@ -4143,6 +4147,8 @@ Initial commit.
 
 <!-- COMMITS -->
 
+[c:51dc943]: https://github.com/serenity-rs/serenity/commit/51dc943b1fa343b9fd28d6c68de765774553a174
+[c:d3ab6a7]: https://github.com/serenity-rs/serenity/commit/d3ab6a7ffe9d72e08c262ed32788be4f7cddb5d0
 [c:649f8f2]: https://github.com/serenity-rs/serenity/commit/649f8f2f660efb6c60ee95d725ede0941ca1b6c2
 [c:aed3886]: https://github.com/serenity-rs/serenity/commit/aed388613c47d34a4299bd61ceee64b3042688a3
 [c:d4caf12]: https://github.com/serenity-rs/serenity/commit/d4caf12ba2c5f8a13b8ac1de2fc87aa0ca981a9d
