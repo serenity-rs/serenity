@@ -3932,6 +3932,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.0]: https://github.com/serenity-rs/serenity/compare/v0.9.3...v0.10.0
 [0.9.3]: https://github.com/serenity-rs/serenity/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/serenity-rs/serenity/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
