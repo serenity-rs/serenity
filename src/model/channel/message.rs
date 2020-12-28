@@ -723,9 +723,7 @@ impl Message {
 
     /// Tries to return author's nickname in the current channel's guild.
     ///
-    /// **Note**:
-    /// If message was sent in a private channel, then the function will return
-    /// `None`.
+    /// Refer to [`User::nick_in()`] inside and `None` outside of a guild.
     #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
         self.author.nick_in(cache_http, self.guild_id?).await
