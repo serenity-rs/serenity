@@ -213,7 +213,7 @@ pub struct InviteGuild {
     pub id: GuildId,
     pub icon: Option<String>,
     pub name: String,
-    pub splash_hash: Option<String>,
+    pub splash: Option<String>,
     pub text_channel_count: Option<u64>,
     pub voice_channel_count: Option<u64>,
 }
