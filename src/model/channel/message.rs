@@ -28,6 +28,7 @@ use std::{
 use crate::{
     constants,
     model::id::{
+        ApplicationId,
         MessageId,
         GuildId,
         ChannelId,
@@ -969,7 +970,7 @@ impl MessageActivityKind {
 #[non_exhaustive]
 pub struct MessageApplication {
     /// ID of the application.
-    pub id: u64,
+    pub id: ApplicationId,
     /// ID of the embed's image asset.
     pub cover_image: Option<String>,
     /// Application's description.
