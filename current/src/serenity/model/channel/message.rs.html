@@ -1078,6 +1078,7 @@
 <span id="1075">1075</span>
 <span id="1076">1076</span>
 <span id="1077">1077</span>
+<span id="1078">1078</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1109,6 +1110,7 @@
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants</span>,
     <span class="ident">model</span>::<span class="ident">id</span>::{
+        <span class="ident">ApplicationId</span>,
         <span class="ident">MessageId</span>,
         <span class="ident">GuildId</span>,
         <span class="ident">ChannelId</span>,
@@ -2050,7 +2052,7 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageApplication</span> {
     <span class="doccomment">/// ID of the application.</span>
-    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">u64</span>,
+    <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">ApplicationId</span>,
     <span class="doccomment">/// ID of the embed&#39;s image asset.</span>
     <span class="kw">pub</span> <span class="ident">cover_image</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="doccomment">/// Application&#39;s description.</span>
