@@ -1,0 +1,35 @@
+[package]
+authors = ["Alex M. M. <acdenissk69@gmail.com>"]
+description = "A Rust library for (de)serializing Discord Voice API gateway messages."
+documentation = "https://docs.rs/serenity"
+homepage = "https://github.com/serenity-rs/serenity"
+include = ["src/**/*.rs", "Cargo.toml"]
+keywords = ["discord", "api"]
+license = "ISC"
+name = "serenity-voice-model"
+readme = "README.md"
+repository = "https://github.com/serenity-rs/serenity.git"
+version = "0.10.0"
+edition = "2018"
+
+[dependencies]
+bitflags = "1"
+enum_primitive = "0.1"
+serde_repr = "0.1"
+
+[dependencies.serde]
+version = "1"
+features = ["derive"]
+
+[dependencies.serde_json]
+features = ["raw_value"]
+version = "1"
+
+[dev-dependencies]
+criterion = "0.3"
+serde_test = "1"
+
+[[bench]]
+name = "deserialisation"
+path = "benches/de.rs"
+harness = false

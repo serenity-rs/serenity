@@ -1,13 +1,12 @@
 use crate::model::prelude::*;
-use chrono::{DateTime, FixedOffset, Local, TimeZone};
+use chrono::{DateTime, Utc};
 use serde_json::Value;
 
 /// A builder for constructing a personal [`Message`] instance.
 /// This can be useful for emitting a manual [`dispatch`] to the framework,
 /// but you don't have a message in hand, or just have a fragment of its data.
 ///
-/// [`Message`]: ../model/channel/struct.Message.html
-/// [`dispatch`]: ../framework/trait.Framework.html#tymethod.dispatch
+/// [`dispatch`]: crate::framework::Framework::dispatch
 #[derive(Debug, Clone)]
 pub struct CustomMessage {
     msg: Message,
@@ -48,8 +47,6 @@ impl CustomMessage {
     /// Assign the dummy message its author.
     ///
     /// If not used, the default value is a dummy [`User`].
-    ///
-    /// [`User`]: ../model/user/struct.User.html
     #[inline]
     pub fn author(&mut self, user: User) -> &mut Self {
         self.msg.author = user;
@@ -81,7 +78,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is `None` (not all messages are edited).
     #[inline]
-    pub fn edited_timestamp(&mut self, timestamp: DateTime<FixedOffset>) -> &mut Self {
+    pub fn edited_timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
         self.msg.edited_timestamp = Some(timestamp);
 
         self
@@ -113,8 +110,6 @@ impl CustomMessage {
     /// Assign the dummy message its type.
     ///
     /// If not used, the default value is [`MessageType::Regular`].
-    ///
-    /// [`MessageType::Regular`]: ../model/channel/enum.MessageType.html#variant.Regular
     #[inline]
     pub fn kind(&mut self, kind: MessageType) -> &mut Self {
         self.msg.kind = kind;
@@ -126,7 +121,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is `None` (not all messages are sent in guilds).
     ///
-    /// [author]: #method.author
+    /// [author]: Self::author
     #[inline]
     pub fn member(&mut self, member: PartialMember) -> &mut Self {
         self.msg.member = Some(member);
@@ -197,7 +192,7 @@ impl CustomMessage {
     ///
     /// If not used, the default value is the current local time.
     #[inline]
-    pub fn timestamp(&mut self, timestamp: DateTime<FixedOffset>) -> &mut Self {
+    pub fn timestamp(&mut self, timestamp: DateTime<Utc>) -> &mut Self {
         self.msg.timestamp = timestamp;
 
         self
@@ -250,7 +245,6 @@ fn dummy_message() -> Message {
             bot: false,
             discriminator: 0x0000,
             name: String::new(),
-            _nonexhaustive: (),
         },
         channel_id: ChannelId::default(),
         content: String::new(),
@@ -261,22 +255,19 @@ fn dummy_message() -> Message {
         member: None,
         mention_everyone: false,
         mention_roles: Vec::new(),
-        mention_channels: None,
+        mention_channels: Vec::new(),
         mentions: Vec::new(),
         nonce: Value::Null,
         pinned: false,
         reactions: Vec::new(),
         tts: false,
         webhook_id: None,
-        timestamp: {
-            let now = Local::now();
-
-            FixedOffset::east(0).timestamp(now.timestamp(), 0)
-        },
+        timestamp: Utc::now(),
         activity: None,
         application: None,
         message_reference: None,
         flags: None,
-        _nonexhaustive: (),
+        stickers: Vec::new(),
+        referenced_message: None,
     }
 }

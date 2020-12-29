@@ -18,6 +18,7 @@ use crate::utils;
 ///
 /// [slack's attachments]: https://api.slack.com/docs/message-attachments
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct Embed {
     /// Information about the author of the embed.
     pub author: Option<EmbedAuthor>,
@@ -51,7 +52,7 @@ pub struct Embed {
     /// For example, if the embed [`kind`] is `"video"`, the provider might
     /// contain information about YouTube.
     ///
-    /// [`kind`]: #structfield.kind
+    /// [`kind`]: Self::kind
     pub provider: Option<EmbedProvider>,
     /// Thumbnail information of the embed.
     pub thumbnail: Option<EmbedThumbnail>,
@@ -65,10 +66,8 @@ pub struct Embed {
     ///
     /// This is present if the [`kind`] is `"video"`.
     ///
-    /// [`kind`]: #structfield.kind
+    /// [`kind`]: Self::kind
     pub video: Option<EmbedVideo>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -77,7 +76,7 @@ impl Embed {
     ///
     /// This should only be useful in conjunction with [`Webhook::execute`].
     ///
-    /// [`Webhook::execute`]: ../webhook/struct.Webhook.html
+    /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     ///
     /// # Examples
     ///
@@ -105,6 +104,7 @@ impl Embed {
 
 /// An author object in an embed.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedAuthor {
     /// The URL of the author icon.
     ///
@@ -116,12 +116,11 @@ pub struct EmbedAuthor {
     pub proxy_icon_url: Option<String>,
     /// The URL of the author.
     pub url: Option<String>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// A field object in an embed.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedField {
     /// Indicator of whether the field should display as inline.
     pub inline: bool,
@@ -133,8 +132,6 @@ pub struct EmbedField {
     ///
     /// The maxiumum length of this field is 1024 unicode codepoints.
     pub value: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 impl EmbedField {
@@ -143,8 +140,8 @@ impl EmbedField {
     /// **Note**: Refer to the [`name`] and [`value`] documentation for maximum
     /// lengths.
     ///
-    /// [`name`]: #structfield.name
-    /// [`value`]: #structfield.value
+    /// [`name`]: Self::name
+    /// [`value`]: Self::value
     pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
         where T: Into<String>, U: Into<String> {
         Self::_new(name.into(), value.into(), inline)
@@ -155,13 +152,13 @@ impl EmbedField {
             name,
             value,
             inline,
-            _nonexhaustive: (),
         }
     }
 }
 
 /// Footer information for an embed.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedFooter {
     /// The URL of the footer icon.
     ///
@@ -171,12 +168,11 @@ pub struct EmbedFooter {
     pub proxy_icon_url: Option<String>,
     /// The associated text with the footer.
     pub text: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// An image object in an embed.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedImage {
     /// The height of the image.
     pub height: u64,
@@ -188,23 +184,21 @@ pub struct EmbedImage {
     pub url: String,
     /// The width of the image.
     pub width: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// The provider of an embed.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedProvider {
     /// The name of the provider.
     pub name: String,
     /// The URL of the provider.
     pub url: Option<String>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// The dimensions and URL of an embed thumbnail.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedThumbnail {
     /// The height of the thumbnail in pixels.
     pub height: u64,
@@ -216,12 +210,11 @@ pub struct EmbedThumbnail {
     pub url: String,
     /// The width of the thumbnail in pixels.
     pub width: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// Video information for an embed.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct EmbedVideo {
     /// The height of the video in pixels.
     pub height: u64,
@@ -229,6 +222,4 @@ pub struct EmbedVideo {
     pub url: String,
     /// The width of the video in pixels.
     pub width: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }

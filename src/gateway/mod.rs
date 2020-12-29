@@ -38,12 +38,12 @@
 //! instance. This should be used when you, for example, want to split 10 shards
 //! across 3 instances.
 //!
-//! [`Client`]: ../client/struct.Client.html
-//! [`Client::start`]: ../client/struct.Client.html#method.start
-//! [`Client::start_autosharded`]: ../client/struct.Client.html#method.start_autosharded
-//! [`Client::start_shard`]: ../client/struct.Client.html#method.start_shard
-//! [`Client::start_shard_range`]: ../client/struct.Client.html#method.start_shard_range
-//! [`Client::start_shards`]: ../client/struct.Client.html#method.start_shards
+//! [`Client`]: crate::Client
+//! [`Client::start`]: crate::Client::start
+//! [`Client::start_autosharded`]: crate::Client::start_autosharded
+//! [`Client::start_shard`]: crate::Client::start_shard
+//! [`Client::start_shard_range`]: crate::Client::start_shard_range
+//! [`Client::start_shards`]: crate::Client::start_shards
 //! [docs]: https://discordapp.com/developers/docs/topics/gateway#sharding
 
 mod error;
@@ -62,60 +62,39 @@ use crate::model::{
 };
 use serde_json::Value;
 use std::fmt::{Display, Formatter, Result as FmtResult};
-use tungstenite::protocol::WebSocket;
-
-#[cfg(feature = "native_tls_backend")]
-use tungstenite::client::AutoStream;
 
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
-#[cfg(not(feature = "native_tls_backend"))]
-pub type WsClient = WebSocket<rustls::StreamOwned<rustls::ClientSession, std::net::TcpStream>>;
+use async_tungstenite::{WebSocketStream, tokio::ConnectStream};
 
-#[cfg(feature = "native_tls_backend")]
-pub type WsClient = WebSocket<AutoStream>;
+pub type WsStream = WebSocketStream<ConnectStream>;
 
 /// Indicates the current connection stage of a [`Shard`].
 ///
 /// This can be useful for knowing which shards are currently "down"/"up".
-///
-/// [`Shard`]: struct.Shard.html
 #[derive(Copy, Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum ConnectionStage {
     /// Indicator that the [`Shard`] is normally connected and is not in, e.g.,
     /// a resume phase.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Connected,
     /// Indicator that the [`Shard`] is connecting and is in, e.g., a resume
     /// phase.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Connecting,
     /// Indicator that the [`Shard`] is fully disconnected and is not in a
     /// reconnecting phase.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Disconnected,
     /// Indicator that the [`Shard`] is currently initiating a handshake.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Handshake,
     /// Indicator that the [`Shard`] has sent an IDENTIFY packet and is awaiting
     /// a READY packet.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Identifying,
     /// Indicator that the [`Shard`] has sent a RESUME packet and is awaiting a
     /// RESUMED packet.
-    ///
-    /// [`Shard`]: struct.Shard.html
     Resuming,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl ConnectionStage {
@@ -147,18 +126,12 @@ impl ConnectionStage {
     ///
     /// assert!(!ConnectionStage::Connected.is_connecting());
     /// ```
-    ///
-    /// [`ConnectionStage::Connecting`]: #variant.Connecting
-    /// [`ConnectionStage::Handshake`]: #variant.Handshake
-    /// [`ConnectionStage::Identifying`]: #variant.Identifying
-    /// [`ConnectionStage::Resuming`]: #variant.Resuming
     pub fn is_connecting(self) -> bool {
         use self::ConnectionStage::*;
 
         match self {
             Connecting | Handshake | Identifying | Resuming => true,
             Connected | Disconnected => false,
-            __Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -174,7 +147,6 @@ impl Display for ConnectionStage {
             Handshake => "handshaking",
             Identifying => "identifying",
             Resuming => "resuming",
-            __Nonexhaustive => unreachable!(),
         })
     }
 }
@@ -185,28 +157,25 @@ impl Display for ConnectionStage {
 /// the lower-level internals of the `client`, `gateway, and `voice` modules it
 /// may be necessary.
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum InterMessage {
     #[cfg(feature = "client")]
     Client(Box<ShardClientMessage>),
     Json(Value),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
+#[non_exhaustive]
 pub enum ShardAction {
     Heartbeat,
     Identify,
     Reconnect(ReconnectType),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// The type of reconnection that should be performed.
+#[non_exhaustive]
 pub enum ReconnectType {
     /// Indicator that a new connection should be made by sending an IDENTIFY.
     Reidentify,
     /// Indicator that a new connection should be made by sending a RESUME.
     Resume,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }

@@ -1,4 +1,4 @@
-//! The client gateway bridge is support essential for the [`client`][client] module.
+//! The client gateway bridge is support essential for the [`client`] module.
 //!
 //! This is made available for user use if one wishes to be lower-level or avoid
 //! the higher functionality of the [`Client`].
@@ -38,15 +38,9 @@
 //! For almost every - if not every - use case, you only need to _possibly_ be
 //! concerned about the [`ShardManager`] in this module.
 //!
-//! [client]: ../../index.html
-//! [`Client`]: ../../struct.Client.html
-//! [`Shard`]: ../../../gateway/struct.Shard.html
-//! [`ShardManager`]: struct.ShardManager.html
-//! [`ShardManager::restart`]: struct.ShardManager.html#method.restart
-//! [`ShardManager::shutdown`]: struct.ShardManager.html#method.shutdown
-//! [`ShardManagerMessage`]: enum.ShardManagerMessage.html
-//! [`ShardQueue`]: struct.ShardQueuer.html
-//! [`ShardRunner`]: struct.ShardRunner.html
+//! [`client`]: crate::client
+//! [`Client`]: crate::Client
+//! [`Shard`]: crate::gateway::Shard
 
 pub mod event;
 
@@ -56,13 +50,15 @@ mod shard_messenger;
 mod shard_queuer;
 mod shard_runner;
 mod shard_runner_message;
+mod intents;
 
 pub use self::shard_manager::{ShardManager, ShardManagerOptions};
-pub use self::shard_manager_monitor::ShardManagerMonitor;
+pub use self::shard_manager_monitor::{ShardManagerMonitor, ShardManagerError};
 pub use self::shard_messenger::ShardMessenger;
 pub use self::shard_queuer::ShardQueuer;
 pub use self::shard_runner::{ShardRunner, ShardRunnerOptions};
-pub use self::shard_runner_message::ShardRunnerMessage;
+pub use self::shard_runner_message::{ShardRunnerMessage, ChunkGuildFilter};
+pub use self::intents::GatewayIntents;
 
 use std::{
     fmt::{
@@ -70,37 +66,25 @@ use std::{
         Formatter,
         Result as FmtResult
     },
-    sync::mpsc::Sender,
     time::Duration as StdDuration
 };
-use crate::gateway::{ConnectionStage, InterMessage};
+use crate::gateway::ConnectionStage;
 
 /// A message either for a [`ShardManager`] or a [`ShardRunner`].
-///
-/// [`ShardManager`]: struct.ShardManager.html
-/// [`ShardRunner`]: struct.ShardRunner.html
 // Once we can use `Box` as part of a pattern, we will reconsider boxing.
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug)]
 pub enum ShardClientMessage {
     /// A message intended to be worked with by a [`ShardManager`].
-    ///
-    /// [`ShardManager`]: struct.ShardManager.html
     Manager(ShardManagerMessage),
     /// A message intended to be worked with by a [`ShardRunner`].
-    ///
-    /// [`ShardRunner`]: struct.ShardRunner.html
     Runner(ShardRunnerMessage),
 }
 
 /// A message for a [`ShardManager`] relating to an operation with a shard.
-///
-/// [`ShardManager`]: struct.ShardManager.html
 #[derive(Clone, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
 pub enum ShardManagerMessage {
     /// Indicator that a [`ShardManagerMonitor`] should restart a shard.
-    ///
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     Restart(ShardId),
     /// An update from a shard runner,
     ShardUpdate {
@@ -110,14 +94,9 @@ pub enum ShardManagerMessage {
     },
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown a shard
     /// without bringing it back up.
-    ///
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     Shutdown(ShardId, u16),
     /// Indicator that a [`ShardManagerMonitor`] should fully shutdown all shards
     /// and end its monitoring process for the [`ShardManager`].
-    ///
-    /// [`ShardManager`]: struct.ShardManager.html
-    /// [`ShardManagerMonitor`]: struct.ShardManagerMonitor.html
     ShutdownAll,
     /// Indicator that a [`ShardManager`] has initiated a shutdown, and for the
     /// component that receives this to also shutdown with no further action
@@ -125,17 +104,28 @@ pub enum ShardManagerMessage {
     ShutdownInitiated,
     /// Indicator that a [`ShardRunner`] has finished the shutdown of a shard, allowing it to
     /// move toward the next one.
+    ShutdownFinished(ShardId),
+    /// Indicator that a shard sent invalid authentication (a bad token) when identifying with the gateway.
+    /// Emitted when a shard receives an [`InvalidAuthentication`] Error
     ///
-    /// [`ShardRunner`]: struct.ShardRunner.html
-    ShutdownFinished(ShardId)
+    /// [`InvalidAuthentication`]: crate::gateway::GatewayError::InvalidAuthentication
+    ShardInvalidAuthentication,
+    /// Indicator that a shard provided undocumented gateway intents.
+    /// Emitted when a shard received an [`InvalidGatewayIntents`] error.
+    ///
+    /// [`InvalidGatewayIntents`]: crate::gateway::GatewayError::InvalidGatewayIntents
+    ShardInvalidGatewayIntents,
+    /// If a connection has been established but privileged gateway intents
+    /// were provided without enabling them prior.
+    /// Emitted when a shard received a [`DisallowedGatewayIntents`] error.
+    ///
+    /// [`DisallowedGatewayIntents`]: crate::gateway::GatewayError::DisallowedGatewayIntents
+    ShardDisallowedGatewayIntents,
 }
 
 /// A message to be sent to the [`ShardQueuer`].
 ///
 /// This should usually be wrapped in a [`ShardClientMessage`].
-///
-/// [`ShardClientMessage`]: enum.ShardClientMessage.html
-/// [`ShardQueuer`]: struct.ShardQueuer.html
 #[derive(Clone, Debug)]
 pub enum ShardQueuerMessage {
     /// Message to start a shard, where the 0-index element is the ID of the
@@ -143,6 +133,8 @@ pub enum ShardQueuerMessage {
     Start(ShardId, ShardId),
     /// Message to shutdown the shard queuer.
     Shutdown,
+    /// Message to dequeue/shutdown a shard.
+    ShutdownShard(ShardId, u16),
 }
 
 /// A light tuplestruct wrapper around a u64 to verify type correctness when
@@ -160,9 +152,6 @@ impl Display for ShardId {
 ///
 /// The [`ShardId`] is not included because, as it stands, you probably already
 /// know the Id if you obtained this.
-///
-/// [`ShardId`]: struct.ShardId.html
-/// [`ShardRunner`]: struct.ShardRunner.html
 #[derive(Debug)]
 pub struct ShardRunnerInfo {
     /// The latency between when a heartbeat was sent and when the
@@ -170,7 +159,13 @@ pub struct ShardRunnerInfo {
     pub latency: Option<StdDuration>,
     /// The channel used to communicate with the shard runner, telling it
     /// what to do with regards to its status.
-    pub runner_tx: Sender<InterMessage>,
+    pub runner_tx: ShardMessenger,
     /// The current connection stage of the shard.
     pub stage: ConnectionStage,
+}
+
+impl AsRef<ShardMessenger> for ShardRunnerInfo {
+    fn as_ref(&self) -> &ShardMessenger {
+        &self.runner_tx
+    }
 }

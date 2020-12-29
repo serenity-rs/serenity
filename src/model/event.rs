@@ -1,27 +1,27 @@
 //! All the events this library handles.
 
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 use serde::de::Error as DeError;
 use serde::ser::{
     Serialize,
     SerializeSeq,
     Serializer
 };
-use serde_json;
-use std::collections::HashMap;
-use super::utils::{deserialize_emojis, deserialize_u64};
+use std::{
+    collections::HashMap,
+    fmt
+};
+use super::utils::deserialize_emojis;
 use super::prelude::*;
-use crate::constants::{OpCode, VoiceOpCode};
+use crate::constants::OpCode;
 use crate::internal::prelude::*;
 
 #[cfg(feature = "cache")]
 use crate::cache::{Cache, CacheUpdate};
 #[cfg(feature = "cache")]
-use crate::internal::RwLockExt;
-#[cfg(feature = "cache")]
-use std::collections::hash_map::Entry;
-#[cfg(feature = "cache")]
 use std::mem;
+#[cfg(feature = "cache")]
+use async_trait::async_trait;
 
 /// Event data for the channel creation event.
 ///
@@ -29,24 +29,17 @@ use std::mem;
 ///
 /// - A [`Channel`] is created in a [`Guild`]
 /// - A [`PrivateChannel`] is created
-/// - The current user is added to a [`Group`]
-///
-/// [`Channel`]: ../channel/enum.Channel.html
-/// [`Group`]: ../channel/struct.Group.html
-/// [`Guild`]: ../guild/struct.Guild.html
-/// [`PrivateChannel`]: ../channel/struct.PrivateChannel.html
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct ChannelCreateEvent {
     /// The channel that was created.
     pub channel: Channel,
-    pub(crate) _nonexhaustive: (),
 }
 
 impl<'de> Deserialize<'de> for ChannelCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -59,114 +52,112 @@ impl Serialize for ChannelCreateEvent {
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for ChannelCreateEvent {
     type Output = Channel;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
         match self.channel {
-            Channel::Group(ref group) => {
-                let group = Arc::clone(group);
-
-                let channel_id = group.with_mut(|writer| {
-                    for (recipient_id, recipient) in &mut writer.recipients {
-                        cache.update_user_entry(&recipient.read());
-
-                        *recipient = Arc::clone(&cache.users[recipient_id]);
-                    }
-
-                    writer.channel_id
-                });
-
-                let ch = cache.groups.insert(channel_id, group);
-
-                ch.map(Channel::Group)
-            },
             Channel::Guild(ref channel) => {
-                let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
+                let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                cache.channels.insert(channel_id, Arc::clone(channel));
+                let old_channel = cache
+                    .guilds
+                    .write().await
+                    .get_mut(&guild_id)
+                    .and_then(|g| g.channels.insert(channel_id, channel.clone()))
+                    .map(Channel::Guild);
 
                 cache
-                    .guilds
-                    .get_mut(&guild_id)
-                    .and_then(|guild| {
-                        guild
-                            .with_mut(|guild| guild.channels.insert(channel_id, Arc::clone(channel)))
-                    })
-                    .map(Channel::Guild)
+                    .channels
+                    .write().await
+                    .insert(channel_id, channel.clone());
+
+                old_channel
             },
-            Channel::Private(ref channel) => {
-                if let Some(channel) = cache.private_channels.get(&channel.with(|c| c.id)) {
-                    return Some(Channel::Private(Arc::clone(&(*channel))));
+            Channel::Private(ref mut channel) => {
+                if let Some(channel) = cache.private_channels.read().await.get(&channel.id) {
+                    return Some(Channel::Private(channel.clone()));
                 }
 
-                let channel = Arc::clone(channel);
+                let id = {
+                    let user_id = {
+                            cache.update_user_entry(&channel.recipient).await;
 
-                let id = channel.with_mut(|writer| {
-                    let user_id = writer.recipient.with_mut(|user| {
-                        cache.update_user_entry(user);
+                            channel.recipient.id
+                    };
 
-                        user.id
-                    });
+                    if let Some(u) = cache.users.read().await.get(&user_id) {
+                        channel.recipient = u.clone();
+                    }
 
-                    writer.recipient = Arc::clone(&cache.users[&user_id]);
-                    writer.id
-                });
+                    channel.id
+                };
 
-                let ch = cache.private_channels.insert(id, Arc::clone(&channel));
-                ch.map(Channel::Private)
+                cache
+                    .private_channels
+                    .write()
+                    .await
+                    .insert(id, channel.clone())
+                    .map(Channel::Private)
             },
-            Channel::Category(ref category) => cache
-                .categories
-                .insert(category.read().id, Arc::clone(category))
-                .map(Channel::Category),
-            Channel::__Nonexhaustive => unreachable!(),
+            Channel::Category(ref category) => {
+                cache
+                    .categories
+                    .write()
+                    .await
+                    .insert(category.id, category.clone())
+                    .map(Channel::Category)
+            },
         }
     }
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct ChannelDeleteEvent {
     pub channel: Channel,
-    pub(crate) _nonexhaustive: (),
 }
 
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "cache", feature = "model"))]
+#[async_trait]
 impl CacheUpdate for ChannelDeleteEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
         match self.channel {
             Channel::Guild(ref channel) => {
-                let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
+                let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                cache.channels.remove(&channel_id);
+                cache
+                    .channels
+                    .write()
+                    .await
+                    .remove(&channel_id);
 
                 cache
                     .guilds
+                    .write()
+                    .await
                     .get_mut(&guild_id)
-                    .and_then(|guild| guild.with_mut(|g| g.channels.remove(&channel_id)));
+                    .map(|g| g.channels.remove(&channel_id));
             },
             Channel::Category(ref category) => {
-                let channel_id = category.with(|cat| cat.id);
+                let channel_id = category.id;
 
-                cache.categories.remove(&channel_id);
+                cache.categories.write().await.remove(&channel_id);
             },
             Channel::Private(ref channel) => {
                 let id = {
-                    channel.read().id
+                    channel.id
                 };
 
-                cache.private_channels.remove(&id);
+                cache.private_channels.write().await.remove(&id);
             },
-
-            // We ignore these because the delete event does not fire for these.
-            Channel::Group(_) |
-            Channel::__Nonexhaustive => unreachable!(),
         };
 
         // Remove the cached messages for the channel.
-        cache.messages.remove(&self.channel.id());
+        cache.messages.write().await.remove(&self.channel.id());
 
         None
     }
@@ -176,7 +167,6 @@ impl<'de> Deserialize<'de> for ChannelDeleteEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -189,151 +179,70 @@ impl Serialize for ChannelDeleteEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ChannelPinsUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
-    pub last_pin_timestamp: Option<DateTime<FixedOffset>>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+    pub last_pin_timestamp: Option<DateTime<Utc>>,
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for ChannelPinsUpdateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        if let Some(channel) = cache.channels.get(&self.channel_id) {
-            channel.with_mut(|c| {
-                c.last_pin_timestamp = self.last_pin_timestamp;
-            });
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        if let Some(channel) = cache.channels.write().await.get_mut(&self.channel_id) {
+            channel.last_pin_timestamp = self.last_pin_timestamp;
 
             return None;
         }
 
-        if let Some(channel) = cache.private_channels.get_mut(&self.channel_id) {
-            channel.with_mut(|c| {
-                c.last_pin_timestamp = self.last_pin_timestamp;
-            });
+        if let Some(channel) = cache.private_channels.write().await.get_mut(&self.channel_id) {
+            channel.last_pin_timestamp = self.last_pin_timestamp;
 
             return None;
         }
-
-        if let Some(group) = cache.groups.get_mut(&self.channel_id) {
-            group.with_mut(|c| {
-                c.last_pin_timestamp = self.last_pin_timestamp;
-            });
-
-            return None;
-        }
-
-        None
-    }
-}
-
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ChannelRecipientAddEvent {
-    pub channel_id: ChannelId,
-    pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[cfg(feature = "cache")]
-impl CacheUpdate for ChannelRecipientAddEvent {
-    type Output = ();
-
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.update_user_entry(&self.user);
-        let user = Arc::clone(&cache.users[&self.user.id]);
-
-        if let Some(group) = cache.groups.get_mut(&self.channel_id) {
-            group.write().recipients.insert(self.user.id, user);
-        }
-
-        None
-    }
-}
-
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct ChannelRecipientRemoveEvent {
-    pub channel_id: ChannelId,
-    pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[cfg(feature = "cache")]
-impl CacheUpdate for ChannelRecipientRemoveEvent {
-    type Output = ();
-
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.groups.get_mut(&self.channel_id).map(|group| {
-            group.with_mut(|g| g.recipients.remove(&self.user.id))
-        });
 
         None
     }
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct ChannelUpdateEvent {
     pub channel: Channel,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for ChannelUpdateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
         match self.channel {
-            Channel::Group(ref group) => {
-                let (ch_id, no_recipients) =
-                    group.with(|g| (g.channel_id, g.recipients.is_empty()));
-
-                match cache.groups.entry(ch_id) {
-                    Entry::Vacant(e) => {
-                        e.insert(Arc::clone(group));
-                    },
-                    Entry::Occupied(mut e) => {
-                        let mut dest = e.get_mut().write();
-
-                        if no_recipients {
-                            let recipients = mem::replace(&mut dest.recipients, HashMap::new());
-
-                            dest.clone_from(&group.read());
-
-                            dest.recipients = recipients;
-                        } else {
-                            dest.clone_from(&group.read());
-                        }
-                    },
-                }
-            },
             Channel::Guild(ref channel) => {
-                let (guild_id, channel_id) = channel.with(|channel| (channel.guild_id, channel.id));
+                let (guild_id, channel_id) = (channel.guild_id, channel.id);
 
-                cache.channels.insert(channel_id, Arc::clone(channel));
+                cache.channels.write().await.insert(channel_id, channel.clone());
 
-                if let Some(guild) = cache.guilds.get_mut(&guild_id) {
-                    guild
-                        .with_mut(|g| g.channels.insert(channel_id, Arc::clone(channel)));
-                }
+                cache
+                    .guilds
+                    .write()
+                    .await
+                    .get_mut(&guild_id)
+                    .map(|g| g.channels.insert(channel_id, channel.clone()));
             },
             Channel::Private(ref channel) => {
-                if let Some(private) = cache.private_channels.get_mut(&channel.read().id) {
-                    private.clone_from(channel);
+                if let Some(c) = cache.private_channels.write().await.get_mut(&channel.id) {
+                    c.clone_from(channel);
                 }
             },
             Channel::Category(ref category) => {
-                if let Some(c) = cache
-                    .categories
-                    .get_mut(&category.read().id)
-                    { c.clone_from(category) }
+                if let Some(c) = cache.categories.write().await.get_mut(&category.id) {
+                    c.clone_from(category);
+                }
             },
-            Channel::__Nonexhaustive => unreachable!(),
         }
 
         None
@@ -344,7 +253,6 @@ impl<'de> Deserialize<'de> for ChannelUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             channel: Channel::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -357,47 +265,47 @@ impl Serialize for ChannelUpdateEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildBanAddEvent {
     pub guild_id: GuildId,
     pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildBanRemoveEvent {
     pub guild_id: GuildId,
     pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct GuildCreateEvent {
     pub guild: Guild,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildCreateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.unavailable_guilds.remove(&self.guild.id);
-
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        cache.unavailable_guilds.write().await.remove(&self.guild.id);
         let mut guild = self.guild.clone();
 
         for (user_id, member) in &mut guild.members {
-            cache.update_user_entry(&member.user.read());
-            let user = Arc::clone(&cache.users[user_id]);
-
-            member.user = Arc::clone(&user);
+            cache.update_user_entry(&member.user).await;
+            if let Some(u) = cache.user(user_id).await {
+                member.user = u;
+            }
         }
 
-        cache.channels.extend(guild.channels.clone());
+        cache.channels.write().await.extend(guild.channels.clone().into_iter());
         cache
             .guilds
-            .insert(self.guild.id, Arc::new(RwLock::new(guild)));
+            .write()
+            .await
+            .insert(self.guild.id, guild);
 
         None
     }
@@ -407,7 +315,6 @@ impl<'de> Deserialize<'de> for GuildCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             guild: Guild::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -420,36 +327,38 @@ impl Serialize for GuildCreateEvent {
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct GuildDeleteEvent {
-    pub guild: PartialGuild,
-    pub(crate) _nonexhaustive: (),
+    pub guild: GuildUnavailable,
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildDeleteEvent {
-    type Output = Arc<RwLock<Guild>>;
+    type Output = Guild;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        // Remove channel entries for the guild if the guild is found.
-        cache.guilds.remove(&self.guild.id).map(|guild| {
-            for channel_id in guild.write().channels.keys() {
-                // Remove the channel from the cache.
-                cache.channels.remove(channel_id);
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        match cache.guilds.write().await.remove(&self.guild.id) {
+            Some(guild) => {
+                for channel_id in guild.channels.keys() {
+                    // Remove the channel from the cache.
+                    cache.channels.write().await.remove(channel_id);
 
-                // Remove the channel's cached messages.
-                cache.messages.remove(channel_id);
-            }
+                    // Remove the channel's cached messages.
+                    cache.messages.write().await.remove(channel_id);
+                }
 
-            guild
-        })
+                Some(guild)
+            },
+            None => None,
+        }
     }
 }
 
 impl<'de> Deserialize<'de> for GuildDeleteEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
-            guild: PartialGuild::deserialize(deserializer)?,
-            _nonexhaustive: (),
+            guild: GuildUnavailable::deserialize(deserializer)?,
         })
     }
 }
@@ -457,27 +366,25 @@ impl<'de> Deserialize<'de> for GuildDeleteEvent {
 impl Serialize for GuildDeleteEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
-        PartialGuild::serialize(&self.guild, serializer)
+        GuildUnavailable::serialize(&self.guild, serializer)
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildEmojisUpdateEvent {
     #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
     pub guild_id: GuildId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildEmojisUpdateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
-            guild.with_mut(|g| {
-                g.emojis.clone_from(&self.emojis)
-            });
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
+            guild.emojis.clone_from(&self.emojis);
         }
 
         None
@@ -485,35 +392,33 @@ impl CacheUpdate for GuildEmojisUpdateEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildIntegrationsUpdateEvent {
     pub guild_id: GuildId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct GuildMemberAddEvent {
     pub guild_id: GuildId,
     pub member: Member,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildMemberAddEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        let user_id = self.member.user.with(|u| u.id);
-        cache.update_user_entry(&self.member.user.read());
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        let user_id = self.member.user.id;
+        cache.update_user_entry(&self.member.user).await;
+        if let Some(u) = cache.user(user_id).await {
+            self.member.user = u;
+        }
 
-        // Always safe due to being inserted above.
-        self.member.user = Arc::clone(&cache.users[&user_id]);
-
-        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
-            guild.with_mut(|guild| {
-                guild.member_count += 1;
-                guild.members.insert(user_id, self.member.clone());
-            });
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
+            guild.member_count += 1;
+            guild.members.insert(user_id, self.member.clone());
         }
 
         None
@@ -533,7 +438,6 @@ impl<'de> Deserialize<'de> for GuildMemberAddEvent {
             guild_id,
             member: Member::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -554,47 +458,45 @@ impl Serialize for GuildMemberAddEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildMemberRemoveEvent {
     pub guild_id: GuildId,
     pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildMemberRemoveEvent {
     type Output = Member;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        cache.guilds.get_mut(&self.guild_id).and_then(|guild| {
-            guild.with_mut(|guild| {
-                guild.member_count -= 1;
-                guild.members.remove(&self.user.id)
-            })
-        })
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
+            guild.member_count -= 1;
+            return guild.members.remove(&self.user.id);
+        }
+
+        None
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct GuildMemberUpdateEvent {
     pub guild_id: GuildId,
     pub nick: Option<String>,
     pub roles: Vec<RoleId>,
     pub user: User,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildMemberUpdateEvent {
     type Output = Member;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        cache.update_user_entry(&self.user);
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        cache.update_user_entry(&self.user).await;
 
-        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
-            let mut guild = guild.write();
-
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
             let mut found = false;
 
             let item = if let Some(member) = guild.members.get_mut(&self.user.id) {
@@ -602,7 +504,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 
                 member.nick.clone_from(&self.nick);
                 member.roles.clone_from(&self.roles);
-                member.user.write().clone_from(&self.user);
+                member.user.clone_from(&self.user);
 
                 found = true;
 
@@ -621,8 +523,7 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                         mute: false,
                         nick: self.nick.clone(),
                         roles: self.roles.clone(),
-                        user: Arc::new(RwLock::new(self.user.clone())),
-                        _nonexhaustive: (),
+                        user: self.user.clone(),
                     },
                 );
             }
@@ -635,24 +536,27 @@ impl CacheUpdate for GuildMemberUpdateEvent {
 }
 
 #[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
 pub struct GuildMembersChunkEvent {
     pub guild_id: GuildId,
     pub members: HashMap<UserId, Member>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+    pub chunk_index: u32,
+    pub chunk_count: u32,
+    pub nonce: Option<String>,
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildMembersChunkEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
         for member in self.members.values() {
-            cache.update_user_entry(&member.user.read());
+            cache.update_user_entry(&member.user).await;
         }
 
-        if let Some(guild) = cache.guilds.get_mut(&self.guild_id) {
-            guild.with_mut(|g| g.members.extend(self.members.clone()))
+        if let Some(g) = cache.guilds.write().await.get_mut(&self.guild_id) {
+            g.members.extend(self.members.clone());
         }
 
         None
@@ -671,6 +575,16 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
         let mut members = map.remove("members")
             .ok_or_else(|| DeError::custom("missing member chunk members"))?;
 
+        let chunk_index = map.get("chunk_index")
+            .ok_or_else(|| DeError::custom("missing member chunk index"))
+            .and_then(u32::deserialize)
+            .map_err(DeError::custom)?;
+
+        let chunk_count = map.get("chunk_count")
+            .ok_or_else(|| DeError::custom("missing member chunk count"))
+            .and_then(u32::deserialize)
+            .map_err(DeError::custom)?;
+
         if let Some(members) = members.as_array_mut() {
             let num = Value::Number(Number::from(guild_id.0));
 
@@ -685,7 +599,7 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
             .map(|members| members
                 .into_iter()
                 .fold(HashMap::new(), |mut acc, member| {
-                    let id = member.user.read().id;
+                    let id = member.user.id;
 
                     acc.insert(id, member);
 
@@ -693,114 +607,200 @@ impl<'de> Deserialize<'de> for GuildMembersChunkEvent {
                 }))
             .map_err(DeError::custom)?;
 
+        let nonce = map.get("nonce")
+            .and_then(|nonce| nonce.as_str())
+            .map(|nonce| nonce.to_string());
+
         Ok(GuildMembersChunkEvent {
             guild_id,
             members,
-            _nonexhaustive: (),
+            chunk_index,
+            chunk_count,
+            nonce,
         })
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
 pub struct GuildRoleCreateEvent {
     pub guild_id: GuildId,
     pub role: Role,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildRoleCreateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.guilds.get_mut(&self.guild_id).map(|guild| {
-            guild
-                .write()
-                .roles
-                .insert(self.role.id, self.role.clone())
-        });
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        cache
+            .guilds
+            .write()
+            .await
+            .get_mut(&self.guild_id)
+            .map(|g| g.roles.insert(self.role.id, self.role.clone()));
 
         None
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct GuildRoleDeleteEvent {
-    pub guild_id: GuildId,
-    pub role_id: RoleId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
+impl<'de> Deserialize<'de> for GuildRoleCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
 
-#[cfg(feature = "cache")]
-impl CacheUpdate for GuildRoleDeleteEvent {
-    type Output = Role;
+        let guild_id = map.remove("guild_id")
+            .ok_or_else(|| DeError::custom("expected guild_id"))
+            .and_then(GuildId::deserialize)
+            .map_err(DeError::custom)?;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        cache
-            .guilds
-            .get_mut(&self.guild_id)
-            .and_then(|guild| guild.with_mut(|g| g.roles.remove(&self.role_id)))
-    }
-}
+        let id = *guild_id.as_u64();
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct GuildRoleUpdateEvent {
-    pub guild_id: GuildId,
-    pub role: Role,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
+        if let Some(value) = map.get_mut("role") {
+            if let Some(role) = value.as_object_mut() {
+                role.insert("guild_id".to_string(), Value::Number(Number::from(id)));
+            }
+        }
 
-#[cfg(feature = "cache")]
-impl CacheUpdate for GuildRoleUpdateEvent {
-    type Output = Role;
+        let role = map.remove("role")
+            .ok_or_else(|| DeError::custom("expected role"))
+            .and_then(Role::deserialize)
+            .map_err(DeError::custom)?;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        cache.guilds.get_mut(&self.guild_id).and_then(|guild| {
-            guild.with_mut(|g| {
-                g.roles
-                    .get_mut(&self.role.id)
-                    .map(|role| mem::replace(role, self.role.clone()))
-            })
+        Ok(Self {
+            guild_id,
+            role,
         })
     }
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct GuildUnavailableEvent {
-    #[serde(rename = "id")] pub guild_id: GuildId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+#[non_exhaustive]
+pub struct GuildRoleDeleteEvent {
+    pub guild_id: GuildId,
+    pub role_id: RoleId,
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for GuildRoleDeleteEvent {
+    type Output = Role;
+
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        cache
+            .guilds
+            .write()
+            .await
+            .get_mut(&self.guild_id)
+            .and_then(|g| g.roles.remove(&self.role_id))
+    }
+}
+
+#[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
+pub struct GuildRoleUpdateEvent {
+    pub guild_id: GuildId,
+    pub role: Role,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
+impl CacheUpdate for GuildRoleUpdateEvent {
+    type Output = Role;
+
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild_id) {
+
+            if let Some(role) = guild.roles.get_mut(&self.role.id) {
+                return Some(mem::replace(role, self.role.clone()));
+            }
+        }
+
+        None
+    }
+}
+
+impl<'de> Deserialize<'de> for GuildRoleUpdateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        let mut map = JsonMap::deserialize(deserializer)?;
+
+        let guild_id = map.remove("guild_id")
+            .ok_or_else(|| DeError::custom("expected guild_id"))
+            .and_then(GuildId::deserialize)
+            .map_err(DeError::custom)?;
+
+        let id = *guild_id.as_u64();
+
+        if let Some(value) = map.get_mut("role") {
+            if let Some(role) = value.as_object_mut() {
+                role.insert("guild_id".to_string(), Value::Number(Number::from(id)));
+            }
+        }
+
+        let role = map.remove("role")
+            .ok_or_else(|| DeError::custom("expected role"))
+            .and_then(Role::deserialize)
+            .map_err(DeError::custom)?;
+
+        Ok(Self {
+            guild_id,
+            role,
+        })
+    }
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct InviteCreateEvent {
+    pub channel_id: ChannelId,
+    pub code: String,
+    pub guild_id: Option<GuildId>,
+    pub inviter: Option<User>,
+    pub max_age: u64,
+    pub max_uses: u64,
+    pub temporary: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct InviteDeleteEvent {
+    pub channel_id: ChannelId,
+    pub guild_id: Option<GuildId>,
+    pub code: String,
+}
+
+#[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
+pub struct GuildUnavailableEvent {
+    #[serde(rename = "id")] pub guild_id: GuildId,
+}
+
+#[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildUnavailableEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.unavailable_guilds.insert(self.guild_id);
-        cache.guilds.remove(&self.guild_id);
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        cache.unavailable_guilds.write().await.insert(self.guild_id);
+        cache.guilds.write().await.remove(&self.guild_id);
 
         None
     }
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct GuildUpdateEvent {
     pub guild: PartialGuild,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for GuildUpdateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        if let Some(guild) = cache.guilds.get_mut(&self.guild.id) {
-            let mut guild = guild.write();
-
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        if let Some(guild) = cache.guilds.write().await.get_mut(&self.guild.id) {
             guild.afk_timeout = self.guild.afk_timeout;
             guild.afk_channel_id.clone_from(&self.guild.afk_channel_id);
             guild.icon.clone_from(&self.guild.icon);
@@ -819,7 +819,6 @@ impl<'de> Deserialize<'de> for GuildUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             guild: PartialGuild::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -832,33 +831,37 @@ impl Serialize for GuildUpdateEvent {
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct MessageCreateEvent {
     pub message: Message,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for MessageCreateEvent {
     /// The oldest message, if the channel's message cache was already full.
     type Output = Message;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        let max = cache.settings().max_messages;
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let max = cache.settings().await.max_messages;
 
         if max == 0 {
             return None;
         }
 
-        let messages = cache.messages
-            .entry(self.message.channel_id)
-            .or_insert_with(Default::default);
-        let queue = cache.message_queue
+
+        let mut messages_map = cache.messages.write().await;
+        let messages = messages_map.entry(self.message.channel_id).or_insert_with(Default::default);
+        let mut message_queues = cache.message_queue.write().await;
+
+        let queue = message_queues
             .entry(self.message.channel_id)
             .or_insert_with(Default::default);
 
         let mut removed_msg = None;
 
         if messages.len() == max {
+
             if let Some(id) = queue.pop_front() {
                 removed_msg = messages.remove(&id);
             }
@@ -875,7 +878,6 @@ impl<'de> Deserialize<'de> for MessageCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             message: Message::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -888,24 +890,23 @@ impl Serialize for MessageCreateEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageDeleteBulkEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub ids: Vec<MessageId>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageDeleteEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     #[serde(rename = "id")] pub message_id: MessageId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct MessageUpdateEvent {
     pub id: MessageId,
     pub guild_id: Option<GuildId>,
@@ -915,24 +916,23 @@ pub struct MessageUpdateEvent {
     pub nonce: Option<String>,
     pub tts: Option<bool>,
     pub pinned: Option<bool>,
-    pub timestamp: Option<DateTime<FixedOffset>>,
-    pub edited_timestamp: Option<DateTime<FixedOffset>>,
+    pub timestamp: Option<DateTime<Utc>>,
+    pub edited_timestamp: Option<DateTime<Utc>>,
     pub author: Option<User>,
     pub mention_everyone: Option<bool>,
     pub mentions: Option<Vec<User>>,
     pub mention_roles: Option<Vec<RoleId>>,
     pub attachments: Option<Vec<Attachment>>,
     pub embeds: Option<Vec<Value>>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for MessageUpdateEvent {
     type Output = Message;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        if let Some(messages) = cache.messages.get_mut(&self.channel_id) {
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        if let Some(messages) = cache.messages.write().await.get_mut(&self.channel_id) {
 
             if let Some(message) = messages.get_mut(&self.id) {
                 let item = message.clone();
@@ -974,30 +974,29 @@ impl CacheUpdate for MessageUpdateEvent {
 }
 
 #[derive(Clone, Debug, Serialize)]
+#[non_exhaustive]
 pub struct PresenceUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub presence: Presence,
-    pub roles: Option<Vec<RoleId>>,
-    #[serde(skip_serializing)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for PresenceUpdateEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
         let user_id = self.presence.user_id;
 
         if let Some(user) = self.presence.user.as_mut() {
-            cache.update_user_entry(&user.read());
-            *user = Arc::clone(&cache.users[&user_id]);
+            cache.update_user_entry(&user).await;
+            if let Some(u) = cache.user(user_id).await {
+                *user = u;
+            }
         }
 
         if let Some(guild_id) = self.guild_id {
-            if let Some(guild) = cache.guilds.get_mut(&guild_id) {
-                let mut guild = guild.write();
-
+            if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
                 // If the member went offline, remove them from the presence list.
                 if self.presence.status == OnlineStatus::Offline {
                     guild.presences.remove(&self.presence.user_id);
@@ -1008,30 +1007,28 @@ impl CacheUpdate for PresenceUpdateEvent {
                 }
 
                 // Create a partial member instance out of the presence update
-                // data. This includes everything but `deaf`, `mute`, and
-                // `joined_at`.
+                // data.
                 if !guild.members.contains_key(&self.presence.user_id) {
                     if let Some(user) = self.presence.user.as_ref() {
-                        let roles = self.roles.clone().unwrap_or_default();
-
                         guild.members.insert(self.presence.user_id, Member {
                             deaf: false,
                             guild_id,
                             joined_at: None,
                             mute: false,
-                            nick: self.presence.nick.clone(),
-                            user: Arc::clone(&user),
-                            roles,
-                            _nonexhaustive: (),
+                            nick: None,
+                            user: user.clone(),
+                            roles: vec![],
                         });
                     }
                 }
             }
         } else if self.presence.status == OnlineStatus::Offline {
-            cache.presences.remove(&self.presence.user_id);
+            cache.presences.write().await.remove(&self.presence.user_id);
         } else {
             cache
                 .presences
+                .write()
+                .await
                 .insert(self.presence.user_id, self.presence.clone());
         }
 
@@ -1048,35 +1045,29 @@ impl<'de> Deserialize<'de> for PresenceUpdateEvent {
                 .map_err(DeError::custom)?,
             None => None,
         };
-        let roles = match map.remove("roles") {
-            Some(v) => serde_json::from_value::<Option<Vec<RoleId>>>(v)
-                .map_err(DeError::custom)?,
-            None => None,
-        };
         let presence = Presence::deserialize(Value::Object(map))
             .map_err(DeError::custom)?;
 
         Ok(Self {
             guild_id,
             presence,
-            roles,
-            _nonexhaustive: (),
         })
     }
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct PresencesReplaceEvent {
     pub presences: Vec<Presence>,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for PresencesReplaceEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
-        cache.presences.extend({
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
+        cache.presences.write().await.extend({
             let mut p: HashMap<UserId, Presence> = HashMap::default();
 
             for presence in &self.presences {
@@ -1096,7 +1087,6 @@ impl<'de> Deserialize<'de> for PresencesReplaceEvent {
 
         Ok(Self {
             presences,
-            _nonexhaustive: (),
         })
     }
 }
@@ -1115,16 +1105,15 @@ impl Serialize for PresencesReplaceEvent {
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct ReactionAddEvent {
     pub reaction: Reaction,
-    pub(crate) _nonexhaustive: (),
 }
 
 impl<'de> Deserialize<'de> for ReactionAddEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             reaction: Reaction::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -1137,16 +1126,15 @@ impl Serialize for ReactionAddEvent {
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct ReactionRemoveEvent {
     pub reaction: Reaction,
-    pub(crate) _nonexhaustive: (),
 }
 
 impl<'de> Deserialize<'de> for ReactionRemoveEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             reaction: Reaction::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -1159,40 +1147,39 @@ impl Serialize for ReactionRemoveEvent {
 }
 
 #[derive(Clone, Copy, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ReactionRemoveAllEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub message_id: MessageId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 /// The "Ready" event, containing initial ready cache
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct ReadyEvent {
     pub ready: Ready,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for ReadyEvent {
     type Output = ();
 
-    fn update(&mut self, cache: &mut Cache) -> Option<()> {
+    async fn update(&mut self, cache: &Cache) -> Option<()> {
         let mut ready = self.ready.clone();
 
         for guild in ready.guilds {
             match guild {
                 GuildStatus::Offline(unavailable) => {
-                    cache.guilds.remove(&unavailable.id);
-                    cache.unavailable_guilds.insert(unavailable.id);
+                    cache.guilds.write().await.remove(&unavailable.id);
+                    cache.unavailable_guilds.write().await.insert(unavailable.id);
                 },
                 GuildStatus::OnlineGuild(guild) => {
-                    cache.unavailable_guilds.remove(&guild.id);
-                    cache.guilds.insert(guild.id, Arc::new(RwLock::new(guild)));
+                    cache.unavailable_guilds.write().await.remove(&guild.id);
+                    cache.guilds.write().await.insert(guild.id, guild);
                 },
                 GuildStatus::OnlinePartialGuild(_) => {},
-                GuildStatus::__Nonexhaustive => unreachable!(),
             }
         }
 
@@ -1201,15 +1188,18 @@ impl CacheUpdate for ReadyEvent {
 
         for (user_id, presence) in &mut ready.presences {
             if let Some(ref user) = presence.user {
-                cache.update_user_entry(&user.read());
+                cache.update_user_entry(user).await;
             }
 
-            presence.user = cache.users.get(user_id).cloned();
+            presence.user = match cache.user(user_id).await {
+                Some(user) => Some(user),
+                None => None,
+            };
         }
 
-        cache.presences.extend(ready.presences);
-        cache.shard_count = ready.shard.map_or(1, |s| s[1]);
-        cache.user = ready.user;
+        cache.presences.write().await.extend(ready.presences);
+        *cache.shard_count.write().await = ready.shard.map_or(1, |s| s[1]);
+        *cache.user.write().await = ready.user;
 
         None
     }
@@ -1219,7 +1209,6 @@ impl<'de> Deserialize<'de> for ReadyEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             ready: Ready::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -1232,42 +1221,41 @@ impl Serialize for ReadyEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ResumedEvent {
     #[serde(rename = "_trace")] pub trace: Vec<Option<String>>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct TypingStartEvent {
     pub guild_id: Option<GuildId>,
     pub channel_id: ChannelId,
     pub timestamp: u64,
     pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct UnknownEvent {
     pub kind: String,
     pub value: Value,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct UserUpdateEvent {
     pub current_user: CurrentUser,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for UserUpdateEvent {
     type Output = CurrentUser;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
-        Some(mem::replace(&mut cache.user, self.current_user.clone()))
+    async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
+        let mut user = cache.user.write().await;
+        Some(mem::replace(&mut user, self.current_user.clone()))
     }
 }
 
@@ -1275,7 +1263,6 @@ impl<'de> Deserialize<'de> for UserUpdateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
             current_user: CurrentUser::deserialize(deserializer)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -1287,31 +1274,45 @@ impl Serialize for UserUpdateEvent {
     }
 }
 
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct VoiceServerUpdateEvent {
     pub channel_id: Option<ChannelId>,
     pub endpoint: Option<String>,
     pub guild_id: Option<GuildId>,
     pub token: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+}
+
+impl fmt::Debug for VoiceServerUpdateEvent {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("VoiceServerUpdateEvent")
+            .field("channel_id", &self.channel_id)
+            .field("endpoint", &self.endpoint)
+            .field("guild_id", &self.guild_id)
+            .finish()
+    }
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub struct VoiceStateUpdateEvent {
     pub guild_id: Option<GuildId>,
     pub voice_state: VoiceState,
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "cache")]
+#[async_trait]
 impl CacheUpdate for VoiceStateUpdateEvent {
     type Output = VoiceState;
 
-    fn update(&mut self, cache: &mut Cache) -> Option<VoiceState> {
+    async fn update(&mut self, cache: &Cache) -> Option<VoiceState> {
         if let Some(guild_id) = self.guild_id {
-            if let Some(guild) = cache.guilds.get_mut(&guild_id) {
-                let mut guild = guild.write();
+
+            if let Some(guild) = cache.guilds.write().await.get_mut(&guild_id) {
+
+                if let Some(member) = &self.voice_state.member {
+                    guild.members.insert(member.user.id, member.clone());
+                }
 
                 if self.voice_state.channel_id.is_some() {
                     // Update or add to the voice state list
@@ -1320,7 +1321,9 @@ impl CacheUpdate for VoiceStateUpdateEvent {
                         .insert(self.voice_state.user_id, self.voice_state.clone())
                 } else {
                     // Remove the user from the voice state list
-                    guild.voice_states.remove(&self.voice_state.user_id)
+                    guild
+                        .voice_states
+                        .remove(&self.voice_state.user_id)
                 }
             } else {
                 None
@@ -1343,7 +1346,6 @@ impl<'de> Deserialize<'de> for VoiceStateUpdateEvent {
             guild_id,
             voice_state: VoiceState::deserialize(Value::Object(map))
                 .map_err(DeError::custom)?,
-            _nonexhaustive: (),
         })
     }
 }
@@ -1366,15 +1368,42 @@ impl Serialize for VoiceStateUpdateEvent {
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct WebhookUpdateEvent {
     pub channel_id: ChannelId,
     pub guild_id: GuildId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[derive(Clone, Debug)]
+#[non_exhaustive]
+pub struct InteractionCreateEvent {
+    pub interaction: Interaction,
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+impl<'de> Deserialize<'de> for InteractionCreateEvent {
+    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
+        Ok(Self {
+            interaction: Interaction::deserialize(deserializer)?,
+        })
+    }
+}
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+impl Serialize for InteractionCreateEvent {
+    fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
+        where S: Serializer {
+        Interaction::serialize(&self.interaction, serializer)
+    }
 }
 
 #[allow(clippy::large_enum_variant)]
 #[derive(Debug, Clone, Serialize)]
+#[non_exhaustive]
 #[serde(untagged)]
 pub enum GatewayEvent {
     Dispatch(u64, Event),
@@ -1384,8 +1413,6 @@ pub enum GatewayEvent {
     InvalidateSession(bool),
     Hello(u64),
     HeartbeatAck,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'de> Deserialize<'de> for GatewayEvent {
@@ -1408,7 +1435,7 @@ impl<'de> Deserialize<'de> for GatewayEvent {
                     .ok_or_else(|| DeError::custom("expected gateway event type"))
                     .and_then(EventType::deserialize)
                     .map_err(DeError::custom)?;
-                let payload = map.remove("d").ok_or_else(|| {
+                let payload = map.remove("d").ok_or({
                     Error::Decode("expected gateway event d", Value::Object(map))
                 }).map_err(DeError::custom)?;
 
@@ -1457,50 +1484,32 @@ impl<'de> Deserialize<'de> for GatewayEvent {
 /// Event received over a websocket connection
 #[allow(clippy::large_enum_variant)]
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 #[serde(untagged)]
 pub enum Event {
     /// A [`Channel`] was created.
     ///
     /// Fires the [`EventHandler::channel_create`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`EventHandler::channel_create`]: ../../client/trait.EventHandler.html#method.channel_create
+    /// [`EventHandler::channel_create`]: crate::client::EventHandler::channel_create
     ChannelCreate(ChannelCreateEvent),
     /// A [`Channel`] has been deleted.
     ///
     /// Fires the [`EventHandler::channel_delete`] event.
     ///
-    /// [`Channel`]: ../channel/enum.Channel.html
-    /// [`EventHandler::channel_delete`]: ../../client/trait.EventHandler.html#method.channel_delete
+    /// [`EventHandler::channel_delete`]: crate::client::EventHandler::channel_delete
     ChannelDelete(ChannelDeleteEvent),
     /// The pins for a [`Channel`] have been updated.
     ///
     /// Fires the [`EventHandler::channel_pins_update`] event.
     ///
-    /// [`Channel`]: ../enum.Channel.html
-    /// [`EventHandler::channel_pins_update`]:
-    /// ../../client/trait.EventHandler.html#method.channel_pins_update
+    /// [`EventHandler::channel_pins_update`]: crate::client::EventHandler::channel_pins_update
     ChannelPinsUpdate(ChannelPinsUpdateEvent),
-    /// A [`User`] has been added to a [`Group`].
-    ///
-    /// Fires the [`EventHandler::channel_recipient_addition`] event.
-    ///
-    /// [`EventHandler::channel_recipient_addition`]: ../../client/trait.EventHandler.html#method.channel_recipient_addition
-    /// [`User`]: ../struct.User.html
-    ChannelRecipientAdd(ChannelRecipientAddEvent),
-    /// A [`User`] has been removed from a [`Group`].
-    ///
-    /// Fires the [`EventHandler::channel_recipient_removal`] event.
-    ///
-    /// [`EventHandler::channel_recipient_removal`]: ../../client/trait.EventHandler.html#method.channel_recipient_removal
-    /// [`User`]: ../struct.User.html
-    ChannelRecipientRemove(ChannelRecipientRemoveEvent),
     /// A [`Channel`] has been updated.
     ///
     /// Fires the [`EventHandler::channel_update`] event.
     ///
-    /// [`EventHandler::channel_update`]: ../../client/trait.EventHandler.html#method.channel_update
-    /// [`User`]: ../struct.User.html
+    /// [`EventHandler::channel_update`]: crate::client::EventHandler::channel_update
     ChannelUpdate(ChannelUpdateEvent),
     GuildBanAdd(GuildBanAddEvent),
     GuildBanRemove(GuildBanRemoveEvent),
@@ -1519,6 +1528,18 @@ pub enum Event {
     /// When a guild is unavailable, such as due to a Discord server outage.
     GuildUnavailable(GuildUnavailableEvent),
     GuildUpdate(GuildUpdateEvent),
+    /// An [`Invite`] was created.
+    ///
+    /// Fires the [`EventHandler::invite_create`] event handler.
+    ///
+    /// [`EventHandler::invite_create`]: crate::client::EventHandler::invite_create
+    InviteCreate(InviteCreateEvent),
+    /// An [`Invite`] was deleted.
+    ///
+    /// Fires the [`EventHandler::invite_delete`] event handler.
+    ///
+    /// [`EventHandler::invite_delete`]: crate::client::EventHandler::invite_delete
+    InviteDelete(InviteDeleteEvent),
     MessageCreate(MessageCreateEvent),
     MessageDelete(MessageDeleteEvent),
     MessageDeleteBulk(MessageDeleteBulkEvent),
@@ -1532,22 +1553,19 @@ pub enum Event {
     ///
     /// Fires the [`EventHandler::reaction_add`] event handler.
     ///
-    /// [`EventHandler::reaction_add`]: ../../client/trait.EventHandler.html#method.reaction_add
+    /// [`EventHandler::reaction_add`]: crate::client::EventHandler::reaction_add
     ReactionAdd(ReactionAddEvent),
     /// A reaction was removed to a message.
     ///
     /// Fires the [`EventHandler::reaction_remove`] event handler.
     ///
-    /// [`EventHandler::reaction_remove`]:
-    /// ../../client/trait.EventHandler.html#method.reaction_remove
+    /// [`EventHandler::reaction_remove`]: crate::client::EventHandler::reaction_remove
     ReactionRemove(ReactionRemoveEvent),
     /// A request was issued to remove all [`Reaction`]s from a [`Message`].
     ///
     /// Fires the [`EventHandler::reaction_remove_all`] event handler.
     ///
-    /// [`Message`]: struct.Message.html
-    /// [`Reaction`]: struct.Reaction.html
-    /// [`EventHandler::reaction_remove_all`]: ../../client/trait.EventHandler.html#method.reaction_remove_all
+    /// [`EventHandler::reaction_remove_all`]: crate::client::EventHandler::reaction_remove_all
     ReactionRemoveAll(ReactionRemoveAllEvent),
     /// The first event in a connection, containing the initial ready cache.
     ///
@@ -1564,14 +1582,61 @@ pub enum Event {
     /// Voice server information is available
     VoiceServerUpdate(VoiceServerUpdateEvent),
     /// A webhook for a [channel][`GuildChannel`] was updated in a [`Guild`].
-    ///
-    /// [`Guild`]: struct.Guild.html
-    /// [`GuildChannel`]: struct.GuildChannel.html
     WebhookUpdate(WebhookUpdateEvent),
+    /// A user used a slash command.
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    InteractionCreate(InteractionCreateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
-    #[doc(hidden)]
-    __Nonexhaustive,
+}
+
+impl Event {
+    /// Return the type of this event.
+    pub fn event_type(&self) -> EventType {
+        match self {
+            Self::ChannelCreate(_) => EventType::ChannelCreate,
+            Self::ChannelDelete(_) => EventType::ChannelDelete,
+            Self::ChannelPinsUpdate(_) => EventType::ChannelPinsUpdate,
+            Self::ChannelUpdate(_) => EventType::ChannelUpdate,
+            Self::GuildBanAdd(_) => EventType::GuildBanAdd,
+            Self::GuildBanRemove(_) => EventType::GuildBanRemove,
+            Self::GuildCreate(_) => EventType::GuildCreate,
+            Self::GuildDelete(_) => EventType::GuildDelete,
+            Self::GuildEmojisUpdate(_) => EventType::GuildEmojisUpdate,
+            Self::GuildIntegrationsUpdate(_) => EventType::GuildIntegrationsUpdate,
+            Self::GuildMemberAdd(_) => EventType::GuildMemberAdd,
+            Self::GuildMemberRemove(_) => EventType::GuildMemberRemove,
+            Self::GuildMemberUpdate(_) => EventType::GuildMemberUpdate,
+            Self::GuildMembersChunk(_) => EventType::GuildMembersChunk,
+            Self::GuildRoleCreate(_) => EventType::GuildRoleCreate,
+            Self::GuildRoleDelete(_) => EventType::GuildRoleDelete,
+            Self::GuildRoleUpdate(_) => EventType::GuildRoleUpdate,
+            Self::GuildUnavailable(_) => EventType::GuildUnavailable,
+            Self::GuildUpdate(_) => EventType::GuildUpdate,
+            Self::InviteCreate(_) => EventType::InviteCreate,
+            Self::InviteDelete(_) => EventType::InviteDelete,
+            Self::MessageCreate(_) => EventType::MessageCreate,
+            Self::MessageDelete(_) => EventType::MessageDelete,
+            Self::MessageDeleteBulk(_) => EventType::MessageDeleteBulk,
+            Self::MessageUpdate(_) => EventType::MessageUpdate,
+            Self::PresenceUpdate(_) => EventType::PresenceUpdate,
+            Self::PresencesReplace(_) => EventType::PresencesReplace,
+            Self::ReactionAdd(_) => EventType::ReactionAdd,
+            Self::ReactionRemove(_) => EventType::ReactionRemove,
+            Self::ReactionRemoveAll(_) => EventType::ReactionRemoveAll,
+            Self::Ready(_) => EventType::Ready,
+            Self::Resumed(_) => EventType::Resumed,
+            Self::TypingStart(_) => EventType::TypingStart,
+            Self::UserUpdate(_) => EventType::UserUpdate,
+            Self::VoiceStateUpdate(_) => EventType::VoiceStateUpdate,
+            Self::VoiceServerUpdate(_) => EventType::VoiceServerUpdate,
+            Self::WebhookUpdate(_) => EventType::WebhookUpdate,
+            #[cfg(feature = "unstable_discord_api")]
+            Self::InteractionCreate(_) => EventType::InteractionCreate,
+            Self::Unknown(unknown) => EventType::Other(unknown.kind.clone()),
+        }
+    }
 }
 
 /// Deserializes a `serde_json::Value` into an `Event`.
@@ -1585,24 +1650,12 @@ pub enum Event {
 /// present and containing a value of `true`, will cause a
 /// [`GuildUnavailableEvent`] to be returned. Otherwise, all other event types
 /// correlate to the deserialization of their appropriate event.
-///
-/// [`EventType::ChannelCreate`]: enum.EventType.html#variant.ChannelCreate
-/// [`EventType::GuildCreate`]: enum.EventType.html#variant.GuildCreate
-/// [`EventType::GuildDelete`]: enum.EventType.html#variant.GuildDelete
-/// [`ChannelCreateEvent`]: struct.ChannelCreateEvent.html
-/// [`GuildUnavailableEvent`]: struct.GuildUnavailableEvent.html
 pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
     Ok(match kind {
         EventType::ChannelCreate => Event::ChannelCreate(serde_json::from_value(v)?),
         EventType::ChannelDelete => Event::ChannelDelete(serde_json::from_value(v)?),
         EventType::ChannelPinsUpdate => {
             Event::ChannelPinsUpdate(serde_json::from_value(v)?)
-        },
-        EventType::ChannelRecipientAdd => {
-            Event::ChannelRecipientAdd(serde_json::from_value(v)?)
-        },
-        EventType::ChannelRecipientRemove => {
-            Event::ChannelRecipientRemove(serde_json::from_value(v)?)
         },
         EventType::ChannelUpdate => Event::ChannelUpdate(serde_json::from_value(v)?),
         EventType::GuildBanAdd => Event::GuildBanAdd(serde_json::from_value(v)?),
@@ -1661,6 +1714,8 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
         EventType::GuildRoleUpdate => {
             Event::GuildRoleUpdate(serde_json::from_value(v)?)
         },
+        EventType::InviteCreate => Event::InviteCreate(serde_json::from_value(v)?),
+        EventType::InviteDelete => Event::InviteDelete(serde_json::from_value(v)?),
         EventType::GuildUpdate => Event::GuildUpdate(serde_json::from_value(v)?),
         EventType::MessageCreate => Event::MessageCreate(serde_json::from_value(v)?),
         EventType::MessageDelete => Event::MessageDelete(serde_json::from_value(v)?),
@@ -1692,12 +1747,12 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
             Event::VoiceStateUpdate(serde_json::from_value(v)?)
         },
         EventType::WebhookUpdate => Event::WebhookUpdate(serde_json::from_value(v)?),
+        #[cfg(feature = "unstable_discord_api")]
+        EventType::InteractionCreate => Event::InteractionCreate(serde_json::from_value(v)?),
         EventType::Other(kind) => Event::Unknown(UnknownEvent {
-            kind: kind.to_owned(),
+            kind,
             value: v,
-            _nonexhaustive: (),
         }),
-        EventType::__Nonexhaustive => unreachable!(),
     })
 }
 
@@ -1708,240 +1763,269 @@ pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
 /// A Deserialization implementation is provided for deserializing raw event
 /// dispatch type strings to this enum, e.g. deserializing `"CHANNEL_CREATE"` to
 /// [`EventType::ChannelCreate`].
-///
-/// [`EventType::ChannelCreate`]: enum.EventType.html#variant.ChannelCreate
 #[derive(Clone, Debug, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum EventType {
     /// Indicator that a channel create payload was received.
     ///
     /// This maps to [`ChannelCreateEvent`].
-    ///
-    /// [`ChannelCreateEvent`]: struct.ChannelCreateEvent.html
     ChannelCreate,
     /// Indicator that a channel delete payload was received.
     ///
     /// This maps to [`ChannelDeleteEvent`].
-    ///
-    /// [`ChannelDeleteEvent`]: struct.ChannelDeleteEvent.html
     ChannelDelete,
     /// Indicator that a channel pins update payload was received.
     ///
     /// This maps to [`ChannelPinsUpdateEvent`].
-    ///
-    /// [`ChannelPinsUpdateEvent`]: struct.ChannelPinsUpdateEvent.html
     ChannelPinsUpdate,
-    /// Indicator that a channel recipient addition payload was received.
-    ///
-    /// This maps to [`ChannelRecipientAddEvent`].
-    ///
-    /// [`ChannelRecipientAddEvent`]: struct.ChannelRecipientAddEvent.html
-    ChannelRecipientAdd,
-    /// Indicator that a channel recipient removal payload was received.
-    ///
-    /// This maps to [`ChannelRecipientRemoveEvent`].
-    ///
-    /// [`ChannelRecipientRemoveEvent`]: struct.ChannelRecipientRemoveEvent.html
-    ChannelRecipientRemove,
     /// Indicator that a channel update payload was received.
     ///
     /// This maps to [`ChannelUpdateEvent`].
-    ///
-    /// [`ChannelUpdateEvent`]: struct.ChannelUpdateEvent.html
     ChannelUpdate,
     /// Indicator that a guild ban addition payload was received.
     ///
     /// This maps to [`GuildBanAddEvent`].
-    ///
-    /// [`GuildBanAddEvent`]: struct.GuildBanAddEvent.html
     GuildBanAdd,
     /// Indicator that a guild ban removal payload was received.
     ///
     /// This maps to [`GuildBanRemoveEvent`].
-    ///
-    /// [`GuildBanRemoveEvent`]: struct.GuildBanRemoveEvent.html
     GuildBanRemove,
     /// Indicator that a guild create payload was received.
     ///
     /// This maps to [`GuildCreateEvent`].
-    ///
-    /// [`GuildCreateEvent`]: struct.GuildCreateEvent.html
     GuildCreate,
     /// Indicator that a guild delete payload was received.
     ///
     /// This maps to [`GuildDeleteEvent`].
-    ///
-    /// [`GuildDeleteEvent`]: struct.GuildDeleteEvent.html
     GuildDelete,
     /// Indicator that a guild emojis update payload was received.
     ///
     /// This maps to [`GuildEmojisUpdateEvent`].
-    ///
-    /// [`GuildEmojisUpdateEvent`]: struct.GuildEmojisUpdateEvent.html
     GuildEmojisUpdate,
     /// Indicator that a guild integrations update payload was received.
     ///
     /// This maps to [`GuildIntegrationsUpdateEvent`].
-    ///
-    /// [`GuildIntegrationsUpdateEvent`]: struct.GuildIntegrationsUpdateEvent.html
     GuildIntegrationsUpdate,
     /// Indicator that a guild member add payload was received.
     ///
     /// This maps to [`GuildMemberAddEvent`].
-    ///
-    /// [`GuildMemberAddEvent`]: struct.GuildMemberAddEvent.html
     GuildMemberAdd,
     /// Indicator that a guild member remove payload was received.
     ///
     /// This maps to [`GuildMemberRemoveEvent`].
-    ///
-    /// [`GuildMemberRemoveEvent`]: struct.GuildMemberRemoveEvent.html
     GuildMemberRemove,
     /// Indicator that a guild member update payload was received.
     ///
     /// This maps to [`GuildMemberUpdateEvent`].
-    ///
-    /// [`GuildMemberUpdateEvent`]: struct.GuildMemberUpdateEvent.html
     GuildMemberUpdate,
     /// Indicator that a guild members chunk payload was received.
     ///
     /// This maps to [`GuildMembersChunkEvent`].
-    ///
-    /// [`GuildMembersChunkEvent`]: struct.GuildMembersChunkEvent.html
     GuildMembersChunk,
     /// Indicator that a guild role create payload was received.
     ///
     /// This maps to [`GuildRoleCreateEvent`].
-    ///
-    /// [`GuildRoleCreateEvent`]: struct.GuildRoleCreateEvent.html
     GuildRoleCreate,
     /// Indicator that a guild role delete payload was received.
     ///
     /// This maps to [`GuildRoleDeleteEvent`].
-    ///
-    /// [`GuildRoleDeleteEvent`]: struct.GuildRoleDeleteEvent.html
     GuildRoleDelete,
     /// Indicator that a guild role update payload was received.
     ///
     /// This maps to [`GuildRoleUpdateEvent`].
-    ///
-    /// [`GuildRoleUpdateEvent`]: struct.GuildRoleUpdateEvent.html
     GuildRoleUpdate,
     /// Indicator that a guild unavailable payload was received.
     ///
     /// This maps to [`GuildUnavailableEvent`].
-    ///
-    /// [`GuildUnavailableEvent`]: struct.GuildUnavailableEvent.html
     GuildUnavailable,
     /// Indicator that a guild update payload was received.
     ///
     /// This maps to [`GuildUpdateEvent`].
-    ///
-    /// [`GuildUpdateEvent`]: struct.GuildUpdateEvent.html
     GuildUpdate,
+    /// Indicator that an invite was created.
+    ///
+    /// This maps to [`InviteCreateEvent`].
+    InviteCreate,
+    /// Indicator that an invite was deleted.
+    ///
+    /// This maps to [`InviteDeleteEvent`].
+    InviteDelete,
     /// Indicator that a message create payload was received.
     ///
     /// This maps to [`MessageCreateEvent`].
-    ///
-    /// [`MessageCreateEvent`]: struct.MessageCreateEvent.html
     MessageCreate,
     /// Indicator that a message delete payload was received.
     ///
     /// This maps to [`MessageDeleteEvent`].
-    ///
-    /// [`MessageDeleteEvent`]: struct.MessageDeleteEvent.html
     MessageDelete,
     /// Indicator that a message delete bulk payload was received.
     ///
     /// This maps to [`MessageDeleteBulkEvent`].
-    ///
-    /// [`MessageDeleteBulkEvent`]: struct.MessageDeleteBulkEvent.html
     MessageDeleteBulk,
     /// Indicator that a message update payload was received.
     ///
     /// This maps to [`MessageUpdateEvent`].
-    ///
-    /// [`MessageUpdateEvent`]: struct.MessageUpdateEvent.html
     MessageUpdate,
     /// Indicator that a presence update payload was received.
     ///
     /// This maps to [`PresenceUpdateEvent`].
-    ///
-    /// [`PresenceUpdateEvent`]: struct.PresenceUpdateEvent.html
     PresenceUpdate,
     /// Indicator that a presences replace payload was received.
     ///
     /// This maps to [`PresencesReplaceEvent`].
-    ///
-    /// [`PresencesReplaceEvent`]: struct.PresencesReplaceEvent.html
     PresencesReplace,
     /// Indicator that a reaction add payload was received.
     ///
     /// This maps to [`ReactionAddEvent`].
-    ///
-    /// [`ReactionAddEvent`]: struct.ReactionAddEvent.html
     ReactionAdd,
     /// Indicator that a reaction remove payload was received.
     ///
     /// This maps to [`ReactionRemoveEvent`].
-    ///
-    /// [`ReactionRemoveEvent`]: struct.ResumedEvent.html
     ReactionRemove,
     /// Indicator that a reaction remove all payload was received.
     ///
     /// This maps to [`ReactionRemoveAllEvent`].
-    ///
-    /// [`ReactionRemoveAllEvent`]: struct.ReactionRemoveAllEvent.html
     ReactionRemoveAll,
     /// Indicator that a ready payload was received.
     ///
     /// This maps to [`ReadyEvent`].
-    ///
-    /// [`ReadyEvent`]: struct.ReadyEvent.html
     Ready,
     /// Indicator that a resumed payload was received.
     ///
     /// This maps to [`ResumedEvent`].
-    ///
-    /// [`ResumedEvent`]: struct.ResumedEvent.html
     Resumed,
     /// Indicator that a typing start payload was received.
     ///
     /// This maps to [`TypingStartEvent`].
-    ///
-    /// [`TypingStartEvent`]: struct.TypingStartEvent.html
     TypingStart,
     /// Indicator that a user update payload was received.
     ///
     /// This maps to [`UserUpdateEvent`].
-    ///
-    /// [`UserUpdateEvent`]: struct.UserUpdateEvent.html
     UserUpdate,
     /// Indicator that a voice state payload was received.
     ///
     /// This maps to [`VoiceStateUpdateEvent`].
-    ///
-    /// [`VoiceStateUpdateEvent`]: struct.VoiceStateUpdateEvent.html
     VoiceStateUpdate,
     /// Indicator that a voice server update payload was received.
     ///
     /// This maps to [`VoiceServerUpdateEvent`].
-    ///
-    /// [`VoiceServerUpdateEvent`]: struct.VoiceServerUpdateEvent.html
     VoiceServerUpdate,
     /// Indicator that a webhook update payload was received.
     ///
     /// This maps to [`WebhookUpdateEvent`].
-    ///
-    /// [`WebhookUpdateEvent`]: struct.WebhookUpdateEvent.html
     WebhookUpdate,
+    /// Indicator that a slash command was received.
+    ///
+    /// This maps to [`InteractionCreateEvent`].
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    InteractionCreate,
     /// An unknown event was received over the gateway.
     ///
     /// This should be logged so that support for it can be added in the
     /// library.
     Other(String),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
+
+impl From<&Event> for EventType {
+    fn from(event: &Event) -> EventType {
+        event.event_type()
+    }
+}
+
+impl EventType {
+    const CHANNEL_CREATE: &'static str = "CHANNEL_CREATE";
+    const CHANNEL_DELETE: &'static str = "CHANNEL_DELETE";
+    const CHANNEL_PINS_UPDATE: &'static str = "CHANNEL_PINS_UPDATE";
+    const CHANNEL_UPDATE: &'static str = "CHANNEL_UPDATE";
+    const GUILD_BAN_ADD: &'static str = "GUILD_BAN_ADD";
+    const GUILD_BAN_REMOVE: &'static str = "GUILD_BAN_REMOVE";
+    const GUILD_CREATE: &'static str = "GUILD_CREATE";
+    const GUILD_DELETE: &'static str = "GUILD_DELETE";
+    const GUILD_EMOJIS_UPDATE: &'static str = "GUILD_EMOJIS_UPDATE";
+    const GUILD_INTEGRATIONS_UPDATE: &'static str = "GUILD_INTEGRATIONS_UPDATE";
+    const GUILD_MEMBER_ADD: &'static str = "GUILD_MEMBER_ADD";
+    const GUILD_MEMBER_REMOVE: &'static str = "GUILD_MEMBER_REMOVE";
+    const GUILD_MEMBER_UPDATE: &'static str = "GUILD_MEMBER_UPDATE";
+    const GUILD_MEMBERS_CHUNK: &'static str = "GUILD_MEMBERS_CHUNK";
+    const GUILD_ROLE_CREATE: &'static str = "GUILD_ROLE_CREATE";
+    const GUILD_ROLE_DELETE: &'static str = "GUILD_ROLE_DELETE";
+    const GUILD_ROLE_UPDATE: &'static str = "GUILD_ROLE_UPDATE";
+    const INVITE_CREATE: &'static str = "INVITE_CREATE";
+    const INVITE_DELETE: &'static str = "INVITE_DELETE";
+    const GUILD_UPDATE: &'static str = "GUILD_UPDATE";
+    const MESSAGE_CREATE: &'static str = "MESSAGE_CREATE";
+    const MESSAGE_DELETE: &'static str = "MESSAGE_DELETE";
+    const MESSAGE_DELETE_BULK: &'static str = "MESSAGE_DELETE_BULK";
+    const MESSAGE_REACTION_ADD: &'static str = "MESSAGE_REACTION_ADD";
+    const MESSAGE_REACTION_REMOVE: &'static str = "MESSAGE_REACTION_REMOVE";
+    const MESSAGE_REACTION_REMOVE_ALL: &'static str = "MESSAGE_REACTION_REMOVE_ALL";
+    const MESSAGE_UPDATE: &'static str = "MESSAGE_UPDATE";
+    const PRESENCE_UPDATE: &'static str = "PRESENCE_UPDATE";
+    const PRESENCES_REPLACE: &'static str = "PRESENCES_REPLACE";
+    const READY: &'static str = "READY";
+    const RESUMED: &'static str = "RESUMED";
+    const TYPING_START: &'static str = "TYPING_START";
+    const USER_UPDATE: &'static str = "USER_UPDATE";
+    const VOICE_SERVER_UPDATE: &'static str = "VOICE_SERVER_UPDATE";
+    const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
+    const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
+
+    /// Return the event name of this event. Some events are synthetic, and we lack
+    /// the information to recover the original event name for these events, in which
+    /// case this method returns `None`.
+    pub fn name(&self) -> Option<&str> {
+        match self {
+            Self::ChannelCreate => Some(Self::CHANNEL_CREATE),
+            Self::ChannelDelete => Some(Self::CHANNEL_DELETE),
+            Self::ChannelPinsUpdate => Some(Self::CHANNEL_PINS_UPDATE),
+            Self::ChannelUpdate => Some(Self::CHANNEL_UPDATE),
+            Self::GuildBanAdd => Some(Self::GUILD_BAN_ADD),
+            Self::GuildBanRemove => Some(Self::GUILD_BAN_REMOVE),
+            Self::GuildCreate => Some(Self::GUILD_CREATE),
+            Self::GuildDelete => Some(Self::GUILD_DELETE),
+            Self::GuildEmojisUpdate => Some(Self::GUILD_EMOJIS_UPDATE),
+            Self::GuildIntegrationsUpdate => Some(Self::GUILD_INTEGRATIONS_UPDATE),
+            Self::GuildMemberAdd => Some(Self::GUILD_MEMBER_ADD),
+            Self::GuildMemberRemove => Some(Self::GUILD_MEMBER_REMOVE),
+            Self::GuildMemberUpdate => Some(Self::GUILD_MEMBER_UPDATE),
+            Self::GuildMembersChunk => Some(Self::GUILD_MEMBERS_CHUNK),
+            Self::GuildRoleCreate => Some(Self::GUILD_ROLE_CREATE),
+            Self::GuildRoleDelete => Some(Self::GUILD_ROLE_DELETE),
+            Self::GuildRoleUpdate => Some(Self::GUILD_ROLE_UPDATE),
+            Self::InviteCreate => Some(Self::INVITE_CREATE),
+            Self::InviteDelete => Some(Self::INVITE_DELETE),
+            Self::GuildUpdate => Some(Self::GUILD_UPDATE),
+            Self::MessageCreate => Some(Self::MESSAGE_CREATE),
+            Self::MessageDelete => Some(Self::MESSAGE_DELETE),
+            Self::MessageDeleteBulk => Some(Self::MESSAGE_DELETE_BULK),
+            Self::ReactionAdd => Some(Self::MESSAGE_REACTION_ADD),
+            Self::ReactionRemove => Some(Self::MESSAGE_REACTION_REMOVE),
+            Self::ReactionRemoveAll => Some(Self::MESSAGE_REACTION_REMOVE_ALL),
+            Self::MessageUpdate => Some(Self::MESSAGE_UPDATE),
+            Self::PresenceUpdate => Some(Self::PRESENCE_UPDATE),
+            Self::PresencesReplace => Some(Self::PRESENCES_REPLACE),
+            Self::Ready => Some(Self::READY),
+            Self::Resumed => Some(Self::RESUMED),
+            Self::TypingStart => Some(Self::TYPING_START),
+            Self::UserUpdate => Some(Self::USER_UPDATE),
+            Self::VoiceServerUpdate => Some(Self::VOICE_SERVER_UPDATE),
+            Self::VoiceStateUpdate => Some(Self::VOICE_STATE_UPDATE),
+            Self::WebhookUpdate => Some(Self::WEBHOOKS_UPDATE),
+            #[cfg(feature = "unstable_discord_api")]
+            Self::InteractionCreate => Some(Self::INTERACTION_CREATE),
+            // GuildUnavailable is a synthetic event type, corresponding to either
+            // `GUILD_CREATE` or `GUILD_DELETE`, but we don't have enough information
+            // to recover the name here, so we return `None` instead.
+            Self::GuildUnavailable => None,
+            Self::Other(other) => Some(&other),
+        }
+    }
+}
+
 
 impl<'de> Deserialize<'de> for EventType {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
@@ -1958,223 +2042,49 @@ impl<'de> Deserialize<'de> for EventType {
             fn visit_str<E>(self, v: &str) -> StdResult<Self::Value, E>
                 where E: DeError {
                 Ok(match v {
-                    "CHANNEL_CREATE" => EventType::ChannelCreate,
-                    "CHANNEL_DELETE" => EventType::ChannelDelete,
-                    "CHANNEL_PINS_UPDATE" => EventType::ChannelPinsUpdate,
-                    "CHANNEL_RECIPIENT_ADD" => EventType::ChannelRecipientAdd,
-                    "CHANNEL_RECIPIENT_REMOVE" => EventType::ChannelRecipientRemove,
-                    "CHANNEL_UPDATE" => EventType::ChannelUpdate,
-                    "GUILD_BAN_ADD" => EventType::GuildBanAdd,
-                    "GUILD_BAN_REMOVE" => EventType::GuildBanRemove,
-                    "GUILD_CREATE" => EventType::GuildCreate,
-                    "GUILD_DELETE" => EventType::GuildDelete,
-                    "GUILD_EMOJIS_UPDATE" => EventType::GuildEmojisUpdate,
-                    "GUILD_INTEGRATIONS_UPDATE" => EventType::GuildIntegrationsUpdate,
-                    "GUILD_MEMBER_ADD" => EventType::GuildMemberAdd,
-                    "GUILD_MEMBER_REMOVE" => EventType::GuildMemberRemove,
-                    "GUILD_MEMBER_UPDATE" => EventType::GuildMemberUpdate,
-                    "GUILD_MEMBERS_CHUNK" => EventType::GuildMembersChunk,
-                    "GUILD_ROLE_CREATE" => EventType::GuildRoleCreate,
-                    "GUILD_ROLE_DELETE" => EventType::GuildRoleDelete,
-                    "GUILD_ROLE_UPDATE" => EventType::GuildRoleUpdate,
-                    "GUILD_UPDATE" => EventType::GuildUpdate,
-                    "MESSAGE_CREATE" => EventType::MessageCreate,
-                    "MESSAGE_DELETE" => EventType::MessageDelete,
-                    "MESSAGE_DELETE_BULK" => EventType::MessageDeleteBulk,
-                    "MESSAGE_REACTION_ADD" => EventType::ReactionAdd,
-                    "MESSAGE_REACTION_REMOVE" => EventType::ReactionRemove,
-                    "MESSAGE_REACTION_REMOVE_ALL" => EventType::ReactionRemoveAll,
-                    "MESSAGE_UPDATE" => EventType::MessageUpdate,
-                    "PRESENCE_UPDATE" => EventType::PresenceUpdate,
-                    "PRESENCES_REPLACE" => EventType::PresencesReplace,
-                    "READY" => EventType::Ready,
-                    "RESUMED" => EventType::Resumed,
-                    "TYPING_START" => EventType::TypingStart,
-                    "USER_UPDATE" => EventType::UserUpdate,
-                    "VOICE_SERVER_UPDATE" => EventType::VoiceServerUpdate,
-                    "VOICE_STATE_UPDATE" => EventType::VoiceStateUpdate,
-                    "WEBHOOKS_UPDATE" => EventType::WebhookUpdate,
+                    EventType::CHANNEL_CREATE => EventType::ChannelCreate,
+                    EventType::CHANNEL_DELETE => EventType::ChannelDelete,
+                    EventType::CHANNEL_PINS_UPDATE => EventType::ChannelPinsUpdate,
+                    EventType::CHANNEL_UPDATE => EventType::ChannelUpdate,
+                    EventType::GUILD_BAN_ADD => EventType::GuildBanAdd,
+                    EventType::GUILD_BAN_REMOVE => EventType::GuildBanRemove,
+                    EventType::GUILD_CREATE => EventType::GuildCreate,
+                    EventType::GUILD_DELETE => EventType::GuildDelete,
+                    EventType::GUILD_EMOJIS_UPDATE => EventType::GuildEmojisUpdate,
+                    EventType::GUILD_INTEGRATIONS_UPDATE => EventType::GuildIntegrationsUpdate,
+                    EventType::GUILD_MEMBER_ADD => EventType::GuildMemberAdd,
+                    EventType::GUILD_MEMBER_REMOVE => EventType::GuildMemberRemove,
+                    EventType::GUILD_MEMBER_UPDATE => EventType::GuildMemberUpdate,
+                    EventType::GUILD_MEMBERS_CHUNK => EventType::GuildMembersChunk,
+                    EventType::GUILD_ROLE_CREATE => EventType::GuildRoleCreate,
+                    EventType::GUILD_ROLE_DELETE => EventType::GuildRoleDelete,
+                    EventType::GUILD_ROLE_UPDATE => EventType::GuildRoleUpdate,
+                    EventType::INVITE_CREATE => EventType::InviteCreate,
+                    EventType::INVITE_DELETE => EventType::InviteDelete,
+                    EventType::GUILD_UPDATE => EventType::GuildUpdate,
+                    EventType::MESSAGE_CREATE => EventType::MessageCreate,
+                    EventType::MESSAGE_DELETE => EventType::MessageDelete,
+                    EventType::MESSAGE_DELETE_BULK => EventType::MessageDeleteBulk,
+                    EventType::MESSAGE_REACTION_ADD => EventType::ReactionAdd,
+                    EventType::MESSAGE_REACTION_REMOVE => EventType::ReactionRemove,
+                    EventType::MESSAGE_REACTION_REMOVE_ALL => EventType::ReactionRemoveAll,
+                    EventType::MESSAGE_UPDATE => EventType::MessageUpdate,
+                    EventType::PRESENCE_UPDATE => EventType::PresenceUpdate,
+                    EventType::PRESENCES_REPLACE => EventType::PresencesReplace,
+                    EventType::READY => EventType::Ready,
+                    EventType::RESUMED => EventType::Resumed,
+                    EventType::TYPING_START => EventType::TypingStart,
+                    EventType::USER_UPDATE => EventType::UserUpdate,
+                    EventType::VOICE_SERVER_UPDATE => EventType::VoiceServerUpdate,
+                    EventType::VOICE_STATE_UPDATE => EventType::VoiceStateUpdate,
+                    EventType::WEBHOOKS_UPDATE => EventType::WebhookUpdate,
+                    #[cfg(feature = "unstable_discord_api")]
+                    EventType::INTERACTION_CREATE => EventType::InteractionCreate,
                     other => EventType::Other(other.to_owned()),
                 })
             }
         }
 
         deserializer.deserialize_str(EventTypeVisitor)
-    }
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceHeartbeat {
-    pub nonce: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Serialize)]
-pub struct VoiceHeartbeatAck {
-    pub nonce: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-impl<'de> Deserialize<'de> for VoiceHeartbeatAck {
-    fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
-        deserialize_u64(deserializer)
-            .map(|nonce| Self { nonce, _nonexhaustive: () })
-    }
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceReady {
-    pub heartbeat_interval: u64,
-    pub modes: Vec<String>,
-    pub ip: String, 
-    pub port: u16,
-    pub ssrc: u32,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceHello {
-    pub heartbeat_interval: u64,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceSessionDescription {
-    pub mode: String,
-    pub secret_key: Vec<u8>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceSpeaking {
-    pub speaking: bool,
-    pub ssrc: u32,
-    pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Debug, Deserialize, Serialize)]
-pub struct VoiceResume {
-    pub server_id: String,
-    pub session_id: String,
-    pub token: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceClientConnect {
-    pub audio_ssrc: u32,
-    pub user_id: UserId,
-    pub video_ssrc: u32,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-#[derive(Clone, Copy, Debug, Deserialize, Serialize)]
-pub struct VoiceClientDisconnect {
-    pub user_id: UserId,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
-}
-
-/// A representation of data received for [`voice`] events.
-///
-/// [`voice`]: ../../voice/index.html
-#[derive(Clone, Debug, Serialize)]
-#[serde(untagged)]
-pub enum VoiceEvent {
-    /// Server's response to the client's Identify operation.
-    /// Contains session-specific information, e.g.
-    /// [`ssrc`] and supported encryption modes.
-    ///
-    /// [`ssrc`]: struct.VoiceReady.html#structfield.ssrc
-    Ready(VoiceReady),
-    /// A voice event describing the current session.
-    SessionDescription(VoiceSessionDescription),
-    /// A voice event denoting that someone is speaking.
-    Speaking(VoiceSpeaking),
-    /// Acknowledgement from the server for a prior voice heartbeat.
-    HeartbeatAck(VoiceHeartbeatAck),
-    /// A "hello" was received with initial voice data, such as the
-    /// true [`heartbeat_interval`].
-    ///
-    /// [`heartbeat_interval`]: struct.VoiceHello.html#structfield.heartbeat_interval
-    Hello(VoiceHello),
-    /// Message received if a Resume request was successful.
-    Resumed,
-    /// Status update in the current channel, indicating that a user has
-    /// connected.
-    ClientConnect(VoiceClientConnect),
-    /// Status update in the current channel, indicating that a user has
-    /// disconnected.
-    ClientDisconnect(VoiceClientDisconnect),
-    /// An unknown voice event not registered.
-    Unknown(VoiceOpCode, Value),
-    #[doc(hidden)]
-    __Nonexhaustive,
-}
-
-impl<'de> Deserialize<'de> for VoiceEvent {
-    fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-        where D: Deserializer<'de> {
-        let mut map = JsonMap::deserialize(deserializer)?;
-
-        let op = map.remove("op")
-            .ok_or_else(|| DeError::custom("expected voice event op"))
-            .and_then(VoiceOpCode::deserialize)
-            .map_err(DeError::custom)?;
-
-        let v = map.remove("d")
-            .ok_or_else(|| DeError::custom("expected voice gateway payload"))
-            .and_then(Value::deserialize)
-            .map_err(DeError::custom)?;
-
-        Ok(match op {
-            VoiceOpCode::HeartbeatAck => {
-                let v = serde_json::from_value(v).map_err(DeError::custom)?;
-
-                VoiceEvent::HeartbeatAck(v)
-            },
-            VoiceOpCode::Ready => {
-                let v = VoiceReady::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::Ready(v)
-            },
-            VoiceOpCode::Hello => {
-                let v = serde_json::from_value(v).map_err(DeError::custom)?;
-
-                VoiceEvent::Hello(v)
-            },
-            VoiceOpCode::SessionDescription => {
-                let v = VoiceSessionDescription::deserialize(v)
-                    .map_err(DeError::custom)?;
-
-                VoiceEvent::SessionDescription(v)
-            },
-            VoiceOpCode::Speaking => {
-                let v = VoiceSpeaking::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::Speaking(v)
-            },
-            VoiceOpCode::Resumed => VoiceEvent::Resumed,
-            VoiceOpCode::ClientConnect => {
-                let v = VoiceClientConnect::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::ClientConnect(v)
-            },
-            VoiceOpCode::ClientDisconnect => {
-                let v = VoiceClientDisconnect::deserialize(v).map_err(DeError::custom)?;
-
-                VoiceEvent::ClientDisconnect(v)
-            },
-            other => VoiceEvent::Unknown(other, v),
-        })
     }
 }

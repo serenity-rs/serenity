@@ -9,9 +9,9 @@ use std::collections::HashMap;
 ///
 /// Except [`name`], all fields are optional.
 ///
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-/// [`Guild`]: ../model/guild/struct.Guild.html
-/// [`name`]: #method.name
+/// [`GuildChannel`]: crate::model::channel::GuildChannel
+/// [`Guild`]: crate::model::guild::Guild
+/// [`name`]: Self::name
 #[derive(Debug, Clone)]
 pub struct CreateChannel(pub HashMap<&'static str, Value>);
 
@@ -94,11 +94,31 @@ impl CreateChannel {
     ///
     /// Inheriting permissions from an exisiting channel:
     ///
-    /// ```rust,ignore
-    /// // Assuming a channel and a guild have already been bound.
-    /// guild.create_channel(|c|
+    /// ```rust,no_run
+    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Arc::new(Http::default());
+    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
+    /// use serenity::model::id::UserId;
+    /// use serenity::model::permissions::Permissions;
+    ///
+    /// // Assuming a guild have already been bound.
+    /// let permissions = Some(PermissionOverwrite {
+    ///     allow: Permissions::READ_MESSAGES,
+    ///     deny: Permissions::SEND_TTS_MESSAGES,
+    ///     kind: PermissionOverwriteType::Member(UserId(1234)),
+    /// });
+    ///
+    /// guild.create_channel(http, |c| {
     ///     c.name("my_new_cool_channel")
-    ///     .permissions(channel.permissions.clone()))
+    ///     .permissions(permissions)
+    /// })
+    /// .await?;
+    /// #    Ok(())
+    /// # }
     /// ```
     pub fn permissions<I>(&mut self, perms: I) -> &mut Self
         where I: IntoIterator<Item=PermissionOverwrite>
@@ -107,7 +127,6 @@ impl CreateChannel {
             let (id, kind) = match perm.kind {
                 PermissionOverwriteType::Member(id) => (id.0, "member"),
                 PermissionOverwriteType::Role(id) => (id.0, "role"),
-                PermissionOverwriteType::__Nonexhaustive => unreachable!(),
             };
 
             json!({

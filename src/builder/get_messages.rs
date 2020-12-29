@@ -26,10 +26,9 @@ use std::collections::HashMap;
 ///
 /// ```rust,no_run
 /// # use serenity::http::Http;
-/// # use std::{error::Error, sync::Arc};
 /// #
-/// # fn try_main() -> Result<(), Box<Error>> {
-/// # let http = Arc::new(Http::default());
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let http = Http::default();
 /// use serenity::model::id::{ChannelId, MessageId};
 ///
 /// // you can then pass it into a function which retrieves messages:
@@ -37,16 +36,13 @@ use std::collections::HashMap;
 ///
 /// let _messages = channel_id.messages(&http, |retriever| {
 ///     retriever.after(MessageId(158339864557912064)).limit(25)
-/// })?;
+/// })
+/// .await?;
 /// #     Ok(())
-/// # }
-/// #
-/// # fn main() {
-/// #     try_main().unwrap();
 /// # }
 /// ```
 ///
-/// [`GuildChannel::messages`]: ../model/channel/struct.GuildChannel.html#method.messages
+/// [`GuildChannel::messages`]: crate::model::channel::GuildChannel::messages
 #[derive(Clone, Debug, Default)]
 pub struct GetMessages(pub HashMap<&'static str, u64>);
 

@@ -2,7 +2,7 @@
 //!
 //! View the [examples] on how to make and structure a bot.
 //!
-//! Serenity supports bot user authentication via the use of [`Client::new`].
+//! Serenity supports bot user authentication via the use of [`Client::builder`].
 //!
 //! Once logged in, you may add handlers to your client to dispatch [`Event`]s,
 //! such as [`Client::on_message`]. This will cause your handler to be called
@@ -36,24 +36,25 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.8"
+//! serenity = "0.9"
 //! ```
 //!
-//! [`Cache`]: cache/struct.Cache.html
-//! [`Client::new`]: client/struct.Client.html#method.new
+//! [`Context`]: crate::client::Context
 //! [`Client::on_message`]: client/struct.Client.html#method.on_message
-//! [`Context`]: client/struct.Context.html
-//! [`Event`]: model/event/enum.Event.html
-//! [`Event::MessageCreate`]: model/event/enum.Event.html#variant.MessageCreate
-//! [`Shard`]: gateway/struct.Shard.html
+//! [`Event`]: crate::model::event::Event
+//! [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+//! [`Shard`]: crate::gateway::Shard
 //! [`examples`]: https://github.com/serenity-rs/serenity/blob/current/examples
-//! [cache docs]: cache/index.html
-//! [client's module-level documentation]: client/index.html
-//! [docs]: https://discordapp.com/developers/docs/intro
+//! [cache docs]: crate::cache
+//! [client's module-level documentation]: crate::client
+//! [docs]: https://discord.com/developers/docs/intro
 //! [examples]: https://github.com/serenity-rs/serenity/tree/current/examples
-//! [gateway docs]: gateway/index.html
+//! [gateway docs]: crate::gateway
 #![doc(html_root_url = "https://docs.rs/serenity/*")]
+#![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(rust_2018_idioms)]
+#![deny(broken_intra_doc_links)]
+#![type_length_limit="3294819"] // needed so ShardRunner::run compiles with instrument.
 
 #[macro_use]
 extern crate serde;
@@ -79,19 +80,19 @@ pub mod gateway;
 pub mod http;
 #[cfg(feature = "utils")]
 pub mod utils;
-#[cfg(feature = "voice")]
-pub mod voice;
+#[cfg(feature = "collector")]
+pub mod collector;
 
 mod error;
 
 pub use crate::error::{Error, Result};
 
-#[cfg(feature = "client")]
+#[cfg(all(feature = "client", feature = "gateway"))]
 pub use crate::client::Client;
 
-#[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
-#[cfg(feature = "cache")]
+#[cfg(all(feature = "client", feature = "cache"))]
+use crate::cache::Cache;
+#[cfg(all(feature = "client", feature = "cache"))]
 use std::time::Duration;
 #[cfg(feature = "client")]
 use std::sync::Arc;
@@ -100,22 +101,21 @@ use crate::http::Http;
 
 
 #[cfg(feature = "client")]
-#[derive(Default)]
+#[derive(Clone, Default)]
+#[non_exhaustive]
 pub struct CacheAndHttp {
     #[cfg(feature = "cache")]
-    pub cache: CacheRwLock,
+    pub cache: Arc<Cache>,
     #[cfg(feature = "cache")]
     pub update_cache_timeout: Option<Duration>,
     pub http: Arc<Http>,
-    __nonexhaustive: (),
 }
-
-// For the procedural macros defined in `command_attr`; do not remove!
-#[allow(clippy::useless_attribute)]
-#[allow(rust_2018_idioms)]
-extern crate self as serenity;
 
 // For the procedural macros in `command_attr`.
 #[cfg(feature = "standard_framework")]
 #[doc(hidden)]
 pub use static_assertions;
+
+pub use async_trait::async_trait;
+pub use futures;
+pub use futures::future::FutureExt;

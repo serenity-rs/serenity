@@ -1,0 +1,285 @@
+[env]
+EXAMPLES_PATH = { value = "./examples", condition = { env_not_set = ["EXAMPLES_PATH"] } }
+
+[tasks.build]
+command = "cargo"
+args = ["build"]
+
+[tasks.build_release]
+extend = "build"
+args = ["build", "--release"]
+
+[tasks.build_example]
+command = "cargo"
+args = ["make", "--cwd", "${EXAMPLES_PATH}/${@}", "examples_build"]
+dependencies = ["build"]
+
+[tasks.build_example_release]
+command = "cargo"
+args = ["make", "--cwd", "${EXAMPLES_PATH}/${@}", "examples_build_release"]
+dependencies = ["build_release"]
+
+[tasks.run]
+command = "cargo"
+args = ["run"]
+
+[tasks.run_release]
+extend = "run"
+args = ["run", "--release"]
+dependencies = ["build"]
+
+[tasks.run_example]
+command = "cargo"
+args = ["make", "--cwd", "${EXAMPLES_PATH}/${@}", "examples_run"]
+dependencies = ["build_release"]
+
+[tasks.run_example_release]
+command = "cargo"
+args = ["make", "--cwd", "${EXAMPLES_PATH}/${@}", "examples_run_release"]
+
+[tasks.1]
+alias = "run_1"
+
+[tasks.run_1]
+command = "cargo"
+args = ["make", "run_example_release", "e01_basic_ping_bot"]
+
+[tasks.build_1]
+command = "cargo"
+args = ["make", "build_example_release", "e01_basic_ping_bot"]
+
+[tasks.dev_run_1]
+command = "cargo"
+args = ["make", "run_example", "e01_basic_ping_bot"]
+
+[tasks.dev_build_1]
+command = "cargo"
+args = ["make", "build_example", "e01_basic_ping_bot"]
+
+[tasks.2]
+alias = "run_2"
+
+[tasks.run_2]
+command = "cargo"
+args = ["make", "run_example_release", "e02_transparent_guild_sharding"]
+
+[tasks.build_2]
+command = "cargo"
+args = ["make", "build_example_release", "e02_transparent_guild_sharding"]
+
+[tasks.dev_run_2]
+command = "cargo"
+args = ["make", "run_example", "e02_transparent_guild_sharding"]
+
+[tasks.dev_build_2]
+command = "cargo"
+args = ["make", "build_example", "e02_transparent_guild_sharding"]
+
+[tasks.3]
+alias = "run_3"
+
+[tasks.run_3]
+command = "cargo"
+args = ["make", "run_example_release", "e03_struct_utilities"]
+
+[tasks.build_3]
+command = "cargo"
+args = ["make", "build_example_release", "e03_struct_utilities"]
+
+[tasks.dev_run_3]
+command = "cargo"
+args = ["make", "run_example", "e03_struct_utilities"]
+
+[tasks.dev_build_3]
+command = "cargo"
+args = ["make", "build_example", "e03_struct_utilities"]
+
+[tasks.4]
+alias = "run_4"
+
+[tasks.run_4]
+command = "cargo"
+args = ["make", "run_example_release", "e04_message_builder"]
+
+[tasks.build_4]
+command = "cargo"
+args = ["make", "build_example_release", "e04_message_builder"]
+
+[tasks.dev_run_4]
+command = "cargo"
+args = ["make", "run_example", "e04_message_builder"]
+
+[tasks.dev_build_4]
+command = "cargo"
+args = ["make", "build_example", "e04_message_builder"]
+
+[tasks.5]
+alias = "run_5"
+
+[tasks.run_5]
+command = "cargo"
+args = ["make", "run_example_release", "e05_command_framework"]
+
+[tasks.build_5]
+command = "cargo"
+args = ["make", "build_example_release", "e05_command_framework"]
+
+[tasks.dev_run_5]
+command = "cargo"
+args = ["make", "run_example", "e05_command_framework"]
+
+[tasks.dev_build_5]
+command = "cargo"
+args = ["make", "build_example", "e05_command_framework"]
+
+[tasks.6]
+alias = "run_6"
+
+[tasks.run_6]
+command = "cargo"
+args = ["make", "run_example_release", "e06_sample_bot_structure"]
+
+[tasks.build_6]
+command = "cargo"
+args = ["make", "build_example_release", "e06_sample_bot_structure"]
+
+[tasks.dev_run_6]
+command = "cargo"
+args = ["make", "run_example", "e06_sample_bot_structure"]
+
+[tasks.dev_build_6]
+command = "cargo"
+args = ["make", "build_example", "e06_sample_bot_structure"]
+
+[tasks.7]
+alias = "run_7"
+
+[tasks.run_7]
+command = "cargo"
+args = ["make", "run_example_release", "e07_env_logging"]
+
+[tasks.build_7]
+command = "cargo"
+args = ["make", "build_example_release", "e07_env_logging"]
+
+[tasks.dev_run_7]
+command = "cargo"
+args = ["make", "run_example", "e07_env_logging"]
+
+[tasks.dev_build_7]
+command = "cargo"
+args = ["make", "build_example", "e07_env_logging"]
+
+[tasks.8]
+alias = "run_8"
+
+[tasks.run_8]
+command = "cargo"
+args = ["make", "run_example_release", "e08_shard_manager"]
+
+[tasks.build_8]
+command = "cargo"
+args = ["make", "build_example_release", "e08_shard_manager"]
+
+[tasks.dev_run_8]
+command = "cargo"
+args = ["make", "run_example", "e08_shard_manager"]
+
+[tasks.dev_build_8]
+command = "cargo"
+args = ["make", "build_example", "e08_shard_manager"]
+
+[tasks.9]
+alias = "run_9"
+
+[tasks.run_9]
+command = "cargo"
+args = ["make", "run_example_release", "e09_create_message_builder"]
+
+[tasks.build_9]
+command = "cargo"
+args = ["make", "build_example_release", "e09_create_message_builder"]
+
+[tasks.dev_run_9]
+command = "cargo"
+args = ["make", "run_example", "e09_create_message_builder"]
+
+[tasks.dev_build_9]
+command = "cargo"
+args = ["make", "build_example", "e09_create_message_builder"]
+
+[tasks.10]
+alias = "run_10"
+
+[tasks.run_10]
+command = "cargo"
+args = ["make", "run_example_release", "e10_collectors"]
+
+[tasks.build_10]
+command = "cargo"
+args = ["make", "build_example_release", "e10_collectors"]
+
+[tasks.dev_run_10]
+command = "cargo"
+args = ["make", "run_example", "e10_collectors"]
+
+[tasks.dev_build_10]
+command = "cargo"
+args = ["make", "build_example", "e10_collectors"]
+
+[tasks.11]
+alias = "run_11"
+
+[tasks.run_11]
+command = "cargo"
+args = ["make", "run_example_release", "e11_gateway_intents"]
+
+[tasks.build_11]
+command = "cargo"
+args = ["make", "build_example_release", "e11_gateway_intents"]
+
+[tasks.dev_run_11]
+command = "cargo"
+args = ["make", "run_example", "e11_gateway_intents"]
+
+[tasks.dev_build_11]
+command = "cargo"
+args = ["make", "build_example", "e11_gateway_intents"]
+
+[tasks.12]
+alias = "run_12"
+
+[tasks.run_12]
+command = "cargo"
+args = ["make", "run_example_release", "e12_global_data"]
+
+[tasks.build_12]
+command = "cargo"
+args = ["make", "build_example_release", "e12_global_data"]
+
+[tasks.dev_run_12]
+command = "cargo"
+args = ["make", "run_example", "e12_global_data"]
+
+[tasks.dev_build_12]
+command = "cargo"
+args = ["make", "build_example", "e12_global_data"]
+
+[tasks.13]
+alias = "run_13"
+
+[tasks.run_13]
+command = "cargo"
+args = ["make", "run_example_release", "e13_parallel_loops"]
+
+[tasks.build_13]
+command = "cargo"
+args = ["make", "build_example_release", "e13_parallel_loops"]
+
+[tasks.dev_run_13]
+command = "cargo"
+args = ["make", "run_example", "e13_parallel_loops"]
+
+[tasks.dev_build_13]
+command = "cargo"
+args = ["make", "build_example", "e13_parallel_loops"]

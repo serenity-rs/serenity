@@ -32,6 +32,7 @@ macro_rules! colour {
 /// # use serde_json::json;
 /// # use serenity::model::guild::Role;
 /// # use serenity::model::id::RoleId;
+/// # use serenity::model::id::GuildId;
 /// # use serenity::model::permissions;
 /// #
 /// # fn main() {
@@ -39,6 +40,7 @@ macro_rules! colour {
 /// #     "color": Colour::BLURPLE,
 /// #     "hoist": false,
 /// #     "id": RoleId(1),
+/// #     "guild_id": GuildId(2),
 /// #     "managed": false,
 /// #     "mentionable": false,
 /// #     "name": "test",
@@ -79,9 +81,9 @@ macro_rules! colour {
 /// assert!(blitz_blue > fooyoo);
 /// ```
 ///
-/// [`Role`]: ../model/guild/struct.Role.html
-/// [`DARK_TEAL`]: #associatedconstant.DARK_TEAL
-/// [`g`]: #method.g
+/// [`Role`]: crate::model::guild::Role
+/// [`DARK_TEAL`]: Self::DARK_TEAL
+/// [`g`]: Self::g
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Ord, PartialEq, PartialOrd, Serialize)]
 pub struct Colour(pub u32);
 
@@ -101,7 +103,7 @@ impl Colour {
     /// assert_eq!(colour.tuple(), (100, 76, 67));
     /// ```
     ///
-    /// [`tuple`]: #method.tuple
+    /// [`tuple`]: Self::tuple
     #[inline]
     pub const fn new(value: u32) -> Colour { Colour(value) }
 
@@ -183,9 +185,9 @@ impl Colour {
     /// assert_eq!(Colour::new(6573123).tuple(), (100, 76, 67));
     /// ```
     ///
-    /// [`r`]: #method.r
-    /// [`g`]: #method.g
-    /// [`b`]: #method.b
+    /// [`r`]: Self::r
+    /// [`g`]: Self::g
+    /// [`b`]: Self::b
     pub const fn tuple(self) -> (u8, u8, u8) { (self.r(), self.g(), self.b()) }
 
     /// Returns a hexadecimal string of this Colour.

@@ -1,18 +1,15 @@
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
 use crate::model::prelude::*;
 
-#[cfg(all(feature = "builder", feature = "model"))]
+#[cfg(feature = "model")]
 use crate::builder::EditChannel;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
-#[cfg(feature = "http")]
-use crate::http::Http;
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
 
 /// A category of [`GuildChannel`]s.
-///
-/// [`GuildChannel`]: struct.GuildChannel.html
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ChannelCategory {
     /// Id of this category.
     pub id: ChannelId,
@@ -26,8 +23,6 @@ pub struct ChannelCategory {
     /// Indicator of the type of channel this is.
     ///
     /// This should always be [`ChannelType::Category`].
-    ///
-    /// [`ChannelType::Category`]: enum.ChannelType.html#variant.Category
     #[serde(rename = "type")]
     pub kind: ChannelType,
     /// The name of the category.
@@ -36,39 +31,32 @@ pub struct ChannelCategory {
     #[serde(default)]
     pub nsfw: bool,
     /// Permission overwrites for the [`GuildChannel`]s.
-    ///
-    /// [`GuildChannel`]: struct.GuildChannel.html
     pub permission_overwrites: Vec<PermissionOverwrite>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
 impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
-    #[cfg(feature = "http")]
     #[inline]
-    pub fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
-        self.id.create_permission(&http, target)
+    pub async fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
+        self.id.create_permission(&http, target).await
     }
 
     /// Deletes all permission overrides in the category from the channels.
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
-    /// [Manage Channel]: ../permissions/struct.Permissions.html#associatedconstant.MANAGE_CHANNELS
-    #[cfg(feature = "http")]
+    /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
-        self.id.delete_permission(&http, permission_type)
+    pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+        self.id.delete_permission(&http, permission_type).await
     }
 
 
     /// Deletes this category if required permissions are met.
     #[inline]
-    #[cfg(feature = "http")]
-    pub fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
-        self.id.delete(&cache_http.http()).map(|_| ())
+    pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
+        self.id.delete(&cache_http.http()).await.map(|_| ())
     }
 
     /// Modifies the category's settings, such as its position or name.
@@ -79,23 +67,28 @@ impl ChannelCategory {
     ///
     /// Change a voice channels name and bitrate:
     ///
-    /// ```rust,ignore
-    /// category.edit(&context, |c| c.name("test").bitrate(86400));
+    /// ```rust,no_run
+    /// # async fn run() {
+    /// #     use serenity::http::Http;
+    /// #     use serenity::model::id::ChannelId;
+    /// #     let http = Http::default();
+    /// #     let category = ChannelId(1234);
+    /// category.edit(&http, |c| c.name("test").bitrate(86400)).await;
+    /// # }
     /// ```
-    #[cfg(all(feature = "builder", feature = "model", feature = "utils", feature = "client"))]
-    pub fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
+    #[cfg(feature = "utils")]
+    pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
         where F: FnOnce(&mut EditChannel) -> &mut EditChannel
     {
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
         map.insert("position", Value::Number(Number::from(self.position)));
 
-
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
         let map = serenity_utils::hashmap_to_json_map(edit_channel.0);
 
-        cache_http.http().edit_channel(self.id.0, &map).map(|channel| {
+        cache_http.http().edit_channel(self.id.0, &map).await.map(|channel| {
             let GuildChannel {
                 id,
                 guild_id,
@@ -117,7 +110,6 @@ impl ChannelCategory {
                 name,
                 position,
                 kind,
-                _nonexhaustive: (),
             };
         })
     }

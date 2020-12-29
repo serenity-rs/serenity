@@ -3,24 +3,24 @@
 use super::{
     id::UserId,
     user::User,
-    utils::default_true
+    utils::*,
 };
+use std::fmt;
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct ApplicationInfo {
     /// The bot user associated with the application. See [`BotApplication`] for
     /// more information.
-    ///
-    /// [`BotApplication`]: struct.BotApplication.html
     pub bot: Option<BotApplication>,
     /// Indicator of whether the bot is public.
     ///
     /// If a bot is public, anyone may invite it to their [`Guild`]. While a bot
     /// is private, only the owner may add it to a guild.
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
+    /// [`Guild`]: super::guild::Guild
     #[serde(default = "default_true")]
     pub bot_public: bool,
     /// Indicator of whether the bot requires an OAuth2 code grant.
@@ -42,16 +42,35 @@ pub struct ApplicationInfo {
     pub redirect_uris: Vec<String>,
     /// A list of RPC Origins assigned to the application.
     pub rpc_origins: Vec<String>,
+    /// The application team group.
+    pub team: Option<Vec<Team>>,
     /// The given secret to the application.
     ///
     /// This is not equivalent to the application's bot user's token.
     pub secret: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+}
+
+impl fmt::Debug for ApplicationInfo {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("ApplicationInfo")
+            .field("bot", &self.bot)
+            .field("bot_public", &self.bot_public)
+            .field("bot_require_code_grant", &self.bot_require_code_grant)
+            .field("description", &self.description)
+            .field("flags", &self.flags)
+            .field("icon", &self.icon)
+            .field("id", &self.id)
+            .field("name", &self.name)
+            .field("redirect_uris", &self.redirect_uris)
+            .field("rpc_origins", &self.rpc_origins)
+            .field("team", &self.team)
+            .finish()
+    }
 }
 
 /// Information about an application with an application's bot user.
-#[derive(Clone, Debug, Deserialize, Serialize)]
+#[derive(Clone, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct BotApplication {
     /// The unique Id of the bot user.
     pub id: UserId,
@@ -74,12 +93,36 @@ pub struct BotApplication {
     /// **Note**: Keep this information private, as untrusted sources can use it
     /// to perform any action with a bot user.
     pub token: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+}
+
+
+impl fmt::Debug for BotApplication {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("BotApplication")
+            .field("id", &self.id)
+            .field("avatar", &self.avatar)
+            .field("bot", &self.bot)
+            .field("discriminator", &self.discriminator)
+            .field("name", &self.name)
+            .finish()
+    }
+}
+
+/// Partial information about the given application.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct PartialCurrentApplicationInfo {
+    /// The unique Id of the user.
+    pub id: UserId,
+    /// The flags associated with the application.
+    ///
+    /// These flags are unknown and are not yet documented in the Discord API
+    /// documentation.
+    pub flags: u64,
 }
 
 /// Information about the current application and its owner.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CurrentApplicationInfo {
     pub description: String,
     pub icon: Option<String>,
@@ -89,6 +132,48 @@ pub struct CurrentApplicationInfo {
     #[serde(default)] pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+    pub team: Option<Team>,
 }
+
+/// Information about the Team group of the application.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct Team {
+    /// The icon of the team.
+    pub icon: Option<String>,
+    /// The snowflake ID of the team.
+    #[serde(deserialize_with = "deserialize_u64")]
+    pub id: u64,
+    /// The members of the team
+    pub members: Vec<TeamMember>,
+    /// The user id of the team owner.
+    pub owner_user_id: UserId,
+}
+
+/// Infromation about a Member on a Team.
+#[derive(Clone, Debug, Deserialize, Serialize)]
+pub struct TeamMember {
+    /// The member's membership state.
+    pub membership_state: MembershipState,
+    /// The list of permissions of the member on the team.
+    ///
+    /// NOTE: Will always be ["*"] for now.
+    pub permissions: Vec<String>,
+    /// The ID of the team they are a member of.
+    #[serde(deserialize_with = "deserialize_u64")]
+    pub team_id: u64,
+    /// The user type of the team member.
+    pub user: User,
+}
+
+#[derive(Clone, Debug, Copy, PartialEq)]
+pub enum MembershipState {
+    Invited = 1,
+    Accepted = 2,
+}
+
+enum_number!(
+    MembershipState {
+        Invited,
+        Accepted,
+    }
+);

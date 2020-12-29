@@ -1,8 +1,5 @@
 //! User information-related models.
 
-#[cfg(feature = "http")]
-use crate::http::CacheHttp;
-use serde_json;
 use std::fmt;
 use super::utils::deserialize_u16;
 use super::prelude::*;
@@ -12,31 +9,29 @@ use crate::{internal::prelude::*, model::misc::Mentionable};
 use crate::builder::{CreateMessage, EditProfile};
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
-#[cfg(all(feature = "cache", feature = "model"))]
-use parking_lot::RwLock;
 #[cfg(feature = "model")]
 use std::fmt::Write;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::Cache;
 #[cfg(feature = "model")]
-use std::mem;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::CacheRwLock;
-#[cfg(all(
-    feature = "model",
-    any(
-        all(feature = "builder", feature = "client"),
-        feature = "http",
-    ),
-))]
 use serde_json::json;
-#[cfg(all(feature = "cache", feature = "model"))]
-use std::sync::Arc;
 #[cfg(feature = "model")]
 use crate::utils;
-#[cfg(feature = "http")]
-use crate::http::Http;
+#[cfg(feature = "collector")]
+use crate::client::bridge::gateway::ShardMessenger;
+#[cfg(feature = "collector")]
+use crate::collector::{
+    CollectReaction, ReactionCollectorBuilder,
+    CollectReply, MessageCollectorBuilder,
+};
+use futures::future::{BoxFuture, FutureExt};
+#[cfg(feature = "model")]
+use crate::http::{Http, CacheHttp};
+
 
 /// Information about the current user.
 #[derive(Clone, Default, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct CurrentUser {
     pub id: UserId,
     pub avatar: Option<String>,
@@ -46,8 +41,6 @@ pub struct CurrentUser {
     pub mfa_enabled: bool,
     #[serde(rename = "username")] pub name: String,
     pub verified: Option<bool>,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
 }
 
 #[cfg(feature = "model")]
@@ -62,24 +55,20 @@ impl CurrentUser {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
+    /// # async fn run() {
+    /// # use serenity::cache::Cache;
+    /// # use tokio::sync::RwLock;
     /// # use std::sync::Arc;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
+    /// # let cache = Cache::default();
     /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// let user = cache.current_user().await;
     ///
     /// match user.avatar_url() {
     ///     Some(url) => println!("{}'s avatar can be found at {}", user.name, url),
     ///     None => println!("{} does not have an avatar set.", user.name)
     /// }
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn avatar_url(&self) -> Option<String> { avatar_url(self.id, self.avatar.as_ref()) }
@@ -100,22 +89,24 @@ impl CurrentUser {
     ///
     /// Change the avatar:
     ///
-    /// ```rust,ignore
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// let avatar = serenity::utils::read_image("./avatar.png").unwrap();
-    ///
-    /// context.cache.write().user.edit(|p| p.avatar(Some(&avatar)));
-    /// # }
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Http::default();
+    /// #     let mut user = CurrentUser::default();
+    /// let avatar = serenity::utils::read_image("./avatar.png")?;
+    ///
+    /// user.edit(&http, |p| p.avatar(Some(&avatar))).await;
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
-    /// [`EditProfile`]: ../../builder/struct.EditProfile.html
-    #[cfg(feature = "http")]
-    pub fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-        where F: FnOnce(&mut EditProfile) -> &mut EditProfile {
+    /// [`EditProfile`]: crate::builder::EditProfile
+    pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
+    where F: FnOnce(&mut EditProfile) -> &mut EditProfile
+    {
         let mut map = HashMap::new();
         map.insert("username", Value::String(self.name.clone()));
 
@@ -127,14 +118,9 @@ impl CurrentUser {
         f(&mut edit_profile);
         let map = utils::hashmap_to_json_map(edit_profile.0);
 
-        match http.as_ref().edit_profile(&map) {
-            Ok(new) => {
-                let _ = mem::replace(self, new);
+        *self = http.as_ref().edit_profile(&map).await?;
 
-                Ok(())
-            },
-            Err(why) => Err(why),
-        }
+        Ok(())
     }
 
     /// Retrieves the URL to the current user's avatar, falling back to the
@@ -143,8 +129,9 @@ impl CurrentUser {
     /// This will call [`avatar_url`] first, and if that returns `None`, it
     /// then falls back to [`default_avatar_url`].
     ///
-    /// [`avatar_url`]: #method.avatar_url
-    /// [`default_avatar_url`]: #method.default_avatar_url
+    /// [`avatar_url`]: Self::avatar_url
+    /// [`default_avatar_url`]: Self::default_avatar_url
+    #[inline]
     pub fn face(&self) -> String {
         self.avatar_url()
             .unwrap_or_else(|| self.default_avatar_url())
@@ -157,31 +144,35 @@ impl CurrentUser {
     /// Print out the names of all guilds the current user is in:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
-    /// # let http = Arc::new(Http::default());
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
+    /// // assuming the user has been bound
     ///
-    /// if let Ok(guilds) = user.guilds(&http) {
+    /// if let Ok(guilds) = user.guilds(&http).await {
     ///     for (index, guild) in guilds.into_iter().enumerate() {
     ///         println!("{}: {}", index, guild.name);
     ///     }
     /// }
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
-    #[cfg(feature = "http")]
-    pub fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
-        http.as_ref().get_guilds(&GuildPagination::After(GuildId(1)), 100)
+    pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
+        let mut guilds = Vec::new();
+        loop {
+            let mut pagination = http.as_ref().get_guilds(
+                &GuildPagination::After(guilds.last().map_or(GuildId(1), |g: &GuildInfo| g.id)),
+                100,
+            ).await?;
+            let len = pagination.len();
+            guilds.append(&mut pagination);
+            if len != 100 {
+                break;
+            }
+        }
+        Ok(guilds)
     }
 
     /// Returns the invite url for the bot with the given permissions.
@@ -195,20 +186,16 @@ impl CurrentUser {
     /// Get the invite url with no permissions set:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let mut cache = cache.write();
-    /// # let http = Arc::new(Http::default());
-    ///
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
     /// use serenity::model::Permissions;
     ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(&http, Permissions::empty()) {
+    /// // assuming the user has been bound
+    /// let url = match user.invite_url(&http, Permissions::empty()).await {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -220,27 +207,22 @@ impl CurrentUser {
     /// assert_eq!(url, "https://discordapp.com/api/oauth2/authorize? \
     ///                  client_id=249608697955745802&scope=bot");
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     ///
     /// Get the invite url with some basic permissions set:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, http::Http, model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::http::Http;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let mut cache = cache.write();
-    /// # let http = Arc::new(Http::default());
+    /// # async fn run() {
+    /// #     let user = CurrentUser::default();
+    /// #     let http = Http::default();
     /// use serenity::model::Permissions;
     ///
-    /// // assuming the cache has been unlocked
-    /// let url = match cache.user.invite_url(&http, Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS) {
+    /// // assuming the user has been bound
+    /// let permissions = Permissions::READ_MESSAGES | Permissions::SEND_MESSAGES | Permissions::EMBED_LINKS;
+    /// let url = match user.invite_url(&http, permissions).await {
     ///     Ok(v) => v,
     ///     Err(why) => {
     ///         println!("Error getting invite url: {:?}", why);
@@ -253,9 +235,6 @@ impl CurrentUser {
     /// "https://discordapp.
     /// com/api/oauth2/authorize?client_id=249608697955745802&scope=bot&permissions=19456");
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     ///
     /// # Errors
@@ -266,15 +245,13 @@ impl CurrentUser {
     ///
     /// May return [`Error::Format`] while writing url to the buffer.
     ///
-    /// [`Error::Format`]: ../../enum.Error.html#variant.Format
-    /// [`HttpError::UnsuccessfulRequest`]: ../../http/enum.HttpError.html#variant.UnsuccessfulRequest
-    #[cfg(feature = "http")]
-    pub fn invite_url(&self, http: impl AsRef<Http>, permissions: Permissions) -> Result<String> {
+    /// [`HttpError::UnsuccessfulRequest`]: crate::http::HttpError::UnsuccessfulRequest
+    pub async fn invite_url(&self, http: impl AsRef<Http>, permissions: Permissions) -> Result<String> {
         let bits = permissions.bits();
-        let client_id = http.as_ref().get_current_application_info().map(|v| v.id)?;
+        let client_id = http.as_ref().get_current_application_info().await.map(|v| v.id)?;
 
         let mut url = format!(
-            "https://discordapp.com/api/oauth2/authorize?client_id={}&scope=bot",
+            "https://discord.com/api/oauth2/authorize?client_id={}&scope=bot",
             client_id
         );
 
@@ -294,25 +271,17 @@ impl CurrentUser {
     /// Print out the current user's static avatar url if one is set:
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
-    /// // assuming the cache has been unlocked
-    /// let user = &cache.user;
+    /// # fn run() {
+    /// #     let user = CurrentUser::default();
+    /// // assuming the user has been bound
     ///
     /// match user.static_avatar_url() {
     ///     Some(url) => println!("{}'s static avatar can be found at {}", user.name, url),
     ///     None => println!("Could not get static avatar for {}.", user.name)
     /// }
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn static_avatar_url(&self) -> Option<String> {
@@ -326,20 +295,14 @@ impl CurrentUser {
     /// Print out the current user's distinct identifier (e.g., Username#1234):
     ///
     /// ```rust,no_run
-    /// # #[cfg(feature = "cache")]
-    /// # fn main() {
-    /// # use serenity::{cache::{Cache, CacheRwLock}, model::prelude::*, prelude::*};
-    /// # use parking_lot::RwLock;
-    /// # use std::sync::Arc;
+    /// # use serenity::model::user::CurrentUser;
     /// #
-    /// # let cache: CacheRwLock = Arc::new(RwLock::new(Cache::default())).into();
-    /// # let cache = cache.read();
-    /// // assuming the cache has been unlocked
-    /// println!("The current user's distinct identifier is {}", cache.user.tag());
+    /// # fn run() {
+    /// #     let user = CurrentUser::default();
+    /// // assuming the user has been bound
+    ///
+    /// println!("The current user's distinct identifier is {}", user.tag());
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "cache"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
@@ -351,8 +314,9 @@ impl CurrentUser {
 ///
 /// The has of the avatar can be retrieved via calling [`name`] on the enum.
 ///
-/// [`name`]: #method.name
+/// [`name`]: Self::name
 #[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[non_exhaustive]
 pub enum DefaultAvatar {
     /// The avatar when the result is `0`.
     #[serde(rename = "6debd47ed13483642cf09e832ed0bc1b")]
@@ -369,8 +333,6 @@ pub enum DefaultAvatar {
     /// The avatar when the result is `4`.
     #[serde(rename = "1cbd08c76f8af6dddce02c5138971129")]
     Red,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl DefaultAvatar {
@@ -385,17 +347,16 @@ impl DefaultAvatar {
 /// - [`DoNotDisturb`];
 /// - [`Invisible`].
 ///
-/// [`DoNotDisturb`]: #variant.DoNotDisturb
-/// [`Invisible`]: #variant.Invisible
+/// [`DoNotDisturb`]: OnlineStatus::DoNotDisturb
+/// [`Invisible`]: OnlineStatus::Invisible
 #[derive(Clone, Copy, Debug, Deserialize, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+#[non_exhaustive]
 pub enum OnlineStatus {
     #[serde(rename = "dnd")] DoNotDisturb,
     #[serde(rename = "idle")] Idle,
     #[serde(rename = "invisible")] Invisible,
     #[serde(rename = "offline")] Offline,
     #[serde(rename = "online")] Online,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl OnlineStatus {
@@ -406,7 +367,6 @@ impl OnlineStatus {
             OnlineStatus::Invisible => "invisible",
             OnlineStatus::Offline => "offline",
             OnlineStatus::Online => "online",
-            OnlineStatus::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -417,6 +377,7 @@ impl Default for OnlineStatus {
 
 /// Information about a user.
 #[derive(Clone, Debug, Deserialize, Serialize)]
+#[non_exhaustive]
 pub struct User {
     /// The unique Id of the user. Can be used to calculate the account's
     /// creation date.
@@ -429,20 +390,36 @@ pub struct User {
     /// The account's discriminator to differentiate the user from others with
     /// the same [`name`]. The name+discriminator pair is always unique.
     ///
-    /// [`name`]: #structfield.name
+    /// [`name`]: Self::name
     #[serde(deserialize_with = "deserialize_u16")]
     pub discriminator: u16,
     /// The account's username. Changing username will trigger a discriminator
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
-    #[serde(skip)]
-    pub(crate) _nonexhaustive: (),
+}
+
+impl Default for User {
+    /// Initializes a `User` with default values. Setting the following:
+    /// - **id** to `UserId(210)`
+    /// - **avatar** to `Some("abc")`
+    /// - **bot** to `true`.
+    /// - **discriminator** to `1432`.
+    /// - **name** to `"test"`.
+    fn default() -> Self {
+        User {
+            id: UserId(210),
+            avatar: Some("abc".to_string()),
+            bot: true,
+            discriminator: 1432,
+            name: "test".to_string(),
+        }
+    }
 }
 
 use std::hash::{Hash, Hasher};
 #[cfg(feature = "model")]
-use chrono::{DateTime, FixedOffset};
+use chrono::{DateTime, Utc};
 
 impl PartialEq for User {
     fn eq(&self, other: &Self) -> bool {
@@ -469,14 +446,19 @@ impl User {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
-    /// [current user]: struct.CurrentUser.html
+    /// [current user]: CurrentUser
     #[inline]
-    #[cfg(feature = "http")]
-    pub fn create_dm_channel(&self, http: impl AsRef<Http>) -> Result<PrivateChannel> { self.id.create_dm_channel(&http) }
+    pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+        if self.bot {
+            return Err(Error::Model(ModelError::MessagingBot));
+        }
+
+        self.id.create_dm_channel(cache_http).await
+    }
 
     /// Retrieves the time that this user was created at.
     #[inline]
-    pub fn created_at(&self) -> DateTime<FixedOffset> { self.id.created_at() }
+    pub fn created_at(&self) -> DateTime<Utc> { self.id.created_at() }
 
     /// Returns the formatted URL to the user's default avatar URL.
     ///
@@ -501,11 +483,12 @@ impl User {
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
     /// #   #[cfg(feature = "cache")]
-    ///     fn message(&self, ctx: Context, msg: Message) {
+    ///     async fn message(&self, ctx: Context, msg: Message) {
     ///         if msg.content == "~help" {
-    ///             let url = match ctx.cache.read().user.invite_url(&ctx, Permissions::empty()) {
+    ///             let url = match ctx.cache.current_user().await.invite_url(&ctx, Permissions::empty()).await {
     ///                 Ok(v) => v,
     ///                 Err(why) => {
     ///                     println!("Error creating invite url: {:?}", why);
@@ -521,23 +504,27 @@ impl User {
     ///
     ///             let dm = msg.author.direct_message(&ctx, |m| {
     ///                 m.content(&help)
-    ///             });
+    ///             })
+    ///             .await;
     ///
     ///             match dm {
     ///                 Ok(_) => {
-    ///                     let _ = msg.react(&ctx, '👌');
+    ///                     let _ = msg.react(&ctx, '👌').await;
     ///                 },
     ///                 Err(why) => {
     ///                     println!("Err sending help: {:?}", why);
     ///
-    ///                     let _ = msg.reply(&ctx, "There was an error DMing you help.");
+    ///                     let _ = msg.reply(&ctx, "There was an error DMing you help.").await;
     ///                 },
     ///             };
     ///         }
     ///     }
     /// }
     ///
-    /// let mut client = Client::new("token", Handler);
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
+    /// #     Ok(())
+    /// # }
     /// # }
     /// ```
     ///
@@ -545,57 +532,12 @@ impl User {
     ///
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
-    ///
-    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
-    /// [`PrivateChannel`]: struct.PrivateChannel.html
-    /// [`User::dm`]: struct.User.html#method.dm
-    // A tale with Clippy:
-    //
-    // A person named Clippy once asked you to unlock a box and take something
-    // from it, but you never re-locked it, so you'll die and the universe will
-    // implode because the box must remain locked unless you're there, and you
-    // can't just borrow that item from it and take it with you forever.
-    //
-    // Instead what you do is unlock the box, take the item out of it, make a
-    // copy of said item, and then re-lock the box, and take your copy of the
-    // item with you.
-    //
-    // The universe is still fine, and nothing implodes.
-    //
-    // (AKA: Clippy is wrong and so we have to mark as allowing this lint.)
-    #[allow(clippy::let_and_return)]
-    #[cfg(all(feature = "builder", feature = "client"))]
-    pub fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
+    pub async fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
         where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
-        if self.bot {
-            return Err(Error::Model(ModelError::MessagingBot));
-        }
-
-        let mut private_channel_id = None;
-
-        #[cfg(feature = "cache")]
-        {
-            if let Some(cache) = cache_http.cache() {
-                private_channel_id = cache.read().private_channels
-                    .values()
-                    .map(|ch| ch.read())
-                    .find(|ch| ch.recipient.read().id == self.id)
-                    .map(|ch| ch.id);
-            }
-        }
-
-        let private_channel_id = match private_channel_id {
-            Some(id) => id,
-            None => {
-                let map = json!({
-                    "recipient_id": self.id.0,
-                });
-
-                cache_http.http().create_private_channel(&map)?.id
-            }
-        };
-
-        private_channel_id.send_message(&cache_http.http(), f)
+        self.create_dm_channel(&cache_http)
+            .await?
+        .send_message(&cache_http.http(), f)
+            .await
     }
 
     /// This is an alias of [direct_message].
@@ -615,13 +557,11 @@ impl User {
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
     ///
-    /// [`ModelError::MessagingBot`]: ../error/enum.Error.html#variant.MessagingBot
-    /// [direct_message]: #method.direct_message
-    #[cfg(all(feature = "builder", feature = "client"))]
+    /// [direct_message]: Self::direct_message
     #[inline]
-    pub fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
+    pub async fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where for <'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
-        self.direct_message(cache_http, f)
+        self.direct_message(cache_http, f).await
     }
 
     /// Retrieves the URL to the user's avatar, falling back to the default
@@ -630,8 +570,8 @@ impl User {
     /// This will call [`avatar_url`] first, and if that returns `None`, it
     /// then falls back to [`default_avatar_url`].
     ///
-    /// [`avatar_url`]: #method.avatar_url
-    /// [`default_avatar_url`]: #method.default_avatar_url
+    /// [`avatar_url`]: Self::avatar_url
+    /// [`default_avatar_url`]: Self::default_avatar_url
     pub fn face(&self) -> String {
         self.avatar_url()
             .unwrap_or_else(|| self.default_avatar_url())
@@ -653,76 +593,65 @@ impl User {
     /// let _ = message.author.has_role(guild_id, role_id);
     /// ```
     ///
-    /// [`Guild`]: ../guild/struct.Guild.html
-    /// [`GuildId`]: ../id/struct.GuildId.html
-    /// [`PartialGuild`]: ../guild/struct.PartialGuild.html
-    /// [`Role`]: ../guild/struct.Role.html
-    /// [`Cache`]: ../../cache/struct.Cache.html
-    #[cfg(feature = "client")]
-    pub fn has_role<G, R>(&self, cache_http: impl CacheHttp, guild: G, role: R) -> Result<bool>
-        where G: Into<GuildContainer>, R: Into<RoleId> {
-        self._has_role(cache_http, guild.into(), role.into())
-    }
-
-    #[cfg(feature = "client")]
-    fn _has_role(
+    /// [`Cache`]: crate::cache::Cache
+    #[inline]
+    pub async fn has_role(
         &self,
         cache_http: impl CacheHttp,
+        guild: impl Into<GuildContainer>,
+        role: impl Into<RoleId>
+    ) -> Result<bool> {
+        self._has_role(&cache_http, guild.into(), role.into()).await
+    }
+
+    fn _has_role<'a>(
+        &'a self,
+        cache_http: &'a impl CacheHttp,
         guild: GuildContainer,
         role: RoleId
-    ) -> Result<bool> {
-        match guild {
-            GuildContainer::Guild(partial_guild) => {
-                self._has_role(
-                    cache_http,
-                    GuildContainer::Id(partial_guild.id), role
-                )
-            },
-            GuildContainer::Id(guild_id) => {
-                let mut has_role = None;
+    ) -> BoxFuture<'a, Result<bool>> {
+        async move {
+            match guild {
+                GuildContainer::Guild(partial_guild) => {
+                    self._has_role(cache_http, GuildContainer::Id(partial_guild.id), role).await
+                },
+                GuildContainer::Id(guild_id) => {
+                    // Silences a warning when compiling without the `cache` feature.
+                    #[allow(unused_mut)]
+                    let mut has_role = None;
 
-                #[cfg(feature = "cache")]
-                {
-                    if let Some(cache) = cache_http.cache() {
-                        has_role = cache.read()
-                            .guilds
-                            .get(&guild_id)
-                            .and_then(|g| {
-                                g.read().members.get(&self.id)
-                                    .map(|m| m.roles.contains(&role))
-                            });
+                    #[cfg(feature = "cache")]
+                    {
+                        if let Some(cache) = cache_http.cache() {
+                            if let Some(member) = cache.member(guild_id, self.id).await {
+                                has_role = Some(member.roles.contains(&role));
+                            }
+                        }
                     }
-                }
 
-                #[cfg(feature = "http")]
-                {
                     if let Some(has_role) = has_role {
                         Ok(has_role)
                     } else {
-                        cache_http.http()
+                        cache_http
+                            .http()
                             .get_member(guild_id.0, self.id.0)
+                            .await
                             .map(|m| m.roles.contains(&role))
                     }
-                }
-                #[cfg(not(feature = "http"))]
-                {
-                    Err(Error::Model(ModelError::ItemMissing))
-                }
-            },
-            GuildContainer::__Nonexhaustive => unreachable!(),
-        }
+                },
+            }
+        }.boxed()
     }
 
     /// Refreshes the information about the user.
     ///
     /// Replaces the instance with the data retrieved over the REST API.
-    #[cfg(feature = "http")]
-    pub fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
-        self.id.to_user(cache_http).map(|replacement| {
-            mem::replace(self, replacement);
-        })
-    }
+    #[inline]
+    pub async fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
+        *self = self.id.to_user(cache_http).await?;
 
+        Ok(())
+    }
 
     /// Returns a static formatted URL of the user's icon, if one exists.
     ///
@@ -742,7 +671,7 @@ impl User {
     ///
     /// ```rust,no_run
     /// # #[cfg(feature = "client")]
-    /// # fn main() {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
@@ -751,25 +680,24 @@ impl User {
     ///
     /// struct Handler;
     ///
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, context: Context, msg: Message) {
+    ///     async fn message(&self, context: Context, msg: Message) {
     ///         if msg.content == "!mytag" {
     ///             let content = MessageBuilder::new()
     ///                 .push("Your tag is ")
     ///                 .push(Bold + msg.author.tag())
     ///                 .build();
     ///
-    ///             let _ = msg.channel_id.say(&context.http, &content);
+    ///             let _ = msg.channel_id.say(&context.http, &content).await;
     ///         }
     ///     }
     /// }
-    /// let mut client = Client::new("token", Handler).unwrap();
+    /// let mut client =Client::builder("token").event_handler(Handler).await?;
     ///
-    /// client.start().unwrap();
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # #[cfg(not(feature = "client"))]
-    /// # fn main() {}
     /// ```
     #[inline]
     pub fn tag(&self) -> String { tag(&self.name, self.discriminator) }
@@ -778,24 +706,45 @@ impl User {
     ///
     /// If none is used, it returns `None`.
     #[inline]
-    #[cfg(feature = "http")]
-    pub fn nick_in<G>(&self, cache_http: impl CacheHttp, guild_id: G) -> Option<String>
-    where G: Into<GuildId> {
-        self._nick_in(cache_http, guild_id.into())
-    }
+    pub async fn nick_in(&self, cache_http: impl CacheHttp, guild_id: impl Into<GuildId>) -> Option<String> {
+        let guild_id = guild_id.into();
 
-    #[cfg(feature = "http")]
-    fn _nick_in(&self, cache_http: impl CacheHttp, guild_id: GuildId) -> Option<String> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                return guild_id.to_guild_cached(cache).and_then(|guild| {
-                    guild.read().members.get(&self.id).and_then(|member| member.nick.clone())
-                });
+                if let Some(guild) = guild_id.to_guild_cached(cache).await {
+                    if let Some(member) = guild.members.get(&self.id) {
+                        return member.nick.clone();
+                    }
+                }
             }
         }
 
-        guild_id.member(cache_http, &self.id).ok().and_then(|member| member.nick.clone())
+        guild_id.member(cache_http, &self.id).await.ok().and_then(|member| member.nick)
+    }
+
+    /// Returns a future that will await one message by this user.
+    #[cfg(feature = "collector")]
+    pub fn await_reply<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReply<'a> {
+        CollectReply::new(shard_messenger).author_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this user.
+    #[cfg(feature = "collector")]
+    pub fn await_replies<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> MessageCollectorBuilder<'a> {
+        MessageCollectorBuilder::new(shard_messenger).author_id(self.id.0)
+    }
+
+    /// Await a single reaction by this user.
+    #[cfg(feature = "collector")]
+    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
+        CollectReaction::new(shard_messenger).author_id(self.id.0)
+    }
+
+    /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this user.
+    #[cfg(feature = "collector")]
+    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
+        ReactionCollectorBuilder::new(shard_messenger).author_id(self.id.0)
     }
 }
 
@@ -812,44 +761,50 @@ impl UserId {
     /// Creates a direct message channel between the [current user] and the
     /// user. This can also retrieve the channel if one already exists.
     ///
-    /// [current user]: ../user/struct.CurrentUser.html
-    #[cfg(feature = "http")]
-    pub fn create_dm_channel(self, http: impl AsRef<Http>) -> Result<PrivateChannel> {
+    /// [current user]: CurrentUser
+    pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
+        #[cfg(feature = "cache")]
+        {
+            if let Some(cache) = cache_http.cache() {
+                for channel in cache.private_channels().await.values() {
+                    if channel.recipient.id == self {
+                        return Ok(channel.clone());
+                    }
+                }
+            }
+        }
+
         let map = json!({
             "recipient_id": self.0,
         });
 
-        http.as_ref().create_private_channel(&map)
+        cache_http.http().create_private_channel(&map).await
     }
 
     /// Attempts to find a [`User`] by its Id in the cache.
-    ///
-    /// [`User`]: ../user/struct.User.html
     #[cfg(feature = "cache")]
     #[inline]
-    pub fn to_user_cached(self, cache: impl AsRef<CacheRwLock>) -> Option<Arc<RwLock<User>>> {cache.as_ref().read().user(self) }
+    pub async fn to_user_cached(self, cache: impl AsRef<Cache>) -> Option<User> {
+        cache.as_ref().user(self).await
+    }
 
     /// First attempts to find a [`User`] by its Id in the cache,
     /// upon failure requests it via the REST API.
     ///
     /// **Note**: If the cache is not enabled,
     /// REST API will be used only.
-    ///
-    /// [`User`]: ../user/struct.User.html
-    #[cfg(feature = "http")]
     #[inline]
-    pub fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
+    pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
-                if let Some(user) = cache.read().user(self) {
-                    return Ok(user.read().clone());
+                if let Some(user) = cache.user(self).await {
+                    return Ok(user);
                 }
             }
         }
 
-        cache_http.http().get_user(self.0)
+        cache_http.http().get_user(self.0).await
     }
 }
 
@@ -861,7 +816,6 @@ impl From<CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name,
-            _nonexhaustive: (),
         }
     }
 }
@@ -874,7 +828,6 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
-            _nonexhaustive: (),
         }
     }
 }
@@ -891,12 +844,12 @@ impl<'a> From<&'a CurrentUser> for UserId {
 
 impl From<Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: Member) -> UserId { member.user.read().id }
+    fn from(member: Member) -> UserId { member.user.id }
 }
 
 impl<'a> From<&'a Member> for UserId {
     /// Gets the Id of a `Member`.
-    fn from(member: &Member) -> UserId { member.user.read().id }
+    fn from(member: &Member) -> UserId { member.user.id }
 }
 
 impl From<User> for UserId {
@@ -949,23 +902,11 @@ fn tag(name: &str, discriminator: u16) -> String {
 mod test {
     #[cfg(feature = "model")]
     mod model {
-        use crate::model::id::UserId;
         use crate::model::user::User;
-
-        fn gen() -> User {
-            User {
-                id: UserId(210),
-                avatar: Some("abc".to_string()),
-                bot: true,
-                discriminator: 1432,
-                name: "test".to_string(),
-                _nonexhaustive: (),
-            }
-        }
 
         #[test]
         fn test_core() {
-            let mut user = gen();
+            let mut user = User::default();
 
             assert!(
                 user.avatar_url()
@@ -998,7 +939,7 @@ mod test {
 
         #[test]
         fn default_avatars() {
-            let mut user = gen();
+            let mut user = User::default();
 
             user.discriminator = 0;
             assert!(user.default_avatar_url().ends_with("0.png"));

@@ -9,6 +9,7 @@ mod create_embed;
 mod create_channel;
 mod create_invite;
 mod create_message;
+mod create_allowed_mentions;
 mod edit_channel;
 mod edit_guild;
 mod edit_member;
@@ -23,6 +24,8 @@ pub use self::{
     create_channel::CreateChannel,
     create_invite::CreateInvite,
     create_message::CreateMessage,
+    create_allowed_mentions::CreateAllowedMentions,
+    create_allowed_mentions::ParseValue,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
     edit_member::EditMember,

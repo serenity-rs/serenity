@@ -4,7 +4,7 @@ use std::collections::HashMap;
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
 ///
-/// [`CurrentUser::edit`]: ../model/user/struct.CurrentUser.html#method.edit
+/// [`CurrentUser::edit`]: crate::model::user::CurrentUser::edit
 #[derive(Clone, Debug, Default)]
 pub struct EditProfile(pub HashMap<&'static str, Value>);
 
@@ -20,37 +20,33 @@ impl EditProfile {
     /// image from a file and return its contents in base64-encoded form:
     ///
     /// ```rust,no_run
-    /// # #[cfg(all(feature = "client", feature = "cache"))]
-    /// # fn main() {
+    /// # #[cfg(all(feature = "client", feature = "cache", feature = "gateway"))]
+    /// # {
     /// # use serenity::prelude::*;
     /// # use serenity::model::prelude::*;
     /// #
     /// # struct Handler;
-    ///
+    /// #
+    /// # #[serenity::async_trait]
     /// # impl EventHandler for Handler {
-    ///    # fn message(&self, context: Context, _: Message) {
-    ///         use serenity::utils;
+    /// #     async fn message(&self, context: Context, _: Message) {
+    /// use serenity::utils;
     ///
-    ///         // assuming a `context` has been bound
+    /// // assuming a `context` has been bound
     ///
-    ///         let base64 = utils::read_image("./my_image.jpg")
-    ///         .expect("Failed to read image");
+    /// let base64 = utils::read_image("./my_image.jpg")
+    ///     .expect("Failed to read image");
     ///
-    ///         let _ = context.cache.write().user.edit(&context, |p|
-    ///             p.avatar(Some(&base64)));
-    ///    # }
+    /// let mut user = context.cache.current_user().await;
+    /// let _ = user.edit(&context, |p| {
+    ///     p.avatar(Some(&base64))
+    /// }).await;
+    /// #     }
     /// # }
-    /// #
-    /// # let mut client = Client::new("token", Handler).unwrap();
-    /// #
-    /// # client.start().unwrap();
     /// # }
-    /// #
-    /// # #[cfg(any(not(feature = "client"), not(feature = "cache")))]
-    /// # fn main() {}
     /// ```
     ///
-    /// [`utils::read_image`]: ../utils/fn.read_image.html
+    /// [`utils::read_image`]: crate::utils::read_image
     pub fn avatar(&mut self, avatar: Option<&str>) -> &mut Self {
         let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
 
@@ -67,7 +63,7 @@ impl EditProfile {
     ///
     /// **Note**: This can only be used by user accounts.
     ///
-    /// [provided]: #method.password
+    /// [provided]: Self::password
     pub fn email(&mut self, email: &str) -> &mut Self {
         self.0.insert("email", Value::String(email.to_string()));
         self
@@ -78,7 +74,7 @@ impl EditProfile {
     /// Note that when modifying the password, the current password must also be
     /// [provided].
     ///
-    /// [provided]: #method.password
+    /// [provided]: Self::password
     pub fn new_password(&mut self, new_password: &str) -> &mut Self {
         self.0.insert("new_password", Value::String(new_password.to_string()));
         self
@@ -87,8 +83,8 @@ impl EditProfile {
     /// Used for providing the current password as verification when
     /// [modifying the password] or [modifying the associated email address].
     ///
-    /// [modifying the password]: #method.new_password
-    /// [modifying the associated email address]: #method.email
+    /// [modifying the password]: Self::new_password
+    /// [modifying the associated email address]: Self::email
     pub fn password(&mut self, password: &str) -> &mut Self {
         self.0.insert("password", Value::String(password.to_string()));
         self

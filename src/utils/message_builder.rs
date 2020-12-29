@@ -20,13 +20,10 @@ use std::{
 /// value:
 ///
 /// ```rust,no_run
-/// # extern crate serde_json;
-/// # extern crate serenity;
-/// #
 /// # use serde_json::json;
 /// # use serenity::model::prelude::*;
 /// #
-/// # fn main() {
+/// # async fn run() {
 /// # let user = UserId(1);
 /// # let emoji = serde_json::from_value::<Emoji>(json!({
 /// #     "animated": false,
@@ -50,9 +47,9 @@ use std::{
 /// # }
 /// ```
 ///
-/// [`build`]: #method.build
-/// [`emoji`]: #method.emoji
-/// [`user`]: #method.user
+/// [`build`]: Self::build
+/// [`emoji`]: Self::emoji
+/// [`user`]: Self::user
 #[derive(Clone, Debug, Default)]
 pub struct MessageBuilder(pub String);
 
@@ -132,10 +129,9 @@ impl MessageBuilder {
     /// assert_eq!(content, "The channel is: <#81384788765712384>");
     /// ```
     ///
-    /// [`Channel`]: ../model/channel/enum.Channel.html
-    /// [`ChannelId`]: ../model/id/struct.ChannelId.html
-    /// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-    /// [Display implementation]: ../model/id/struct.ChannelId.html#method.fmt-1
+    /// [`Channel`]: crate::model::channel::Channel
+    /// [`GuildChannel`]: crate::model::channel::GuildChannel
+    /// [Display implementation]: ChannelId#impl-Display
     #[inline]
     pub fn channel<C: Into<ChannelId>>(&mut self, channel: C) -> &mut Self {
         self._channel(channel.into())
@@ -157,13 +153,10 @@ impl MessageBuilder {
     /// Mention an emoji in a message's content:
     ///
     /// ```rust
-    /// # extern crate serde_json;
-    /// # extern crate serenity;
-    /// #
     /// # use serde_json::json;
     /// # use serenity::model::guild::Role;
     /// #
-    /// # fn main() {
+    /// # {
     /// #
     /// use serenity::model::guild::Emoji;
     /// use serenity::model::id::EmojiId;
@@ -188,7 +181,7 @@ impl MessageBuilder {
     /// # }
     /// ```
     ///
-    /// [Display implementation]: ../model/guild/struct.Emoji.html#method.fmt
+    /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
         let _ = write!(self.0, "{}", emoji);
 
@@ -196,8 +189,6 @@ impl MessageBuilder {
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
-    ///
-    /// [`Mentionable`]: ../model/misc/trait.Mentionable.html
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
         let _ = write!(self.0, "{}", item.mention());
 
@@ -870,9 +861,8 @@ impl MessageBuilder {
     /// Refer to `RoleId`'s [Display implementation] for more information on how
     /// this is formatted.
     ///
-    /// [`Role`]: ../model/guild/struct.Role.html
-    /// [`RoleId`]: ../model/id/struct.RoleId.html
-    /// [Display implementation]: ../model/id/struct.RoleId.html#method.fmt-1
+    /// [`Role`]: crate::model::guild::Role
+    /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
         let _ = write!(self.0, "{}", role.into().mention());
 
@@ -887,9 +877,8 @@ impl MessageBuilder {
     /// Refer to `UserId`'s [Display implementation] for more information on how
     /// this is formatted.
     ///
-    /// [`User`]: ../model/user/struct.User.html
-    /// [`UserId`]: ../model/id/struct.UserId.html
-    /// [Display implementation]: ../model/id/struct.UserId.html#method.fmt-1
+    /// [`User`]: crate::model::user::User
+    /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
         let _ = write!(self.0, "{}", user.into().mention());
 
@@ -926,9 +915,8 @@ impl Display for MessageBuilder {
 /// Make a named link to Rust's GitHub organization:
 ///
 /// ```rust
-/// # #[cfg(feature = "utils")]
-/// # fn main() {
-/// #
+/// #[cfg(feature = "utils")]
+/// {
 /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
 ///
 /// let msg = MessageBuilder::new()
@@ -936,15 +924,14 @@ impl Display for MessageBuilder {
 ///     .build();
 ///
 /// assert_eq!(msg, "[Rust's GitHub](https://github.com/rust-lang)");
-/// # }
-/// #
-/// # #[cfg(not(feature = "utils"))]
-/// # fn main() { }
+/// }
+///
+/// #[cfg(not(feature = "utils"))]
+/// {}
 /// ```
 ///
-/// [`MessageBuilder`]: struct.MessageBuilder.html
-/// [`push_named_link`]: #tymethod.push_named_link
-/// [`push_named_link_safe`]: #tymethod.push_named_link_safe
+/// [`push_named_link`]: Self::push_named_link
+/// [`push_named_link_safe`]: Self::push_named_link_safe
 pub trait EmbedMessageBuilding {
     /// Pushes a named link to a message, intended for use in embeds.
     ///
@@ -953,9 +940,8 @@ pub trait EmbedMessageBuilding {
     /// Make a simple link to Rust's homepage for use in an embed:
     ///
     /// ```rust
-    /// # #[cfg(feature = "utils")]
-    /// # fn main() {
-    /// #
+    /// #[cfg(feature = "utils")]
+    /// {
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
     /// let mut msg = MessageBuilder::new();
@@ -964,10 +950,10 @@ pub trait EmbedMessageBuilding {
     /// let content = msg.build();
     ///
     /// assert_eq!(content, "Rust's website: [Homepage](https://rust-lang.org)");
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "utils"))]
-    /// # fn main() { }
+    /// }
+    ///
+    /// #[cfg(not(feature = "utils"))]
+    /// {}
     /// ```
     fn push_named_link<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self;
 
@@ -979,9 +965,8 @@ pub trait EmbedMessageBuilding {
     /// # Examples
     ///
     /// ```rust
-    /// # #[cfg(feature = "utils")]
-    /// # fn main() {
-    /// #
+    /// #[cfg(feature = "utils")]
+    /// {
     /// use serenity::utils::{EmbedMessageBuilding, MessageBuilder};
     ///
     /// let mut msg = MessageBuilder::new();
@@ -990,13 +975,13 @@ pub trait EmbedMessageBuilding {
     /// let content = msg.build();
     ///
     /// assert_eq!(content, "A weird website name: [Try to   break links ( (](https://rust-lang.org)");
-    /// # }
-    /// #
-    /// # #[cfg(not(feature = "utils"))]
-    /// # fn main() { }
+    /// }
+    ///
+    /// #[cfg(not(feature = "utils"))]
+    /// {}
     /// ```
     ///
-    /// [`push_named_link`]: #tymethod.push_named_link
+    /// [`push_named_link`]: Self::push_named_link
     fn push_named_link_safe<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self;
 }
 
@@ -1011,7 +996,7 @@ impl EmbedMessageBuilding for MessageBuilder {
     }
 
     fn push_named_link_safe<T: I, U: I>(&mut self, name: T, url: U) -> &mut Self {
-        self.0.push_str("[");
+        self.0.push('[');
         {
             let mut c = name.into();
             c.inner = normalize(&c.inner).replace("]", " ");
@@ -1023,7 +1008,7 @@ impl EmbedMessageBuilding for MessageBuilder {
             c.inner = normalize(&c.inner).replace(")", " ");
             self.0.push_str(&c.to_string());
         }
-        self.0.push_str(")");
+        self.0.push(')');
 
         self
     }
@@ -1043,6 +1028,7 @@ impl EmbedMessageBuilding for MessageBuilder {
 /// use serenity::utils::Content;
 /// let content: Content = Bold + Italic + "text";
 /// ```
+#[non_exhaustive]
 pub enum ContentModifier {
     Italic,
     Bold,
@@ -1050,8 +1036,6 @@ pub enum ContentModifier {
     Code,
     Underline,
     Spoiler,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 /// Describes formatting on string content
@@ -1138,10 +1122,10 @@ impl Content {
             ContentModifier::Spoiler => {
                 self.spoiler = true;
             },
-            ContentModifier::__Nonexhaustive => unreachable!(),
         }
     }
 
+    #[allow(clippy::inherent_to_string)]
     pub fn to_string(&self) -> String {
         trait UnwrapWith {
             fn unwrap_with(&self, n: usize) -> usize;
@@ -1272,6 +1256,7 @@ fn normalize(text: &str) -> String {
         .replace("discord.me", "discord\u{2024}me")
         .replace("discordlist.net", "discordlist\u{2024}net")
         .replace("discordservers.com", "discordservers\u{2024}com")
+        .replace("discord.com/invite", "discord\u{2024}com/invite")
         .replace("discordapp.com/invite", "discordapp\u{2024}com/invite")
         // Remove right-to-left override and other similar annoying symbols
         .replace('\u{202E}', " ") // RTL Override
@@ -1336,7 +1321,6 @@ mod test {
                 managed: false,
                 require_colons: true,
                 roles: vec![],
-                _nonexhaustive: (),
             })
             .build();
         let content_mentions = MessageBuilder::new()
@@ -1584,7 +1568,7 @@ mod test {
         assert_eq!(super::normalize("discord.me"), "discord\u{2024}me");
         assert_eq!(super::normalize("discordlist.net"), "discordlist\u{2024}net");
         assert_eq!(super::normalize("discordservers.com"), "discordservers\u{2024}com");
-        assert_eq!(super::normalize("discordapp.com/invite"), "discordapp\u{2024}com/invite");
+        assert_eq!(super::normalize("discord.com/invite"), "discord\u{2024}com/invite");
         assert_eq!(super::normalize("\u{202E}"), " ");
         assert_eq!(super::normalize("\u{200F}"), " ");
         assert_eq!(super::normalize("\u{202B}"), " ");

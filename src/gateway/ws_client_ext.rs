@@ -1,35 +1,40 @@
-use chrono::Utc;
+use crate::client::bridge::gateway::{ChunkGuildFilter, GatewayIntents};
 use crate::constants::{self, OpCode};
-use crate::gateway::{CurrentPresence, WsClient};
+use crate::gateway::{CurrentPresence, WsStream};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::SenderExt;
 use crate::model::id::GuildId;
+use async_trait::async_trait;
 use serde_json::json;
 use std::env::consts;
-use log::{debug, trace};
+use std::time::SystemTime;
+use tracing::instrument;
+use tracing::{debug, trace};
 
+#[async_trait]
 pub trait WebSocketGatewayClientExt {
-    fn send_chunk_guilds<It>(
+    async fn send_chunk_guild(
         &mut self,
-        guild_ids: It,
+        guild_id: GuildId,
         shard_info: &[u64; 2],
         limit: Option<u16>,
-        query: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId>;
+        filter: ChunkGuildFilter,
+        nonce: Option<&str>,
+    ) -> Result<()>;
 
-    fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
+    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()>;
 
-    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: GatewayIntents)
         -> Result<()>;
 
-    fn send_presence_update(
+    async fn send_presence_update(
         &mut self,
         shard_info: &[u64; 2],
         current_presence: &CurrentPresence,
     ) -> Result<()>;
 
-    fn send_resume(
+    async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],
         session_id: &str,
@@ -38,37 +43,53 @@ pub trait WebSocketGatewayClientExt {
     ) -> Result<()>;
 }
 
-impl WebSocketGatewayClientExt for WsClient {
-    fn send_chunk_guilds<It>(
+#[async_trait]
+impl WebSocketGatewayClientExt for WsStream {
+    #[instrument(skip(self))]
+    async fn send_chunk_guild(
         &mut self,
-        guild_ids: It,
+        guild_id: GuildId,
         shard_info: &[u64; 2],
         limit: Option<u16>,
-        query: Option<&str>,
-    ) -> Result<()> where It: IntoIterator<Item=GuildId> {
+        filter: ChunkGuildFilter,
+        nonce: Option<&str>,
+    ) -> Result<()> {
         debug!("[Shard {:?}] Requesting member chunks", shard_info);
 
-        self.send_json(&json!({
+        let mut payload = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": guild_ids.into_iter().map(|x| x.as_ref().0).collect::<Vec<u64>>(),
+                "guild_id": [guild_id.as_ref().0],
                 "limit": limit.unwrap_or(0),
-                "query": query.unwrap_or(""),
+                "nonce": nonce.unwrap_or(""),
             },
-        })).map_err(From::from)
+        });
+
+        match filter {
+            ChunkGuildFilter::None => {},
+            ChunkGuildFilter::Query(query) => payload["d"]["query"] = json!(query),
+            ChunkGuildFilter::UserIds(user_ids) => {
+                let ids = user_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
+                payload["d"]["user_ids"] = json!(ids)
+            },
+        };
+
+        self.send_json(&payload).await.map_err(From::from)
     }
 
-    fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
+    #[instrument(skip(self))]
+    async fn send_heartbeat(&mut self, shard_info: &[u64; 2], seq: Option<u64>)
         -> Result<()> {
         trace!("[Shard {:?}] Sending heartbeat d: {:?}", shard_info, seq);
 
         self.send_json(&json!({
             "d": seq,
             "op": OpCode::Heartbeat.num(),
-        })).map_err(From::from)
+        })).await.map_err(From::from)
     }
 
-    fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, guild_subscriptions: bool)
+    #[instrument(skip(self, token))]
+    async fn send_identify(&mut self, shard_info: &[u64; 2], token: &str, intents: GatewayIntents)
         -> Result<()> {
         debug!("[Shard {:?}] Identifying", shard_info);
 
@@ -77,9 +98,9 @@ impl WebSocketGatewayClientExt for WsClient {
             "d": {
                 "compress": true,
                 "large_threshold": constants::LARGE_THRESHOLD,
-                "guild_subscriptions": guild_subscriptions,
                 "shard": shard_info,
                 "token": token,
+                "intents": intents,
                 "v": constants::GATEWAY_VERSION,
                 "properties": {
                     "$browser": "serenity",
@@ -87,16 +108,17 @@ impl WebSocketGatewayClientExt for WsClient {
                     "$os": consts::OS,
                 },
             },
-        }))
+        })).await
     }
 
-    fn send_presence_update(
+    #[instrument(skip(self))]
+    async fn send_presence_update(
         &mut self,
         shard_info: &[u64; 2],
         current_presence: &CurrentPresence,
     ) -> Result<()> {
         let &(ref activity, ref status) = current_presence;
-        let now = Utc::now().timestamp() as u64;
+        let now = SystemTime::now();
 
         debug!("[Shard {:?}] Sending presence update", shard_info);
 
@@ -112,10 +134,11 @@ impl WebSocketGatewayClientExt for WsClient {
                     "url": x.url,
                 })),
             },
-        }))
+        })).await
     }
 
-    fn send_resume(
+    #[instrument(skip(self))]
+    async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],
         session_id: &str,
@@ -131,6 +154,6 @@ impl WebSocketGatewayClientExt for WsClient {
                 "seq": seq,
                 "token": token,
             },
-        })).map_err(From::from)
+        })).await.map_err(From::from)
     }
 }
