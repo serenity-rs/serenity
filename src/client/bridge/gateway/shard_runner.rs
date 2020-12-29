@@ -1,65 +1,62 @@
-use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction};
+use crate::gateway::{InterMessage, ReconnectType, Shard, ShardAction, GatewayError};
 use crate::internal::prelude::*;
 use crate::internal::ws_impl::{ReceiverExt, SenderExt};
 use crate::model::event::{Event, GatewayEvent};
 use crate::CacheAndHttp;
-use parking_lot::Mutex;
-use parking_lot::RwLock;
+use tokio::sync::RwLock;
 use serde::Deserialize;
 use std::{
     borrow::Cow,
-    sync::{
-        mpsc::{
-            self,
-            Receiver,
-            Sender,
-            TryRecvError
-        },
-        Arc,
-    },
+    sync::Arc,
 };
-use super::super::super::dispatch::{DispatchEvent, dispatch};
-use super::super::super::{EventHandler, RawEventHandler};
+use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
+use futures::{SinkExt, StreamExt};
+use crate::client::dispatch::{DispatchEvent, dispatch};
+use crate::client::{EventHandler, RawEventHandler};
 use super::event::{ClientEvent, ShardStageUpdateEvent};
 use super::{ShardClientMessage, ShardId, ShardManagerMessage, ShardRunnerMessage};
-use threadpool::ThreadPool;
-use tungstenite::{
+use async_tungstenite::tungstenite::{
+    self,
     error::Error as TungsteniteError,
     protocol::frame::CloseFrame,
 };
-use typemap::ShareMap;
 
+use typemap_rev::TypeMap;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use super::super::voice::ClientVoiceManager;
-use log::{error, debug, warn};
+use crate::client::bridge::voice::VoiceGatewayManager;
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionAction, ReactionFilter};
+
+use tracing::{trace, error, debug, warn, info, instrument};
 
 /// A runner for managing a [`Shard`] and its respective WebSocket client.
-///
-/// [`Shard`]: ../../../gateway/struct.Shard.html
 pub struct ShardRunner {
-    data: Arc<RwLock<ShareMap>>,
+    data: Arc<RwLock<TypeMap>>,
     event_handler: Option<Arc<dyn EventHandler>>,
     raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
+    framework: Arc<Box<dyn Framework + Send + Sync>>,
     manager_tx: Sender<ShardManagerMessage>,
     // channel to receive messages from the shard manager and dispatches
     runner_rx: Receiver<InterMessage>,
     // channel to send messages to the shard runner from the shard manager
     runner_tx: Sender<InterMessage>,
     pub(crate) shard: Shard,
-    threadpool: ThreadPool,
     #[cfg(feature = "voice")]
-    voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     cache_and_http: Arc<CacheAndHttp>,
+    #[cfg(feature = "collector")]
+    message_filters: Vec<MessageFilter>,
+    #[cfg(feature = "collector")]
+    reaction_filters: Vec<ReactionFilter>,
 }
 
 impl ShardRunner {
     /// Creates a new runner for a Shard.
     pub fn new(opt: ShardRunnerOptions) -> Self {
-        let (tx, rx) = mpsc::channel();
+        let (tx, rx) = mpsc::unbounded();
 
         Self {
             runner_rx: rx,
@@ -71,10 +68,13 @@ impl ShardRunner {
             framework: opt.framework,
             manager_tx: opt.manager_tx,
             shard: opt.shard,
-            threadpool: opt.threadpool,
             #[cfg(feature = "voice")]
             voice_manager: opt.voice_manager,
             cache_and_http: opt.cache_and_http,
+            #[cfg(feature = "collector")]
+            message_filters: Vec::new(),
+            #[cfg(feature = "collector")]
+            reaction_filters: Vec::new(),
         }
     }
 
@@ -100,30 +100,29 @@ impl ShardRunner {
     ///
     /// 6. Go back to 1.
     ///
-    /// [`GatewayEvent`]: ../../../model/event/enum.GatewayEvent.html
-    /// [`Shard`]: ../../../gateway/struct.Shard.html
-    /// [`ShardManager`]: struct.ShardManager.html
-    /// [`ShardRunnerMessage`]: enum.ShardRunnerMessage.html
-    pub fn run(&mut self) -> Result<()> {
-        debug!("[ShardRunner {:?}] Running", self.shard.shard_info());
+    /// [`ShardManager`]: super::ShardManager
+    #[instrument(skip(self))]
+    pub async fn run(&mut self) -> Result<()> {
+        info!("[ShardRunner {:?}] Running", self.shard.shard_info());
 
         loop {
-            if !self.recv()? {
+            trace!("[ShardRunner {:?}] loop iteration started.", self.shard.shard_info());
+            if !self.recv().await? {
                 return Ok(());
             }
 
             // check heartbeat
-            if !self.shard.check_heartbeat() {
+            if !self.shard.check_heartbeat().await {
                 warn!(
                     "[ShardRunner {:?}] Error heartbeating",
                     self.shard.shard_info(),
                 );
 
-                return self.request_restart();
+                return self.request_restart().await;
             }
 
             let pre = self.shard.stage();
-            let (event, action, successful) = self.recv_event();
+            let (event, action, successful) = self.recv_event().await?;
             let post = self.shard.stage();
 
             if post != pre {
@@ -134,27 +133,86 @@ impl ShardRunner {
                     old: pre,
                     shard_id: ShardId(self.shard.shard_info()[0]),
                 });
-                self.dispatch(DispatchEvent::Client(e));
+
+                self.dispatch(DispatchEvent::Client(e)).await;
             }
 
             match action {
                 Some(ShardAction::Reconnect(ReconnectType::Reidentify)) => {
-                    let _ = self.request_restart();
-                    continue;
+                    return self.request_restart().await;
                 },
                 Some(other) => {
-                    let _ = self.action(&other);
+                    let _ = self.action(&other).await;
                 },
                 None => {},
             }
 
             if let Some(event) = event {
-                self.dispatch(DispatchEvent::Model(event));
+                #[cfg(feature = "collector")]
+                {
+                    self.handle_filters(&event);
+                }
+
+                self.dispatch(DispatchEvent::Model(event)).await;
             }
 
             if !successful && !self.shard.stage().is_connecting() {
-                return self.request_restart();
+                return self.request_restart().await;
             }
+            trace!("[ShardRunner {:?}] loop iteration reached the end.", self.shard.shard_info());
+        }
+    }
+
+    /// Lets filters check the `event` to send them to collectors if the `event`
+    /// is accepted by them.
+    #[cfg(feature = "collector")]
+    fn handle_filters(&mut self, event: &Event) {
+        /// Unlike `Vec`'s `retain`, allows mutable references in `f`.
+        fn retain<T, F>(vec: &mut Vec<T>, mut f: F)
+        where
+            F: FnMut(&mut T) -> bool,
+        {
+            let len = vec.len();
+            let mut del = 0;
+            {
+                let v = &mut **vec;
+
+                for i in 0..len {
+
+                    if !f(&mut v[i]) {
+                        del += 1;
+                    } else if del > 0 {
+                        v.swap(i - del, i);
+                    }
+                }
+            }
+
+            if del > 0 {
+                vec.truncate(len - del);
+            }
+        }
+
+        // Avoid the clone if there is no message filter.
+        if !self.message_filters.is_empty() {
+
+            if let Event::MessageCreate(ref msg_event) = &event {
+                let msg = Arc::new(msg_event.message.clone());
+
+                retain(&mut self.message_filters, |f| f.send_message(&msg));
+            }
+        }
+
+        // Avoid the clone if there is no reacton filter.
+        if !self.reaction_filters.is_empty() {
+            let reaction = Arc::new(match &event {
+                Event::ReactionAdd(ref reaction_event) =>
+                    ReactionAction::Added(Arc::new(reaction_event.reaction.clone())),
+                Event::ReactionRemove(ref reaction_event) =>
+                    ReactionAction::Removed(Arc::new(reaction_event.reaction.clone())),
+                _ => return,
+            });
+
+            retain(&mut self.reaction_filters, |f| f.send_reaction(&reaction));
         }
     }
 
@@ -172,18 +230,13 @@ impl ShardRunner {
     /// # Errors
     ///
     /// Returns
-    fn action(&mut self, action: &ShardAction) -> Result<()> {
+    #[instrument(skip(self, action))]
+    async fn action(&mut self, action: &ShardAction) -> Result<()> {
         match *action {
-            ShardAction::Reconnect(ReconnectType::Reidentify) => {
-                self.request_restart()
-            },
-            ShardAction::Reconnect(ReconnectType::Resume) => {
-                self.shard.resume()
-            },
-            ShardAction::Reconnect(ReconnectType::__Nonexhaustive) => unreachable!(),
-            ShardAction::Heartbeat => self.shard.heartbeat(),
-            ShardAction::Identify => self.shard.identify(),
-            ShardAction::__Nonexhaustive => unreachable!(),
+            ShardAction::Reconnect(ReconnectType::Reidentify) => self.request_restart().await,
+            ShardAction::Reconnect(ReconnectType::Resume) => self.shard.resume().await,
+            ShardAction::Heartbeat => self.shard.heartbeat().await,
+            ShardAction::Identify => self.shard.identify().await,
         }
     }
 
@@ -194,7 +247,8 @@ impl ShardRunner {
     // Returns whether the WebSocket client is still active.
     //
     // If true, the WebSocket client was _not_ shutdown. If false, it was.
-    fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
+    #[instrument(skip(self))]
+    async fn checked_shutdown(&mut self, id: ShardId, close_code: u16) -> bool {
         // First verify the ID so we know for certain this runner is
         // to shutdown.
         if id.0 != self.shard.shard_info()[0] {
@@ -207,14 +261,14 @@ impl ShardRunner {
         let _ = self.shard.client.close(Some(CloseFrame {
             code: close_code.into(),
             reason: Cow::from(""),
-        }));
+        })).await;
 
         // In return, we wait for either a Close Frame response, or an error, after which this WS is deemed
         // disconnected from Discord.
         loop {
-            match self.shard.client.read_message() {
-                Ok(tungstenite::Message::Close(_)) => break,
-                Err(_) => {
+            match self.shard.client.next().await {
+                Some(Ok(tungstenite::Message::Close(_))) => break,
+                Some(Err(_)) => {
                     warn!(
                         "[ShardRunner {:?}] Received an error awaiting close frame",
                         self.shard.shard_info(),
@@ -226,7 +280,7 @@ impl ShardRunner {
         }
 
         // Inform the manager that shutdown for this shard has finished.
-        if let Err(why) = self.manager_tx.send(ShardManagerMessage::ShutdownFinished(id)) {
+        if let Err(why) = self.manager_tx.unbounded_send(ShardManagerMessage::ShutdownFinished(id)) {
             warn!(
                 "[ShardRunner {:?}] Could not send ShutdownFinished: {:#?}",
                 self.shard.shard_info(),
@@ -237,7 +291,8 @@ impl ShardRunner {
     }
 
     #[inline]
-    fn dispatch(&self, event: DispatchEvent) {
+    #[instrument(skip(self, event))]
+    async fn dispatch(&self, event: DispatchEvent) {
         dispatch(
             event,
             #[cfg(feature = "framework")]
@@ -246,10 +301,9 @@ impl ShardRunner {
             &self.event_handler,
             &self.raw_event_handler,
             &self.runner_tx,
-            &self.threadpool,
             self.shard.shard_info()[0],
             Arc::clone(&self.cache_and_http),
-        );
+        ).await;
     }
 
     // Handles a received value over the shard runner rx channel.
@@ -258,43 +312,56 @@ impl ShardRunner {
     //
     // This always returns true, except in the case that the shard manager asked
     // the runner to shutdown.
-    fn handle_rx_value(&mut self, value: InterMessage) -> bool {
+    #[instrument(skip(self))]
+    async fn handle_rx_value(&mut self, value: InterMessage) -> bool {
         match value {
             InterMessage::Client(value) => match *value {
-                    ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) =>
-                        self.checked_shutdown(id, 4000),
-                    ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id, code)) =>
-                        self.checked_shutdown(id, code),
-                    ShardClientMessage::Manager(ShardManagerMessage::ShutdownAll) => {
-                        // This variant should never be received.
+                ShardClientMessage::Manager(ShardManagerMessage::Restart(id)) =>
+                    self.checked_shutdown(id, 4000).await,
+                ShardClientMessage::Manager(ShardManagerMessage::Shutdown(id, code)) =>
+                    self.checked_shutdown(id, code).await,
+                ShardClientMessage::Manager(ShardManagerMessage::ShutdownAll) => {
+                    // This variant should never be received.
+                    warn!(
+                        "[ShardRunner {:?}] Received a ShutdownAll?",
+                        self.shard.shard_info(),
+                    );
+
+                    true
+                },
+                ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate { .. }) => {
+                    // nb: not sent here
+
+                    true
+                },
+                ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated) => {
+                    // nb: not sent here
+
+                    true
+                },
+                ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
+                    // nb: not sent here
+
+                    true
+                },
+                ShardClientMessage::Manager(ShardManagerMessage::ShardDisallowedGatewayIntents)
+                    | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidAuthentication)
+                    | ShardClientMessage::Manager(ShardManagerMessage::ShardInvalidGatewayIntents) => {
+                        // These variants should never be received.
                         warn!(
-                            "[ShardRunner {:?}] Received a ShutdownAll?",
+                            "[ShardRunner {:?}] Received a ShardError?",
                             self.shard.shard_info(),
                         );
 
                         true
                     },
-                    ShardClientMessage::Manager(ShardManagerMessage::ShardUpdate { .. }) => {
-                        // nb: not sent here
-
-                        true
-                    },
-                    ShardClientMessage::Manager(ShardManagerMessage::ShutdownInitiated) => {
-                        // nb: not sent here
-
-                        true
-                    },
-                    ShardClientMessage::Manager(ShardManagerMessage::ShutdownFinished(_)) => {
-                        // nb: not sent here
-
-                        true
-                    },
-                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuilds { guild_ids, limit, query }) => {
-                    self.shard.chunk_guilds(
-                        guild_ids,
+                ShardClientMessage::Runner(ShardRunnerMessage::ChunkGuild { guild_id, limit, filter, nonce }) => {
+                    self.shard.chunk_guild(
+                        guild_id,
                         limit,
-                        query.as_ref().map(String::as_str),
-                    ).is_ok()
+                        filter,
+                        nonce.as_deref(),
+                    ).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Close(code, reason)) => {
                     let reason = reason.unwrap_or_else(String::new);
@@ -302,10 +369,10 @@ impl ShardRunner {
                         code: code.into(),
                         reason: Cow::from(reason),
                     };
-                    self.shard.client.close(Some(close)).is_ok()
+                    self.shard.client.close(Some(close)).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::Message(msg)) => {
-                    self.shard.client.write_message(msg).is_ok()
+                    self.shard.client.send(msg).await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::SetActivity(activity)) => {
                     // To avoid a clone of `activity`, we do a little bit of
@@ -323,57 +390,61 @@ impl ShardRunner {
                     // - the original activity we received over the channel
                     self.shard.set_activity(activity);
 
-                    self.shard.update_presence().is_ok()
+                    self.shard.update_presence().await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::SetPresence(status, activity)) => {
                     self.shard.set_presence(status, activity);
 
-                    self.shard.update_presence().is_ok()
+                    self.shard.update_presence().await.is_ok()
                 },
                 ShardClientMessage::Runner(ShardRunnerMessage::SetStatus(status)) => {
                     self.shard.set_status(status);
 
-                    self.shard.update_presence().is_ok()
+                    self.shard.update_presence().await.is_ok()
+                },
+                #[cfg(feature = "collector")]
+                ShardClientMessage::Runner(ShardRunnerMessage::SetMessageFilter(collector)) => {
+                    self.message_filters.push(collector);
+
+                    true
+                },
+                #[cfg(feature = "collector")]
+                ShardClientMessage::Runner(ShardRunnerMessage::SetReactionFilter(collector)) => {
+                    self.reaction_filters.push(collector);
+
+                    true
                 },
             },
             InterMessage::Json(value) => {
                 // Value must be forwarded over the websocket
-                self.shard.client.send_json(&value).is_ok()
+                self.shard.client.send_json(&value).await.is_ok()
             },
-            InterMessage::__Nonexhaustive => unreachable!(),
         }
     }
 
     #[cfg(feature = "voice")]
-    fn handle_voice_event(&self, event: &Event) {
-        match *event {
-            Event::Ready(_) => {
-                self.voice_manager.lock().set(
-                    self.shard.shard_info()[0],
-                    self.runner_tx.clone(),
-                );
-            },
-            Event::VoiceServerUpdate(ref event) => {
-                if let Some(guild_id) = event.guild_id {
-                    let mut manager = self.voice_manager.lock();
-                    let search = manager.get_mut(guild_id);
-
-                    if let Some(handler) = search {
-                        handler.update_server(&event.endpoint, &event.token);
+    #[instrument(skip(self))]
+    async fn handle_voice_event(&self, event: &Event) {
+        if let Some(voice_manager) = &self.voice_manager {
+            match *event {
+                Event::Ready(_) => {
+                    voice_manager.register_shard(
+                        self.shard.shard_info()[0],
+                        self.runner_tx.clone(),
+                    ).await;
+                },
+                Event::VoiceServerUpdate(ref event) => {
+                    if let Some(guild_id) = event.guild_id {
+                        voice_manager.server_update(guild_id, &event.endpoint, &event.token).await;
                     }
-                }
-            },
-            Event::VoiceStateUpdate(ref event) => {
-                if let Some(guild_id) = event.guild_id {
-                    let mut manager = self.voice_manager.lock();
-                    let search = manager.get_mut(guild_id);
-
-                    if let Some(handler) = search {
-                        handler.update_state(&event.voice_state);
+                },
+                Event::VoiceStateUpdate(ref event) => {
+                    if let Some(guild_id) = event.guild_id {
+                        voice_manager.state_update(guild_id, &event.voice_state).await;
                     }
-                }
-            },
-            _ => {},
+                },
+                _ => {},
+            }
         }
     }
 
@@ -386,25 +457,26 @@ impl ShardRunner {
     // should _never_ happen, as the sending half is kept on the runner.
 
     // Returns whether the shard runner is in a state that can continue.
-    fn recv(&mut self) -> Result<bool> {
+    #[instrument(skip(self))]
+    async fn recv(&mut self) -> Result<bool> {
         loop {
-            match self.runner_rx.try_recv() {
-                Ok(value) => {
-                    if !self.handle_rx_value(value) {
+            match self.runner_rx.try_next() {
+                Ok(Some(value)) => {
+                    if !self.handle_rx_value(value).await {
                         return Ok(false);
                     }
                 },
-                Err(TryRecvError::Disconnected) => {
+                Ok(None) => {
                     warn!(
                         "[ShardRunner {:?}] Sending half DC; restarting",
                         self.shard.shard_info(),
                     );
 
-                    let _ = self.request_restart();
+                    let _ = self.request_restart().await;
 
                     return Ok(false);
                 },
-                Err(TryRecvError::Empty) => break,
+                Err(_) => break,
             }
         }
 
@@ -415,57 +487,35 @@ impl ShardRunner {
 
     /// Returns a received event, as well as whether reading the potentially
     /// present event was successful.
-    fn recv_event(&mut self) -> (Option<Event>, Option<ShardAction>, bool) {
-        let gw_event = match self.shard.client.recv_json() {
+    #[instrument(skip(self))]
+    async fn recv_event(&mut self) -> Result<(Option<Event>, Option<ShardAction>, bool)> {
+        let gw_event = match self.shard.client.recv_json().await {
             Ok(Some(value)) => {
                 GatewayEvent::deserialize(value).map(Some).map_err(From::from)
             },
             Ok(None) => Ok(None),
             Err(Error::Tungstenite(TungsteniteError::Io(_))) => {
-                // Check that an amount of time at least double the
-                // heartbeat_interval has passed.
-                //
-                // If not, continue on trying to receive messages.
-                //
-                // If it has, attempt to auto-reconnect.
-                {
-                    let last = self.shard.last_heartbeat_ack();
-                    let interval = self.shard.heartbeat_interval();
-
-                    if let (Some(last_heartbeat_ack), Some(interval)) = (last, interval) {
-                        let seconds_passed = last_heartbeat_ack.elapsed().as_secs();
-                        let interval_in_secs = interval / 1000;
-
-                        if seconds_passed <= interval_in_secs * 2 {
-                            return (None, None, true);
-                        }
-                    } else {
-                        return (None, None, true);
-                    }
-                }
-
                 debug!("Attempting to auto-reconnect");
 
                 match self.shard.reconnection_type() {
-                    ReconnectType::Reidentify => return (None, None, false),
+                    ReconnectType::Reidentify => return Ok((None, None, false)),
                     ReconnectType::Resume => {
-                        if let Err(why) = self.shard.resume() {
+                        if let Err(why) = self.shard.resume().await {
                             warn!("Failed to resume: {:?}", why);
 
-                            return (None, None, false);
+                            return Ok((None, None, false));
                         }
                     },
-                    ReconnectType::__Nonexhaustive => unreachable!(),
                 }
 
-                return (None, None, true);
+                return Ok((None, None, true));
             },
             Err(why) => Err(why),
         };
 
         let event = match gw_event {
             Ok(Some(event)) => Ok(event),
-            Ok(None) => return (None, None, true),
+            Ok(None) => return Ok((None, None, true)),
             Err(why) => Err(why),
         };
 
@@ -475,7 +525,33 @@ impl ShardRunner {
             Err(why) => {
                 error!("Shard handler received err: {:?}", why);
 
-                return (None, None, true);
+                match why {
+                    Error::Gateway(GatewayError::InvalidAuthentication) => {
+                        if self.manager_tx.unbounded_send(
+                            ShardManagerMessage::ShardInvalidAuthentication).is_err() {
+                            panic!("Failed sending InvalidAuthentication error to the shard manager.");
+                        }
+
+                        return Err(why);
+                    },
+                    Error::Gateway(GatewayError::InvalidGatewayIntents) => {
+                        if self.manager_tx.unbounded_send(
+                            ShardManagerMessage::ShardInvalidGatewayIntents).is_err() {
+                            panic!("Failed sending InvalidGatewayIntents error to the shard manager.");
+                        }
+
+                        return Err(why);
+                    },
+                    Error::Gateway(GatewayError::DisallowedGatewayIntents) => {
+                        if self.manager_tx.unbounded_send(
+                            ShardManagerMessage::ShardDisallowedGatewayIntents).is_err() {
+                            panic!("Failed sending DisallowedGatewayIntents error to the shard manager.");
+                        }
+
+                        return Err(why);
+                    },
+                    _ => return Ok((None, None, true)),
+                }
             },
         };
 
@@ -486,7 +562,7 @@ impl ShardRunner {
         #[cfg(feature = "voice")]
         {
             if let Ok(GatewayEvent::Dispatch(_, ref event)) = event {
-                self.handle_voice_event(&event);
+                self.handle_voice_event(&event).await;
             }
         }
 
@@ -495,10 +571,11 @@ impl ShardRunner {
             _ => None,
         };
 
-        (event, action, true)
+        Ok((event, action, true))
     }
 
-    fn request_restart(&self) -> Result<()> {
+    #[instrument(skip(self))]
+    async fn request_restart(&mut self) -> Result<()> {
         self.update_manager();
 
         debug!(
@@ -507,18 +584,22 @@ impl ShardRunner {
         );
         let shard_id = ShardId(self.shard.shard_info()[0]);
         let msg = ShardManagerMessage::Restart(shard_id);
-        let _ = self.manager_tx.send(msg);
+
+        if let Err(error) = self.manager_tx.unbounded_send(msg) {
+            warn!("Error sending request restart: {:?}", error);
+        }
 
         #[cfg(feature = "voice")]
-        {
-            self.voice_manager.lock().manager_remove(shard_id.0);
+        if let Some(voice_manager) = &self.voice_manager {
+            voice_manager.deregister_shard(shard_id.0).await;
         }
 
         Ok(())
     }
 
+    #[instrument(skip(self))]
     fn update_manager(&self) {
-        let _ = self.manager_tx.send(ShardManagerMessage::ShardUpdate {
+        let _ = self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
             id: ShardId(self.shard.shard_info()[0]),
             latency: self.shard.latency(),
             stage: self.shard.stage(),
@@ -527,18 +608,15 @@ impl ShardRunner {
 }
 
 /// Options to be passed to [`ShardRunner::new`].
-///
-/// [`ShardRunner::new`]: struct.ShardRunner.html#method.new
 pub struct ShardRunnerOptions {
-    pub data: Arc<RwLock<ShareMap>>,
+    pub data: Arc<RwLock<TypeMap>>,
     pub event_handler: Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
+    pub framework: Arc<Box<dyn Framework + Send + Sync>>,
     pub manager_tx: Sender<ShardManagerMessage>,
     pub shard: Shard,
-    pub threadpool: ThreadPool,
     #[cfg(feature = "voice")]
-    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync>>,
     pub cache_and_http: Arc<CacheAndHttp>,
 }

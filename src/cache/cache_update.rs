@@ -1,18 +1,20 @@
 use super::Cache;
+use async_trait::async_trait;
 
 /// Trait used for updating the cache with a type.
 ///
 /// This may be implemented on a type and used to update the cache via
 /// [`Cache::update`].
 ///
+/// **Info**:
+/// You may not access the fields of the cache, as they are public for the
+/// crate only.
+///
 /// # Examples
 ///
 /// Creating a custom struct implementation to update the cache with:
 ///
-/// ```rust
-/// extern crate serde_json;
-/// extern crate serenity;
-///
+/// ```rust,ignore
 /// use serde_json::json;
 /// use serenity::{
 ///     cache::{Cache, CacheUpdate},
@@ -37,32 +39,32 @@ use super::Cache;
 ///     user_name: String,
 /// }
 ///
+/// #[serenity::async_trait]
 /// impl CacheUpdate for DatabaseUserUpdate {
 ///     // A copy of the old user's data, if it existed in the cache.
 ///     type Output = User;
 ///
-///     fn update(&mut self, cache: &mut Cache) -> Option<Self::Output> {
+///     async fn update(&mut self, cache: &Cache) -> Option<Self::Output> {
 ///         // If an entry for the user already exists, update its fields.
 ///         match cache.users.entry(self.user_id) {
 ///             Entry::Occupied(entry) => {
 ///                 let user = entry.get();
-///                 let mut writer = user.write();
-///                 let old = writer.clone();
+///                 let old_user = user.clone();
 ///
-///                 writer.bot = self.user_is_bot;
-///                 writer.discriminator = self.user_discriminator;
-///                 writer.id = self.user_id;
+///                 user.bot = self.user_is_bot;
+///                 user.discriminator = self.user_discriminator;
+///                 user.id = self.user_id;
 ///
-///                 if writer.avatar != self.user_avatar {
-///                     writer.avatar = self.user_avatar.clone();
+///                 if user.avatar != self.user_avatar {
+///                     user.avatar = self.user_avatar.clone();
 ///                 }
 ///
-///                 if writer.name != self.user_name {
-///                     writer.name = self.user_name.clone();
+///                 if user.name != self.user_name {
+///                     user.name = self.user_name.clone();
 ///                 }
 ///
 ///                 // Return the old copy for the user's sake.
-///                 Some(old)
+///                 Some(old_user)
 ///             },
 ///             Entry::Vacant(entry) => {
 ///                 // We can convert a `serde_json::Value` to a User for test
@@ -75,7 +77,7 @@ use super::Cache;
 ///                     "username": self.user_name.clone(),
 ///                 })).expect("Error making user");
 ///
-///                 entry.insert(Arc::new(RwLock::new(user)));
+///                 entry.insert(user);
 ///
 ///                 // There was no old copy, so return None.
 ///                 None
@@ -84,7 +86,7 @@ use super::Cache;
 ///     }
 /// }
 ///
-/// # fn main() {
+/// # async fn run() {
 /// // Create an instance of the cache.
 /// let mut cache = Cache::new();
 ///
@@ -99,11 +101,10 @@ use super::Cache;
 /// };
 ///
 /// // Update the cache with the message.
-/// cache.update(&mut update_message);
+/// cache.update(&mut update_message).await;
 /// # }
 /// ```
-///
-/// [`Cache::update`]: struct.Cache.html#method.update
+#[async_trait]
 pub trait CacheUpdate {
     /// The return type of an update.
     ///
@@ -111,5 +112,5 @@ pub trait CacheUpdate {
     type Output;
 
     /// Updates the cache with the implementation.
-    fn update(&mut self, _: &mut Cache) -> Option<Self::Output>;
+    async fn update(&mut self, _: &Cache) -> Option<Self::Output>;
 }

@@ -14,21 +14,26 @@
 //!
 //! Click [here][Client examples] for an example on how to use a `Client`.
 //!
-//! [`Client`]: struct.Client.html#examples
-//! [`Context`]: struct.Context.html
-//! [Client examples]: struct.Client.html#examples
+//! [Client examples]: Client#examples
 
 pub mod bridge;
 
 mod context;
+#[cfg(feature = "gateway")]
 mod dispatch;
 mod error;
+#[cfg(feature = "gateway")]
 mod event_handler;
+#[cfg(feature = "gateway")]
 mod extras;
 
 pub use self::{
     context::Context,
     error::Error as ClientError,
+};
+
+#[cfg(feature = "gateway")]
+pub use self::{
     event_handler::{EventHandler, RawEventHandler},
     extras::Extras,
 };
@@ -36,27 +41,291 @@ pub use self::{
 pub use crate::CacheAndHttp;
 
 #[cfg(feature = "cache")]
-pub use crate::cache::{Cache, CacheRwLock};
-
-#[cfg(feature = "cache")]
-use std::time::Duration;
+pub use crate::cache::Cache;
 
 use crate::internal::prelude::*;
-use parking_lot::Mutex;
-use parking_lot::RwLock;
-use self::bridge::gateway::{ShardManager, ShardManagerMonitor, ShardManagerOptions};
-use std::sync::Arc;
-use threadpool::ThreadPool;
-use typemap::ShareMap;
-use log::{error, debug, info};
+use tokio::sync::{Mutex, RwLock};
+#[cfg(feature = "gateway")]
+use super::gateway::GatewayError;
+#[cfg(feature = "gateway")]
+use self::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerMonitor, ShardManagerOptions, ShardManagerError};
+use std::{
+    boxed::Box,
+    sync::Arc,
+    future::Future,
+    pin::Pin,
+    task::{Context as FutContext, Poll},
+};
+#[cfg(all(feature = "cache", feature = "gateway"))]
+use std::time::Duration;
+use tracing::{error, debug, info, instrument};
 
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 #[cfg(feature = "voice")]
-use crate::model::id::UserId;
-#[cfg(feature = "voice")]
-use self::bridge::voice::ClientVoiceManager;
+use self::bridge::voice::VoiceGatewayManager;
 use crate::http::Http;
+use typemap_rev::{TypeMap, TypeMapKey};
+use futures::future::BoxFuture;
+
+/// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
+#[cfg(feature = "gateway")]
+pub struct ClientBuilder<'a> {
+    data: Option<TypeMap>,
+    http: Option<Http>,
+    fut: Option<BoxFuture<'a, Result<Client>>>,
+    intents: GatewayIntents,
+    #[cfg(feature = "cache")]
+    timeout: Option<Duration>,
+    #[cfg(feature = "framework")]
+    framework: Option<Arc<Box<dyn Framework + Send + Sync + 'static>>>,
+    #[cfg(feature = "voice")]
+    voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
+    event_handler: Option<Arc<dyn EventHandler>>,
+    raw_event_handler: Option<Arc<dyn RawEventHandler>>,
+}
+
+#[cfg(feature = "gateway")]
+impl<'a> ClientBuilder<'a> {
+    /// Construct a new builder to call methods on for the client construction.
+    /// The `token` will automatically be prefixed "Bot " if not already.
+    ///
+    /// **Panic**:
+    /// If you enabled the `framework`-feature (on by default), you must specify
+    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// otherwise awaiting the builder will cause a panic.
+    ///
+    /// [`framework`]: Self::framework
+    /// [`framework_arc`]: Self::framework_arc
+    pub fn new(token: impl AsRef<str>) -> Self {
+        Self {
+            data: Some(TypeMap::new()),
+            http: None,
+            fut: None,
+            intents: GatewayIntents::non_privileged(),
+            #[cfg(feature = "cache")]
+            timeout: None,
+            #[cfg(feature = "framework")]
+            framework: None,
+            #[cfg(feature = "voice")]
+            voice_manager: None,
+            event_handler: None,
+            raw_event_handler: None,
+        }.token(token)
+    }
+
+    /// Sets a token for the bot. If the token is not prefixed "Bot ",
+    /// this method will automatically do so.
+    pub fn token(mut self, token: impl AsRef<str>) -> Self {
+        let token = token.as_ref().trim();
+
+        let token = if token.starts_with("Bot ") {
+            token.to_string()
+        } else {
+            format!("Bot {}", token)
+        };
+
+        self.http = Some(Http::new_with_token(&token));
+
+        self
+    }
+
+    /// Sets the entire [`TypeMap`] that will be available in [`Context`]s.
+    /// A `TypeMap` must not be constructed manually: [`type_map_insert`]
+    /// can be used to insert one type at a time.
+    ///
+    /// [`type_map_insert`]: Self::type_map_insert
+    pub fn type_map(mut self, type_map: TypeMap) -> Self {
+        self.data = Some(type_map);
+
+        self
+    }
+
+    /// Insert a single `value` into the internal [`TypeMap`] that will
+    /// be available in [`Context::data`].
+    /// This method can be called multiple times in order to populate the
+    /// [`TypeMap`] with `value`s.
+    pub fn type_map_insert<T: TypeMapKey>(mut self, value: T::Value) -> Self {
+        if let Some(ref mut data) = self.data {
+            data.insert::<T>(value);
+        } else {
+            let mut type_map = TypeMap::new();
+            type_map.insert::<T>(value);
+
+            self.data = Some(type_map);
+        }
+
+        self
+    }
+
+    /// Sets how long - if wanted to begin with - a cache update shall
+    /// be attempted for. After the `timeout` ran out, the update will be
+    /// skipped.
+    ///
+    /// By default, a cache update will never timeout and potentially
+    /// cause a deadlock.
+    /// A timeout however, will invalidate the cache.
+    #[cfg(feature = "cache")]
+    pub fn cache_update_timeout(mut self, timeout: Duration) -> Self {
+        self.timeout = Some(timeout);
+
+        self
+    }
+
+    /// Sets the command framework to be used. It will receive messages sent
+    /// over the gateway and then consider - based on its settings - whether to
+    /// dispatch a command.
+    ///
+    /// *Info*:
+    /// If a reference to the framework is required for manual dispatch,
+    /// use the [`framework_arc`]-method instead.
+    ///
+    /// [`framework_arc`]: Self::framework_arc
+    #[cfg(feature = "framework")]
+    pub fn framework<F>(mut self, framework: F) -> Self
+    where F: Framework + Send + Sync + 'static,
+    {
+        self.framework = Some(Arc::new(Box::new(framework)));
+
+        self
+    }
+
+    /// This method allows to pass an `Arc`'ed `framework` - this step is
+    /// done for you in the [`framework`]-method, if you don't need the
+    /// extra control.
+    /// You can provide a clone and keep the original to manually dispatch.
+    ///
+    /// [`framework`]: Self::framework
+    #[cfg(feature = "framework")]
+    pub fn framework_arc(mut self, framework: Arc<Box<dyn Framework + Send + Sync + 'static>>) -> Self {
+        self.framework = Some(framework);
+
+        self
+    }
+
+    /// Sets the voice gateway handler to be used. It will receive voice events sent
+    /// over the gateway and then consider - based on its settings - whether to
+    /// dispatch a command.
+    ///
+    /// *Info*:
+    /// If a reference to the voice_manager is required for manual dispatch,
+    /// use the [`voice_manager_arc`]-method instead.
+    ///
+    /// [`voice_manager_arc`]: Self::voice_manager_arc
+    #[cfg(feature = "voice")]
+    pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
+    where V: VoiceGatewayManager + Send + Sync + 'static,
+    {
+        self.voice_manager = Some(Arc::new(voice_manager));
+
+        self
+    }
+
+    /// This method allows to pass an `Arc`'ed `voice_manager` - this step is
+    /// done for you in the [`voice_manager`]-method, if you don't need the
+    /// extra control.
+    /// You can provide a clone and keep the original to manually dispatch.
+    ///
+    /// [`voice_manager`]: #method.voice_manager
+    #[cfg(feature = "voice")]
+    pub fn voice_manager_arc(mut self, voice_manager: Arc<dyn VoiceGatewayManager + Send + Sync + 'static>) -> Self {
+        self.voice_manager = Some(voice_manager);
+
+        self
+    }
+
+    /// Sets all intents directly, replacing already set intents.
+    ///
+    /// To enable privileged intents, `GatewayIntents::all` to
+    ///
+    /// *Info*:
+    /// Intents are a bitflag, you can combine them by performing the
+    /// `|`-operator.
+    pub fn intents(mut self, intents: GatewayIntents) -> Self {
+        self.intents = intents;
+
+        self
+    }
+
+    /// Sets an event handler with multiple methods for each possible event.
+    pub fn event_handler<H: EventHandler + 'static>(mut self, event_handler: H) -> Self {
+        self.event_handler = Some(Arc::new(event_handler));
+
+        self
+    }
+
+    /// Sets an event handler with a single method where all received gateway
+    /// events will be dispatched.
+    pub fn raw_event_handler<H: RawEventHandler + 'static>(mut self, raw_event_handler: H) -> Self {
+        self.raw_event_handler = Some(Arc::new(raw_event_handler));
+
+        self
+    }
+}
+
+#[cfg(feature = "gateway")]
+impl<'a> Future for ClientBuilder<'a> {
+    type Output = Result<Client>;
+
+    #[instrument(skip(self))]
+    fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
+        if self.fut.is_none() {
+            let data = Arc::new(RwLock::new(self.data.take().unwrap()));
+            #[cfg(feature = "framework")]
+            let framework = self.framework.take()
+                .expect("The `framework`-feature is enabled (it's on by default), but no framework was provided.\n\
+                If you don't want to use the command framework, disable default features and specify all features you want to use.");
+            let event_handler = self.event_handler.take();
+            let raw_event_handler = self.raw_event_handler.take();
+            let intents = self.intents;
+            let http = Arc::new(self.http.take().unwrap());
+            #[cfg(feature = "voice")]
+            let voice_manager = self.voice_manager.take();
+
+            let cache_and_http = Arc::new(CacheAndHttp {
+                #[cfg(feature = "cache")]
+                cache: Arc::new(Cache::default()),
+                #[cfg(feature = "cache")]
+                update_cache_timeout: self.timeout.take(),
+                http: Arc::clone(&http),
+            });
+
+            self.fut = Some(Box::pin(async move {
+                let url = Arc::new(Mutex::new(http.get_gateway().await?.url));
+
+                let (shard_manager, shard_manager_worker) = {
+                    ShardManager::new(ShardManagerOptions {
+                        data: &data,
+                        event_handler: &event_handler,
+                        raw_event_handler: &raw_event_handler,
+                        #[cfg(feature = "framework")]
+                        framework: &framework,
+                        shard_index: 0,
+                        shard_init: 0,
+                        shard_total: 0,
+                        #[cfg(feature = "voice")]
+                        voice_manager: &voice_manager,
+                        ws_url: &url,
+                        cache_and_http: &cache_and_http,
+                        intents,
+                    }).await
+                };
+
+                Ok(Client {
+                    ws_uri: url,
+                    data,
+                    shard_manager,
+                    shard_manager_worker,
+                    #[cfg(feature = "voice")]
+                    voice_manager,
+                    cache_and_http,
+                })
+            }))
+        }
+
+        self.fut.as_mut().unwrap().as_mut().poll(ctx)
+    }
+}
 
 /// The Client is the way to be able to start sending authenticated requests
 /// over the REST API, as well as initializing a WebSocket connection through
@@ -84,25 +353,29 @@ use crate::http::Http;
 ///
 /// struct Handler;
 ///
+/// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     fn message(&self, context: Context, msg: Message) {
+///     async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!ping" {
 ///             let _ = msg.channel_id.say(&context, "Pong!");
 ///         }
 ///     }
 /// }
 ///
-/// let mut client = Client::new("my token here", Handler).expect("Could not create new client.");
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// let mut client = Client::builder("my token here").event_handler(Handler).await?;
 ///
-/// client.start().expect("Could not start client.");
+/// client.start().await?;
+/// #   Ok(())
+/// # }
 /// ```
 ///
-/// [`Shard`]: ../gateway/struct.Shard.html
-/// [`EventHandler::message`]: trait.EventHandler.html#tymethod.message
-/// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
-/// [sharding docs]: ../index.html#sharding
+/// [`Shard`]: crate::gateway::Shard
+/// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+/// [sharding docs]: crate::gateway#sharding
+#[cfg(feature = "gateway")]
 pub struct Client {
-    /// A ShareMap which requires types to be Send + Sync. This is a map that
+    /// A TypeMap which requires types to be Send + Sync. This is a map that
     /// can be safely shared across contexts.
     ///
     /// The purpose of the data field is to be accessible and persistent across
@@ -124,9 +397,8 @@ pub struct Client {
     /// - [`Event::MessageUpdate`]
     ///
     /// ```rust,ignore
-    /// // Of note, this imports `typemap`'s `Key` as `TypeMapKey`.
     /// use serenity::prelude::*;
-    /// use serenity::model::*;
+    /// use serenity::model::prelude::*;
     /// use std::collections::HashMap;
     /// use std::env;
     ///
@@ -136,10 +408,8 @@ pub struct Client {
     ///     type Value = HashMap<String, u64>;
     /// }
     ///
-    /// fn reg<S>(ctx: Context, name: S)
-    ///   where S: Into<std::string::String>
-    /// {
-    ///     let mut data = ctx.data.write();
+    /// async fn reg<S: Into<String>>(ctx: Context, name: S) {
+    ///     let mut data = ctx.data.write().await;
     ///     let counter = data.get_mut::<MessageEventCounter>().unwrap();
     ///     let entry = counter.entry(name.into()).or_insert(0);
     ///     *entry += 1;
@@ -147,48 +417,50 @@ pub struct Client {
     ///
     /// struct Handler;
     ///
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
+    /// #[serenity::async_trait]
     /// impl EventHandler for Handler {
-    ///     fn message(&self, ctx: Context, _: Message) { reg(ctx, "MessageCreate") }
-    ///     fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
-    ///         reg(ctx, "MessageDelete") }
-    ///     fn message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
-    ///         reg(ctx, "MessageDeleteBulk") }
-    ///     fn message_update(&self, ctx: Context, _: MessageUpdateEvent) {
-    ///         reg(ctx, "MessageUpdate") }
+    ///     async fn message(&self, ctx: Context, _: Message) {
+    ///         reg(ctx, "MessageCreate").await
+    ///     }
+    ///     async fn message_delete(&self, ctx: Context, _: ChannelId, _: MessageId) {
+    ///         reg(ctx, "MessageDelete").await
+    ///     }
+    ///     async fn message_delete_bulk(&self, ctx: Context, _: ChannelId, _: Vec<MessageId>) {
+    ///         reg(ctx, "MessageDeleteBulk").await
+    ///     }
+    ///
+    ///     #[cfg(feature = "cache")]
+    ///     async fn message_update(&self, ctx: Context, _old: Option<Message>, _new: Option<Message>, _: MessageUpdateEvent) {
+    ///         reg(ctx, "MessageUpdate").await
+    ///     }
+    ///
+    ///     #[cfg(not(feature = "cache"))]
+    ///     async fn message_update(&self, ctx: Context, _new_data: MessageUpdateEvent) {
+    ///         reg(ctx, "MessageUpdate").await
+    ///     }
     /// }
     ///
-    /// # #[cfg(all(feature = "client", feature = "standard_framework", feature = "model"))]
-    /// # fn main() {
-    ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN").expect("Could not find token."), Handler)
-    ///     .expect("Could not create client.");
-    ///
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     /// {
-    ///     let mut data = client.data.write();
+    ///     let mut data = client.data.write().await;
     ///     data.insert::<MessageEventCounter>(HashMap::default());
     /// }
     ///
-    /// client.start().expect("Could not start client.");
+    /// client.start().await?;
+    /// #     Ok(())
     /// # }
     /// ```
     ///
     /// Refer to [example 05] for an example on using the `data` field.
     ///
-    /// [`Context::data`]: struct.Context.html#structfield.data
-    /// [`Event::MessageCreate`]: ../model/event/enum.Event.html#variant.MessageCreate
-    /// [`Event::MessageDelete`]: ../model/event/enum.Event.html#variant.MessageDelete
-    /// [`Event::MessageDeleteBulk`]: ../model/event/enum.Event.html#variant.MessageDeleteBulk
-    /// [`Event::MessageUpdate`]: ../model/event/enum.Event.html#variant.MessageUpdate
+    /// [`Event::MessageCreate`]: crate::model::event::Event::MessageCreate
+    /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
+    /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
+    /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
     /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
-    pub data: Arc<RwLock<ShareMap>>,
-    /// A vector of all active shards that have received their [`Event::Ready`]
-    /// payload, and have dispatched to [`on_ready`] if an event handler was
-    /// configured.
-    ///
-    /// [`Event::Ready`]: ../model/event/enum.Event.html#variant.Ready
-    /// [`on_ready`]: #method.on_ready
-    #[cfg(feature = "framework")] framework: Arc<Mutex<Option<Box<dyn Framework + Send>>>>,
+    pub data: Arc<RwLock<TypeMap>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
     /// The key is the shard ID and the value is the shard itself.
@@ -207,92 +479,71 @@ pub struct Client {
     /// 5 seconds:
     ///
     /// ```rust,no_run
-    /// # extern crate serenity;
-    /// #
     /// # use serenity::client::{Client, EventHandler};
-    /// # use std::error::Error;
     /// # use std::time::Duration;
-    /// # use std::{env, thread};
-    ///
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    ///
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// struct Handler;
     ///
     /// impl EventHandler for Handler { }
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// let shard_manager = client.shard_manager.clone();
     ///
-    /// thread::spawn(move || {
+    /// tokio::spawn(async move {
     ///     loop {
-    ///         println!("Shard count instantiated: {}",
-    ///                  shard_manager.lock().shards_instantiated().len());
+    ///         let sm = shard_manager.lock().await;
+    ///         let count = sm.shards_instantiated().await.len();
+    ///         println!("Shard count instantiated: {}", count);
     ///
-    ///         thread::sleep(Duration::from_millis(5000));
+    ///         tokio::time::delay_for(Duration::from_millis(5000)).await;
     ///     }
     /// });
     /// #     Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
     /// Shutting down all connections after one minute of operation:
     ///
     /// ```rust,no_run
-    /// # use std::error::Error;
-    /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// use serenity::client::{Client, EventHandler};
     /// use std::time::Duration;
-    /// use std::{env, thread};
     ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler { }
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
     /// // Create a clone of the `Arc` containing the shard manager.
     /// let shard_manager = client.shard_manager.clone();
     ///
     /// // Create a thread which will sleep for 60 seconds and then have the
     /// // shard manager shutdown.
-    /// thread::spawn(move || {
-    ///     thread::sleep(Duration::from_secs(60));
+    /// tokio::spawn(async move {
+    ///     tokio::time::delay_for(Duration::from_secs(60));
     ///
-    ///     shard_manager.lock().shutdown_all();
+    ///     shard_manager.lock().await.shutdown_all().await;
     ///
     ///     println!("Shutdown shard manager!");
     /// });
     ///
-    /// println!("Client shutdown: {:?}", client.start());
+    /// println!("Client shutdown: {:?}", client.start().await);
     /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
     /// ```
-    ///
-    /// [`Client::start_shard`]: #method.start_shard
-    /// [`Client::start_shards`]: #method.start_shards
     pub shard_manager: Arc<Mutex<ShardManager>>,
     shard_manager_worker: ShardManagerMonitor,
-    /// The threadpool shared by all shards.
-    ///
-    /// Defaults to 5 threads, which should suffice small bots. Consider
-    /// increasing this number as your bot grows.
-    pub threadpool: ThreadPool,
     /// The voice manager for the client.
     ///
     /// This is an ergonomic structure for interfacing over shards' voice
     /// connections.
     #[cfg(feature = "voice")]
-    pub voice_manager: Arc<Mutex<ClientVoiceManager>>,
+    pub voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     /// URI that the client's shards will use to connect to the gateway.
     ///
     /// This is likely not important for production usage and is, at best, used
@@ -301,282 +552,22 @@ pub struct Client {
     /// This is wrapped in an `Arc<Mutex<T>>` so all shards will have an updated
     /// value available.
     pub ws_uri: Arc<Mutex<String>>,
+    /// A container for an optional cache and HTTP client.
+    /// It also contains the cache update timeout.
     pub cache_and_http: Arc<CacheAndHttp>,
 }
 
 impl Client {
-    /// Creates a Client for a bot user.
-    ///
-    /// Discord has a requirement of prefixing bot tokens with `"Bot "`, which
-    /// this function will automatically do for you if not already included.
-    ///
-    /// # Examples
-    ///
-    /// Create a Client, using a token from an environment variable:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    /// # use std::error::Error;
-    /// #
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
-    /// use std::env;
-    ///
-    /// let token = env::var("DISCORD_TOKEN")?;
-    /// let client = Client::new(&token, Handler)?;
-    /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #    try_main().unwrap();
-    /// # }
-    /// ```
-    pub fn new<H: EventHandler + 'static>(token: impl AsRef<str>, handler: H) -> Result<Self> {
-        Self::new_with_extras(token, |e| e.event_handler(handler))
+    /// Returns a builder implementing [`Future`]. You can chain the builder methods and then await
+    /// in order to finish the [`Client`].
+    #[deprecated(since="0.9.0", note="please use `builder` instead")]
+    #[allow(clippy::new_ret_no_self)]
+    pub fn new<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
+        Self::builder(token)
     }
 
-    /// Creates a client with an optional Handler. If you pass `None`, events are never parsed, but
-    /// they can be received by registering a RawHandler.
-    #[deprecated(since = "0.8.0", note = "Replaced by `new_with_extras`.")]
-    pub fn new_with_handlers<H, RH>(token: impl AsRef<str>, handler: Option<H>, raw_handler: Option<RH>) -> Result<Self>
-        where H: EventHandler + 'static, RH: RawEventHandler + 'static
-    {
-        Self::new_with_extras(token, |e| {
-            if let Some(handler) = handler {
-                e.event_handler(handler);
-            }
-
-            if let Some(raw_handler) = raw_handler {
-                e.raw_event_handler(raw_handler);
-            }
-
-            e
-        })
-    }
-
-    /// Creates a Client for a bot user and sets a cache update timeout.
-    /// If set to some duration, updating the cache will try to claim a
-    /// write-lock for given duration and skip received event but also
-    /// issue a deadlock-warning upon failure.
-    /// If `duration` is set to `None`, updating the cache will try to claim
-    /// a write-lock until success and potentially deadlock.
-    #[cfg(feature = "cache")]
-    #[deprecated(since = "0.8.0", note = "Replaced by `new_with_extras`.")]
-    pub fn new_with_cache_update_timeout<H>(token: impl AsRef<str>, handler: H, duration: Option<Duration>) -> Result<Self>
-        where H: EventHandler + 'static
-    {
-        Self::new_with_extras(token, |e| {
-            e.event_handler(handler);
-
-            if let Some(duration) = duration {
-                e.cache_update_timeout(duration);
-            }
-
-            e
-        })
-    }
-
-    /// Creates a client with extra configuration.
-    pub fn new_with_extras(token: impl AsRef<str>, f: impl FnOnce(&mut Extras) -> &mut Extras) -> Result<Self>
-    {
-        let token = token.as_ref().trim();
-
-        let token = if token.starts_with("Bot ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
-
-        let mut extras = Extras::default();
-
-        f(&mut extras);
-
-        let Extras {
-            event_handler,
-            raw_event_handler,
-            #[cfg(feature = "cache")]
-            timeout,
-            guild_subscriptions,
-        } = extras;
-
-        let http = Http::new_with_token(&token);
-
-        let name = "serenity client".to_owned();
-        let threadpool = ThreadPool::with_name(name, 5);
-        let url = Arc::new(Mutex::new(http.get_gateway()?.url));
-        let data = Arc::new(RwLock::new(ShareMap::custom()));
-
-        #[cfg(feature = "framework")]
-        let framework = Arc::new(Mutex::new(None));
-        #[cfg(feature = "voice")]
-        let voice_manager = Arc::new(Mutex::new(ClientVoiceManager::new(
-            0,
-            UserId(0),
-        )));
-
-        let cache_and_http = Arc::new(CacheAndHttp {
-            #[cfg(feature = "cache")]
-            cache: CacheRwLock::default(),
-            #[cfg(feature = "cache")]
-            update_cache_timeout: timeout,
-            http: Arc::new(http),
-            __nonexhaustive: (),
-        });
-
-        let (shard_manager, shard_manager_worker) = {
-            ShardManager::new(ShardManagerOptions {
-                data: &data,
-                event_handler: &event_handler,
-                raw_event_handler: &raw_event_handler,
-                #[cfg(feature = "framework")]
-                framework: &framework,
-                shard_index: 0,
-                shard_init: 0,
-                shard_total: 0,
-                threadpool: threadpool.clone(),
-                #[cfg(feature = "voice")]
-                voice_manager: &voice_manager,
-                ws_url: &url,
-                cache_and_http: &cache_and_http,
-                guild_subscriptions,
-            })
-        };
-
-        Ok(Client {
-            ws_uri: url,
-            #[cfg(feature = "framework")]
-            framework,
-            data,
-            shard_manager,
-            shard_manager_worker,
-            threadpool,
-            #[cfg(feature = "voice")]
-            voice_manager,
-            cache_and_http,
-        })
-    }
-
-    /// Sets a framework to be used with the client. All message events will be
-    /// passed through the framework _after_ being passed to the [`message`]
-    /// event handler.
-    ///
-    /// See the [framework module-level documentation][framework docs] for more
-    /// information on usage.
-    ///
-    /// # Examples
-    ///
-    /// Create a simple framework that responds to a `~ping` command:
-    ///
-    /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
-    /// # use std::error::Error;
-    /// #
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// use std::env;
-    ///
-    /// use serenity::framework::StandardFramework;
-    /// use serenity::client::{Client, Context};
-    /// use serenity::model::channel::Message;
-    /// use serenity::framework::standard::{CommandResult, macros::{group, command}};
-    ///
-    /// #[command]
-    /// fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-    ///     msg.channel_id.say(&ctx.http, "Pong!")?;
-    ///     Ok(())
-    /// }
-    ///
-    /// // Commands must be intermediately handled through groups.
-    /// #[group("pingpong")]
-    /// #[commands(ping)]
-    /// struct PingPong;
-    /// #
-    /// # fn try_main() -> Result<(), Box<dyn Error>> {
-    ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
-    /// client.with_framework(StandardFramework::new()
-    ///     .configure(|c| c.prefix("~"))
-    ///     // The macros generate instances of command and group structs, which reside as `static` variables.
-    ///     // Hence the uppercase name, and the suffix for distinguishment.
-    ///     .group(&PINGPONG_GROUP));
-    /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
-    /// ```
-    ///
-    /// Using your own framework:
-    ///
-    /// ```rust,ignore
-    /// # use serenity::prelude::EventHandler;
-    /// # use std::error::Error;
-    /// #
-    /// use serenity::Framework;
-    /// use serenity::client::Context;
-    /// use serenity::model::*;
-    /// use tokio_core::reactor::Handle;
-    /// use std::collections::HashMap;
-    ///
-    ///
-    /// struct MyFramework {
-    ///     commands: HashMap<String, Box<Fn(Message, Vec<String>)>>,
-    /// }
-    ///
-    /// impl Framework for MyFramework {
-    ///     fn dispatch(&mut self, _: Context, msg: Message, tokio_handle: &Handle) {
-    ///         let args = msg.content.split_whitespace();
-    ///         let command = match args.advance() {
-    ///             Some(command) => {
-    ///                 if !command.starts_with('*') { return; }
-    ///                 command
-    ///             },
-    ///             None => return,
-    ///         };
-    ///
-    ///         let command = match self.commands.get(&command) {
-    ///             Some(command) => command, None => return,
-    ///         };
-    ///
-    ///         tokio_handle.spawn_fn(move || { (command)(msg, args); Ok() });
-    ///     }
-    /// }
-    ///
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    ///
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::Client;
-    /// use std::env;
-    ///
-    /// let mut client = Client::new(&token, Handler).unwrap();
-    /// client.with_framework(MyFramework { commands: {
-    ///     let mut map = HashMap::new();
-    ///     map.insert("ping".to_string(), Box::new(|msg, _| msg.channel_id.say("pong!")));
-    ///     map
-    /// }});
-    /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
-    /// ```
-    /// Refer to the documentation for the `framework` module for more in-depth
-    /// information.
-    ///
-    /// [`message`]: trait.EventHandler.html#method.message
-    /// [framework docs]: ../framework/index.html
-    #[cfg(feature = "framework")]
-    pub fn with_framework<F: Framework + Send + 'static>(&mut self, f: F) {
-        *self.framework.lock() = Some(Box::new(f));
+    pub fn builder<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
+        ClientBuilder::new(token)
     }
 
     /// Establish the connection and start listening for events.
@@ -596,33 +587,29 @@ impl Client {
     /// Starting a Client with only 1 shard, out of 1 total:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
-    /// #
+    /// # use serenity::prelude::EventHandler;
+    /// use serenity::Client;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::Client;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start() {
+    /// if let Err(why) = client.start().await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
     /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
-    /// # }
     /// ```
     ///
-    /// [gateway docs]: ../gateway/index.html#sharding
-    pub fn start(&mut self) -> Result<()> {
-        self.start_connection([0, 0, 1])
+    /// [gateway docs]: crate::gateway#sharding
+    #[instrument(skip(self))]
+    pub async fn start(&mut self) -> Result<()> {
+        self.start_connection([0, 0, 1]).await
     }
 
     /// Establish the connection(s) and start listening for events.
@@ -642,27 +629,22 @@ impl Client {
     /// Start as many shards as needed using autosharding:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
-    /// #
+    /// # use serenity::prelude::EventHandler;
+    /// use serenity::Client;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::Client;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_autosharded() {
+    /// if let Err(why) = client.start_autosharded().await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -671,16 +653,16 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    /// [gateway docs]: ../gateway/index.html#sharding
-    pub fn start_autosharded(&mut self) -> Result<()> {
+    /// [gateway docs]: crate::gateway#sharding
+    #[instrument(skip(self))]
+    pub async fn start_autosharded(&mut self) -> Result<()> {
         let (x, y) = {
-            let res = self.cache_and_http.http.get_bot_gateway()?;
+            let res = self.cache_and_http.http.get_bot_gateway().await?;
 
             (res.shards as u64 - 1, res.shards as u64)
         };
 
-        self.start_connection([0, x, y])
+        self.start_connection([0, x, y]).await
     }
 
     /// Establish a sharded connection and start listening for events.
@@ -700,27 +682,22 @@ impl Client {
     /// Start shard 3 of 5:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
-    /// #
+    /// # use serenity::prelude::EventHandler;
+    /// use serenity::Client;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::Client;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_shard(3, 5) {
+    /// if let Err(why) = client.start_shard(3, 5).await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -728,26 +705,22 @@ impl Client {
     /// [`start_autosharded`]):
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
-    /// #
+    /// # use serenity::prelude::EventHandler;
+    /// use serenity::Client;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::Client;
-    /// use std::env;
     ///
-    /// let mut client = Client::new(&env::var("DISCORD_TOKEN")?, Handler)?;
+    /// # async fn run() -> Result<(), Box<dyn Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_shard(0, 1) {
+    /// if let Err(why) = client.start_shard(0, 1).await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -756,12 +729,12 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    /// [`start`]: #method.start
-    /// [`start_autosharded`]: #method.start_autosharded
-    /// [gateway docs]: ../gateway/index.html#sharding
-    pub fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
-        self.start_connection([shard, shard, shards])
+    /// [`start`]: Self::start
+    /// [`start_autosharded`]: Self::start_autosharded
+    /// [gateway docs]: crate::gateway#sharding
+    #[instrument(skip(self))]
+    pub async fn start_shard(&mut self, shard: u64, shards: u64) -> Result<()> {
+        self.start_connection([shard, shard, shards]).await
     }
 
     /// Establish sharded connections and start listening for events.
@@ -781,27 +754,22 @@ impl Client {
     /// Start all of 8 shards:
     ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
-    /// #
+    /// # use serenity::prelude::EventHandler;
+    /// use serenity::Client;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::Client;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_shards(8) {
+    /// if let Err(why) = client.start_shards(8).await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -810,12 +778,12 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    /// [`start_shard`]: #method.start_shard
-    /// [`start_shard_range`]: #method.start_shard_range
-    /// [Gateway docs]: ../gateway/index.html#sharding
-    pub fn start_shards(&mut self, total_shards: u64) -> Result<()> {
-        self.start_connection([0, total_shards - 1, total_shards])
+    /// [`start_shard`]: Self::start_shard
+    /// [`start_shard_range`]: Self::start_shard_range
+    /// [Gateway docs]: crate::gateway#sharding
+    #[instrument(skip(self))]
+    pub async fn start_shards(&mut self, total_shards: u64) -> Result<()> {
+        self.start_connection([0, total_shards - 1, total_shards]).await
     }
 
     /// Establish a range of sharded connections and start listening for events.
@@ -835,42 +803,23 @@ impl Client {
     ///
     /// For a bot using a total of 10 shards, initialize shards 4 through 7:
     ///
-    /// ```no_run
-    /// # use serenity::prelude::EventHandler;
-    /// struct Handler;
-    ///
-    /// impl EventHandler for Handler {}
-    /// use serenity::Client;
-    /// use std::env;
-    ///
-    /// let token = env::var("DISCORD_TOKEN").unwrap();
-    /// let mut client = Client::new(&token, Handler).unwrap();
-    ///
-    /// let _ = client.start_shard_range([4, 7], 10);
-    /// ```
-    ///
     /// ```rust,no_run
-    /// # use serenity::prelude::EventHandler;
     /// # use std::error::Error;
-    /// #
+    /// # use serenity::prelude::EventHandler;
+    /// use serenity::Client;
+    ///
     /// struct Handler;
     ///
     /// impl EventHandler for Handler {}
-    /// # fn try_main() -> Result<(), Box<Error>> {
-    /// use serenity::client::Client;
-    /// use std::env;
     ///
-    /// let token = env::var("DISCORD_TOKEN")?;
-    /// let mut client = Client::new(&token, Handler).unwrap();
+    /// # async fn run() -> Result<(), Box<dyn Error>> {
+    /// let token = std::env::var("DISCORD_TOKEN")?;
+    /// let mut client = Client::builder(&token).event_handler(Handler).await?;
     ///
-    /// if let Err(why) = client.start_shard_range([4, 7], 10) {
+    /// if let Err(why) = client.start_shard_range([4, 7], 10).await {
     ///     println!("Err with client: {:?}", why);
     /// }
     /// # Ok(())
-    /// # }
-    /// #
-    /// # fn main() {
-    /// #     try_main().unwrap();
     /// # }
     /// ```
     ///
@@ -879,45 +828,40 @@ impl Client {
     /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
     /// an error.
     ///
-    ///
-    /// [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    /// [`start_shard`]: #method.start_shard
-    /// [`start_shards`]: #method.start_shards
-    /// [Gateway docs]: ../gateway/index.html#sharding
-    pub fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
-        self.start_connection([range[0], range[1], total_shards])
+    /// [`start_shard`]: Self::start_shard
+    /// [`start_shards`]: Self::start_shards
+    /// [Gateway docs]: crate::gateway#sharding
+    #[instrument(skip(self))]
+    pub async fn start_shard_range(&mut self, range: [u64; 2], total_shards: u64) -> Result<()> {
+        self.start_connection([range[0], range[1], total_shards]).await
     }
 
-    // Shard data layout is:
-    // 0: first shard number to initialize
-    // 1: shard number to initialize up to and including
-    // 2: total number of shards the bot is sharding for
-    //
-    // Not all shards need to be initialized in this process.
-    //
-    // # Errors
-    //
-    // Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
-    // an error.
-    //
-    // [`ClientError::Shutdown`]: enum.ClientError.html#variant.Shutdown
-    fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
+    /// Shard data layout is:
+    /// 0: first shard number to initialize
+    /// 1: shard number to initialize up to and including
+    /// 2: total number of shards the bot is sharding for
+    ///
+    /// Not all shards need to be initialized in this process.
+    ///
+    /// # Errors
+    ///
+    /// Returns a [`ClientError::Shutdown`] when all shards have shutdown due to
+    /// an error.
+    #[instrument(skip(self))]
+    async fn start_connection(&mut self, shard_data: [u64; 3]) -> Result<()> {
         #[cfg(feature = "voice")]
-        self.voice_manager.lock().set_shard_count(shard_data[2]);
+        if let Some(voice_manager) = &self.voice_manager {
+            let user = self.cache_and_http.http.get_current_user().await?;
 
-        #[cfg(feature = "voice")]
-        {
-            let user = self.cache_and_http.http.get_current_user()?;
-
-            self.voice_manager.lock().set_user_id(user.id);
+            voice_manager.initialise(shard_data[2], user.id).await;
         }
 
         {
-            let mut manager = self.shard_manager.lock();
+            let mut manager = self.shard_manager.lock().await;
 
             let init = shard_data[1] - shard_data[0] + 1;
 
-            manager.set_shards(shard_data[0], init, shard_data[2]);
+            manager.set_shards(shard_data[0], init, shard_data[2]).await;
 
             debug!(
                 "Initializing shard info: {} - {}/{}",
@@ -930,13 +874,20 @@ impl Client {
                 error!("Failed to boot a shard: {:?}", why);
                 info!("Shutting down all shards");
 
-                manager.shutdown_all();
+                manager.shutdown_all().await;
 
                 return Err(Error::Client(ClientError::ShardBootFailure));
             }
         }
 
-        self.shard_manager_worker.run();
+        if let Err(why) = self.shard_manager_worker.run().await {
+            let err =  match why {
+                ShardManagerError::DisallowedGatewayIntents => GatewayError::DisallowedGatewayIntents,
+                ShardManagerError::InvalidGatewayIntents => GatewayError::InvalidGatewayIntents,
+                ShardManagerError::InvalidToken => GatewayError::InvalidAuthentication,
+            };
+            return Err(Error::Gateway(err));
+        }
 
         Ok(())
     }
@@ -978,8 +929,6 @@ impl Client {
 ///
 /// Returns a [`ClientError::InvalidToken`] when one of the above checks fail.
 /// The type of failure is not specified.
-///
-/// [`ClientError::InvalidToken`]: enum.ClientError.html#variant.InvalidToken
 pub fn validate_token(token: impl AsRef<str>) -> Result<()> {
     let token = token.as_ref();
 

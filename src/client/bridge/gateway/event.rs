@@ -16,9 +16,6 @@ pub(crate) enum ClientEvent {
 ///
 /// This might happen when a shard changes from [`ConnectionStage::Identifying`]
 /// to [`ConnectionStage::Connected`].
-///
-/// [`ConnectionStage::Connected`]: ../../../../gateway/enum.ConnectionStage.html#variant.Connected
-/// [`ConnectionStage::Identifying`]: ../../../../gateway/enum.ConnectionStage.html#variant.Identifying
 #[derive(Clone, Debug)]
 pub struct ShardStageUpdateEvent {
     /// The new connection stage.

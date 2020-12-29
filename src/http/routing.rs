@@ -2,44 +2,47 @@ use std::{
     borrow::Cow,
     fmt::{Display, Write},
 };
+use crate::constants;
+
 use super::LightMethod;
 
 /// A representation of all routes registered within the library. These are safe
 /// and memory-efficient representations of each path that functions exist for
 /// in the [`http`] module.
 ///
-/// [`http`]: ../index.html
+/// [`http`]: crate::http
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
 pub enum Route {
     /// Route for the `/channels/:channel_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsId(u64),
     /// Route for the `/channels/:channel_id/invites` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdInvites(u64),
     /// Route for the `/channels/:channel_id/messages` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessages(u64),
     /// Route for the `/channels/:channel_id/messages/bulk-delete` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesBulkDelete(u64),
     /// Route for the `/channels/:channel_id/messages/:message_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     // This route is a unique case. The ratelimit for message _deletions_ is
     // different than the overall route ratelimit.
     //
@@ -48,20 +51,20 @@ pub enum Route {
     // Additionally, this needs to be a `LightMethod` from the parent module
     // and _not_ a `reqwest` `Method` due to `reqwest`'s not deriving `Copy`.
     //
-    // [Rate Limits]: https://discordapp.com/developers/docs/topics/rate-limits
+    // [Rate Limits]: https://discord.com/developers/docs/topics/rate-limits
     ChannelsIdMessagesId(LightMethod, u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/ack` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesIdAck(u64),
     /// Route for the `/channels/:channel_id/messages/:message_id/reactions`
     /// path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesIdReactions(u64),
     /// Route for the
     /// `/channels/:channel_id/messages/:message_id/reactions/:reaction/@me`
@@ -69,37 +72,37 @@ pub enum Route {
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdMessagesIdReactionsUserIdType(u64),
     /// Route for the `/channels/:channel_id/permissions/:target_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPermissionsOverwriteId(u64),
     /// Route for the `/channels/:channel_id/pins` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPins(u64),
     /// Route for the `/channels/:channel_id/pins/:message_id` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdPinsMessageId(u64),
     /// Route for the `/channels/:channel_id/typing` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdTyping(u64),
     /// Route for the `/channels/:channel_id/webhooks` path.
     ///
     /// The data is the relevant [`ChannelId`].
     ///
-    /// [`ChannelId`]: ../../model/id/struct.ChannelId.html
+    /// [`ChannelId`]: crate::model::id::ChannelId
     ChannelsIdWebhooks(u64),
     /// Route for the `/gateway` path.
     Gateway,
@@ -111,133 +114,133 @@ pub enum Route {
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsId(u64),
     /// Route for the `/guilds/:guild_id/bans` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdBans(u64),
     /// Route for the `/guilds/:guild_id/audit-logs` path.
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdAuditLogs(u64),
     /// Route for the `/guilds/:guild_id/bans/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdBansUserId(u64),
     /// Route for the `/guilds/:guild_id/channels/:channel_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdChannels(u64),
     /// Route for the `/guilds/:guild_id/embed` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdEmbed(u64),
     /// Route for the `/guilds/:guild_id/emojis` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdEmojis(u64),
     /// Route for the `/guilds/:guild_id/emojis/:emoji_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdEmojisId(u64),
     /// Route for the `/guilds/:guild_id/integrations` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdIntegrations(u64),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdIntegrationsId(u64),
     /// Route for the `/guilds/:guild_id/integrations/:integration_id/sync`
     /// path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdIntegrationsIdSync(u64),
     /// Route for the `/guilds/:guild_id/invites` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdInvites(u64),
     /// Route for the `/guilds/:guild_id/members` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembers(u64),
     /// Route for the `/guilds/:guild_id/members/:user_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersId(u64),
     /// Route for the `/guilds/:guild_id/members/:user_id/roles/:role_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersIdRolesId(u64),
     /// Route for the `/guilds/:guild_id/members/@me/nick` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdMembersMeNick(u64),
     /// Route for the `/guilds/:guild_id/prune` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdPrune(u64),
     /// Route for the `/guilds/:guild_id/regions` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRegions(u64),
     /// Route for the `/guilds/:guild_id/roles` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRoles(u64),
     /// Route for the `/guilds/:guild_id/roles/:role_id` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdRolesId(u64),
     /// Route for the `/guilds/:guild_id/vanity-url` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdVanityUrl(u64),
     /// Route for the `/guilds/:guild_id/webhooks` path.
     ///
     /// The data is the relevant [`GuildId`].
     ///
-    /// [`GuildId`]: ../../model/id/struct.GuildId.html
+    /// [`GuildId`]: crate::model::id::GuildId
     GuildsIdWebhooks(u64),
     /// Route for the `/invites/:code` path.
     InvitesCode,
@@ -255,14 +258,60 @@ pub enum Route {
     VoiceRegions,
     /// Route for the `/webhooks/:webhook_id` path.
     WebhooksId(u64),
+    /// Route for the `/webhooks/:application_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    WebhooksApplicationId(u64),
+    /// Route for the `/interactions/:interaction_id` path.
+    ///
+    /// The data is the relevant [`InteractionId`].
+    ///
+    /// [`InteractionId`]: crate::model::id::InteractionId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    InteractionsId(u64),
+    /// Route for the `/applications/:application_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    ApplicationsIdCommands(u64),
+    /// Route for the `/applications/:application_id/commands/:command_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    ApplicationsIdCommandsId(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    ApplicationsIdGuildsIdCommands(u64),
+    /// Route for the `/applications/:application_id/guilds/:guild_id` path.
+    ///
+    /// The data is the relevant [`ApplicationId`].
+    ///
+    /// [`ApplicationId`]: crate::model::id::ApplicationId
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    ApplicationsIdGuildsIdCommandsId(u64),
     /// Route where no ratelimit headers are in place (i.e. user account-only
     /// routes).
     ///
     /// This is a special case, in that if the route is `None` then pre- and
     /// post-hooks are not executed.
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Route {
@@ -290,6 +339,19 @@ impl Route {
             message_id,
             reaction_type,
             user_id,
+        )
+    }
+
+    pub fn channel_message_reaction_emoji<T>(
+        channel_id: u64,
+        message_id: u64,
+        reaction_type: T
+    ) -> String where T: Display {
+        format!(
+            api!("/channels/{}/messages/{}/reactions/{}"),
+            channel_id,
+            message_id,
+            reaction_type,
         )
     }
 
@@ -362,10 +424,6 @@ impl Route {
         api!("/gateway/bot")
     }
 
-    pub fn group_recipient(group_id: u64, user_id: u64) -> String {
-        format!(api!("/channels/{}/recipients/{}"), group_id, user_id)
-    }
-
     pub fn guild(guild_id: u64) -> String {
         format!(api!("/guilds/{}"), guild_id)
     }
@@ -412,7 +470,7 @@ impl Route {
         reason: &str,
     ) -> String {
         format!(
-            api!("/guilds/{}/bans/{}?delete-message-days={}&reason={}"),
+            api!("/guilds/{}/bans/{}?delete_message_days={}&reason={}"),
             guild_id,
             user_id,
             delete_message_days,
@@ -511,9 +569,7 @@ impl Route {
             let _ = write!(s, "&after={}", after);
         }
 
-        if let Some(limit) = limit {
-            let _ = write!(s, "&limit={}", limit);
-        }
+        let _ = write!(s, "&limit={}", limit.unwrap_or(constants::MEMBER_FETCH_LIMIT));
 
         s
     }
@@ -630,14 +686,80 @@ impl Route {
         -> String where D: Display {
         format!(api!("/webhooks/{}/{}?wait={}"), webhook_id, token, wait)
     }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn webhook_original_interaction_response<D: Display>(
+        application_id: u64,
+        token: D
+    ) -> String {
+        format!(api!("/webhooks/{}/{}/messages/@original"), application_id, token)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn webhook_followup_message<D: Display>(
+        application_id: u64,
+        token: D,
+        message_id: u64,
+    ) -> String {
+        format!(api!("/webhooks/{}/{}/messages/{}"), application_id, token, message_id)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn webhook_followup_messages<D: Display>(
+        application_id: u64,
+        token: D,
+        wait: bool,
+    ) -> String {
+        format!(api!("/webhooks/{}/{}?wait={}"), application_id, token, wait)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn interaction_response<D: Display>(
+        application_id: u64,
+        token: D,
+    ) -> String {
+        format!(api!("/webhooks/{}/{}/callback"), application_id, token)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn application_command(application_id: u64, command_id: u64) -> String {
+        format!(api!("/applications/{}/commands/{}"), application_id, command_id)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn application_commands(application_id: u64) -> String {
+        format!(api!("/applications/{}/commands"), application_id)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn application_guild_command(
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64
+    ) -> String {
+        format!(api!("/applications/{}/guilds/{}/commands/{}"), application_id, guild_id, command_id)
+    }
+
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    pub fn application_guild_commands(
+        application_id: u64,
+        guild_id: u64,
+    ) -> String {
+        format!(api!("/applications/{}/guilds/{}/commands"), application_id, guild_id)
+    }
 }
 
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum RouteInfo<'a> {
-    AddGroupRecipient {
-        group_id: u64,
-        user_id: u64,
-    },
     AddMemberRole {
         guild_id: u64,
         role_id: u64,
@@ -658,10 +780,34 @@ pub enum RouteInfo<'a> {
     CreateEmoji {
         guild_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    CreateFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        wait: bool,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    CreateGlobalApplicationCommand {
+        application_id: u64,
+    },
     CreateGuild,
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    CreateGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+    },
     CreateGuildIntegration {
         guild_id: u64,
         integration_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    CreateInteractionResponse {
+        interaction_id: u64,
+        interaction_token: &'a str,
     },
     CreateInvite {
         channel_id: u64,
@@ -692,8 +838,28 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         emoji_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    DeleteFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        message_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    DeleteGlobalApplicationCommand {
+        application_id: u64,
+        command_id: u64,
+    },
     DeleteGuild {
         guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    DeleteGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
     },
     DeleteGuildIntegration {
         guild_id: u64,
@@ -712,6 +878,17 @@ pub enum RouteInfo<'a> {
     DeleteMessageReactions {
         channel_id: u64,
         message_id: u64,
+    },
+    DeleteMessageReactionEmoji {
+        channel_id: u64,
+        message_id: u64,
+        reaction: &'a str,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    DeleteOriginalInteractionResponse {
+        application_id: u64,
+        interaction_token: &'a str,
     },
     DeletePermission {
         channel_id: u64,
@@ -741,8 +918,28 @@ pub enum RouteInfo<'a> {
         guild_id: u64,
         emoji_id: u64,
     },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    EditFollowupMessage {
+        application_id: u64,
+        interaction_token: &'a str,
+        message_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    EditGlobalApplicationCommand {
+        application_id: u64,
+        command_id: u64,
+    },
     EditGuild {
         guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    EditGuildApplicationCommand {
+        application_id: u64,
+        guild_id: u64,
+        command_id: u64,
     },
     EditGuildChannels {
         guild_id: u64,
@@ -760,6 +957,12 @@ pub enum RouteInfo<'a> {
     },
     EditNickname {
         guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    EditOriginalInteractionResponse {
+        application_id: u64,
+        interaction_token: &'a str,
     },
     EditProfile,
     EditRole {
@@ -807,8 +1010,26 @@ pub enum RouteInfo<'a> {
     },
     GetCurrentApplicationInfo,
     GetCurrentUser,
+    GetEmojis {
+        guild_id: u64,
+    },
+    GetEmoji {
+        guild_id: u64,
+        emoji_id: u64,
+    },
     GetGateway,
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    GetGlobalApplicationCommands {
+        application_id: u64,
+    },
     GetGuild {
+        guild_id: u64,
+    },
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    GetGuildApplicationCommands {
+        application_id: u64,
         guild_id: u64,
     },
     GetGuildEmbed {
@@ -897,10 +1118,6 @@ pub enum RouteInfo<'a> {
     LeaveGuild {
         guild_id: u64,
     },
-    RemoveGroupRecipient {
-        group_id: u64,
-        user_id: u64,
-    },
     PinMessage {
         channel_id: u64,
         message_id: u64,
@@ -929,18 +1146,11 @@ pub enum RouteInfo<'a> {
         channel_id: u64,
         message_id: u64,
     },
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'a> RouteInfo<'a> {
     pub fn deconstruct(&self) -> (LightMethod, Route, Cow<'_, str>) {
         match *self {
-            RouteInfo::AddGroupRecipient { group_id, user_id } => (
-                LightMethod::Put,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
-            ),
             RouteInfo::AddMemberRole { guild_id, role_id, user_id } => (
                 LightMethod::Put,
                 Route::GuildsIdMembersIdRolesId(guild_id),
@@ -977,15 +1187,45 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmojis(guild_id),
                 Cow::from(Route::guild_emojis(guild_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateFollowupMessage {
+                application_id,
+                interaction_token,
+                wait,
+            } => (
+                LightMethod::Post,
+                Route::WebhooksId(application_id),
+                Cow::from(Route::webhook_followup_messages(
+                    application_id, interaction_token, wait
+                )),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateGlobalApplicationCommand { application_id } => (
+                LightMethod::Post,
+                Route::ApplicationsIdCommands(application_id),
+                Cow::from(Route::application_commands(application_id))
+            ),
             RouteInfo::CreateGuild => (
                 LightMethod::Post,
                 Route::Guilds,
                 Cow::from(Route::guilds()),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateGuildApplicationCommand { application_id, guild_id } => (
+                LightMethod::Post,
+                Route::ApplicationsIdGuildsIdCommands(application_id),
+                Cow::from(Route::application_guild_commands(application_id, guild_id))
+            ),
             RouteInfo::CreateGuildIntegration { guild_id, integration_id } => (
                 LightMethod::Post,
                 Route::GuildsIdIntegrationsId(guild_id),
                 Cow::from(Route::guild_integration(guild_id, integration_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::CreateInteractionResponse { interaction_id, interaction_token } => (
+                LightMethod::Post,
+                Route::InteractionsId(interaction_id),
+                Cow::from(Route::interaction_response(interaction_id, interaction_token)),
             ),
             RouteInfo::CreateInvite { channel_id } => (
                 LightMethod::Post,
@@ -1037,10 +1277,43 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmojisId(guild_id),
                 Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::DeleteFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id
+            } => (
+                LightMethod::Delete,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_followup_message(
+                    application_id,
+                    interaction_token,
+                    message_id
+                )),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::DeleteGlobalApplicationCommand {
+                application_id,
+                command_id
+            } => (
+                LightMethod::Delete,
+                Route::ApplicationsIdCommandsId(application_id),
+                Cow::from(Route::application_command(application_id, command_id)),
+            ),
             RouteInfo::DeleteGuild { guild_id } => (
                 LightMethod::Delete,
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild(guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::DeleteGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Delete,
+                Route::ApplicationsIdGuildsIdCommandsId(application_id),
+                Cow::from(Route::application_guild_command(application_id, guild_id, command_id)),
             ),
             RouteInfo::DeleteGuildIntegration { guild_id, integration_id } => (
                 LightMethod::Delete,
@@ -1060,6 +1333,15 @@ impl<'a> RouteInfo<'a> {
                     message_id,
                 )),
             ),
+            RouteInfo::DeleteMessageReactionEmoji { channel_id, message_id,  reaction} => (
+                LightMethod::Delete,
+                Route::ChannelsIdMessagesIdReactions(channel_id),
+                Cow::from(Route::channel_message_reaction_emoji(
+                    channel_id,
+                    message_id,
+                    reaction,
+                )),
+            ),
             RouteInfo::DeleteMessage { channel_id, message_id } => (
                 LightMethod::Delete,
                 Route::ChannelsIdMessagesId(LightMethod::Delete, message_id),
@@ -1069,6 +1351,18 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Post,
                 Route::ChannelsIdMessagesBulkDelete(channel_id),
                 Cow::from(Route::channel_messages_bulk_delete(channel_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::DeleteOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            } => (
+                LightMethod::Delete,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_original_interaction_response(
+                    application_id,
+                    interaction_token,
+                )),
             ),
             RouteInfo::DeletePermission { channel_id, target_id } => (
                 LightMethod::Delete,
@@ -1115,10 +1409,47 @@ impl<'a> RouteInfo<'a> {
                 Route::GuildsIdEmojisId(guild_id),
                 Cow::from(Route::guild_emoji(guild_id, emoji_id)),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditFollowupMessage {
+                application_id,
+                interaction_token,
+                message_id,
+            } => (
+                LightMethod::Patch,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_followup_message(
+                    application_id,
+                    interaction_token,
+                    message_id)
+                ),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditGlobalApplicationCommand {
+                application_id,
+                command_id,
+            } => (
+                LightMethod::Patch,
+                Route::ApplicationsIdCommandsId(application_id),
+                Cow::from(Route::application_command(application_id, command_id)),
+            ),
             RouteInfo::EditGuild { guild_id } => (
                 LightMethod::Patch,
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild(guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditGuildApplicationCommand {
+                application_id,
+                guild_id,
+                command_id,
+            } => (
+                LightMethod::Patch,
+                Route::ApplicationsIdGuildsIdCommandsId(application_id),
+                Cow::from(Route::application_guild_command(
+                    application_id,
+                    guild_id,
+                    command_id)
+                ),
             ),
             RouteInfo::EditGuildChannels { guild_id } => (
                 LightMethod::Patch,
@@ -1144,6 +1475,18 @@ impl<'a> RouteInfo<'a> {
                 LightMethod::Patch,
                 Route::GuildsIdMembersMeNick(guild_id),
                 Cow::from(Route::guild_nickname(guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::EditOriginalInteractionResponse {
+                application_id,
+                interaction_token,
+            } => (
+                LightMethod::Patch,
+                Route::WebhooksApplicationId(application_id),
+                Cow::from(Route::webhook_original_interaction_response(
+                    application_id,
+                    interaction_token
+                )),
             ),
             RouteInfo::EditProfile => (
                 LightMethod::Patch,
@@ -1241,15 +1584,40 @@ impl<'a> RouteInfo<'a> {
                 Route::UsersMe,
                 Cow::from(Route::user("@me")),
             ),
+            RouteInfo::GetEmojis { guild_id } => (
+                LightMethod::Get,
+                Route::GuildsIdEmojis(guild_id),
+                Cow::from(Route::guild_emojis(guild_id)),
+            ),
+            RouteInfo::GetEmoji { guild_id, emoji_id } => (
+                LightMethod::Get,
+                Route::GuildsIdEmojisId(guild_id),
+                Cow::from(Route::guild_emoji(guild_id, emoji_id)),
+            ),
             RouteInfo::GetGateway => (
                 LightMethod::Get,
                 Route::Gateway,
                 Cow::from(Route::gateway()),
             ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetGlobalApplicationCommands { application_id } => (
+                LightMethod::Get,
+                Route::ApplicationsIdCommands(application_id),
+                Cow::from(Route::application_commands(application_id)),
+            ),
             RouteInfo::GetGuild { guild_id } => (
                 LightMethod::Get,
                 Route::GuildsId(guild_id),
                 Cow::from(Route::guild(guild_id)),
+            ),
+            #[cfg(feature = "unstable_discord_api")]
+            RouteInfo::GetGuildApplicationCommands {
+                application_id,
+                guild_id,
+            } => (
+                LightMethod::Get,
+                Route::ApplicationsIdGuildsIdCommands(application_id),
+                Cow::from(Route::application_guild_commands(application_id, guild_id)),
             ),
             RouteInfo::GetGuildEmbed { guild_id } => (
                 LightMethod::Get,
@@ -1405,11 +1773,6 @@ impl<'a> RouteInfo<'a> {
                 Route::UsersMeGuildsId,
                 Cow::from(Route::user_guild("@me", guild_id)),
             ),
-            RouteInfo::RemoveGroupRecipient { group_id, user_id } => (
-                LightMethod::Delete,
-                Route::None,
-                Cow::from(Route::group_recipient(group_id, user_id)),
-            ),
             RouteInfo::PinMessage { channel_id, message_id } => (
                 LightMethod::Put,
                 Route::ChannelsIdPins(channel_id),
@@ -1458,7 +1821,6 @@ impl<'a> RouteInfo<'a> {
                 Route::ChannelsIdPinsMessageId(channel_id),
                 Cow::from(Route::channel_pin(channel_id, message_id)),
             ),
-            RouteInfo::__Nonexhaustive => unreachable!(),
         }
     }
 }

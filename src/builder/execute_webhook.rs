@@ -1,5 +1,6 @@
 use serde_json::Value;
 use std::collections::HashMap;
+use crate::http::AttachmentType;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -19,12 +20,11 @@ use std::collections::HashMap;
 /// use serenity::model::channel::Embed;
 /// use serenity::utils::Colour;
 ///
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// # let http = Http::default();
 /// let id = 245037420704169985;
 /// let token = "ig5AO-wdVWpCBtUUMxmgsWryqgsW3DChbKYOINftJ4DCrUbnkedoYZD0VOH1QLr-S3sV";
-/// # use std::sync::Arc;
-/// # let http = Arc::new(Http::default());
-/// let webhook = http.as_ref().get_webhook_with_token(id, token)
-///     .expect("valid webhook");
+/// let webhook = http.get_webhook_with_token(id, token).await?;
 ///
 /// let website = Embed::fake(|e| {
 ///     e.title("The Rust Language Website")
@@ -39,18 +39,21 @@ use std::collections::HashMap;
 ///         .field("Rust by Example", "A collection of Rust examples", false)
 /// });
 ///
-/// let _ = webhook.execute(&http, false, |w| {
+/// webhook.execute(&http, false, |w| {
 ///     w.content("Here's some information on Rust:").embeds(vec![website, resources])
-/// });
+/// })
+/// .await?;
+/// #     Ok(())
+/// # }
 /// ```
 ///
-/// [`Webhook`]: ../model/webhook/struct.Webhook.html
-/// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
-/// [`execute_webhook`]: ../http/client/struct.Http.html#method.execute_webhook
+/// [`Webhook`]: crate::model::webhook::Webhook
+/// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
+/// [`execute_webhook`]: crate::http::client::Http::execute_webhook
 #[derive(Clone, Debug)]
-pub struct ExecuteWebhook(pub HashMap<&'static str, Value>);
+pub struct ExecuteWebhook<'a>(pub HashMap<&'static str, Value>, pub Vec<AttachmentType<'a>>);
 
-impl ExecuteWebhook {
+impl<'a> ExecuteWebhook<'a> {
     /// Override the default avatar of the webhook with an image URL.
     ///
     /// # Examples
@@ -59,16 +62,19 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let avatar_url = "https://i.imgur.com/KTs6whd.jpg";
     ///
-    /// let _ = webhook.execute(&http, false, |w| {
+    /// webhook.execute(&http, false, |w| {
     ///     w.avatar_url(avatar_url).content("Here's a webhook")
-    /// });
+    /// })
+    /// .await?;
+    /// #     Ok(())
+    /// # }
     /// ```
     pub fn avatar_url<S: ToString>(&mut self, avatar_url: S) -> &mut Self {
         self.0.insert("avatar_url", Value::String(avatar_url.to_string()));
@@ -86,23 +92,47 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("foo")
-    /// });
+    /// })
+    /// .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     ///
-    /// [`embeds`]: #method.embeds
+    /// [`embeds`]: Self::embeds
     pub fn content<S: ToString>(&mut self, content: S) -> &mut Self {
         self.0.insert("content", Value::String(content.to_string()));
+        self
+    }
+
+    /// Appends a file to the webhook message.
+    pub fn add_file<T: Into<AttachmentType<'a>>>(&mut self, file: T) -> &mut Self {
+        self.1.push(file.into());
+        self
+    }
+
+    /// Appends a list of files to the webhook message.
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+        self.1.extend(files.into_iter().map(|f| f.into()));
+        self
+    }
+
+    /// Sets a list of files to include in the webhook message.
+    ///
+    /// Calling this multiple times will overwrite the file list.
+    /// To append files, call `add_file` or `add_files` instead.
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+        self.1 = files.into_iter().map(|f| f.into()).collect();
         self
     }
 
@@ -116,8 +146,8 @@ impl ExecuteWebhook {
     /// Refer to the [struct-level documentation] for an example on how to use
     /// embeds.
     ///
-    /// [`Embed::fake`]: ../model/channel/struct.Embed.html#method.fake
-    /// [`Webhook::execute`]: ../model/webhook/struct.Webhook.html#method.execute
+    /// [`Embed::fake`]: crate::model::channel::Embed::fake
+    /// [`Webhook::execute`]: crate::model::webhook::Webhook::execute
     /// [struct-level documentation]: #examples
     pub fn embeds(&mut self, embeds: Vec<Value>) -> &mut Self {
         self.0.insert("embeds", Value::Array(embeds));
@@ -132,18 +162,21 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").tts(true)
-    /// });
+    /// })
+    /// .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
         self.0.insert("tts", Value::Bool(tts));
@@ -158,18 +191,21 @@ impl ExecuteWebhook {
     ///
     /// ```rust,no_run
     /// # use serenity::http::Http;
-    /// # use std::sync::Arc;
     /// #
-    /// # let http = Arc::new(Http::default());
-    /// # let webhook = http.as_ref().get_webhook_with_token(0, "").unwrap();
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// # let http = Http::default();
+    /// # let webhook = http.get_webhook_with_token(0, "").await?;
     /// #
     /// let execution = webhook.execute(&http, false, |w| {
     ///     w.content("hello").username("hakase")
-    /// });
+    /// })
+    /// .await;
     ///
     /// if let Err(why) = execution {
     ///     println!("Err sending webhook: {:?}", why);
     /// }
+    /// #     Ok(())
+    /// # }
     /// ```
     pub fn username<S: ToString>(&mut self, username: S) -> &mut Self {
         self.0.insert("username", Value::String(username.to_string()));
@@ -177,7 +213,7 @@ impl ExecuteWebhook {
     }
 }
 
-impl Default for ExecuteWebhook {
+impl<'a> Default for ExecuteWebhook<'a> {
     /// Returns a default set of values for a [`Webhook`] execution.
     ///
     /// The only default value is [`tts`] being set to `false`.
@@ -192,12 +228,12 @@ impl Default for ExecuteWebhook {
     /// let executor = ExecuteWebhook::default();
     /// ```
     ///
-    /// [`Webhook`]: ../model/webhook/struct.Webhook.html
-    /// [`tts`]: #method.tts
-    fn default() -> ExecuteWebhook {
+    /// [`Webhook`]: crate::model::webhook::Webhook
+    /// [`tts`]: Self::tts
+    fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
         map.insert("tts", Value::Bool(false));
 
-        ExecuteWebhook(map)
+        ExecuteWebhook(map, vec![])
     }
 }

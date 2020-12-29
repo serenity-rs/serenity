@@ -239,22 +239,7 @@ impl AttributeOption for Option<String> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::Name, ValueKind::Equals, ValueKind::SingleList])?;
 
-        Ok(if values.literals.is_empty() {
-            Some(String::new())
-        } else if let Lit::Bool(b) = &values.literals[0] {
-            if b.value {
-                Some(String::new())
-            } else {
-                None
-            }
-        } else {
-            let s = values.literals[0].to_str();
-            match &s[..] {
-                "true" => Some(String::new()),
-                "false" => None,
-                _ => Some(s),
-            }
-        })
+        Ok(values.literals.get(0).map(|l| l.to_str()))
     }
 }
 

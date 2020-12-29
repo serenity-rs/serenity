@@ -10,15 +10,22 @@ use std::collections::HashMap;
 ///
 /// Edit a channel, providing a new name and topic:
 ///
-/// ```rust,ignore
+/// ```rust,no_run
+/// # use serenity::{http::Http, model::id::ChannelId};
+/// #
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+/// #     let http = Http::default();
+/// #     let mut channel = ChannelId(0);
 /// // assuming a channel has already been bound
-/// if let Err(why) = channel::edit(|c| c.name("new name").topic("a test topic")) {
+/// if let Err(why) = channel.edit(&http, |c| c.name("new name").topic("a test topic")).await {
 ///     // properly handle the error
 /// }
+/// #     Ok(())
+/// # }
 /// ```
 ///
-/// [`GuildChannel`]: ../model/channel/struct.GuildChannel.html
-/// [`GuildChannel::edit`]: ../model/channel/struct.GuildChannel.html#method.edit
+/// [`GuildChannel`]: crate::model::channel::GuildChannel
+/// [`GuildChannel::edit`]: crate::model::channel::GuildChannel::edit
 #[derive(Clone, Debug, Default)]
 pub struct EditChannel(pub HashMap<&'static str, Value>);
 
@@ -27,7 +34,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
+    /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn bitrate(&mut self, bitrate: u64) -> &mut Self {
         self.0.insert("bitrate", Value::Number(Number::from(bitrate)));
         self
@@ -53,7 +60,7 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
+    /// [text]: crate::model::channel::ChannelType::Text
     pub fn topic<S: ToString>(&mut self, topic: S) -> &mut Self {
         self.0.insert("topic", Value::String(topic.to_string()));
         self
@@ -63,7 +70,7 @@ impl EditChannel {
     ///
     /// This is for [text] channels only.
     ///
-    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
+    /// [text]: crate::model::channel::ChannelType::Text
     pub fn nsfw(&mut self, nsfw: bool) -> &mut Self {
         self.0.insert("nsfw", Value::Bool(nsfw));
 
@@ -74,7 +81,7 @@ impl EditChannel {
     ///
     /// This is for [voice] channels only.
     ///
-    /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
+    /// [voice]: crate::model::channel::ChannelType::Voice
     pub fn user_limit(&mut self, user_limit: u64) -> &mut Self {
         self.0.insert("user_limit", Value::Number(Number::from(user_limit)));
         self
@@ -84,8 +91,8 @@ impl EditChannel {
     ///
     /// This is for [text] and [voice] channels only.
     ///
-    /// [text]: ../model/channel/enum.ChannelType.html#variant.Text
-    /// [voice]: ../model/channel/enum.ChannelType.html#variant.Voice
+    /// [text]: crate::model::channel::ChannelType::Text
+    /// [voice]: crate::model::channel::ChannelType::Voice
     #[inline]
     pub fn category<C: Into<Option<ChannelId>>>(&mut self, category: C) -> &mut Self {
         self._category(category.into());

@@ -1,19 +1,24 @@
 //! A set of constants used by the library.
 
 /// The maximum length of the textual size of an embed.
-pub const EMBED_MAX_LENGTH: u16 = 6000;
+pub const EMBED_MAX_LENGTH: usize = 6000;
+
 /// The gateway version used by the library. The gateway URI is retrieved via
 /// the REST API.
-pub const GATEWAY_VERSION: u8 = 6;
-/// The voice gateway version used by the library.
-pub const VOICE_GATEWAY_VERSION: u8 = 3;
+pub const GATEWAY_VERSION: u8 = 8;
+
 /// The large threshold to send on identify.
 pub const LARGE_THRESHOLD: u8 = 250;
+
 /// The maximum unicode code points allowed within a message by Discord.
-pub const MESSAGE_CODE_LIMIT: u16 = 2000;
+pub const MESSAGE_CODE_LIMIT: usize = 2000;
+
+/// The maximum number of members the bot can fetch at once
+pub const MEMBER_FETCH_LIMIT: u64 = 1000;
+
 /// The [UserAgent] sent along with every request.
 ///
-/// [UserAgent]: ../../reqwest/header/constant.USER_AGENT.html
+/// [UserAgent]: ::reqwest::header::USER_AGENT
 pub const USER_AGENT: &str = concat!(
     "DiscordBot (https://github.com/serenity-rs/serenity, ",
     env!("CARGO_PKG_VERSION"),
@@ -65,6 +70,7 @@ pub static JOIN_MESSAGES: &[&str] = &[
 
 /// Enum to map gateway opcodes.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
 pub enum OpCode {
     /// Dispatches an event.
     Event = 0,
@@ -90,8 +96,6 @@ pub enum OpCode {
     Hello = 10,
     /// Sent immediately following a client heartbeat that was received.
     HeartbeatAck = 11,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 enum_number!(
@@ -126,75 +130,6 @@ impl OpCode {
             OpCode::InvalidSession => 9,
             OpCode::Hello => 10,
             OpCode::HeartbeatAck => 11,
-            OpCode::__Nonexhaustive => unreachable!(),
-        }
-    }
-}
-
-/// Enum to map voice opcodes.
-#[derive(Clone, Copy, Debug, Eq, Hash, PartialEq, PartialOrd, Ord)]
-pub enum VoiceOpCode {
-    /// Used to begin a voice websocket connection.
-    Identify = 0,
-    /// Used to select the voice protocol.
-    SelectProtocol = 1,
-    /// Used to complete the websocket handshake.
-    Ready = 2,
-    /// Used to keep the websocket connection alive.
-    Heartbeat = 3,
-    /// Used to describe the session.
-    SessionDescription = 4,
-    /// Used to indicate which users are speaking.
-    Speaking = 5,
-    /// Heartbeat ACK, received by the client to show the server's receipt of a heartbeat.
-    HeartbeatAck = 6,
-    /// Sent after a disconnect to attempt to resume a session.
-    Resume = 7,
-    /// Used to determine how often the client must send a heartbeat.
-    Hello = 8,
-    /// Sent by the server if a session coulkd successfully be resumed.
-    Resumed = 9,
-    /// Message indicating that another user has connected to the voice channel.
-    ClientConnect = 12,
-    /// Message indicating that another user has disconnected from the voice channel.
-    ClientDisconnect = 13,
-    #[doc(hidden)]
-    __Nonexhaustive,
-}
-
-enum_number!(
-    VoiceOpCode {
-        Identify,
-        SelectProtocol,
-        Ready,
-        Heartbeat,
-        SessionDescription,
-        Speaking,
-        HeartbeatAck,
-        Resume,
-        Hello,
-        Resumed,
-        ClientConnect,
-        ClientDisconnect,
-    }
-);
-
-impl VoiceOpCode {
-    pub fn num(self) -> u64 {
-        match self {
-            VoiceOpCode::Identify => 0,
-            VoiceOpCode::SelectProtocol => 1,
-            VoiceOpCode::Ready => 2,
-            VoiceOpCode::Heartbeat => 3,
-            VoiceOpCode::SessionDescription => 4,
-            VoiceOpCode::Speaking => 5,
-            VoiceOpCode::HeartbeatAck => 6,
-            VoiceOpCode::Resume => 7,
-            VoiceOpCode::Hello => 8,
-            VoiceOpCode::Resumed => 9,
-            VoiceOpCode::ClientConnect => 12,
-            VoiceOpCode::ClientDisconnect => 13,
-            VoiceOpCode::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -244,4 +179,8 @@ pub mod close_codes {
     ///
     /// Cannot reconnect.
     pub const SHARDING_REQUIRED: u16 = 4011;
+    /// Undocumented gateway intents have been provided.
+    pub const INVALID_GATEWAY_INTENTS: u16 = 4013;
+    /// Disallowed gateway intents have been provided.
+    pub const DISALLOWED_GATEWAY_INTENTS: u16 = 4014;
 }

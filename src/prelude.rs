@@ -12,21 +12,21 @@
 //! use serenity::prelude::*;
 //! ```
 //!
-//! [`serenity::Error`]: ../enum.Error.html
+//! [`serenity::Error`]: crate::Error
 
 pub use crate::error::Error as SerenityError;
 pub use crate::model::misc::Mentionable;
-pub use parking_lot::{Mutex, RwLock};
+pub use tokio::sync::{Mutex, RwLock};
 
+#[cfg(all(feature = "client", feature = "gateway"))]
+pub use crate::client::{Client, ClientError, EventHandler, RawEventHandler};
 #[cfg(feature = "client")]
-pub use crate::client::{Client, ClientError, Context, EventHandler, RawEventHandler};
+pub use crate::client::Context;
+#[cfg(feature = "client")]
+pub use typemap_rev::{TypeMap, TypeMapKey};
 #[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 pub use crate::http::HttpError;
 #[cfg(feature = "model")]
 pub use crate::model::ModelError;
-#[cfg(feature = "typemap")]
-pub use typemap::{Key as TypeMapKey, ShareMap};
-#[cfg(feature = "voice")]
-pub use crate::voice::VoiceError;

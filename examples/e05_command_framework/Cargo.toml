@@ -1,0 +1,13 @@
+[package]
+name = "e05_command_framework"
+version = "0.1.0"
+authors = ["my name <my@email.address>"]
+edition = "2018"
+
+[dependencies.serenity]
+features = ["framework", "standard_framework", "rustls_backend"]
+path = "../../"
+
+[dependencies.tokio]
+version = "0.2"
+features = ["macros"]

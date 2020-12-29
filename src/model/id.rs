@@ -1,6 +1,6 @@
 //! A collection of newtypes defining type-strong IDs.
 
-use chrono::{FixedOffset, DateTime, NaiveDateTime};
+use chrono::{Utc, DateTime, NaiveDateTime};
 use crate::internal::prelude::*;
 use serde::de::{Deserialize, Deserializer};
 use std::fmt::{Display, Formatter, Result as FmtResult};
@@ -11,13 +11,13 @@ macro_rules! id_u64 {
         $(
             impl $name {
                 /// Retrieves the time that the Id was created at.
-                pub fn created_at(&self) -> DateTime<FixedOffset> {
+                pub fn created_at(&self) -> DateTime<Utc> {
                     let offset = self.0 >> 22;
                     let secs = offset / 1000;
                     let millis = (offset % 1000) * 1_000_000; // 1 million nanoseconds in a millisecond
 
                     let tm = NaiveDateTime::from_timestamp(1_420_070_400 + secs as i64, millis as u32);
-                    DateTime::from_utc(tm, FixedOffset::east(0))
+                    DateTime::from_utc(tm, Utc)
                 }
 
                 /// Immutably borrow inner Id.
@@ -119,7 +119,7 @@ pub struct RoleId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct UserId(pub u64);
 
-/// An identifier for a [`Webhook`](../webhook/struct.Webhook.html).
+/// An identifier for a [`Webhook`][super::webhook::Webhook]
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct WebhookId(pub u64);
 
@@ -131,6 +131,22 @@ pub struct AuditLogEntryId(pub u64);
 #[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
 pub struct AttachmentId(u64);
 
+/// An identifier for a sticker.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct StickerId(pub u64);
+
+/// An identifier for a sticker pack.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct StickerPackId(pub u64);
+
+/// An identifier for an interaction.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct InteractionId(pub u64);
+
+/// An identifier for a slash command.
+#[derive(Copy, Clone, Default, Debug, Eq, Hash, PartialEq, PartialOrd, Ord, Serialize)]
+pub struct CommandId(pub u64);
+
 id_u64! {
     AttachmentId;
     ApplicationId;
@@ -140,7 +156,11 @@ id_u64! {
     IntegrationId;
     MessageId;
     RoleId;
+    StickerId;
+    StickerPackId;
     UserId;
     WebhookId;
     AuditLogEntryId;
+    InteractionId;
+    CommandId;
 }

@@ -10,7 +10,7 @@ use syn::{
     punctuated::Punctuated,
     spanned::Spanned,
     token::{Comma, Mut},
-    Ident, Lit, Type,
+    Ident, Lifetime, Lit, Type,
 };
 
 pub trait LitExt {
@@ -188,7 +188,7 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
         ));
     }
 
-    let context: Type = parse_quote!(&mut serenity::client::Context);
+    let context: Type = parse_quote!(&serenity::client::Context);
     let message: Type = parse_quote!(&serenity::model::channel::Message);
     let args: Type = parse_quote!(serenity::framework::standard::Args);
     let args2: Type = parse_quote!(&mut serenity::framework::standard::Args);
@@ -237,4 +237,13 @@ pub fn create_declaration_validations(fun: &mut CommandFun, dec_for: DeclarFor) 
 pub fn create_return_type_validation(r#fn: &mut CommandFun, expect: Type) {
     let stmt = generate_type_validation(r#fn.ret.clone(), expect);
     r#fn.body.insert(0, stmt);
+}
+
+#[inline]
+pub fn populate_fut_lifetimes_on_refs(args: &mut Vec<Argument>) {
+    for arg in args {
+        if let Type::Reference(reference) = &mut arg.kind {
+            reference.lifetime = Some(Lifetime::new("'fut", Span::call_site()));
+        }
+    }
 }

@@ -1,7 +1,7 @@
 use std::collections::HashMap;
 use std::sync::Arc;
 
-use super::super::*;
+use crate::framework::standard::*;
 
 #[derive(Debug)]
 pub enum Map {

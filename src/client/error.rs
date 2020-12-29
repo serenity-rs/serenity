@@ -12,17 +12,18 @@ use std::{
 /// This is always wrapped within the library's generic [`Error::Client`]
 /// variant.
 ///
-/// [`Client`]: struct.Client.html
-/// [`Error`]: ../enum.Error.html
-/// [`Error::Client`]: ../enum.Error.html#variant.Client
-/// [`GuildId::ban`]: ../model/id/struct.GuildId.html#method.ban
+/// [`Client`]: super::Client
+/// [`Error`]: crate::Error
+/// [`Error::Client`]: crate::Error::Client
+/// [`GuildId::ban`]: crate::model::id::GuildId::ban
 #[allow(clippy::enum_variant_names)]
 #[derive(Clone, Debug, Eq, Hash, PartialEq)]
+#[non_exhaustive]
 pub enum Error {
     /// When the token provided is invalid. This is returned when validating a
     /// token through the [`validate_token`] function.
     ///
-    /// [`validate_token`]: fn.validate_token.html
+    /// [`validate_token`]: super::validate_token
     InvalidToken,
     /// When a shard has completely failed to reboot after resume and/or
     /// reconnect attempts.
@@ -30,8 +31,6 @@ pub enum Error {
     /// When all shards that the client is responsible for have shutdown with an
     /// error.
     Shutdown,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Display for Error {
@@ -40,7 +39,6 @@ impl Display for Error {
             Error::InvalidToken => f.write_str("The provided token was invalid"),
             Error::ShardBootFailure => f.write_str("Failed to (re-)boot a shard"),
             Error::Shutdown => f.write_str("The clients shards shutdown"),
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -51,7 +49,6 @@ impl StdError for Error {
             Error::InvalidToken => "The provided token was invalid",
             Error::ShardBootFailure => "Failed to (re-)boot a shard",
             Error::Shutdown => "The clients shards shutdown",
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }

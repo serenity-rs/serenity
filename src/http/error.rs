@@ -1,7 +1,7 @@
 use reqwest::{
-    Error as ReqwestError,
-    blocking::Response,
     header::InvalidHeaderValue,
+    Error as ReqwestError,
+    Response,
     StatusCode,
     Url,
 };
@@ -10,8 +10,8 @@ use std::{
     fmt::{
         Display,
         Formatter,
-        Result as FmtResult
-    }
+        Result as FmtResult,
+    },
 };
 use url::ParseError as UrlError;
 
@@ -36,14 +36,16 @@ pub struct ErrorResponse {
     pub error: DiscordJsonError,
 }
 
-impl From<Response> for ErrorResponse {
-    fn from(r: Response) -> Self {
+impl ErrorResponse {
+    // We need a freestanding from-function since we cannot implement an async
+    // From-trait.
+    pub async fn from_response(r: Response) -> Self {
         ErrorResponse {
             status_code: r.status(),
             url: r.url().clone(),
-            error: r.json().unwrap_or_else(|_| DiscordJsonError {
+            error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
-                message: "[Serenity] No correct json was received!".to_string(),
+                message: "[Serenity] Could not decode json when receiving error response from discord!".to_string(),
                 non_exhaustive: (),
             }),
         }
@@ -52,6 +54,7 @@ impl From<Response> for ErrorResponse {
 
 
 #[derive(Debug)]
+#[non_exhaustive]
 pub enum Error {
     /// When a non-successful status code was received for a request.
     UnsuccessfulRequest(ErrorResponse),
@@ -67,8 +70,45 @@ pub enum Error {
     InvalidHeader(InvalidHeaderValue),
     /// Reqwest's Error contain information on why sending a request failed.
     Request(ReqwestError),
-    #[doc(hidden)]
-    __Nonexhaustive,
+}
+
+impl Error {
+    // We need a freestanding from-function since we cannot implement an async
+    // From-trait.
+    pub async fn from_response(r: Response) -> Self {
+        ErrorResponse::from_response(r)
+            .await
+            .into()
+    }
+
+    /// Returns true when the error is caused by an unsuccessful request
+    pub fn is_unsuccessful_request(&self) -> bool {
+        matches!(self, Self::UnsuccessfulRequest(_))
+    }
+
+    /// Returns true when the error is caused by the url containing invalid input
+    pub fn is_url_error(&self) -> bool {
+        matches!(self, Self::Url(_))
+    }
+
+    /// Returns true when the error is caused by an invalid header
+    pub fn is_invalid_header(&self) -> bool {
+        matches!(self, Self::InvalidHeader(_))
+    }
+
+    /// Returns the status code if the error is an unsuccessful request
+    pub fn status_code(&self) -> Option<StatusCode> {
+        match self {
+            Self::UnsuccessfulRequest(res) => Some(res.status_code),
+            _ => None,
+        }
+    }
+}
+
+impl From<ErrorResponse> for Error {
+    fn from(error: ErrorResponse) -> Error {
+        Error::UnsuccessfulRequest(error)
+    }
 }
 
 impl From<ReqwestError> for Error {
@@ -98,7 +138,6 @@ impl Display for Error {
             Error::Url(_) => f.write_str("Provided URL is incorrect."),
             Error::InvalidHeader(_) => f.write_str("Provided value is an invalid header value."),
             Error::Request(_) => f.write_str("Error while sending HTTP request."),
-            Error::__Nonexhaustive => unreachable!(),
         }
     }
 }
@@ -119,8 +158,8 @@ mod test {
     use http_crate::response::Builder;
     use reqwest::ResponseBuilderExt;
 
-    #[test]
-    fn test_error_response_into() {
+    #[tokio::test]
+    async fn test_error_response_into() {
         let error = DiscordJsonError {
             code: 43121215,
             message: String::from("This is a Ferris error"),
@@ -133,8 +172,8 @@ mod test {
         let body_string = serde_json::to_string(&error).unwrap();
         let response = builder.body(body_string.into_bytes()).unwrap();
 
-        let reqwest_response: reqwest::blocking::Response = response.into();
-        let error_response: ErrorResponse = reqwest_response.into();
+        let reqwest_response: reqwest::Response = response.into();
+        let error_response = ErrorResponse::from_response(reqwest_response).await;
 
         let known = ErrorResponse {
             status_code: reqwest::StatusCode::from_u16(403).unwrap(),

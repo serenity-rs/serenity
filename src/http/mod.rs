@@ -20,43 +20,42 @@
 //! instance methods where possible, as they each offer different
 //! levels of a high-level interface to the HTTP module.
 //!
-//! [`Client`]: ../client/struct.Client.html
-//! [model]: ../model/index.html
+//! [`Client`]: crate::Client
+//! [model]: crate::model
 
 pub mod client;
 pub mod error;
 pub mod ratelimiting;
 pub mod request;
 pub mod routing;
+pub mod typing;
 
 pub use reqwest::StatusCode;
 pub use self::client::*;
 pub use self::error::Error as HttpError;
+pub use self::typing::*;
 
 use reqwest::Method;
 use crate::model::prelude::*;
 use self::request::Request;
 use std::{
     borrow::Cow,
-    fs::File,
     path::{Path, PathBuf},
+    sync::Arc,
 };
-
-#[cfg(any(feature = "client", feature = "http"))]
-use std::sync::Arc;
+use tokio::fs::File;
 
 #[cfg(feature = "cache")]
-use crate::cache::CacheRwLock;
+use crate::cache::Cache;
 #[cfg(feature = "client")]
 use crate::client::Context;
 #[cfg(feature = "client")]
 use crate::CacheAndHttp;
 
-
 /// This trait will be required by functions that need [`Http`] and can
-/// optionally use a [`CacheRwLock`] to potentially avoid REST-requests.
+/// optionally use a [`Cache`] to potentially avoid REST-requests.
 ///
-/// The types [`Context`], [`CacheRwLock`], and [`Http`] implement this trait
+/// The types [`Context`], [`Cache`], and [`Http`] implement this trait
 /// and thus passing these to functions expecting `impl CacheHttp` is possible.
 ///
 /// In a situation where you have the `cache`-feature enabled but you do not
@@ -65,111 +64,60 @@ use crate::CacheAndHttp;
 /// If you are calling a function that expects `impl CacheHttp` as argument
 /// and you wish to utilise the `cache`-feature but you got no access to a
 /// [`Context`], you can pass a tuple of `(CacheRwLock, Http)`.
-///
-/// [`CacheRwLock`]: ../cache/struct.CacheRwLock.html
-/// [`Http`]: client/struct.Http.html
-/// [`Context`]: ../client/struct.Context.html
-pub trait CacheHttp {
-    #[cfg(feature = "http")]
+pub trait CacheHttp: Send + Sync {
     fn http(&self) -> &Http;
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { None }
+    fn cache(&self) -> Option<&Arc<Cache>> { None }
+}
+
+impl<T> CacheHttp for &T
+    where T: CacheHttp
+{
+    fn http(&self) -> &Http { (*self).http() }
+    #[cfg(feature = "cache")]
+    fn cache(&self) -> Option<&Arc<Cache>> { (*self).cache() }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for Context {
-    #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(feature = "client")]
-impl CacheHttp for &Context {
-    #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(feature = "client")]
-impl CacheHttp for &mut Context {
-    #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(feature = "client")]
-impl CacheHttp for &&mut Context {
-    #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&Arc<Cache>> { Some(&self.cache) }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for CacheAndHttp {
-    #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(feature = "client")]
-impl CacheHttp for &CacheAndHttp {
-    #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&Arc<Cache>> { Some(&self.cache) }
 }
 
 #[cfg(feature = "client")]
 impl CacheHttp for Arc<CacheAndHttp> {
-    #[cfg(feature = "http")]
     fn http(&self) -> &Http { &self.http }
     #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
+    fn cache(&self) -> Option<&Arc<Cache>> { Some(&self.cache) }
 }
 
-#[cfg(feature = "client")]
-impl CacheHttp for &Arc<CacheAndHttp> {
-    #[cfg(feature = "http")]
-    fn http(&self) -> &Http { &self.http }
-    #[cfg(feature = "cache")]
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.cache) }
-}
-
-#[cfg(all(feature = "cache", feature = "http"))]
-impl CacheHttp for (&CacheRwLock, &Http) {
-    fn cache(&self) -> Option<&CacheRwLock> { Some(&self.0) }
+#[cfg(feature = "cache")]
+impl CacheHttp for (&Arc<Cache>, &Http) {
+    fn cache(&self) -> Option<&Arc<Cache>> { Some(&self.0) }
     fn http(&self) -> &Http { &self.1 }
 }
 
-#[cfg(feature = "http")]
-impl CacheHttp for &Http {
-    fn http(&self) -> &Http { *self }
-}
-
-#[cfg(feature = "http")]
 impl CacheHttp for Arc<Http> {
     fn http(&self) -> &Http { &*self }
 }
 
-#[cfg(feature = "http")]
-impl CacheHttp for &Arc<Http> {
-    fn http(&self) -> &Http { &*self }
-}
-
-#[cfg(all(feature = "cache", feature = "http"))]
-impl AsRef<CacheRwLock> for (&CacheRwLock, &Http) {
-    fn as_ref(&self) -> &CacheRwLock {
-        self.0
+#[cfg(feature = "cache")]
+impl AsRef<Cache> for (&Arc<Cache>, &Http) {
+    fn as_ref(&self) -> &Cache {
+        &**self.0
     }
 }
 
 #[cfg(feature = "cache")]
-impl AsRef<Http> for (&CacheRwLock, &Http) {
+impl AsRef<Http> for (&Arc<Cache>, &Http) {
     fn as_ref(&self) -> &Http {
         self.1
     }
@@ -206,6 +154,7 @@ impl LightMethod {
 
 /// Enum that allows a user to pass a `Path` or a `File` type to `send_files`
 #[derive(Clone, Debug)]
+#[non_exhaustive]
 pub enum AttachmentType<'a> {
     /// Indicates that the `AttachmentType` is a byte slice with a filename.
     Bytes{ data: Cow<'a, [u8]>, filename: String } ,
@@ -215,8 +164,6 @@ pub enum AttachmentType<'a> {
     Path(&'a Path),
     /// Indicates that the `AttachmentType` is an image URL.
     Image(&'a str),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl<'a> From<(&'a [u8], &str)> for AttachmentType<'a> {
@@ -252,14 +199,13 @@ impl<'a> From<(&'a File, &str)> for AttachmentType<'a> {
 /// Representation of the method of a query to send for the [`get_guilds`]
 /// function.
 ///
-/// [`get_guilds`]: fn.get_guilds.html
+/// [`get_guilds`]: Http::get_guilds
+#[non_exhaustive]
 pub enum GuildPagination {
     /// The Id to get the guilds after.
     After(GuildId),
     /// The Id to get the guilds before.
     Before(GuildId),
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[cfg(test)]

@@ -1,6 +1,6 @@
 [package]
 name = "command_attr"
-version = "0.2.0"
+version = "0.3.2"
 authors = ["acdenisSK <acdenissk69@gmail.com>"]
 edition = "2018"
 description = "Procedural macros for command creation for the Serenity library."
@@ -12,4 +12,4 @@ proc-macro = true
 [dependencies]
 quote = "^1.0"
 syn = { version = "^1.0", features = ["full", "derive", "extra-traits"] }
-proc-macro2 = "^1.0"
+proc-macro2 = "1.0"

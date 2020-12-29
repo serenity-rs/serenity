@@ -13,35 +13,38 @@ use serde_json::Value;
 ///
 /// ```rust,no_run
 /// # #[cfg(all(feature = "cache", feature = "client"))]
-/// # fn main() {
+/// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
 /// # use serenity::prelude::*;
 /// # use serenity::model::prelude::*;
 /// # use serenity::model::channel::Channel;
 ///
 /// struct Handler;
 ///
+/// #[serenity::async_trait]
 /// impl EventHandler for Handler {
-///     fn message(&self, context: Context, msg: Message) {
+///    async fn message(&self, context: Context, msg: Message) {
 ///         if msg.content == "!createinvite" {
-///             let channel = match context.cache.read().guild_channel(msg.channel_id) {
+///             let channel = match context.cache.guild_channel(msg.channel_id).await {
 ///                 Some(channel) => channel,
 ///                 None => {
-///                     let _ = msg.channel_id.say(&context, "Error creating invite");
+///                     let _ = msg.channel_id.say(&context, "Error creating invite").await;
 ///                     return;
 ///                 },
 ///             };
 ///
-///             let channel = channel.read();
-///
 ///             let creation = channel.create_invite(&context, |i| {
 ///                 i.max_age(3600).max_uses(10)
-///             });
+///             })
+///             .await;
 ///
 ///             let invite = match creation {
 ///                 Ok(invite) => invite,
 ///                 Err(why) => {
 ///                     println!("Err creating invite: {:?}", why);
-///                     if let Err(why) = msg.channel_id.say(&context, "Error creating invite") {
+///                     if let Err(why) = msg
+///                         .channel_id
+///                         .say(&context, "Error creating invite")
+///                         .await {
 ///                         println!("Err sending err msg: {:?}", why);
 ///                     }
 ///
@@ -50,22 +53,20 @@ use serde_json::Value;
 ///             };
 ///
 ///             let content = format!("Here's your invite: {}", invite.url());
-///             let _ = msg.channel_id.say(&context, &content);
+///             let _ = msg.channel_id.say(&context, &content).await;
 ///         }
 ///     }
 /// }
 ///
-/// let mut client = Client::new("token", Handler).unwrap();
+/// let mut client =Client::builder("token").event_handler(Handler).await?;
 ///
-/// client.start().unwrap();
+/// client.start().await?;
+/// #     Ok(())
 /// # }
-/// #
-/// # #[cfg(not(all(feature = "cache", feature = "client")))]
-/// # fn main() {}
 /// ```
 ///
-/// [`GuildChannel::create_invite`]: ../model/channel/struct.GuildChannel.html#method.create_invite
-/// [`RichInvite`]: ../model/invite/struct.RichInvite.html
+/// [`GuildChannel::create_invite`]: crate::model::channel::GuildChannel::create_invite
+/// [`RichInvite`]: crate::model::invite::RichInvite
 #[derive(Clone, Debug)]
 pub struct CreateInvite(pub HashMap<&'static str, Value>);
 
@@ -89,17 +90,15 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read();
+    /// # async fn example(context: &Context) -> CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
     /// #
     /// let invite = channel.create_invite(context, |i| {
     ///     i.max_age(3600)
-    /// })?;
-    /// # Ok(())
+    /// })
+    /// .await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
         self.0
@@ -126,17 +125,15 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read();
+    /// # async fn example(context: &Context) -> CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
     /// #
     /// let invite = channel.create_invite(context, |i| {
     ///     i.max_uses(5)
-    /// })?;
-    /// # Ok(())
+    /// })
+    /// .await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
         self.0
@@ -161,14 +158,14 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read();
+    /// # async fn example(context: &Context) -> CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
     /// #
     /// let invite = channel.create_invite(context, |i| {
     ///     i.temporary(true)
-    /// })?;
-    /// # Ok(())
+    /// })
+    /// .await?;
+    /// #     Ok(())
     /// # }
     /// #
     /// # fn main() {}
@@ -195,17 +192,15 @@ impl CreateInvite {
     /// #
     /// # #[cfg(all(feature = "cache", feature = "client", feature = "framework", feature = "http"))]
     /// # #[command]
-    /// # fn example(context: &mut Context) -> CommandResult {
-    /// #     let channel = context.cache.read().guild_channel(81384788765712384).unwrap();
-    /// #     let channel = channel.read();
+    /// # async fn example(context: &Context) -> CommandResult {
+    /// #     let channel = context.cache.guild_channel(81384788765712384).await.unwrap();
     /// #
     /// let invite = channel.create_invite(context, |i| {
     ///     i.unique(true)
-    /// })?;
-    /// # Ok(())
+    /// })
+    /// .await?;
+    /// #     Ok(())
     /// # }
-    /// #
-    /// # fn main() {}
     /// ```
     pub fn unique(&mut self, unique: bool) -> &mut Self {
         self.0.insert("unique", Value::Bool(unique));

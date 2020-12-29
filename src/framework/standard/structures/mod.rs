@@ -1,6 +1,7 @@
 use std::{
     collections::HashSet,
     fmt,
+    error::Error as StdError,
 };
 use crate::client::Context;
 use crate::model::{
@@ -10,6 +11,7 @@ use crate::model::{
 };
 use crate::utils::Colour;
 use super::Args;
+use futures::future::BoxFuture;
 
 mod check;
 pub mod buckets;
@@ -17,12 +19,11 @@ pub mod buckets;
 pub use self::check::*;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
+#[non_exhaustive]
 pub enum OnlyIn {
     Dm,
     Guild,
     None,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 impl Default for OnlyIn {
@@ -41,7 +42,9 @@ pub struct CommandOptions {
     /// Command description, used by other commands.
     pub desc: Option<&'static str>,
     /// Delimiters used to split the arguments of the command by.
-    /// If empty, the [global delimiters](struct.Configuration.html#method.delimiters) are used.
+    /// If empty, the [global delimiters] are used.
+    ///
+    /// [global delimiters]: super::Configuration::delimiters
     pub delimiters: &'static [&'static str],
     /// Command usage schema, used by other commands.
     pub usage: Option<&'static str>,
@@ -67,19 +70,9 @@ pub struct CommandOptions {
     pub sub_commands: &'static [&'static Command],
 }
 
-#[derive(Debug, Clone)]
-pub struct CommandError(pub String);
-
-impl<T: fmt::Display> From<T> for CommandError {
-    #[inline]
-    fn from(d: T) -> Self {
-        CommandError(d.to_string())
-    }
-}
-
-pub type CommandResult = ::std::result::Result<(), CommandError>;
-
-pub type CommandFn = fn(&mut Context, &Message, Args) -> CommandResult;
+pub type CommandError = Box<dyn StdError + Send + Sync>;
+pub type CommandResult<T = ()> = std::result::Result<T, CommandError>;
+pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
     pub fun: CommandFn,
@@ -101,14 +94,14 @@ impl PartialEq for Command {
     }
 }
 
-pub type HelpCommandFn = fn(
-    &mut Context,
-    &Message,
+pub type HelpCommandFn = for<'fut> fn(
+    &'fut Context,
+    &'fut Message,
     Args,
-    &'static HelpOptions,
-    &[&'static CommandGroup],
+    &'fut HelpOptions,
+    &'fut [&'static CommandGroup],
     HashSet<UserId>,
-) -> CommandResult;
+) -> BoxFuture<'fut, CommandResult>;
 
 pub struct HelpCommand {
     pub fun: HelpCommandFn,
@@ -137,6 +130,7 @@ impl PartialEq for HelpCommand {
 /// Lacking required roles to execute the command.
 /// The command can't be used in the current channel (as in `DM only` or `guild only`).
 #[derive(Copy, Clone, Debug, PartialOrd, Ord, Eq, PartialEq)]
+#[non_exhaustive]
 pub enum HelpBehaviour {
     /// The command will be displayed, hence nothing will be done.
     Nothing,
@@ -144,8 +138,6 @@ pub enum HelpBehaviour {
     Strike,
     /// Does not list a command in the help-menu.
     Hide,
-    #[doc(hidden)]
-    __Nonexhaustive,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -171,8 +163,10 @@ pub struct HelpOptions {
     pub aliases_label: &'static str,
     /// Text specifying that a command is only usable in a guild.
     pub guild_only_text: &'static str,
-    /// Text labeling a command's names of checks.
+    /// Text labelling a command's names of checks.
     pub checks_label: &'static str,
+    /// Text labelling a command's subcommands
+    pub sub_commands_label: &'static str,
     /// Text specifying that a command is only usable in via DM.
     pub dm_only_text: &'static str,
     /// Text specifying that a command can be used via DM and in guilds.
@@ -233,6 +227,7 @@ pub struct GroupOptions {
     pub checks: &'static [&'static Check],
     pub default_command: Option<&'static Command>,
     pub description: Option<&'static str>,
+    pub summary: Option<&'static str>,
     pub commands: &'static [&'static Command],
     pub sub_groups: &'static [&'static CommandGroup],
 }

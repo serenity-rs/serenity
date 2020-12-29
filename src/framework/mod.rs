@@ -1,6 +1,6 @@
 //! The framework is a customizable method of separating commands.
 //!
-//! This is used in combination with [`Client::with_framework`].
+//! This is used in combination with [`ClientBuilder::framework`].
 //!
 //! The framework has a number of configurations, and can have any number of
 //! commands bound to it. The primary purpose of it is to offer the utility of
@@ -36,18 +36,17 @@
 //! use serenity::model::channel::Message;
 //! use serenity::framework::standard::macros::{command, group};
 //! use serenity::framework::standard::{StandardFramework, CommandResult};
-//! use std::env;
 //!
 //! #[command]
-//! fn about(ctx: &mut Context, msg: &Message) -> CommandResult {
-//!     msg.channel_id.say(&ctx.http, "A simple test bot")?;
+//! async fn about(ctx: &Context, msg: &Message) -> CommandResult {
+//!     msg.channel_id.say(&ctx.http, "A simple test bot").await?;
 //!
 //!     Ok(())
 //! }
 //!
 //! #[command]
-//! fn ping(ctx: &mut Context, msg: &Message) -> CommandResult {
-//!     msg.channel_id.say(&ctx.http, "pong!")?;
+//! async fn ping(ctx: &Context, msg: &Message) -> CommandResult {
+//!     msg.channel_id.say(&ctx.http, "pong!").await?;
 //!
 //!     Ok(())
 //! }
@@ -60,20 +59,23 @@
 //!
 //! impl EventHandler for Handler {}
 //!
-//! # fn main() {
-//! let mut client = Client::new(&env::var("DISCORD_TOKEN").unwrap(), Handler).unwrap();
+//! # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+//! let token = std::env::var("DISCORD_TOKEN")?;
 //!
-//! client.with_framework(StandardFramework::new()
+//! let framework = StandardFramework::new()
 //!     .configure(|c| c.prefix("~"))
 //!     // The `#[group]` (and similarly, `#[command]`) macro generates static instances
 //!     // containing any options you gave it. For instance, the group `name` and its `commands`.
 //!     // Their identifiers, names you can use to refer to these instances in code, are an
 //!     // all-uppercased version of the `name` with a `_GROUP` suffix appended at the end.
-//!     .group(&GENERAL_GROUP));
+//!     .group(&GENERAL_GROUP);
+//!
+//! let mut client = Client::builder(&token).event_handler(Handler).framework(framework).await?;
+//! #     Ok(())
 //! # }
 //! ```
 //!
-//! [`Client::with_framework`]: ../client/struct.Client.html#method.with_framework
+//! [`ClientBuilder::framework`]: crate::client::ClientBuilder::framework
 
 #[cfg(feature = "standard_framework")]
 pub mod standard;
@@ -83,7 +85,7 @@ pub use self::standard::StandardFramework;
 
 use crate::client::Context;
 use crate::model::channel::Message;
-use threadpool::ThreadPool;
+use async_trait::async_trait;
 
 /// A trait for defining your own framework for serenity to use.
 ///
@@ -91,20 +93,27 @@ use threadpool::ThreadPool;
 /// However, using this will benefit you by abstracting the `EventHandler` away,
 /// and providing a reference to serenity's threadpool,
 /// so that you may run your commands in separate threads.
-pub trait Framework {
-    fn dispatch(&mut self, _: Context, _: Message, _: &ThreadPool);
+#[async_trait]
+pub trait Framework: Send + Sync {
+    async fn dispatch(&self, _: Context, _: Message);
 }
 
-impl<F: Framework + ?Sized> Framework for Box<F> {
+#[async_trait]
+impl<F> Framework for Box<F>
+where F: Framework + ?Sized
+{
     #[inline]
-    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        (**self).dispatch(ctx, msg, threadpool);
+    async fn dispatch(&self, ctx: Context, msg: Message) {
+        (**self).dispatch(ctx, msg).await;
     }
 }
 
-impl<'a, F: Framework + ?Sized> Framework for &'a mut F {
+#[async_trait]
+impl<'a, F> Framework for &'a mut F
+where F: Framework + ?Sized
+{
     #[inline]
-    fn dispatch(&mut self, ctx: Context, msg: Message, threadpool: &ThreadPool) {
-        (**self).dispatch(ctx, msg, threadpool);
+    async fn dispatch(&self, ctx: Context, msg: Message) {
+        (**self).dispatch(ctx, msg).await;
     }
 }
