@@ -857,6 +857,12 @@
 <span id="854">854</span>
 <span id="855">855</span>
 <span id="856">856</span>
+<span id="857">857</span>
+<span id="858">858</span>
+<span id="859">859</span>
+<span id="860">860</span>
+<span id="861">861</span>
+<span id="862">862</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::{<span class="self">self</span>, <span class="ident">close_codes</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
@@ -1421,7 +1427,13 @@
 
                 <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">ShardAction</span>::<span class="ident">Reconnect</span>(<span class="self">self</span>.<span class="ident">reconnection_type</span>())))
             },
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>),
+            <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">why</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="macro">warn</span><span class="macro">!</span>(<span class="string">&quot;[Shard {:?}] Unhandled error: {:?}&quot;</span>,
+                    <span class="self">self</span>.<span class="ident">shard_info</span>,
+                    <span class="ident">why</span>);
+
+                <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>)
+            },
         }
     }
 
