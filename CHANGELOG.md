@@ -19,6 +19,7 @@ Thanks to the following for their contributions:
 - [@james7132]
 - [@KamranMackey]
 - [@Lakelezz]
+- [@LavaToaster]
 - [@nickelc]
 - [@peppizza]
 - [@SadiinsoSnowfall]
@@ -30,6 +31,7 @@ Thanks to the following for their contributions:
 
 ### Added
 
+- [gateway] Log unhandled errors when handling events in the gateway ([@LavaToaster]) [c:2e8f968]
 - [model/http] Add Slash Command Gateway and REST API Support ([@Baev1]) [c:649f8f2]
 - [framework] Add Max Delay Limits, Delay Hook, and `RateLimitInfo` ([@Lakelezz]) [c:aed3886]
 - [model] Add partial application information to the Ready event. ([@KamranMackey]) [c:d4caf12]
@@ -83,6 +85,9 @@ Thanks to the following for their contributions:
 
 ### Fixed
 
+- [model] Fix doc comments for `ReactionCollector` ([@Th3-M4jor]) [c:7684323]
+- [model] Fix the stated order of `ChannelId::messages_iter` ([@acdenisSK]) [c:03a1f97]
+- [model] Use  `ApplicationId` instead of `u64` in `MessageApplication` (#1158) ([@sam-kirby]) [c:66e7add]
 - [model] Use guild splash hash for splash_url() instead of icon hash ([@drklee3]) [c:d3ab6a7]
 - [model/http] Handle 200 Response when modifying Members on API v8 ([@drklee3]) [c:8471f5b]
 - [framework] Check for discrepancies in prefixless groups ([@acdenisSK]) [c:692e984]
@@ -4076,6 +4081,7 @@ Initial commit.
 [@ks129]: https://github.com/ks129
 [@kyranet]: https://github.com/kyranet
 [@Lakelezz]: https://github.com/Lakelezz
+[@LavaToaster]: https://github.com/LavaToaster
 [@LeSeulArtichaut]: https://github.com/LeSeulArtichaut
 [@LikeLakers2]: https://github.com/LikeLakers2
 [@Lymia]: https://github.com/Lymia
@@ -4148,6 +4154,10 @@ Initial commit.
 
 <!-- COMMITS -->
 
+[c:2e8f968]: https://github.com/serenity-rs/serenity/commit/2e8f968fe80ce3747772d194120dd9b41d3694d3
+[c:7684323]: https://github.com/serenity-rs/serenity/commit/7684323d1264583d8f3d0424bd8fca1e0abf1941
+[c:03a1f97]: https://github.com/serenity-rs/serenity/commit/03a1f97a40c00bf5d8551a6036c58263fd86dc07
+[c:66e7add]: https://github.com/serenity-rs/serenity/commit/66e7addd8cddf98d1f279cd4cc51c8d3f62e1ccc
 [c:51dc943]: https://github.com/serenity-rs/serenity/commit/51dc943b1fa343b9fd28d6c68de765774553a174
 [c:d3ab6a7]: https://github.com/serenity-rs/serenity/commit/d3ab6a7ffe9d72e08c262ed32788be4f7cddb5d0
 [c:649f8f2]: https://github.com/serenity-rs/serenity/commit/649f8f2f660efb6c60ee95d725ede0941ca1b6c2
