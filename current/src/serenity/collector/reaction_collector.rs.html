@@ -479,7 +479,7 @@
                 }
 
                 <span class="doccomment">/// Sets the guild in which the reaction must occur.</span>
-                <span class="doccomment">/// If a reaction is not on a message with this ID, it won&#39;t be received.</span>
+                <span class="doccomment">/// If a reaction is not on a message with this guild ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">guild_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">guild_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                     <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">guild_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>.<span class="ident">into</span>());
 
@@ -487,7 +487,7 @@
                 }
 
                 <span class="doccomment">/// Sets the channel on which the reaction must occur.</span>
-                <span class="doccomment">/// If a reaction is not on a message with this ID, it won&#39;t be received.</span>
+                <span class="doccomment">/// If a reaction is not on a message with this channel ID, it won&#39;t be received.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">channel_id</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">channel_id</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
                     <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">channel_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">channel_id</span>.<span class="ident">into</span>());
 
