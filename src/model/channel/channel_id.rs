@@ -410,7 +410,7 @@ impl ChannelId {
     /// A buffer of at most 100 messages is used to reduce the number of calls.
     /// necessary.
     ///
-    /// The stream returns the oldest message first, followed by newer messages.
+    /// The stream returns the newest message first, followed by older messages.
     ///
     /// # Examples
     ///
