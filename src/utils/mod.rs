@@ -284,7 +284,7 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
 
     let len = mention.len();
 
-    if len < 6 || len > 56 {
+    if !(6..=56).contains(&len) {
         return None;
     }
 

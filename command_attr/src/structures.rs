@@ -480,11 +480,10 @@ pub struct Options {
 impl Options {
     #[inline]
     pub fn new() -> Self {
-        let mut options = Self::default();
-
-        options.help_available = true;
-
-        options
+        Self {
+            help_available: true,
+            ..Default::default()
+        }
     }
 }
 
@@ -653,10 +652,9 @@ pub struct GroupOptions {
 impl GroupOptions {
     #[inline]
     pub fn new() -> Self {
-        let mut options = Self::default();
-
-        options.help_available = true;
-
-        options
+        Self {
+            help_available: true,
+            ..Default::default()
+        }
     }
 }

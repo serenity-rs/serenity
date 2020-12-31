@@ -1484,7 +1484,7 @@ impl Http {
         after: Option<u64>
     ) -> Result<Vec<Member>> {
         if let Some(l) = limit {
-            if (l < 1) || (l > constants::MEMBER_FETCH_LIMIT) {
+            if !(1..=constants::MEMBER_FETCH_LIMIT).contains(&l) {
                 return Err(Error::NotInRange("limit", l, 1, constants::MEMBER_FETCH_LIMIT))
             }
         }

@@ -959,10 +959,7 @@ impl Guild {
             let split = name.split_at(pos + 1);
 
             let split2 = (
-                match split.0.get(0..split.0.len() - 1) {
-                    Some(s) => s,
-                    None => "",
-                },
+                split.0.get(0..split.0.len() - 1).unwrap_or(""),
                 split.1,
             );
 
