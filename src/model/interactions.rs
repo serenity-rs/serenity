@@ -125,7 +125,7 @@ pub struct ApplicationCommandInteractionData {
 #[non_exhaustive]
 pub struct ApplicationCommandInteractionDataOption {
     pub name: String,
-    pub value: Option<ApplicationCommandOptionType>,
+    pub value: Option<Value>,
     #[serde(default)]
     pub options: Vec<ApplicationCommandInteractionDataOption>,
 }
@@ -161,7 +161,7 @@ pub struct ApplicationCommandOption {
 }
 
 /// The type of an application command option.
-#[derive(Copy, Clone, Debug, Deserialize, Hash, Eq, PartialEq, PartialOrd, Ord, Serialize)]
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
 #[non_exhaustive]
 #[repr(u8)]
 pub enum ApplicationCommandOptionType {
@@ -174,6 +174,17 @@ pub enum ApplicationCommandOptionType {
     Channel = 7,
     Role = 8,
 }
+
+enum_number!(ApplicationCommandOptionType {
+    SubCommand,
+    SubCommandGroup,
+    String,
+    Integer,
+    Boolean,
+    User,
+    Channel,
+    Role,
+});
 
 /// The only valid values a user can pick in a command option.
 #[derive(Clone, Debug, Deserialize, Serialize)]
