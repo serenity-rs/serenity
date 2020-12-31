@@ -736,7 +736,7 @@
                     <span class="kw">let</span> <span class="ident">was_first_try</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span>;
 
                     <span class="comment">// Are delay limits left?</span>
-                    <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">+</span> <span class="number">1</span> {
+                    <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> {
                         <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
                         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">delay_action</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delay_action</span> {
@@ -785,7 +785,7 @@
             <span class="kw">let</span> <span class="ident">was_first_try</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span>;
 
             <span class="comment">// Are delay limits left?</span>
-            <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span><span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">+</span> <span class="number">1</span> {
+            <span class="kw">let</span> <span class="ident">action</span> <span class="op">=</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">await_ratelimits</span> <span class="op">&gt;</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> {
                 <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">delay_action</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">delay_action</span> {
@@ -815,7 +815,7 @@
                 <span class="ident">is_first_try</span>: <span class="ident">was_first_try</span>,
             })
         } <span class="kw">else</span> {
-            <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>.<span class="ident">checked_sub</span>(<span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="number">0</span>);
+            <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span> <span class="op">=</span> <span class="ident">ticket_owner</span>.<span class="ident">awaiting</span>.<span class="ident">saturating_sub</span>(<span class="number">1</span>);
             <span class="ident">ticket_owner</span>.<span class="ident">tickets</span> <span class="op">+</span><span class="op">=</span> <span class="number">1</span>;
             <span class="ident">ticket_owner</span>.<span class="ident">is_first_try</span> <span class="op">=</span> <span class="bool-val">true</span>;
             <span class="ident">ticket_owner</span>.<span class="ident">last_time</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">now</span>);
