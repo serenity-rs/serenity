@@ -203,7 +203,7 @@ impl TicketCounter {
                     let was_first_try = ticket_owner.is_first_try;
 
                     // Are delay limits left?
-                    let action = if self.await_ratelimits >= ticket_owner.awaiting + 1 {
+                    let action = if self.await_ratelimits > ticket_owner.awaiting {
                         ticket_owner.awaiting += 1;
 
                         if let Some(delay_action) = self.delay_action {
@@ -252,7 +252,7 @@ impl TicketCounter {
             let was_first_try = ticket_owner.is_first_try;
 
             // Are delay limits left?
-            let action = if self.await_ratelimits >= ticket_owner.awaiting + 1 {
+            let action = if self.await_ratelimits > ticket_owner.awaiting {
                 ticket_owner.awaiting += 1;
 
                 if let Some(delay_action) = self.delay_action {
