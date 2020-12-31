@@ -282,7 +282,7 @@ impl TicketCounter {
                 is_first_try: was_first_try,
             })
         } else {
-            ticket_owner.awaiting = ticket_owner.awaiting.checked_sub(1).unwrap_or(0);
+            ticket_owner.awaiting = ticket_owner.awaiting.saturating_sub(1);
             ticket_owner.tickets += 1;
             ticket_owner.is_first_try = true;
             ticket_owner.last_time = Some(now);
