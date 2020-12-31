@@ -12,7 +12,7 @@ use tokio::{
         UnboundedReceiver as Receiver,
         UnboundedSender as Sender,
     },
-    time::{Delay, delay_for},
+    time::{Delay, sleep},
 };
 use futures::{
     future::BoxFuture,
@@ -76,7 +76,7 @@ macro_rules! impl_message_collector {
                 /// Sets a `duration` for how long the collector shall receive
                 /// messages.
                 pub fn timeout(mut self, duration: Duration) -> Self {
-                    self.timeout = Some(delay_for(duration));
+                    self.timeout = Some(sleep(duration));
 
                     self
                 }

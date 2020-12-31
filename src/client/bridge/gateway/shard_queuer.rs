@@ -10,7 +10,7 @@ use futures::{
     StreamExt,
     channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
 };
-use tokio::time::{delay_for, timeout, Duration, Instant};
+use tokio::time::{sleep, timeout, Duration, Instant};
 use crate::client::{EventHandler, RawEventHandler};
 use super::{
     GatewayIntents,
@@ -156,7 +156,7 @@ impl ShardQueuer {
 
         let to_sleep = duration - elapsed;
 
-        delay_for(to_sleep).await;
+        sleep(to_sleep).await;
     }
 
     #[instrument(skip(self))]

@@ -218,7 +218,7 @@ impl Cache {
     ///         //
     ///         // For demonstrative purposes we're just sleeping the thread for 5
     ///         // seconds.
-    ///         tokio::time::delay_for(Duration::from_secs(5)).await;
+    ///         tokio::time::sleep(Duration::from_secs(5)).await;
     ///
     ///         println!("{} unknown members", ctx.cache.unknown_members().await);
     ///     }
