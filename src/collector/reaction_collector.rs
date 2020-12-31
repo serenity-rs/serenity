@@ -12,7 +12,7 @@ use tokio::{
         UnboundedReceiver as Receiver,
         UnboundedSender as Sender,
     },
-    time::{Delay, delay_for},
+    time::{Sleep, sleep},
 };
 use futures::{
     future::BoxFuture,
@@ -112,7 +112,7 @@ macro_rules! impl_reaction_collector {
                 /// Sets a `duration` for how long the collector shall receive
                 /// reactions.
                 pub fn timeout(mut self, duration: Duration) -> Self {
-                    self.timeout = Some(delay_for(duration));
+                    self.timeout = Some(Box::pin(sleep(duration)));
 
                     self
                 }
@@ -267,7 +267,7 @@ impl_reaction_collector! {
 pub struct ReactionCollectorBuilder<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
-    timeout: Option<Delay>,
+    timeout: Option<Pin<Box<Sleep>>>,
     fut: Option<BoxFuture<'a, ReactionCollector>>,
 }
 
@@ -296,7 +296,7 @@ impl<'a> Future for ReactionCollectorBuilder<'a> {
 
                 ReactionCollector {
                     receiver: Box::pin(receiver),
-                    timeout: timeout.map(Box::pin),
+                    timeout,
                 }
             }))
         }
@@ -308,7 +308,7 @@ impl<'a> Future for ReactionCollectorBuilder<'a> {
 pub struct CollectReaction<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
-    timeout: Option<Delay>,
+    timeout: Option<Pin<Box<Sleep>>>,
     fut: Option<BoxFuture<'a, Option<Arc<ReactionAction>>>>,
 }
 
@@ -337,7 +337,7 @@ impl<'a> Future for CollectReaction<'a> {
 
                 ReactionCollector {
                     receiver: Box::pin(receiver),
-                    timeout: timeout.map(Box::pin),
+                    timeout,
                 }.next().await
             }))
         }
@@ -362,7 +362,7 @@ impl std::fmt::Debug for FilterOptions {
 /// set duration.
 pub struct ReactionCollector {
     receiver: Pin<Box<Receiver<Arc<ReactionAction>>>>,
-    timeout: Option<Pin<Box<Delay>>>,
+    timeout: Option<Pin<Box<Sleep>>>,
 }
 
 impl ReactionCollector {
@@ -388,7 +388,7 @@ impl Stream for ReactionCollector {
             }
         }
 
-        self.receiver.as_mut().poll_next(ctx)
+        self.receiver.as_mut().poll_recv(ctx)
     }
 }
 

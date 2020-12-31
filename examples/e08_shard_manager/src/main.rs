@@ -29,7 +29,7 @@ use serenity::{
     model::gateway::Ready,
     prelude::*,
 };
-use tokio::time::delay_for;
+use tokio::time::sleep;
 
 struct Handler;
 
@@ -68,7 +68,7 @@ async fn main() {
 
     tokio::spawn(async move {
         loop {
-            delay_for(Duration::from_secs(30)).await;
+            sleep(Duration::from_secs(30)).await;
 
             let lock = manager.lock().await;
             let shard_runners = lock.runners.lock().await;
