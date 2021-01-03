@@ -274,9 +274,9 @@ impl Ratelimit {
 
             // if duration is negative (i.e. adequate time has passed since last call to this api)
             Err(_) => {
-            if self.remaining() != 0 {
-                self.remaining -= 1;
-            }
+                if self.remaining() != 0 {
+                    self.remaining -= 1;
+                }
             return;
             }
         };
