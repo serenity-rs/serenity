@@ -253,29 +253,31 @@ pub struct Ratelimit {
 }
 
 impl Ratelimit {
-    #[cfg(feature = "absolute_ratelimits")]
-    fn get_delay(&self) -> Option<Duration> {
-        self.reset?.duration_since(SystemTime::now()).ok()
-    }
-
-    #[cfg(not(feature = "absolute_ratelimits"))]
-    fn get_delay(&self) -> Option<Duration> {
-        self.reset_after
-    }
-
     #[instrument]
     pub async fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
         }
 
-		let delay = match self.get_delay() {
-            Some(delay) => delay,
+        let reset = match self.reset {
+            Some(reset) => reset,
             None => {
                 // We're probably in the past.
                 self.remaining = self.limit;
 
                 return;
+            }
+        };
+
+        let delay = match reset.duration_since(SystemTime::now()) {
+            Ok(delay) => delay,
+
+            // if duration is negative (i.e. adequate time has passed since last call to this api)
+            Err(_) => {
+            if self.remaining() != 0 {
+                self.remaining -= 1;
+            }
+            return;
             }
         };
 
@@ -306,10 +308,15 @@ impl Ratelimit {
         }
 
         if let Some(reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
-            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
+            if cfg!(feature = "absolute_ratelimits") {
+                self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
+            }
         }
 
         if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
+            if cfg!(not(feature = "absolute_ratelimits")) {
+                self.reset = Some(SystemTime::now() + Duration::from_secs_f64(reset_after));
+            }
             self.reset_after = Some(Duration::from_secs_f64(reset_after));
         }
 
