@@ -277,7 +277,7 @@ impl Ratelimit {
                 if self.remaining() != 0 {
                     self.remaining -= 1;
                 }
-            return;
+                return;
             }
         };
 
