@@ -141,7 +141,7 @@ client.</p>
         <span class="kw">let</span> <span class="ident">count</span> <span class="op">=</span> <span class="ident">sm</span>.<span class="ident">shards_instantiated</span>().<span class="kw">await</span>.<span class="ident">len</span>();
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;Shard count instantiated: {}&quot;</span>, <span class="ident">count</span>);
 
-        <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">5000</span>)).<span class="kw">await</span>;
+        <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_millis</span>(<span class="number">5000</span>)).<span class="kw">await</span>;
     }
 });</pre></div>
 <p>Shutting down all connections after one minute of operation:</p>
@@ -163,7 +163,7 @@ client.</p>
 <span class="comment">// Create a thread which will sleep for 60 seconds and then have the</span>
 <span class="comment">// shard manager shutdown.</span>
 <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
-    <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">60</span>));
+    <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">60</span>));
 
     <span class="ident">shard_manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
 

@@ -40,13 +40,13 @@ used to determine how many members have not yet been received.</p>
         <span class="comment">//</span>
         <span class="comment">// For demonstrative purposes we&#39;re just sleeping the thread for 5</span>
         <span class="comment">// seconds.</span>
-        <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">5</span>)).<span class="kw">await</span>;
+        <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">5</span>)).<span class="kw">await</span>;
 
         <span class="macro">println</span><span class="macro">!</span>(<span class="string">&quot;{} unknown members&quot;</span>, <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">unknown_members</span>().<span class="kw">await</span>);
     }
 }
 
-<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span><span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+<span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">client</span> <span class="op">=</span> <span class="ident">Client</span>::<span class="ident">builder</span>(<span class="string">&quot;token&quot;</span>).<span class="ident">event_handler</span>(<span class="ident">Handler</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
 <span class="ident">client</span>.<span class="ident">start</span>().<span class="kw">await</span><span class="question-mark">?</span>;</pre></div>
 </div><h4 id="method.private_channels" class="method"><code>pub async fn <a href="#method.private_channels" class="fnname">private_channels</a>(&amp;self) -&gt; <a class="struct" href="https://doc.rust-lang.org/nightly/std/collections/hash/map/struct.HashMap.html" title="struct std::collections::hash::map::HashMap">HashMap</a>&lt;<a class="struct" href="../../serenity/model/id/struct.ChannelId.html" title="struct serenity::model::id::ChannelId">ChannelId</a>, <a class="struct" href="../../serenity/model/channel/struct.PrivateChannel.html" title="struct serenity::model::channel::PrivateChannel">PrivateChannel</a>&gt;</code><a class="srclink" href="../../src/serenity/cache/mod.rs.html#271-273" title="goto source code">[src]</a></h4><div class="docblock"><p>Fetches a vector of all <a href="../../serenity/model/channel/struct.PrivateChannel.html" title="PrivateChannel"><code>PrivateChannel</code></a> Ids that are

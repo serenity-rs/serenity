@@ -1459,7 +1459,7 @@
     <span class="doccomment">///         let count = sm.shards_instantiated().await.len();</span>
     <span class="doccomment">///         println!(&quot;Shard count instantiated: {}&quot;, count);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         tokio::time::delay_for(Duration::from_millis(5000)).await;</span>
+    <span class="doccomment">///         tokio::time::sleep(Duration::from_millis(5000)).await;</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -1486,7 +1486,7 @@
     <span class="doccomment">/// // Create a thread which will sleep for 60 seconds and then have the</span>
     <span class="doccomment">/// // shard manager shutdown.</span>
     <span class="doccomment">/// tokio::spawn(async move {</span>
-    <span class="doccomment">///     tokio::time::delay_for(Duration::from_secs(60));</span>
+    <span class="doccomment">///     tokio::time::sleep(Duration::from_secs(60));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     shard_manager.lock().await.shutdown_all().await;</span>
     <span class="doccomment">///</span>

@@ -415,7 +415,7 @@
         <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
         <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>,
     },
-    <span class="ident">time</span>::{<span class="ident">Delay</span>, <span class="ident">delay_for</span>},
+    <span class="ident">time</span>::{<span class="ident">Sleep</span>, <span class="ident">sleep</span>},
 };
 <span class="kw">use</span> <span class="ident">futures</span>::{
     <span class="ident">future</span>::<span class="ident">BoxFuture</span>,
@@ -515,7 +515,7 @@
                 <span class="doccomment">/// Sets a `duration` for how long the collector shall receive</span>
                 <span class="doccomment">/// reactions.</span>
                 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">timeout</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">duration</span>: <span class="ident">Duration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-                    <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">delay_for</span>(<span class="ident">duration</span>));
+                    <span class="self">self</span>.<span class="ident">timeout</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">sleep</span>(<span class="ident">duration</span>)));
 
                     <span class="self">self</span>
                 }
@@ -670,7 +670,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Delay</span><span class="op">&gt;</span>,
+    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">ReactionCollector</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -699,7 +699,7 @@
 
                 <span class="ident">ReactionCollector</span> {
                     <span class="ident">receiver</span>: <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">receiver</span>),
-                    <span class="ident">timeout</span>: <span class="ident">timeout</span>.<span class="ident">map</span>(<span class="ident">Box</span>::<span class="ident">pin</span>),
+                    <span class="ident">timeout</span>,
                 }
             }))
         }
@@ -711,7 +711,7 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CollectReaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="ident">filter</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">FilterOptions</span><span class="op">&gt;</span>,
     <span class="ident">shard</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Delay</span><span class="op">&gt;</span>,
+    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="ident">fut</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReactionAction</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
@@ -740,7 +740,7 @@
 
                 <span class="ident">ReactionCollector</span> {
                     <span class="ident">receiver</span>: <span class="ident">Box</span>::<span class="ident">pin</span>(<span class="ident">receiver</span>),
-                    <span class="ident">timeout</span>: <span class="ident">timeout</span>.<span class="ident">map</span>(<span class="ident">Box</span>::<span class="ident">pin</span>),
+                    <span class="ident">timeout</span>,
                 }.<span class="ident">next</span>().<span class="kw">await</span>
             }))
         }
@@ -765,7 +765,7 @@
 <span class="doccomment">/// set duration.</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ReactionCollector</span> {
     <span class="ident">receiver</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Receiver</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">ReactionAction</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
-    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Delay</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="ident">timeout</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Pin</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="ident">Sleep</span><span class="op">&gt;</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="kw">impl</span> <span class="ident">ReactionCollector</span> {
@@ -791,7 +791,7 @@
             }
         }
 
-        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">as_mut</span>().<span class="ident">poll_next</span>(<span class="ident">ctx</span>)
+        <span class="self">self</span>.<span class="ident">receiver</span>.<span class="ident">as_mut</span>().<span class="ident">poll_recv</span>(<span class="ident">ctx</span>)
     }
 }
 

@@ -90,7 +90,7 @@
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>::<span class="prelude-ty">Result</span>, <span class="ident">http</span>::<span class="ident">Http</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">sync</span>::<span class="ident">oneshot</span>::{<span class="self">self</span>, <span class="ident">Sender</span>, <span class="ident">error</span>::<span class="ident">TryRecvError</span>}, <span class="ident">time</span>::{<span class="ident">delay_for</span>, <span class="ident">Duration</span>}};
+<span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">sync</span>::<span class="ident">oneshot</span>::{<span class="self">self</span>, <span class="ident">Sender</span>, <span class="ident">error</span>::<span class="ident">TryRecvError</span>}, <span class="ident">time</span>::{<span class="ident">sleep</span>, <span class="ident">Duration</span>}};
 
 <span class="doccomment">/// A struct to start typing in a [`Channel`] for an indefinite period of time.</span>
 <span class="doccomment">///</span>
@@ -155,7 +155,7 @@
 
                 <span class="comment">// It is unclear for how long typing persists after this method is called.</span>
                 <span class="comment">// It is generally assumed to be 7 or 10 seconds, so we use 7 to be safe.</span>
-                <span class="ident">delay_for</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">7</span>)).<span class="kw">await</span>;
+                <span class="ident">sleep</span>(<span class="ident">Duration</span>::<span class="ident">from_secs</span>(<span class="number">7</span>)).<span class="kw">await</span>;
             }
 
             <span class="prelude-ty">Result</span>::<span class="prelude-val">Ok</span>(())
