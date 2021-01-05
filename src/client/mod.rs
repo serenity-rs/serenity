@@ -558,14 +558,6 @@ pub struct Client {
 }
 
 impl Client {
-    /// Returns a builder implementing [`Future`]. You can chain the builder methods and then await
-    /// in order to finish the [`Client`].
-    #[deprecated(since="0.9.0", note="please use `builder` instead")]
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
-        Self::builder(token)
-    }
-
     pub fn builder<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
         ClientBuilder::new(token)
     }
