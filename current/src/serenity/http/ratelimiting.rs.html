@@ -493,6 +493,7 @@
 <span id="490">490</span>
 <span id="491">491</span>
 <span id="492">492</span>
+<span id="493">493</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Routes are used for ratelimiting. These are to differentiate between the</span>
 <span class="doccomment">//! different _types_ of routes - such as getting the current user&#39;s channels -</span>
@@ -803,16 +804,17 @@
             <span class="self">self</span>.<span class="ident">remaining</span> <span class="op">=</span> <span class="ident">remaining</span>;
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reset</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset&quot;</span>)<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;absolute_ratelimits&quot;</span>) {
-                <span class="self">self</span>.<span class="ident">reset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration</span>::<span class="ident">from_secs_f64</span>(<span class="ident">reset</span>));
-            }
+        <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;absolute_ratelimits&quot;</span>)]</span>
+        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">_reset</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset&quot;</span>)<span class="question-mark">?</span> {
+            <span class="self">self</span>.<span class="ident">reset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">std</span>::<span class="ident">time</span>::<span class="ident">UNIX_EPOCH</span> <span class="op">+</span> <span class="ident">Duration</span>::<span class="ident">from_secs_f64</span>(<span class="ident">_reset</span>));
         }
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">reset_after</span>) <span class="op">=</span> <span class="ident">parse_header</span>::<span class="op">&lt;</span><span class="ident">f64</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="ident">response</span>.<span class="ident">headers</span>(), <span class="string">&quot;x-ratelimit-reset-after&quot;</span>)<span class="question-mark">?</span> {
-            <span class="kw">if</span> <span class="macro">cfg</span><span class="macro">!</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;absolute_ratelimits&quot;</span>)) {
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;absolute_ratelimits&quot;</span>))]</span>
+            {
                 <span class="self">self</span>.<span class="ident">reset</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">SystemTime</span>::<span class="ident">now</span>() <span class="op">+</span> <span class="ident">Duration</span>::<span class="ident">from_secs_f64</span>(<span class="ident">reset_after</span>));
             }
+
             <span class="self">self</span>.<span class="ident">reset_after</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">Duration</span>::<span class="ident">from_secs_f64</span>(<span class="ident">reset_after</span>));
         }
 
