@@ -561,7 +561,13 @@ impl Shard {
 
                 Ok(Some(ShardAction::Reconnect(self.reconnection_type())))
             },
-            _ => Ok(None),
+            Err(ref why) => {
+                warn!("[Shard {:?}] Unhandled error: {:?}",
+                    self.shard_info,
+                    why);
+
+                Ok(None)
+            },
         }
     }
 

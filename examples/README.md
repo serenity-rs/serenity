@@ -26,7 +26,7 @@ To run an example, you have various options:
  3 => Structure Utilities: Simple usage of the utils feature.
  4 => Message Builder: A demonstration of the message builder utility, to generate messages safely.
  5 => Command Framework: The main example, where it's demonstrated how to use serenity's command framework,
-      along with mosts of it's utilities.
+      along with most of its utilities.
       This example also shows how to share data between events and commands, using `Context.data`
  6 => Simple Bot Stucture: An example showing the recommended file structure to use.
  7 => Env Logging: How to use the tracing crate along with serenity.

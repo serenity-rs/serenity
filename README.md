@@ -148,6 +148,7 @@ instead of `rustls_backend`.
 ratelimits, or use the interval given by Discord that might be less efficient
 due to latency in the network. If you turn this feature on, it is recommended to
 synchronise your clock with an NTP server (such as Google's).
+- **unstable_discord_api**: Enables features of the Discord API that do not have a stable interface. The features might not have official documentation or are subject to change.
 
 Serenity offers two TLS-backends, `rustls_backend` by default, you need to pick
 one if you do not use the default features:

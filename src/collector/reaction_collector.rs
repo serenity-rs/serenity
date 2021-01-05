@@ -76,7 +76,7 @@ macro_rules! impl_reaction_collector {
                 }
 
                 /// Sets the guild in which the reaction must occur.
-                /// If a reaction is not on a message with this ID, it won't be received.
+                /// If a reaction is not on a message with this guild ID, it won't be received.
                 pub fn guild_id(mut self, guild_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().guild_id = Some(guild_id.into());
 
@@ -84,7 +84,7 @@ macro_rules! impl_reaction_collector {
                 }
 
                 /// Sets the channel on which the reaction must occur.
-                /// If a reaction is not on a message with this ID, it won't be received.
+                /// If a reaction is not on a message with this channel ID, it won't be received.
                 pub fn channel_id(mut self, channel_id: impl Into<u64>) -> Self {
                     self.filter.as_mut().unwrap().channel_id = Some(channel_id.into());
 

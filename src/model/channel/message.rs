@@ -28,6 +28,7 @@ use std::{
 use crate::{
     constants,
     model::id::{
+        ApplicationId,
         MessageId,
         GuildId,
         ChannelId,
@@ -723,9 +724,7 @@ impl Message {
 
     /// Tries to return author's nickname in the current channel's guild.
     ///
-    /// **Note**:
-    /// If message was sent in a private channel, then the function will return
-    /// `None`.
+    /// Refer to [`User::nick_in()`] inside and `None` outside of a guild.
     #[inline]
     pub async fn author_nick(&self, cache_http: impl CacheHttp) -> Option<String> {
         self.author.nick_in(cache_http, self.guild_id?).await
@@ -971,7 +970,7 @@ impl MessageActivityKind {
 #[non_exhaustive]
 pub struct MessageApplication {
     /// ID of the application.
-    pub id: u64,
+    pub id: ApplicationId,
     /// ID of the embed's image asset.
     pub cover_image: Option<String>,
     /// Application's description.

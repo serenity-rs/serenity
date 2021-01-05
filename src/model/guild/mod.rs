@@ -959,10 +959,7 @@ impl Guild {
             let split = name.split_at(pos + 1);
 
             let split2 = (
-                match split.0.get(0..split.0.len() - 1) {
-                    Some(s) => s,
-                    None => "",
-                },
+                split.0.get(0..split.0.len() - 1).unwrap_or(""),
                 split.1,
             );
 
@@ -1558,9 +1555,9 @@ impl Guild {
 
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon
+        self.splash
             .as_ref()
-            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
     }
 
     /// Starts an integration sync for the given integration Id.
@@ -2005,9 +2002,9 @@ impl From<u64> for GuildContainer {
 impl InviteGuild {
     /// Returns the formatted URL of the guild's splash image, if one exists.
     pub fn splash_url(&self) -> Option<String> {
-        self.icon
+        self.splash
             .as_ref()
-            .map(|icon| format!(cdn!("/splashes/{}/{}.webp"), self.id, icon))
+            .map(|splash| format!(cdn!("/splashes/{}/{}.webp?size=4096"), self.id, splash))
     }
 }
 
