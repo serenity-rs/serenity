@@ -722,7 +722,7 @@ impl Route {
         application_id: u64,
         token: D,
     ) -> String {
-        format!(api!("/webhooks/{}/{}/callback"), application_id, token)
+        format!(api!("/interactions/{}/{}/callback"), application_id, token)
     }
 
     #[cfg(feature = "unstable_discord_api")]
