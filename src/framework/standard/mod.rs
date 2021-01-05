@@ -297,7 +297,7 @@ impl StandardFramework {
             }
 
             match duration {
-                Some(duration) => tokio::time::delay_for(duration).await,
+                Some(duration) => tokio::time::sleep(duration).await,
                 None => break,
             }
         }

@@ -12,7 +12,7 @@ use tokio::{
         UnboundedReceiver as Receiver,
         UnboundedSender as Sender,
     },
-    time::{Delay, delay_for},
+    time::{Sleep, sleep},
 };
 use futures::{
     future::BoxFuture,
@@ -76,7 +76,7 @@ macro_rules! impl_message_collector {
                 /// Sets a `duration` for how long the collector shall receive
                 /// messages.
                 pub fn timeout(mut self, duration: Duration) -> Self {
-                    self.timeout = Some(delay_for(duration));
+                    self.timeout = Some(Box::pin(sleep(duration)));
 
                     self
                 }
@@ -167,7 +167,7 @@ impl_message_collector! {
 pub struct MessageCollectorBuilder<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
-    timeout: Option<Delay>,
+    timeout: Option<Pin<Box<Sleep>>>,
     fut: Option<BoxFuture<'a, MessageCollector>>,
 }
 
@@ -207,7 +207,7 @@ impl<'a> Future for MessageCollectorBuilder<'a> {
 
                 MessageCollector {
                     receiver: Box::pin(receiver),
-                    timeout: timeout.map(Box::pin),
+                    timeout,
                 }
             }))
         }
@@ -219,7 +219,7 @@ impl<'a> Future for MessageCollectorBuilder<'a> {
 pub struct CollectReply<'a> {
     filter: Option<FilterOptions>,
     shard: Option<ShardMessenger>,
-    timeout: Option<Delay>,
+    timeout: Option<Pin<Box<Sleep>>>,
     fut: Option<BoxFuture<'a, Option<Arc<Message>>>>,
 }
 
@@ -248,7 +248,7 @@ impl<'a> Future for CollectReply<'a> {
 
                 MessageCollector {
                     receiver: Box::pin(receiver),
-                    timeout: timeout.map(Box::pin),
+                    timeout,
                 }.next().await
             }))
         }
@@ -273,7 +273,7 @@ impl std::fmt::Debug for FilterOptions {
 /// set duration.
 pub struct MessageCollector {
     receiver: Pin<Box<Receiver<Arc<Message>>>>,
-    timeout: Option<Pin<Box<Delay>>>,
+    timeout: Option<Pin<Box<Sleep>>>,
 }
 
 impl MessageCollector {
@@ -299,7 +299,7 @@ impl Stream for MessageCollector {
             }
         }
 
-        self.receiver.as_mut().poll_next(ctx)
+        self.receiver.as_mut().poll_recv(ctx)
     }
 }
 
