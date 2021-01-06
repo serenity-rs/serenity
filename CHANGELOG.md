@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.10.0] - 2020-12-##
+## [0.10.0] - 2021-01-06
 
 Thanks to the following for their contributions:
 
