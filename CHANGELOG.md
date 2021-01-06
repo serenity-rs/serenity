@@ -60,6 +60,7 @@ Thanks to the following for their contributions:
 
 ### Changed
 
+- [model] Change `Mentionable` to return a struct that implements `Display` ([@Wolvereness]) [c:2624170]
 - [misc] Update to tokio 1.0 and reqwest 0.11 ([@nickelc]) [c:a27d7bb]
 - [model] Point to `User::nick_in` in `Message::author_nick`'s documentation ([@Wolvereness]) [c:51dc943]
 - [model] Improve permission checking ([@ThatsNoMoon]) [c:dbb3669]
@@ -4165,6 +4166,7 @@ Initial commit.
 
 <!-- COMMITS -->
 
+[c:2624170]: https://github.com/serenity-rs/serenity/commit/2624170835961e57fe00f027763166d74613b8da
 [c:7647e1e]: https://github.com/serenity-rs/serenity/commit/7647e1e7bb4754a5880246312fb807daede31b23
 [c:0b1fc27]: https://github.com/serenity-rs/serenity/commit/0b1fc2737efebde01f6f3b781bcdfc83a30e908e
 [c:a27d7bb]: https://github.com/serenity-rs/serenity/commit/a27d7bb43977da0f4d10f3405b12e07d56cf9a74
