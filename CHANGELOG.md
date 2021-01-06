@@ -11,6 +11,7 @@ Thanks to the following for their contributions:
 - [@acdenisSK]
 - [@Baev1]
 - [@casey]
+- [@chocological00]
 - [@Daggy1234]
 - [@drklee3]
 - [@FelixMcFelix]
@@ -23,6 +24,7 @@ Thanks to the following for their contributions:
 - [@nickelc]
 - [@peppizza]
 - [@SadiinsoSnowfall]
+- [@SinsofSloth]
 - [@sam-kirby]
 - [@Th3-M4jor]
 - [@ThatsNoMoon]
@@ -31,6 +33,8 @@ Thanks to the following for their contributions:
 
 ### Added
 
+- [client/voice] Document VoiceGatewayManager interface ([@FelixMcFelix]) [c:7647e1e]
+- [misc] Describe the `unstable_discord_api` feature ([@acdenisSK]) [c:0b1fc27]
 - [gateway] Log unhandled errors when handling events in the gateway ([@LavaToaster]) [c:2e8f968]
 - [model/http] Add Slash Command Gateway and REST API Support ([@Baev1]) [c:649f8f2]
 - [framework] Add Max Delay Limits, Delay Hook, and `RateLimitInfo` ([@Lakelezz]) [c:aed3886]
@@ -56,6 +60,7 @@ Thanks to the following for their contributions:
 
 ### Changed
 
+- [misc] Update to tokio 1.0 and reqwest 0.11 ([@nickelc]) [c:a27d7bb]
 - [model] Point to `User::nick_in` in `Message::author_nick`'s documentation ([@Wolvereness]) [c:51dc943]
 - [model] Improve permission checking ([@ThatsNoMoon]) [c:dbb3669]
 - [model] Change signatures of `Emoji` methods to require `Cache` and `Http`. ([@Lakelezz]) [c:6aa2841]
@@ -85,6 +90,9 @@ Thanks to the following for their contributions:
 
 ### Fixed
 
+- [http] Fix local ratelimit bug ([@chocological00] [@Lakelezz]) [c:3d56a57] [c:4f07798]
+- [http] Fix path to the HTTP endpoint of interaction responses ([@SinsofSloth]) [c:fcb1daa]
+- [model] Fix deserialization of interactions ([@acdenisSK]) [c:b42591c]
 - [model] Fix doc comments for `ReactionCollector` ([@Th3-M4jor]) [c:7684323]
 - [model] Fix the stated order of `ChannelId::messages_iter` ([@acdenisSK]) [c:03a1f97]
 - [model] Use  `ApplicationId` instead of `u64` in `MessageApplication` (#1158) ([@sam-kirby]) [c:66e7add]
@@ -94,7 +102,7 @@ Thanks to the following for their contributions:
 - [framework] Check a sub-command's parent first. ([@Lakelezz]) [c:20043d4]
 - [model] Percent encode audit log reasons to prevent missing characters or truncation ([@drklee3]) [c:02916dc]
 - [model] Reverse the message buffer before returning messages from it ([@acdenisSK]) [c:e49fae4]
-- [misc] Fix clippy warnings ([@nickelc]) [c:a7ab03e] [c:7ad3abe] [c:a42bba2]
+- [misc] Fix clippy warnings ([@nickelc]) [c:a7ab03e] [c:7ad3abe] [c:a42bba2] [c:3282d77]
 - [model] Fix voice region deserialization ([@KamranMackey]) [c:ba85299]
 - [framework] Avoid cloning the entire guild object upon a command invocation ([@acdenisSK]) [c:ac23e19]
 - [framework] Fix typo in check-docs. ([@Lakelezz]) [c:5fea8e4]
@@ -108,6 +116,7 @@ Thanks to the following for their contributions:
 
 ### Removed
 
+- [misc] Remove `#[deprecated]` items. ([@Lakelezz]) [c:aca54ac]
 - [client] Remove unused event handlers for groups ([@acdenisSK]) [c:52f9dca]
 - [framework/command_attr] Remove unnecessary `extern crate` in `command_attr` ([@acdenisSK]) [c:d6984a8]
 - [framework/command_attr] Remove recursion limit in `command_attr` ([@acdenisSK]) [c:4729f26]
@@ -4037,6 +4046,7 @@ Initial commit.
 [@Celti]: https://github.com/Celti
 [@ConcurrentMarxistGC]: https://github.com/ConcurrentMarxistGC
 [@casey]: https://github.com/casey
+[@chocological00]: https://github.com/chocological00
 [@Daggy1234]: https://github.com/Daggy1234
 [@DarkKirb]: https://github.com/DarkKirb
 [@Deebster]: https://github.com/Deebster
@@ -4121,6 +4131,7 @@ Initial commit.
 [@SOF3]: https://github.com/SOF3
 [@SadiinsoSnowfall]: https://github.com/SadiinsoSnowfall
 [@Scetch]: https://github.com/Scetch
+[@SinsofSloth]: https://github.com/SinsofSloth
 [@Sreyas-Sreelal]: https://github.com/Sreyas-Sreelal
 [@SunDwarf]: https://github.com/SunDwarf
 [@sam-kirby]: https://github.com/sam-kirby
@@ -4154,6 +4165,15 @@ Initial commit.
 
 <!-- COMMITS -->
 
+[c:7647e1e]: https://github.com/serenity-rs/serenity/commit/7647e1e7bb4754a5880246312fb807daede31b23
+[c:0b1fc27]: https://github.com/serenity-rs/serenity/commit/0b1fc2737efebde01f6f3b781bcdfc83a30e908e
+[c:a27d7bb]: https://github.com/serenity-rs/serenity/commit/a27d7bb43977da0f4d10f3405b12e07d56cf9a74
+[c:3d56a57]: https://github.com/serenity-rs/serenity/commit/3d56a57d105b1c1177f1874295709ddb18298d44
+[c:4f07798]: https://github.com/serenity-rs/serenity/commit/4f077989ef8a4bc54429df4f77197a09f6e678fa
+[c:fcb1daa]: https://github.com/serenity-rs/serenity/commit/fcb1daa7bc47f28f250127cd125dca784d1c6f35
+[c:b42591c]: https://github.com/serenity-rs/serenity/commit/b42591c0ef97da4da822be2070b8899c89d4a708
+[c:3282d77]: https://github.com/serenity-rs/serenity/commit/3282d77966426f3f73bb7892d943b89e9cde475b
+[c:aca54ac]: https://github.com/serenity-rs/serenity/commit/aca54acfc9acde6230c2b3cfc08780d69c44a98d
 [c:2e8f968]: https://github.com/serenity-rs/serenity/commit/2e8f968fe80ce3747772d194120dd9b41d3694d3
 [c:7684323]: https://github.com/serenity-rs/serenity/commit/7684323d1264583d8f3d0424bd8fca1e0abf1941
 [c:03a1f97]: https://github.com/serenity-rs/serenity/commit/03a1f97a40c00bf5d8551a6036c58263fd86dc07
