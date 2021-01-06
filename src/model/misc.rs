@@ -8,81 +8,182 @@ use std::error::Error as StdError;
 use std::result::Result as StdResult;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
-#[cfg(all(feature = "model", feature = "utils"))]
 use std::fmt;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
 
 /// Allows something - such as a channel or role - to be mentioned in a message.
 pub trait Mentionable {
-    /// Creates a mentionable string, that will be able to notify and/or create
-    /// a link to the item.
-    fn mention(&self) -> String;
+    /// Creates a [`Mention`] that will be able to notify or create a link to the
+    /// item.
+    ///
+    /// [`Mention`] implements [`Display`], so [`ToString::to_string()`] can
+    /// be called on it, or inserted directly into a [`format_args!`] type of
+    /// macro.
+    ///
+    /// # Examples
+    ///
+    /// ```
+    /// # #[cfg(feature = "client")] {
+    /// # use serenity::model::guild::Member;
+    /// # use serenity::model::channel::GuildChannel;
+    /// # use serenity::model::id::ChannelId;
+    /// # use serenity::prelude::Context;
+    /// # use serenity::Error;
+    /// use serenity::model::misc::Mentionable;
+    /// async fn greet(
+    ///     ctx: Context,
+    ///     member: Member,
+    ///     to_channel: GuildChannel,
+    ///     rules_channel: ChannelId,
+    /// ) -> Result<(), Error> {
+    ///     to_channel.id.send_message(
+    ///         ctx,
+    ///         |m| m.content(format_args!(
+    ///             "Hi {member}, welcome to the server! \
+    ///                 Please refer to {rules} for our code of conduct, \
+    ///                 and enjoy your stay.",
+    ///             member = member.mention(),
+    ///             rules = rules_channel.mention(),
+    ///         )),
+    ///     ).await?;
+    ///     Ok(())
+    /// }
+    /// # }
+    /// ```
+    /// ```
+    /// # use serenity::model::id::{RoleId, ChannelId, UserId};
+    /// use serenity::model::misc::Mentionable;
+    /// let user: UserId = 1.into();
+    /// let channel: ChannelId = 2.into();
+    /// let role: RoleId = 3.into();
+    /// assert_eq!(
+    ///     "<@1> <#2> <@&3>",
+    ///     format!(
+    ///         "{} {} {}",
+    ///         user.mention(),
+    ///         channel.mention(),
+    ///         role.mention(),
+    ///     ),
+    /// )
+    /// ```
+    fn mention(&self) -> Mention;
 }
 
-impl Mentionable for ChannelId {
-    fn mention(&self) -> String { format!("<#{}>", self.0) }
+#[derive(Debug, Clone, Copy)]
+/// A struct that represents some way to insert a notification, link, or emoji
+/// into a message.
+///
+/// [`Display`] is the primary way of utilizing a [`Mention`], either in a
+/// [`format_args!`] type of macro or with [`ToString::to_string()`]. A
+/// [`Mention`] is created using [`Mentionable::mention()`], or with
+/// [`From`]/[`Into`].
+///
+/// # Examples
+///
+/// ```
+/// # use serenity::model::id::{RoleId, ChannelId, UserId};
+/// use serenity::model::misc::Mention;
+/// let user: UserId = 1.into();
+/// let channel: ChannelId = 2.into();
+/// let role: RoleId = 3.into();
+/// assert_eq!(
+///     "<@1> <#2> <@&3>",
+///     format!(
+///         "{} {} {}",
+///         Mention::from(user),
+///         Mention::from(channel),
+///         Mention::from(role),
+///     ),
+/// )
+/// ```
+pub struct Mention(MentionableImpl);
+
+#[derive(Debug, Clone, Copy)]
+enum MentionableImpl {
+    Channel(ChannelId),
+    User(UserId),
+    Role(RoleId),
+    Emoji(EmojiId, bool),
 }
 
-impl Mentionable for Channel {
-    fn mention(&self) -> String {
-        match self {
-            Channel::Guild(channel) => channel.mention(),
-            Channel::Private(channel) => channel.mention(),
-            Channel::Category(channel) => channel.mention(),
+macro_rules! mention {
+    ($i:ident: $($t:ty, $e:expr;)*) => {$(
+        impl From<$t> for Mention {
+            #[inline(always)]
+            fn from($i: $t) -> Self {
+                $e.into()
+            }
+        }
+    )*};
+}
+
+mention!(value:
+    MentionableImpl, Mention(value);
+    &'_ Channel, value.id();
+    ChannelId, MentionableImpl::Channel(value);
+    &'_ ChannelCategory, value.id;
+    &'_ GuildChannel, value.id;
+    &'_ PrivateChannel, value.id;
+    &'_ CurrentUser, value.id;
+    &'_ Member, value.user.id;
+    UserId, MentionableImpl::User(value);
+    &'_ User, value.id;
+    RoleId, MentionableImpl::Role(value);
+    &'_ Role, value.id;
+    EmojiId, MentionableImpl::Emoji(value, false);
+    (EmojiId, bool), MentionableImpl::Emoji(value.0, value.1);
+    &'_ Emoji, MentionableImpl::Emoji(value.id, value.animated);
+);
+
+impl Display for Mention {
+    fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
+        match self.0 {
+            MentionableImpl::Channel(id) =>
+                f.write_fmt(format_args!("<#{}>", id.0)),
+            MentionableImpl::User(id) =>
+                f.write_fmt(format_args!("<@{}>", id.0)),
+            MentionableImpl::Role(id) =>
+                f.write_fmt(format_args!("<@&{}>", id.0)),
+            MentionableImpl::Emoji(id, animated) =>
+                f.write_fmt(format_args!(
+                    "<{}:_:{}>",
+                    if animated { "a" } else { "" },
+                    id.0,
+                )),
         }
     }
 }
 
-impl Mentionable for ChannelCategory {
-    fn mention(&self) -> String {
-        format!("<#{}>", self.name)
-    }
+macro_rules! mentionable {
+    ($i:ident = $e:expr, $($t:ty;)* ) => {$(
+        impl Mentionable for $t {
+            #[inline(always)]
+            fn mention(&self) -> Mention {
+                let $i = self;
+                $e.into()
+            }
+        }
+    )*};
 }
 
-impl Mentionable for CurrentUser {
-    fn mention(&self) -> String {
-        format!("<@{}>", self.id.0)
-    }
-}
-
-impl Mentionable for Emoji {
-    fn mention(&self) -> String {
-        format!("<:{}:{}>", self.name, self.id.0)
-    }
-}
-
-impl Mentionable for Member {
-    fn mention(&self) -> String {
-        format!("<@{}>", self.user.id.0)
-    }
-}
-
-impl Mentionable for PrivateChannel {
-    fn mention(&self) -> String {
-        format!("<#{}>", self.id.0)
-    }
-}
-
-impl Mentionable for RoleId {
-    fn mention(&self) -> String { format!("<@&{}>", self.0) }
-}
-
-impl Mentionable for Role {
-    fn mention(&self) -> String { format!("<@&{}>", self.id.0) }
-}
-
-impl Mentionable for UserId {
-    fn mention(&self) -> String { format!("<@{}>", self.0) }
-}
-
-impl Mentionable for User {
-    fn mention(&self) -> String { format!("<@{}>", self.id.0) }
-}
-
-impl Mentionable for GuildChannel {
-    fn mention(&self) -> String { format!("<#{}>", self.id.0) }
-}
+mentionable!(v = *v,
+    ChannelId;
+    RoleId;
+    UserId;
+    Mention;
+);
+mentionable!(v = v,
+    Channel;
+    ChannelCategory;
+    CurrentUser;
+    Emoji;
+    Member;
+    PrivateChannel;
+    Role;
+    User;
+    GuildChannel;
+);
 
 #[cfg(all(feature = "model", feature = "utils"))]
 #[derive(Debug)]
@@ -350,14 +451,14 @@ mod test {
                 user: user.clone(),
             };
 
-            assert_eq!(ChannelId(1).mention(), "<#1>");
-            assert_eq!(channel.mention(), "<#4>");
-            assert_eq!(emoji.mention(), "<:a:5>");
-            assert_eq!(member.mention(), "<@6>");
-            assert_eq!(role.mention(), "<@&2>");
-            assert_eq!(role.id.mention(), "<@&2>");
-            assert_eq!(user.mention(), "<@6>");
-            assert_eq!(user.id.mention(), "<@6>");
+            assert_eq!(ChannelId(1).mention().to_string(), "<#1>");
+            assert_eq!(channel.mention().to_string(), "<#4>");
+            assert_eq!(emoji.mention().to_string(), "<:_:5>");
+            assert_eq!(member.mention().to_string(), "<@6>");
+            assert_eq!(role.mention().to_string(), "<@&2>");
+            assert_eq!(role.id.mention().to_string(), "<@&2>");
+            assert_eq!(user.mention().to_string(), "<@6>");
+            assert_eq!(user.id.mention().to_string(), "<@6>");
         }
 
         #[test]
