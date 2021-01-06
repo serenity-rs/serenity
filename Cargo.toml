@@ -52,7 +52,7 @@ version = "0.11"
 
 [dependencies.serenity-voice-model]
 path = "./voice-model"
-version = "0.10"
+version = "0.1"
 optional = true
 
 [dependencies.static_assertions]
