@@ -439,21 +439,6 @@ impl Member {
     pub async fn unban(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().remove_ban(self.guild_id.0, self.user.id.0).await
     }
-
-    /// Retrieves the member's user ID.
-    ///
-    /// This is a shortcut for accessing the [`user`] structfield, retrieving a
-    /// reader guard, and then copying its ID.
-    ///
-    /// # Deadlocking
-    ///
-    /// This function can deadlock while retrieving a read guard to the user
-    /// object if your application infinitely holds a write lock elsewhere.
-    #[inline]
-    #[deprecated(note = "The user is no longer put behind a RwLock, making this method pointless", since = "0.9.0")]
-    pub fn user_id(&self) -> UserId {
-        self.user.id
-    }
 }
 
 impl Display for Member {

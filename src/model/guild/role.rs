@@ -110,24 +110,6 @@ impl Role {
         self.guild_id.edit_role(http, self.id, f).await
     }
 
-    /// Searches the cache for the guild that owns the role.
-    ///
-    /// # Errors
-    ///
-    /// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache
-    /// that contains the role.
-    #[cfg(feature = "cache")]
-    #[deprecated(note = "replaced with the `guild_id` field", since = "0.9.0")]
-    pub async fn find_guild(&self, cache: impl AsRef<Cache>) -> Result<GuildId> {
-        for guild in cache.as_ref().guilds.read().await.values() {
-            if guild.roles.contains_key(&RoleId(self.id.0)) {
-                return Ok(guild.id);
-            }
-        }
-
-        Err(Error::Model(ModelError::GuildNotFound))
-    }
-
     /// Check that the role has the given permission.
     #[inline]
     pub fn has_permission(&self, permission: Permissions) -> bool {
