@@ -36,7 +36,7 @@
 //!
 //! ```toml
 //! [dependencies]
-//! serenity = "0.9"
+//! serenity = "0.10"
 //! ```
 //!
 //! [`Context`]: crate::client::Context
