@@ -45,6 +45,11 @@ use crate::model::guild::Member;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 
+#[cfg(feature = "tokio_compat")]
+use tokio::time::delay_for as sleep;
+#[cfg(not(feature = "tokio_compat"))]
+use tokio::time::sleep;
+
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
 #[derive(Debug)]
@@ -297,7 +302,7 @@ impl StandardFramework {
             }
 
             match duration {
-                Some(duration) => tokio::time::sleep(duration).await,
+                Some(duration) => sleep(duration).await,
                 None => break,
             }
         }
