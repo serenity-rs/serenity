@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.9.4] - 2021-01-07
+
+Thanks to the following for their contributions:
+
+- [@acdenisSK]
+
+### Fixed
+
+- [misc] Fixate `command_attr` version to 0.3.2 ([@acdenisSK]) [c:b03df91]
+
 ## [0.9.3] - 2020-12-18
 
 Thanks to the following for their contributions:
@@ -3827,6 +3837,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.9.4]: https://github.com/serenity-rs/serenity/compare/v0.9.3...v0.9.4
 [0.9.3]: https://github.com/serenity-rs/serenity/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/serenity-rs/serenity/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
@@ -4033,6 +4044,8 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:b03df91]: https://github.com/serenity-rs/serenity/commit/b03df91f50a554cd9ab3dcb78d74eba46f2601e8
 
 [c:1cc66b3]: https://github.com/serenity/serenity/commit/1cc66b3d4ba70f75823cb59c5db4e4b0ef162ac7
 [c:1047eac]: https://github.com/serenity/serenity/commit/1047eac908eb28c69691292db8e35e089985a09e
