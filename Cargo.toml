@@ -29,7 +29,7 @@ version = "0.2"
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3"
+version = "=0.3.2"
 optional = true
 
 [dependencies.serde]
