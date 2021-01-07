@@ -23,6 +23,6 @@ pub use super::user::*;
 pub use super::voice::*;
 pub use super::webhook::*;
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 pub use super::interactions::*;
 pub use super::*;

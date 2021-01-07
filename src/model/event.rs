@@ -1375,7 +1375,7 @@ pub struct WebhookUpdateEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 #[derive(Clone, Debug)]
 #[non_exhaustive]
 pub struct InteractionCreateEvent {
@@ -1383,7 +1383,7 @@ pub struct InteractionCreateEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 impl<'de> Deserialize<'de> for InteractionCreateEvent {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         Ok(Self {
@@ -1393,7 +1393,7 @@ impl<'de> Deserialize<'de> for InteractionCreateEvent {
 }
 
 #[cfg(feature = "unstable_discord_api")]
-#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 impl Serialize for InteractionCreateEvent {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
         where S: Serializer {
@@ -1585,7 +1585,7 @@ pub enum Event {
     WebhookUpdate(WebhookUpdateEvent),
     /// A user used a slash command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate(InteractionCreateEvent),
     /// An event type not covered by the above
     Unknown(UnknownEvent),
@@ -1918,7 +1918,7 @@ pub enum EventType {
     ///
     /// This maps to [`InteractionCreateEvent`].
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     InteractionCreate,
     /// An unknown event was received over the gateway.
     ///
@@ -1971,7 +1971,7 @@ impl EventType {
     const VOICE_STATE_UPDATE: &'static str = "VOICE_STATE_UPDATE";
     const WEBHOOKS_UPDATE: &'static str = "WEBHOOKS_UPDATE";
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     const INTERACTION_CREATE: &'static str = "INTERACTION_CREATE";
 
     /// Return the event name of this event. Some events are synthetic, and we lack
