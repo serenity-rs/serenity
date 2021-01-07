@@ -1,5 +1,5 @@
 #[cfg(all(any(feature = "http", feature = "gateway"),
-    not(any(feature = "rustls_backend", feature = "native_tls_backend"))))]
+    not(any(feature = "rustls_backend_marker", feature = "native_tls_backend_marker"))))]
 compile_error!("You have the `http` or `gateway` feature enabled, \
     either the `rustls_backend` or `native_tls_backend` feature must be
     selected to let Serenity use `http` or `gateway`.\n\

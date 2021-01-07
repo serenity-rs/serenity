@@ -34,6 +34,7 @@ use tokio::{
     io::AsyncReadExt,
     fs::File,
 };
+
 use crate::http::routing::Route;
 use percent_encoding::{
     utf8_percent_encode,
@@ -183,7 +184,7 @@ impl Http {
 
         let mut headers = Headers::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
-    
+
         let response = self.request(Request {
             body: Some(&body),
             headers: Some(headers),
@@ -2179,12 +2180,12 @@ impl Http {
     }
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(not(feature = "native_tls_backend_marker"))]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_rustls_tls()
 }
 
-#[cfg(feature = "native_tls_backend")]
+#[cfg(feature = "native_tls_backend_marker")]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_native_tls()
 }

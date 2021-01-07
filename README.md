@@ -158,6 +158,10 @@ TLS implementation.
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
 and OpenSSL on other platforms.
 
+In case you need the old `tokio` version `0.2`, pick one of these backends instead:
+
+- **rustls_tokio_0_2_backend**: Combines **rustls_backend** with `tokio` version `0.2`.
+- **native_tls_tokio_0_2_backend**: Combines **native_tls_backend** with `tokio` version `0.2`.
 
 If you want all of the default features except for `cache` for example, you can
 list all but that:

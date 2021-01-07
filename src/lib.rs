@@ -59,6 +59,18 @@
 #[macro_use]
 extern crate serde;
 
+#[cfg(feature = "tokio_compat")]
+extern crate tokio_compat as tokio;
+
+#[cfg(feature = "reqwest_compat")]
+extern crate reqwest_compat as reqwest;
+
+#[cfg(feature = "async_tungstenite_compat")]
+extern crate async_tungstenite_compat as async_tungstenite;
+
+#[cfg(feature = "bytes_compat")]
+extern crate bytes_compat as bytes;
+
 #[macro_use]
 mod internal;
 
