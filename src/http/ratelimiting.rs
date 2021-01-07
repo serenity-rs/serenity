@@ -57,7 +57,7 @@ use std::{
     i64,
     f64,
 };
-use tokio::time::{delay_for, Duration};
+use tokio::time::{sleep, Duration};
 use super::{HttpError, Request};
 use tracing::{debug, instrument};
 
@@ -211,7 +211,7 @@ impl Ratelimiter {
                     Ok(
                         if let Some(retry_after) = parse_header::<f64>(&response.headers(), "retry-after")? {
                             debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
-                            delay_for(Duration::from_secs_f64(retry_after)).await;
+                            sleep(Duration::from_secs_f64(retry_after)).await;
 
                             true
                         } else {
@@ -253,28 +253,30 @@ pub struct Ratelimit {
 }
 
 impl Ratelimit {
-    #[cfg(feature = "absolute_ratelimits")]
-    fn get_delay(&self) -> Option<Duration> {
-        self.reset?.duration_since(SystemTime::now()).ok()
-    }
-
-    #[cfg(not(feature = "absolute_ratelimits"))]
-    fn get_delay(&self) -> Option<Duration> {
-        self.reset_after
-    }
-
     #[instrument]
     pub async fn pre_hook(&mut self, route: &Route) {
         if self.limit() == 0 {
             return;
         }
 
-		let delay = match self.get_delay() {
-            Some(delay) => delay,
+        let reset = match self.reset {
+            Some(reset) => reset,
             None => {
                 // We're probably in the past.
                 self.remaining = self.limit;
 
+                return;
+            }
+        };
+
+        let delay = match reset.duration_since(SystemTime::now()) {
+            Ok(delay) => delay,
+
+            // if duration is negative (i.e. adequate time has passed since last call to this api)
+            Err(_) => {
+                if self.remaining() != 0 {
+                    self.remaining -= 1;
+                }
                 return;
             }
         };
@@ -287,7 +289,7 @@ impl Ratelimit {
                 delay.as_millis(),
             );
 
-            delay_for(delay).await;
+            sleep(delay).await;
 
             return;
         }
@@ -305,11 +307,17 @@ impl Ratelimit {
             self.remaining = remaining;
         }
 
-        if let Some(reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
-            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(reset));
+        #[cfg(feature = "absolute_ratelimits")]
+        if let Some(_reset) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset")? {
+            self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(_reset));
         }
 
         if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
+            #[cfg(not(feature = "absolute_ratelimits"))]
+            {
+                self.reset = Some(SystemTime::now() + Duration::from_secs_f64(reset_after));
+            }
+
             self.reset_after = Some(Duration::from_secs_f64(reset_after));
         }
 
@@ -317,7 +325,7 @@ impl Ratelimit {
             false
         } else if let Some(retry_after) = parse_header::<f64>(&response.headers(), "retry-after")? {
             debug!("Ratelimited on route {:?} for {:?}ms", route, retry_after);
-            delay_for(Duration::from_secs_f64(retry_after)).await;
+            sleep(Duration::from_secs_f64(retry_after)).await;
 
             true
         } else {

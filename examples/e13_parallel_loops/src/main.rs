@@ -52,7 +52,7 @@ impl EventHandler for Handler {
                     // We clone Context again here, because Arc is owned, so it moves to the
                     // new function.
                     log_system_load(Arc::clone(&ctx1)).await;
-                    tokio::time::delay_for(Duration::from_secs(120)).await;
+                    tokio::time::sleep(Duration::from_secs(120)).await;
                 }
             });
 
@@ -61,7 +61,7 @@ impl EventHandler for Handler {
             tokio::spawn(async move {
                 loop {
                     set_status_to_current_time(Arc::clone(&ctx2)).await;
-                    tokio::time::delay_for(Duration::from_secs(60)).await;
+                    tokio::time::sleep(Duration::from_secs(60)).await;
                 }
             });
 

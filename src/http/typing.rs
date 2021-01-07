@@ -1,6 +1,6 @@
 use crate::{error::Result, http::Http};
 use std::sync::Arc;
-use tokio::{sync::oneshot::{self, Sender, error::TryRecvError}, time::{delay_for, Duration}};
+use tokio::{sync::oneshot::{self, Sender, error::TryRecvError}, time::{sleep, Duration}};
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
 ///
@@ -65,7 +65,7 @@ impl Typing {
 
                 // It is unclear for how long typing persists after this method is called.
                 // It is generally assumed to be 7 or 10 seconds, so we use 7 to be safe.
-                delay_for(Duration::from_secs(7)).await;
+                sleep(Duration::from_secs(7)).await;
             }
 
             Result::Ok(())

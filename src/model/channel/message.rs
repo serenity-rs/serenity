@@ -300,7 +300,7 @@ impl Message {
                 let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
 
                 self.content = if chosen.contains("$user") {
-                    chosen.replace("$user", &self.author.mention())
+                    chosen.replace("$user", &self.author.mention().to_string())
                 } else {
                     chosen.to_string()
                 };
@@ -322,7 +322,7 @@ impl Message {
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
             let _ = write!(at_distinct, "{:04}", u.discriminator);
-            let mut m = u.mention();
+            let mut m = u.mention().to_string();
             // Check whether we're replacing a nickname mention or a normal mention.
             // `UserId::mention` returns a normal mention. If it isn't present in the message, it's a nickname mention.
             if !result.contains(&m) {
@@ -334,7 +334,7 @@ impl Message {
 
         // Then replace all role mentions.
         for id in &self.mention_roles {
-            let mention = id.mention();
+            let mention = id.mention().to_string();
 
             if let Some(role) = id.to_role_cached(&cache).await {
                 result = result.replace(&mention, &format!("@{}", role.name));

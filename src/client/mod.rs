@@ -498,7 +498,7 @@ pub struct Client {
     ///         let count = sm.shards_instantiated().await.len();
     ///         println!("Shard count instantiated: {}", count);
     ///
-    ///         tokio::time::delay_for(Duration::from_millis(5000)).await;
+    ///         tokio::time::sleep(Duration::from_millis(5000)).await;
     ///     }
     /// });
     /// #     Ok(())
@@ -525,7 +525,7 @@ pub struct Client {
     /// // Create a thread which will sleep for 60 seconds and then have the
     /// // shard manager shutdown.
     /// tokio::spawn(async move {
-    ///     tokio::time::delay_for(Duration::from_secs(60));
+    ///     tokio::time::sleep(Duration::from_secs(60));
     ///
     ///     shard_manager.lock().await.shutdown_all().await;
     ///
@@ -558,14 +558,6 @@ pub struct Client {
 }
 
 impl Client {
-    /// Returns a builder implementing [`Future`]. You can chain the builder methods and then await
-    /// in order to finish the [`Client`].
-    #[deprecated(since="0.9.0", note="please use `builder` instead")]
-    #[allow(clippy::new_ret_no_self)]
-    pub fn new<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
-        Self::builder(token)
-    }
-
     pub fn builder<'a>(token: impl AsRef<str>) -> ClientBuilder<'a> {
         ClientBuilder::new(token)
     }
