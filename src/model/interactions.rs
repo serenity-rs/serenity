@@ -209,14 +209,6 @@ pub enum InteractionResponseType {
     AcknowledgeWithSource = 5
 }
 
-enum_number!(InteractionResponseType {
-    Pong,
-    Acknowledge,
-    ChannelMessage,
-    ChannelMessageWithSource,
-    AcknowledgeWithSource,
-});
-
 #[derive(Clone, Serialize)]
 #[non_exhaustive]
 pub struct InteractionApplicationCommandCallbackDataFlags {
