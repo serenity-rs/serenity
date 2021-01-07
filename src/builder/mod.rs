@@ -26,6 +26,7 @@ pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_channel::CreateChannel,
     create_invite::CreateInvite,
+    create_interaction_response_followup::CreateInteractionResponseFollowup,
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_message::CreateMessage,
     create_allowed_mentions::CreateAllowedMentions,
