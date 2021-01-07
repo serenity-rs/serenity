@@ -334,7 +334,7 @@ pub trait EventHandler: Send + Sync {
     ///
     /// Provides the created interaction.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     async fn interaction_create(&self, _ctx: Context, _interaction: Interaction) {}
 }
 
