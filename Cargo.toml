@@ -21,7 +21,7 @@ async-trait = "0.1"
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3"
+version = "0.3.3"
 optional = true
 
 [dependencies.serde]
