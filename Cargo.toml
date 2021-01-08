@@ -99,7 +99,7 @@ optional = true
 version = "0.5"
 
 [dependencies.tokio]
-version = "1.0"
+version = "1"
 default-features = true
 optional = true
 features = ["fs", "macros", "rt", "sync", "time"]

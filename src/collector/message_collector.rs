@@ -13,10 +13,10 @@ use tokio::{
         UnboundedSender as Sender,
     },
 };
-#[cfg(feature = "tokio_compat")]
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::{Delay as Sleep, delay_for as sleep};
 
-#[cfg(not(feature = "tokio_compat"))]
+#[cfg(feature = "tokio")]
 use tokio::time::{Sleep, sleep};
 
 use futures::{

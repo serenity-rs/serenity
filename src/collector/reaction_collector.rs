@@ -22,10 +22,10 @@ use crate::{
     model::channel::Reaction,
     model::id::UserId,
 };
-#[cfg(feature = "tokio_compat")]
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::{Delay as Sleep, delay_for as sleep};
 
-#[cfg(not(feature = "tokio_compat"))]
+#[cfg(feature = "tokio")]
 use tokio::time::{Sleep, sleep};
 
 macro_rules! impl_reaction_collector {

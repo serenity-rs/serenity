@@ -10,9 +10,10 @@ use futures::{
     StreamExt,
     channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
 };
-#[cfg(feature = "tokio_compat")]
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::delay_for as sleep;
-#[cfg(not(feature = "tokio_compat"))]
+
+#[cfg(feature = "tokio")]
 use tokio::time::sleep;
 
 use tokio::time::{timeout, Duration, Instant};

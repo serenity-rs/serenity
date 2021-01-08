@@ -59,16 +59,16 @@
 #[macro_use]
 extern crate serde;
 
-#[cfg(feature = "tokio_compat")]
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 extern crate tokio_compat as tokio;
 
-#[cfg(feature = "reqwest_compat")]
+#[cfg(all(feature = "reqwest_compat", not(feature = "reqwest")))]
 extern crate reqwest_compat as reqwest;
 
-#[cfg(feature = "async_tungstenite_compat")]
+#[cfg(all(feature = "async_tungstenite_compat", not(feature = "async_tungstenite")))]
 extern crate async_tungstenite_compat as async_tungstenite;
 
-#[cfg(feature = "bytes_compat")]
+#[cfg(all(feature = "bytes_compat", not(feature = "bytes")))]
 extern crate bytes_compat as bytes;
 
 #[macro_use]

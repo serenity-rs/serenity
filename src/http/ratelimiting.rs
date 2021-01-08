@@ -58,9 +58,11 @@ use std::{
     f64,
 };
 use tokio::time::{Duration};
-#[cfg(feature = "tokio_compat")]
+
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::delay_for as sleep;
-#[cfg(not(feature = "tokio_compat"))]
+
+#[cfg(feature = "tokio")]
 use tokio::time::sleep;
 
 use super::{HttpError, Request};
