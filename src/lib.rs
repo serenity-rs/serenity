@@ -65,7 +65,7 @@ extern crate tokio_compat as tokio;
 #[cfg(all(feature = "reqwest_compat", not(feature = "reqwest")))]
 extern crate reqwest_compat as reqwest;
 
-#[cfg(all(feature = "async_tungstenite_compat", not(feature = "async_tungstenite")))]
+#[cfg(all(feature = "async_tungstenite_compat", not(feature = "async-tungstenite")))]
 extern crate async_tungstenite_compat as async_tungstenite;
 
 #[cfg(all(feature = "bytes_compat", not(feature = "bytes")))]
