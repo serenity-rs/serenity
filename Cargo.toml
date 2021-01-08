@@ -126,10 +126,10 @@ package = "http"
 
 [features]
 # Defaults with different backends
-default = ["default_no_backend" "rustls_backend"]
-default_native_tls = ["default_no_backend" "native_tls_backend"]
-default_tokio_0_2 = ["default_no_backend" "rustls_tokio_0_2_backend"]
-default_native_tls_tokio_0_2 = ["default_no_backend" "native_tls_tokio_0_2_backend"]
+default = ["default_no_backend", "rustls_backend"]
+default_native_tls = ["default_no_backend", "native_tls_backend"]
+default_tokio_0_2 = ["default_no_backend", "rustls_tokio_0_2_backend"]
+default_native_tls_tokio_0_2 = ["default_no_backend", "native_tls_tokio_0_2_backend"]
 
 # Serenity requires a backend, this picks all default features without a backend.
 default_no_backend = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils"]
