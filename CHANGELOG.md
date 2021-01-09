@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
+## [0.10.2] - 2021-01-09
+
+Thanks to the following for their contributions:
+
+- [@Lakelezz]
+- [@nickelc]
+
+### Added
+
+- [misc] Add compatibility features for tokio `0.2` and `1.0` ([@Lakelezz]) [c:580d6de]
+
+### Fixed
+
+- [misc] Fix doc_cfg attributes for the `unstable_discord_api` feature ([@nickelc]) [c:9a97f9b]
+
 ## [0.10.1] - 2021-01-07
 
 Thanks to the following for their contributions:
@@ -3967,6 +3982,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
+[0.10.2]: https://github.com/serenity-rs/serenity/compare/v0.10.1...v0.10.2
 [0.10.1]: https://github.com/serenity-rs/serenity/compare/v0.10.0...v0.10.1
 [0.10.0]: https://github.com/serenity-rs/serenity/compare/v0.9.4...v0.10.0
 [0.9.4]: https://github.com/serenity-rs/serenity/compare/v0.9.3...v0.9.4
@@ -4187,6 +4203,9 @@ Initial commit.
 
 
 <!-- COMMITS -->
+
+[c:580d6de]: https://github.com/serenity-rs/serenity/commit/580d6de400165b8fedd19e359d91d72e782e45d9
+[c:9a97f9b]: https://github.com/serenity-rs/serenity/commit/9a97f9b7030e17701fb2887bf86cebde4ec14e8a
 
 [c:ab8c82b]: https://github.com/serenity-rs/serenity/commit/ab8c82bddc2854f17e04efd10ccfd5357a5b415f
 
