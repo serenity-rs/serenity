@@ -57,7 +57,14 @@ use std::{
     i64,
     f64,
 };
-use tokio::time::{sleep, Duration};
+use tokio::time::{Duration};
+
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
+use tokio::time::delay_for as sleep;
+
+#[cfg(feature = "tokio")]
+use tokio::time::sleep;
+
 use super::{HttpError, Request};
 use tracing::{debug, instrument};
 
