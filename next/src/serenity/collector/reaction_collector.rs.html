@@ -400,6 +400,10 @@
 <span id="397">397</span>
 <span id="398">398</span>
 <span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed</span>::<span class="ident">Box</span>,
@@ -415,7 +419,6 @@
         <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
         <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>,
     },
-    <span class="ident">time</span>::{<span class="ident">Sleep</span>, <span class="ident">sleep</span>},
 };
 <span class="kw">use</span> <span class="ident">futures</span>::{
     <span class="ident">future</span>::<span class="ident">BoxFuture</span>,
@@ -426,6 +429,11 @@
     <span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Reaction</span>,
     <span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">UserId</span>,
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="ident">Delay</span> <span class="kw">as</span> <span class="ident">Sleep</span>, <span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="ident">Sleep</span>, <span class="ident">sleep</span>};
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">impl_reaction_collector</span> {
     ($(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span>;)<span class="kw-2">*</span>) <span class="op">=</span><span class="op">&gt;</span> {
