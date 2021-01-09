@@ -128,7 +128,7 @@ There are these alternative default features, they require to set `default-featu
 - **default_native_tls_tokio_0_2**: Uses `native_tls_backend` with `tokio` version `0.2`.
 - **default_no_backend**: Excludes the default backend, pick your own backend instead.
 
-If you are unsure which to pick, just go with the normal default features (by not setting `default-features = false`).
+If you are unsure which to pick, use the default features by not setting `default-features = false`.
 
 The following is a full list of features:
 
