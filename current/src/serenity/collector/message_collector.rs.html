@@ -311,6 +311,11 @@
 <span id="308">308</span>
 <span id="309">309</span>
 <span id="310">310</span>
+<span id="311">311</span>
+<span id="312">312</span>
+<span id="313">313</span>
+<span id="314">314</span>
+<span id="315">315</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed</span>::<span class="ident">Box</span>,
@@ -326,8 +331,13 @@
         <span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>,
         <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>,
     },
-    <span class="ident">time</span>::{<span class="ident">Sleep</span>, <span class="ident">sleep</span>},
 };
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="ident">Delay</span> <span class="kw">as</span> <span class="ident">Sleep</span>, <span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::{<span class="ident">Sleep</span>, <span class="ident">sleep</span>};
+
 <span class="kw">use</span> <span class="ident">futures</span>::{
     <span class="ident">future</span>::<span class="ident">BoxFuture</span>,
     <span class="ident">stream</span>::{<span class="ident">Stream</span>, <span class="ident">StreamExt</span>},

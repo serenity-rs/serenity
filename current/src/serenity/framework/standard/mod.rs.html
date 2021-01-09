@@ -867,6 +867,12 @@
 <span id="864">864</span>
 <span id="865">865</span>
 <span id="866">866</span>
+<span id="867">867</span>
+<span id="868">868</span>
+<span id="869">869</span>
+<span id="870">870</span>
+<span id="871">871</span>
+<span id="872">872</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -914,6 +920,12 @@
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">guild</span>::<span class="ident">Member</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{<span class="ident">guild</span>::<span class="ident">Role</span>, <span class="ident">id</span>::<span class="ident">RoleId</span>};
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>;
 
 <span class="doccomment">/// An enum representing all possible fail conditions under which a command won&#39;t</span>
 <span class="doccomment">/// be executed.</span>
@@ -1167,7 +1179,7 @@
             }
 
             <span class="kw">match</span> <span class="ident">duration</span> {
-                <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
+                <span class="prelude-val">Some</span>(<span class="ident">duration</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">sleep</span>(<span class="ident">duration</span>).<span class="kw">await</span>,
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>,
             }
         }

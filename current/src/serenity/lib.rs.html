@@ -122,6 +122,18 @@
 <span id="119">119</span>
 <span id="120">120</span>
 <span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Serenity is a Rust library for the Discord API.</span>
 <span class="doccomment">//!</span>
@@ -183,6 +195,18 @@
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">serde</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">tokio_compat</span> <span class="kw">as</span> <span class="ident">tokio</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reqwest_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;reqwest&quot;</span>)))]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">reqwest_compat</span> <span class="kw">as</span> <span class="ident">reqwest</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-tungstenite_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;async-tungstenite&quot;</span>)))]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">async_tungstenite_compat</span> <span class="kw">as</span> <span class="ident">async_tungstenite</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bytes_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;bytes&quot;</span>)))]</span>
+<span class="kw">extern</span> <span class="kw">crate</span> <span class="ident">bytes_compat</span> <span class="kw">as</span> <span class="ident">bytes</span>;
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>
 <span class="kw">mod</span> <span class="ident">internal</span>;
