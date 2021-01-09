@@ -1336,13 +1336,13 @@
     <span class="doccomment">///         //</span>
     <span class="doccomment">///         // For demonstrative purposes we&#39;re just sleeping the thread for 5</span>
     <span class="doccomment">///         // seconds.</span>
-    <span class="doccomment">///         tokio::time::delay_for(Duration::from_secs(5)).await;</span>
+    <span class="doccomment">///         tokio::time::sleep(Duration::from_secs(5)).await;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///         println!(&quot;{} unknown members&quot;, ctx.cache.unknown_members().await);</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// }</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// let mut client =Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
+    <span class="doccomment">/// let mut client = Client::builder(&quot;token&quot;).event_handler(Handler).await?;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// client.start().await?;</span>
     <span class="doccomment">/// #     Ok(())</span>

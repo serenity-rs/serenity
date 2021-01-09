@@ -2326,9 +2326,6 @@
 <span id="2323">2323</span>
 <span id="2324">2324</span>
 <span id="2325">2325</span>
-<span id="2326">2326</span>
-<span id="2327">2327</span>
-<span id="2328">2328</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -3291,10 +3288,7 @@
             <span class="kw">let</span> <span class="ident">split</span> <span class="op">=</span> <span class="ident">name</span>.<span class="ident">split_at</span>(<span class="ident">pos</span> <span class="op">+</span> <span class="number">1</span>);
 
             <span class="kw">let</span> <span class="ident">split2</span> <span class="op">=</span> (
-                <span class="kw">match</span> <span class="ident">split</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="number">0</span>..<span class="ident">split</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>) {
-                    <span class="prelude-val">Some</span>(<span class="ident">s</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">s</span>,
-                    <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="string">&quot;&quot;</span>,
-                },
+                <span class="ident">split</span>.<span class="number">0</span>.<span class="ident">get</span>(<span class="number">0</span>..<span class="ident">split</span>.<span class="number">0</span>.<span class="ident">len</span>() <span class="op">-</span> <span class="number">1</span>).<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
                 <span class="ident">split</span>.<span class="number">1</span>,
             );
 
@@ -3890,9 +3884,9 @@
 
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s splash image, if one exists.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">icon</span>
+        <span class="self">self</span>.<span class="ident">splash</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/splashes/{}/{}.webp&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">splash</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/splashes/{}/{}.webp?size=4096&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">splash</span>))
     }
 
     <span class="doccomment">/// Starts an integration sync for the given integration Id.</span>
@@ -4337,9 +4331,9 @@
 <span class="kw">impl</span> <span class="ident">InviteGuild</span> {
     <span class="doccomment">/// Returns the formatted URL of the guild&#39;s splash image, if one exists.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">splash_url</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
-        <span class="self">self</span>.<span class="ident">icon</span>
+        <span class="self">self</span>.<span class="ident">splash</span>
             .<span class="ident">as_ref</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">icon</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/splashes/{}/{}.webp&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">icon</span>))
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">splash</span><span class="op">|</span> <span class="macro">format</span><span class="macro">!</span>(<span class="macro">cdn</span><span class="macro">!</span>(<span class="string">&quot;/splashes/{}/{}.webp?size=4096&quot;</span>), <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">splash</span>))
     }
 }
 

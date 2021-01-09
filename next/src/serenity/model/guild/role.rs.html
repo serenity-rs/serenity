@@ -208,24 +208,6 @@
 <span id="205">205</span>
 <span id="206">206</span>
 <span id="207">207</span>
-<span id="208">208</span>
-<span id="209">209</span>
-<span id="210">210</span>
-<span id="211">211</span>
-<span id="212">212</span>
-<span id="213">213</span>
-<span id="214">214</span>
-<span id="215">215</span>
-<span id="216">216</span>
-<span id="217">217</span>
-<span id="218">218</span>
-<span id="219">219</span>
-<span id="220">220</span>
-<span id="221">221</span>
-<span id="222">222</span>
-<span id="223">223</span>
-<span id="224">224</span>
-<span id="225">225</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">Ordering</span>;
@@ -337,24 +319,6 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="kw">impl</span> <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditRole</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Role</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">edit_role</span>(<span class="ident">http</span>, <span class="self">self</span>.<span class="ident">id</span>, <span class="ident">f</span>).<span class="kw">await</span>
-    }
-
-    <span class="doccomment">/// Searches the cache for the guild that owns the role.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// # Errors</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// Returns a [`ModelError::GuildNotFound`] if a guild is not in the cache</span>
-    <span class="doccomment">/// that contains the role.</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">note</span> <span class="op">=</span> <span class="string">&quot;replaced with the `guild_id` field&quot;</span>, <span class="ident">since</span> <span class="op">=</span> <span class="string">&quot;0.9.0&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">find_guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span> {
-        <span class="kw">for</span> <span class="ident">guild</span> <span class="kw">in</span> <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guilds</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">values</span>() {
-            <span class="kw">if</span> <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">contains_key</span>(<span class="kw-2">&amp;</span><span class="ident">RoleId</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)) {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">guild</span>.<span class="ident">id</span>);
-            }
-        }
-
-        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">GuildNotFound</span>))
     }
 
     <span class="doccomment">/// Check that the role has the given permission.</span>

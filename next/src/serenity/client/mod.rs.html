@@ -950,14 +950,6 @@
 <span id="947">947</span>
 <span id="948">948</span>
 <span id="949">949</span>
-<span id="950">950</span>
-<span id="951">951</span>
-<span id="952">952</span>
-<span id="953">953</span>
-<span id="954">954</span>
-<span id="955">955</span>
-<span id="956">956</span>
-<span id="957">957</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
@@ -1459,7 +1451,7 @@
     <span class="doccomment">///         let count = sm.shards_instantiated().await.len();</span>
     <span class="doccomment">///         println!(&quot;Shard count instantiated: {}&quot;, count);</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">///         tokio::time::delay_for(Duration::from_millis(5000)).await;</span>
+    <span class="doccomment">///         tokio::time::sleep(Duration::from_millis(5000)).await;</span>
     <span class="doccomment">///     }</span>
     <span class="doccomment">/// });</span>
     <span class="doccomment">/// #     Ok(())</span>
@@ -1486,7 +1478,7 @@
     <span class="doccomment">/// // Create a thread which will sleep for 60 seconds and then have the</span>
     <span class="doccomment">/// // shard manager shutdown.</span>
     <span class="doccomment">/// tokio::spawn(async move {</span>
-    <span class="doccomment">///     tokio::time::delay_for(Duration::from_secs(60));</span>
+    <span class="doccomment">///     tokio::time::sleep(Duration::from_secs(60));</span>
     <span class="doccomment">///</span>
     <span class="doccomment">///     shard_manager.lock().await.shutdown_all().await;</span>
     <span class="doccomment">///</span>
@@ -1519,14 +1511,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Client</span> {
-    <span class="doccomment">/// Returns a builder implementing [`Future`]. You can chain the builder methods and then await</span>
-    <span class="doccomment">/// in order to finish the [`Client`].</span>
-    <span class="attribute">#[<span class="ident">deprecated</span>(<span class="ident">since</span><span class="op">=</span><span class="string">&quot;0.9.0&quot;</span>, <span class="ident">note</span><span class="op">=</span><span class="string">&quot;please use `builder` instead&quot;</span>)]</span>
-    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">new_ret_no_self</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-        <span class="self">Self</span>::<span class="ident">builder</span>(<span class="ident">token</span>)
-    }
-
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">builder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ClientBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ClientBuilder</span>::<span class="ident">new</span>(<span class="ident">token</span>)
     }
