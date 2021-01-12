@@ -7,6 +7,11 @@
 
 mod create_embed;
 mod create_channel;
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+mod create_interaction;
+
 mod create_invite;
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
@@ -28,6 +33,7 @@ mod edit_role;
 mod execute_webhook;
 mod get_messages;
 
+
 pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_channel::CreateChannel,
@@ -46,7 +52,12 @@ pub use self::{
 };
 
 #[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 pub use self::{
+    create_interaction::{
+        CreateInteraction,
+        CreateInteractionOption,
+    },
     create_interaction_response_followup::CreateInteractionResponseFollowup,
     create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     edit_interaction_response::EditInteractionResponse,
