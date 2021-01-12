@@ -24,8 +24,6 @@ mod get_messages;
 pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_channel::CreateChannel,
-    create_interaction::CreateInteraction,
-    create_interaction::CreateInteractionOption,
     create_invite::CreateInvite,
     create_message::CreateMessage,
     create_allowed_mentions::CreateAllowedMentions,
@@ -38,4 +36,12 @@ pub use self::{
     edit_role::EditRole,
     execute_webhook::ExecuteWebhook,
     get_messages::GetMessages
+};
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+pub use self::create_interaction::{
+    CreateInteraction,
+    CreateInteractionOption,
+    CreateInteractionOptionChoices,
 };

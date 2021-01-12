@@ -7,9 +7,9 @@ use crate::{
 };
 
 #[derive(Clone, Debug, Default)]
-pub struct InteractionOptionChoices(pub Vec<Value>);
+pub struct CreateInteractionOptionChoices(pub Vec<Value>);
 
-impl InteractionOptionChoices {
+impl CreateInteractionOptionChoices {
     #[inline]
     pub fn add_int<D: ToString>(&mut self, name: D, value: i32) -> &mut Self {
         self.add_value(name.to_string(), Value::Number(serde_json::Number::from(value)))
@@ -82,8 +82,8 @@ impl CreateInteractionOption {
 
     /// Sets the choices for the option
     pub fn choices<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut InteractionOptionChoices) -> &mut InteractionOptionChoices {
-        let mut choices = InteractionOptionChoices::default();
+    where F: FnOnce(&mut CreateInteractionOptionChoices) -> &mut CreateInteractionOptionChoices {
+        let mut choices = CreateInteractionOptionChoices::default();
         f(&mut choices);
         self.0.insert("choices", Value::Array(choices.0));
         self
