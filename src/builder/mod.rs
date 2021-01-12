@@ -7,7 +7,11 @@
 
 mod create_embed;
 mod create_channel;
+
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
 mod create_interaction;
+
 mod create_invite;
 mod create_message;
 mod create_allowed_mentions;
