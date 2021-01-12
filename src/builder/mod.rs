@@ -7,6 +7,7 @@
 
 mod create_embed;
 mod create_channel;
+mod create_interaction;
 mod create_invite;
 mod create_message;
 mod create_allowed_mentions;
@@ -19,9 +20,12 @@ mod edit_role;
 mod execute_webhook;
 mod get_messages;
 
+
 pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_channel::CreateChannel,
+    create_interaction::CreateInteraction,
+    create_interaction::CreateInteractionOption,
     create_invite::CreateInvite,
     create_message::CreateMessage,
     create_allowed_mentions::CreateAllowedMentions,
