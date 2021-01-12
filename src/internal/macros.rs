@@ -47,7 +47,7 @@ macro_rules! feature_cache {
 }
 
 macro_rules! enum_number {
-    ($name:ident { $($variant:ident, )* }) => {
+    ($name:ident { $($variant:ident $(,)? )* }) => {
         impl ::serde::Serialize for $name {
             fn serialize<S>(&self, serializer: S) -> ::std::result::Result<S::Ok, S::Error>
                 where S: ::serde::Serializer
