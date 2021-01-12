@@ -153,6 +153,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
             max_message_size: None,
             max_frame_size: None,
             max_send_queue: None,
+            accept_unmasked_frames: false,
         }))
         .await
         .map_err(|_| RustlsError::HandshakeError)?;
@@ -169,6 +170,7 @@ pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
             max_message_size: None,
             max_frame_size: None,
             max_send_queue: None,
+            accept_unmasked_frames: false,
         }))
         .await?;
 
