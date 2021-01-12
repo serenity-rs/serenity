@@ -177,6 +177,8 @@
 <span id="174">174</span>
 <span id="175">175</span>
 <span id="176">176</span>
+<span id="177">177</span>
+<span id="178">178</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">flate2</span>::<span class="ident">read</span>::<span class="ident">ZlibDecoder</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::{<span class="ident">GatewayError</span>, <span class="ident">WsStream</span>};
@@ -333,6 +335,7 @@
             <span class="ident">max_message_size</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_frame_size</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_send_queue</span>: <span class="prelude-val">None</span>,
+            <span class="ident">accept_unmasked_frames</span>: <span class="bool-val">false</span>,
         }))
         .<span class="kw">await</span>
         .<span class="ident">map_err</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="ident">RustlsError</span>::<span class="ident">HandshakeError</span>)<span class="question-mark">?</span>;
@@ -349,6 +352,7 @@
             <span class="ident">max_message_size</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_frame_size</span>: <span class="prelude-val">None</span>,
             <span class="ident">max_send_queue</span>: <span class="prelude-val">None</span>,
+            <span class="ident">accept_unmasked_frames</span>: <span class="bool-val">false</span>,
         }))
         .<span class="kw">await</span><span class="question-mark">?</span>;
 
