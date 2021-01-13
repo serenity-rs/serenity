@@ -85,10 +85,10 @@ impl CreateInteractionOption {
         self
     }
 
-    /// If the option is a [`SubCommand`] or [`SubGroup`] nested options are its parameters.
+    /// If the option is a [`SubCommand`] or [`SubCommandGroup`] nested options are its parameters.
     ///
     /// [`subcommand`]: crate::model::interactions::ApplicationCommandOptionType::SubCommand
-    /// [`subgroup`]: crate::model::interactions::ApplicationCommandOptionType::SubGroup
+    /// [`subgroup`]: crate::model::interactions::ApplicationCommandOptionType::SubCommandGroup
     pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
     where F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption {
         let mut data = CreateInteractionOption::default();
@@ -117,6 +117,7 @@ impl CreateInteractionOption {
 ///
 /// [`name`] and [`description`] are required fields.
 ///
+/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
 /// [`name`]: Self::name
 /// [`description`]: Self::description
 #[derive(Clone, Debug, Default)]
