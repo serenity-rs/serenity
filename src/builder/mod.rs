@@ -47,5 +47,4 @@ pub use self::{
 pub use self::create_interaction::{
     CreateInteraction,
     CreateInteractionOption,
-    CreateInteractionOptionChoices,
 };
