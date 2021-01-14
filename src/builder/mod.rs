@@ -32,18 +32,22 @@ pub use self::{
     create_embed::{CreateEmbed, CreateEmbedAuthor, CreateEmbedFooter, Timestamp},
     create_channel::CreateChannel,
     create_invite::CreateInvite,
-    create_interaction_response_followup::CreateInteractionResponseFollowup,
-    create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
     create_message::CreateMessage,
     create_allowed_mentions::CreateAllowedMentions,
     create_allowed_mentions::ParseValue,
     edit_channel::EditChannel,
     edit_guild::EditGuild,
-    edit_interaction_response::EditInteractionResponse,
     edit_member::EditMember,
     edit_message::EditMessage,
     edit_profile::EditProfile,
     edit_role::EditRole,
     execute_webhook::ExecuteWebhook,
     get_messages::GetMessages
+};
+
+#[cfg(feature = "unstable_discord_api")]
+pub use self::{
+    create_interaction_response_followup::CreateInteractionResponseFollowup,
+    create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
+    edit_interaction_response::EditInteractionResponse,
 };
