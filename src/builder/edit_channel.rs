@@ -1,5 +1,9 @@
-use crate::internal::prelude::*;
+use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType};
 use crate::model::id::ChannelId;
+use crate::internal::prelude::*;
+
+use serde_json::{json, Value};
+
 use std::collections::HashMap;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
@@ -112,6 +116,61 @@ impl EditChannel {
     #[inline]
     pub fn slow_mode_rate(&mut self, seconds: u64) -> &mut Self {
         self.0.insert("rate_limit_per_user", Value::Number(Number::from(seconds)));
+
+        self
+    }
+
+    /// A set of overwrites defining what a user or a user carrying a certain role can
+    /// and cannot do.
+    ///
+    /// # Example
+    ///
+    /// Inheriting permissions from an exisiting channel:
+    ///
+    /// ```rust,no_run
+    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
+    /// #     let http = Arc::new(Http::default());
+    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
+    /// use serenity::model::id::UserId;
+    /// use serenity::model::permissions::Permissions;
+    ///
+    /// // Assuming a guild have already been bound.
+    /// let permissions = Some(PermissionOverwrite {
+    ///     allow: Permissions::READ_MESSAGES,
+    ///     deny: Permissions::SEND_TTS_MESSAGES,
+    ///     kind: PermissionOverwriteType::Member(UserId(1234)),
+    /// });
+    ///
+    /// guild.create_channel(http, |c| {
+    ///     c.name("my_new_cool_channel")
+    ///     .permissions(permissions)
+    /// })
+    /// .await?;
+    /// #    Ok(())
+    /// # }
+    /// ```
+    pub fn permissions<I>(&mut self, perms: I) -> &mut Self
+        where I: IntoIterator<Item=PermissionOverwrite>
+    {
+        let overwrites = perms.into_iter().map(|perm| {
+            let (id, kind) = match perm.kind {
+                PermissionOverwriteType::Member(id) => (id.0, "member"),
+                PermissionOverwriteType::Role(id) => (id.0, "role"),
+            };
+
+            json!({
+                "allow": perm.allow.bits(),
+                "deny": perm.deny.bits(),
+                "id": id,
+                "type": kind,
+            })
+        }).collect();
+
+        self.0.insert("permission_overwrites", Value::Array(overwrites));
 
         self
     }
