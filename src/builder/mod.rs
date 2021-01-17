@@ -13,10 +13,19 @@ mod create_channel;
 mod create_interaction;
 
 mod create_invite;
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+mod create_interaction_response_followup;
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+mod create_interaction_response;
 mod create_message;
 mod create_allowed_mentions;
 mod edit_channel;
 mod edit_guild;
+#[cfg(feature = "unstable_discord_api")]
+#[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+mod edit_interaction_response;
 mod edit_member;
 mod edit_message;
 mod edit_profile;
@@ -44,7 +53,12 @@ pub use self::{
 
 #[cfg(feature = "unstable_discord_api")]
 #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
-pub use self::create_interaction::{
-    CreateInteraction,
-    CreateInteractionOption,
+pub use self::{
+    create_interaction::{
+        CreateInteraction,
+        CreateInteractionOption
+    },
+    create_interaction_response_followup::CreateInteractionResponseFollowup,
+    create_interaction_response::{CreateInteractionResponse, CreateInteractionResponseData},
+    edit_interaction_response::EditInteractionResponse,
 };
