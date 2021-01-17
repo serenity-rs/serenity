@@ -2,7 +2,11 @@
 
 use super::prelude::*;
 use crate::internal::prelude::*;
+use crate::http::Http;
+use crate::builder::{CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse};
+use crate::utils;
 
+use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde_json::{Value, Number};
 
@@ -192,4 +196,85 @@ enum_number!(ApplicationCommandOptionType {
 pub struct ApplicationCommandOptionChoice {
     pub name: String,
     pub value: Value,
+}
+
+#[derive(Copy, Clone, Debug, Hash, Eq, PartialEq, PartialOrd, Ord)]
+#[non_exhaustive]
+#[repr(u8)]
+pub enum InteractionResponseType {
+    Pong = 1,
+    Acknowledge = 2,
+    ChannelMessage = 3,
+    ChannelMessageWithSource = 4,
+    AcknowledgeWithSource = 5
+}
+
+#[derive(Clone, Serialize)]
+#[non_exhaustive]
+pub struct InteractionApplicationCommandCallbackDataFlags {
+    bits: u64
+}
+
+__impl_bitflags! {
+    InteractionApplicationCommandCallbackDataFlags: u64 {
+        /// Interaction message will only be visible to sender
+        EPHEMERAL = 0b0000_0000_0000_0000_0000_0000_0100_0000;
+    }
+}
+
+impl Interaction {
+    /// Creates a response to the interaction received.
+    ///
+    /// Note: Message contents must be under 2000 unicode code points.
+    pub async fn create_interaction_response<F>(self, http: impl AsRef<Http>, f: F) 
+        where for <'b> F: FnOnce(&'b mut CreateInteractionResponse) -> &'b mut CreateInteractionResponse {
+            let mut interaction_response = CreateInteractionResponse::default();
+            let interaction_response = f(&mut interaction_response);
+
+            let map = utils::hashmap_to_json_map(interaction_response.0.clone());
+
+            Message::check_content_length(&map).unwrap();
+            Message::check_embed_length(&map).unwrap();    
+
+            http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await.unwrap();
+        }
+
+    /// Edits the initial interaction response.
+    /// 
+    /// Refer to Discord's docs for Edit Webhook Message for field information.
+    /// 
+    /// Note:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    pub async fn edit_original_interaction_response<F>(self, http: impl AsRef<Http>, application_id: u64, f: F) 
+        where for <'b> F: FnOnce(&'b mut EditInteractionResponse) -> &'b mut EditInteractionResponse {
+            let mut interaction_response = EditInteractionResponse::default();
+            let interaction_response = f(&mut interaction_response);
+
+            let map = utils::hashmap_to_json_map(interaction_response.0.clone());
+
+            Message::check_content_length(&map).unwrap();
+            Message::check_embed_length(&map).unwrap();    
+
+            http.as_ref().edit_original_interaction_response(application_id, &self.token, &Value::Object(map)).await.unwrap();
+        }
+
+    /// Deletes the initial interaction response.
+    pub async fn delete_original_interaction_response(self, http: impl AsRef<Http>, application_id: u64) {
+        http.as_ref().delete_original_interaction_response(application_id, &self.token).await.unwrap();
+    }
+
+    /// Creates a followup response to the response sent.
+    ///
+    /// Note: Message contents must be under 2000 unicode code points.
+    pub async fn create_followup_message<'a, F>(self, http: impl AsRef<Http>, application_id: u64, wait: bool, f: F) 
+        where for <'b> F: FnOnce(&'b mut CreateInteractionResponseFollowup<'a>) -> &'b mut CreateInteractionResponseFollowup<'a> {
+            let mut interaction_response = CreateInteractionResponseFollowup::default();
+            let interaction_response = f(&mut interaction_response);
+
+            let map = utils::hashmap_to_json_map(interaction_response.0.clone());
+
+            Message::check_content_length(&map).unwrap();
+            Message::check_embed_length(&map).unwrap();    
+
+            http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await.unwrap();
+        }
 }
