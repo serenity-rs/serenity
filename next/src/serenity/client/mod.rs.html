@@ -950,6 +950,27 @@
 <span id="947">947</span>
 <span id="948">948</span>
 <span id="949">949</span>
+<span id="950">950</span>
+<span id="951">951</span>
+<span id="952">952</span>
+<span id="953">953</span>
+<span id="954">954</span>
+<span id="955">955</span>
+<span id="956">956</span>
+<span id="957">957</span>
+<span id="958">958</span>
+<span id="959">959</span>
+<span id="960">960</span>
+<span id="961">961</span>
+<span id="962">962</span>
+<span id="963">963</span>
+<span id="964">964</span>
+<span id="965">965</span>
+<span id="966">966</span>
+<span id="967">967</span>
+<span id="968">968</span>
+<span id="969">969</span>
+<span id="970">970</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The Client contains information about a single bot&#39;s token, as well</span>
 <span class="doccomment">//! as event handlers. Dispatching events to configured handlers and starting</span>
@@ -1040,17 +1061,7 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">ClientBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="doccomment">/// Construct a new builder to call methods on for the client construction.</span>
-    <span class="doccomment">/// The `token` will automatically be prefixed &quot;Bot &quot; if not already.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// **Panic**:</span>
-    <span class="doccomment">/// If you enabled the `framework`-feature (on by default), you must specify</span>
-    <span class="doccomment">/// a framework via the [`framework`] or [`framework_arc`] method,</span>
-    <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
-    <span class="doccomment">///</span>
-    <span class="doccomment">/// [`framework`]: Self::framework</span>
-    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+    <span class="kw">fn</span> <span class="ident">_new</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">Self</span> {
             <span class="ident">data</span>: <span class="prelude-val">Some</span>(<span class="ident">TypeMap</span>::<span class="ident">new</span>()),
             <span class="ident">http</span>: <span class="prelude-val">None</span>,
@@ -1064,7 +1075,38 @@
             <span class="ident">voice_manager</span>: <span class="prelude-val">None</span>,
             <span class="ident">event_handler</span>: <span class="prelude-val">None</span>,
             <span class="ident">raw_event_handler</span>: <span class="prelude-val">None</span>,
-        }.<span class="ident">token</span>(<span class="ident">token</span>)
+        }
+    }
+
+    <span class="doccomment">/// Construct a new builder to call methods on for the client construction.</span>
+    <span class="doccomment">/// The `token` will automatically be prefixed &quot;Bot &quot; if not already.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Panic**:</span>
+    <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
+    <span class="doccomment">/// a framework via the [`framework`] or [`framework_arc`] method,</span>
+    <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`framework`]: Self::framework</span>
+    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">token</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">str</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class="ident">_new</span>().<span class="ident">token</span>(<span class="ident">token</span>)
+    }
+
+    <span class="doccomment">/// Construct a new builder with a [`Http`] instance to calls methods on</span>
+    <span class="doccomment">/// for the client construction.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// **Panic**:</span>
+    <span class="doccomment">/// If you have enabled the `framework`-feature (on by default), you must specify</span>
+    <span class="doccomment">/// a framework via the [`framework`] or [`framework_arc`] method,</span>
+    <span class="doccomment">/// otherwise awaiting the builder will cause a panic.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Http`]: crate::http::Http</span>
+    <span class="doccomment">/// [`framework`]: Self::framework</span>
+    <span class="doccomment">/// [`framework_arc`]: Self::framework_arc</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">new_with_http</span>(<span class="ident">http</span>: <span class="ident">Http</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">c</span> <span class="op">=</span> <span class="self">Self</span>::<span class="ident">_new</span>();
+        <span class="ident">c</span>.<span class="ident">http</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">http</span>);
+        <span class="ident">c</span>
     }
 
     <span class="doccomment">/// Sets a token for the bot. If the token is not prefixed &quot;Bot &quot;,</span>

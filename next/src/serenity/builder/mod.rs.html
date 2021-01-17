@@ -38,6 +38,22 @@
 <span id="35">35</span>
 <span id="36">36</span>
 <span id="37">37</span>
+<span id="38">38</span>
+<span id="39">39</span>
+<span id="40">40</span>
+<span id="41">41</span>
+<span id="42">42</span>
+<span id="43">43</span>
+<span id="44">44</span>
+<span id="45">45</span>
+<span id="46">46</span>
+<span id="47">47</span>
+<span id="48">48</span>
+<span id="49">49</span>
+<span id="50">50</span>
+<span id="51">51</span>
+<span id="52">52</span>
+<span id="53">53</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of builders used to make using methods on certain structs simpler to</span>
 <span class="doccomment">//! use.</span>
@@ -49,10 +65,19 @@
 <span class="kw">mod</span> <span class="ident">create_embed</span>;
 <span class="kw">mod</span> <span class="ident">create_channel</span>;
 <span class="kw">mod</span> <span class="ident">create_invite</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">create_interaction_response_followup</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">create_interaction_response</span>;
 <span class="kw">mod</span> <span class="ident">create_message</span>;
 <span class="kw">mod</span> <span class="ident">create_allowed_mentions</span>;
 <span class="kw">mod</span> <span class="ident">edit_channel</span>;
 <span class="kw">mod</span> <span class="ident">edit_guild</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>))]</span>
+<span class="kw">mod</span> <span class="ident">edit_interaction_response</span>;
 <span class="kw">mod</span> <span class="ident">edit_member</span>;
 <span class="kw">mod</span> <span class="ident">edit_message</span>;
 <span class="kw">mod</span> <span class="ident">edit_profile</span>;
@@ -76,5 +101,11 @@
     <span class="ident">execute_webhook</span>::<span class="ident">ExecuteWebhook</span>,
     <span class="ident">get_messages</span>::<span class="ident">GetMessages</span>
 };
-</pre></div>
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::{
+    <span class="ident">create_interaction_response_followup</span>::<span class="ident">CreateInteractionResponseFollowup</span>,
+    <span class="ident">create_interaction_response</span>::{<span class="ident">CreateInteractionResponse</span>, <span class="ident">CreateInteractionResponseData</span>},
+    <span class="ident">edit_interaction_response</span>::<span class="ident">EditInteractionResponse</span>,
+};</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "serenity";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>
