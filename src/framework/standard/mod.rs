@@ -602,7 +602,7 @@ impl StandardFramework {
 
 #[async_trait]
 impl Framework for StandardFramework {
-    #[instrument(skip(self, ctx))]
+    #[instrument(skip(self, ctx, msg))]
     async fn dispatch(&self, mut ctx: Context, msg: Message) {
         if self.should_ignore(&msg) {
             return;
