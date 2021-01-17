@@ -128,24 +128,24 @@ impl EditChannel {
     /// Inheriting permissions from an exisiting channel:
     ///
     /// ```rust,no_run
-    /// # use serenity::{http::Http, model::id::GuildId};
+    /// # use serenity::{http::Http, model::id::ChannelId};
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() -> Result<(), Box<dyn std::error::Error>> {
     /// #     let http = Arc::new(Http::default());
-    /// #     let mut guild = GuildId(0).to_partial_guild(&http).await?;
+    /// #     let mut channel = ChannelId(0);
     /// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};
     /// use serenity::model::id::UserId;
     /// use serenity::model::permissions::Permissions;
     ///
-    /// // Assuming a guild has already been bound.
+    /// // Assuming a channel has already been bound.
     /// let permissions = Some(PermissionOverwrite {
     ///     allow: Permissions::READ_MESSAGES,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
     /// });
     ///
-    /// guild.edit_channel(http, |c| {
+    /// channel.edit(http, |c| {
     ///     c.name("my_edited_cool_channel")
     ///     .permissions(permissions)
     /// })
