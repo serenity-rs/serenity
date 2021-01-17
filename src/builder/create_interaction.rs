@@ -93,12 +93,7 @@ impl CreateInteractionOption {
     where F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption {
         let mut data = CreateInteractionOption::default();
         f(&mut data);
-        let new_option = utils::hashmap_to_json_map(data.0);
-        let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
-        if let Some(opt_arr) = options.as_array_mut() {
-            opt_arr.push(Value::Object(new_option));
-        };
-        self
+        self.add_sub_option(data)
     }
 
     pub fn add_sub_option(&mut self, sub_option: CreateInteractionOption) -> &mut Self {
@@ -149,13 +144,7 @@ impl CreateInteraction {
     where F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption {
         let mut data = CreateInteractionOption::default();
         f(&mut data);
-        let new_option = utils::hashmap_to_json_map(data.0);
-        let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
-        if let Some(opt_arr) = options.as_array_mut() {
-            opt_arr.push(Value::Object(new_option));
-        };
-        // should this be changed to have None be a panic?
-        self
+        self.add_interaction_option(data)
 
     }
 
@@ -185,4 +174,3 @@ impl CreateInteraction {
     }
 
 }
-
