@@ -108,7 +108,7 @@ impl<'a> ClientBuilder<'a> {
     /// The `token` will automatically be prefixed "Bot " if not already.
     ///
     /// **Panic**:
-    /// If you enabled the `framework`-feature (on by default), you must specify
+    /// If you have enabled the `framework`-feature (on by default), you must specify
     /// a framework via the [`framework`] or [`framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     ///
@@ -122,7 +122,7 @@ impl<'a> ClientBuilder<'a> {
     /// for the client construction.
     ///
     /// **Panic**:
-    /// If you enabled the `framework`-feature (on by default), you must specify
+    /// If you have enabled the `framework`-feature (on by default), you must specify
     /// a framework via the [`framework`] or [`framework_arc`] method,
     /// otherwise awaiting the builder will cause a panic.
     ///
