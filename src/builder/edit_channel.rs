@@ -138,15 +138,15 @@ impl EditChannel {
     /// use serenity::model::id::UserId;
     /// use serenity::model::permissions::Permissions;
     ///
-    /// // Assuming a guild have already been bound.
+    /// // Assuming a guild has already been bound.
     /// let permissions = Some(PermissionOverwrite {
     ///     allow: Permissions::READ_MESSAGES,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
     /// });
     ///
-    /// guild.create_channel(http, |c| {
-    ///     c.name("my_new_cool_channel")
+    /// guild.edit_channel(http, |c| {
+    ///     c.name("my_edited_cool_channel")
     ///     .permissions(permissions)
     /// })
     /// .await?;
