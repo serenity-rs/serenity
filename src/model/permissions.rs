@@ -41,10 +41,11 @@
 //! [Manage Roles]: Permissions::MANAGE_ROLES
 //! [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
 
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
 use serde::ser::{Serialize, Serializer};
-use bitflags::__impl_bitflags;
-use std::fmt::{Display, Formatter, Result as FmtResult};
 
 /// This macro generates the [`Permissions::get_permission_names`] method.
 ///
@@ -203,7 +204,6 @@ pub const PRESET_VOICE: Permissions = Permissions {
 /// [`PermissionOverwrite`]: super::channel::PermissionOverwrite
 /// [`Role`]: super::guild::Role
 /// [`User`]: super::user::User
-///
 #[derive(Copy, PartialEq, Eq, Clone, PartialOrd, Ord, Hash)]
 pub struct Permissions {
     /// The flags making up the permissions.
@@ -211,7 +211,7 @@ pub struct Permissions {
     /// # Note
     /// Do not modify this yourself; use the provided methods.
     /// Do the same when creating, unless you're absolutely certain that you're giving valid permission flags.
-    pub bits: u64
+    pub bits: u64,
 }
 
 __impl_bitflags! {
@@ -358,205 +358,269 @@ impl Permissions {
     /// [Add Reactions] permission.
     ///
     /// [Add Reactions]: Self::ADD_REACTIONS
-    pub fn add_reactions(self) -> bool { self.contains(Self::ADD_REACTIONS) }
+    pub fn add_reactions(self) -> bool {
+        self.contains(Self::ADD_REACTIONS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Administrator] permission.
     ///
     /// [Administrator]: Self::ADMINISTRATOR
-    pub fn administrator(self) -> bool { self.contains(Self::ADMINISTRATOR) }
+    pub fn administrator(self) -> bool {
+        self.contains(Self::ADMINISTRATOR)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Attach Files] permission.
     ///
     /// [Attach Files]: Self::ATTACH_FILES
-    pub fn attach_files(self) -> bool { self.contains(Self::ATTACH_FILES) }
+    pub fn attach_files(self) -> bool {
+        self.contains(Self::ATTACH_FILES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Ban Members] permission.
     ///
     /// [Ban Members]: Self::BAN_MEMBERS
-    pub fn ban_members(self) -> bool { self.contains(Self::BAN_MEMBERS) }
+    pub fn ban_members(self) -> bool {
+        self.contains(Self::BAN_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Change Nickname] permission.
     ///
     /// [Change Nickname]: Self::CHANGE_NICKNAME
-    pub fn change_nickname(self) -> bool { self.contains(Self::CHANGE_NICKNAME) }
+    pub fn change_nickname(self) -> bool {
+        self.contains(Self::CHANGE_NICKNAME)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Connect] permission.
     ///
     /// [Connect]: Self::CONNECT
-    pub fn connect(self) -> bool { self.contains(Self::CONNECT) }
+    pub fn connect(self) -> bool {
+        self.contains(Self::CONNECT)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [View Audit Log] permission.
     ///
     /// [View Audit Log]: Self::VIEW_AUDIT_LOG
-    pub fn view_audit_log(self) -> bool { self.contains(Self::VIEW_AUDIT_LOG) }
+    pub fn view_audit_log(self) -> bool {
+        self.contains(Self::VIEW_AUDIT_LOG)
+    }
 
     /// Shorthand for checking that the set of permission contains the
     /// [Priority Speaker] permission.
     ///
     /// [Priority Speaker]: Self::PRIORITY_SPEAKER
-    pub fn priority_speaker(self) -> bool { self.contains(Self::PRIORITY_SPEAKER) }
+    pub fn priority_speaker(self) -> bool {
+        self.contains(Self::PRIORITY_SPEAKER)
+    }
 
     /// Shorthand for checking that the set of permission contains the
     /// [Stream] permission.
     ///
     /// [Stream]: Self::STREAM
-    pub fn stream(self) -> bool { self.contains(Self::STREAM) }
+    pub fn stream(self) -> bool {
+        self.contains(Self::STREAM)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Create Invite] permission.
     ///
     /// [Create Invite]: Self::CREATE_INVITE
-    pub fn create_invite(self) -> bool { self.contains(Self::CREATE_INVITE) }
+    pub fn create_invite(self) -> bool {
+        self.contains(Self::CREATE_INVITE)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Deafen Members] permission.
     ///
     /// [Deafen Members]: Self::DEAFEN_MEMBERS
-    pub fn deafen_members(self) -> bool { self.contains(Self::DEAFEN_MEMBERS) }
+    pub fn deafen_members(self) -> bool {
+        self.contains(Self::DEAFEN_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Embed Links] permission.
     ///
     /// [Embed Links]: Self::EMBED_LINKS
-    pub fn embed_links(self) -> bool { self.contains(Self::EMBED_LINKS) }
+    pub fn embed_links(self) -> bool {
+        self.contains(Self::EMBED_LINKS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    pub fn external_emojis(self) -> bool { self.contains(Self::USE_EXTERNAL_EMOJIS) }
+    pub fn external_emojis(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Kick Members] permission.
     ///
     /// [Kick Members]: Self::KICK_MEMBERS
-    pub fn kick_members(self) -> bool { self.contains(Self::KICK_MEMBERS) }
+    pub fn kick_members(self) -> bool {
+        self.contains(Self::KICK_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Channels] permission.
     ///
     /// [Manage Channels]: Self::MANAGE_CHANNELS
-    pub fn manage_channels(self) -> bool { self.contains(Self::MANAGE_CHANNELS) }
+    pub fn manage_channels(self) -> bool {
+        self.contains(Self::MANAGE_CHANNELS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Emojis] permission.
     ///
     /// [Manage Emojis]: Self::MANAGE_EMOJIS
-    pub fn manage_emojis(self) -> bool { self.contains(Self::MANAGE_EMOJIS) }
+    pub fn manage_emojis(self) -> bool {
+        self.contains(Self::MANAGE_EMOJIS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Guild] permission.
     ///
     /// [Manage Guild]: Self::MANAGE_GUILD
-    pub fn manage_guild(self) -> bool { self.contains(Self::MANAGE_GUILD) }
+    pub fn manage_guild(self) -> bool {
+        self.contains(Self::MANAGE_GUILD)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Messages] permission.
     ///
     /// [Manage Messages]: Self::MANAGE_MESSAGES
-    pub fn manage_messages(self) -> bool { self.contains(Self::MANAGE_MESSAGES) }
+    pub fn manage_messages(self) -> bool {
+        self.contains(Self::MANAGE_MESSAGES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Nicknames] permission.
     ///
     /// [Manage Nicknames]: Self::MANAGE_NICKNAMES
-    pub fn manage_nicknames(self) -> bool { self.contains(Self::MANAGE_NICKNAMES) }
+    pub fn manage_nicknames(self) -> bool {
+        self.contains(Self::MANAGE_NICKNAMES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Roles] permission.
     ///
     /// [Manage Roles]: Self::MANAGE_ROLES
-    pub fn manage_roles(self) -> bool { self.contains(Self::MANAGE_ROLES) }
+    pub fn manage_roles(self) -> bool {
+        self.contains(Self::MANAGE_ROLES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: Self::MANAGE_WEBHOOKS
-    pub fn manage_webhooks(self) -> bool { self.contains(Self::MANAGE_WEBHOOKS) }
+    pub fn manage_webhooks(self) -> bool {
+        self.contains(Self::MANAGE_WEBHOOKS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Mention Everyone] permission.
     ///
     /// [Mention Everyone]: Self::MENTION_EVERYONE
-    pub fn mention_everyone(self) -> bool { self.contains(Self::MENTION_EVERYONE) }
+    pub fn mention_everyone(self) -> bool {
+        self.contains(Self::MENTION_EVERYONE)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Move Members] permission.
     ///
     /// [Move Members]: Self::MOVE_MEMBERS
-    pub fn move_members(self) -> bool { self.contains(Self::MOVE_MEMBERS) }
+    pub fn move_members(self) -> bool {
+        self.contains(Self::MOVE_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Mute Members] permission.
     ///
     /// [Mute Members]: Self::MUTE_MEMBERS
-    pub fn mute_members(self) -> bool { self.contains(Self::MUTE_MEMBERS) }
+    pub fn mute_members(self) -> bool {
+        self.contains(Self::MUTE_MEMBERS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Read Message History] permission.
     ///
     /// [Read Message History]: Self::READ_MESSAGE_HISTORY
-    pub fn read_message_history(self) -> bool { self.contains(Self::READ_MESSAGE_HISTORY) }
+    pub fn read_message_history(self) -> bool {
+        self.contains(Self::READ_MESSAGE_HISTORY)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Read Messages] permission.
     ///
     /// [Read Messages]: Self::READ_MESSAGES
-    pub fn read_messages(self) -> bool { self.contains(Self::READ_MESSAGES) }
+    pub fn read_messages(self) -> bool {
+        self.contains(Self::READ_MESSAGES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Send Messages] permission.
     ///
     /// [Send Messages]: Self::SEND_MESSAGES
-    pub fn send_messages(self) -> bool { self.contains(Self::SEND_MESSAGES) }
+    pub fn send_messages(self) -> bool {
+        self.contains(Self::SEND_MESSAGES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Send TTS Messages] permission.
     ///
     /// [Send TTS Messages]: Self::SEND_TTS_MESSAGES
-    pub fn send_tts_messages(self) -> bool { self.contains(Self::SEND_TTS_MESSAGES) }
+    pub fn send_tts_messages(self) -> bool {
+        self.contains(Self::SEND_TTS_MESSAGES)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Speak] permission.
     ///
     /// [Speak]: Self::SPEAK
-    pub fn speak(self) -> bool { self.contains(Self::SPEAK) }
+    pub fn speak(self) -> bool {
+        self.contains(Self::SPEAK)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use External Emojis] permission.
     ///
     /// [Use External Emojis]: Self::USE_EXTERNAL_EMOJIS
-    pub fn use_external_emojis(self) -> bool { self.contains(Self::USE_EXTERNAL_EMOJIS) }
+    pub fn use_external_emojis(self) -> bool {
+        self.contains(Self::USE_EXTERNAL_EMOJIS)
+    }
 
     /// Shorthand for checking that the set of permissions contains the
     /// [Use VAD] permission.
     ///
     /// [Use VAD]: Self::USE_VAD
-    pub fn use_vad(self) -> bool { self.contains(Self::USE_VAD) }
+    pub fn use_vad(self) -> bool {
+        self.contains(Self::USE_VAD)
+    }
 }
 
 impl Default for Permissions {
-    fn default() -> Self { Self::empty() }
+    fn default() -> Self {
+        Self::empty()
+    }
 }
 
 impl<'de> Deserialize<'de> for Permissions {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
         let str_u64 = String::deserialize(deserializer)?;
-        Ok(Permissions::from_bits_truncate(
-            str_u64.parse::<u64>().map_err(D::Error::custom)?,
-        ))
+        Ok(Permissions::from_bits_truncate(str_u64.parse::<u64>().map_err(D::Error::custom)?))
     }
 }
 
 impl Serialize for Permissions {
     fn serialize<S>(&self, serializer: S) -> Result<S::Ok, S::Error>
-        where S: Serializer {
+    where
+        S: Serializer,
+    {
         serializer.collect_str(&self.bits())
     }
 }

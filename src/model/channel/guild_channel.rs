@@ -1,49 +1,39 @@
-use chrono::{DateTime, Utc};
-use crate::model::prelude::*;
+#[cfg(feature = "model")]
+use std::fmt::{Display, Formatter, Result as FmtResult};
+#[cfg(feature = "model")]
+use std::sync::Arc;
 
-use tokio::{
-    io::AsyncReadExt,
-    fs::File,
-};
-use reqwest::Url;
 use bytes::buf::Buf;
-
+use chrono::{DateTime, Utc};
 #[cfg(feature = "cache")]
 use futures::stream::StreamExt;
-#[cfg(feature = "cache")]
-use crate::cache::Cache;
-#[cfg(feature = "model")]
-use crate::builder::{
-    CreateInvite,
-    CreateMessage,
-    EditMessage,
-    GetMessages
-};
-#[cfg(feature = "model")]
-use crate::http::AttachmentType;
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::internal::prelude::*;
-#[cfg(feature = "model")]
-use std::fmt::{
-    Display,
-    Formatter,
-    Result as FmtResult
-};
-#[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils as serenity_utils;
+use reqwest::Url;
+use tokio::{fs::File, io::AsyncReadExt};
+
 #[cfg(feature = "model")]
 use crate::builder::EditChannel;
+#[cfg(feature = "model")]
+use crate::builder::{CreateInvite, CreateMessage, EditMessage, GetMessages};
+#[cfg(feature = "cache")]
+use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction, ReactionCollectorBuilder,
-    CollectReply, MessageCollectorBuilder,
+    CollectReaction,
+    CollectReply,
+    MessageCollectorBuilder,
+    ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp, Typing};
+use crate::http::AttachmentType;
 #[cfg(feature = "model")]
-use std::sync::Arc;
+use crate::http::{CacheHttp, Http, Typing};
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
+#[cfg(all(feature = "model", feature = "utils"))]
+use crate::utils as serenity_utils;
 
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
@@ -146,7 +136,7 @@ impl GuildChannel {
     #[cfg(feature = "utils")]
     pub async fn create_invite<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<RichInvite>
     where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite
+        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
     {
         #[cfg(feature = "cache")]
         {
@@ -257,7 +247,11 @@ impl GuildChannel {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     /// [Send TTS Messages]: Permissions::SEND_TTS_MESSAGES
     #[inline]
-    pub async fn create_permission(&self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
+    pub async fn create_permission(
+        &self,
+        http: impl AsRef<Http>,
+        target: &PermissionOverwrite,
+    ) -> Result<()> {
         self.id.create_permission(&http, target).await
     }
 
@@ -296,8 +290,14 @@ impl GuildChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn delete_messages<T, It>(&self, http: impl AsRef<Http>, message_ids: It) -> Result<()>
-    where T: AsRef<MessageId>, It: IntoIterator<Item=T>
+    pub async fn delete_messages<T, It>(
+        &self,
+        http: impl AsRef<Http>,
+        message_ids: It,
+    ) -> Result<()>
+    where
+        T: AsRef<MessageId>,
+        It: IntoIterator<Item = T>,
     {
         self.id.delete_messages(&http, message_ids).await
     }
@@ -309,7 +309,11 @@ impl GuildChannel {
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn delete_permission(&self, http: impl AsRef<Http>, permission_type: PermissionOverwriteType) -> Result<()> {
+    pub async fn delete_permission(
+        &self,
+        http: impl AsRef<Http>,
+        permission_type: PermissionOverwriteType,
+    ) -> Result<()> {
         self.id.delete_permission(&http, permission_type).await
     }
 
@@ -343,7 +347,8 @@ impl GuildChannel {
     /// ```
     #[cfg(feature = "utils")]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where F: FnOnce(&mut EditChannel) -> &mut EditChannel
+    where
+        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
         #[cfg(feature = "cache")]
         {
@@ -391,9 +396,10 @@ impl GuildChannel {
         &self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        f: F
+        f: F,
     ) -> Result<Message>
-    where F: FnOnce(&mut EditMessage) -> &mut EditMessage
+    where
+        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         self.id.edit_message(&http, message_id, f).await
     }
@@ -430,7 +436,11 @@ impl GuildChannel {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
-    pub async fn message(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<Message> {
+    pub async fn message(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<Message> {
         self.id.message(&http, message_id).await
     }
 
@@ -445,13 +455,16 @@ impl GuildChannel {
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn messages<F>(&self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where F: FnOnce(&mut GetMessages) -> &mut GetMessages
+    where
+        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
     {
         self.id.messages(&http, builder).await
     }
 
     /// Returns the name of the guild channel.
-    pub fn name(&self) -> &str { &self.name }
+    pub fn name(&self) -> &str {
+        &self.name
+    }
 
     /// Calculates the permissions of a member.
     ///
@@ -552,9 +565,14 @@ impl GuildChannel {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn permissions_for_user(&self, cache: impl AsRef<Cache>, user_id: impl Into<UserId>) -> Result<Permissions> {
+    pub async fn permissions_for_user(
+        &self,
+        cache: impl AsRef<Cache>,
+        user_id: impl Into<UserId>,
+    ) -> Result<Permissions> {
         let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
-        let member = guild.members.get(&user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))?;
+        let member =
+            guild.members.get(&user_id.into()).ok_or(Error::Model(ModelError::MemberNotFound))?;
         guild.user_permissions_in(self, member)
     }
 
@@ -572,15 +590,24 @@ impl GuildChannel {
     /// be found in the [`Cache`].
     #[cfg(feature = "cache")]
     #[inline]
-    pub async fn permissions_for_role(&self, cache: impl AsRef<Cache>, role_id: impl Into<RoleId>) -> Result<Permissions> {
+    pub async fn permissions_for_role(
+        &self,
+        cache: impl AsRef<Cache>,
+        role_id: impl Into<RoleId>,
+    ) -> Result<Permissions> {
         let guild = self.guild(&cache).await.ok_or(Error::Model(ModelError::GuildNotFound))?;
-        let role = guild.roles.get(&role_id.into()).ok_or(Error::Model(ModelError::RoleNotFound))?;
+        let role =
+            guild.roles.get(&role_id.into()).ok_or(Error::Model(ModelError::RoleNotFound))?;
         guild.role_permissions_in(self, role)
     }
 
     /// Pins a [`Message`] to the channel.
     #[inline]
-    pub async fn pin(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn pin(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
         self.id.pin(&http, message_id).await
     }
 
@@ -622,7 +649,11 @@ impl GuildChannel {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     #[inline]
-    pub async fn say(&self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
+    pub async fn say(
+        &self,
+        http: impl AsRef<Http>,
+        content: impl std::fmt::Display,
+    ) -> Result<Message> {
         self.id.say(&http, content).await
     }
 
@@ -643,9 +674,17 @@ impl GuildChannel {
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
-    pub async fn send_files<'a, F, T, It>(&self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-              T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
+    pub async fn send_files<'a, F, T, It>(
+        &self,
+        http: impl AsRef<Http>,
+        files: It,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+        T: Into<AttachmentType<'a>>,
+        It: IntoIterator<Item = T>,
+    {
         self.id.send_files(&http, files, f).await
     }
 
@@ -666,7 +705,9 @@ impl GuildChannel {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     pub async fn send_message<'a, F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
-    where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+    {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
@@ -735,7 +776,11 @@ impl GuildChannel {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn unpin(&self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn unpin(
+        &self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
         self.id.unpin(&http, message_id).await
     }
 
@@ -761,69 +806,76 @@ impl GuildChannel {
     #[inline]
     pub async fn members(&self, cache: impl AsRef<Cache>) -> Result<Vec<Member>> {
         let cache = cache.as_ref();
-        let guild = cache
-            .guild(self.guild_id)
-            .await
-            .ok_or(ModelError::GuildNotFound)?;
+        let guild = cache.guild(self.guild_id).await.ok_or(ModelError::GuildNotFound)?;
 
         match self.kind {
-            ChannelType::Voice => {
-                Ok(guild
+            ChannelType::Voice => Ok(guild
                 .voice_states
                 .values()
                 .filter_map(|v| {
-                    v.channel_id.and_then(
-                        |c| {
-                            if c == self.id {
-                                guild.members.get(&v.user_id).cloned()
-                            } else {
-                                None
-                            }
-                        },
-                    )
+                    v.channel_id.and_then(|c| {
+                        if c == self.id {
+                            guild.members.get(&v.user_id).cloned()
+                        } else {
+                            None
+                        }
+                    })
                 })
-                .collect())
-            },
-            ChannelType::News | ChannelType::Text => Ok(futures::stream::iter(
-                guild
-                    .members
-                    .iter())
+                .collect()),
+            ChannelType::News | ChannelType::Text => {
+                Ok(futures::stream::iter(guild.members.iter())
                     .filter_map(|e| async move {
-                        if self.permissions_for_user(cache, e.0)
+                        if self
+                            .permissions_for_user(cache, e.0)
                             .await
-                            .map(|p| p.contains(Permissions::READ_MESSAGES)).unwrap_or(false)
+                            .map(|p| p.contains(Permissions::READ_MESSAGES))
+                            .unwrap_or(false)
                         {
                             Some(e.1.clone())
                         } else {
                             None
                         }
-                    }).collect::<Vec<Member>>()
-                    .await),
+                    })
+                    .collect::<Vec<Member>>()
+                    .await)
+            },
             _ => Err(Error::from(ModelError::InvalidChannelType)),
         }
     }
 
     /// Returns a future that will await one message by this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reply<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReply<'a> {
+    pub fn await_reply<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReply<'a> {
         CollectReply::new(shard_messenger).guild_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages sent by this guild.
     #[cfg(feature = "collector")]
-    pub fn await_replies<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> MessageCollectorBuilder<'a> {
+    pub fn await_replies<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
 
     /// Await a single reaction by this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
+    pub fn await_reaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReaction<'a> {
         CollectReaction::new(shard_messenger).guild_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent by this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
+    pub fn await_reactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
 
@@ -836,15 +888,19 @@ impl GuildChannel {
     /// Returns a [`ModelError::NameTooLong`] if the name of the webhook is
     /// over the limit of 100 characters.
     /// Returns a [`ModelError::InvalidChannelType`] if the channel type is not text.
-    pub async fn create_webhook(&self, http: impl AsRef<Http>, name: impl std::fmt::Display) -> Result<Webhook> {
+    pub async fn create_webhook(
+        &self,
+        http: impl AsRef<Http>,
+        name: impl std::fmt::Display,
+    ) -> Result<Webhook> {
         let name = name.to_string();
 
         if name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort))
+            return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong))
+            return Err(Error::Model(ModelError::NameTooLong));
         } else if self.kind.num() != 0 {
-            return Err(Error::Model(ModelError::InvalidChannelType))
+            return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
         let map = serde_json::json!({
@@ -855,23 +911,32 @@ impl GuildChannel {
     }
 
     /// Avatar must be a 128x128 image.
-    pub async fn create_webhook_with_avatar<'a>(&self, http: impl AsRef<Http>, name: impl std::fmt::Display, avatar: impl Into<AttachmentType<'a>>) -> Result<Webhook> {
+    pub async fn create_webhook_with_avatar<'a>(
+        &self,
+        http: impl AsRef<Http>,
+        name: impl std::fmt::Display,
+        avatar: impl Into<AttachmentType<'a>>,
+    ) -> Result<Webhook> {
         let name = name.to_string();
         let avatar = avatar.into();
 
         if name.len() < 2 {
-            return Err(Error::Model(ModelError::NameTooShort))
+            return Err(Error::Model(ModelError::NameTooShort));
         } else if name.len() > 100 {
-            return Err(Error::Model(ModelError::NameTooLong))
+            return Err(Error::Model(ModelError::NameTooLong));
         } else if self.kind.num() != 0 {
-            return Err(Error::Model(ModelError::InvalidChannelType))
+            return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
         let avatar = match avatar {
-            AttachmentType::Bytes{ data, filename: _ } => {
-                "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned())
-            },
-            AttachmentType::File{ file, filename: _ } => {
+            AttachmentType::Bytes {
+                data,
+                filename: _,
+            } => "data:image/png;base64,".to_string() + &base64::encode(&data.into_owned()),
+            AttachmentType::File {
+                file,
+                filename: _,
+            } => {
                 let mut buf = Vec::new();
                 file.try_clone().await?.read_to_end(&mut buf).await?;
 

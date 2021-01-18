@@ -1,10 +1,10 @@
-use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType};
-use crate::model::id::ChannelId;
-use crate::internal::prelude::*;
+use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use std::collections::HashMap;
+use crate::internal::prelude::*;
+use crate::model::channel::{PermissionOverwrite, PermissionOverwriteType};
+use crate::model::id::ChannelId;
 
 /// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]
 ///
@@ -106,7 +106,7 @@ impl EditChannel {
     fn _category(&mut self, category: Option<ChannelId>) {
         self.0.insert("parent_id", match category {
             Some(c) => Value::Number(Number::from(c.0)),
-            None => Value::Null
+            None => Value::Null,
         });
     }
 
@@ -154,21 +154,25 @@ impl EditChannel {
     /// # }
     /// ```
     pub fn permissions<I>(&mut self, perms: I) -> &mut Self
-        where I: IntoIterator<Item=PermissionOverwrite>
+    where
+        I: IntoIterator<Item = PermissionOverwrite>,
     {
-        let overwrites = perms.into_iter().map(|perm| {
-            let (id, kind) = match perm.kind {
-                PermissionOverwriteType::Member(id) => (id.0, "member"),
-                PermissionOverwriteType::Role(id) => (id.0, "role"),
-            };
+        let overwrites = perms
+            .into_iter()
+            .map(|perm| {
+                let (id, kind) = match perm.kind {
+                    PermissionOverwriteType::Member(id) => (id.0, "member"),
+                    PermissionOverwriteType::Role(id) => (id.0, "role"),
+                };
 
-            json!({
-                "allow": perm.allow.bits(),
-                "deny": perm.deny.bits(),
-                "id": id,
-                "type": kind,
+                json!({
+                    "allow": perm.allow.bits(),
+                    "deny": perm.deny.bits(),
+                    "id": id,
+                    "type": kind,
+                })
             })
-        }).collect();
+            .collect();
 
         self.0.insert("permission_overwrites", Value::Array(overwrites));
 

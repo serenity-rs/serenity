@@ -50,25 +50,22 @@ mod error;
 mod shard;
 mod ws_client_ext;
 
+use std::fmt::{Display, Formatter, Result as FmtResult};
+
+use serde_json::Value;
+
 pub use self::{
     error::Error as GatewayError,
     shard::Shard,
-    ws_client_ext::WebSocketGatewayClientExt
+    ws_client_ext::WebSocketGatewayClientExt,
 };
-
-use crate::model::{
-    gateway::Activity,
-    user::OnlineStatus,
-};
-use serde_json::Value;
-use std::fmt::{Display, Formatter, Result as FmtResult};
-
 #[cfg(feature = "client")]
 use crate::client::bridge::gateway::ShardClientMessage;
+use crate::model::{gateway::Activity, user::OnlineStatus};
 
 pub type CurrentPresence = (Option<Activity>, OnlineStatus);
 
-use async_tungstenite::{WebSocketStream, tokio::ConnectStream};
+use async_tungstenite::{tokio::ConnectStream, WebSocketStream};
 
 pub type WsStream = WebSocketStream<ConnectStream>;
 

@@ -1,35 +1,32 @@
-use crate::model::prelude::*;
-
 #[cfg(feature = "model")]
 use std::fmt::Write as FmtWrite;
 #[cfg(feature = "model")]
-use crate::builder::{
-    CreateInvite,
-    CreateMessage,
-    EditChannel,
-    EditMessage,
-    GetMessages
-};
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
-#[cfg(feature = "model")]
-use crate::http::AttachmentType;
-#[cfg(all(feature = "model", feature = "utils"))]
-use crate::utils;
-#[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp, Typing};
+use std::sync::Arc;
+
+use futures::stream::Stream;
 #[cfg(feature = "model")]
 use serde_json::json;
+
 #[cfg(feature = "model")]
-use std::sync::Arc;
-use futures::stream::Stream;
+use crate::builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction, ReactionCollectorBuilder,
-    CollectReply, MessageCollectorBuilder,
+    CollectReaction,
+    CollectReply,
+    MessageCollectorBuilder,
+    ReactionCollectorBuilder,
 };
+#[cfg(feature = "model")]
+use crate::http::AttachmentType;
+#[cfg(feature = "model")]
+use crate::http::{CacheHttp, Http, Typing};
+use crate::model::prelude::*;
+#[cfg(all(feature = "model", feature = "utils"))]
+use crate::utils;
 
 #[cfg(feature = "model")]
 impl ChannelId {
@@ -65,7 +62,7 @@ impl ChannelId {
     #[cfg(feature = "utils")]
     pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
     where
-        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite
+        F: FnOnce(&mut CreateInvite) -> &mut CreateInvite,
     {
         let mut invite = CreateInvite::default();
         f(&mut invite);
@@ -84,7 +81,11 @@ impl ChannelId {
     /// Requires the [Manage Channels] permission.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
-    pub async fn create_permission(self, http: impl AsRef<Http>, target: &PermissionOverwrite) -> Result<()> {
+    pub async fn create_permission(
+        self,
+        http: impl AsRef<Http>,
+        target: &PermissionOverwrite,
+    ) -> Result<()> {
         let (id, kind) = match target.kind {
             PermissionOverwriteType::Member(id) => (id.0, "member"),
             PermissionOverwriteType::Role(id) => (id.0, "role"),
@@ -114,7 +115,7 @@ impl ChannelId {
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        reaction_type: impl Into<ReactionType>
+        reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
         http.as_ref().create_reaction(self.0, message_id.into().0, &reaction_type.into()).await
     }
@@ -134,7 +135,11 @@ impl ChannelId {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn delete_message(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn delete_message(
+        self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
         http.as_ref().delete_message(self.0, message_id.into().0).await
     }
 
@@ -154,12 +159,12 @@ impl ChannelId {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_messages<T, It>(self, http: impl AsRef<Http>, message_ids: It) -> Result<()>
-    where T: AsRef<MessageId>, It: IntoIterator<Item=T>,
+    where
+        T: AsRef<MessageId>,
+        It: IntoIterator<Item = T>,
     {
-        let ids = message_ids
-            .into_iter()
-            .map(|message_id| message_id.as_ref().0)
-            .collect::<Vec<u64>>();
+        let ids =
+            message_ids.into_iter().map(|message_id| message_id.as_ref().0).collect::<Vec<u64>>();
 
         let len = ids.len();
 
@@ -184,15 +189,14 @@ impl ChannelId {
     pub async fn delete_permission(
         self,
         http: impl AsRef<Http>,
-        permission_type: PermissionOverwriteType
+        permission_type: PermissionOverwriteType,
     ) -> Result<()> {
-        http.as_ref().delete_permission(
-            self.0,
-            match permission_type {
+        http.as_ref()
+            .delete_permission(self.0, match permission_type {
                 PermissionOverwriteType::Member(id) => id.0,
                 PermissionOverwriteType::Role(id) => id.0,
-            },
-        ).await
+            })
+            .await
     }
 
     /// Deletes the given [`Reaction`] from the channel.
@@ -207,16 +211,17 @@ impl ChannelId {
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
         user_id: Option<UserId>,
-        reaction_type: impl Into<ReactionType>
+        reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref().delete_reaction(
-            self.0,
-            message_id.into().0,
-            user_id.map(|uid| uid.0),
-            &reaction_type.into(),
-        ).await
+        http.as_ref()
+            .delete_reaction(
+                self.0,
+                message_id.into().0,
+                user_id.map(|uid| uid.0),
+                &reaction_type.into(),
+            )
+            .await
     }
-
 
     /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
     ///
@@ -228,13 +233,11 @@ impl ChannelId {
         self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
-        reaction_type: impl Into<ReactionType>
+        reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
-        http.as_ref().delete_message_reaction_emoji(
-            self.0,
-            message_id.into().0,
-            &reaction_type.into()
-        ).await
+        http.as_ref()
+            .delete_message_reaction_emoji(self.0, message_id.into().0, &reaction_type.into())
+            .await
     }
 
     /// Edits the settings of a [`Channel`], optionally setting new values.
@@ -250,7 +253,7 @@ impl ChannelId {
     /// ```rust,no_run
     /// // assuming a `channel_id` has been bound
     ///
-    ///# async fn run() {
+    /// # async fn run() {
     /// #     use serenity::http::Http;
     /// #     use serenity::model::id::ChannelId;
     /// #     let http = Http::default();
@@ -263,7 +266,8 @@ impl ChannelId {
     #[cfg(feature = "utils")]
     #[inline]
     pub async fn edit<F>(self, http: impl AsRef<Http>, f: F) -> Result<GuildChannel>
-    where F: FnOnce(&mut EditChannel) -> &mut EditChannel
+    where
+        F: FnOnce(&mut EditChannel) -> &mut EditChannel,
     {
         let mut channel = EditChannel::default();
         f(&mut channel);
@@ -292,8 +296,14 @@ impl ChannelId {
     /// [`the limit`]: crate::builder::EditMessage::content
     #[cfg(feature = "utils")]
     #[inline]
-    pub async fn edit_message<F>(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>, f: F) -> Result<Message>
-    where F: FnOnce(&mut EditMessage) -> &mut EditMessage
+    pub async fn edit_message<F>(
+        self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+        f: F,
+    ) -> Result<Message>
+    where
+        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         let mut msg = EditMessage::default();
         f(&mut msg);
@@ -353,16 +363,16 @@ impl ChannelId {
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
-    pub async fn message(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<Message> {
-        http
-            .as_ref()
-            .get_message(self.0, message_id.into().0)
-            .await
-            .map(|mut msg| {
-                msg.transform_content();
+    pub async fn message(
+        self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<Message> {
+        http.as_ref().get_message(self.0, message_id.into().0).await.map(|mut msg| {
+            msg.transform_content();
 
-                msg
-            })
+            msg
+        })
     }
 
     /// Gets messages from the channel.
@@ -374,7 +384,8 @@ impl ChannelId {
     /// [`GetMessages`]: crate::builder::GetMessages
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn messages<F>(self, http: impl AsRef<Http>, builder: F) -> Result<Vec<Message>>
-    where F: FnOnce(&mut GetMessages) -> &mut GetMessages
+    where
+        F: FnOnce(&mut GetMessages) -> &mut GetMessages,
     {
         let mut get_messages = GetMessages::default();
         builder(&mut get_messages);
@@ -389,19 +400,15 @@ impl ChannelId {
             write!(query, "&before={}", before)?;
         }
 
-        http
-            .as_ref()
-            .get_messages(self.0, &query)
-            .await
-            .map(|msgs| {
-                msgs.into_iter()
-                    .map(|mut msg| {
-                        msg.transform_content();
+        http.as_ref().get_messages(self.0, &query).await.map(|msgs| {
+            msgs.into_iter()
+                .map(|mut msg| {
+                    msg.transform_content();
 
-                        msg
-                    })
-                    .collect::<Vec<Message>>()
-            })
+                    msg
+                })
+                .collect::<Vec<Message>>()
+        })
     }
 
     /// Streams over all the messages in a channel.
@@ -439,7 +446,7 @@ impl ChannelId {
     /// ```
     ///
     /// [`messages`]: Self::messages
-    pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item=Result<Message>> {
+    pub fn messages_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Message>> {
         MessagesIter::<H>::stream(http, self)
     }
 
@@ -480,7 +487,8 @@ impl ChannelId {
     /// **Note**: Requires the [Read Message History] permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
-    pub async fn reaction_users(self,
+    pub async fn reaction_users(
+        self,
         http: impl AsRef<Http>,
         message_id: impl Into<MessageId>,
         reaction_type: impl Into<ReactionType>,
@@ -489,13 +497,15 @@ impl ChannelId {
     ) -> Result<Vec<User>> {
         let limit = limit.map_or(50, |x| if x > 100 { 100 } else { x });
 
-        http.as_ref().get_reaction_users(
-            self.0,
-            message_id.into().0,
-            &reaction_type.into(),
-            limit,
-            after.into().map(|x| x.0),
-        ).await
+        http.as_ref()
+            .get_reaction_users(
+                self.0,
+                message_id.into().0,
+                &reaction_type.into(),
+                limit,
+                after.into().map(|x| x.0),
+            )
+            .await
     }
 
     /// Sends a message with just the given message content in the channel.
@@ -506,7 +516,11 @@ impl ChannelId {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     #[inline]
-    pub async fn say(self, http: impl AsRef<Http>, content: impl std::fmt::Display) -> Result<Message> {
+    pub async fn say(
+        self,
+        http: impl AsRef<Http>,
+        content: impl std::fmt::Display,
+    ) -> Result<Message> {
         self.send_message(&http, |m| m.content(content)).await
     }
 
@@ -584,9 +598,17 @@ impl ChannelId {
     /// [Attach Files]: Permissions::ATTACH_FILES
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "utils")]
-    pub async fn send_files<'a, F, T, It>(self, http: impl AsRef<Http>, files: It, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
-              T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T> {
+    pub async fn send_files<'a, F, T, It>(
+        self,
+        http: impl AsRef<Http>,
+        files: It,
+        f: F,
+    ) -> Result<Message>
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+        T: Into<AttachmentType<'a>>,
+        It: IntoIterator<Item = T>,
+    {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
@@ -617,7 +639,9 @@ impl ChannelId {
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "utils")]
     pub async fn send_message<'a, F>(self, http: impl AsRef<Http>, f: F) -> Result<Message>
-        where for <'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a> {
+    where
+        for<'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
+    {
         let mut create_message = CreateMessage::default();
         let msg = f(&mut create_message);
 
@@ -685,7 +709,11 @@ impl ChannelId {
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
-    pub async fn unpin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
+    pub async fn unpin(
+        self,
+        http: impl AsRef<Http>,
+        message_id: impl Into<MessageId>,
+    ) -> Result<()> {
         http.as_ref().unpin_message(self.0, message_id.into().0).await
     }
 
@@ -701,25 +729,37 @@ impl ChannelId {
 
     /// Returns a future that will await one message sent in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reply<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReply<'a> {
+    pub fn await_reply<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReply<'a> {
         CollectReply::new(shard_messenger).channel_id(self.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_replies<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> MessageCollectorBuilder<'a> {
+    pub fn await_replies<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).channel_id(self.0)
     }
 
     /// Await a single reaction in this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
+    pub fn await_reaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReaction<'a> {
         CollectReaction::new(shard_messenger).channel_id(self.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this channel.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
+    pub fn await_reactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).channel_id(self.0)
     }
 }
@@ -740,22 +780,30 @@ impl<'a> From<&'a Channel> for ChannelId {
 
 impl From<PrivateChannel> for ChannelId {
     /// Gets the Id of a private channel.
-    fn from(private_channel: PrivateChannel) -> ChannelId { private_channel.id }
+    fn from(private_channel: PrivateChannel) -> ChannelId {
+        private_channel.id
+    }
 }
 
 impl<'a> From<&'a PrivateChannel> for ChannelId {
     /// Gets the Id of a private channel.
-    fn from(private_channel: &PrivateChannel) -> ChannelId { private_channel.id }
+    fn from(private_channel: &PrivateChannel) -> ChannelId {
+        private_channel.id
+    }
 }
 
 impl From<GuildChannel> for ChannelId {
     /// Gets the Id of a guild channel.
-    fn from(public_channel: GuildChannel) -> ChannelId { public_channel.id }
+    fn from(public_channel: GuildChannel) -> ChannelId {
+        public_channel.id
+    }
 }
 
 impl<'a> From<&'a GuildChannel> for ChannelId {
     /// Gets the Id of a guild channel.
-    fn from(public_channel: &GuildChannel) -> ChannelId { public_channel.id }
+    fn from(public_channel: &GuildChannel) -> ChannelId {
+        public_channel.id
+    }
 }
 
 /// A helper class returned by [`ChannelId::messages_iter`]
@@ -803,13 +851,16 @@ impl<H: AsRef<Http>> MessagesIter<H> {
 
         // If `self.before` is not set yet, we can use `.messages` to fetch
         // the last message after very first fetch from last.
-        self.buffer = self.channel_id.messages(&self.http, |b| {
-            if let Some(before) = self.before {
-                b.before(before);
-            }
+        self.buffer = self
+            .channel_id
+            .messages(&self.http, |b| {
+                if let Some(before) = self.before {
+                    b.before(before);
+                }
 
-            b.limit(grab_size)
-        }).await?;
+                b.limit(grab_size)
+            })
+            .await?;
 
         self.buffer.reverse();
 
@@ -855,7 +906,10 @@ impl<H: AsRef<Http>> MessagesIter<H> {
     /// ```
     ///
     /// [`messages`]: ChannelId::messages
-    pub fn stream(http: impl AsRef<Http>, channel_id: ChannelId) -> impl Stream<Item=Result<Message>> {
+    pub fn stream(
+        http: impl AsRef<Http>,
+        channel_id: ChannelId,
+    ) -> impl Stream<Item = Result<Message>> {
         let init_state = MessagesIter::new(http, channel_id);
 
         futures::stream::unfold(init_state, |mut state| async {

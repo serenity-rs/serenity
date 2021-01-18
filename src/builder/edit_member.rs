@@ -1,6 +1,7 @@
+use std::collections::HashMap;
+
 use crate::internal::prelude::*;
 use crate::model::id::{ChannelId, RoleId};
-use std::collections::HashMap;
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -47,11 +48,9 @@ impl EditMember {
     /// Requires the [Manage Roles] permission to modify.
     ///
     /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
-    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item=T>>(&mut self, roles: It) -> &mut Self {
-        let role_ids = roles
-            .into_iter()
-            .map(|x| Value::Number(Number::from(x.as_ref().0)))
-            .collect();
+    pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item = T>>(&mut self, roles: It) -> &mut Self {
+        let role_ids =
+            roles.into_iter().map(|x| Value::Number(Number::from(x.as_ref().0))).collect();
 
         self._roles(role_ids);
         self

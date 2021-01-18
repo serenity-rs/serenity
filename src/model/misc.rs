@@ -1,14 +1,14 @@
 //! Miscellaneous helper traits, enums, and structs for models.
 
-use super::prelude::*;
-
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::error::Error as StdError;
+use std::fmt;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::result::Result as StdResult;
 #[cfg(all(feature = "model", feature = "utils"))]
 use std::str::FromStr;
-use std::fmt;
+
+use super::prelude::*;
 #[cfg(all(feature = "model", any(feature = "cache", feature = "utils")))]
 use crate::utils;
 
@@ -37,16 +37,18 @@ pub trait Mentionable {
     ///     to_channel: GuildChannel,
     ///     rules_channel: ChannelId,
     /// ) -> Result<(), Error> {
-    ///     to_channel.id.send_message(
-    ///         ctx,
-    ///         |m| m.content(format_args!(
-    ///             "Hi {member}, welcome to the server! \
+    ///     to_channel
+    ///         .id
+    ///         .send_message(ctx, |m| {
+    ///             m.content(format_args!(
+    ///                 "Hi {member}, welcome to the server! \
     ///                 Please refer to {rules} for our code of conduct, \
     ///                 and enjoy your stay.",
-    ///             member = member.mention(),
-    ///             rules = rules_channel.mention(),
-    ///         )),
-    ///     ).await?;
+    ///                 member = member.mention(),
+    ///                 rules = rules_channel.mention(),
+    ///             ))
+    ///         })
+    ///         .await?;
     ///     Ok(())
     /// }
     /// # }
@@ -59,12 +61,7 @@ pub trait Mentionable {
     /// let role: RoleId = 3.into();
     /// assert_eq!(
     ///     "<@1> <#2> <@&3>",
-    ///     format!(
-    ///         "{} {} {}",
-    ///         user.mention(),
-    ///         channel.mention(),
-    ///         role.mention(),
-    ///     ),
+    ///     format!("{} {} {}", user.mention(), channel.mention(), role.mention(),),
     /// )
     /// ```
     fn mention(&self) -> Mention;
@@ -89,12 +86,7 @@ pub trait Mentionable {
 /// let role: RoleId = 3.into();
 /// assert_eq!(
 ///     "<@1> <#2> <@&3>",
-///     format!(
-///         "{} {} {}",
-///         Mention::from(user),
-///         Mention::from(channel),
-///         Mention::from(role),
-///     ),
+///     format!("{} {} {}", Mention::from(user), Mention::from(channel), Mention::from(role),),
 /// )
 /// ```
 pub struct Mention(MentionableImpl);
@@ -139,18 +131,12 @@ mention!(value:
 impl Display for Mention {
     fn fmt(&self, f: &mut Formatter<'_>) -> fmt::Result {
         match self.0 {
-            MentionableImpl::Channel(id) =>
-                f.write_fmt(format_args!("<#{}>", id.0)),
-            MentionableImpl::User(id) =>
-                f.write_fmt(format_args!("<@{}>", id.0)),
-            MentionableImpl::Role(id) =>
-                f.write_fmt(format_args!("<@&{}>", id.0)),
-            MentionableImpl::Emoji(id, animated) =>
-                f.write_fmt(format_args!(
-                    "<{}:_:{}>",
-                    if animated { "a" } else { "" },
-                    id.0,
-                )),
+            MentionableImpl::Channel(id) => f.write_fmt(format_args!("<#{}>", id.0)),
+            MentionableImpl::User(id) => f.write_fmt(format_args!("<@{}>", id.0)),
+            MentionableImpl::Role(id) => f.write_fmt(format_args!("<@&{}>", id.0)),
+            MentionableImpl::Emoji(id, animated) => {
+                f.write_fmt(format_args!("<{}:_:{}>", if animated { "a" } else { "" }, id.0,))
+            },
         }
     }
 }
@@ -306,9 +292,10 @@ impl EmojiIdentifier {
 impl FromStr for EmojiIdentifier {
     type Err = ();
 
-    fn from_str(s: &str) -> StdResult<Self, ()> { utils::parse_emoji(s).ok_or(()) }
+    fn from_str(s: &str) -> StdResult<Self, ()> {
+        utils::parse_emoji(s).ok_or(())
+    }
 }
-
 
 /// A component that was affected during a service incident.
 ///

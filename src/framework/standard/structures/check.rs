@@ -1,9 +1,11 @@
+use std::error::Error;
+use std::fmt::{self, Debug, Display};
+
+use futures::future::BoxFuture;
+
 use crate::client::Context;
 use crate::framework::standard::{Args, CommandOptions};
 use crate::model::channel::Message;
-use futures::future::BoxFuture;
-use std::error::Error;
-use std::fmt::{self, Debug, Display};
 
 /// This type describes why a check has failed.
 ///
@@ -69,9 +71,12 @@ impl Display for Reason {
             Self::Unknown => write!(f, "Unknown"),
             Self::User(reason) => write!(f, "User {}", reason),
             Self::Log(reason) => write!(f, "Log {}", reason),
-            Self::UserAndLog { user, log } => {
+            Self::UserAndLog {
+                user,
+                log,
+            } => {
                 write!(f, "UserAndLog {{user: {}, log: {}}}", user, log)
-            }
+            },
         }
     }
 }

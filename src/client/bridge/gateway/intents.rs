@@ -15,7 +15,7 @@ pub struct GatewayIntents {
     /// # Note
     /// Do not modify this yourself; use the provided methods.
     /// Do the same when creating, unless you're absolutely certain that you're giving valid intents flags.
-    pub bits: u64
+    pub bits: u64,
 }
 
 __impl_bitflags! {
@@ -122,7 +122,9 @@ __impl_bitflags! {
 }
 
 impl Default for GatewayIntents {
-    fn default() -> Self { Self::empty() }
+    fn default() -> Self {
+        Self::empty()
+    }
 }
 
 impl<'de> Deserialize<'de> for GatewayIntents {

@@ -1,32 +1,27 @@
 use std::{
     boxed::Box,
-    sync::Arc,
-    time::Duration,
     future::Future,
     pin::Pin,
+    sync::Arc,
     task::{Context as FutContext, Poll},
+    time::Duration,
 };
-use tokio::{
-    sync::mpsc::{
-        unbounded_channel,
-        UnboundedReceiver as Receiver,
-        UnboundedSender as Sender,
-    },
-};
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::{Delay as Sleep, delay_for as sleep};
-
-#[cfg(feature = "tokio")]
-use tokio::time::{Sleep, sleep};
 
 use futures::{
     future::BoxFuture,
     stream::{Stream, StreamExt},
 };
-use crate::{
-    client::bridge::gateway::ShardMessenger,
-    model::channel::Message,
+use tokio::sync::mpsc::{
+    unbounded_channel,
+    UnboundedReceiver as Receiver,
+    UnboundedSender as Sender,
 };
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
+use tokio::time::{delay_for as sleep, Delay as Sleep};
+#[cfg(feature = "tokio")]
+use tokio::time::{sleep, Sleep};
+
+use crate::{client::bridge::gateway::ShardMessenger, model::channel::Message};
 
 macro_rules! impl_message_collector {
     ($($name:ident;)*) => {
@@ -118,7 +113,6 @@ impl MessageFilter {
     /// to the constraints and the limits are not reached yet.
     pub(crate) fn send_message(&mut self, message: &Arc<Message>) -> bool {
         if self.is_passing_constraints(&message) {
-
             if self.options.filter.as_ref().map_or(true, |f| f(&message)) {
                 self.collected += 1;
 
@@ -137,20 +131,19 @@ impl MessageFilter {
     /// Constraints are optional, as it is possible to limit messages to
     /// be sent by a specific author or in a specifc guild.
     fn is_passing_constraints(&self, message: &Arc<Message>) -> bool {
-        self.options.guild_id.map_or(true, |g| { Some(g) == message.guild_id.map(|g| g.0) })
-        && self.options.channel_id.map_or(true, |g| { g == message.channel_id.0 })
-        && self.options.author_id.map_or(true, |g| { g == message.author.id.0 })
+        self.options.guild_id.map_or(true, |g| Some(g) == message.guild_id.map(|g| g.0))
+            && self.options.channel_id.map_or(true, |g| g == message.channel_id.0)
+            && self.options.author_id.map_or(true, |g| g == message.author.id.0)
     }
 
     /// Checks if the filter is within set receive and collect limits.
     /// A message is considered *received* even when it does not meet the
     /// constraints.
     fn is_within_limits(&self) -> bool {
-        self.options.filter_limit.as_ref().map_or(true, |limit| { self.filtered < *limit })
-        && self.options.collect_limit.as_ref().map_or(true, |limit| { self.collected < *limit })
+        self.options.filter_limit.as_ref().map_or(true, |limit| self.filtered < *limit)
+            && self.options.collect_limit.as_ref().map_or(true, |limit| self.collected < *limit)
     }
 }
-
 
 #[derive(Clone, Default)]
 struct FilterOptions {
@@ -254,7 +247,9 @@ impl<'a> Future for CollectReply<'a> {
                 MessageCollector {
                     receiver: Box::pin(receiver),
                     timeout,
-                }.next().await
+                }
+                .next()
+                .await
             }))
         }
 
@@ -295,7 +290,6 @@ impl Stream for MessageCollector {
     type Item = Arc<Message>;
     fn poll_next(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Option<Self::Item>> {
         if let Some(ref mut timeout) = self.timeout {
-
             match timeout.as_mut().poll(ctx) {
                 Poll::Ready(_) => {
                     return Poll::Ready(None);

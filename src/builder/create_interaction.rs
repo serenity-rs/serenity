@@ -1,10 +1,8 @@
 use std::collections::HashMap;
-use serde_json::{Value, json};
 
-use crate::{
-    model::interactions::ApplicationCommandOptionType,
-    utils,
-};
+use serde_json::{json, Value};
+
+use crate::{model::interactions::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
 ///
@@ -18,7 +16,6 @@ use crate::{
 pub struct CreateInteractionOption(pub HashMap<&'static str, Value>);
 
 impl CreateInteractionOption {
-
     /// Set the ApplicationCommandOptionType for the InteractionOption.
     pub fn kind(&mut self, kind: ApplicationCommandOptionType) -> &mut Self {
         self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
@@ -41,7 +38,7 @@ impl CreateInteractionOption {
         self
     }
 
-    /// The first required option for the user to complete 
+    /// The first required option for the user to complete
     ///
     /// **Note**: Only one option can be `default`.
     pub fn default_option(&mut self, default: bool) -> &mut Self {
@@ -90,7 +87,9 @@ impl CreateInteractionOption {
     /// [`SubCommand`]: crate::model::interactions::ApplicationCommandOptionType::SubCommand
     /// [`SubCommandGroup`]: crate::model::interactions::ApplicationCommandOptionType::SubCommandGroup
     pub fn create_sub_option<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption {
+    where
+        F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption,
+    {
         let mut data = CreateInteractionOption::default();
         f(&mut data);
         self.add_sub_option(data)
@@ -104,9 +103,7 @@ impl CreateInteractionOption {
         };
         self
     }
-
 }
-
 
 /// A builder for creating a new [`ApplicationCommand`].
 ///
@@ -119,7 +116,6 @@ impl CreateInteractionOption {
 pub struct CreateInteraction(pub HashMap<&'static str, Value>);
 
 impl CreateInteraction {
-
     /// Specify the name of the Interaction.
     ///
     /// **Note**: Must be between 1 and 32 characters long,
@@ -141,11 +137,12 @@ impl CreateInteraction {
     ///
     /// **Note**: Interactions can only have up to 10 options.
     pub fn create_interaction_option<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption {
+    where
+        F: FnOnce(&mut CreateInteractionOption) -> &mut CreateInteractionOption,
+    {
         let mut data = CreateInteractionOption::default();
         f(&mut data);
         self.add_interaction_option(data)
-
     }
 
     /// Add an interaction option for the interaction.
@@ -159,18 +156,17 @@ impl CreateInteraction {
         };
         // should this be changed to have None be a panic?
         self
-
     }
 
     /// Sets all the interaction options for the interaction.
     ///
     /// **Note**: Interactions can only have up to 10 options.
     pub fn set_interaction_options(&mut self, options: Vec<CreateInteractionOption>) -> &mut Self {
-        let new_options = options.into_iter().map(
-            |f| Value::Object(utils::hashmap_to_json_map(f.0))
-        ).collect::<Vec<Value>>();
+        let new_options = options
+            .into_iter()
+            .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
+            .collect::<Vec<Value>>();
         self.0.insert("options", Value::Array(new_options));
         self
     }
-
 }

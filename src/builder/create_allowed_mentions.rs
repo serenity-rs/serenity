@@ -1,9 +1,9 @@
-use crate::model::id::{UserId, RoleId};
-
-use serde_json::{json, Value};
-use serde::{Serialize, Deserialize};
-
 use std::collections::HashMap;
+
+use serde::{Deserialize, Serialize};
+use serde_json::{json, Value};
+
+use crate::model::id::{RoleId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub enum ParseValue {
@@ -57,7 +57,6 @@ pub enum ParseValue {
 ///     am.parse(ParseValue::Everyone);
 ///     am.users(vec![msg.author.id])
 /// });
-///
 /// ```
 ///
 /// [`ChannelId::send_message`]: crate::model::id::ChannelId::send_message
@@ -102,9 +101,12 @@ impl CreateAllowedMentions {
     /// Sets the users that will be allowed to be mentioned.
     #[inline]
     pub fn users<U: Into<UserId>>(&mut self, users: impl IntoIterator<Item = U>) -> &mut Self {
-        self.0.insert("users", Value::Array({
-            users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
-        }));
+        self.0.insert(
+            "users",
+            Value::Array({
+                users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
+            }),
+        );
         self
     }
 
@@ -122,9 +124,12 @@ impl CreateAllowedMentions {
     /// Sets the roles that will be allowed to be mentioned.
     #[inline]
     pub fn roles<R: Into<RoleId>>(&mut self, users: impl IntoIterator<Item = R>) -> &mut Self {
-        self.0.insert("roles", Value::Array({
-            users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
-        }));
+        self.0.insert(
+            "roles",
+            Value::Array({
+                users.into_iter().map(|i| json!(i.into().to_string())).collect::<Vec<_>>()
+            }),
+        );
         self
     }
 

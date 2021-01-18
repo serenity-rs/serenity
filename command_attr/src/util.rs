@@ -1,17 +1,23 @@
-use crate::structures::CommandFun;
 use proc_macro::TokenStream;
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{format_ident, quote, ToTokens};
 use syn::{
-    braced, bracketed, parenthesized,
+    braced,
+    bracketed,
+    parenthesized,
     parse::{Error, Parse, ParseStream, Result as SynResult},
     parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
     token::{Comma, Mut},
-    Ident, Lifetime, Lit, Type,
+    Ident,
+    Lifetime,
+    Lit,
+    Type,
 };
+
+use crate::structures::CommandFun;
 
 pub trait LitExt {
     fn to_str(&self) -> String;
@@ -34,9 +40,7 @@ impl LitExt for Lit {
         if let Lit::Bool(b) = self {
             b.value
         } else {
-            self.to_str()
-                .parse()
-                .unwrap_or_else(|_| panic!("expected bool from {:?}", self))
+            self.to_str().parse().unwrap_or_else(|_| panic!("expected bool from {:?}", self))
         }
     }
 

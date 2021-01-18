@@ -1,13 +1,15 @@
 //! Representations of voice information.
 
+use std::fmt;
+
+use chrono::{DateTime, Utc};
+use serde::de::{self, Deserialize, Deserializer, IgnoredAny, MapAccess, Visitor};
+
 use super::{
     guild::Member,
     id::{ChannelId, GuildId, RoleId, UserId},
     user::User,
 };
-use chrono::{DateTime, Utc};
-use serde::de::{self, Deserialize, Deserializer, Visitor, MapAccess, IgnoredAny};
-use std::fmt;
 
 /// Information about an available voice region.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -46,7 +48,6 @@ pub struct VoiceState {
     pub user_id: UserId,
 }
 
-
 impl fmt::Debug for VoiceState {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("VoiceState")
@@ -66,10 +67,8 @@ impl fmt::Debug for VoiceState {
     }
 }
 
-
 impl<'de> Deserialize<'de> for VoiceState {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
-
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]
         enum Field {
@@ -130,7 +129,7 @@ impl<'de> Deserialize<'de> for VoiceState {
                         Err(_) => {
                             map.next_value::<IgnoredAny>()?;
                             continue;
-                        }
+                        },
                     };
 
                     match key {
@@ -139,19 +138,19 @@ impl<'de> Deserialize<'de> for VoiceState {
                                 return Err(de::Error::duplicate_field("channel_id"));
                             }
                             channel_id = map.next_value()?;
-                        }
+                        },
                         Field::Deaf => {
                             if deaf.is_some() {
                                 return Err(de::Error::duplicate_field("deaf"));
                             }
                             deaf = Some(map.next_value()?);
-                        }
+                        },
                         Field::GuildId => {
                             if guild_id.is_some() {
                                 return Err(de::Error::duplicate_field("guild_id"));
                             }
                             guild_id = map.next_value()?;
-                        }
+                        },
                         Field::Member => {
                             if member.is_some() {
                                 return Err(de::Error::duplicate_field("member"));
@@ -169,61 +168,61 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     user: partial_member.user,
                                 });
                             }
-                        }
+                        },
                         Field::Mute => {
                             if mute.is_some() {
                                 return Err(de::Error::duplicate_field("mute"));
                             }
                             mute = Some(map.next_value()?);
-                        }
+                        },
                         Field::SelfDeaf => {
                             if self_deaf.is_some() {
                                 return Err(de::Error::duplicate_field("self_deaf"));
                             }
                             self_deaf = Some(map.next_value()?);
-                        }
+                        },
                         Field::SelfMute => {
                             if self_mute.is_some() {
                                 return Err(de::Error::duplicate_field("self_mute"));
                             }
                             self_mute = Some(map.next_value()?);
-                        }
+                        },
                         Field::SelfStream => {
                             if self_stream.is_some() {
                                 return Err(de::Error::duplicate_field("self_stream"));
                             }
                             self_stream = map.next_value()?;
-                        }
+                        },
                         Field::SelfVideo => {
                             if self_video.is_some() {
                                 return Err(de::Error::duplicate_field("self_video"));
                             }
                             self_video = Some(map.next_value()?);
-                        }
+                        },
                         Field::SessionId => {
                             if session_id.is_some() {
                                 return Err(de::Error::duplicate_field("session_id"));
                             }
                             session_id = Some(map.next_value()?);
-                        }
+                        },
                         Field::Suppress => {
                             if suppress.is_some() {
                                 return Err(de::Error::duplicate_field("suppress"));
                             }
                             suppress = Some(map.next_value()?);
-                        }
+                        },
                         Field::Token => {
                             if token.is_some() {
                                 return Err(de::Error::duplicate_field("token"));
                             }
                             token = map.next_value()?;
-                        }
+                        },
                         Field::UserId => {
                             if user_id.is_some() {
                                 return Err(de::Error::duplicate_field("user_id"));
                             }
                             user_id = Some(map.next_value()?);
-                        }
+                        },
                     }
                 }
 
@@ -231,12 +230,14 @@ impl<'de> Deserialize<'de> for VoiceState {
                 let mute = mute.ok_or_else(|| de::Error::missing_field("mute"))?;
                 let self_deaf = self_deaf.ok_or_else(|| de::Error::missing_field("self_deaf"))?;
                 let self_mute = self_mute.ok_or_else(|| de::Error::missing_field("self_mute"))?;
-                let self_video = self_video.ok_or_else(|| de::Error::missing_field("self_video"))?;
-                let session_id = session_id.ok_or_else(|| de::Error::missing_field("session_id"))?;
+                let self_video =
+                    self_video.ok_or_else(|| de::Error::missing_field("self_video"))?;
+                let session_id =
+                    session_id.ok_or_else(|| de::Error::missing_field("session_id"))?;
                 let suppress = suppress.ok_or_else(|| de::Error::missing_field("suppress"))?;
                 let user_id = user_id.ok_or_else(|| de::Error::missing_field("user_id"))?;
 
-                if let (Some(guild_id), Some( member)) = (guild_id, member.as_mut()) {
+                if let (Some(guild_id), Some(member)) = (guild_id, member.as_mut()) {
                     member.guild_id = guild_id;
                 }
 

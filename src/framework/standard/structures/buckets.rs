@@ -1,14 +1,14 @@
-use crate::client::Context;
-use crate::model::channel::Message;
-use futures::future::BoxFuture;
 use std::collections::HashMap;
 use std::time::{Duration, Instant};
 
-type Check =
-    for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, bool>;
+use futures::future::BoxFuture;
 
-type DelayHook =
-    for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
+use crate::client::Context;
+use crate::model::channel::Message;
+
+type Check = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, bool>;
+
+type DelayHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, ()>;
 
 pub(crate) struct Ratelimit {
     pub delay: Duration,
@@ -70,17 +70,18 @@ impl Bucket {
                 } else {
                     None
                 }
-            }
+            },
             Self::Channel(counter) => counter.take(ctx, msg, msg.channel_id.0).await,
             // This requires the cache, as messages do not contain their channel's
             // category.
             #[cfg(feature = "cache")]
-            Self::Category(counter) =>
+            Self::Category(counter) => {
                 if let Some(category_id) = msg.category_id(ctx).await {
                     counter.take(ctx, msg, category_id.0).await
                 } else {
                     None
-                },
+                }
+            },
         }
     }
 
@@ -93,17 +94,18 @@ impl Bucket {
                 if let Some(guild_id) = msg.guild_id {
                     counter.give(ctx, msg, guild_id.0).await
                 }
-            }
+            },
             Self::Channel(counter) => counter.give(ctx, msg, msg.channel_id.0).await,
             // This requires the cache, as messages do not contain their channel's
             // category.
             #[cfg(feature = "cache")]
-            Self::Category(counter) =>
+            Self::Category(counter) => {
                 if let Some(category_id) = msg.category_id(ctx).await {
                     counter.give(ctx, msg, category_id.0).await
                 }
-            }
+            },
         }
+    }
 }
 
 /// Keeps track of who owns how many tickets and when they accessed the last
@@ -177,28 +179,27 @@ impl TicketCounter {
     /// no ticket can be taken and the duration must elapse.
     pub async fn take(&mut self, ctx: &Context, msg: &Message, id: u64) -> Option<RateLimitInfo> {
         if let Some(ref check) = self.check {
-
             if !(check)(ctx, msg).await {
-                return None
+                return None;
             }
         }
 
         let now = Instant::now();
         let Self {
-            tickets_for, ratelimit, ..
+            tickets_for,
+            ratelimit,
+            ..
         } = self;
 
-        let ticket_owner = tickets_for.entry(id)
-            .or_insert_with(|| UnitRatelimit::new(now));
+        let ticket_owner = tickets_for.entry(id).or_insert_with(|| UnitRatelimit::new(now));
 
         // Check if too many tickets have been taken already.
         // If all tickets are exhausted, return the needed delay
         // for this invocation.
         if let Some((timespan, limit)) = ratelimit.limit {
-
             if (ticket_owner.tickets + 1) > limit {
-                if let Some(ratelimit) = (ticket_owner
-                    .set_time + timespan).checked_duration_since(now)
+                if let Some(ratelimit) =
+                    (ticket_owner.set_time + timespan).checked_duration_since(now)
                 {
                     let was_first_try = ticket_owner.is_first_try;
 
@@ -233,7 +234,7 @@ impl TicketCounter {
                         max_delays: self.await_ratelimits,
                         action,
                         is_first_try: was_first_try,
-                    })
+                    });
                 } else {
                     ticket_owner.tickets = 0;
                     ticket_owner.set_time = now;
@@ -245,9 +246,8 @@ impl TicketCounter {
         // the current invocation
         // If the time did not pass, return the needed delay for this
         // invocation.
-        if let Some(ratelimit) = ticket_owner
-            .last_time
-            .and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
+        if let Some(ratelimit) =
+            ticket_owner.last_time.and_then(|x| (x + ratelimit.delay).checked_duration_since(now))
         {
             let was_first_try = ticket_owner.is_first_try;
 
@@ -280,7 +280,7 @@ impl TicketCounter {
                 max_delays: self.await_ratelimits,
                 action,
                 is_first_try: was_first_try,
-            })
+            });
         } else {
             ticket_owner.awaiting = ticket_owner.awaiting.saturating_sub(1);
             ticket_owner.tickets += 1;
@@ -297,14 +297,12 @@ impl TicketCounter {
     /// atomic execution of calling `take` and `give`.
     pub async fn give(&mut self, ctx: &Context, msg: &Message, id: u64) {
         if let Some(ref check) = self.check {
-
             if !(check)(ctx, msg).await {
-                return
+                return;
             }
         }
 
         if let Some(ticket_owner) = self.tickets_for.get_mut(&id) {
-
             // Remove a ticket if one is available.
             if ticket_owner.tickets > 0 {
                 ticket_owner.tickets -= 1;
@@ -319,9 +317,7 @@ impl TicketCounter {
             // taken.
             // If the value is set to `None` this could possibly reset the
             // bucket.
-            ticket_owner.last_time = ticket_owner
-                .last_time
-                .and_then(|i| i.checked_sub(delay));
+            ticket_owner.last_time = ticket_owner.last_time.and_then(|i| i.checked_sub(delay));
         }
     }
 }

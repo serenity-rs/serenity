@@ -1,16 +1,15 @@
 use std::collections::HashMap;
+
 use serde_json::Value;
 
-use crate::{
-    model::{
-        interactions::{
-            InteractionApplicationCommandCallbackDataFlags,
-            InteractionResponseType
-        }
-    }, utils
-};
-
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::{
+    model::interactions::{
+        InteractionApplicationCommandCallbackDataFlags,
+        InteractionResponseType,
+    },
+    utils,
+};
 
 #[derive(Clone, Debug)]
 pub struct CreateInteractionResponse(pub HashMap<&'static str, Value>);
@@ -26,7 +25,9 @@ impl CreateInteractionResponse {
 
     /// Sets the `InteractionApplicationCommandCallbackData` for the message.
     pub fn interaction_response_data<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateInteractionResponseData) -> &mut CreateInteractionResponseData {
+    where
+        F: FnOnce(&mut CreateInteractionResponseData) -> &mut CreateInteractionResponseData,
+    {
         let mut data = CreateInteractionResponseData::default();
         f(&mut data);
         let map = utils::hashmap_to_json_map(data.0);
@@ -35,7 +36,6 @@ impl CreateInteractionResponse {
         self.0.insert("data", data);
         self
     }
-
 }
 
 impl<'a> Default for CreateInteractionResponse {
@@ -48,7 +48,7 @@ impl<'a> Default for CreateInteractionResponse {
 }
 
 #[derive(Clone, Debug, Default)]
-pub struct CreateInteractionResponseData(pub HashMap<&'static str, Value>, );
+pub struct CreateInteractionResponseData(pub HashMap<&'static str, Value>);
 
 impl CreateInteractionResponseData {
     /// Set whether the message is text-to-speech.
@@ -73,10 +73,12 @@ impl CreateInteractionResponseData {
         self.0.insert("content", Value::String(content));
         self
     }
-    
+
     /// Create an embed for the message.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
         self.set_embed(embed)
@@ -93,7 +95,9 @@ impl CreateInteractionResponseData {
 
     /// Set the allowed mentions for the message.
     pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions {
+    where
+        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
+    {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);

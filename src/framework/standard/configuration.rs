@@ -1,10 +1,16 @@
-use super::Delimiter;
-use crate::client::Context;
-use crate::model::{channel::Message, id::{UserId, GuildId, ChannelId}};
 use std::collections::HashSet;
+
 use futures::future::BoxFuture;
 
-type DynamicPrefixHook = for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
+use super::Delimiter;
+use crate::client::Context;
+use crate::model::{
+    channel::Message,
+    id::{ChannelId, GuildId, UserId},
+};
+
+type DynamicPrefixHook =
+    for<'fut> fn(&'fut Context, &'fut Message) -> BoxFuture<'fut, Option<String>>;
 
 /// A configuration struct for deciding whether the framework
 /// should allow optional whitespace between prefixes, group prefixes and command names.
@@ -177,7 +183,7 @@ impl Configuration {
         self
     }
 
-       /// HashSet of channels Ids where commands will be working.
+    /// HashSet of channels Ids where commands will be working.
     ///
     /// **Note**: Defaults to an empty HashSet.
     ///
@@ -338,7 +344,7 @@ impl Configuration {
     ///             }.to_string())
     ///         }))
     ///         // This disables the default prefix "~"
-    ///         .prefix("") 
+    ///         .prefix("")
     ///     );
     /// ```
     ///
@@ -459,11 +465,7 @@ impl Configuration {
     ///
     /// [`dynamic_prefix`]: Self::dynamic_prefix
     pub fn prefix(&mut self, prefix: &str) -> &mut Self {
-        self.prefixes = if prefix.is_empty() {
-            vec![]
-        } else {
-            vec![prefix.to_string()]
-        };
+        self.prefixes = if prefix.is_empty() { vec![] } else { vec![prefix.to_string()] };
 
         self
     }
@@ -495,7 +497,6 @@ impl Configuration {
         T: ToString,
         It: IntoIterator<Item = T>,
     {
-
         self.prefixes = prefixes.into_iter().map(|p| p.to_string()).collect();
 
         self
@@ -559,8 +560,7 @@ impl Configuration {
         It: IntoIterator<Item = T>,
     {
         self.delimiters.clear();
-        self.delimiters
-            .extend(delimiters.into_iter().map(|s| s.into()));
+        self.delimiters.extend(delimiters.into_iter().map(|s| s.into()));
 
         self
     }

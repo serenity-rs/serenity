@@ -1,7 +1,8 @@
-use serenity::model::channel::ReactionType;
-use serenity::model::id::EmojiId;
 use std::convert::TryFrom;
 use std::str::FromStr;
+
+use serenity::model::channel::ReactionType;
+use serenity::model::id::EmojiId;
 
 #[test]
 fn str_to_reaction_type() {

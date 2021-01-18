@@ -1,11 +1,8 @@
 //! Models about OAuth2 applications.
 
-use super::{
-    id::UserId,
-    user::User,
-    utils::*,
-};
 use std::fmt;
+
+use super::{id::UserId, user::User, utils::*};
 
 /// Information about a user's application. An application does not necessarily
 /// have an associated bot user.
@@ -95,7 +92,6 @@ pub struct BotApplication {
     pub token: String,
 }
 
-
 impl fmt::Debug for BotApplication {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         f.debug_struct("BotApplication")
@@ -129,7 +125,8 @@ pub struct CurrentApplicationInfo {
     pub id: UserId,
     pub name: String,
     pub owner: User,
-    #[serde(default)] pub rpc_origins: Vec<String>,
+    #[serde(default)]
+    pub rpc_origins: Vec<String>,
     pub bot_public: bool,
     pub bot_require_code_grant: bool,
     pub team: Option<Team>,
@@ -171,9 +168,7 @@ pub enum MembershipState {
     Accepted = 2,
 }
 
-enum_number!(
-    MembershipState {
-        Invited,
-        Accepted,
-    }
-);
+enum_number!(MembershipState {
+    Invited,
+    Accepted,
+});

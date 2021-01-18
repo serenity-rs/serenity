@@ -14,19 +14,19 @@
 //!
 //! [`serenity::Error`]: crate::Error
 
-pub use crate::error::Error as SerenityError;
-pub use crate::model::misc::Mentionable;
 pub use tokio::sync::{Mutex, RwLock};
-
-#[cfg(all(feature = "client", feature = "gateway"))]
-pub use crate::client::{Client, ClientError, EventHandler, RawEventHandler};
-#[cfg(feature = "client")]
-pub use crate::client::Context;
 #[cfg(feature = "client")]
 pub use typemap_rev::{TypeMap, TypeMapKey};
+
+#[cfg(feature = "client")]
+pub use crate::client::Context;
+#[cfg(all(feature = "client", feature = "gateway"))]
+pub use crate::client::{Client, ClientError, EventHandler, RawEventHandler};
+pub use crate::error::Error as SerenityError;
 #[cfg(feature = "gateway")]
 pub use crate::gateway::GatewayError;
 #[cfg(feature = "http")]
 pub use crate::http::HttpError;
+pub use crate::model::misc::Mentionable;
 #[cfg(feature = "model")]
 pub use crate::model::ModelError;

@@ -2,12 +2,9 @@
 
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult
-    }
+    fmt::{Display, Formatter, Result as FmtResult},
 };
+
 use super::Permissions;
 
 /// An error returned from the [`model`] module.
@@ -165,9 +162,7 @@ impl Display for Error {
             Error::InvalidPermissions(_) => f.write_str("Invalid permissions."),
             Error::InvalidUser => f.write_str("The current user cannot perform the action."),
             Error::ItemMissing => f.write_str("The required item is missing from the cache."),
-            Error::WrongGuild => {
-                f.write_str("Provided member or channel is from the wrong guild.")
-            }
+            Error::WrongGuild => f.write_str("Provided member or channel is from the wrong guild."),
             Error::MessageTooLong(_) => f.write_str("Message too large."),
             Error::MessagingBot => f.write_str("Attempted to message another bot user."),
             Error::NameTooShort => f.write_str("Name is under the character limit."),

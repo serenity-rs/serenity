@@ -1,5 +1,6 @@
-use crate::model::id::MessageId;
 use std::collections::HashMap;
+
+use crate::model::id::MessageId;
 
 /// Builds a request for a request to the API to retrieve messages.
 ///

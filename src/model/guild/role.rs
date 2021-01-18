@@ -1,23 +1,23 @@
-use crate::model::prelude::*;
 use std::cmp::Ordering;
+
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use async_trait::async_trait;
 
 #[cfg(feature = "model")]
 use crate::builder::EditRole;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
-
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::cache::FromStrAndCache;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::model::misc::RoleParseError;
-#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use crate::utils::parse_role;
 #[cfg(feature = "model")]
 use crate::http::Http;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
-use async_trait::async_trait;
+use crate::model::misc::RoleParseError;
+use crate::model::prelude::*;
+#[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
+use crate::utils::parse_role;
 
 /// Information about a role within a guild. A role represents a set of
 /// permissions, and can be attached to one or multiple users. A role has
@@ -103,10 +103,14 @@ impl Role {
     ///     r
     /// });
     /// ```
-    ///
+    /// 
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn edit(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut EditRole) -> &mut EditRole) -> Result<Role> {
+    pub async fn edit(
+        &self,
+        http: impl AsRef<Http>,
+        f: impl FnOnce(&mut EditRole) -> &mut EditRole,
+    ) -> Result<Role> {
         self.guild_id.edit_role(http, self.id, f).await
     }
 
@@ -152,11 +156,15 @@ impl Ord for Role {
 }
 
 impl PartialEq for Role {
-    fn eq(&self, other: &Role) -> bool { self.id == other.id }
+    fn eq(&self, other: &Role) -> bool {
+        self.id == other.id
+    }
 }
 
 impl PartialOrd for Role {
-    fn partial_cmp(&self, other: &Role) -> Option<Ordering> { Some(self.cmp(other)) }
+    fn partial_cmp(&self, other: &Role) -> Option<Ordering> {
+        Some(self.cmp(other))
+    }
 }
 
 #[cfg(feature = "model")]
@@ -180,12 +188,16 @@ impl RoleId {
 
 impl From<Role> for RoleId {
     /// Gets the Id of a role.
-    fn from(role: Role) -> RoleId { role.id }
+    fn from(role: Role) -> RoleId {
+        role.id
+    }
 }
 
 impl<'a> From<&'a Role> for RoleId {
     /// Gets the Id of a role.
-    fn from(role: &Role) -> RoleId { role.id }
+    fn from(role: &Role) -> RoleId {
+        role.id
+    }
 }
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
@@ -194,7 +206,8 @@ impl FromStrAndCache for Role {
     type Err = RoleParseError;
 
     async fn from_str<CRL>(cache: CRL, s: &str) -> StdResult<Self, Self::Err>
-    where CRL: AsRef<Cache> + Send + Sync
+    where
+        CRL: AsRef<Cache> + Send + Sync,
     {
         match parse_role(s) {
             Some(x) => match RoleId(x).to_role_cached(&cache).await {

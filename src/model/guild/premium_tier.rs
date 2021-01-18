@@ -9,14 +9,12 @@ pub enum PremiumTier {
     Tier3,
 }
 
-enum_number!(
-    PremiumTier {
-        Tier0,
-        Tier1,
-        Tier2,
-        Tier3,
-    }
-);
+enum_number!(PremiumTier {
+    Tier0,
+    Tier1,
+    Tier2,
+    Tier3,
+});
 
 impl PremiumTier {
     pub fn num(self) -> u64 {

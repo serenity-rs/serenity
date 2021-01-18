@@ -1,11 +1,12 @@
 use async_trait::async_trait;
 use futures::channel::mpsc::UnboundedSender as Sender;
+
 use crate::{
-	gateway::InterMessage,
-	model::{
-	    id::{GuildId, UserId},
-	    voice::VoiceState,
-	},
+    gateway::InterMessage,
+    model::{
+        id::{GuildId, UserId},
+        voice::VoiceState,
+    },
 };
 
 /// Interface for any compatible voice plugin.
@@ -14,9 +15,9 @@ use crate::{
 /// packet handlers for voice-specific gateway messages.
 #[async_trait]
 pub trait VoiceGatewayManager: Send + Sync {
-	/// Performs initial setup at the start of a connection to Discord.
-	///
-	/// This will only occur once, and provides the bot's ID and shard count.
+    /// Performs initial setup at the start of a connection to Discord.
+    ///
+    /// This will only occur once, and provides the bot's ID and shard count.
     async fn initialise(&self, shard_count: u64, user_id: UserId);
 
     /// Handler fired in response to a `Ready` event.

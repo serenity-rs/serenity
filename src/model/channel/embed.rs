@@ -2,10 +2,10 @@
 use crate::builder::CreateEmbed;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
-#[cfg(feature = "utils")]
-use crate::utils::Colour;
 #[cfg(feature = "model")]
 use crate::utils;
+#[cfg(feature = "utils")]
+use crate::utils::Colour;
 
 /// Represents a rich embed which allows using richer markdown, multiple fields
 /// and more. This was heavily inspired by [slack's attachments].
@@ -93,7 +93,9 @@ impl Embed {
     /// ```
     #[inline]
     pub fn fake<F>(f: F) -> Value
-        where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
         let mut create_embed = CreateEmbed::default();
         f(&mut create_embed);
         let map = utils::hashmap_to_json_map(create_embed.0);
@@ -143,7 +145,10 @@ impl EmbedField {
     /// [`name`]: Self::name
     /// [`value`]: Self::value
     pub fn new<T, U>(name: T, value: U, inline: bool) -> Self
-        where T: Into<String>, U: Into<String> {
+    where
+        T: Into<String>,
+        U: Into<String>,
+    {
         Self::_new(name.into(), value.into(), inline)
     }
 

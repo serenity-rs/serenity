@@ -1,27 +1,25 @@
-use crate::gateway::{InterMessage, Shard};
-use crate::internal::prelude::*;
-use crate::CacheAndHttp;
-use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::{HashMap, VecDeque},
     sync::Arc,
 };
+
 use futures::{
+    channel::mpsc::{UnboundedReceiver as Receiver, UnboundedSender as Sender},
     StreamExt,
-    channel::mpsc::{UnboundedSender as Sender, UnboundedReceiver as Receiver},
 };
+use tokio::sync::{Mutex, RwLock};
 #[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::delay_for as sleep;
-
 #[cfg(feature = "tokio")]
 use tokio::time::sleep;
-
 use tokio::time::{timeout, Duration, Instant};
-use crate::client::{EventHandler, RawEventHandler};
+use tracing::{debug, info, instrument, warn};
+use typemap_rev::TypeMap;
+
 use super::{
     GatewayIntents,
-    ShardId,
     ShardClientMessage,
+    ShardId,
     ShardManagerMessage,
     ShardMessenger,
     ShardQueuerMessage,
@@ -29,14 +27,15 @@ use super::{
     ShardRunnerInfo,
     ShardRunnerOptions,
 };
-use crate::gateway::ConnectionStage;
-use tracing::{debug, info, warn, instrument};
-
-use typemap_rev::TypeMap;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
+use crate::client::{EventHandler, RawEventHandler};
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
+use crate::gateway::ConnectionStage;
+use crate::gateway::{InterMessage, Shard};
+use crate::internal::prelude::*;
+use crate::CacheAndHttp;
 
 const WAIT_BETWEEN_BOOTS_IN_SECONDS: u64 = 5;
 
@@ -124,7 +123,7 @@ impl ShardQueuer {
                     debug!("[Shard Queuer] Received to shutdown.");
                     self.shutdown_runners().await;
 
-                    break
+                    break;
                 },
                 Ok(Some(ShardQueuerMessage::ShutdownShard(shard, code))) => {
                     debug!("[Shard Queuer] Received to shutdown shard {} with {}.", shard.0, code);
@@ -189,7 +188,8 @@ impl ShardQueuer {
             &self.cache_and_http.http.token,
             shard_info,
             self.intents,
-        ).await?;
+        )
+        .await?;
 
         let mut runner = ShardRunner::new(ShardRunnerOptions {
             data: Arc::clone(&self.data),

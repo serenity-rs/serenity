@@ -36,13 +36,11 @@ pub enum StickerFormatType {
     Lottie = 3,
 }
 
-enum_number!(
-    StickerFormatType {
-        Png,
-        Apng,
-        Lottie,
-    }
-);
+enum_number!(StickerFormatType {
+    Png,
+    Apng,
+    Lottie,
+});
 
 impl StickerFormatType {
     pub fn num(self) -> u64 {

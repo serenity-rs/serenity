@@ -51,35 +51,43 @@
 //! with the [`plain`] function.
 
 #[cfg(all(feature = "cache", feature = "http"))]
-use super::{
-    Args, CommandGroup, CommandOptions, Check,
-    has_correct_roles, HelpBehaviour,
-    HelpOptions, has_correct_permissions, OnlyIn,
-    structures::Command as InternalCommand,
-};
-#[cfg(all(feature = "cache", feature = "http"))]
-use crate::{
-    http::CacheHttp,
-    cache::Cache,
-    client::Context,
-    framework::standard::CommonOptions,
-    model::channel::Message,
-    Error,
-    http::Http,
-    model::id::{ChannelId, UserId},
-    utils::Colour,
-};
-#[cfg(all(feature = "cache", feature = "http"))]
 use std::{
     borrow::Borrow,
     collections::HashSet,
     fmt::Write,
     ops::{Index, IndexMut},
 };
-#[cfg(all(feature = "cache", feature = "http"))]
-use tracing::warn;
+
 #[cfg(all(feature = "cache", feature = "http"))]
 use futures::future::{BoxFuture, FutureExt};
+#[cfg(all(feature = "cache", feature = "http"))]
+use tracing::warn;
+
+#[cfg(all(feature = "cache", feature = "http"))]
+use super::{
+    has_correct_permissions,
+    has_correct_roles,
+    structures::Command as InternalCommand,
+    Args,
+    Check,
+    CommandGroup,
+    CommandOptions,
+    HelpBehaviour,
+    HelpOptions,
+    OnlyIn,
+};
+#[cfg(all(feature = "cache", feature = "http"))]
+use crate::{
+    cache::Cache,
+    client::Context,
+    framework::standard::CommonOptions,
+    http::CacheHttp,
+    http::Http,
+    model::channel::Message,
+    model::id::{ChannelId, UserId},
+    utils::Colour,
+    Error,
+};
 
 /// Macro to format a command according to a `HelpBehaviour` or
 /// continue to the next command-name upon hiding.
@@ -100,7 +108,7 @@ macro_rules! format_command_name {
 macro_rules! warn_about_failed_send {
     ($customised_help:expr, $error:expr) => {
         warn!("Failed to send {:?} because: {:?}", $customised_help, $error);
-    }
+    };
 }
 
 /// A single group containing its name and all related commands that are eligible
@@ -160,10 +168,7 @@ impl Suggestions {
             None => return String::new(),
         };
 
-        let size = self
-            .as_vec()
-            .iter()
-            .fold(0, |total_size, size| total_size + size.name.len());
+        let size = self.as_vec().iter().fold(0, |total_size, size| total_size + size.name.len());
         let byte_len_of_sep = self.as_vec().len().saturating_sub(1) * separator.len();
         let mut result = String::with_capacity(size + byte_len_of_sep);
         result.push_str(first_iter_element.name.borrow());
@@ -184,15 +189,9 @@ impl Suggestions {
 #[non_exhaustive]
 pub enum CustomisedHelpData<'a> {
     /// To display suggested commands.
-    SuggestedCommands {
-        help_description: String,
-        suggestions: Suggestions,
-    },
+    SuggestedCommands { help_description: String, suggestions: Suggestions },
     /// To display groups and their commands by name.
-    GroupedCommands {
-        help_description: String,
-        groups: Vec<GroupCommandsPair>,
-    },
+    GroupedCommands { help_description: String, groups: Vec<GroupCommandsPair> },
     /// To display one specific command.
     SingleCommand { command: Command<'a> },
     /// To display failure in finding a fitting command.
@@ -304,8 +303,8 @@ pub async fn has_all_requirements(
 #[inline]
 #[cfg(all(feature = "cache", feature = "http"))]
 fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
-    search_on.starts_with(word) && search_on.get(word.len()..=word.len())
-        .map_or(false, |slice| slice == " ")
+    search_on.starts_with(word)
+        && search_on.get(word.len()..=word.len()).map_or(false, |slice| slice == " ")
 }
 
 #[inline]
@@ -316,32 +315,26 @@ fn find_any_command_matches(
     name_to_find: &mut String,
     found_prefix: &mut bool,
 ) -> Option<&'static str> {
-
     command
         .options
         .names
         .iter()
         .find(|command_name| {
-            group
-                .options
-                .prefixes
-                .iter()
-                .any(|prefix| {
-                    if *found_prefix || starts_with_whole_word(&name_to_find, &prefix) {
-
-                        if !*found_prefix {
-                            *found_prefix = true;
-                            name_to_find.drain(..=prefix.len());
-                        }
-
-                        &name_to_find == command_name
-                    } else {
-                        false
+            group.options.prefixes.iter().any(|prefix| {
+                if *found_prefix || starts_with_whole_word(&name_to_find, &prefix) {
+                    if !*found_prefix {
+                        *found_prefix = true;
+                        name_to_find.drain(..=prefix.len());
                     }
-                })
-        }).cloned()
-}
 
+                    &name_to_find == command_name
+                } else {
+                    false
+                }
+            })
+        })
+        .cloned()
+}
 
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn check_common_behaviour(
@@ -355,8 +348,9 @@ async fn check_common_behaviour(
         return HelpBehaviour::Hide;
     }
 
-    if options.only_in() == OnlyIn::Dm && !msg.is_private() ||
-       options.only_in() == OnlyIn::Guild && msg.is_private() {
+    if options.only_in() == OnlyIn::Dm && !msg.is_private()
+        || options.only_in() == OnlyIn::Guild && msg.is_private()
+    {
         return help_options.wrong_channel;
     }
 
@@ -394,7 +388,8 @@ async fn check_command_behaviour(
 ) -> HelpBehaviour {
     let b = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
 
-    if b == HelpBehaviour::Nothing && (!options.owner_privilege || !owners.contains(&msg.author.id)) {
+    if b == HelpBehaviour::Nothing && (!options.owner_privilege || !owners.contains(&msg.author.id))
+    {
         for check in group_checks.iter().chain(options.checks) {
             if !check.check_in_help {
                 continue;
@@ -426,19 +421,14 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
         let group = *group;
         let mut found: Option<&'static InternalCommand> = None;
 
-        let group_behaviour = check_common_behaviour(
-                &ctx,
-                msg,
-                &group.options,
-                &owners,
-                &help_options,
-        ).await;
+        let group_behaviour =
+            check_common_behaviour(&ctx, msg, &group.options, &owners, &help_options).await;
 
         match &group_behaviour {
             HelpBehaviour::Nothing => (),
             _ => {
                 continue;
-            }
+            },
         }
 
         let mut found_group_prefix: bool = false;
@@ -450,12 +440,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     name.drain(..=group.name.len());
                 }
 
-                let command_found = command
-                    .options
-                    .names
-                    .iter()
-                    .find(|n| **n == name)
-                    .cloned();
+                let command_found = command.options.names.iter().find(|n| **n == name).cloned();
 
                 if command_found.is_some() {
                     command_found
@@ -487,14 +472,17 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     if let Some(ref sub_command) = sub_command_found {
                         // Check parent command's behaviour and permission first
                         // before we consider the sub-command overwrite it.
-                        if HelpBehaviour::Nothing == check_command_behaviour(
-                            ctx,
-                            msg,
-                            &command.options,
-                            group.options.checks,
-                            &owners,
-                            &help_options,
-                        ).await {
+                        if HelpBehaviour::Nothing
+                            == check_command_behaviour(
+                                ctx,
+                                msg,
+                                &command.options,
+                                group.options.checks,
+                                &owners,
+                                &help_options,
+                            )
+                            .await
+                        {
                             command = sub_command;
                             Some(sub_command.options.names[0])
                         } else {
@@ -505,29 +493,26 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     }
                 }
             } else {
-                find_any_command_matches(
-                    &command,
-                    &group,
-                    name,
-                    &mut found_group_prefix
-                )
+                find_any_command_matches(&command, &group, name, &mut found_group_prefix)
             };
 
             if search_command_name_matched.is_some() {
-                if HelpBehaviour::Nothing == check_command_behaviour(
-                    ctx,
-                    msg,
-                    &command.options,
-                    group.options.checks,
-                    &owners,
-                    &help_options,
-                ).await {
+                if HelpBehaviour::Nothing
+                    == check_command_behaviour(
+                        ctx,
+                        msg,
+                        &command.options,
+                        group.options.checks,
+                        &owners,
+                        &help_options,
+                    )
+                    .await
+                {
                     found = Some(command);
                 } else {
                     break;
                 }
             } else if help_options.max_levenshtein_distance > 0 {
-
                 let command_name = if let Some(first_prefix) = group.options.prefixes.get(0) {
                     format!("{} {}", &first_prefix, &command.options.names[0])
                 } else {
@@ -537,14 +522,16 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                 let levenshtein_distance = levenshtein_distance(&command_name, &name);
 
                 if levenshtein_distance <= help_options.max_levenshtein_distance
-                    && HelpBehaviour::Nothing == check_command_behaviour(
-                        ctx,
-                        msg,
-                        &command.options,
-                        group.options.checks,
-                        &owners,
-                        &help_options,
-                    ).await
+                    && HelpBehaviour::Nothing
+                        == check_command_behaviour(
+                            ctx,
+                            msg,
+                            &command.options,
+                            group.options.checks,
+                            &owners,
+                            &help_options,
+                        )
+                        .await
                 {
                     similar_commands.push(SuggestedCommandName {
                         name: command_name,
@@ -574,19 +561,20 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
             similar_commands
                 .sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
 
-            let check_names: Vec<String> = command
-                .options
-                .checks
-                .iter()
-                .chain(group.options.checks.iter())
-                .filter_map(|check| {
-                    if check.display_in_help {
-                        Some(check.name.to_string())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
+            let check_names: Vec<String> =
+                command
+                    .options
+                    .checks
+                    .iter()
+                    .chain(group.options.checks.iter())
+                    .filter_map(|check| {
+                        if check.display_in_help {
+                            Some(check.name.to_string())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
 
             let sub_command_names: Vec<String> = options
                 .sub_commands
@@ -597,7 +585,8 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     } else {
                         None
                     }
-                }).collect();
+                })
+                .collect();
 
             return Ok(CustomisedHelpData::SingleCommand {
                 command: Command {
@@ -623,11 +612,12 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
             help_options,
             similar_commands,
             owners,
-        ).await {
+        )
+        .await
+        {
             Ok(found) => return Ok(found),
             Err(()) => (),
         }
-
     }
 
     Err(())
@@ -643,15 +633,8 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
     similar_commands: &'rec mut Vec<SuggestedCommandName>,
     owners: &'rec HashSet<UserId>,
 ) -> BoxFuture<'rec, Result<CustomisedHelpData<'a>, ()>> {
-    _nested_group_command_search(
-        ctx,
-        msg,
-        groups,
-        name,
-        help_options,
-        similar_commands,
-        owners
-    ).boxed()
+    _nested_group_command_search(ctx, msg, groups, name, help_options, similar_commands, owners)
+        .boxed()
 }
 
 /// Tries to extract a single command matching searched command name otherwise
@@ -676,7 +659,9 @@ async fn fetch_single_command<'a>(
         &help_options,
         &mut similar_commands,
         &owners,
-    ).await {
+    )
+    .await
+    {
         Ok(found) => Ok(found),
         Err(()) => Err(similar_commands),
     }
@@ -703,13 +688,7 @@ async fn fill_eligible_commands<'a>(
         } else {
             std::cmp::max(
                 *highest_formatter,
-                check_common_behaviour(
-                    &ctx,
-                    msg,
-                    &group.options,
-                    owners,
-                    help_options,
-                ).await
+                check_common_behaviour(&ctx, msg, &group.options, owners, help_options).await,
             )
         }
     };
@@ -728,7 +707,7 @@ async fn fill_eligible_commands<'a>(
                 to_fill.command_names.push(name);
 
                 continue;
-            }
+            },
         }
 
         let command_behaviour = check_command_behaviour(
@@ -738,7 +717,8 @@ async fn fill_eligible_commands<'a>(
             group.options.checks,
             owners,
             help_options,
-        ).await;
+        )
+        .await;
 
         let name = format_command_name!(command_behaviour, &name);
         to_fill.command_names.push(name);
@@ -771,12 +751,15 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
             &group,
             &mut group_with_cmds,
             &mut highest_formatter,
-        ).await;
+        )
+        .await;
 
         for sub_group in group.options.sub_groups {
             if HelpBehaviour::Hide == highest_formatter {
                 break;
-            } else if sub_group.options.commands.is_empty() && sub_group.options.sub_groups.is_empty() {
+            } else if sub_group.options.commands.is_empty()
+                && sub_group.options.sub_groups.is_empty()
+            {
                 continue;
             }
 
@@ -788,15 +771,16 @@ fn fetch_all_eligible_commands_in_group<'rec, 'a: 'rec>(
                 &help_options,
                 &sub_group,
                 highest_formatter,
-            ).await;
+            )
+            .await;
 
             group_with_cmds.sub_groups.push(grouped_cmd);
         }
 
         group_with_cmds
-    }.boxed()
+    }
+    .boxed()
 }
-
 
 /// Fetch groups with their commands.
 #[cfg(feature = "cache")]
@@ -839,7 +823,8 @@ async fn create_single_group(
         &help_options,
         &group,
         HelpBehaviour::Nothing,
-    ).await;
+    )
+    .await;
 
     group_with_cmds.name = group.name;
     group_with_cmds.summary = group.options.summary;
@@ -878,28 +863,20 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
     async move {
         let is_prefixless_group = {
             group.options.prefixes.is_empty()
-                && trim_prefixless_group(
-                    &group.name.to_lowercase(),
-                    searched_named_lowercase,
-                )
+                && trim_prefixless_group(&group.name.to_lowercase(), searched_named_lowercase)
         };
         let mut progressed = is_prefixless_group;
-        let is_word_prefix = group
-            .options
-            .prefixes
-            .iter()
-            .any(|prefix| {
-                if starts_with_whole_word(&searched_named_lowercase, &prefix) {
-                    searched_named_lowercase.drain(..=prefix.len());
-                    progressed = true;
-                }
+        let is_word_prefix = group.options.prefixes.iter().any(|prefix| {
+            if starts_with_whole_word(&searched_named_lowercase, &prefix) {
+                searched_named_lowercase.drain(..=prefix.len());
+                progressed = true;
+            }
 
-                prefix == searched_named_lowercase
-            });
+            prefix == searched_named_lowercase
+        });
 
         if is_prefixless_group || is_word_prefix {
-            let single_group =
-                create_single_group(ctx, msg, &group, owners, &help_options).await;
+            let single_group = create_single_group(ctx, msg, &group, owners, &help_options).await;
 
             if !single_group.command_names.is_empty() {
                 return Some(CustomisedHelpData::GroupedCommands {
@@ -921,14 +898,17 @@ pub fn searched_lowercase<'rec, 'a: 'rec>(
                     owners,
                     help_options,
                     searched_named_lowercase,
-                ).await {
+                )
+                .await
+                {
                     return Some(found_set);
                 }
             }
         }
 
         None
-    }.boxed()
+    }
+    .boxed()
 }
 
 /// Iterates over all commands and forges them into a `CustomisedHelpData`,
@@ -960,7 +940,9 @@ pub async fn create_customised_help_data<'a>(
                         owners,
                         help_options,
                         &mut searched_named_lowercase,
-                    ).await {
+                    )
+                    .await
+                    {
                         return found_command;
                     }
                 }
@@ -975,7 +957,7 @@ pub async fn create_customised_help_data<'a>(
                         suggestions: Suggestions(suggestions),
                     }
                 }
-            }
+            },
         };
     }
 
@@ -986,21 +968,14 @@ pub async fn create_customised_help_data<'a>(
     };
 
     let description = if let Some(ref strikethrough_command_text) = strikethrough_command_tip {
-        format!(
-            "{}\n{}",
-            &help_options.individual_command_tip, &strikethrough_command_text
-        )
+        format!("{}\n{}", &help_options.individual_command_tip, &strikethrough_command_text)
     } else {
         help_options.individual_command_tip.to_string()
     };
 
-    let listed_groups = create_command_group_commands_pair_from_groups(
-        ctx,
-        msg,
-        &groups,
-        owners,
-        &help_options,
-    ).await;
+    let listed_groups =
+        create_command_group_commands_pair_from_groups(ctx, msg, &groups, owners, &help_options)
+            .await;
 
     if listed_groups.is_empty() {
         CustomisedHelpData::NoCommandFound {
@@ -1027,11 +1002,7 @@ fn flatten_group_to_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        let _ = writeln!(group_text,
-            "{}__**{}**__",
-            repeated_indent_str,
-            group.name,
-        );
+        let _ = writeln!(group_text, "{}__**{}**__", repeated_indent_str, group.name,);
     }
 
     let mut summary_or_prefixes = false;
@@ -1042,7 +1013,8 @@ fn flatten_group_to_string(
     }
 
     if !group.prefixes.is_empty() {
-        let _ = writeln!(group_text,
+        let _ = writeln!(
+            group_text,
             "{}{}: `{}`",
             &repeated_indent_str,
             help_options.group_prefix,
@@ -1055,10 +1027,7 @@ fn flatten_group_to_string(
         let _ = writeln!(group_text);
     }
 
-    let mut joined_commands = group
-        .command_names
-        .join(&format!("\n{}", &repeated_indent_str));
-
+    let mut joined_commands = group.command_names.join(&format!("\n{}", &repeated_indent_str));
 
     if !group.command_names.is_empty() {
         joined_commands.insert_str(0, &repeated_indent_str);
@@ -1067,16 +1036,10 @@ fn flatten_group_to_string(
     let _ = writeln!(group_text, "{}", joined_commands);
 
     for sub_group in &group.sub_groups {
-
         if !(sub_group.command_names.is_empty() && sub_group.sub_groups.is_empty()) {
             let mut sub_group_text = String::default();
 
-            flatten_group_to_string(
-                &mut sub_group_text,
-                &sub_group,
-                nest_level + 1,
-                &help_options,
-            );
+            flatten_group_to_string(&mut sub_group_text, &sub_group, nest_level + 1, &help_options);
 
             let _ = write!(group_text, "{}", sub_group_text);
         }
@@ -1096,17 +1059,14 @@ fn flatten_group_to_plain_string(
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        let _ = write!(group_text,
-            "\n{}**{}**",
-            repeated_indent_str,
-            group.name,
-        );
+        let _ = write!(group_text, "\n{}**{}**", repeated_indent_str, group.name,);
     }
 
     if group.prefixes.is_empty() {
         let _ = write!(group_text, ": ");
     } else {
-        let _ = write!(group_text,
+        let _ = write!(
+            group_text,
             " ({}: `{}`): ",
             help_options.group_prefix,
             group.prefixes.join("`, `"),
@@ -1131,7 +1091,6 @@ fn flatten_group_to_plain_string(
     }
 }
 
-
 /// Sends an embed listing all groups with their commands.
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn send_grouped_commands_embed(
@@ -1142,28 +1101,25 @@ async fn send_grouped_commands_embed(
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(&http, |m| {
-        m.embed(|embed| {
-            embed.colour(colour);
-            embed.description(help_description);
+    channel_id
+        .send_message(&http, |m| {
+            m.embed(|embed| {
+                embed.colour(colour);
+                embed.description(help_description);
 
-            for group in groups {
-                let mut embed_text = String::default();
+                for group in groups {
+                    let mut embed_text = String::default();
 
-                flatten_group_to_string(
-                    &mut embed_text,
-                    &group,
-                    0,
-                    &help_options,
-                );
+                    flatten_group_to_string(&mut embed_text, &group, 0, &help_options);
 
-                embed.field(group.name, &embed_text, true);
-            }
+                    embed.field(group.name, &embed_text, true);
+                }
 
-            embed
-        });
-        m
-    }).await
+                embed
+            });
+            m
+        })
+        .await
 }
 
 /// Sends embed showcasing information about a single command.
@@ -1175,79 +1131,74 @@ async fn send_single_command_embed(
     command: &Command<'_>,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(&http, |m| {
-        m.embed(|embed| {
-            embed.title(&command.name);
-            embed.colour(colour);
+    channel_id
+        .send_message(&http, |m| {
+            m.embed(|embed| {
+                embed.title(&command.name);
+                embed.colour(colour);
 
-            if let Some(ref desc) = command.description {
-                embed.description(desc);
-            }
+                if let Some(ref desc) = command.description {
+                    embed.description(desc);
+                }
 
-            if let Some(ref usage) = command.usage {
-                let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0) {
-                    format!("`{} {} {}`", first_prefix, command.name, usage)
-                } else {
-                    format!("`{} {}`", command.name, usage)
-                };
+                if let Some(ref usage) = command.usage {
+                    let full_usage_text = if let Some(first_prefix) = command.group_prefixes.get(0)
+                    {
+                        format!("`{} {} {}`", first_prefix, command.name, usage)
+                    } else {
+                        format!("`{} {}`", command.name, usage)
+                    };
 
-                embed.field(&help_options.usage_label, full_usage_text, true);
-            }
+                    embed.field(&help_options.usage_label, full_usage_text, true);
+                }
 
-            if !command.usage_sample.is_empty() {
-                let full_example_text =
-                    if let Some(first_prefix) = command.group_prefixes.get(0) {
-                        let format_example = |example| {
-                            format!("`{} {} {}`\n", first_prefix, command.name, example)
-                        };
-                        command
-                           .usage_sample
-                           .iter()
-                           .map(format_example)
-                           .collect::<String>()
+                if !command.usage_sample.is_empty() {
+                    let full_example_text = if let Some(first_prefix) =
+                        command.group_prefixes.get(0)
+                    {
+                        let format_example =
+                            |example| format!("`{} {} {}`\n", first_prefix, command.name, example);
+                        command.usage_sample.iter().map(format_example).collect::<String>()
                     } else {
                         let format_example = |example| format!("`{} {}`\n", command.name, example);
-                        command
-                           .usage_sample
-                           .iter()
-                           .map(format_example)
-                           .collect::<String>()
+                        command.usage_sample.iter().map(format_example).collect::<String>()
                     };
-                embed.field(&help_options.usage_sample_label, full_example_text, true);
-            }
+                    embed.field(&help_options.usage_sample_label, full_example_text, true);
+                }
 
-            embed.field(&help_options.grouped_label, command.group_name, true);
+                embed.field(&help_options.grouped_label, command.group_name, true);
 
-            if !command.aliases.is_empty() {
-                embed.field(
-                    &help_options.aliases_label,
-                    format!("`{}`", command.aliases.join("`, `")),
-                    true,
-                );
-            }
+                if !command.aliases.is_empty() {
+                    embed.field(
+                        &help_options.aliases_label,
+                        format!("`{}`", command.aliases.join("`, `")),
+                        true,
+                    );
+                }
 
-            embed.field(&help_options.available_text, &command.availability, true);
+                embed.field(&help_options.available_text, &command.availability, true);
 
-            if !command.checks.is_empty() {
-                embed.field(
-                    &help_options.checks_label,
-                    format!("`{}`", command.checks.join("`, `")),
-                    true,
-                );
-            }
+                if !command.checks.is_empty() {
+                    embed.field(
+                        &help_options.checks_label,
+                        format!("`{}`", command.checks.join("`, `")),
+                        true,
+                    );
+                }
 
-            if !command.sub_commands.is_empty() {
-                embed.field(
-                    &help_options.sub_commands_label,
-                    format!("`{}`", command.sub_commands.join("`, `")),
-                    true,
-                );
-            }
+                if !command.sub_commands.is_empty() {
+                    embed.field(
+                        &help_options.sub_commands_label,
+                        format!("`{}`", command.sub_commands.join("`, `")),
+                        true,
+                    );
+                }
 
-            embed
-        });
-        m
-    }).await
+                embed
+            });
+            m
+        })
+        .await
 }
 
 /// Sends embed listing commands that are similar to the sent one.
@@ -1261,14 +1212,16 @@ async fn send_suggestion_embed(
 ) -> Result<Message, Error> {
     let text = help_description.replace("{}", &suggestions.join("`, `"));
 
-    channel_id.send_message(&http, |m| {
-        m.embed(|e| {
-            e.colour(colour);
-            e.description(text);
-            e
-        });
-        m
-    }).await
+    channel_id
+        .send_message(&http, |m| {
+            m.embed(|e| {
+                e.colour(colour);
+                e.description(text);
+                e
+            });
+            m
+        })
+        .await
 }
 
 /// Sends an embed explaining fetching commands failed.
@@ -1279,14 +1232,16 @@ async fn send_error_embed(
     input: &str,
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id.send_message(&http, |m| {
-        m.embed(|e| {
-            e.colour(colour);
-            e.description(input);
-            e
-        });
-        m
-    }).await
+    channel_id
+        .send_message(&http, |m| {
+            m.embed(|e| {
+                e.colour(colour);
+                e.description(input);
+                e
+            });
+            m
+        })
+        .await
 }
 
 /// Posts an embed showing each individual command group and its commands.
@@ -1336,39 +1291,53 @@ pub async fn with_embeds(
         CustomisedHelpData::SuggestedCommands {
             ref help_description,
             ref suggestions,
-        } => send_suggestion_embed(
-            &ctx.http,
-            msg.channel_id,
-            &help_description,
-            &suggestions,
-            help_options.embed_error_colour,
-        ).await,
+        } => {
+            send_suggestion_embed(
+                &ctx.http,
+                msg.channel_id,
+                &help_description,
+                &suggestions,
+                help_options.embed_error_colour,
+            )
+            .await
+        },
         CustomisedHelpData::NoCommandFound {
             ref help_error_message,
-        } => send_error_embed(
-            &ctx.http,
-            msg.channel_id,
-            help_error_message,
-            help_options.embed_error_colour,
-        ).await,
+        } => {
+            send_error_embed(
+                &ctx.http,
+                msg.channel_id,
+                help_error_message,
+                help_options.embed_error_colour,
+            )
+            .await
+        },
         CustomisedHelpData::GroupedCommands {
             ref help_description,
             ref groups,
-        } => send_grouped_commands_embed(
-            &ctx.http,
-            &help_options,
-            msg.channel_id,
-            &help_description,
-            &groups,
-            help_options.embed_success_colour,
-        ).await,
-        CustomisedHelpData::SingleCommand { ref command } => send_single_command_embed(
-            &ctx.http,
-            &help_options,
-            msg.channel_id,
-            &command,
-            help_options.embed_success_colour,
-        ).await,
+        } => {
+            send_grouped_commands_embed(
+                &ctx.http,
+                &help_options,
+                msg.channel_id,
+                &help_description,
+                &groups,
+                help_options.embed_success_colour,
+            )
+            .await
+        },
+        CustomisedHelpData::SingleCommand {
+            ref command,
+        } => {
+            send_single_command_embed(
+                &ctx.http,
+                &help_options,
+                msg.channel_id,
+                &command,
+                help_options.embed_success_colour,
+            )
+            .await
+        },
     };
 
     match response_result {
@@ -1393,12 +1362,7 @@ fn grouped_commands_to_plain_string(
     for group in groups {
         let _ = write!(result, "\n**{}**", &group.name);
 
-        flatten_group_to_plain_string(
-            &mut result,
-            &group,
-            0,
-            &help_options,
-        );
+        flatten_group_to_plain_string(&mut result, &group, 0, &help_options);
     }
 
     result
@@ -1420,11 +1384,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
     }
 
     if let Some(ref description) = command.description {
-        let _ = writeln!(
-            result,
-            "**{}**: {}",
-            help_options.description_label, description
-        );
+        let _ = writeln!(result, "**{}**: {}", help_options.description_label, description);
     };
 
     if let Some(ref usage) = command.usage {
@@ -1435,11 +1395,8 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                 help_options.usage_label, first_prefix, command.name, usage
             );
         } else {
-            let _ = writeln!(
-                result,
-                "**{}**: `{} {}`",
-                help_options.usage_label, command.name, usage
-            );
+            let _ =
+                writeln!(result, "**{}**: `{} {}`", help_options.usage_label, command.name, usage);
         }
     }
 
@@ -1452,10 +1409,7 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                     help_options.usage_sample_label, first_prefix, command.name, example
                 );
             };
-            command
-                .usage_sample
-                .iter()
-                .for_each(format_example);
+            command.usage_sample.iter().for_each(format_example);
         } else {
             let format_example = |example| {
                 let _ = writeln!(
@@ -1464,32 +1418,22 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
                     help_options.usage_sample_label, command.name, example
                 );
             };
-            command
-                .usage_sample
-                .iter()
-                .for_each(format_example);
+            command.usage_sample.iter().for_each(format_example);
         }
     }
 
-    let _ = writeln!(
-        result,
-        "**{}**: {}",
-        help_options.grouped_label, command.group_name
-    );
+    let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
 
-    let _ = writeln!(
-        result,
-        "**{}**: {}",
-        help_options.available_text, command.availability
-    );
+    let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
 
     if !command.sub_commands.is_empty() {
         let _ = writeln!(
             result,
             "**{}**: {}",
-            help_options.sub_commands_label, format!("`{}`", command.sub_commands.join("`, `"))
+            help_options.sub_commands_label,
+            format!("`{}`", command.sub_commands.join("`, `"))
         );
-     }
+    }
 
     result
 }
@@ -1549,9 +1493,9 @@ pub async fn plain(
             ref help_description,
             ref groups,
         } => grouped_commands_to_plain_string(&help_options, &help_description, &groups),
-        CustomisedHelpData::SingleCommand { ref command } => {
-            single_command_to_plain_string(&help_options, &command)
-        },
+        CustomisedHelpData::SingleCommand {
+            ref command,
+        } => single_command_to_plain_string(&help_options, &command),
     };
 
     match msg.channel_id.say(&ctx, result).await {
@@ -1559,7 +1503,7 @@ pub async fn plain(
         Err(why) => {
             warn_about_failed_send!(&formatted_help, why);
             None
-        }
+        },
     }
 }
 
@@ -1631,6 +1575,7 @@ mod matrix_tests {
     }
 
     #[test]
+    #[allow(clippy::no_effect)]
     #[should_panic(expected = "the len is 4 but the index is 9")]
     fn panic_index_too_high() {
         let matrix = Matrix::new(2, 2);
@@ -1638,6 +1583,7 @@ mod matrix_tests {
     }
 
     #[test]
+    #[allow(clippy::no_effect)]
     #[should_panic(expected = "the len is 0 but the index is 0")]
     fn panic_indexing_when_empty() {
         let matrix = Matrix::new(0, 0);

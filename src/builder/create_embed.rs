@@ -14,16 +14,15 @@
 //! [`ExecuteWebhook::embeds`]: crate::builder::ExecuteWebhook::embeds
 //! [here]: https://discord.com/developers/docs/resources/channel#embed-object
 
-use crate::internal::prelude::*;
-use crate::model::channel::Embed;
-use crate::utils;
+use std::collections::HashMap;
+use std::fmt::Display;
 
 use chrono::{DateTime, TimeZone};
 use serde_json::{json, Value};
 
-use std::fmt::Display;
-use std::collections::HashMap;
-
+use crate::internal::prelude::*;
+use crate::model::channel::Embed;
+use crate::utils;
 #[cfg(feature = "utils")]
 use crate::utils::Colour;
 
@@ -47,7 +46,9 @@ impl CreateEmbed {
     /// Refer to the documentation for [`CreateEmbedAuthor`] for more
     /// information.
     pub fn author<F>(&mut self, f: F) -> &mut Self
-        where F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor {
+    where
+        F: FnOnce(&mut CreateEmbedAuthor) -> &mut CreateEmbedAuthor,
+    {
         let mut author = CreateEmbedAuthor::default();
         f(&mut author);
         self.set_author(author)
@@ -83,10 +84,7 @@ impl CreateEmbed {
 
     #[cfg(feature = "utils")]
     fn _colour(&mut self, colour: Colour) {
-        self.0.insert(
-            "color",
-            Value::Number(Number::from(u64::from(colour.0))),
-        );
+        self.0.insert("color", Value::Number(Number::from(u64::from(colour.0))));
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -123,17 +121,18 @@ impl CreateEmbed {
     /// **Note**: Maximum amount of characters you can put is 256 in a field
     /// name and 1024 in a field value.
     #[inline]
-    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool)  -> &mut Self
-        where T: ToString, U: ToString {
+    pub fn field<T, U>(&mut self, name: T, value: U, inline: bool) -> &mut Self
+    where
+        T: ToString,
+        U: ToString,
+    {
         self._field(name.to_string(), value.to_string(), inline);
         self
     }
 
     fn _field(&mut self, name: String, value: String, inline: bool) {
         {
-            let entry = self.0
-                .entry("fields")
-                .or_insert_with(|| Value::Array(vec![]));
+            let entry = self.0.entry("fields").or_insert_with(|| Value::Array(vec![]));
 
             if let Value::Array(ref mut inner) = *entry {
                 inner.push(json!({
@@ -151,9 +150,11 @@ impl CreateEmbed {
     ///
     /// [`field`]: Self::field
     pub fn fields<T, U, It>(&mut self, fields: It) -> &mut Self
-        where It: IntoIterator<Item=(T, U, bool)>,
-              T: ToString,
-              U: ToString {
+    where
+        It: IntoIterator<Item = (T, U, bool)>,
+        T: ToString,
+        U: ToString,
+    {
         for (name, value, inline) in fields {
             self.field(name, value, inline);
         }
@@ -166,7 +167,9 @@ impl CreateEmbed {
     /// Refer to the documentation for [`CreateEmbedFooter`] for more
     /// information.
     pub fn footer<F>(&mut self, f: F) -> &mut Self
-        where F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter {
+    where
+        F: FnOnce(&mut CreateEmbedFooter) -> &mut CreateEmbedFooter,
+    {
         let mut create_embed_footer = CreateEmbedFooter::default();
         f(&mut create_embed_footer);
         self.set_footer(create_embed_footer)
@@ -501,7 +504,9 @@ impl<'a> From<&'a str> for Timestamp {
 }
 
 impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
-    where Tz::Offset: Display {
+where
+    Tz::Offset: Display,
+{
     fn from(dt: &'a DateTime<Tz>) -> Self {
         Self {
             ts: dt.to_rfc3339(),
@@ -511,10 +516,13 @@ impl<'a, Tz: TimeZone> From<&'a DateTime<Tz>> for Timestamp
 
 #[cfg(test)]
 mod test {
-    use crate::{model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
-        utils::{self, Colour}};
     use serde_json::{json, Value};
+
     use super::CreateEmbed;
+    use crate::{
+        model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
+        utils::{self, Colour},
+    };
 
     #[test]
     fn test_from_embed() {
@@ -559,11 +567,11 @@ mod test {
         };
 
         let mut builder = CreateEmbed::from(embed);
-            builder.colour(0xFF0011);
-            builder.description("This is a hakase description");
-            builder.image("https://i.imgur.com/XfWpfCV.gif");
-            builder.title("still a hakase");
-            builder.url("https://i.imgur.com/XfWpfCV.gif");
+        builder.colour(0xFF0011);
+        builder.description("This is a hakase description");
+        builder.image("https://i.imgur.com/XfWpfCV.gif");
+        builder.title("still a hakase");
+        builder.url("https://i.imgur.com/XfWpfCV.gif");
 
         let built = Value::Object(utils::hashmap_to_json_map(builder.0));
 
