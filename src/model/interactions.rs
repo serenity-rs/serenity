@@ -238,7 +238,7 @@ impl Interaction {
     /// Create a simple ping command
     ///
     /// ```rust,no_run
-    /// # use serenity::http:Http;
+    /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
@@ -258,7 +258,7 @@ impl Interaction {
     /// Create a command that echoes what is inserted
     ///
     /// ```rust,no_run
-    /// # use serenity::http:Http;
+    /// # use serenity::http::Http;
     /// # use std::sync::Arc;
     /// #
     /// # async fn run() {
