@@ -8,7 +8,7 @@ license = "ISC"
 name = "serenity"
 readme = "README.md"
 repository = "https://github.com/serenity-rs/serenity.git"
-version = "0.10.2"
+version = "0.10.0"
 edition = "2018"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
@@ -21,7 +21,7 @@ async-trait = "0.1"
 
 [dependencies.command_attr]
 path = "./command_attr"
-version = "0.3.3"
+version = "0.3"
 optional = true
 
 [dependencies.serde]
@@ -50,14 +50,6 @@ features = ["json", "multipart", "stream"]
 optional = true
 version = "0.11"
 
-# Tokio v0.2
-[dependencies.reqwest_compat]
-package = "reqwest"
-default-features = false
-features = ["json", "stream"]
-optional = true
-version = "0.10"
-
 [dependencies.serenity-voice-model]
 path = "./voice-model"
 version = "0.1"
@@ -73,14 +65,6 @@ features = ["tokio-runtime"]
 optional = true
 version = "0.11"
 
-# Tokio v0.2
-[dependencies.async-tungstenite_compat]
-package = "async-tungstenite"
-default-features = false
-features = ["tokio-runtime"]
-optional = true
-version = "0.9"
-
 [dependencies.typemap_rev]
 optional = true
 version = "0.1.3"
@@ -93,24 +77,10 @@ version = "^2.1"
 optional = true
 version = "1.0"
 
-[dependencies.bytes_compat]
-package = "bytes"
-optional = true
-version = "0.5"
-
 [dependencies.tokio]
-version = "1"
-default-features = true
-optional = true
+version = "1.0"
+default-features = false
 features = ["fs", "macros", "rt", "sync", "time"]
-
-# Tokio v0.2
-[dependencies.tokio_compat]
-package = "tokio"
-version = "0.2"
-optional = true
-default-features = true
-features = ["fs", "macros", "rt-core", "sync", "time", "stream"]
 
 [dependencies.futures]
 version = "0.3"
@@ -125,15 +95,8 @@ version = "0.2"
 package = "http"
 
 [features]
-# Defaults with different backends
-default = ["default_no_backend", "rustls_backend"]
-default_native_tls = ["default_no_backend", "native_tls_backend"]
-default_tokio_0_2 = ["default_no_backend", "rustls_tokio_0_2_backend"]
-default_native_tls_tokio_0_2 = ["default_no_backend", "native_tls_tokio_0_2_backend"]
-
-# Serenity requires a backend, this picks all default features without a backend.
-default_no_backend = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils"]
-
+default = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils", "rustls_backend"]
+default_native_tls = ["builder", "cache", "client", "framework", "gateway", "model", "http", "standard_framework", "utils", "native_tls_backend"]
 builder = ["utils"]
 cache = []
 collector = ["gateway", "model"]
@@ -141,27 +104,16 @@ client = ["http", "typemap_rev"]
 extras = []
 framework = ["client", "model", "utils"]
 gateway = ["flate2", "http", "url", "utils"]
-http = ["url"]
+http = ["url", "bytes"]
 absolute_ratelimits = ["http"]
+rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls"]
+native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls"]
 model = ["builder", "http"]
 voice-model = ["serenity-voice-model"]
 standard_framework = ["framework", "uwl", "command_attr", "static_assertions"]
 unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
-
-# Backends to pick from:
-# - Rustls Backends
-rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls", "tokio", "rustls_backend_marker", "bytes"]
-rustls_tokio_0_2_backend = ["reqwest_compat/rustls-tls", "async-tungstenite_compat/tokio-rustls", "tokio_compat", "bytes_compat", "rustls_backend_marker"]
-# Marks that a Rustls backend is active
-rustls_backend_marker = []
-
-# - Native TLS Backends
-native_tls_backend = ["reqwest/native-tls", "async-tungstenite/tokio-native-tls", "tokio", "bytes", "native_tls_backend_marker"]
-native_tls_tokio_0_2_backend = ["reqwest_compat/native-tls", "async-tungstenite_compat/tokio-native-tls", "tokio_compat", "bytes_compat", "native_tls_backend_marker"]
-# Marks that a Native TLS backend is active
-native_tls_backend_marker = []
 
 [package.metadata.docs.rs]
 all-features = true

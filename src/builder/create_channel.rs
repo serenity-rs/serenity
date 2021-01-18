@@ -105,7 +105,7 @@ impl CreateChannel {
     /// use serenity::model::id::UserId;
     /// use serenity::model::permissions::Permissions;
     ///
-    /// // Assuming a guild has already been bound.
+    /// // Assuming a guild have already been bound.
     /// let permissions = Some(PermissionOverwrite {
     ///     allow: Permissions::READ_MESSAGES,
     ///     deny: Permissions::SEND_TTS_MESSAGES,

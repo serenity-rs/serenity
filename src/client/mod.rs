@@ -87,7 +87,17 @@ pub struct ClientBuilder<'a> {
 
 #[cfg(feature = "gateway")]
 impl<'a> ClientBuilder<'a> {
-    fn _new() -> Self {
+    /// Construct a new builder to call methods on for the client construction.
+    /// The `token` will automatically be prefixed "Bot " if not already.
+    ///
+    /// **Panic**:
+    /// If you enabled the `framework`-feature (on by default), you must specify
+    /// a framework via the [`framework`] or [`framework_arc`] method,
+    /// otherwise awaiting the builder will cause a panic.
+    ///
+    /// [`framework`]: Self::framework
+    /// [`framework_arc`]: Self::framework_arc
+    pub fn new(token: impl AsRef<str>) -> Self {
         Self {
             data: Some(TypeMap::new()),
             http: None,
@@ -101,38 +111,7 @@ impl<'a> ClientBuilder<'a> {
             voice_manager: None,
             event_handler: None,
             raw_event_handler: None,
-        }
-    }
-
-    /// Construct a new builder to call methods on for the client construction.
-    /// The `token` will automatically be prefixed "Bot " if not already.
-    ///
-    /// **Panic**:
-    /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`framework`] or [`framework_arc`] method,
-    /// otherwise awaiting the builder will cause a panic.
-    ///
-    /// [`framework`]: Self::framework
-    /// [`framework_arc`]: Self::framework_arc
-    pub fn new(token: impl AsRef<str>) -> Self {
-        Self::_new().token(token)
-    }
-
-    /// Construct a new builder with a [`Http`] instance to calls methods on
-    /// for the client construction.
-    ///
-    /// **Panic**:
-    /// If you have enabled the `framework`-feature (on by default), you must specify
-    /// a framework via the [`framework`] or [`framework_arc`] method,
-    /// otherwise awaiting the builder will cause a panic.
-    ///
-    /// [`Http`]: crate::http::Http
-    /// [`framework`]: Self::framework
-    /// [`framework_arc`]: Self::framework_arc
-    pub fn new_with_http(http: Http) -> Self {
-        let mut c = Self::_new();
-        c.http = Some(http);
-        c
+        }.token(token)
     }
 
     /// Sets a token for the bot. If the token is not prefixed "Bot ",

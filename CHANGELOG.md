@@ -3,31 +3,6 @@
 All notable changes to this project will be documented in this file.
 This project mostly adheres to [Semantic Versioning][semver].
 
-## [0.10.2] - 2021-01-09
-
-Thanks to the following for their contributions:
-
-- [@Lakelezz]
-- [@nickelc]
-
-### Added
-
-- [misc] Add compatibility features for tokio `0.2` and `1.0` ([@Lakelezz]) [c:580d6de]
-
-### Fixed
-
-- [misc] Fix doc_cfg attributes for the `unstable_discord_api` feature ([@nickelc]) [c:9a97f9b]
-
-## [0.10.1] - 2021-01-07
-
-Thanks to the following for their contributions:
-
-- [@nickelc]
-
-### Fixed
-
-- [misc] Bump the required version of the `command_attr` crate ([@nickelc]) [c:ab8c82b]
-
 ## [0.10.0] - 2021-01-06
 
 Thanks to the following for their contributions:
@@ -147,16 +122,6 @@ Thanks to the following for their contributions:
 - [framework/command_attr] Remove unnecessary `extern crate` in `command_attr` ([@acdenisSK]) [c:d6984a8]
 - [framework/command_attr] Remove recursion limit in `command_attr` ([@acdenisSK]) [c:4729f26]
 - [misc] Remove remaining instances of private `_nonexhausive` fields ([@KamranMackey]) [c:ac66a54]
-
-## [0.9.4] - 2021-01-07
-
-Thanks to the following for their contributions:
-
-- [@acdenisSK]
-
-### Fixed
-
-- [misc] Fixate `command_attr` version to 0.3.2 ([@acdenisSK]) [c:b03df91]
 
 ## [0.9.3] - 2020-12-18
 
@@ -3982,10 +3947,7 @@ Initial commit.
 
 <!-- COMPARISONS -->
 
-[0.10.2]: https://github.com/serenity-rs/serenity/compare/v0.10.1...v0.10.2
-[0.10.1]: https://github.com/serenity-rs/serenity/compare/v0.10.0...v0.10.1
-[0.10.0]: https://github.com/serenity-rs/serenity/compare/v0.9.4...v0.10.0
-[0.9.4]: https://github.com/serenity-rs/serenity/compare/v0.9.3...v0.9.4
+[0.10.0]: https://github.com/serenity-rs/serenity/compare/v0.9.3...v0.10.0
 [0.9.3]: https://github.com/serenity-rs/serenity/compare/v0.9.2...v0.9.3
 [0.9.2]: https://github.com/serenity-rs/serenity/compare/v0.9.1...v0.9.2
 [0.9.1]: https://github.com/serenity-rs/serenity/compare/v0.9.0...v0.9.1
@@ -4204,11 +4166,6 @@ Initial commit.
 
 <!-- COMMITS -->
 
-[c:580d6de]: https://github.com/serenity-rs/serenity/commit/580d6de400165b8fedd19e359d91d72e782e45d9
-[c:9a97f9b]: https://github.com/serenity-rs/serenity/commit/9a97f9b7030e17701fb2887bf86cebde4ec14e8a
-
-[c:ab8c82b]: https://github.com/serenity-rs/serenity/commit/ab8c82bddc2854f17e04efd10ccfd5357a5b415f
-
 [c:2624170]: https://github.com/serenity-rs/serenity/commit/2624170835961e57fe00f027763166d74613b8da
 [c:7647e1e]: https://github.com/serenity-rs/serenity/commit/7647e1e7bb4754a5880246312fb807daede31b23
 [c:0b1fc27]: https://github.com/serenity-rs/serenity/commit/0b1fc2737efebde01f6f3b781bcdfc83a30e908e
@@ -4293,8 +4250,6 @@ Initial commit.
 [c:d6984a8]: https://github.com/serenity-rs/serenity/commit/d6984a831c0e0ef13948e96f8c7dc6e9a0bd74d5
 [c:4729f26]: https://github.com/serenity-rs/serenity/commit/4729f2603396be768daee56ff12414331893651c
 [c:ac66a54]: https://github.com/serenity-rs/serenity/commit/ac66a54b87a743eb9f85a7f1dd064769792b3c29
-
-[c:b03df91]: https://github.com/serenity-rs/serenity/commit/b03df91f50a554cd9ab3dcb78d74eba46f2601e8
 
 [c:1cc66b3]: https://github.com/serenity/serenity/commit/1cc66b3d4ba70f75823cb59c5db4e4b0ef162ac7
 [c:1047eac]: https://github.com/serenity/serenity/commit/1047eac908eb28c69691292db8e35e089985a09e

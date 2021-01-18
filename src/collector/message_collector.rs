@@ -12,13 +12,8 @@ use tokio::{
         UnboundedReceiver as Receiver,
         UnboundedSender as Sender,
     },
+    time::{Sleep, sleep},
 };
-#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
-use tokio::time::{Delay as Sleep, delay_for as sleep};
-
-#[cfg(feature = "tokio")]
-use tokio::time::{Sleep, sleep};
-
 use futures::{
     future::BoxFuture,
     stream::{Stream, StreamExt},
