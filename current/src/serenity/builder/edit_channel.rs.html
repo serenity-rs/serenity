@@ -119,9 +119,72 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
+<span id="123">123</span>
+<span id="124">124</span>
+<span id="125">125</span>
+<span id="126">126</span>
+<span id="127">127</span>
+<span id="128">128</span>
+<span id="129">129</span>
+<span id="130">130</span>
+<span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
+<span id="137">137</span>
+<span id="138">138</span>
+<span id="139">139</span>
+<span id="140">140</span>
+<span id="141">141</span>
+<span id="142">142</span>
+<span id="143">143</span>
+<span id="144">144</span>
+<span id="145">145</span>
+<span id="146">146</span>
+<span id="147">147</span>
+<span id="148">148</span>
+<span id="149">149</span>
+<span id="150">150</span>
+<span id="151">151</span>
+<span id="152">152</span>
+<span id="153">153</span>
+<span id="154">154</span>
+<span id="155">155</span>
+<span id="156">156</span>
+<span id="157">157</span>
+<span id="158">158</span>
+<span id="159">159</span>
+<span id="160">160</span>
+<span id="161">161</span>
+<span id="162">162</span>
+<span id="163">163</span>
+<span id="164">164</span>
+<span id="165">165</span>
+<span id="166">166</span>
+<span id="167">167</span>
+<span id="168">168</span>
+<span id="169">169</span>
+<span id="170">170</span>
+<span id="171">171</span>
+<span id="172">172</span>
+<span id="173">173</span>
+<span id="174">174</span>
+<span id="175">175</span>
+<span id="176">176</span>
+<span id="177">177</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">channel</span>::{<span class="ident">PermissionOverwrite</span>, <span class="ident">PermissionOverwriteType</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::<span class="ident">ChannelId</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+
+<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
+
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
 <span class="doccomment">/// A builder to edit a [`GuildChannel`] for use via [`GuildChannel::edit`]</span>
@@ -234,6 +297,61 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">slow_mode_rate</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">seconds</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;rate_limit_per_user&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">seconds</span>)));
+
+        <span class="self">self</span>
+    }
+
+    <span class="doccomment">/// A set of overwrites defining what a user or a user carrying a certain role can</span>
+    <span class="doccomment">/// and cannot do.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Example</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Inheriting permissions from an exisiting channel:</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// ```rust,no_run</span>
+    <span class="doccomment">/// # use serenity::{http::Http, model::id::ChannelId};</span>
+    <span class="doccomment">/// # use std::sync::Arc;</span>
+    <span class="doccomment">/// #</span>
+    <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn std::error::Error&gt;&gt; {</span>
+    <span class="doccomment">/// #     let http = Arc::new(Http::default());</span>
+    <span class="doccomment">/// #     let mut channel = ChannelId(0);</span>
+    <span class="doccomment">/// use serenity::model::channel::{PermissionOverwrite, PermissionOverwriteType};</span>
+    <span class="doccomment">/// use serenity::model::id::UserId;</span>
+    <span class="doccomment">/// use serenity::model::permissions::Permissions;</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// // Assuming a channel has already been bound.</span>
+    <span class="doccomment">/// let permissions = Some(PermissionOverwrite {</span>
+    <span class="doccomment">///     allow: Permissions::READ_MESSAGES,</span>
+    <span class="doccomment">///     deny: Permissions::SEND_TTS_MESSAGES,</span>
+    <span class="doccomment">///     kind: PermissionOverwriteType::Member(UserId(1234)),</span>
+    <span class="doccomment">/// });</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// channel.edit(http, |c| {</span>
+    <span class="doccomment">///     c.name(&quot;my_edited_cool_channel&quot;)</span>
+    <span class="doccomment">///     .permissions(permissions)</span>
+    <span class="doccomment">/// })</span>
+    <span class="doccomment">/// .await?;</span>
+    <span class="doccomment">/// #    Ok(())</span>
+    <span class="doccomment">/// # }</span>
+    <span class="doccomment">/// ```</span>
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span><span class="op">&lt;</span><span class="ident">I</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">perms</span>: <span class="ident">I</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
+        <span class="kw">where</span> <span class="ident">I</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">PermissionOverwrite</span><span class="op">&gt;</span>
+    {
+        <span class="kw">let</span> <span class="ident">overwrites</span> <span class="op">=</span> <span class="ident">perms</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">perm</span><span class="op">|</span> {
+            <span class="kw">let</span> (<span class="ident">id</span>, <span class="ident">kind</span>) <span class="op">=</span> <span class="kw">match</span> <span class="ident">perm</span>.<span class="ident">kind</span> {
+                <span class="ident">PermissionOverwriteType</span>::<span class="ident">Member</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">id</span>.<span class="number">0</span>, <span class="string">&quot;member&quot;</span>),
+                <span class="ident">PermissionOverwriteType</span>::<span class="ident">Role</span>(<span class="ident">id</span>) <span class="op">=</span><span class="op">&gt;</span> (<span class="ident">id</span>.<span class="number">0</span>, <span class="string">&quot;role&quot;</span>),
+            };
+
+            <span class="macro">json</span><span class="macro">!</span>({
+                <span class="string">&quot;allow&quot;</span>: <span class="ident">perm</span>.<span class="ident">allow</span>.<span class="ident">bits</span>(),
+                <span class="string">&quot;deny&quot;</span>: <span class="ident">perm</span>.<span class="ident">deny</span>.<span class="ident">bits</span>(),
+                <span class="string">&quot;id&quot;</span>: <span class="ident">id</span>,
+                <span class="string">&quot;type&quot;</span>: <span class="ident">kind</span>,
+            })
+        }).<span class="ident">collect</span>();
+
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permission_overwrites&quot;</span>, <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">overwrites</span>));
 
         <span class="self">self</span>
     }
