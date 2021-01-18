@@ -37,6 +37,14 @@ use tracing::{error, warn};
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
 
+#[cfg(all(feature = "model", feature = "unstable_discord_api"))]
+use crate::{
+    model::{
+        interactions::{Interaction, ApplicationCommand}
+    },
+    builder::CreateInteraction,
+};
+
 /// A representation of a banning of a user.
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Hash, Serialize)]
 pub struct Ban {
@@ -457,6 +465,21 @@ impl Guild {
     #[inline]
     pub async fn create_integration<I>(&self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>, kind: &str) -> Result<()> {
         self.id.create_integration(&http, integration_id, kind).await
+    }
+
+    /// Creates a new [`ApplicationCommand`] for the guild.
+    ///
+    /// See the documentation for [`Interaction::create_global_application_command`] on how to use this.
+    ///
+    /// **Note**: `application_id` is usually the bot's id, unless it's a very old bot.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    #[inline]
+    pub async fn create_application_command<F>(&self, http: impl AsRef<Http>, application_id: u64, f: F) -> Result<ApplicationCommand>
+    where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
+        Interaction::create_guild_application_command(http, self.id, application_id, f).await
     }
 
     /// Creates a new role in the guild with the data set, if any.

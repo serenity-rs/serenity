@@ -23,6 +23,13 @@ use crate::collector::{
 };
 #[cfg(feature = "model")]
 use crate::http::{Http, CacheHttp};
+#[cfg(all(feature = "model", feature = "unstable_discord_api"))]
+use crate::{
+    model::{
+        interactions::{Interaction, ApplicationCommand}
+    },
+    builder::CreateInteraction,
+};
 
 #[cfg(feature = "model")]
 impl GuildId {
@@ -198,6 +205,21 @@ impl GuildId {
         });
 
         http.as_ref().create_guild_integration(self.0, integration_id.0, &map).await
+    }
+
+    /// Creates a new [`ApplicationCommand`] for the guild.
+    ///
+    /// See the documentation for [`Interaction::create_global_application_command`] on how to use this.
+    ///
+    /// **Note**: `application_id` is usually the bot's id, unless it's a very old bot.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    #[inline]
+    pub async fn create_application_command<F>(self, http: impl AsRef<Http>, application_id: u64, f: F) -> Result<ApplicationCommand>
+    where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
+        Interaction::create_guild_application_command(http, self, application_id, f).await
     }
 
     /// Creates a new role in the guild with the data set, if any.
