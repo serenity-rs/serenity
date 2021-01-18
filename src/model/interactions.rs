@@ -280,7 +280,7 @@ impl Interaction {
     /// .await;
     /// # }
     /// ```
-    /// [`ApplicationCommand`]: Self::ApplicationCommand
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
     pub async fn create_global_application_command<F>(http: impl AsRef<Http>, application_id: u64, f: F) -> Result<ApplicationCommand>
         where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
@@ -292,7 +292,7 @@ impl Interaction {
     ///
     /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
     ///
-    /// [`ApplicationCommand`]: Self::ApplicationCommand
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     pub async fn create_guild_application_command<F>(http: impl AsRef<Http>, guild_id: GuildId, application_id: u64, f: F) -> Result<ApplicationCommand>
         where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
             let map = Interaction::build_interaction(f);
