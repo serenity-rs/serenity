@@ -3,7 +3,7 @@
 use super::prelude::*;
 use crate::internal::prelude::*;
 use crate::http::Http;
-use crate::builder::{CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse};
+use crate::builder::{CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse, CreateInteraction};
 use crate::utils;
 
 use bitflags::__impl_bitflags;
@@ -226,7 +226,7 @@ impl Interaction {
     /// Creates a response to the interaction received.
     ///
     /// Note: Message contents must be under 2000 unicode code points.
-    pub async fn create_interaction_response<F>(self, http: impl AsRef<Http>, f: F) 
+    pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) 
         where for <'b> F: FnOnce(&'b mut CreateInteractionResponse) -> &'b mut CreateInteractionResponse {
             let mut interaction_response = CreateInteractionResponse::default();
             let interaction_response = f(&mut interaction_response);
@@ -244,7 +244,7 @@ impl Interaction {
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     /// 
     /// Note:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
-    pub async fn edit_original_interaction_response<F>(self, http: impl AsRef<Http>, application_id: u64, f: F) 
+    pub async fn edit_original_interaction_response<F>(&self, http: impl AsRef<Http>, application_id: u64, f: F) 
         where for <'b> F: FnOnce(&'b mut EditInteractionResponse) -> &'b mut EditInteractionResponse {
             let mut interaction_response = EditInteractionResponse::default();
             let interaction_response = f(&mut interaction_response);
@@ -258,14 +258,14 @@ impl Interaction {
         }
 
     /// Deletes the initial interaction response.
-    pub async fn delete_original_interaction_response(self, http: impl AsRef<Http>, application_id: u64) {
+    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>, application_id: u64) {
         http.as_ref().delete_original_interaction_response(application_id, &self.token).await.unwrap();
     }
 
     /// Creates a followup response to the response sent.
     ///
     /// Note: Message contents must be under 2000 unicode code points.
-    pub async fn create_followup_message<'a, F>(self, http: impl AsRef<Http>, application_id: u64, wait: bool, f: F) 
+    pub async fn create_followup_message<'a, F>(&self, http: impl AsRef<Http>, application_id: u64, wait: bool, f: F) 
         where for <'b> F: FnOnce(&'b mut CreateInteractionResponseFollowup<'a>) -> &'b mut CreateInteractionResponseFollowup<'a> {
             let mut interaction_response = CreateInteractionResponseFollowup::default();
             let interaction_response = f(&mut interaction_response);
@@ -277,4 +277,6 @@ impl Interaction {
 
             http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await.unwrap();
         }
+
+    
 }
