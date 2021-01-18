@@ -3,12 +3,12 @@
 use super::prelude::*;
 use crate::internal::prelude::*;
 use crate::http::Http;
-use crate::builder::{CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse};
+use crate::builder::{CreateInteractionResponse, CreateInteractionResponseFollowup, EditInteractionResponse, CreateInteraction};
 use crate::utils;
 
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde_json::{Value, Number};
+use serde_json::{Value, Number, Map};
 
 /// Information about an interaction.
 ///
@@ -223,58 +223,148 @@ __impl_bitflags! {
 }
 
 impl Interaction {
+
+    /// Creates a global [`ApplicationCommand`],
+    /// overriding an existing one with the same name if it exists.
+    ///
+    /// When a created `ApplicationCommand` is used, the [`InteractionCreate`] event will be emitted.
+    ///
+    /// **Note**: Global commands may take up to an hour to become available.
+    ///
+    /// As such, it is recommended that guild application commands be used for testing purposes.
+    ///
+    /// # Examples
+    ///
+    /// Create a simple ping command
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::default());
+    /// use serenity::model::interactions::Interaction;
+    ///
+    /// let application_id = 42; // usually this will be the bot's UserId
+    /// 
+    /// let _ = Interaction::create_global_application_command(&http, application_id, |a| {
+    ///    a.name("ping")
+    ///     .description("A simple ping command")
+    /// })
+    /// .await;
+    /// # }
+    /// ```
+    ///
+    /// Create a command that echoes what is inserted
+    ///
+    /// ```rust,no_run
+    /// # use serenity::http::Http;
+    /// # use std::sync::Arc;
+    /// #
+    /// # async fn run() {
+    /// # let http = Arc::new(Http::default());
+    /// use serenity::model::interactions::{Interaction, ApplicationCommandOptionType};
+    ///
+    /// let application_id = 42; // usually this will be the bot's UserId
+    /// 
+    /// let _ = Interaction::create_global_application_command(&http, application_id, |a| {
+    ///    a.name("echo")
+    ///     .description("What is said is echoed")
+    ///     .create_interaction_option(|o| {
+    ///         o.name("to_say")
+    ///          .description("What will be echoed")
+    ///          .kind(ApplicationCommandOptionType::String)
+    ///          .required(true)
+    ///     })
+    /// })
+    /// .await;
+    /// # }
+    /// ```
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
+    pub async fn create_global_application_command<F>(http: impl AsRef<Http>, application_id: u64, f: F) -> Result<ApplicationCommand>
+        where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
+            let map = Interaction::build_interaction(f);
+            http.as_ref().create_global_application_command(application_id, &Value::Object(map)).await
+        }
+
+    /// Creates a guild specific [`ApplicationCommand`]
+    ///
+    /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
+    pub async fn create_guild_application_command<F>(http: impl AsRef<Http>, guild_id: GuildId, application_id: u64, f: F) -> Result<ApplicationCommand>
+        where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
+            let map = Interaction::build_interaction(f);
+            http.as_ref().create_guild_application_command(application_id, guild_id.0, &Value::Object(map)).await
+        }
+
+    #[inline]
+    fn build_interaction<F>(f: F) -> Map<String, Value>
+        where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
+            let mut create_interaction = CreateInteraction::default();
+            f(&mut create_interaction);
+            utils::hashmap_to_json_map(create_interaction.0)
+        }
+
     /// Creates a response to the interaction received.
     ///
-    /// Note: Message contents must be under 2000 unicode code points.
-    pub async fn create_interaction_response<F>(self, http: impl AsRef<Http>, f: F) 
-        where for <'b> F: FnOnce(&'b mut CreateInteractionResponse) -> &'b mut CreateInteractionResponse {
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
+        where F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse {
             let mut interaction_response = CreateInteractionResponse::default();
-            let interaction_response = f(&mut interaction_response);
+            f(&mut interaction_response);
 
-            let map = utils::hashmap_to_json_map(interaction_response.0.clone());
+            let map = utils::hashmap_to_json_map(interaction_response.0);
 
             Message::check_content_length(&map).unwrap();
             Message::check_embed_length(&map).unwrap();    
 
-            http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await.unwrap();
+            http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
         }
 
     /// Edits the initial interaction response.
+    ///
+    /// `application_id` will usually be the bot's `[UserId]`, except in cases of bots being very old.
     /// 
     /// Refer to Discord's docs for Edit Webhook Message for field information.
     /// 
-    /// Note:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
-    pub async fn edit_original_interaction_response<F>(self, http: impl AsRef<Http>, application_id: u64, f: F) 
-        where for <'b> F: FnOnce(&'b mut EditInteractionResponse) -> &'b mut EditInteractionResponse {
+    /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
+    ///
+    /// [`UserId`]: crate::model::id::UserId
+    pub async fn edit_original_interaction_response<F>(&self, http: impl AsRef<Http>, application_id: u64, f: F) -> Result<Message>
+        where F: FnOnce(&mut EditInteractionResponse) -> &mut EditInteractionResponse {
             let mut interaction_response = EditInteractionResponse::default();
-            let interaction_response = f(&mut interaction_response);
+            f(&mut interaction_response);
 
-            let map = utils::hashmap_to_json_map(interaction_response.0.clone());
+            let map = utils::hashmap_to_json_map(interaction_response.0);
 
             Message::check_content_length(&map).unwrap();
             Message::check_embed_length(&map).unwrap();    
 
-            http.as_ref().edit_original_interaction_response(application_id, &self.token, &Value::Object(map)).await.unwrap();
+            http.as_ref().edit_original_interaction_response(application_id, &self.token, &Value::Object(map)).await
         }
 
     /// Deletes the initial interaction response.
-    pub async fn delete_original_interaction_response(self, http: impl AsRef<Http>, application_id: u64) {
-        http.as_ref().delete_original_interaction_response(application_id, &self.token).await.unwrap();
+    pub async fn delete_original_interaction_response(&self, http: impl AsRef<Http>, application_id: u64) -> Result<()> {
+        http.as_ref().delete_original_interaction_response(application_id, &self.token).await
     }
 
     /// Creates a followup response to the response sent.
     ///
-    /// Note: Message contents must be under 2000 unicode code points.
-    pub async fn create_followup_message<'a, F>(self, http: impl AsRef<Http>, application_id: u64, wait: bool, f: F) 
+    /// **Note**: Message contents must be under 2000 unicode code points.
+    pub async fn create_followup_message<'a, F>(&self, http: impl AsRef<Http>, application_id: u64, wait: bool, f: F) -> Result<Option<Message>>
         where for <'b> F: FnOnce(&'b mut CreateInteractionResponseFollowup<'a>) -> &'b mut CreateInteractionResponseFollowup<'a> {
             let mut interaction_response = CreateInteractionResponseFollowup::default();
-            let interaction_response = f(&mut interaction_response);
+            f(&mut interaction_response);
 
-            let map = utils::hashmap_to_json_map(interaction_response.0.clone());
+            let map = utils::hashmap_to_json_map(interaction_response.0);
 
             Message::check_content_length(&map).unwrap();
             Message::check_embed_length(&map).unwrap();    
 
-            http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await.unwrap();
+            http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await
         }
+
+    
 }
