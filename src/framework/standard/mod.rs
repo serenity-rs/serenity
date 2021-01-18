@@ -45,6 +45,12 @@ use crate::model::guild::Member;
 #[cfg(all(feature = "cache", feature = "http", feature = "model"))]
 use crate::model::{guild::Role, id::RoleId};
 
+#[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
+use tokio::time::delay_for as sleep;
+
+#[cfg(feature = "tokio")]
+use tokio::time::sleep;
+
 /// An enum representing all possible fail conditions under which a command won't
 /// be executed.
 #[derive(Debug)]
@@ -297,7 +303,7 @@ impl StandardFramework {
             }
 
             match duration {
-                Some(duration) => tokio::time::sleep(duration).await,
+                Some(duration) => sleep(duration).await,
                 None => break,
             }
         }
@@ -596,7 +602,7 @@ impl StandardFramework {
 
 #[async_trait]
 impl Framework for StandardFramework {
-    #[instrument(skip(self, ctx))]
+    #[instrument(skip(self, ctx, msg))]
     async fn dispatch(&self, mut ctx: Context, msg: Message) {
         if self.should_ignore(&msg) {
             return;

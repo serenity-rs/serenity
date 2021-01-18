@@ -34,6 +34,7 @@ use tokio::{
     io::AsyncReadExt,
     fs::File,
 };
+
 use crate::http::routing::Route;
 use percent_encoding::{
     utf8_percent_encode,
@@ -171,7 +172,7 @@ impl Http {
     ///
     /// [`execute_webhook`]: Self::execute_webhook
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_followup_message(
         &self,
         application_id: u64,
@@ -183,7 +184,7 @@ impl Http {
 
         let mut headers = Headers::new();
         headers.insert(CONTENT_TYPE, HeaderValue::from_static(&"application/json"));
-    
+
         let response = self.request(Request {
             body: Some(&body),
             headers: Some(headers),
@@ -212,7 +213,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-global-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_global_application_command(
         &self,
         application_id: u64,
@@ -276,7 +277,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#create-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_guild_application_command(
         &self,
         application_id: u64,
@@ -312,7 +313,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#interaction-interaction-response
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn create_interaction_response(
         &self,
         interaction_id: u64,
@@ -461,7 +462,7 @@ impl Http {
 
     /// Deletes a follow-up message for an interaction.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_followup_message(
         &self,
         application_id: u64,
@@ -481,7 +482,7 @@ impl Http {
 
     /// Deletes a global command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_global_application_command(
         &self,
         application_id: u64,
@@ -508,7 +509,7 @@ impl Http {
 
     /// Deletes a guild command.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_guild_application_command(
         &self,
         application_id: u64,
@@ -609,7 +610,7 @@ impl Http {
 
     /// Deletes the initial interaction response.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn delete_original_interaction_response(
         &self,
         application_id: u64,
@@ -755,7 +756,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_followup_message(
         &self,
         application_id: u64,
@@ -782,7 +783,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-global-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_global_application_command(
         &self,
         application_id: u64,
@@ -818,7 +819,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/interactions/slash-commands#edit-guild-application-command
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_guild_application_command(
         &self,
         application_id: u64,
@@ -913,7 +914,7 @@ impl Http {
     ///
     /// [docs]: https://discord.com/developers/docs/resources/webhook#edit-webhook-message
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn edit_original_interaction_response(
         &self,
         application_id: u64,
@@ -1393,7 +1394,7 @@ impl Http {
 
     /// Fetches all of the global commands for your application.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_global_application_commands(
         &self,
         application_id: u64,
@@ -1416,7 +1417,7 @@ impl Http {
 
     /// Fetches all of the guild commands for your application for a specific guild.
     #[cfg(feature = "unstable_discord_api")]
-    #[cfg_attr(docsrs, doc(feature = "unstable_discord_api"))]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     pub async fn get_guild_application_commands(
         &self,
         application_id: u64,
@@ -2179,12 +2180,12 @@ impl Http {
     }
 }
 
-#[cfg(not(feature = "native_tls_backend"))]
+#[cfg(not(feature = "native_tls_backend_marker"))]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_rustls_tls()
 }
 
-#[cfg(feature = "native_tls_backend")]
+#[cfg(feature = "native_tls_backend_marker")]
 fn configure_client_backend(builder: ClientBuilder) -> ClientBuilder {
     builder.use_native_tls()
 }

@@ -101,7 +101,7 @@ Add the following to your `Cargo.toml` file:
 
 ```toml
 [dependencies]
-serenity = "0.9"
+serenity = "0.10"
 ```
 
 Serenity supports a minimum of Rust 1.48.
@@ -115,11 +115,20 @@ Cargo.toml:
 [dependencies.serenity]
 default-features = false
 features = ["pick", "your", "feature", "names", "here"]
-version = "0.9"
+version = "0.10"
 ```
 
 The default features are: `builder`, `cache`, `client`, `framework`, `gateway`,
 `http`, `model`, `standard_framework`, `utils`, and `rustls_backend`.
+
+There are these alternative default features, they require to set `default-features = false`:
+
+- **default_tokio_0_2**: Uses the default backend with `tokio` version `0.2`.
+- **default_native_tls**: Uses `native_tls_backend` instead of the default `rustls_backend`.
+- **default_native_tls_tokio_0_2**: Uses `native_tls_backend` with `tokio` version `0.2`.
+- **default_no_backend**: Excludes the default backend, pick your own backend instead.
+
+If you are unsure which to pick, use the default features by not setting `default-features = false`.
 
 The following is a full list of features:
 
@@ -158,6 +167,10 @@ TLS implementation.
 - **native_tls_backend**: Uses SChannel on Windows, Secure Transport on macOS,
 and OpenSSL on other platforms.
 
+If you need to use `tokio` version `0.2` use the backends below:
+
+- **rustls_tokio_0_2_backend**: Combines **rustls_backend** with `tokio` version `0.2`.
+- **native_tls_tokio_0_2_backend**: Combines **native_tls_backend** with `tokio` version `0.2`.
 
 If you want all of the default features except for `cache` for example, you can
 list all but that:
@@ -176,7 +189,7 @@ features = [
     "utils",
     "rustls_backend",
 ]
-version = "0.9"
+version = "0.10"
 ```
 
 # Dependencies

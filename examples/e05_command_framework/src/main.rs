@@ -376,7 +376,7 @@ async fn owner_check(_: &Context, msg: &Message, _: &mut Args, _: &CommandOption
     //
     // 4. If you want log for your system and for the user, use:
     // `Reason::UserAndLog { user, log }`
-    if msg.author.id == 7 {
+    if msg.author.id != 7 {
         return Err(Reason::User("Lacked owner permission".to_string()));
     }
 
