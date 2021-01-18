@@ -4,25 +4,23 @@ Please post a comment on an existing issue if you'd like to work on it. Please
 post an issue prior to dedicating a large amount of time on a PR so it can be
 determined if the change is something that the community wants.
 
-There are going to (usually) be 3 primary branches:
+There are going to (usually) be 2 primary branches:
 
 - `current`: Development branch of the _most recent_ major version. For example,
-if the largest version is v0.5.3, then the v0.5.x series will be on this branch.
+if the largest version is v0.10.2, then the v0.10.x series will be on this branch.
 Bugfixes, internal rewrites, documentation updates, new features, etc. go here
 so long as they do not introduce breaking changes.
-- `v0.Y.x`: Development branch of the _second most recent_ major version. If
-the largest version is v0.5.X, then this will be the branch for bugfixes for the
-v0.4.x version series. Bugfixes from the `current` branch may be backported here
-if applicable.
-- `v0.Z.x`: Development branch of the _next_ major version. Following the same
-example, this would be for the v0.6.x version series. This is where breaking
+
+- `next`: Development branch of the _next_ major version. Following the same
+example, this would be for the v0.11.x version series. This is where breaking
 changes go.
 
-### Testing
+# Testing
 
-Make sure you run tests via `cargo test --all-features` prior to submitting a
-PR, and updating any of the examples in the `examples` directory where
-applicable.
+Make sure you run tests with the various feature combinations, which you can
+find in [our CI pipeline][test_ci]. To run tests with all features, use
+`cargo test --all-features`. Run and update the examples in the `examples`
+directory where applicable.
 
 # Issues
 
@@ -43,41 +41,30 @@ possible, potentially with a code sample of what it might look like.
 
 # Code Style
 
-We don't follow rustfmt because it often produces unreadable results.
-
-Generally, there are a few rules to note, the rest should be grokable from
-existing rules:
-
-Add an empty line before and after logical blocks, but only if there is code
-before or after it. For example:
-
-```rust
-fn foo() {
-    let x = true;
-
-    if x {
-        println!("x is true");
-    }
-
-    let y = 1u64;
-
-    match y {
-        1 => println!("y is 1"),
-        other => println!("y is not 1, it is {}", other),
-    }
-}
-```
-
-Add an empty line after the subject line in documentation. For example:
-
-```rust
-/// This is the subject.
-///
-/// This is more detailed information.
-///
-/// Note the empty line after the subject, and between paragraphs.
-fn foo() { }
-```
+We always follow rustfmt, and it is enforced in our CI pipeline. Before
+committing your changes, always run `cargo fmt --all`.
 
 We have an 80 characters per line soft limit. In case readability would suffer
 and to support descriptive naming, 100 characters is our hard limit.
+
+# Commit style
+
+When creating a commit summary, use the imperative mood. The summary
+should describe the action that is administered by the commit's changes.
+
+Proper examples of a commit summary are:
+
+- "Add tests for checking permissions" -- changes add new tests
+- "Fix double sending bug" -- changes fix erroneous behaviour
+- "Increase character limit to 2500" -- changes alter existing behaviour
+
+Improper commit summary are:
+
+- "Removed deprecated items"
+- "Changing default data for user objects"
+- "Misc. changes"
+
+The summary should preferably fit into 50 characters. The first letter must
+also be capitalized.
+
+[test_ci]: .github/workflows/ci.yml
