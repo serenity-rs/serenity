@@ -480,26 +480,14 @@
 <span id="477">477</span>
 <span id="478">478</span>
 <span id="479">479</span>
-<span id="480">480</span>
-<span id="481">481</span>
-<span id="482">482</span>
-<span id="483">483</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{
-    <span class="self">self</span>,
-    <span class="ident">Deserialize</span>,
-    <span class="ident">Deserializer</span>,
-    <span class="ident">MapAccess</span>,
-    <span class="ident">Visitor</span>
-};
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">fmt</span>, <span class="ident">mem</span>::<span class="ident">transmute</span>};
+
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{<span class="self">self</span>, <span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">MapAccess</span>, <span class="ident">Visitor</span>};
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::<span class="ident">Serializer</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::<span class="ident">HashMap</span>,
-    <span class="ident">mem</span>::<span class="ident">transmute</span>,
-    <span class="ident">fmt</span>,
-};
 
 <span class="doccomment">/// Determines to what entity an action was used on.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -717,7 +705,6 @@
     }
 }
 
-
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="attribute">#[<span class="ident">repr</span>(<span class="ident">u8</span>)]</span>
@@ -739,10 +726,13 @@
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Change</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;key&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;key&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="comment">// TODO: Change these to an actual type.</span>
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;old_value&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;new_value&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;old_value&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">old</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;new_value&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">new</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -764,10 +754,7 @@
     <span class="doccomment">/// Determines what action was done on a [`target_id`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`target_id`]: Self::target_id</span>
-    <span class="attribute">#[<span class="ident">serde</span>(
-        <span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;action_handler&quot;</span>,
-        <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;action_type&quot;</span>
-    )]</span>
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">with</span> <span class="op">=</span> <span class="string">&quot;action_handler&quot;</span>, <span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;action_type&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="ident">action</span>: <span class="ident">Action</span>,
     <span class="doccomment">/// What was the reasoning by doing an action on a target? If there was one.</span>
     <span class="kw">pub</span> <span class="ident">reason</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
@@ -820,7 +807,10 @@
                 <span class="ident">formatter</span>.<span class="ident">write_str</span>(<span class="string">&quot;an optional integer or a string with a valid number inside&quot;</span>)
             }
 
-            <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Value</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+            <span class="kw">fn</span> <span class="ident">visit_some</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(
+                <span class="self">self</span>,
+                <span class="ident">deserializer</span>: <span class="ident">D</span>,
+            ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Value</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
                 <span class="ident">deserializer</span>.<span class="ident">deserialize_any</span>(<span class="ident">OptionU64Visitor</span>)
             }
 
@@ -883,10 +873,7 @@
         <span class="ident">de</span>.<span class="ident">deserialize_any</span>(<span class="ident">ActionVisitor</span>)
     }
 
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(
-        <span class="ident">action</span>: <span class="kw-2">&amp;</span><span class="ident">Action</span>,
-        <span class="ident">serializer</span>: <span class="ident">S</span>,
-    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span>: <span class="ident">Serializer</span><span class="op">&gt;</span>(<span class="ident">action</span>: <span class="kw-2">&amp;</span><span class="ident">Action</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="ident">serializer</span>.<span class="ident">serialize_u8</span>(<span class="ident">action</span>.<span class="ident">num</span>())
     }
 }
@@ -895,10 +882,13 @@
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>)]</span>
         <span class="kw">enum</span> <span class="ident">Field</span> {
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;audit_log_entries&quot;</span>)]</span> <span class="ident">Entries</span>,
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;webhooks&quot;</span>)]</span> <span class="ident">Webhooks</span>,
-            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;users&quot;</span>)]</span> <span class="ident">Users</span>,
-            <span class="comment">// TODO(field added by Discord, undocumented) #[serde(rename = &quot;integrations&quot;)] Integrations,</span>
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;audit_log_entries&quot;</span>)]</span>
+            <span class="ident">Entries</span>,
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;webhooks&quot;</span>)]</span>
+            <span class="ident">Webhooks</span>,
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;users&quot;</span>)]</span>
+            <span class="ident">Users</span>,
+            <span class="comment">/* TODO(field added by Discord, undocumented) #[serde(rename = &quot;integrations&quot;)] Integrations, */</span>
         }
 
         <span class="kw">struct</span> <span class="ident">EntriesVisitor</span>;
@@ -923,32 +913,34 @@
                             }
 
                             <span class="ident">audit_log_entries</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">AuditLogEntry</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
-                        }
+                        },
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field</span>::<span class="ident">Webhooks</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">if</span> <span class="ident">webhooks</span>.<span class="ident">is_some</span>() {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">duplicate_field</span>(<span class="string">&quot;webhooks&quot;</span>));
                             }
 
                             <span class="ident">webhooks</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Webhook</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
-                        }
+                        },
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">Some</span>(<span class="ident">Field</span>::<span class="ident">Users</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                             <span class="kw">if</span> <span class="ident">users</span>.<span class="ident">is_some</span>() {
                                 <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">de</span>::<span class="ident">Error</span>::<span class="ident">duplicate_field</span>(<span class="string">&quot;users&quot;</span>));
                             }
 
                             <span class="ident">users</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">User</span><span class="op">&gt;</span><span class="op">&gt;</span>()<span class="question-mark">?</span>);
-                        }
+                        },
                         <span class="prelude-val">Ok</span>(<span class="prelude-val">None</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">break</span>, <span class="comment">// No more keys</span>
-                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;unknown field&quot;</span>) {
-                            <span class="comment">// e is of type &lt;V as MapAccess&gt;::Error, which is a macro-defined trait, ultimately</span>
-                            <span class="comment">// implemented by serde::de::value::Error. Seeing as every error is a simple string and not</span>
-                            <span class="comment">// using a proper Error num, the best we can do here is to check if the string contains</span>
-                            <span class="comment">// this error. This was added because Discord randomly started sending new fields.</span>
-                            <span class="comment">// But no JSON deserializer should ever error over this.</span>
-                            <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">serde_json</span>::<span class="ident">Value</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// Actually read the value to avoid syntax errors</span>
-                        } <span class="kw">else</span> {
-                            <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>)
-                        }
+                        <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                            <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">to_string</span>().<span class="ident">contains</span>(<span class="string">&quot;unknown field&quot;</span>) {
+                                <span class="comment">// e is of type &lt;V as MapAccess&gt;::Error, which is a macro-defined trait, ultimately</span>
+                                <span class="comment">// implemented by serde::de::value::Error. Seeing as every error is a simple string and not</span>
+                                <span class="comment">// using a proper Error num, the best we can do here is to check if the string contains</span>
+                                <span class="comment">// this error. This was added because Discord randomly started sending new fields.</span>
+                                <span class="comment">// But no JSON deserializer should ever error over this.</span>
+                                <span class="ident">map</span>.<span class="ident">next_value</span>::<span class="op">&lt;</span><span class="ident">serde_json</span>::<span class="ident">Value</span><span class="op">&gt;</span>()<span class="question-mark">?</span>; <span class="comment">// Actually read the value to avoid syntax errors</span>
+                            } <span class="kw">else</span> {
+                                <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">e</span>);
+                            }
+                        },
                     }
                 }
 

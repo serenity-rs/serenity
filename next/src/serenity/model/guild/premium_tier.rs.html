@@ -35,8 +35,6 @@
 <span id="32">32</span>
 <span id="33">33</span>
 <span id="34">34</span>
-<span id="35">35</span>
-<span id="36">36</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">/// The guild&#39;s premium tier, depends on the amount of users boosting the guild currently</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">Eq</span>, <span class="ident">PartialEq</span>, <span class="ident">Ord</span>, <span class="ident">PartialOrd</span>, <span class="ident">Hash</span>)]</span>
@@ -49,14 +47,12 @@
     <span class="ident">Tier3</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(
-    <span class="ident">PremiumTier</span> {
-        <span class="ident">Tier0</span>,
-        <span class="ident">Tier1</span>,
-        <span class="ident">Tier2</span>,
-        <span class="ident">Tier3</span>,
-    }
-);
+<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">PremiumTier</span> {
+    <span class="ident">Tier0</span>,
+    <span class="ident">Tier1</span>,
+    <span class="ident">Tier2</span>,
+    <span class="ident">Tier3</span>,
+});
 
 <span class="kw">impl</span> <span class="ident">PremiumTier</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {

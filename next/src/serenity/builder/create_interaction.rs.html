@@ -173,18 +173,12 @@
 <span id="170">170</span>
 <span id="171">171</span>
 <span id="172">172</span>
-<span id="173">173</span>
-<span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">Value</span>, <span class="ident">json</span>};
 
-<span class="kw">use</span> <span class="kw">crate</span>::{
-    <span class="ident">model</span>::<span class="ident">interactions</span>::<span class="ident">ApplicationCommandOptionType</span>,
-    <span class="ident">utils</span>,
-};
+<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">json</span>, <span class="ident">Value</span>};
+
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">model</span>::<span class="ident">interactions</span>::<span class="ident">ApplicationCommandOptionType</span>, <span class="ident">utils</span>};
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommandInteractionDataOption`].</span>
 <span class="doccomment">///</span>
@@ -198,7 +192,6 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteractionOption</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">CreateInteractionOption</span> {
-
     <span class="doccomment">/// Set the ApplicationCommandOptionType for the InteractionOption.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">kind</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">kind</span>: <span class="ident">ApplicationCommandOptionType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;type&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">serde_json</span>::<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">kind</span> <span class="kw">as</span> <span class="ident">u8</span>)));
@@ -221,7 +214,7 @@
         <span class="self">self</span>
     }
 
-    <span class="doccomment">/// The first required option for the user to complete </span>
+    <span class="doccomment">/// The first required option for the user to complete</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Only one option can be `default`.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">default_option</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">default</span>: <span class="ident">bool</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
@@ -270,7 +263,9 @@
     <span class="doccomment">/// [`SubCommand`]: crate::model::interactions::ApplicationCommandOptionType::SubCommand</span>
     <span class="doccomment">/// [`SubCommandGroup`]: crate::model::interactions::ApplicationCommandOptionType::SubCommandGroup</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_sub_option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span> {
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span>,
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateInteractionOption</span>::<span class="ident">default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>);
         <span class="self">self</span>.<span class="ident">add_sub_option</span>(<span class="ident">data</span>)
@@ -284,9 +279,7 @@
         };
         <span class="self">self</span>
     }
-
 }
-
 
 <span class="doccomment">/// A builder for creating a new [`ApplicationCommand`].</span>
 <span class="doccomment">///</span>
@@ -299,7 +292,6 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">CreateInteraction</span>(<span class="kw">pub</span> <span class="ident">HashMap</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span>, <span class="ident">Value</span><span class="op">&gt;</span>);
 
 <span class="kw">impl</span> <span class="ident">CreateInteraction</span> {
-
     <span class="doccomment">/// Specify the name of the Interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Must be between 1 and 32 characters long,</span>
@@ -321,11 +313,12 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Interactions can only have up to 10 options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">create_interaction_option</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span> {
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionOption</span>,
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">data</span> <span class="op">=</span> <span class="ident">CreateInteractionOption</span>::<span class="ident">default</span>();
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">data</span>);
         <span class="self">self</span>.<span class="ident">add_interaction_option</span>(<span class="ident">data</span>)
-
     }
 
     <span class="doccomment">/// Add an interaction option for the interaction.</span>
@@ -339,20 +332,19 @@
         };
         <span class="comment">// should this be changed to have None be a panic?</span>
         <span class="self">self</span>
-
     }
 
     <span class="doccomment">/// Sets all the interaction options for the interaction.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Interactions can only have up to 10 options.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_interaction_options</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">options</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">CreateInteractionOption</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(
-            <span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>))
-        ).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
+        <span class="kw">let</span> <span class="ident">new_options</span> <span class="op">=</span> <span class="ident">options</span>
+            .<span class="ident">into_iter</span>()
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">f</span>.<span class="number">0</span>)))
+            .<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Value</span><span class="op">&gt;</span><span class="op">&gt;</span>();
         <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;options&quot;</span>, <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">new_options</span>));
         <span class="self">self</span>
     }
-
 }
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "serenity";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

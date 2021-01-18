@@ -48,15 +48,17 @@
 <span id="45">45</span>
 <span id="46">46</span>
 <span id="47">47</span>
+<span id="48">48</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">async_trait</span>::<span class="ident">async_trait</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::<span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>;
+
 <span class="kw">use</span> <span class="kw">crate</span>::{
-	<span class="ident">gateway</span>::<span class="ident">InterMessage</span>,
-	<span class="ident">model</span>::{
-	    <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
-	    <span class="ident">voice</span>::<span class="ident">VoiceState</span>,
-	},
+    <span class="ident">gateway</span>::<span class="ident">InterMessage</span>,
+    <span class="ident">model</span>::{
+        <span class="ident">id</span>::{<span class="ident">GuildId</span>, <span class="ident">UserId</span>},
+        <span class="ident">voice</span>::<span class="ident">VoiceState</span>,
+    },
 };
 
 <span class="doccomment">/// Interface for any compatible voice plugin.</span>
@@ -65,9 +67,9 @@
 <span class="doccomment">/// packet handlers for voice-specific gateway messages.</span>
 <span class="attribute">#[<span class="ident">async_trait</span>]</span>
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">VoiceGatewayManager</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
-	<span class="doccomment">/// Performs initial setup at the start of a connection to Discord.</span>
-	<span class="doccomment">///</span>
-	<span class="doccomment">/// This will only occur once, and provides the bot&#39;s ID and shard count.</span>
+    <span class="doccomment">/// Performs initial setup at the start of a connection to Discord.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// This will only occur once, and provides the bot&#39;s ID and shard count.</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">initialise</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_count</span>: <span class="ident">u64</span>, <span class="ident">user_id</span>: <span class="ident">UserId</span>);
 
     <span class="doccomment">/// Handler fired in response to a `Ready` event.</span>

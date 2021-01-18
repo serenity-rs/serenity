@@ -93,16 +93,22 @@
 <span id="90">90</span>
 <span id="91">91</span>
 <span id="92">92</span>
+<span id="93">93</span>
+<span id="94">94</span>
+<span id="95">95</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>::<span class="prelude-ty">Result</span>, <span class="ident">http</span>::<span class="ident">Http</span>};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
-<span class="kw">use</span> <span class="ident">tokio</span>::{<span class="ident">sync</span>::<span class="ident">oneshot</span>::{<span class="self">self</span>, <span class="ident">Sender</span>, <span class="ident">error</span>::<span class="ident">TryRecvError</span>}, <span class="ident">time</span>::<span class="ident">Duration</span>};
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>::{
+    <span class="ident">sync</span>::<span class="ident">oneshot</span>::{<span class="self">self</span>, <span class="ident">error</span>::<span class="ident">TryRecvError</span>, <span class="ident">Sender</span>},
+    <span class="ident">time</span>::<span class="ident">Duration</span>,
+};
+
+<span class="kw">use</span> <span class="kw">crate</span>::{<span class="ident">error</span>::<span class="prelude-ty">Result</span>, <span class="ident">http</span>::<span class="ident">Http</span>};
 
 <span class="doccomment">/// A struct to start typing in a [`Channel`] for an indefinite period of time.</span>
 <span class="doccomment">///</span>

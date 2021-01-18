@@ -90,10 +90,6 @@
 <span id="87">87</span>
 <span id="88">88</span>
 <span id="89">89</span>
-<span id="90">90</span>
-<span id="91">91</span>
-<span id="92">92</span>
-<span id="93">93</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of macros for easily working with internals.</span>
 
@@ -121,30 +117,26 @@
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">status</span> {
     (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>:<span class="ident">expr</span>) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="macro">concat</span><span class="macro">!</span>(<span class="string">&quot;https://status.discord.com/api/v2&quot;</span>, <span class="macro-nonterminal">$</span><span class="macro-nonterminal">e</span>)
-    }
+    };
 }
 
 <span class="comment">// Enable check for cache</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>))]</span>
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">feature_cache</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enabled</span>:<span class="ident">block</span> <span class="kw">else</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">disabled</span>:<span class="ident">block</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enabled</span>
-        }
-    }
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enabled</span>:<span class="ident">block</span> <span class="kw">else</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">disabled</span>:<span class="ident">block</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">enabled</span>
+    }};
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>), <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>))]</span>
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">feature_cache</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enabled</span>:<span class="ident">block</span> <span class="kw">else</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">disabled</span>:<span class="ident">block</span>) <span class="op">=</span><span class="op">&gt;</span> {
-        {
-            <span class="macro-nonterminal">$</span><span class="macro-nonterminal">disabled</span>
-        }
-    }
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">enabled</span>:<span class="ident">block</span> <span class="kw">else</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">disabled</span>:<span class="ident">block</span>) <span class="op">=</span><span class="op">&gt;</span> {{
+        <span class="macro-nonterminal">$</span><span class="macro-nonterminal">disabled</span>
+    }};
 }
 
 <span class="macro">macro_rules</span><span class="macro">!</span> <span class="ident">enum_number</span> {
-    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">ident</span>, )<span class="op">*</span> }) <span class="op">=</span><span class="op">&gt;</span> {
+    (<span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span>:<span class="ident">ident</span> { $(<span class="macro-nonterminal">$</span><span class="macro-nonterminal">variant</span>:<span class="ident">ident</span> $(,)<span class="question-mark">?</span> )<span class="op">*</span> }) <span class="op">=</span><span class="op">&gt;</span> {
         <span class="kw">impl</span> ::<span class="ident">serde</span>::<span class="ident">Serialize</span> <span class="kw">for</span> <span class="macro-nonterminal">$</span><span class="macro-nonterminal">name</span> {
             <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> ::<span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
                 <span class="kw">where</span> <span class="ident">S</span>: ::<span class="ident">serde</span>::<span class="ident">Serializer</span>

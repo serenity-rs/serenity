@@ -2060,62 +2060,25 @@
 <span id="2057">2057</span>
 <span id="2058">2058</span>
 <span id="2059">2059</span>
-<span id="2060">2060</span>
-<span id="2061">2061</span>
-<span id="2062">2062</span>
-<span id="2063">2063</span>
-<span id="2064">2064</span>
-<span id="2065">2065</span>
-<span id="2066">2066</span>
-<span id="2067">2067</span>
-<span id="2068">2068</span>
-<span id="2069">2069</span>
-<span id="2070">2070</span>
-<span id="2071">2071</span>
-<span id="2072">2072</span>
-<span id="2073">2073</span>
-<span id="2074">2074</span>
-<span id="2075">2075</span>
-<span id="2076">2076</span>
-<span id="2077">2077</span>
-<span id="2078">2078</span>
-<span id="2079">2079</span>
-<span id="2080">2080</span>
-<span id="2081">2081</span>
-<span id="2082">2082</span>
-<span id="2083">2083</span>
-<span id="2084">2084</span>
-<span id="2085">2085</span>
-<span id="2086">2086</span>
-<span id="2087">2087</span>
-<span id="2088">2088</span>
-<span id="2089">2089</span>
-<span id="2090">2090</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
-<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::{
-    <span class="ident">Serialize</span>,
-    <span class="ident">SerializeSeq</span>,
-    <span class="ident">Serializer</span>
-};
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::<span class="ident">HashMap</span>,
-    <span class="ident">fmt</span>
-};
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">deserialize_emojis</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::<span class="ident">OpCode</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">mem</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">fmt</span>};
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">async_trait</span>::<span class="ident">async_trait</span>;
+<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>;
+<span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">ser</span>::{<span class="ident">Serialize</span>, <span class="ident">SerializeSeq</span>, <span class="ident">Serializer</span>};
+
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">deserialize_emojis</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::{<span class="ident">Cache</span>, <span class="ident">CacheUpdate</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">constants</span>::<span class="ident">OpCode</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 
 <span class="doccomment">/// Event data for the channel creation event.</span>
 <span class="doccomment">///</span>
@@ -2140,7 +2103,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ChannelCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Channel</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2157,15 +2122,13 @@
 
                 <span class="kw">let</span> <span class="ident">old_channel</span> <span class="op">=</span> <span class="ident">cache</span>
                     .<span class="ident">guilds</span>
-                    .<span class="ident">write</span>().<span class="kw">await</span>
+                    .<span class="ident">write</span>()
+                    .<span class="kw">await</span>
                     .<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>)
                     .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">g</span>.<span class="ident">channels</span>.<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>()))
                     .<span class="ident">map</span>(<span class="ident">Channel</span>::<span class="ident">Guild</span>);
 
-                <span class="ident">cache</span>
-                    .<span class="ident">channels</span>
-                    .<span class="ident">write</span>().<span class="kw">await</span>
-                    .<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
+                <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">channel_id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>());
 
                 <span class="ident">old_channel</span>
             },
@@ -2176,9 +2139,9 @@
 
                 <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> {
                     <span class="kw">let</span> <span class="ident">user_id</span> <span class="op">=</span> {
-                            <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">recipient</span>).<span class="kw">await</span>;
+                        <span class="ident">cache</span>.<span class="ident">update_user_entry</span>(<span class="kw-2">&amp;</span><span class="ident">channel</span>.<span class="ident">recipient</span>).<span class="kw">await</span>;
 
-                            <span class="ident">channel</span>.<span class="ident">recipient</span>.<span class="ident">id</span>
+                        <span class="ident">channel</span>.<span class="ident">recipient</span>.<span class="ident">id</span>
                     };
 
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">u</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">users</span>.<span class="ident">read</span>().<span class="kw">await</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">user_id</span>) {
@@ -2195,14 +2158,12 @@
                     .<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">channel</span>.<span class="ident">clone</span>())
                     .<span class="ident">map</span>(<span class="ident">Channel</span>::<span class="ident">Private</span>)
             },
-            <span class="ident">Channel</span>::<span class="ident">Category</span>(<span class="kw-2">ref</span> <span class="ident">category</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="ident">cache</span>
-                    .<span class="ident">categories</span>
-                    .<span class="ident">write</span>()
-                    .<span class="kw">await</span>
-                    .<span class="ident">insert</span>(<span class="ident">category</span>.<span class="ident">id</span>, <span class="ident">category</span>.<span class="ident">clone</span>())
-                    .<span class="ident">map</span>(<span class="ident">Channel</span>::<span class="ident">Category</span>)
-            },
+            <span class="ident">Channel</span>::<span class="ident">Category</span>(<span class="kw-2">ref</span> <span class="ident">category</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">cache</span>
+                .<span class="ident">categories</span>
+                .<span class="ident">write</span>()
+                .<span class="kw">await</span>
+                .<span class="ident">insert</span>(<span class="ident">category</span>.<span class="ident">id</span>, <span class="ident">category</span>.<span class="ident">clone</span>())
+                .<span class="ident">map</span>(<span class="ident">Channel</span>::<span class="ident">Category</span>),
         }
     }
 }
@@ -2223,11 +2184,7 @@
             <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> (<span class="ident">guild_id</span>, <span class="ident">channel_id</span>) <span class="op">=</span> (<span class="ident">channel</span>.<span class="ident">guild_id</span>, <span class="ident">channel</span>.<span class="ident">id</span>);
 
-                <span class="ident">cache</span>
-                    .<span class="ident">channels</span>
-                    .<span class="ident">write</span>()
-                    .<span class="kw">await</span>
-                    .<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>);
+                <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>);
 
                 <span class="ident">cache</span>
                     .<span class="ident">guilds</span>
@@ -2242,9 +2199,7 @@
                 <span class="ident">cache</span>.<span class="ident">categories</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">channel_id</span>);
             },
             <span class="ident">Channel</span>::<span class="ident">Private</span>(<span class="kw-2">ref</span> <span class="ident">channel</span>) <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> {
-                    <span class="ident">channel</span>.<span class="ident">id</span>
-                };
+                <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> { <span class="ident">channel</span>.<span class="ident">id</span> };
 
                 <span class="ident">cache</span>.<span class="ident">private_channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
             },
@@ -2267,7 +2222,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ChannelDeleteEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Channel</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2353,7 +2310,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ChannelUpdateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Channel</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2395,11 +2354,7 @@
         }
 
         <span class="ident">cache</span>.<span class="ident">channels</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">extend</span>(<span class="ident">guild</span>.<span class="ident">channels</span>.<span class="ident">clone</span>().<span class="ident">into_iter</span>());
-        <span class="ident">cache</span>
-            .<span class="ident">guilds</span>
-            .<span class="ident">write</span>()
-            .<span class="kw">await</span>
-            .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>);
+        <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">guild</span>.<span class="ident">id</span>, <span class="ident">guild</span>);
 
         <span class="prelude-val">None</span>
     }
@@ -2415,7 +2370,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">GuildCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Guild</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2459,7 +2416,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">GuildDeleteEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">GuildUnavailable</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2467,7 +2426,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildEmojisUpdateEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_emojis&quot;</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_emojis&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">emojis</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">serialize_with</span> <span class="op">=</span> <span class="string">&quot;serialize_emojis&quot;</span>, <span class="ident">deserialize_with</span> <span class="op">=</span> <span class="string">&quot;deserialize_emojis&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">emojis</span>: <span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">EmojiId</span>, <span class="ident">Emoji</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
@@ -2523,22 +2483,24 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member add guild id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">GuildId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="ident">GuildMemberAddEvent</span> {
             <span class="ident">guild_id</span>,
-            <span class="ident">member</span>: <span class="ident">Member</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
-                .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
+            <span class="ident">member</span>: <span class="ident">Member</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">GuildMemberAddEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ser</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">Serializer</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>);
         <span class="ident">Member</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">member</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ser</span>).<span class="ident">unwrap</span>(); <span class="comment">// TODO find better way to do this</span>
@@ -2608,18 +2570,15 @@
             };
 
             <span class="kw">if</span> <span class="op">!</span><span class="ident">found</span> {
-                <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(
-                    <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>,
-                    <span class="ident">Member</span> {
-                        <span class="ident">deaf</span>: <span class="bool-val">false</span>,
-                        <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
-                        <span class="ident">joined_at</span>: <span class="prelude-val">None</span>,
-                        <span class="ident">mute</span>: <span class="bool-val">false</span>,
-                        <span class="ident">nick</span>: <span class="self">self</span>.<span class="ident">nick</span>.<span class="ident">clone</span>(),
-                        <span class="ident">roles</span>: <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>(),
-                        <span class="ident">user</span>: <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">clone</span>(),
-                    },
-                );
+                <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">Member</span> {
+                    <span class="ident">deaf</span>: <span class="bool-val">false</span>,
+                    <span class="ident">guild_id</span>: <span class="self">self</span>.<span class="ident">guild_id</span>,
+                    <span class="ident">joined_at</span>: <span class="prelude-val">None</span>,
+                    <span class="ident">mute</span>: <span class="bool-val">false</span>,
+                    <span class="ident">nick</span>: <span class="self">self</span>.<span class="ident">nick</span>.<span class="ident">clone</span>(),
+                    <span class="ident">roles</span>: <span class="self">self</span>.<span class="ident">roles</span>.<span class="ident">clone</span>(),
+                    <span class="ident">user</span>: <span class="self">self</span>.<span class="ident">user</span>.<span class="ident">clone</span>(),
+                });
             }
 
             <span class="ident">item</span>
@@ -2661,20 +2620,23 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk guild id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">GuildId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;members&quot;</span>)
-            .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk members&quot;</span>))<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">members</span> <span class="op">=</span>
+            <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;members&quot;</span>).<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk members&quot;</span>))<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">chunk_index</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;chunk_index&quot;</span>)
+        <span class="kw">let</span> <span class="ident">chunk_index</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">get</span>(<span class="string">&quot;chunk_index&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk index&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">u32</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">chunk_count</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;chunk_count&quot;</span>)
+        <span class="kw">let</span> <span class="ident">chunk_count</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">get</span>(<span class="string">&quot;chunk_count&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;missing member chunk count&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">u32</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -2690,20 +2652,19 @@
         }
 
         <span class="kw">let</span> <span class="ident">members</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">Member</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">members</span>)
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">members</span><span class="op">|</span> <span class="ident">members</span>
-                .<span class="ident">into_iter</span>()
-                .<span class="ident">fold</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">member</span><span class="op">|</span> {
+            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">members</span><span class="op">|</span> {
+                <span class="ident">members</span>.<span class="ident">into_iter</span>().<span class="ident">fold</span>(<span class="ident">HashMap</span>::<span class="ident">new</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">acc</span>, <span class="ident">member</span><span class="op">|</span> {
                     <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>;
 
                     <span class="ident">acc</span>.<span class="ident">insert</span>(<span class="ident">id</span>, <span class="ident">member</span>);
 
                     <span class="ident">acc</span>
-                }))
+                })
+            })
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;nonce&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">nonce</span><span class="op">|</span> <span class="ident">nonce</span>.<span class="ident">as_str</span>())
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">nonce</span><span class="op">|</span> <span class="ident">nonce</span>.<span class="ident">to_string</span>());
+        <span class="kw">let</span> <span class="ident">nonce</span> <span class="op">=</span>
+            <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;nonce&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">nonce</span><span class="op">|</span> <span class="ident">nonce</span>.<span class="ident">as_str</span>()).<span class="ident">map</span>(<span class="op">|</span><span class="ident">nonce</span><span class="op">|</span> <span class="ident">nonce</span>.<span class="ident">to_string</span>());
 
         <span class="prelude-val">Ok</span>(<span class="ident">GuildMembersChunkEvent</span> {
             <span class="ident">guild_id</span>,
@@ -2743,7 +2704,8 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">GuildId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -2756,7 +2718,8 @@
             }
         }
 
-        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;role&quot;</span>)
+        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;role&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected role&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">Role</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -2804,7 +2767,6 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild_id</span>) {
-
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">role</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">role</span>.<span class="ident">id</span>) {
                 <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">mem</span>::<span class="ident">replace</span>(<span class="ident">role</span>, <span class="self">self</span>.<span class="ident">role</span>.<span class="ident">clone</span>()));
             }
@@ -2818,7 +2780,8 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">GuildId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -2831,7 +2794,8 @@
             }
         }
 
-        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;role&quot;</span>)
+        <span class="kw">let</span> <span class="ident">role</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;role&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected role&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">Role</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -2866,7 +2830,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">GuildUnavailableEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;id&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;id&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -2919,7 +2884,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">GuildUpdateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">PartialGuild</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">guild</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2943,19 +2910,15 @@
             <span class="kw">return</span> <span class="prelude-val">None</span>;
         }
 
-
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">messages_map</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">write</span>().<span class="kw">await</span>;
         <span class="kw">let</span> <span class="ident">messages</span> <span class="op">=</span> <span class="ident">messages_map</span>.<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">or_insert_with</span>(<span class="ident">Default</span>::<span class="ident">default</span>);
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">message_queues</span> <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">message_queue</span>.<span class="ident">write</span>().<span class="kw">await</span>;
 
-        <span class="kw">let</span> <span class="ident">queue</span> <span class="op">=</span> <span class="ident">message_queues</span>
-            .<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>)
-            .<span class="ident">or_insert_with</span>(<span class="ident">Default</span>::<span class="ident">default</span>);
+        <span class="kw">let</span> <span class="ident">queue</span> <span class="op">=</span> <span class="ident">message_queues</span>.<span class="ident">entry</span>(<span class="self">self</span>.<span class="ident">message</span>.<span class="ident">channel_id</span>).<span class="ident">or_insert_with</span>(<span class="ident">Default</span>::<span class="ident">default</span>);
 
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">removed_msg</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="kw">if</span> <span class="ident">messages</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="ident">max</span> {
-
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">id</span>) <span class="op">=</span> <span class="ident">queue</span>.<span class="ident">pop_front</span>() {
                 <span class="ident">removed_msg</span> <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="ident">id</span>);
             }
@@ -2978,7 +2941,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">MessageCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Message</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">message</span>, <span class="ident">serializer</span>)
     }
 }
@@ -2996,7 +2961,8 @@
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">MessageDeleteEvent</span> {
     <span class="kw">pub</span> <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;id&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;id&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">message_id</span>: <span class="ident">MessageId</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -3027,7 +2993,6 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">messages</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">messages</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">channel_id</span>) {
-
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">message</span>) <span class="op">=</span> <span class="ident">messages</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">id</span>) {
                 <span class="kw">let</span> <span class="ident">item</span> <span class="op">=</span> <span class="ident">message</span>.<span class="ident">clone</span>();
 
@@ -3095,9 +3060,7 @@
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Offline</span> {
                     <span class="ident">guild</span>.<span class="ident">presences</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>);
                 } <span class="kw">else</span> {
-                    <span class="ident">guild</span>
-                        .<span class="ident">presences</span>
-                        .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>());
+                    <span class="ident">guild</span>.<span class="ident">presences</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>());
                 }
 
                 <span class="comment">// Create a partial member instance out of the presence update</span>
@@ -3119,11 +3082,7 @@
         } <span class="kw">else</span> <span class="kw">if</span> <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">status</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Offline</span> {
             <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>);
         } <span class="kw">else</span> {
-            <span class="ident">cache</span>
-                .<span class="ident">presences</span>
-                .<span class="ident">write</span>()
-                .<span class="kw">await</span>
-                .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>());
+            <span class="ident">cache</span>.<span class="ident">presences</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">presence</span>.<span class="ident">clone</span>());
         }
 
         <span class="prelude-val">None</span>
@@ -3135,12 +3094,10 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
         <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>) {
-            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>)
-                .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
+            <span class="prelude-val">Some</span>(<span class="ident">v</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>::<span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">v</span>).<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
-        <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">Presence</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
-            .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
+        <span class="kw">let</span> <span class="ident">presence</span> <span class="op">=</span> <span class="ident">Presence</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="self">Self</span> {
             <span class="ident">guild_id</span>,
@@ -3187,7 +3144,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">PresencesReplaceEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">seq</span> <span class="op">=</span> <span class="ident">serializer</span>.<span class="ident">serialize_seq</span>(<span class="prelude-val">Some</span>(<span class="self">self</span>.<span class="ident">presences</span>.<span class="ident">len</span>()))<span class="question-mark">?</span>;
 
         <span class="kw">for</span> <span class="ident">value</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">presences</span> {
@@ -3214,7 +3173,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ReactionAddEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Reaction</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reaction</span>, <span class="ident">serializer</span>)
     }
 }
@@ -3235,7 +3196,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ReactionRemoveEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Reaction</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">reaction</span>, <span class="ident">serializer</span>)
     }
 }
@@ -3309,7 +3272,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">ReadyEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Ready</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">ready</span>, <span class="ident">serializer</span>)
     }
 }
@@ -3317,7 +3282,8 @@
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">ResumedEvent</span> {
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;_trace&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">trace</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;_trace&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">trace</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Debug</span>, <span class="ident">Deserialize</span>, <span class="ident">Serialize</span>)]</span>
@@ -3363,7 +3329,9 @@
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">UserUpdateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">CurrentUser</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">current_user</span>, <span class="ident">serializer</span>)
     }
 }
@@ -3401,23 +3369,17 @@
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">update</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache</span>: <span class="kw-2">&amp;</span><span class="ident">Cache</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">VoiceState</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
-
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">cache</span>.<span class="ident">guilds</span>.<span class="ident">write</span>().<span class="kw">await</span>.<span class="ident">get_mut</span>(<span class="kw-2">&amp;</span><span class="ident">guild_id</span>) {
-
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">member</span> {
                     <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">insert</span>(<span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>, <span class="ident">member</span>.<span class="ident">clone</span>());
                 }
 
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">channel_id</span>.<span class="ident">is_some</span>() {
                     <span class="comment">// Update or add to the voice state list</span>
-                    <span class="ident">guild</span>
-                        .<span class="ident">voice_states</span>
-                        .<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">clone</span>())
+                    <span class="ident">guild</span>.<span class="ident">voice_states</span>.<span class="ident">insert</span>(<span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>, <span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">clone</span>())
                 } <span class="kw">else</span> {
                     <span class="comment">// Remove the user from the voice state list</span>
-                    <span class="ident">guild</span>
-                        .<span class="ident">voice_states</span>
-                        .<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>)
+                    <span class="ident">guild</span>.<span class="ident">voice_states</span>.<span class="ident">remove</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>.<span class="ident">user_id</span>)
                 }
             } <span class="kw">else</span> {
                 <span class="prelude-val">None</span>
@@ -3438,15 +3400,16 @@
 
         <span class="prelude-val">Ok</span>(<span class="ident">VoiceStateUpdateEvent</span> {
             <span class="ident">guild_id</span>,
-            <span class="ident">voice_state</span>: <span class="ident">VoiceState</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
-                .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
+            <span class="ident">voice_state</span>: <span class="ident">VoiceState</span>::<span class="ident">deserialize</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>,
         })
     }
 }
 
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">VoiceStateUpdateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u8</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">Vec</span>::<span class="ident">new</span>();
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">ser</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">Serializer</span>::<span class="ident">new</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">s</span>);
         <span class="ident">VoiceState</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">voice_state</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ser</span>).<span class="ident">unwrap</span>(); <span class="comment">// TODO find better way to do this</span>
@@ -3490,7 +3453,9 @@
 <span class="attribute">#[<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">doc</span>(<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)))]</span>
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">InteractionCreateEvent</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span> {
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
+    {
         <span class="ident">Interaction</span>::<span class="ident">serialize</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">interaction</span>, <span class="ident">serializer</span>)
     }
 }
@@ -3510,36 +3475,39 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GatewayEvent</span> {
-    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
+    <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;op&quot;</span>)
+        <span class="kw">let</span> <span class="ident">op</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;op&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected op&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">OpCode</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">op</span> {
             <span class="ident">OpCode</span>::<span class="ident">Event</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;s&quot;</span>)
+                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">map</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;s&quot;</span>)
                     .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected gateway event sequence&quot;</span>))
                     .<span class="ident">and_then</span>(<span class="ident">u64</span>::<span class="ident">deserialize</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;t&quot;</span>)
+                <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;t&quot;</span>)
                     .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected gateway event type&quot;</span>))
                     .<span class="ident">and_then</span>(<span class="ident">EventType</span>::<span class="ident">deserialize</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>).<span class="ident">ok_or</span>({
-                    <span class="ident">Error</span>::<span class="ident">Decode</span>(<span class="string">&quot;expected gateway event d&quot;</span>, <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
-                }).<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
-
-                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>, <span class="ident">payload</span>)
+                <span class="kw">let</span> <span class="ident">payload</span> <span class="op">=</span> <span class="ident">map</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>)
+                    .<span class="ident">ok_or</span>(<span class="ident">Error</span>::<span class="ident">Decode</span>(<span class="string">&quot;expected gateway event d&quot;</span>, <span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)))
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
+
+                <span class="kw">let</span> <span class="ident">x</span> <span class="op">=</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>, <span class="ident">payload</span>).<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
                 <span class="ident">GatewayEvent</span>::<span class="ident">Dispatch</span>(<span class="ident">s</span>, <span class="ident">x</span>)
             },
             <span class="ident">OpCode</span>::<span class="ident">Heartbeat</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;s&quot;</span>)
+                <span class="kw">let</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">map</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;s&quot;</span>)
                     .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;Expected heartbeat s&quot;</span>))
                     .<span class="ident">and_then</span>(<span class="ident">u64</span>::<span class="ident">deserialize</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -3548,21 +3516,22 @@
             },
             <span class="ident">OpCode</span>::<span class="ident">Reconnect</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">GatewayEvent</span>::<span class="ident">Reconnect</span>,
             <span class="ident">OpCode</span>::<span class="ident">InvalidSession</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="ident">resumable</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>)
-                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> {
-                        <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected gateway invalid session d&quot;</span>)
-                    })
+                <span class="kw">let</span> <span class="ident">resumable</span> <span class="op">=</span> <span class="ident">map</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>)
+                    .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected gateway invalid session d&quot;</span>))
                     .<span class="ident">and_then</span>(<span class="ident">bool</span>::<span class="ident">deserialize</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
                 <span class="ident">GatewayEvent</span>::<span class="ident">InvalidateSession</span>(<span class="ident">resumable</span>)
             },
             <span class="ident">OpCode</span>::<span class="ident">Hello</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>)
+                <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">d</span> <span class="op">=</span> <span class="ident">map</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;d&quot;</span>)
                     .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected gateway hello d&quot;</span>))
                     .<span class="ident">and_then</span>(<span class="ident">JsonMap</span>::<span class="ident">deserialize</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
-                <span class="kw">let</span> <span class="ident">interval</span> <span class="op">=</span> <span class="ident">d</span>.<span class="ident">remove</span>(<span class="string">&quot;heartbeat_interval&quot;</span>)
+                <span class="kw">let</span> <span class="ident">interval</span> <span class="op">=</span> <span class="ident">d</span>
+                    .<span class="ident">remove</span>(<span class="string">&quot;heartbeat_interval&quot;</span>)
                     .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected gateway hello interval&quot;</span>))
                     .<span class="ident">and_then</span>(<span class="ident">u64</span>::<span class="ident">deserialize</span>)
                     .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -3748,9 +3717,7 @@
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">kind</span> {
         <span class="ident">EventType</span>::<span class="ident">ChannelCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ChannelCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">ChannelDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ChannelDelete</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType</span>::<span class="ident">ChannelPinsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">ChannelPinsUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
+        <span class="ident">EventType</span>::<span class="ident">ChannelPinsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ChannelPinsUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">ChannelUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ChannelUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">GuildBanAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildBanAdd</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">GuildBanRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildBanRemove</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
@@ -3760,9 +3727,7 @@
 
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>())
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
 
                 <span class="ident">Event</span>::<span class="ident">GuildUnavailable</span>(<span class="ident">guild_data</span>)
@@ -3773,9 +3738,7 @@
         <span class="ident">EventType</span>::<span class="ident">GuildDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">v</span>)<span class="question-mark">?</span>;
 
-            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>)
-                    .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>())
-                    .<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
+            <span class="kw">if</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;unavailable&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">v</span><span class="op">|</span> <span class="ident">v</span>.<span class="ident">as_bool</span>()).<span class="ident">unwrap_or</span>(<span class="bool-val">false</span>) {
                 <span class="kw">let</span> <span class="ident">guild_data</span> <span class="op">=</span> <span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>;
 
                 <span class="ident">Event</span>::<span class="ident">GuildUnavailable</span>(<span class="ident">guild_data</span>)
@@ -3783,63 +3746,35 @@
                 <span class="ident">Event</span>::<span class="ident">GuildDelete</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))<span class="question-mark">?</span>)
             }
         },
-        <span class="ident">EventType</span>::<span class="ident">GuildEmojisUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildEmojisUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
+        <span class="ident">EventType</span>::<span class="ident">GuildEmojisUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildEmojisUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">GuildIntegrationsUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
             <span class="ident">Event</span>::<span class="ident">GuildIntegrationsUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
         },
         <span class="ident">EventType</span>::<span class="ident">GuildMemberAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildMemberAdd</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType</span>::<span class="ident">GuildMemberRemove</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildMemberRemove</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">GuildMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildMemberUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">GuildMembersChunk</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildMembersChunk</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">GuildRoleCreate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildRoleCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">GuildRoleDelete</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildRoleDelete</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">GuildRoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">GuildRoleUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
+        <span class="ident">EventType</span>::<span class="ident">GuildMemberRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildMemberRemove</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">GuildMemberUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildMemberUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">GuildMembersChunk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildMembersChunk</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">GuildRoleCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildRoleCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">GuildRoleDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildRoleDelete</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">GuildRoleUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildRoleUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">InviteCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">InviteCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">InviteDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">InviteDelete</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">GuildUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">GuildUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">MessageCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">MessageCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">MessageDelete</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">MessageDelete</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType</span>::<span class="ident">MessageDeleteBulk</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">MessageDeleteBulk</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">ReactionAdd</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">ReactionAdd</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">ReactionRemove</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">ReactionRemove</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">ReactionRemoveAll</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">ReactionRemoveAll</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
+        <span class="ident">EventType</span>::<span class="ident">MessageDeleteBulk</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">MessageDeleteBulk</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">ReactionAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ReactionAdd</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">ReactionRemove</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ReactionRemove</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">ReactionRemoveAll</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ReactionRemoveAll</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">MessageUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">MessageUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">PresenceUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">PresenceUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType</span>::<span class="ident">PresencesReplace</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">PresencesReplace</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
+        <span class="ident">EventType</span>::<span class="ident">PresencesReplace</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">PresencesReplace</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">Ready</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">Ready</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">Resumed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">Resumed</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">TypingStart</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">TypingStart</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">UserUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">UserUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
-        <span class="ident">EventType</span>::<span class="ident">VoiceServerUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">VoiceServerUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
-        <span class="ident">EventType</span>::<span class="ident">VoiceStateUpdate</span> <span class="op">=</span><span class="op">&gt;</span> {
-            <span class="ident">Event</span>::<span class="ident">VoiceStateUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>)
-        },
+        <span class="ident">EventType</span>::<span class="ident">VoiceServerUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">VoiceServerUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
+        <span class="ident">EventType</span>::<span class="ident">VoiceStateUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">VoiceStateUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="ident">EventType</span>::<span class="ident">WebhookUpdate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">WebhookUpdate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
         <span class="ident">EventType</span>::<span class="ident">InteractionCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">InteractionCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
@@ -4120,10 +4055,11 @@
     }
 }
 
-
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EventType</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> {
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
+    {
         <span class="kw">struct</span> <span class="ident">EventTypeVisitor</span>;
 
         <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Visitor</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">EventTypeVisitor</span> {
@@ -4134,7 +4070,9 @@
             }
 
             <span class="kw">fn</span> <span class="ident">visit_str</span><span class="op">&lt;</span><span class="ident">E</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">v</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Value</span>, <span class="ident">E</span><span class="op">&gt;</span>
-                <span class="kw">where</span> <span class="ident">E</span>: <span class="ident">DeError</span> {
+            <span class="kw">where</span>
+                <span class="ident">E</span>: <span class="ident">DeError</span>,
+            {
                 <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">v</span> {
                     <span class="ident">EventType</span>::<span class="ident">CHANNEL_CREATE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType</span>::<span class="ident">ChannelCreate</span>,
                     <span class="ident">EventType</span>::<span class="ident">CHANNEL_DELETE</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">EventType</span>::<span class="ident">ChannelDelete</span>,

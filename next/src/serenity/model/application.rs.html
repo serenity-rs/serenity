@@ -175,20 +175,12 @@
 <span id="172">172</span>
 <span id="173">173</span>
 <span id="174">174</span>
-<span id="175">175</span>
-<span id="176">176</span>
-<span id="177">177</span>
-<span id="178">178</span>
-<span id="179">179</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models about OAuth2 applications.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::{
-    <span class="ident">id</span>::<span class="ident">UserId</span>,
-    <span class="ident">user</span>::<span class="ident">User</span>,
-    <span class="ident">utils</span>::<span class="kw-2">*</span>,
-};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>;
+
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">id</span>::<span class="ident">UserId</span>, <span class="ident">user</span>::<span class="ident">User</span>, <span class="ident">utils</span>::<span class="kw-2">*</span>};
 
 <span class="doccomment">/// Information about a user&#39;s application. An application does not necessarily</span>
 <span class="doccomment">/// have an associated bot user.</span>
@@ -278,7 +270,6 @@
     <span class="kw">pub</span> <span class="ident">token</span>: <span class="ident">String</span>,
 }
 
-
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">BotApplication</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
         <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;BotApplication&quot;</span>)
@@ -312,7 +303,8 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">UserId</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">owner</span>: <span class="ident">User</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span> <span class="kw">pub</span> <span class="ident">rpc_origins</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">rpc_origins</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">bot_public</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">bot_require_code_grant</span>: <span class="ident">bool</span>,
     <span class="kw">pub</span> <span class="ident">team</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Team</span><span class="op">&gt;</span>,
@@ -354,11 +346,9 @@
     <span class="ident">Accepted</span> <span class="op">=</span> <span class="number">2</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(
-    <span class="ident">MembershipState</span> {
-        <span class="ident">Invited</span>,
-        <span class="ident">Accepted</span>,
-    }
-);
+<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">MembershipState</span> {
+    <span class="ident">Invited</span>,
+    <span class="ident">Accepted</span>,
+});
 </pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "serenity";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

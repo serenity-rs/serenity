@@ -1079,51 +1079,82 @@
 <span id="1076">1076</span>
 <span id="1077">1077</span>
 <span id="1078">1078</span>
+<span id="1079">1079</span>
+<span id="1080">1080</span>
+<span id="1081">1081</span>
+<span id="1082">1082</span>
+<span id="1083">1083</span>
+<span id="1084">1084</span>
+<span id="1085">1085</span>
+<span id="1086">1086</span>
+<span id="1087">1087</span>
+<span id="1088">1088</span>
+<span id="1089">1089</span>
+<span id="1090">1090</span>
+<span id="1091">1091</span>
+<span id="1092">1092</span>
+<span id="1093">1093</span>
+<span id="1094">1094</span>
+<span id="1095">1095</span>
+<span id="1096">1096</span>
+<span id="1097">1097</span>
+<span id="1098">1098</span>
+<span id="1099">1099</span>
+<span id="1100">1100</span>
+<span id="1101">1101</span>
+<span id="1102">1102</span>
+<span id="1103">1103</span>
+<span id="1104">1104</span>
+<span id="1105">1105</span>
+<span id="1106">1106</span>
+<span id="1107">1107</span>
+<span id="1108">1108</span>
+<span id="1109">1109</span>
+<span id="1110">1110</span>
+<span id="1111">1111</span>
+<span id="1112">1112</span>
+<span id="1113">1113</span>
+<span id="1114">1114</span>
+<span id="1115">1115</span>
+<span id="1116">1116</span>
+<span id="1117">1117</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
-<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Display</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">EditMessage</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::<span class="ident">Write</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">bitflags</span>::<span class="ident">__impl_bitflags</span>;
+<span class="kw">use</span> <span class="ident">chrono</span>::{<span class="ident">DateTime</span>, <span class="ident">Utc</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">serde</span>::{
     <span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>},
     <span class="ident">ser</span>::{<span class="ident">Serialize</span>, <span class="ident">Serializer</span>},
 };
+<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Value</span>;
+
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>))]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>::{<span class="ident">CreateEmbed</span>, <span class="ident">EditMessage</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardMessenger</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">CollectReaction</span>, <span class="ident">ReactionCollectorBuilder</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::{<span class="ident">CacheHttp</span>, <span class="ident">Http</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">utils</span>::<span class="ident">U64Visitor</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">result</span>::<span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">StdResult</span>,
-};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">constants</span>,
-    <span class="ident">model</span>::<span class="ident">id</span>::{
-        <span class="ident">ApplicationId</span>,
-        <span class="ident">MessageId</span>,
-        <span class="ident">GuildId</span>,
-        <span class="ident">ChannelId</span>,
-    },
+    <span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">ApplicationId</span>, <span class="ident">ChannelId</span>, <span class="ident">GuildId</span>, <span class="ident">MessageId</span>},
 };
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::{<span class="ident">Http</span>, <span class="ident">CacheHttp</span>};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{
-    <span class="ident">ReactionCollectorBuilder</span>, <span class="ident">CollectReaction</span>,
-};
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardMessenger</span>;
 
 <span class="doccomment">/// A representation of a message over a guild&#39;s text channel, a group, or a</span>
 <span class="doccomment">/// private channel.</span>
@@ -1232,7 +1263,8 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
                 <span class="kw">let</span> <span class="ident">is_author</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>;
-                <span class="kw">let</span> <span class="ident">has_perms</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">has_perms</span> <span class="op">=</span>
+                    <span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">is_author</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_perms</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
@@ -1283,7 +1315,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_reaction_emoji</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
-        <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>
+        <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
     ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1335,7 +1367,8 @@
     <span class="doccomment">/// [`the limit`]: crate::builder::EditMessage::content</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;utils&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditMessage</span>,
     {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
@@ -1354,7 +1387,7 @@
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">embed</span>) <span class="op">=</span> <span class="self">self</span>.<span class="ident">embeds</span>.<span class="ident">get</span>(<span class="number">0</span>) {
             <span class="kw">let</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">CreateEmbed</span>::<span class="ident">from</span>(<span class="ident">embed</span>.<span class="ident">clone</span>());
-            <span class="ident">builder</span>.<span class="ident">embed</span>( <span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
+            <span class="ident">builder</span>.<span class="ident">embed</span>(<span class="op">|</span><span class="ident">e</span><span class="op">|</span> {
                 <span class="kw-2">*</span><span class="ident">e</span> <span class="op">=</span> <span class="ident">embed</span>;
                 <span class="ident">e</span>
             });
@@ -1364,7 +1397,10 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">builder</span>.<span class="number">0</span>);
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
+            .<span class="ident">http</span>()
+            .<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1372,10 +1408,8 @@
     <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">transform_content</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">kind</span> {
             <span class="ident">MessageType</span>::<span class="ident">PinsAdd</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span> <span class="macro">format</span><span class="macro">!</span>(
-                    <span class="string">&quot;{} pinned a message to this channel. See all the pins.&quot;</span>,
-                    <span class="self">self</span>.<span class="ident">author</span>
-                );
+                <span class="self">self</span>.<span class="ident">content</span> <span class="op">=</span>
+                    <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} pinned a message to this channel. See all the pins.&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>);
             },
             <span class="ident">MessageType</span>::<span class="ident">MemberJoin</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">sec</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">timestamp</span>.<span class="ident">timestamp</span>() <span class="kw">as</span> <span class="ident">usize</span>;
@@ -1426,9 +1460,7 @@
         }
 
         <span class="comment">// And finally replace everyone and here mentions.</span>
-        <span class="ident">result</span>
-            .<span class="ident">replace</span>(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>)
-            .<span class="ident">replace</span>(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
+        <span class="ident">result</span>.<span class="ident">replace</span>(<span class="string">&quot;@everyone&quot;</span>, <span class="string">&quot;@\u{200B}everyone&quot;</span>).<span class="ident">replace</span>(<span class="string">&quot;@here&quot;</span>, <span class="string">&quot;@\u{200B}here&quot;</span>)
     }
 
     <span class="doccomment">/// Gets the list of [`User`]s who have reacted to a [`Message`] with a</span>
@@ -1465,7 +1497,7 @@
     <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Guild</span><span class="op">&gt;</span> {
-       <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="kw">await</span>
+        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Returns a field to the `Guild` for the message if one is in the cache.</span>
@@ -1478,13 +1510,16 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`guild_id`]: Self::guild_id</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="ident">field_accessor</span>: <span class="ident">Fun</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">Ret</span>: <span class="ident">Clone</span>, <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">guild_field</span><span class="op">&lt;</span><span class="ident">Ret</span>, <span class="ident">Fun</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+        <span class="ident">field_accessor</span>: <span class="ident">Fun</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Ret</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">Ret</span>: <span class="ident">Clone</span>,
+        <span class="ident">Fun</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="ident">Guild</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Ret</span>,
     {
-        <span class="ident">cache</span>
-            .<span class="ident">as_ref</span>()
-            .<span class="ident">guild_field</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>, <span class="ident">field_accessor</span>)
-            .<span class="kw">await</span>
+        <span class="ident">cache</span>.<span class="ident">as_ref</span>().<span class="ident">guild_field</span>(<span class="self">self</span>.<span class="ident">guild_id</span><span class="question-mark">?</span>, <span class="ident">field_accessor</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// True if message was sent using direct messages.</span>
@@ -1581,18 +1616,25 @@
     <span class="doccomment">/// [Add Reactions]: Permissions::ADD_REACTIONS</span>
     <span class="doccomment">/// [permissions]: super::permissions</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">react</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">react</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">reaction_type</span>: <span class="kw">impl</span> <span class="ident">Into</span><span class="op">&lt;</span><span class="ident">ReactionType</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_react</span>(<span class="ident">cache_http</span>, <span class="kw-2">&amp;</span><span class="ident">reaction_type</span>.<span class="ident">into</span>()).<span class="kw">await</span>
     }
 
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_react</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">reaction_type</span>: <span class="kw-2">&amp;</span><span class="ident">ReactionType</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_react</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">reaction_type</span>: <span class="kw-2">&amp;</span><span class="ident">ReactionType</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Reaction</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">unused_mut</span>)]</span>
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">None</span>;
 
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
                     <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">ADD_REACTIONS</span>;
 
@@ -1636,7 +1678,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">false</span>)).<span class="kw">await</span>
     }
 
@@ -1658,7 +1704,11 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply_ping</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply_ping</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="ident">content</span>, <span class="prelude-val">Some</span>(<span class="bool-val">true</span>)).<span class="kw">await</span>
     }
 
@@ -1683,35 +1733,47 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Send Messages]: Permissions::SEND_MESSAGES</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply_mention</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">reply_mention</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">_reply</span>(<span class="ident">cache_http</span>, <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;{} {}&quot;</span>, <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">mention</span>(), <span class="ident">content</span>), <span class="prelude-val">None</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// `inlined` decides whether this reply is inlinded and whether it pings.</span>
-    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_reply</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>, <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>, <span class="ident">inlined</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_reply</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>,
+        <span class="ident">content</span>: <span class="kw">impl</span> <span class="ident">Display</span>,
+        <span class="ident">inlined</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">bool</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
                     <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">SEND_MESSAGES</span>;
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
+                    <span class="kw">if</span> <span class="op">!</span><span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>)
+                        .<span class="kw">await</span><span class="question-mark">?</span>
+                    {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                     }
                 }
             }
         }
 
-        <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">builder</span><span class="op">|</span> {
-            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ping_user</span>) <span class="op">=</span> <span class="ident">inlined</span> {
-                <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>
-                    .<span class="ident">reference_message</span>(<span class="self">self</span>)
-                    .<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">replied_user</span>(<span class="ident">ping_user</span>));
-            }
+        <span class="self">self</span>.<span class="ident">channel_id</span>
+            .<span class="ident">send_message</span>(<span class="ident">cache_http</span>.<span class="ident">http</span>(), <span class="op">|</span><span class="kw-2">mut</span> <span class="ident">builder</span><span class="op">|</span> {
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">ping_user</span>) <span class="op">=</span> <span class="ident">inlined</span> {
+                    <span class="ident">builder</span> <span class="op">=</span> <span class="ident">builder</span>
+                        .<span class="ident">reference_message</span>(<span class="self">self</span>)
+                        .<span class="ident">allowed_mentions</span>(<span class="op">|</span><span class="ident">f</span><span class="op">|</span> <span class="ident">f</span>.<span class="ident">replied_user</span>(<span class="ident">ping_user</span>));
+                }
 
-            <span class="ident">builder</span>.<span class="ident">content</span>(<span class="ident">content</span>)
-        }).<span class="kw">await</span>
+                <span class="ident">builder</span>.<span class="ident">content</span>(<span class="ident">content</span>)
+            })
+            .<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Delete all embeds in this message</span>
@@ -1732,7 +1794,9 @@
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
                 <span class="kw">let</span> <span class="ident">is_author</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>;
-                <span class="kw">let</span> <span class="ident">has_perms</span> <span class="op">=</span> <span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="kw">let</span> <span class="ident">has_perms</span> <span class="op">=</span>
+                    <span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>)
+                        .<span class="kw">await</span><span class="question-mark">?</span>;
 
                 <span class="kw">if</span> <span class="op">!</span><span class="ident">is_author</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_perms</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
@@ -1745,7 +1809,10 @@
 
         <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">suppress</span>.<span class="number">0</span>);
 
-        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">http</span>().<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span><span class="question-mark">?</span>;
+        <span class="kw-2">*</span><span class="self">self</span> <span class="op">=</span> <span class="ident">cache_http</span>
+            .<span class="ident">http</span>()
+            .<span class="ident">edit_message</span>(<span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
+            .<span class="kw">await</span><span class="question-mark">?</span>;
 
         <span class="prelude-val">Ok</span>(())
     }
@@ -1794,7 +1861,9 @@
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
                     <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
 
-                    <span class="kw">if</span> <span class="op">!</span><span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
+                    <span class="kw">if</span> <span class="op">!</span><span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>)
+                        .<span class="kw">await</span><span class="question-mark">?</span>
+                    {
                         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
                     }
                 }
@@ -1817,20 +1886,29 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">link</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">guild_id</span> {
-            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>, <span class="ident">guild_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>),
+            <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(
+                <span class="string">&quot;https://discord.com/channels/{}/{}/{}&quot;</span>,
+                <span class="ident">guild_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>
+            ),
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;https://discord.com/channels/@me/{}/{}&quot;</span>, <span class="self">self</span>.<span class="ident">channel_id</span>.<span class="number">0</span>, <span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>),
         }
     }
 
     <span class="doccomment">/// Await a single reaction on this message.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CollectReaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">CollectReaction</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">CollectReaction</span>::<span class="ident">new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
     <span class="doccomment">/// Returns a stream builder which can be awaited to obtain a stream of reactions on this message.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reactions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">await_reactions</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">shard_messenger</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">ShardMessenger</span><span class="op">&gt;</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">ReactionCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
         <span class="ident">ReactionCollectorBuilder</span>::<span class="ident">new</span>(<span class="ident">shard_messenger</span>).<span class="ident">message_id</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>)
     }
 
@@ -1911,12 +1989,16 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
     <span class="doccomment">/// Gets the Id of a `Message`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> { <span class="ident">message</span>.<span class="ident">id</span> }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> {
+        <span class="ident">message</span>.<span class="ident">id</span>
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Message</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageId</span> {
     <span class="doccomment">/// Gets the Id of a `Message`.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> { <span class="ident">message</span>.<span class="ident">id</span> }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">message</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">MessageId</span> {
+        <span class="ident">message</span>.<span class="ident">id</span>
+    }
 }
 
 <span class="doccomment">/// A representation of a reaction to a message.</span>
@@ -1973,24 +2055,22 @@
     <span class="ident">ApplicationCommand</span> <span class="op">=</span> <span class="number">20</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(
-    <span class="ident">MessageType</span> {
-        <span class="ident">Regular</span>,
-        <span class="ident">GroupRecipientAddition</span>,
-        <span class="ident">GroupRecipientRemoval</span>,
-        <span class="ident">GroupCallCreation</span>,
-        <span class="ident">GroupNameUpdate</span>,
-        <span class="ident">GroupIconUpdate</span>,
-        <span class="ident">PinsAdd</span>,
-        <span class="ident">MemberJoin</span>,
-        <span class="ident">NitroBoost</span>,
-        <span class="ident">NitroTier1</span>,
-        <span class="ident">NitroTier2</span>,
-        <span class="ident">NitroTier3</span>,
-        <span class="ident">InlineReply</span>,
-        <span class="ident">ApplicationCommand</span>,
-    }
-);
+<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">MessageType</span> {
+    <span class="ident">Regular</span>,
+    <span class="ident">GroupRecipientAddition</span>,
+    <span class="ident">GroupRecipientRemoval</span>,
+    <span class="ident">GroupCallCreation</span>,
+    <span class="ident">GroupNameUpdate</span>,
+    <span class="ident">GroupIconUpdate</span>,
+    <span class="ident">PinsAdd</span>,
+    <span class="ident">MemberJoin</span>,
+    <span class="ident">NitroBoost</span>,
+    <span class="ident">NitroTier1</span>,
+    <span class="ident">NitroTier2</span>,
+    <span class="ident">NitroTier3</span>,
+    <span class="ident">InlineReply</span>,
+    <span class="ident">ApplicationCommand</span>,
+});
 
 <span class="kw">impl</span> <span class="ident">MessageType</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
@@ -2025,14 +2105,12 @@
     <span class="ident">JOIN_REQUEST</span> <span class="op">=</span> <span class="number">5</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(
-    <span class="ident">MessageActivityKind</span> {
-        <span class="ident">JOIN</span>,
-        <span class="ident">SPECTATE</span>,
-        <span class="ident">LISTEN</span>,
-        <span class="ident">JOIN_REQUEST</span>,
-    }
-);
+<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">MessageActivityKind</span> {
+    <span class="ident">JOIN</span>,
+    <span class="ident">SPECTATE</span>,
+    <span class="ident">LISTEN</span>,
+    <span class="ident">JOIN_REQUEST</span>,
+});
 
 <span class="kw">impl</span> <span class="ident">MessageActivityKind</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {
@@ -2142,18 +2220,18 @@
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">MessageFlags</span> {
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span>,
     {
-        <span class="prelude-val">Ok</span>(<span class="ident">MessageFlags</span>::<span class="ident">from_bits_truncate</span>(
-            <span class="ident">deserializer</span>.<span class="ident">deserialize_u64</span>(<span class="ident">U64Visitor</span>)<span class="question-mark">?</span>,
-        ))
+        <span class="prelude-val">Ok</span>(<span class="ident">MessageFlags</span>::<span class="ident">from_bits_truncate</span>(<span class="ident">deserializer</span>.<span class="ident">deserialize_u64</span>(<span class="ident">U64Visitor</span>)<span class="question-mark">?</span>))
     }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">Serialize</span> <span class="kw">for</span> <span class="ident">MessageFlags</span> {
     <span class="kw">fn</span> <span class="ident">serialize</span><span class="op">&lt;</span><span class="ident">S</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">serializer</span>: <span class="ident">S</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="ident">S</span>::<span class="prelude-val">Ok</span>, <span class="ident">S</span>::<span class="ident">Error</span><span class="op">&gt;</span>
-    <span class="kw">where</span> <span class="ident">S</span>: <span class="ident">Serializer</span>
+    <span class="kw">where</span>
+        <span class="ident">S</span>: <span class="ident">Serializer</span>,
     {
         <span class="ident">serializer</span>.<span class="ident">serialize_u64</span>(<span class="self">self</span>.<span class="ident">bits</span>())
     }

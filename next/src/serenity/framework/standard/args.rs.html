@@ -925,13 +925,14 @@
 <span id="922">922</span>
 <span id="923">923</span>
 <span id="924">924</span>
+<span id="925">925</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">uwl</span>::<span class="ident">Stream</span>;
-
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">marker</span>::<span class="ident">PhantomData</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">fmt</span>, <span class="ident">str</span>::<span class="ident">FromStr</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
+
+<span class="kw">use</span> <span class="ident">uwl</span>::<span class="ident">Stream</span>;
 
 <span class="doccomment">/// Defines how an operation on an `Args` method failed.</span>
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>)]</span>
@@ -1024,7 +1025,10 @@
 <span class="kw">impl</span> <span class="ident">Token</span> {
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">new</span>(<span class="ident">kind</span>: <span class="ident">TokenKind</span>, <span class="ident">start</span>: <span class="ident">usize</span>, <span class="ident">end</span>: <span class="ident">usize</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
-        <span class="ident">Token</span> { <span class="ident">kind</span>, <span class="ident">span</span>: (<span class="ident">start</span>, <span class="ident">end</span>) }
+        <span class="ident">Token</span> {
+            <span class="ident">kind</span>,
+            <span class="ident">span</span>: (<span class="ident">start</span>, <span class="ident">end</span>),
+        }
     }
 }
 
@@ -1108,7 +1112,6 @@
 <span class="doccomment">/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;hello&quot;);</span>
 <span class="doccomment">/// // Same here.</span>
 <span class="doccomment">/// assert_eq!(args.single::&lt;String&gt;().unwrap(), &quot;world!&quot;);</span>
-<span class="doccomment">///</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// We can also parse &quot;quoted arguments&quot; (no pun intended):</span>
@@ -1318,21 +1321,21 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">s</span> <span class="op">=</span> <span class="ident">s</span>;
 
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
-            <span class="ident">State</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="ident">State</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {},
             <span class="ident">State</span>::<span class="ident">Quoted</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">s</span> <span class="op">=</span> <span class="ident">remove_quotes</span>(<span class="ident">s</span>);
-            }
+            },
             <span class="ident">State</span>::<span class="ident">Trimmed</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">s</span> <span class="op">=</span> <span class="ident">trim</span>(<span class="ident">s</span>);
-            }
+            },
             <span class="ident">State</span>::<span class="ident">QuotedTrimmed</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">s</span> <span class="op">=</span> <span class="ident">remove_quotes</span>(<span class="ident">s</span>);
                 <span class="ident">s</span> <span class="op">=</span> <span class="ident">trim</span>(<span class="ident">s</span>);
-            }
+            },
             <span class="ident">State</span>::<span class="ident">TrimmedQuoted</span> <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">s</span> <span class="op">=</span> <span class="ident">trim</span>(<span class="ident">s</span>);
                 <span class="ident">s</span> <span class="op">=</span> <span class="ident">remove_quotes</span>(<span class="ident">s</span>);
-            }
+            },
         }
 
         <span class="ident">s</span>
@@ -1395,7 +1398,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Trimmed</span>,
             <span class="ident">State</span>::<span class="ident">Quoted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">QuotedTrimmed</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
 
         <span class="self">self</span>
@@ -1412,7 +1415,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State</span>::<span class="ident">Trimmed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="prelude-val">None</span>,
             <span class="ident">State</span>::<span class="ident">QuotedTrimmed</span> <span class="op">|</span> <span class="ident">State</span>::<span class="ident">TrimmedQuoted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Quoted</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
 
         <span class="self">self</span>
@@ -1449,7 +1452,7 @@
             <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
                 <span class="ident">State</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Quoted</span>,
                 <span class="ident">State</span>::<span class="ident">Trimmed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">TrimmedQuoted</span>,
-                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
             }
         }
 
@@ -1467,7 +1470,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State</span>::<span class="ident">Quoted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="prelude-val">None</span>,
             <span class="ident">State</span>::<span class="ident">QuotedTrimmed</span> <span class="op">|</span> <span class="ident">State</span>::<span class="ident">TrimmedQuoted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Trimmed</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
 
         <span class="self">self</span>
@@ -1538,7 +1541,6 @@
     <span class="doccomment">/// assert_eq!(args.single_quoted::&lt;u32&gt;().unwrap(), 2);</span>
     <span class="doccomment">/// assert!(args.is_empty());</span>
     <span class="doccomment">/// ```</span>
-    <span class="doccomment">///</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">single_quoted</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">FromStr</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">T</span>::<span class="prelude-val">Err</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="ident">p</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">quoted</span>().<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span>()<span class="question-mark">?</span>;
@@ -1791,7 +1793,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Quoted</span>,
             <span class="ident">State</span>::<span class="ident">Trimmed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">TrimmedQuoted</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
 
         <span class="self">self</span>
@@ -1803,7 +1805,7 @@
         <span class="kw">match</span> <span class="self">self</span>.<span class="ident">state</span> {
             <span class="ident">State</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">Trimmed</span>,
             <span class="ident">State</span>::<span class="ident">Quoted</span> <span class="op">=</span><span class="op">&gt;</span> <span class="self">self</span>.<span class="ident">state</span> <span class="op">=</span> <span class="ident">State</span>::<span class="ident">QuotedTrimmed</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {}
+            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {},
         }
 
         <span class="self">self</span>

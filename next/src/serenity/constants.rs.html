@@ -185,8 +185,6 @@
 <span id="182">182</span>
 <span id="183">183</span>
 <span id="184">184</span>
-<span id="185">185</span>
-<span id="186">186</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of constants used by the library.</span>
 
@@ -288,22 +286,20 @@
     <span class="ident">HeartbeatAck</span> <span class="op">=</span> <span class="number">11</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(
-    <span class="ident">OpCode</span> {
-        <span class="ident">Event</span>,
-        <span class="ident">Heartbeat</span>,
-        <span class="ident">Identify</span>,
-        <span class="ident">StatusUpdate</span>,
-        <span class="ident">VoiceStateUpdate</span>,
-        <span class="ident">VoiceServerPing</span>,
-        <span class="ident">Resume</span>,
-        <span class="ident">Reconnect</span>,
-        <span class="ident">GetGuildMembers</span>,
-        <span class="ident">InvalidSession</span>,
-        <span class="ident">Hello</span>,
-        <span class="ident">HeartbeatAck</span>,
-    }
-);
+<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">OpCode</span> {
+    <span class="ident">Event</span>,
+    <span class="ident">Heartbeat</span>,
+    <span class="ident">Identify</span>,
+    <span class="ident">StatusUpdate</span>,
+    <span class="ident">VoiceStateUpdate</span>,
+    <span class="ident">VoiceServerPing</span>,
+    <span class="ident">Resume</span>,
+    <span class="ident">Reconnect</span>,
+    <span class="ident">GetGuildMembers</span>,
+    <span class="ident">InvalidSession</span>,
+    <span class="ident">Hello</span>,
+    <span class="ident">HeartbeatAck</span>,
+});
 
 <span class="kw">impl</span> <span class="ident">OpCode</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {

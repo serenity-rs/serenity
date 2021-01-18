@@ -873,10 +873,13 @@
 <span id="870">870</span>
 <span id="871">871</span>
 <span id="872">872</span>
+<span id="873">873</span>
+<span id="874">874</span>
+<span id="875">875</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
-    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">check</span>, <span class="ident">hook</span>};
+    <span class="kw">pub</span> <span class="kw">use</span> <span class="ident">command_attr</span>::{<span class="ident">check</span>, <span class="ident">command</span>, <span class="ident">group</span>, <span class="ident">help</span>, <span class="ident">hook</span>};
 }
 
 <span class="kw">mod</span> <span class="ident">args</span>;
@@ -884,48 +887,38 @@
 <span class="kw">mod</span> <span class="ident">parse</span>;
 <span class="kw">mod</span> <span class="ident">structures</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">args</span>::{<span class="ident">Args</span>, <span class="ident">Delimiter</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ArgError</span>, <span class="ident">Iter</span>, <span class="ident">RawArguments</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">WithWhiteSpace</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
-
-<span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">RateLimitAction</span>};
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::<span class="ident">BucketBuilder</span>;
-
-<span class="kw">use</span> <span class="ident">parse</span>::{<span class="ident">ParseError</span>, <span class="ident">Invoke</span>};
-<span class="kw">use</span> <span class="ident">parse</span>::<span class="ident">map</span>::{<span class="ident">CommandMap</span>, <span class="ident">GroupMap</span>, <span class="ident">Map</span>};
-
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">buckets</span>::{<span class="ident">RateLimitInfo</span>, <span class="ident">RevertBucket</span>};
-
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Framework</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
-    <span class="ident">channel</span>::<span class="ident">Message</span>,
-    <span class="ident">permissions</span>::<span class="ident">Permissions</span>,
-};
-
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
-<span class="kw">use</span> <span class="ident">uwl</span>::<span class="ident">Stream</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">args</span>::{<span class="ident">Args</span>, <span class="ident">Delimiter</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ArgError</span>, <span class="ident">Iter</span>, <span class="ident">RawArguments</span>};
 <span class="kw">use</span> <span class="ident">async_trait</span>::<span class="ident">async_trait</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">configuration</span>::{<span class="ident">Configuration</span>, <span class="ident">WithWhiteSpace</span>};
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
+<span class="kw">use</span> <span class="ident">parse</span>::<span class="ident">map</span>::{<span class="ident">CommandMap</span>, <span class="ident">GroupMap</span>, <span class="ident">Map</span>};
+<span class="kw">use</span> <span class="ident">parse</span>::{<span class="ident">Invoke</span>, <span class="ident">ParseError</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::<span class="ident">BucketBuilder</span>;
+<span class="kw">use</span> <span class="ident">structures</span>::<span class="ident">buckets</span>::{<span class="ident">Bucket</span>, <span class="ident">RateLimitAction</span>};
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">structures</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>;
 <span class="kw">use</span> <span class="ident">tracing</span>::<span class="ident">instrument</span>;
+<span class="kw">use</span> <span class="ident">uwl</span>::<span class="ident">Stream</span>;
 
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">buckets</span>::{<span class="ident">RateLimitInfo</span>, <span class="ident">RevertBucket</span>};
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Framework</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">channel</span>::<span class="ident">Channel</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">guild</span>::<span class="ident">Member</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{<span class="ident">channel</span>::<span class="ident">Message</span>, <span class="ident">permissions</span>::<span class="ident">Permissions</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{<span class="ident">guild</span>::<span class="ident">Role</span>, <span class="ident">id</span>::<span class="ident">RoleId</span>};
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio_compat&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)))]</span>
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">delay_for</span> <span class="kw">as</span> <span class="ident">sleep</span>;
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;tokio&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">time</span>::<span class="ident">sleep</span>;
 
 <span class="doccomment">/// An enum representing all possible fail conditions under which a command won&#39;t</span>
 <span class="doccomment">/// be executed.</span>
@@ -962,10 +955,17 @@
     <span class="ident">TooManyArguments</span> { <span class="ident">max</span>: <span class="ident">u16</span>, <span class="ident">given</span>: <span class="ident">usize</span> },
 }
 
-<span class="kw">type</span> <span class="ident">DispatchHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span> , ()<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">DispatchHook</span> <span class="op">=</span>
+    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">DispatchError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">BeforeHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">bool</span><span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">AfterHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandError</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
-<span class="kw">type</span> <span class="ident">UnrecognisedHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">AfterHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>,
+    <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>,
+    <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">CommandError</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
+<span class="kw">type</span> <span class="ident">UnrecognisedHook</span> <span class="op">=</span>
+    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">str</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">NormalMessageHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 <span class="kw">type</span> <span class="ident">PrefixOnlyHook</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, ()<span class="op">&gt;</span>;
 
@@ -1077,24 +1077,21 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">bucket</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="self">self</span>, <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span>
     <span class="kw">where</span>
-        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">BucketBuilder</span>,
     {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">builder</span> <span class="op">=</span> <span class="ident">BucketBuilder</span>::<span class="ident">default</span>();
 
         <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">builder</span>);
 
-        <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(
-            <span class="ident">name</span>.<span class="ident">to_string</span>(),
-            <span class="ident">builder</span>.<span class="ident">construct</span>(),
-        );
+        <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">insert</span>(<span class="ident">name</span>.<span class="ident">to_string</span>(), <span class="ident">builder</span>.<span class="ident">construct</span>());
 
         <span class="self">self</span>
     }
 
     <span class="doccomment">/// Whether the message should be ignored because it is from a bot or webhook.</span>
     <span class="kw">fn</span> <span class="ident">should_ignore</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
-        (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_bots</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">bot</span>) <span class="op">|</span><span class="op">|</span>
-            (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_webhooks</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">webhook_id</span>.<span class="ident">is_some</span>())
+        (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_bots</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">bot</span>)
+            <span class="op">|</span><span class="op">|</span> (<span class="self">self</span>.<span class="ident">config</span>.<span class="ident">ignore_webhooks</span> <span class="op">&amp;&amp;</span> <span class="ident">msg</span>.<span class="ident">webhook_id</span>.<span class="ident">is_some</span>())
     }
 
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">should_fail</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>(
@@ -1150,8 +1147,9 @@
             }
         }
 
-        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span>
-           <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">channel_id</span>) {
+        <span class="kw">if</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">is_empty</span>()
+            <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="self">self</span>.<span class="ident">config</span>.<span class="ident">allowed_channels</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">channel_id</span>)
+        {
             <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">BlockedChannel</span>);
         }
 
@@ -1165,13 +1163,14 @@
             {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>)) {
-
+                <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span>
+                    <span class="ident">command</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>))
+                {
                     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>) <span class="op">=</span> <span class="ident">bucket</span>.<span class="ident">take</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
-
                         <span class="ident">duration</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">rate_limit_info</span>.<span class="ident">action</span> {
-                            <span class="ident">RateLimitAction</span>::<span class="ident">Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction</span>::<span class="ident">FailedDelay</span> <span class="op">=</span><span class="op">&gt;</span>
-                                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">Ratelimited</span>(<span class="ident">rate_limit_info</span>)),
+                            <span class="ident">RateLimitAction</span>::<span class="ident">Cancelled</span> <span class="op">|</span> <span class="ident">RateLimitAction</span>::<span class="ident">FailedDelay</span> <span class="op">=</span><span class="op">&gt;</span> {
+                                <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">DispatchError</span>::<span class="ident">Ratelimited</span>(<span class="ident">rate_limit_info</span>))
+                            },
                             <span class="ident">RateLimitAction</span>::<span class="ident">Delayed</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">rate_limit_info</span>.<span class="ident">rate_limit</span>),
                         };
                     }
@@ -1513,7 +1512,8 @@
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">groups</span>,
             <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">config</span>,
             <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">as_ref</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">h</span><span class="op">|</span> <span class="ident">h</span>.<span class="ident">options</span>.<span class="ident">names</span>),
-        ).<span class="kw">await</span>;
+        )
+        .<span class="kw">await</span>;
 
         <span class="kw">let</span> <span class="ident">invoke</span> <span class="op">=</span> <span class="kw">match</span> <span class="ident">invocation</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">i</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">i</span>,
@@ -1529,14 +1529,14 @@
                 }
 
                 <span class="kw">return</span>;
-            }
+            },
             <span class="prelude-val">Err</span>(<span class="ident">ParseError</span>::<span class="ident">Dispatch</span>(<span class="ident">error</span>)) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">dispatch</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">dispatch</span> {
                     <span class="ident">dispatch</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">error</span>).<span class="kw">await</span>;
                 }
 
                 <span class="kw">return</span>;
-            }
+            },
         };
 
         <span class="kw">match</span> <span class="ident">invoke</span> {
@@ -1560,8 +1560,11 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
                     <span class="ident">after</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
                 }
-            }
-            <span class="ident">Invoke</span>::<span class="ident">Command</span> { <span class="ident">command</span>, <span class="ident">group</span> } <span class="op">=</span><span class="op">&gt;</span> {
+            },
+            <span class="ident">Invoke</span>::<span class="ident">Command</span> {
+                <span class="ident">command</span>,
+                <span class="ident">group</span>,
+            } <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">args</span> <span class="op">=</span> {
                     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">borrow</span>::<span class="ident">Cow</span>;
 
@@ -1611,7 +1614,9 @@
                 <span class="kw">if</span> <span class="macro">matches</span><span class="macro">!</span>(<span class="ident">res</span>, <span class="prelude-val">Err</span>(<span class="kw-2">ref</span> <span class="ident">e</span>) <span class="kw">if</span> <span class="ident">e</span>.<span class="ident">is</span>::<span class="op">&lt;</span><span class="ident">RevertBucket</span><span class="op">&gt;</span>()) {
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">buckets</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">buckets</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
-                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>)) {
+                    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="kw-2">ref</span> <span class="kw-2">mut</span> <span class="ident">bucket</span>) <span class="op">=</span>
+                        <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">bucket</span>.<span class="ident">as_ref</span>().<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">b</span><span class="op">|</span> <span class="ident">buckets</span>.<span class="ident">get_mut</span>(<span class="kw-2">*</span><span class="ident">b</span>))
+                    {
                         <span class="ident">bucket</span>.<span class="ident">give</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>).<span class="kw">await</span>;
                     }
                 }
@@ -1619,7 +1624,7 @@
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">after</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">after</span> {
                     <span class="ident">after</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">ctx</span>, <span class="kw-2">&amp;</span><span class="ident">msg</span>, <span class="ident">name</span>, <span class="ident">res</span>).<span class="kw">await</span>;
                 }
-            }
+            },
         }
     }
 }
@@ -1722,7 +1727,7 @@
                     <span class="ident">e</span>
                 );
                 <span class="kw">return</span> <span class="bool-val">false</span>;
-            }
+            },
         };
 
         <span class="ident">perms</span>.<span class="ident">contains</span>(<span class="kw-2">*</span><span class="ident">options</span>.<span class="ident">required_permissions</span>())
@@ -1735,12 +1740,13 @@
 <span class="kw">pub</span>(<span class="kw">crate</span>) <span class="kw">fn</span> <span class="ident">has_correct_roles</span>(
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
     <span class="ident">roles</span>: <span class="kw-2">&amp;</span><span class="ident">HashMap</span><span class="op">&lt;</span><span class="ident">RoleId</span>, <span class="ident">Role</span><span class="op">&gt;</span>,
-    <span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>)
-<span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
+    <span class="ident">member</span>: <span class="kw-2">&amp;</span><span class="ident">Member</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">bool</span> {
     <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">allowed_roles</span>().<span class="ident">is_empty</span>() {
         <span class="bool-val">true</span>
     } <span class="kw">else</span> {
-        <span class="ident">options</span>.<span class="ident">allowed_roles</span>()
+        <span class="ident">options</span>
+            .<span class="ident">allowed_roles</span>()
             .<span class="ident">iter</span>()
             .<span class="ident">flat_map</span>(<span class="op">|</span><span class="ident">r</span><span class="op">|</span> <span class="ident">roles</span>.<span class="ident">values</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">role</span><span class="op">|</span> <span class="kw-2">*</span><span class="ident">r</span> <span class="op">=</span><span class="op">=</span> <span class="ident">role</span>.<span class="ident">name</span>))
             .<span class="ident">any</span>(<span class="op">|</span><span class="ident">g</span><span class="op">|</span> <span class="ident">member</span>.<span class="ident">roles</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">g</span>.<span class="ident">id</span>))
