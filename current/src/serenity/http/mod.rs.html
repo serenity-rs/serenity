@@ -228,6 +228,44 @@
 <span id="225">225</span>
 <span id="226">226</span>
 <span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
+<span id="235">235</span>
+<span id="236">236</span>
+<span id="237">237</span>
+<span id="238">238</span>
+<span id="239">239</span>
+<span id="240">240</span>
+<span id="241">241</span>
+<span id="242">242</span>
+<span id="243">243</span>
+<span id="244">244</span>
+<span id="245">245</span>
+<span id="246">246</span>
+<span id="247">247</span>
+<span id="248">248</span>
+<span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
+<span id="254">254</span>
+<span id="255">255</span>
+<span id="256">256</span>
+<span id="257">257</span>
+<span id="258">258</span>
+<span id="259">259</span>
+<span id="260">260</span>
+<span id="261">261</span>
+<span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! The HTTP module which provides functions for performing requests to</span>
 <span class="doccomment">//! endpoints in Discord&#39;s API.</span>
@@ -261,25 +299,25 @@
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">routing</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">typing</span>;
 
-<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">StatusCode</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">client</span>::<span class="kw-2">*</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">HttpError</span>;
-<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">typing</span>::<span class="kw-2">*</span>;
-
-<span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">Method</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="self">self</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">borrow</span>::<span class="ident">Cow</span>,
     <span class="ident">path</span>::{<span class="ident">Path</span>, <span class="ident">PathBuf</span>},
     <span class="ident">sync</span>::<span class="ident">Arc</span>,
 };
+
+<span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">Method</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="ident">reqwest</span>::<span class="ident">StatusCode</span>;
 <span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">fs</span>::<span class="ident">File</span>;
 
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">client</span>::<span class="kw-2">*</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">HttpError</span>;
+<span class="kw">use</span> <span class="self">self</span>::<span class="ident">request</span>::<span class="ident">Request</span>;
+<span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">typing</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">cache</span>::<span class="ident">Cache</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">CacheAndHttp</span>;
 
@@ -298,46 +336,71 @@
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">CacheHttp</span>: <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span> {
     <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span>;
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> { <span class="prelude-val">None</span> }
+    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">None</span>
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="ident">T</span><span class="op">&gt;</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="kw-2">&amp;</span><span class="ident">T</span>
-    <span class="kw">where</span> <span class="ident">T</span>: <span class="ident">CacheHttp</span>
+<span class="kw">where</span>
+    <span class="ident">T</span>: <span class="ident">CacheHttp</span>,
 {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> { (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">http</span>() }
+    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">http</span>()
+    }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> { (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cache</span>() }
+    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        (<span class="kw-2">*</span><span class="self">self</span>).<span class="ident">cache</span>()
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">Context</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span> }
+    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+    }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>) }
+    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">CacheAndHttp</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span> }
+    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+    }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>) }
+    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">CacheAndHttp</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span> }
+    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">http</span>
+    }
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>) }
+    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">cache</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> (<span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>, <span class="kw-2">&amp;</span><span class="ident">Http</span>) {
-    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> { <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>) }
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> { <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span> }
+    <span class="kw">fn</span> <span class="ident">cache</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+        <span class="prelude-val">Some</span>(<span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">0</span>)
+    }
+    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> {
+        <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="number">1</span>
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="kw">for</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> { <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span> }
+    <span class="kw">fn</span> <span class="ident">http</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="ident">Http</span> {
+        <span class="kw-2">&amp;</span><span class="kw-2">*</span><span class="self">self</span>
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
@@ -388,9 +451,9 @@
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="doccomment">/// Indicates that the `AttachmentType` is a byte slice with a filename.</span>
-    <span class="ident">Bytes</span>{ <span class="ident">data</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">filename</span>: <span class="ident">String</span> } ,
+    <span class="ident">Bytes</span> { <span class="ident">data</span>: <span class="ident">Cow</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, [<span class="ident">u8</span>]<span class="op">&gt;</span>, <span class="ident">filename</span>: <span class="ident">String</span> },
     <span class="doccomment">/// Indicates that the `AttachmentType` is a `File`</span>
-    <span class="ident">File</span>{ <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="ident">filename</span>: <span class="ident">String</span> },
+    <span class="ident">File</span> { <span class="ident">file</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="ident">filename</span>: <span class="ident">String</span> },
     <span class="doccomment">/// Indicates that the `AttachmentType` is a `Path`</span>
     <span class="ident">Path</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Path</span>),
     <span class="doccomment">/// Indicates that the `AttachmentType` is an image URL.</span>
@@ -398,7 +461,12 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">params</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> { <span class="ident">AttachmentType</span>::<span class="ident">Bytes</span>{ <span class="ident">data</span>: <span class="ident">Cow</span>::<span class="ident">Borrowed</span>(<span class="ident">params</span>.<span class="number">0</span>), <span class="ident">filename</span>: <span class="ident">params</span>.<span class="number">1</span>.<span class="ident">to_string</span>() } }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">params</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> [<span class="ident">u8</span>], <span class="kw-2">&amp;</span><span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">AttachmentType</span>::<span class="ident">Bytes</span> {
+            <span class="ident">data</span>: <span class="ident">Cow</span>::<span class="ident">Borrowed</span>(<span class="ident">params</span>.<span class="number">0</span>),
+            <span class="ident">filename</span>: <span class="ident">params</span>.<span class="number">1</span>.<span class="ident">to_string</span>(),
+        }
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">str</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
@@ -420,11 +488,18 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PathBuf</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pathbuf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> { <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="ident">pathbuf</span>.<span class="ident">as_path</span>()) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">pathbuf</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">PathBuf</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span> {
+        <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="ident">pathbuf</span>.<span class="ident">as_path</span>())
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">From</span><span class="op">&lt;</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)<span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> { <span class="ident">AttachmentType</span>::<span class="ident">File</span>{ <span class="ident">file</span>: <span class="ident">f</span>.<span class="number">0</span>, <span class="ident">filename</span>: <span class="ident">f</span>.<span class="number">1</span>.<span class="ident">to_string</span>() } }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">f</span>: (<span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">File</span>, <span class="kw-2">&amp;</span><span class="ident">str</span>)) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">AttachmentType</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
+        <span class="ident">AttachmentType</span>::<span class="ident">File</span> {
+            <span class="ident">file</span>: <span class="ident">f</span>.<span class="number">0</span>,
+            <span class="ident">filename</span>: <span class="ident">f</span>.<span class="number">1</span>.<span class="ident">to_string</span>(),
+        }
+    }
 }
 
 <span class="doccomment">/// Representation of the method of a query to send for the [`get_guilds`]</span>
@@ -441,19 +516,20 @@
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">test</span>)]</span>
 <span class="kw">mod</span> <span class="ident">test</span> {
-    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">AttachmentType</span>;
     <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">path</span>::<span class="ident">Path</span>;
+
+    <span class="kw">use</span> <span class="kw">super</span>::<span class="ident">AttachmentType</span>;
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">test_attachment_type</span>() {
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">match</span> <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./dogs/corgis/kona.png&quot;</span>)) {
-            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        });
-        <span class="macro">assert</span><span class="macro">!</span>(<span class="kw">match</span> <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="string">&quot;./cats/copycat.png&quot;</span>) {
-            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">true</span>,
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> <span class="bool-val">false</span>,
-        });
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+            <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./dogs/corgis/kona.png&quot;</span>)),
+            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>)
+        ));
+        <span class="macro">assert</span><span class="macro">!</span>(<span class="macro">matches</span><span class="macro">!</span>(
+            <span class="ident">AttachmentType</span>::<span class="ident">from</span>(<span class="ident">Path</span>::<span class="ident">new</span>(<span class="string">&quot;./cats/copycat.png&quot;</span>)),
+            <span class="ident">AttachmentType</span>::<span class="ident">Path</span>(<span class="kw">_</span>)
+        ));
     }
 }
 </pre></div>

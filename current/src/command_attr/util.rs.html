@@ -250,21 +250,31 @@
 <span id="247">247</span>
 <span id="248">248</span>
 <span id="249">249</span>
+<span id="250">250</span>
+<span id="251">251</span>
+<span id="252">252</span>
+<span id="253">253</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">structures</span>::<span class="ident">CommandFun</span>;
 <span class="kw">use</span> <span class="ident">proc_macro</span>::<span class="ident">TokenStream</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">TokenStream</span> <span class="kw">as</span> <span class="ident">TokenStream2</span>;
 <span class="kw">use</span> <span class="ident">quote</span>::{<span class="ident">format_ident</span>, <span class="ident">quote</span>, <span class="ident">ToTokens</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::{
-    <span class="ident">braced</span>, <span class="ident">bracketed</span>, <span class="ident">parenthesized</span>,
+    <span class="ident">braced</span>,
+    <span class="ident">bracketed</span>,
+    <span class="ident">parenthesized</span>,
     <span class="ident">parse</span>::{<span class="ident">Error</span>, <span class="ident">Parse</span>, <span class="ident">ParseStream</span>, <span class="prelude-ty">Result</span> <span class="kw">as</span> <span class="ident">SynResult</span>},
     <span class="ident">parse_quote</span>,
     <span class="ident">punctuated</span>::<span class="ident">Punctuated</span>,
     <span class="ident">spanned</span>::<span class="ident">Spanned</span>,
     <span class="ident">token</span>::{<span class="ident">Comma</span>, <span class="ident">Mut</span>},
-    <span class="ident">Ident</span>, <span class="ident">Lifetime</span>, <span class="ident">Lit</span>, <span class="ident">Type</span>,
+    <span class="ident">Ident</span>,
+    <span class="ident">Lifetime</span>,
+    <span class="ident">Lit</span>,
+    <span class="ident">Type</span>,
 };
+
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">structures</span>::<span class="ident">CommandFun</span>;
 
 <span class="kw">pub</span> <span class="kw">trait</span> <span class="ident">LitExt</span> {
     <span class="kw">fn</span> <span class="ident">to_str</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span>;
@@ -287,9 +297,7 @@
         <span class="kw">if</span> <span class="kw">let</span> <span class="ident">Lit</span>::<span class="ident">Bool</span>(<span class="ident">b</span>) <span class="op">=</span> <span class="self">self</span> {
             <span class="ident">b</span>.<span class="ident">value</span>
         } <span class="kw">else</span> {
-            <span class="self">self</span>.<span class="ident">to_str</span>()
-                .<span class="ident">parse</span>()
-                .<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected bool from {:?}&quot;</span>, <span class="self">self</span>))
+            <span class="self">self</span>.<span class="ident">to_str</span>().<span class="ident">parse</span>().<span class="ident">unwrap_or_else</span>(<span class="op">|</span><span class="kw">_</span><span class="op">|</span> <span class="macro">panic</span><span class="macro">!</span>(<span class="string">&quot;expected bool from {:?}&quot;</span>, <span class="self">self</span>))
         }
     }
 

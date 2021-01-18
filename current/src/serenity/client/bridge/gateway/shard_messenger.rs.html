@@ -261,13 +261,14 @@
 <span id="258">258</span>
 <span id="259">259</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
+<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
+
+<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ChunkGuildFilter</span>, <span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>};
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">MessageFilter</span>, <span class="ident">ReactionFilter</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">InterMessage</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardClientMessage</span>, <span class="ident">ShardRunnerMessage</span>, <span class="ident">ChunkGuildFilter</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>, <span class="ident">TrySendError</span>};
-<span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">collector</span>::{<span class="ident">ReactionFilter</span>, <span class="ident">MessageFilter</span>};
 
 <span class="doccomment">/// A lightweight wrapper around an mpsc sender.</span>
 <span class="doccomment">///</span>
@@ -496,8 +497,7 @@
 
     <span class="doccomment">/// Sends a message to the shard.</span>
     <span class="attribute">#[<span class="ident">inline</span>]</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_to_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">ShardRunnerMessage</span>)
-        <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">send_to_shard</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">msg</span>: <span class="ident">ShardRunnerMessage</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">TrySendError</span><span class="op">&lt;</span><span class="ident">InterMessage</span><span class="op">&gt;</span><span class="op">&gt;</span> {
         <span class="self">self</span>.<span class="ident">tx</span>.<span class="ident">unbounded_send</span>(<span class="ident">InterMessage</span>::<span class="ident">Client</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">ShardClientMessage</span>::<span class="ident">Runner</span>(<span class="ident">msg</span>))))
     }
 

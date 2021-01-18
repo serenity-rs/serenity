@@ -200,34 +200,70 @@
 <span id="197">197</span>
 <span id="198">198</span>
 <span id="199">199</span>
+<span id="200">200</span>
+<span id="201">201</span>
+<span id="202">202</span>
+<span id="203">203</span>
+<span id="204">204</span>
+<span id="205">205</span>
+<span id="206">206</span>
+<span id="207">207</span>
+<span id="208">208</span>
+<span id="209">209</span>
+<span id="210">210</span>
+<span id="211">211</span>
+<span id="212">212</span>
+<span id="213">213</span>
+<span id="214">214</span>
+<span id="215">215</span>
+<span id="216">216</span>
+<span id="217">217</span>
+<span id="218">218</span>
+<span id="219">219</span>
+<span id="220">220</span>
+<span id="221">221</span>
+<span id="222">222</span>
+<span id="223">223</span>
+<span id="224">224</span>
+<span id="225">225</span>
+<span id="226">226</span>
+<span id="227">227</span>
+<span id="228">228</span>
+<span id="229">229</span>
+<span id="230">230</span>
+<span id="231">231</span>
+<span id="232">232</span>
+<span id="233">233</span>
+<span id="234">234</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">ModelError</span>;
-<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
-    <span class="ident">fmt</span>::{
-        <span class="self">self</span>,
-        <span class="ident">Display</span>,
-        <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">FormatError</span>
-    },
+    <span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Display</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">FormatError</span>},
     <span class="ident">io</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">IoError</span>,
-    <span class="ident">num</span>::<span class="ident">ParseIntError</span>
+    <span class="ident">num</span>::<span class="ident">ParseIntError</span>,
 };
-<span class="kw">use</span> <span class="ident">tracing</span>::<span class="ident">instrument</span>;
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
-<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>, <span class="ident">header</span>::<span class="ident">InvalidHeaderValue</span>};
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">TungsteniteError</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
+<span class="kw">use</span> <span class="ident">reqwest</span>::{<span class="ident">header</span>::<span class="ident">InvalidHeaderValue</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">ReqwestError</span>};
+<span class="kw">use</span> <span class="ident">serde_json</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">JsonError</span>;
+<span class="kw">use</span> <span class="ident">tracing</span>::<span class="ident">instrument</span>;
+
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;client&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">ClientError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">gateway</span>::<span class="ident">GatewayError</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">HttpError</span>;
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)
+))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">ws_impl</span>::<span class="ident">RustlsError</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">ModelError</span>;
 
 <span class="doccomment">/// The common result type between most library functions.</span>
 <span class="doccomment">///</span>
@@ -294,7 +330,11 @@
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
     <span class="ident">Http</span>(<span class="ident">Box</span><span class="op">&lt;</span><span class="ident">HttpError</span><span class="op">&gt;</span>),
     <span class="doccomment">/// An error occuring in rustls</span>
-    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
+    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>,
+        <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>,
+        <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)
+    ))]</span>
     <span class="ident">Rustls</span>(<span class="ident">RustlsError</span>),
     <span class="doccomment">/// An error from the `tungstenite` crate.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
@@ -302,53 +342,79 @@
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">FormatError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FormatError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Format</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">FormatError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Format</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">GatewayError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">GatewayError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">GatewayError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">IoError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">IoError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">IoError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Io</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">JsonError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">JsonError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Json</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">JsonError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Json</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ParseIntError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ParseIntError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Num</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ParseIntError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Num</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ModelError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ModelError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ModelError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">e</span>)
+    }
 }
 
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>,
+    <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>,
+    <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)
+))]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">RustlsError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">RustlsError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Rustls</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">RustlsError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Rustls</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">TungsteniteError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">TungsteniteError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Tungstenite</span>(<span class="ident">e</span>) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">TungsteniteError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Tungstenite</span>(<span class="ident">e</span>)
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">HttpError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">HttpError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">Error</span>::<span class="ident">Http</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">e</span>)) }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">HttpError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">Error</span>::<span class="ident">Http</span>(<span class="ident">Box</span>::<span class="ident">new</span>(<span class="ident">e</span>))
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">InvalidHeaderValue</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">InvalidHeaderValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">HttpError</span>::<span class="ident">InvalidHeader</span>(<span class="ident">e</span>).<span class="ident">into</span>() }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">InvalidHeaderValue</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">HttpError</span>::<span class="ident">InvalidHeader</span>(<span class="ident">e</span>).<span class="ident">into</span>()
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">ReqwestError</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">Error</span> {
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ReqwestError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> { <span class="ident">HttpError</span>::<span class="ident">Request</span>(<span class="ident">e</span>).<span class="ident">into</span>() }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">e</span>: <span class="ident">ReqwestError</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Error</span> {
+        <span class="ident">HttpError</span>::<span class="ident">Request</span>(<span class="ident">e</span>).<span class="ident">into</span>()
+    }
 }
 
 <span class="kw">impl</span> <span class="ident">Display</span> <span class="kw">for</span> <span class="ident">Error</span> {
@@ -392,7 +458,11 @@
             <span class="ident">Error</span>::<span class="ident">Gateway</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>)]</span>
             <span class="ident">Error</span>::<span class="ident">Http</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
-            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>, <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)))]</span>
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(
+                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>,
+                <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;rustls_backend_marker&quot;</span>,
+                <span class="ident">not</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;native_tls_backend_marker&quot;</span>)
+            ))]</span>
             <span class="ident">Error</span>::<span class="ident">Rustls</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>),
             <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;gateway&quot;</span>)]</span>
             <span class="ident">Error</span>::<span class="ident">Tungstenite</span>(<span class="ident">inner</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">Some</span>(<span class="ident">inner</span>),

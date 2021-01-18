@@ -280,6 +280,8 @@
 <span id="277">277</span>
 <span id="278">278</span>
 <span id="279">279</span>
+<span id="280">280</span>
+<span id="281">281</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">bitflags</span>::<span class="ident">__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::{
@@ -298,7 +300,7 @@
     <span class="doccomment">/// # Note</span>
     <span class="doccomment">/// Do not modify this yourself; use the provided methods.</span>
     <span class="doccomment">/// Do the same when creating, unless you&#39;re absolutely certain that you&#39;re giving valid intents flags.</span>
-    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u64</span>
+    <span class="kw">pub</span> <span class="ident">bits</span>: <span class="ident">u64</span>,
 }
 
 <span class="macro">__impl_bitflags</span><span class="macro">!</span> {
@@ -405,7 +407,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">GatewayIntents</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="self">Self</span>::<span class="ident">empty</span>() }
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class="ident">empty</span>()
+    }
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">GatewayIntents</span> {

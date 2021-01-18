@@ -56,8 +56,6 @@
 <span id="53">53</span>
 <span id="54">54</span>
 <span id="55">55</span>
-<span id="56">56</span>
-<span id="57">57</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">StickerId</span>, <span class="ident">StickerPackId</span>};
 
@@ -97,13 +95,11 @@
     <span class="ident">Lottie</span> <span class="op">=</span> <span class="number">3</span>,
 }
 
-<span class="macro">enum_number</span><span class="macro">!</span>(
-    <span class="ident">StickerFormatType</span> {
-        <span class="ident">Png</span>,
-        <span class="ident">Apng</span>,
-        <span class="ident">Lottie</span>,
-    }
-);
+<span class="macro">enum_number</span><span class="macro">!</span>(<span class="ident">StickerFormatType</span> {
+    <span class="ident">Png</span>,
+    <span class="ident">Apng</span>,
+    <span class="ident">Lottie</span>,
+});
 
 <span class="kw">impl</span> <span class="ident">StickerFormatType</span> {
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">num</span>(<span class="self">self</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">u64</span> {

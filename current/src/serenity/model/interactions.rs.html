@@ -371,18 +371,71 @@
 <span id="368">368</span>
 <span id="369">369</span>
 <span id="370">370</span>
+<span id="371">371</span>
+<span id="372">372</span>
+<span id="373">373</span>
+<span id="374">374</span>
+<span id="375">375</span>
+<span id="376">376</span>
+<span id="377">377</span>
+<span id="378">378</span>
+<span id="379">379</span>
+<span id="380">380</span>
+<span id="381">381</span>
+<span id="382">382</span>
+<span id="383">383</span>
+<span id="384">384</span>
+<span id="385">385</span>
+<span id="386">386</span>
+<span id="387">387</span>
+<span id="388">388</span>
+<span id="389">389</span>
+<span id="390">390</span>
+<span id="391">391</span>
+<span id="392">392</span>
+<span id="393">393</span>
+<span id="394">394</span>
+<span id="395">395</span>
+<span id="396">396</span>
+<span id="397">397</span>
+<span id="398">398</span>
+<span id="399">399</span>
+<span id="400">400</span>
+<span id="401">401</span>
+<span id="402">402</span>
+<span id="403">403</span>
+<span id="404">404</span>
+<span id="405">405</span>
+<span id="406">406</span>
+<span id="407">407</span>
+<span id="408">408</span>
+<span id="409">409</span>
+<span id="410">410</span>
+<span id="411">411</span>
+<span id="412">412</span>
+<span id="413">413</span>
+<span id="414">414</span>
+<span id="415">415</span>
+<span id="416">416</span>
+<span id="417">417</span>
+<span id="418">418</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>::{<span class="ident">CreateInteractionResponse</span>, <span class="ident">CreateInteractionResponseFollowup</span>, <span class="ident">EditInteractionResponse</span>, <span class="ident">CreateInteraction</span>};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>;
-
 <span class="kw">use</span> <span class="ident">bitflags</span>::<span class="ident">__impl_bitflags</span>;
 <span class="kw">use</span> <span class="ident">serde</span>::<span class="ident">de</span>::{<span class="ident">Deserialize</span>, <span class="ident">Deserializer</span>, <span class="ident">Error</span> <span class="kw">as</span> <span class="ident">DeError</span>};
-<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">Value</span>, <span class="ident">Number</span>, <span class="ident">Map</span>};
+<span class="kw">use</span> <span class="ident">serde_json</span>::{<span class="ident">Map</span>, <span class="ident">Number</span>, <span class="ident">Value</span>};
+
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>::{
+    <span class="ident">CreateInteraction</span>,
+    <span class="ident">CreateInteractionResponse</span>,
+    <span class="ident">CreateInteractionResponseFollowup</span>,
+    <span class="ident">EditInteractionResponse</span>,
+};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">http</span>::<span class="ident">Http</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>;
 
 <span class="doccomment">/// Information about an interaction.</span>
 <span class="doccomment">///</span>
@@ -406,23 +459,22 @@
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">JsonMap</span>::<span class="ident">deserialize</span>(<span class="ident">deserializer</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>)
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_str</span>())
-            .<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get</span>(<span class="string">&quot;guild_id&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_str</span>()).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span>().<span class="ident">ok</span>());
 
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild_id</span>) <span class="op">=</span> <span class="ident">id</span> {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">map</span>.<span class="ident">get_mut</span>(<span class="string">&quot;member&quot;</span>).<span class="ident">and_then</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="ident">as_object_mut</span>()) {
-                <span class="ident">member</span>
-                    .<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">guild_id</span>)));
+                <span class="ident">member</span>.<span class="ident">insert</span>(<span class="string">&quot;guild_id&quot;</span>.<span class="ident">to_string</span>(), <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">guild_id</span>)));
             }
         }
 
-        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">InteractionId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;type&quot;</span>)
+        <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;type&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected type&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">InteractionType</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -433,27 +485,32 @@
             <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
         };
 
-        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">guild_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;guild_id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected guild_id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">GuildId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;channel_id&quot;</span>)
+        <span class="kw">let</span> <span class="ident">channel_id</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;channel_id&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected channel_id&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">ChannelId</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;member&quot;</span>)
+        <span class="kw">let</span> <span class="ident">member</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;member&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected member&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">Member</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;token&quot;</span>)
+        <span class="kw">let</span> <span class="ident">token</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;token&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected token&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">String</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
 
-        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">map</span>.<span class="ident">remove</span>(<span class="string">&quot;version&quot;</span>)
+        <span class="kw">let</span> <span class="ident">version</span> <span class="op">=</span> <span class="ident">map</span>
+            .<span class="ident">remove</span>(<span class="string">&quot;version&quot;</span>)
             .<span class="ident">ok_or_else</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">DeError</span>::<span class="ident">custom</span>(<span class="string">&quot;expected version&quot;</span>))
             .<span class="ident">and_then</span>(<span class="ident">u8</span>::<span class="ident">deserialize</span>)
             .<span class="ident">map_err</span>(<span class="ident">DeError</span>::<span class="ident">custom</span>)<span class="question-mark">?</span>;
@@ -580,13 +637,13 @@
     <span class="ident">Acknowledge</span> <span class="op">=</span> <span class="number">2</span>,
     <span class="ident">ChannelMessage</span> <span class="op">=</span> <span class="number">3</span>,
     <span class="ident">ChannelMessageWithSource</span> <span class="op">=</span> <span class="number">4</span>,
-    <span class="ident">AcknowledgeWithSource</span> <span class="op">=</span> <span class="number">5</span>
+    <span class="ident">AcknowledgeWithSource</span> <span class="op">=</span> <span class="number">5</span>,
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Clone</span>, <span class="ident">Serialize</span>)]</span>
 <span class="attribute">#[<span class="ident">non_exhaustive</span>]</span>
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">InteractionApplicationCommandCallbackDataFlags</span> {
-    <span class="ident">bits</span>: <span class="ident">u64</span>
+    <span class="ident">bits</span>: <span class="ident">u64</span>,
 }
 
 <span class="macro">__impl_bitflags</span><span class="macro">!</span> {
@@ -597,7 +654,6 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Interaction</span> {
-
     <span class="doccomment">/// Creates a global [`ApplicationCommand`],</span>
     <span class="doccomment">/// overriding an existing one with the same name if it exists.</span>
     <span class="doccomment">///</span>
@@ -620,7 +676,7 @@
     <span class="doccomment">/// use serenity::model::interactions::Interaction;</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let application_id = 42; // usually this will be the bot&#39;s UserId</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// let _ = Interaction::create_global_application_command(&amp;http, application_id, |a| {</span>
     <span class="doccomment">///    a.name(&quot;ping&quot;)</span>
     <span class="doccomment">///     .description(&quot;A simple ping command&quot;)</span>
@@ -640,7 +696,7 @@
     <span class="doccomment">/// use serenity::model::interactions::{Interaction, ApplicationCommandOptionType};</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// let application_id = 42; // usually this will be the bot&#39;s UserId</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// let _ = Interaction::create_global_application_command(&amp;http, application_id, |a| {</span>
     <span class="doccomment">///    a.name(&quot;echo&quot;)</span>
     <span class="doccomment">///     .description(&quot;What is said is echoed&quot;)</span>
@@ -656,90 +712,131 @@
     <span class="doccomment">/// ```</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
     <span class="doccomment">/// [`InteractionCreate`]: crate::client::EventHandler::interaction_create</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span> {
-            <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Interaction</span>::<span class="ident">build_interaction</span>(<span class="ident">f</span>);
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_command</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
-        }
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>,
+    {
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Interaction</span>::<span class="ident">build_interaction</span>(<span class="ident">f</span>);
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_global_application_command</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+    }
 
     <span class="doccomment">/// Creates a guild specific [`ApplicationCommand`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">guild_id</span>: <span class="ident">GuildId</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span> {
-            <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Interaction</span>::<span class="ident">build_interaction</span>(<span class="ident">f</span>);
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_guild_application_command</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
-        }
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">guild_id</span>: <span class="ident">GuildId</span>,
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">ApplicationCommand</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>,
+    {
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">Interaction</span>::<span class="ident">build_interaction</span>(<span class="ident">f</span>);
+        <span class="ident">http</span>.<span class="ident">as_ref</span>()
+            .<span class="ident">create_guild_application_command</span>(<span class="ident">application_id</span>, <span class="ident">guild_id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
+            .<span class="kw">await</span>
+    }
 
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="kw">fn</span> <span class="ident">build_interaction</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Map</span><span class="op">&lt;</span><span class="ident">String</span>, <span class="ident">Value</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_interaction</span> <span class="op">=</span> <span class="ident">CreateInteraction</span>::<span class="ident">default</span>();
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">create_interaction</span>);
-            <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">create_interaction</span>.<span class="number">0</span>)
-        }
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteraction</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">create_interaction</span> <span class="op">=</span> <span class="ident">CreateInteraction</span>::<span class="ident">default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">create_interaction</span>);
+        <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">create_interaction</span>.<span class="number">0</span>)
+    }
 
     <span class="doccomment">/// Creates a response to the interaction received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse</span>::<span class="ident">default</span>();
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponse</span>::<span class="ident">default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
 
-            <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
-            <span class="ident">Message</span>::<span class="ident">check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
-            <span class="ident">Message</span>::<span class="ident">check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();    
+        <span class="ident">Message</span>::<span class="ident">check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
+        <span class="ident">Message</span>::<span class="ident">check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
 
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_interaction_response</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
-        }
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_interaction_response</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
+    }
 
     <span class="doccomment">/// Edits the initial interaction response.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// `application_id` will usually be the bot&#39;s `[UserId]`, except in cases of bots being very old.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// Refer to Discord&#39;s docs for Edit Webhook Message for field information.</span>
-    <span class="doccomment">/// </span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditInteractionResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditInteractionResponse</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">EditInteractionResponse</span>::<span class="ident">default</span>();
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditInteractionResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">EditInteractionResponse</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">EditInteractionResponse</span>::<span class="ident">default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
 
-            <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
-            <span class="ident">Message</span>::<span class="ident">check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
-            <span class="ident">Message</span>::<span class="ident">check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();    
+        <span class="ident">Message</span>::<span class="ident">check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
+        <span class="ident">Message</span>::<span class="ident">check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
 
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">edit_original_interaction_response</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>)).<span class="kw">await</span>
-        }
+        <span class="ident">http</span>.<span class="ident">as_ref</span>()
+            .<span class="ident">edit_original_interaction_response</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="kw-2">&amp;</span><span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">map</span>))
+            .<span class="kw">await</span>
+    }
 
     <span class="doccomment">/// Deletes the initial interaction response.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">delete_original_interaction_response</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span>
     }
 
     <span class="doccomment">/// Creates a followup response to the response sent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
-    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">application_id</span>: <span class="ident">u64</span>, <span class="ident">wait</span>: <span class="ident">bool</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
-        <span class="kw">where</span> <span class="kw">for</span> <span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
-            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup</span>::<span class="ident">default</span>();
-            <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
+    <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
+        <span class="kw-2">&amp;</span><span class="self">self</span>,
+        <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
+        <span class="ident">application_id</span>: <span class="ident">u64</span>,
+        <span class="ident">wait</span>: <span class="ident">bool</span>,
+        <span class="ident">f</span>: <span class="ident">F</span>,
+    ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>
+    <span class="kw">where</span>
+        <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;b</span><span class="op">&gt;</span> <span class="ident">F</span>: <span class="ident">FnOnce</span>(
+            <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+        ) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="lifetime">&#39;b</span> <span class="kw-2">mut</span> <span class="ident">CreateInteractionResponseFollowup</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>,
+    {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">interaction_response</span> <span class="op">=</span> <span class="ident">CreateInteractionResponseFollowup</span>::<span class="ident">default</span>();
+        <span class="ident">f</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">interaction_response</span>);
 
-            <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
+        <span class="kw">let</span> <span class="ident">map</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">interaction_response</span>.<span class="number">0</span>);
 
-            <span class="ident">Message</span>::<span class="ident">check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
-            <span class="ident">Message</span>::<span class="ident">check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();    
+        <span class="ident">Message</span>::<span class="ident">check_content_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
+        <span class="ident">Message</span>::<span class="ident">check_embed_length</span>(<span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="ident">unwrap</span>();
 
-            <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_followup_message</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">wait</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
-        }
-
-    
-}</pre></div>
+        <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">create_followup_message</span>(<span class="ident">application_id</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>, <span class="ident">wait</span>, <span class="kw-2">&amp;</span><span class="ident">map</span>).<span class="kw">await</span>
+    }
+}
+</pre></div>
 </section><section id="search" class="content hidden"></section><section class="footer"></section><script>window.rootPath = "../../../";window.currentCrate = "serenity";</script><script src="../../../main.js"></script><script src="../../../source-script.js"></script><script src="../../../source-files.js"></script><script defer src="../../../search-index.js"></script></body></html>

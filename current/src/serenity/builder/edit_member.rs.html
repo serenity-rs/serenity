@@ -91,11 +91,11 @@
 <span id="88">88</span>
 <span id="89">89</span>
 <span id="90">90</span>
-<span id="91">91</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::<span class="ident">id</span>::{<span class="ident">ChannelId</span>, <span class="ident">RoleId</span>};
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
 <span class="doccomment">/// A builder which edits the properties of a [`Member`], to be used in</span>
 <span class="doccomment">/// conjunction with [`Member::edit`].</span>
@@ -142,11 +142,9 @@
     <span class="doccomment">/// Requires the [Manage Roles] permission to modify.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES</span>
-    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">roles</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span><span class="op">=</span><span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="kw">let</span> <span class="ident">role_ids</span> <span class="op">=</span> <span class="ident">roles</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">x</span>.<span class="ident">as_ref</span>().<span class="number">0</span>)))
-            .<span class="ident">collect</span>();
+    <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">roles</span><span class="op">&lt;</span><span class="ident">T</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>, <span class="ident">It</span>: <span class="ident">IntoIterator</span><span class="op">&lt;</span><span class="ident">Item</span> <span class="op">=</span> <span class="ident">T</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">roles</span>: <span class="ident">It</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
+        <span class="kw">let</span> <span class="ident">role_ids</span> <span class="op">=</span>
+            <span class="ident">roles</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">x</span>.<span class="ident">as_ref</span>().<span class="number">0</span>))).<span class="ident">collect</span>();
 
         <span class="self">self</span>.<span class="ident">_roles</span>(<span class="ident">role_ids</span>);
         <span class="self">self</span>

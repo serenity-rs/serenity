@@ -32,6 +32,9 @@
 <span id="29">29</span>
 <span id="30">30</span>
 <span id="31">31</span>
+<span id="32">32</span>
+<span id="33">33</span>
+<span id="34">34</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="kw">super</span>::<span class="kw-2">*</span>;
 
@@ -42,7 +45,8 @@
     <span class="kw">pub</span> <span class="ident">id</span>: <span class="ident">IntegrationId</span>,
     <span class="kw">pub</span> <span class="ident">account</span>: <span class="ident">IntegrationAccount</span>,
     <span class="kw">pub</span> <span class="ident">enabled</span>: <span class="ident">bool</span>,
-    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;expire_behaviour&quot;</span>)]</span> <span class="kw">pub</span> <span class="ident">expire_behaviour</span>: <span class="ident">u64</span>,
+    <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">rename</span> <span class="op">=</span> <span class="string">&quot;expire_behaviour&quot;</span>)]</span>
+    <span class="kw">pub</span> <span class="ident">expire_behaviour</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">expire_grace_period</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">kind</span>: <span class="ident">String</span>,
     <span class="kw">pub</span> <span class="ident">name</span>: <span class="ident">String</span>,
@@ -54,7 +58,9 @@
 
 <span class="kw">impl</span> <span class="ident">From</span><span class="op">&lt;</span><span class="ident">Integration</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">IntegrationId</span> {
     <span class="doccomment">/// Gets the Id of integration.</span>
-    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">integration</span>: <span class="ident">Integration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntegrationId</span> { <span class="ident">integration</span>.<span class="ident">id</span> }
+    <span class="kw">fn</span> <span class="ident">from</span>(<span class="ident">integration</span>: <span class="ident">Integration</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">IntegrationId</span> {
+        <span class="ident">integration</span>.<span class="ident">id</span>
+    }
 }
 
 <span class="doccomment">/// Integration account object.</span>

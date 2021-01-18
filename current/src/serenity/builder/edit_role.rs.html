@@ -108,18 +108,11 @@
 <span id="105">105</span>
 <span id="106">106</span>
 <span id="107">107</span>
-<span id="108">108</span>
-<span id="109">109</span>
-<span id="110">110</span>
-<span id="111">111</span>
-<span id="112">112</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
-    <span class="ident">guild</span>::<span class="ident">Role</span>,
-    <span class="ident">Permissions</span>
-};
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
+
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">internal</span>::<span class="ident">prelude</span>::<span class="kw-2">*</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{<span class="ident">guild</span>::<span class="ident">Role</span>, <span class="ident">Permissions</span>};
 
 <span class="doccomment">/// A builder to create or edit a [`Role`] for use via a number of model methods.</span>
 <span class="doccomment">///</span>
@@ -179,7 +172,7 @@
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;managed&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="ident">role</span>.<span class="ident">managed</span>));
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;mentionable&quot;</span>, <span class="ident">Value</span>::<span class="ident">Bool</span>(<span class="ident">role</span>.<span class="ident">mentionable</span>));
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;name&quot;</span>, <span class="ident">Value</span>::<span class="ident">String</span>(<span class="ident">role</span>.<span class="ident">name</span>.<span class="ident">clone</span>()));
-        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>,<span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>())));
+        <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">role</span>.<span class="ident">permissions</span>.<span class="ident">bits</span>())));
         <span class="ident">map</span>.<span class="ident">insert</span>(<span class="string">&quot;position&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">role</span>.<span class="ident">position</span>)));
 
         <span class="ident">EditRole</span>(<span class="ident">map</span>)
@@ -212,10 +205,7 @@
 
     <span class="doccomment">/// The set of permissions to assign the role.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">permissions</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">permissions</span>: <span class="ident">Permissions</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
-        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(
-            <span class="string">&quot;permissions&quot;</span>,
-            <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>())),
-        );
+        <span class="self">self</span>.<span class="number">0</span>.<span class="ident">insert</span>(<span class="string">&quot;permissions&quot;</span>, <span class="ident">Value</span>::<span class="ident">Number</span>(<span class="ident">Number</span>::<span class="ident">from</span>(<span class="ident">permissions</span>.<span class="ident">bits</span>())));
         <span class="self">self</span>
     }
 

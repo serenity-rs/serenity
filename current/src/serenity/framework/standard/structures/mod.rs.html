@@ -271,24 +271,25 @@
 <span id="268">268</span>
 <span id="269">269</span>
 <span id="270">270</span>
+<span id="271">271</span>
+<span id="272">272</span>
+<span id="273">273</span>
+<span id="274">274</span>
+<span id="275">275</span>
+<span id="276">276</span>
+<span id="277">277</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">std</span>::{
-    <span class="ident">collections</span>::<span class="ident">HashSet</span>,
-    <span class="ident">fmt</span>,
-    <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>,
-};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{
-    <span class="ident">channel</span>::<span class="ident">Message</span>,
-    <span class="ident">permissions</span>::<span class="ident">Permissions</span>,
-    <span class="ident">id</span>::<span class="ident">UserId</span>,
-};
-<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">Colour</span>;
-<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Args</span>;
+<span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashSet</span>, <span class="ident">error</span>::<span class="ident">Error</span> <span class="kw">as</span> <span class="ident">StdError</span>, <span class="ident">fmt</span>};
+
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">future</span>::<span class="ident">BoxFuture</span>;
 
-<span class="kw">mod</span> <span class="ident">check</span>;
+<span class="kw">use</span> <span class="kw">super</span>::<span class="ident">Args</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">Context</span>;
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">model</span>::{<span class="ident">channel</span>::<span class="ident">Message</span>, <span class="ident">id</span>::<span class="ident">UserId</span>, <span class="ident">permissions</span>::<span class="ident">Permissions</span>};
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">utils</span>::<span class="ident">Colour</span>;
+
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">buckets</span>;
+<span class="kw">mod</span> <span class="ident">check</span>;
 
 <span class="kw">pub</span> <span class="kw">use</span> <span class="self">self</span>::<span class="ident">check</span>::<span class="kw-2">*</span>;
 
@@ -301,7 +302,9 @@
 }
 
 <span class="kw">impl</span> <span class="ident">Default</span> <span class="kw">for</span> <span class="ident">OnlyIn</span> {
-    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> { <span class="self">Self</span>::<span class="prelude-val">None</span> }
+    <span class="kw">fn</span> <span class="ident">default</span>() <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
+        <span class="self">Self</span>::<span class="prelude-val">None</span>
+    }
 }
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Default</span>, <span class="ident">PartialEq</span>)]</span>
@@ -346,7 +349,8 @@
 
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandError</span> <span class="op">=</span> <span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">StdError</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>;
 <span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandResult</span><span class="op">&lt;</span><span class="ident">T</span> <span class="op">=</span> ()<span class="op">&gt;</span> <span class="op">=</span> <span class="ident">std</span>::<span class="ident">result</span>::<span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">T</span>, <span class="ident">CommandError</span><span class="op">&gt;</span>;
-<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandFn</span> <span class="op">=</span> <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">Args</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">CommandResult</span><span class="op">&gt;</span>;
+<span class="kw">pub</span> <span class="kw">type</span> <span class="ident">CommandFn</span> <span class="op">=</span>
+    <span class="kw">for</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span><span class="op">&gt;</span> <span class="kw">fn</span>(<span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Context</span>, <span class="kw-2">&amp;</span><span class="lifetime">&#39;fut</span> <span class="ident">Message</span>, <span class="ident">Args</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;fut</span>, <span class="ident">CommandResult</span><span class="op">&gt;</span>;
 
 <span class="kw">pub</span> <span class="kw">struct</span> <span class="ident">Command</span> {
     <span class="kw">pub</span> <span class="ident">fun</span>: <span class="ident">CommandFn</span>,
@@ -355,9 +359,7 @@
 
 <span class="kw">impl</span> <span class="ident">fmt</span>::<span class="ident">Debug</span> <span class="kw">for</span> <span class="ident">Command</span> {
     <span class="kw">fn</span> <span class="ident">fmt</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">f</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fmt</span>::<span class="ident">Formatter</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">fmt</span>::<span class="prelude-ty">Result</span> {
-        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Command&quot;</span>)
-            .<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>)
-            .<span class="ident">finish</span>()
+        <span class="ident">f</span>.<span class="ident">debug_struct</span>(<span class="string">&quot;Command&quot;</span>).<span class="ident">field</span>(<span class="string">&quot;options&quot;</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">options</span>).<span class="ident">finish</span>()
     }
 }
 
@@ -520,8 +522,14 @@
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_eq</span>() {
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>));
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
+            <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>)
+        );
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>,
+            <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>)
+        );
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
@@ -532,13 +540,19 @@
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_strike</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
+            <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>)
+        );
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
     }
 
     <span class="attribute">#[<span class="ident">test</span>]</span>
     <span class="kw">fn</span> <span class="ident">help_behaviour_nothing</span>() {
-        <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>));
+        <span class="macro">assert_eq</span><span class="macro">!</span>(
+            <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>,
+            <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Strike</span>)
+        );
         <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>, <span class="ident">std</span>::<span class="ident">cmp</span>::<span class="ident">max</span>(<span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>, <span class="ident">HelpBehaviour</span>::<span class="ident">Hide</span>));
     }
 }

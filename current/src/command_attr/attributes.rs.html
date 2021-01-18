@@ -321,27 +321,9 @@
 <span id="318">318</span>
 <span id="319">319</span>
 <span id="320">320</span>
-<span id="321">321</span>
-<span id="322">322</span>
-<span id="323">323</span>
-<span id="324">324</span>
-<span id="325">325</span>
-<span id="326">326</span>
-<span id="327">327</span>
-<span id="328">328</span>
-<span id="329">329</span>
-<span id="330">330</span>
-<span id="331">331</span>
-<span id="332">332</span>
-<span id="333">333</span>
-<span id="334">334</span>
-<span id="335">335</span>
-<span id="336">336</span>
-<span id="337">337</span>
-<span id="338">338</span>
-<span id="339">339</span>
-<span id="340">340</span>
 </pre><div class="example-wrap"><pre class="rust ">
+<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
+
 <span class="kw">use</span> <span class="ident">proc_macro2</span>::<span class="ident">Span</span>;
 <span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">parse</span>::{<span class="ident">Error</span>, <span class="prelude-ty">Result</span>};
 <span class="kw">use</span> <span class="ident">syn</span>::<span class="ident">spanned</span>::<span class="ident">Spanned</span>;
@@ -349,8 +331,6 @@
 
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">structures</span>::{<span class="ident">Checks</span>, <span class="ident">Colour</span>, <span class="ident">HelpBehaviour</span>, <span class="ident">OnlyIn</span>, <span class="ident">Permissions</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">util</span>::{<span class="ident">AsOption</span>, <span class="ident">LitExt</span>};
-
-<span class="kw">use</span> <span class="ident">std</span>::<span class="ident">fmt</span>::{<span class="self">self</span>, <span class="ident">Write</span>};
 
 <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Debug</span>, <span class="ident">Clone</span>, <span class="ident">Copy</span>, <span class="ident">PartialEq</span>)]</span>
 <span class="kw">pub</span> <span class="kw">enum</span> <span class="ident">ValueKind</span> {
@@ -380,24 +360,15 @@
 
 <span class="kw">fn</span> <span class="ident">to_ident</span>(<span class="ident">p</span>: <span class="ident">Path</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Ident</span><span class="op">&gt;</span> {
     <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(
-            <span class="ident">p</span>.<span class="ident">span</span>(),
-            <span class="string">&quot;cannot convert an empty path to an identifier&quot;</span>,
-        ));
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">p</span>.<span class="ident">span</span>(), <span class="string">&quot;cannot convert an empty path to an identifier&quot;</span>));
     }
 
     <span class="kw">if</span> <span class="ident">p</span>.<span class="ident">segments</span>.<span class="ident">len</span>() <span class="op">&gt;</span> <span class="number">1</span> {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(
-            <span class="ident">p</span>.<span class="ident">span</span>(),
-            <span class="string">&quot;the path must not have more than one segment&quot;</span>,
-        ));
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">p</span>.<span class="ident">span</span>(), <span class="string">&quot;the path must not have more than one segment&quot;</span>));
     }
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">p</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">arguments</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(
-            <span class="ident">p</span>.<span class="ident">span</span>(),
-            <span class="string">&quot;the singular path segment must not have any arguments&quot;</span>,
-        ));
+        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(<span class="ident">p</span>.<span class="ident">span</span>(), <span class="string">&quot;the singular path segment must not have any arguments&quot;</span>));
     }
 
     <span class="prelude-val">Ok</span>(<span class="ident">p</span>.<span class="ident">segments</span>[<span class="number">0</span>].<span class="ident">ident</span>.<span class="ident">clone</span>())
@@ -431,7 +402,7 @@
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">path</span>)<span class="question-mark">?</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values</span>::<span class="ident">new</span>(<span class="ident">name</span>, <span class="ident">ValueKind</span>::<span class="ident">Name</span>, <span class="ident">Vec</span>::<span class="ident">new</span>(), <span class="ident">attr</span>.<span class="ident">span</span>()))
-        }
+        },
         <span class="ident">Meta</span>::<span class="ident">List</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">nested</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">nested</span>;
@@ -457,20 +428,16 @@
                 }
             }
 
-            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lits</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
-                <span class="ident">ValueKind</span>::<span class="ident">SingleList</span>
-            } <span class="kw">else</span> {
-                <span class="ident">ValueKind</span>::<span class="ident">List</span>
-            };
+            <span class="kw">let</span> <span class="ident">kind</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">lits</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> { <span class="ident">ValueKind</span>::<span class="ident">SingleList</span> } <span class="kw">else</span> { <span class="ident">ValueKind</span>::<span class="ident">List</span> };
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values</span>::<span class="ident">new</span>(<span class="ident">name</span>, <span class="ident">kind</span>, <span class="ident">lits</span>, <span class="ident">attr</span>.<span class="ident">span</span>()))
-        }
+        },
         <span class="ident">Meta</span>::<span class="ident">NameValue</span>(<span class="ident">meta</span>) <span class="op">=</span><span class="op">&gt;</span> {
             <span class="kw">let</span> <span class="ident">name</span> <span class="op">=</span> <span class="ident">to_ident</span>(<span class="ident">meta</span>.<span class="ident">path</span>)<span class="question-mark">?</span>;
             <span class="kw">let</span> <span class="ident">lit</span> <span class="op">=</span> <span class="ident">meta</span>.<span class="ident">lit</span>;
 
             <span class="prelude-val">Ok</span>(<span class="ident">Values</span>::<span class="ident">new</span>(<span class="ident">name</span>, <span class="ident">ValueKind</span>::<span class="ident">Equals</span>, <span class="macro">vec</span><span class="macro">!</span>[<span class="ident">lit</span>], <span class="ident">attr</span>.<span class="ident">span</span>()))
-        }
+        },
     }
 }
 
@@ -490,7 +457,7 @@
                     <span class="ident">f</span>.<span class="ident">write_char</span>(<span class="string">&#39;\n&#39;</span>)<span class="question-mark">?</span>;
                     <span class="macro">write</span><span class="macro">!</span>(<span class="ident">f</span>, <span class="string">&quot;{}: {}&quot;</span>, <span class="ident">idx</span>, <span class="ident">elem</span>)<span class="question-mark">?</span>;
                 }
-            }
+            },
         }
 
         <span class="prelude-val">Ok</span>(())
@@ -512,10 +479,7 @@
         <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">new</span>(
             <span class="ident">values</span>.<span class="ident">span</span>,
             <span class="comment">// Using the `_args` version here to avoid an allocation.</span>
-            <span class="macro">format_args</span><span class="macro">!</span>(
-                <span class="string">&quot;the attribute must be in of these forms:\n{}&quot;</span>,
-                <span class="ident">DisplaySlice</span>(<span class="ident">forms</span>)
-            ),
+            <span class="macro">format_args</span><span class="macro">!</span>(<span class="string">&quot;the attribute must be in of these forms:\n{}&quot;</span>, <span class="ident">DisplaySlice</span>(<span class="ident">forms</span>)),
         ));
     }
 
@@ -535,11 +499,7 @@
     <span class="kw">fn</span> <span class="ident">parse</span>(<span class="ident">values</span>: <span class="ident">Values</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="self">Self</span><span class="op">&gt;</span> {
         <span class="ident">validate</span>(<span class="kw-2">&amp;</span><span class="ident">values</span>, <span class="kw-2">&amp;</span>[<span class="ident">ValueKind</span>::<span class="ident">List</span>])<span class="question-mark">?</span>;
 
-        <span class="prelude-val">Ok</span>(<span class="ident">values</span>
-            .<span class="ident">literals</span>
-            .<span class="ident">into_iter</span>()
-            .<span class="ident">map</span>(<span class="op">|</span><span class="ident">lit</span><span class="op">|</span> <span class="ident">lit</span>.<span class="ident">to_str</span>())
-            .<span class="ident">collect</span>())
+        <span class="prelude-val">Ok</span>(<span class="ident">values</span>.<span class="ident">literals</span>.<span class="ident">into_iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">lit</span><span class="op">|</span> <span class="ident">lit</span>.<span class="ident">to_str</span>()).<span class="ident">collect</span>())
     }
 }
 

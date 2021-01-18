@@ -113,16 +113,24 @@
 <span id="110">110</span>
 <span id="111">111</span>
 <span id="112">112</span>
+<span id="113">113</span>
+<span id="114">114</span>
+<span id="115">115</span>
+<span id="116">116</span>
+<span id="117">117</span>
+<span id="118">118</span>
 </pre><div class="example-wrap"><pre class="rust ">
-<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
+
+<span class="kw">use</span> <span class="ident">futures</span>::{
+    <span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>},
+    <span class="ident">StreamExt</span>,
+};
+<span class="kw">use</span> <span class="ident">tokio</span>::<span class="ident">sync</span>::<span class="ident">Mutex</span>;
+<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">instrument</span>, <span class="ident">warn</span>};
+
 <span class="kw">use</span> <span class="kw">super</span>::{<span class="ident">ShardManager</span>, <span class="ident">ShardManagerMessage</span>};
 <span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">client</span>::<span class="ident">bridge</span>::<span class="ident">gateway</span>::<span class="ident">ShardId</span>;
-<span class="kw">use</span> <span class="ident">tracing</span>::{<span class="ident">debug</span>, <span class="ident">warn</span>, <span class="ident">instrument</span>};
-<span class="kw">use</span> <span class="ident">futures</span>::{
-    <span class="ident">StreamExt</span>,
-    <span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">UnboundedReceiver</span> <span class="kw">as</span> <span class="ident">Receiver</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>},
-};
 
 <span class="doccomment">/// The shard manager monitor monitors the shard manager and performs actions</span>
 <span class="doccomment">/// on it as received.</span>
@@ -177,9 +185,13 @@
             <span class="kw">match</span> <span class="ident">value</span> {
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">Restart</span>(<span class="ident">shard_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">restart</span>(<span class="ident">shard_id</span>).<span class="kw">await</span>;
-                    <span class="kw">let</span> <span class="kw">_</span>  <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
                 },
-                <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardUpdate</span> { <span class="ident">id</span>, <span class="ident">latency</span>, <span class="ident">stage</span> } <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardUpdate</span> {
+                    <span class="ident">id</span>,
+                    <span class="ident">latency</span>,
+                    <span class="ident">stage</span>,
+                } <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="kw">let</span> <span class="ident">manager</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
                     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">runners</span> <span class="op">=</span> <span class="ident">manager</span>.<span class="ident">runners</span>.<span class="ident">lock</span>().<span class="kw">await</span>;
 
@@ -187,10 +199,10 @@
                         <span class="ident">runner</span>.<span class="ident">latency</span> <span class="op">=</span> <span class="ident">latency</span>;
                         <span class="ident">runner</span>.<span class="ident">stage</span> <span class="op">=</span> <span class="ident">stage</span>;
                     }
-                }
+                },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>).<span class="kw">await</span>;
-                    <span class="kw">let</span> <span class="kw">_</span>  <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
+                    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShutdownAll</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
@@ -206,7 +218,7 @@
                             <span class="ident">why</span>
                         );
                     }
-                }
+                },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardInvalidAuthentication</span> <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown_all</span>().<span class="kw">await</span>;
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">ShardManagerError</span>::<span class="ident">InvalidToken</span>);
