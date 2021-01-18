@@ -1,28 +1,26 @@
 use serde::de::Error as DeError;
 
-use crate::model::prelude::*;
-use crate::model::utils::{deserialize_emojis, deserialize_roles};
-
 #[cfg(feature = "model")]
 use crate::builder::{CreateChannel, EditGuild, EditMember, EditRole};
-#[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
 #[cfg(all(feature = "cache", feature = "utils", feature = "client"))]
 use crate::cache::Cache;
 #[cfg(feature = "collector")]
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReply, MessageCollectorBuilder,
-    CollectReaction, ReactionCollectorBuilder,
+    CollectReaction,
+    CollectReply,
+    MessageCollectorBuilder,
+    ReactionCollectorBuilder,
 };
-
+#[cfg(feature = "model")]
+use crate::http::{CacheHttp, Http};
+use crate::model::prelude::*;
+use crate::model::utils::{deserialize_emojis, deserialize_roles};
 #[cfg(all(feature = "model", feature = "unstable_discord_api"))]
 use crate::{
-    model::{
-        interactions::{Interaction, ApplicationCommand}
-    },
     builder::CreateInteraction,
+    model::interactions::{ApplicationCommand, Interaction},
 };
 
 /// Partial information about a [`Guild`]. This does not include information
@@ -36,7 +34,8 @@ pub struct PartialGuild {
     pub default_message_notifications: DefaultMessageNotificationLevel,
     pub widget_channel_id: Option<ChannelId>,
     pub widget_enabled: bool,
-    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")] pub emojis: HashMap<EmojiId, Emoji>,
+    #[serde(serialize_with = "serialize_emojis", deserialize_with = "deserialize_emojis")]
+    pub emojis: HashMap<EmojiId, Emoji>,
     /// Features enabled for the guild.
     ///
     /// Refer to [`Guild::features`] for more information.
@@ -46,7 +45,8 @@ pub struct PartialGuild {
     pub name: String,
     pub owner_id: UserId,
     pub region: String,
-    #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")] pub roles: HashMap<RoleId, Role>,
+    #[serde(serialize_with = "serialize_roles", deserialize_with = "deserialize_roles")]
+    pub roles: HashMap<RoleId, Role>,
     pub splash: Option<String>,
     pub verification_level: VerificationLevel,
     pub description: Option<String>,
@@ -81,7 +81,12 @@ impl PartialGuild {
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
-    pub async fn ban(&self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
+    pub async fn ban(
+        &self,
+        http: impl AsRef<Http>,
+        user: impl Into<UserId>,
+        dmd: u8,
+    ) -> Result<()> {
         self.ban_with_reason(&http, user, dmd, "").await
     }
 
@@ -94,7 +99,7 @@ impl PartialGuild {
         http: impl AsRef<Http>,
         user: impl Into<UserId>,
         dmd: u8,
-        reason: impl AsRef<str>
+        reason: impl AsRef<str>,
     ) -> Result<()> {
         self.id.ban_with_reason(&http, user, dmd, reason).await
     }
@@ -111,7 +116,10 @@ impl PartialGuild {
 
     /// Gets all of the guild's channels over the REST API.
     #[inline]
-    pub async fn channels(&self, http: impl AsRef<Http>) -> Result<HashMap<ChannelId, GuildChannel>> {
+    pub async fn channels(
+        &self,
+        http: impl AsRef<Http>,
+    ) -> Result<HashMap<ChannelId, GuildChannel>> {
         self.id.channels(&http).await
     }
 
@@ -133,7 +141,11 @@ impl PartialGuild {
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
-    pub async fn create_channel(&self, http: impl AsRef<Http>, f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel) -> Result<GuildChannel> {
+    pub async fn create_channel(
+        &self,
+        http: impl AsRef<Http>,
+        f: impl FnOnce(&mut CreateChannel) -> &mut CreateChannel,
+    ) -> Result<GuildChannel> {
         self.id.create_channel(&http, f).await
     }
 
@@ -154,7 +166,12 @@ impl PartialGuild {
     /// [`utils::read_image`]: crate::utils::read_image
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
-    pub async fn create_emoji(&self, http: impl AsRef<Http>, name: &str, image: &str) -> Result<Emoji> {
+    pub async fn create_emoji(
+        &self,
+        http: impl AsRef<Http>,
+        name: &str,
+        image: &str,
+    ) -> Result<Emoji> {
         self.id.create_emoji(&http, name, image).await
     }
 
@@ -168,7 +185,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
-        kind: &str
+        kind: &str,
     ) -> Result<()> {
         self.id.create_integration(&http, integration_id, kind).await
     }
@@ -183,8 +200,15 @@ impl PartialGuild {
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
     #[inline]
-    pub async fn create_application_command<F>(&self, http: impl AsRef<Http>, application_id: u64, f: F) -> Result<ApplicationCommand>
-    where F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction {
+    pub async fn create_application_command<F>(
+        &self,
+        http: impl AsRef<Http>,
+        application_id: u64,
+        f: F,
+    ) -> Result<ApplicationCommand>
+    where
+        F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
+    {
         Interaction::create_guild_application_command(http, self.id, application_id, f).await
     }
 
@@ -202,7 +226,8 @@ impl PartialGuild {
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn create_role<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Role>
-    where F: FnOnce(&mut EditRole) -> &mut EditRole
+    where
+        F: FnOnce(&mut EditRole) -> &mut EditRole,
     {
         self.id.create_role(&http, f).await
     }
@@ -222,7 +247,11 @@ impl PartialGuild {
     ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
-    pub async fn delete_emoji(&self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>) -> Result<()> {
+    pub async fn delete_emoji(
+        &self,
+        http: impl AsRef<Http>,
+        emoji_id: impl Into<EmojiId>,
+    ) -> Result<()> {
         self.id.delete_emoji(&http, emoji_id).await
     }
 
@@ -232,7 +261,11 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn delete_integration(&self, http: impl AsRef<Http>, integration_id: impl Into<IntegrationId>) -> Result<()> {
+    pub async fn delete_integration(
+        &self,
+        http: impl AsRef<Http>,
+        integration_id: impl Into<IntegrationId>,
+    ) -> Result<()> {
         self.id.delete_integration(&http, integration_id).await
     }
 
@@ -245,7 +278,11 @@ impl PartialGuild {
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
-    pub async fn delete_role(&self, http: impl AsRef<Http>, role_id: impl Into<RoleId>) -> Result<()> {
+    pub async fn delete_role(
+        &self,
+        http: impl AsRef<Http>,
+        role_id: impl Into<RoleId>,
+    ) -> Result<()> {
         self.id.delete_role(&http, role_id).await
     }
 
@@ -256,7 +293,8 @@ impl PartialGuild {
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
-    where F: FnOnce(&mut EditGuild) -> &mut EditGuild
+    where
+        F: FnOnce(&mut EditGuild) -> &mut EditGuild,
     {
         match self.id.edit(&http, f).await {
             Ok(guild) => {
@@ -289,7 +327,12 @@ impl PartialGuild {
     ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
-    pub async fn edit_emoji(&self, http: impl AsRef<Http>, emoji_id: impl Into<EmojiId>, name: &str) -> Result<Emoji> {
+    pub async fn edit_emoji(
+        &self,
+        http: impl AsRef<Http>,
+        emoji_id: impl Into<EmojiId>,
+        name: &str,
+    ) -> Result<Emoji> {
         self.id.edit_emoji(&http, emoji_id, name).await
     }
 
@@ -309,8 +352,14 @@ impl PartialGuild {
     /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id])).await;
     /// ```
     #[inline]
-    pub async fn edit_member<F>(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>, f: F) -> Result<Member>
-    where F: FnOnce(&mut EditMember) -> &mut EditMember
+    pub async fn edit_member<F>(
+        &self,
+        http: impl AsRef<Http>,
+        user_id: impl Into<UserId>,
+        f: F,
+    ) -> Result<Member>
+    where
+        F: FnOnce(&mut EditMember) -> &mut EditMember,
     {
         self.id.edit_member(&http, user_id, f).await
     }
@@ -329,7 +378,11 @@ impl PartialGuild {
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
     #[inline]
-    pub async fn edit_nickname(&self, http: impl AsRef<Http>, new_nickname: Option<&str>) -> Result<()> {
+    pub async fn edit_nickname(
+        &self,
+        http: impl AsRef<Http>,
+        new_nickname: Option<&str>,
+    ) -> Result<()> {
         self.id.edit_nickname(&http, new_nickname).await
     }
 
@@ -356,16 +409,14 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        reason: &str
+        reason: &str,
     ) -> Result<()> {
         self.id.kick_with_reason(&http, user_id, reason).await
     }
 
     /// Returns a formatted URL of the guild's icon, if the guild has an icon.
     pub fn icon_url(&self) -> Option<String> {
-        self.icon
-            .as_ref()
-            .map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
+        self.icon.as_ref().map(|icon| format!(cdn!("/icons/{}/{}.webp"), self.id, icon))
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
@@ -406,13 +457,17 @@ impl PartialGuild {
 
     /// Gets a user's [`Member`] for the guild by Id.
     #[inline]
-    pub async fn member(&self, cache_http: impl CacheHttp, user_id: impl Into<UserId>) -> Result<Member> {
+    pub async fn member(
+        &self,
+        cache_http: impl CacheHttp,
+        user_id: impl Into<UserId>,
+    ) -> Result<Member> {
         self.id.member(cache_http, user_id).await
     }
 
     /// Gets a list of the guild's members.
     ///
-    /// Optionally pass in the `limit` to limit the number of results. 
+    /// Optionally pass in the `limit` to limit the number of results.
     /// Minimum value is 1, maximum and default value is 1000.
     /// <br>
     /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
@@ -423,7 +478,7 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         limit: Option<u64>,
-        after: impl Into<Option<UserId>>
+        after: impl Into<Option<UserId>>,
     ) -> Result<Vec<Member>> {
         self.id.members(&http, limit, after).await
     }
@@ -438,21 +493,19 @@ impl PartialGuild {
         &self,
         http: impl AsRef<Http>,
         user_id: impl Into<UserId>,
-        channel_id: impl Into<ChannelId>
+        channel_id: impl Into<ChannelId>,
     ) -> Result<Member> {
         self.id.move_member(&http, user_id, channel_id).await
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
     #[inline]
-    pub fn user_permissions_in(&self, channel: &GuildChannel, member: &Member) -> Result<Permissions> {
-        Guild::_user_permissions_in(
-            channel,
-            member,
-            &self.roles,
-            self.owner_id,
-            self.id
-        )
+    pub fn user_permissions_in(
+        &self,
+        channel: &GuildChannel,
+        member: &Member,
+    ) -> Result<Permissions> {
+        Guild::_user_permissions_in(channel, member, &self.roles, self.owner_id, self.id)
     }
 
     /// Calculate a [`Role`]'s permissions in a given channel in the guild.
@@ -531,7 +584,7 @@ impl PartialGuild {
     pub async fn start_integration_sync(
         &self,
         http: impl AsRef<Http>,
-        integration_id: impl Into<IntegrationId>
+        integration_id: impl Into<IntegrationId>,
     ) -> Result<()> {
         self.id.start_integration_sync(&http, integration_id).await
     }
@@ -609,25 +662,37 @@ impl PartialGuild {
 
     /// Returns a future that will await one message sent in this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reply<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReply<'a> {
+    pub fn await_reply<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReply<'a> {
         CollectReply::new(shard_messenger).guild_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of messages in this guild.
     #[cfg(feature = "collector")]
-    pub fn await_replies<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> MessageCollectorBuilder<'a> {
+    pub fn await_replies<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> MessageCollectorBuilder<'a> {
         MessageCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
 
     /// Await a single reaction in this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
+    pub fn await_reaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReaction<'a> {
         CollectReaction::new(shard_messenger).guild_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions sent in this guild.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
+    pub fn await_reactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).guild_id(self.id.0)
     }
 }
@@ -636,49 +701,48 @@ impl<'de> Deserialize<'de> for PartialGuild {
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         let mut map = JsonMap::deserialize(deserializer)?;
 
-        let id = map.get("id")
-            .and_then(|x| x.as_str())
-            .and_then(|x| x.parse::<u64>().ok());
+        let id = map.get("id").and_then(|x| x.as_str()).and_then(|x| x.parse::<u64>().ok());
 
         if let Some(guild_id) = id {
             if let Some(array) = map.get_mut("roles").and_then(|x| x.as_array_mut()) {
                 for value in array {
                     if let Some(role) = value.as_object_mut() {
-                        role
-                            .insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                        role.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
                     }
                 }
             }
         }
 
         let afk_channel_id = match map.remove("afk_channel_id") {
-            Some(v) => serde_json::from_value::<Option<ChannelId>>(v)
-                .map_err(DeError::custom)?,
+            Some(v) => serde_json::from_value::<Option<ChannelId>>(v).map_err(DeError::custom)?,
             None => None,
         };
-        let afk_timeout = map.remove("afk_timeout")
+        let afk_timeout = map
+            .remove("afk_timeout")
             .ok_or_else(|| DeError::custom("expected guild afk_timeout"))
             .and_then(u64::deserialize)
             .map_err(DeError::custom)?;
-        let default_message_notifications = map.remove("default_message_notifications")
-            .ok_or_else(|| {
-                DeError::custom("expected guild default_message_notifications")
-            })
+        let default_message_notifications = map
+            .remove("default_message_notifications")
+            .ok_or_else(|| DeError::custom("expected guild default_message_notifications"))
             .and_then(DefaultMessageNotificationLevel::deserialize)
             .map_err(DeError::custom)?;
         let widget_channel_id = match map.remove("widget_channel_id") {
             Some(e) => Option::<ChannelId>::deserialize(e).map_err(DeError::custom)?,
             None => None,
         };
-        let widget_enabled = map.remove("widget_enabled")
+        let widget_enabled = map
+            .remove("widget_enabled")
             .ok_or_else(|| DeError::custom("expected guild widget_enabled"))
             .and_then(bool::deserialize)
             .map_err(DeError::custom)?;
-        let emojis = map.remove("emojis")
+        let emojis = map
+            .remove("emojis")
             .ok_or_else(|| DeError::custom("expected guild emojis"))
             .and_then(deserialize_emojis)
             .map_err(DeError::custom)?;
-        let features = map.remove("features")
+        let features = map
+            .remove("features")
             .ok_or_else(|| DeError::custom("expected guild features"))
             .and_then(serde_json::from_value::<Vec<String>>)
             .map_err(DeError::custom)?;
@@ -686,27 +750,33 @@ impl<'de> Deserialize<'de> for PartialGuild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let id = map.remove("id")
+        let id = map
+            .remove("id")
             .ok_or_else(|| DeError::custom("expected guild id"))
             .and_then(GuildId::deserialize)
             .map_err(DeError::custom)?;
-        let mfa_level = map.remove("mfa_level")
+        let mfa_level = map
+            .remove("mfa_level")
             .ok_or_else(|| DeError::custom("expected guild mfa_level"))
             .and_then(MfaLevel::deserialize)
             .map_err(DeError::custom)?;
-        let name = map.remove("name")
+        let name = map
+            .remove("name")
             .ok_or_else(|| DeError::custom("expected guild name"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
-        let owner_id = map.remove("owner_id")
+        let owner_id = map
+            .remove("owner_id")
             .ok_or_else(|| DeError::custom("expected guild owner_id"))
             .and_then(UserId::deserialize)
             .map_err(DeError::custom)?;
-        let region = map.remove("region")
+        let region = map
+            .remove("region")
             .ok_or_else(|| DeError::custom("expected guild region"))
             .and_then(String::deserialize)
             .map_err(DeError::custom)?;
-        let roles = map.remove("roles")
+        let roles = map
+            .remove("roles")
             .ok_or_else(|| DeError::custom("expected guild roles"))
             .and_then(deserialize_roles)
             .map_err(DeError::custom)?;
@@ -714,7 +784,8 @@ impl<'de> Deserialize<'de> for PartialGuild {
             Some(v) => Option::<String>::deserialize(v).map_err(DeError::custom)?,
             None => None,
         };
-        let verification_level = map.remove("verification_level")
+        let verification_level = map
+            .remove("verification_level")
             .ok_or_else(|| DeError::custom("expected guild verification_level"))
             .and_then(VerificationLevel::deserialize)
             .map_err(DeError::custom)?;

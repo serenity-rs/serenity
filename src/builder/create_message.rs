@@ -1,11 +1,11 @@
-use crate::internal::prelude::*;
-use crate::http::AttachmentType;
-use crate::model::channel::{ReactionType, MessageReference};
-use super::CreateEmbed;
-use super::CreateAllowedMentions;
-use crate::utils;
-
 use std::collections::HashMap;
+
+use super::CreateAllowedMentions;
+use super::CreateEmbed;
+use crate::http::AttachmentType;
+use crate::internal::prelude::*;
+use crate::model::channel::{MessageReference, ReactionType};
+use crate::utils;
 
 /// A builder to specify the contents of an [`Http::send_message`] request,
 /// primarily meant for use through [`ChannelId::send_message`].
@@ -54,7 +54,11 @@ use std::collections::HashMap;
 /// [`embed`]: Self::embed
 /// [`Http::send_message`]: crate::http::client::Http::send_message
 #[derive(Clone, Debug)]
-pub struct CreateMessage<'a>(pub HashMap<&'static str, Value>, pub Option<Vec<ReactionType>>, pub Vec<AttachmentType<'a>>);
+pub struct CreateMessage<'a>(
+    pub HashMap<&'static str, Value>,
+    pub Option<Vec<ReactionType>>,
+    pub Vec<AttachmentType<'a>>,
+);
 
 impl<'a> CreateMessage<'a> {
     /// Set the content of the message.
@@ -72,7 +76,9 @@ impl<'a> CreateMessage<'a> {
 
     /// Create an embed for the message.
     pub fn embed<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed {
+    where
+        F: FnOnce(&mut CreateEmbed) -> &mut CreateEmbed,
+    {
         let mut embed = CreateEmbed::default();
         f(&mut embed);
         self.set_embed(embed)
@@ -99,7 +105,10 @@ impl<'a> CreateMessage<'a> {
 
     /// Adds a list of reactions to create after the message's sent.
     #[inline]
-    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item=R>>(&mut self, reactions: It) -> &mut Self {
+    pub fn reactions<R: Into<ReactionType>, It: IntoIterator<Item = R>>(
+        &mut self,
+        reactions: It,
+    ) -> &mut Self {
         self._reactions(reactions.into_iter().map(Into::into).collect());
         self
     }
@@ -115,7 +124,10 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Appends a list of files to the message.
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
         self.2.extend(files.into_iter().map(|f| f.into()));
         self
     }
@@ -124,14 +136,19 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call `add_file` or `add_files` instead.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
         self.2 = files.into_iter().map(|f| f.into()).collect();
         self
     }
 
     /// Set the allowed mentions for the message.
     pub fn allowed_mentions<F>(&mut self, f: F) -> &mut Self
-    where F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions {
+    where
+        F: FnOnce(&mut CreateAllowedMentions) -> &mut CreateAllowedMentions,
+    {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);

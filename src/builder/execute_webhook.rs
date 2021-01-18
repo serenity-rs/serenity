@@ -1,5 +1,7 @@
-use serde_json::Value;
 use std::collections::HashMap;
+
+use serde_json::Value;
+
 use crate::http::AttachmentType;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
@@ -122,7 +124,10 @@ impl<'a> ExecuteWebhook<'a> {
     }
 
     /// Appends a list of files to the webhook message.
-    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+    pub fn add_files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
         self.1.extend(files.into_iter().map(|f| f.into()));
         self
     }
@@ -131,7 +136,10 @@ impl<'a> ExecuteWebhook<'a> {
     ///
     /// Calling this multiple times will overwrite the file list.
     /// To append files, call `add_file` or `add_files` instead.
-    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item=T>>(&mut self, files: It) -> &mut Self {
+    pub fn files<T: Into<AttachmentType<'a>>, It: IntoIterator<Item = T>>(
+        &mut self,
+        files: It,
+    ) -> &mut Self {
         self.1 = files.into_iter().map(|f| f.into()).collect();
         self
     }

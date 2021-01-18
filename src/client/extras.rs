@@ -1,12 +1,10 @@
-use super::{EventHandler, RawEventHandler};
-use crate::client::bridge::gateway::GatewayIntents;
-
 use std::fmt;
 use std::sync::Arc;
-
 #[cfg(feature = "cache")]
 use std::time::Duration;
 
+use super::{EventHandler, RawEventHandler};
+use crate::client::bridge::gateway::GatewayIntents;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
 

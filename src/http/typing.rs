@@ -1,12 +1,15 @@
-use crate::{error::Result, http::Http};
 use std::sync::Arc;
-use tokio::{sync::oneshot::{self, Sender, error::TryRecvError}, time::Duration};
 
 #[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::delay_for as sleep;
-
 #[cfg(feature = "tokio")]
 use tokio::time::sleep;
+use tokio::{
+    sync::oneshot::{self, error::TryRecvError, Sender},
+    time::Duration,
+};
+
+use crate::{error::Result, http::Http};
 
 /// A struct to start typing in a [`Channel`] for an indefinite period of time.
 ///

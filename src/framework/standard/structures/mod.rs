@@ -1,20 +1,14 @@
-use std::{
-    collections::HashSet,
-    fmt,
-    error::Error as StdError,
-};
-use crate::client::Context;
-use crate::model::{
-    channel::Message,
-    permissions::Permissions,
-    id::UserId,
-};
-use crate::utils::Colour;
-use super::Args;
+use std::{collections::HashSet, error::Error as StdError, fmt};
+
 use futures::future::BoxFuture;
 
-mod check;
+use super::Args;
+use crate::client::Context;
+use crate::model::{channel::Message, id::UserId, permissions::Permissions};
+use crate::utils::Colour;
+
 pub mod buckets;
+mod check;
 
 pub use self::check::*;
 
@@ -27,7 +21,9 @@ pub enum OnlyIn {
 }
 
 impl Default for OnlyIn {
-    fn default() -> Self { Self::None }
+    fn default() -> Self {
+        Self::None
+    }
 }
 
 #[derive(Debug, Default, PartialEq)]
@@ -72,7 +68,8 @@ pub struct CommandOptions {
 
 pub type CommandError = Box<dyn StdError + Send + Sync>;
 pub type CommandResult<T = ()> = std::result::Result<T, CommandError>;
-pub type CommandFn = for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
+pub type CommandFn =
+    for<'fut> fn(&'fut Context, &'fut Message, Args) -> BoxFuture<'fut, CommandResult>;
 
 pub struct Command {
     pub fun: CommandFn,
@@ -81,9 +78,7 @@ pub struct Command {
 
 impl fmt::Debug for Command {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        f.debug_struct("Command")
-            .field("options", &self.options)
-            .finish()
+        f.debug_struct("Command").field("options", &self.options).finish()
     }
 }
 
@@ -246,8 +241,14 @@ mod levenshtein_tests {
     #[test]
     fn help_behaviour_eq() {
         assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Hide, HelpBehaviour::Hide));
-        assert_eq!(HelpBehaviour::Strike, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Strike));
-        assert_eq!(HelpBehaviour::Nothing, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Nothing));
+        assert_eq!(
+            HelpBehaviour::Strike,
+            std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Strike)
+        );
+        assert_eq!(
+            HelpBehaviour::Nothing,
+            std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Nothing)
+        );
     }
 
     #[test]
@@ -258,13 +259,19 @@ mod levenshtein_tests {
 
     #[test]
     fn help_behaviour_strike() {
-        assert_eq!(HelpBehaviour::Strike, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Nothing));
+        assert_eq!(
+            HelpBehaviour::Strike,
+            std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Nothing)
+        );
         assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Strike, HelpBehaviour::Hide));
     }
 
     #[test]
     fn help_behaviour_nothing() {
-        assert_eq!(HelpBehaviour::Strike, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Strike));
+        assert_eq!(
+            HelpBehaviour::Strike,
+            std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Strike)
+        );
         assert_eq!(HelpBehaviour::Hide, std::cmp::max(HelpBehaviour::Nothing, HelpBehaviour::Hide));
     }
 }

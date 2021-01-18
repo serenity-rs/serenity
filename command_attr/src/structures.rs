@@ -1,17 +1,31 @@
-use crate::consts::CHECK;
-use crate::util::{Argument, AsOption, IdentExt2, Parenthesised};
+use std::str::FromStr;
+
 use proc_macro2::Span;
 use proc_macro2::TokenStream as TokenStream2;
 use quote::{quote, ToTokens};
 use syn::{
     braced,
     parse::{Error, Parse, ParseStream, Result},
-    spanned::Spanned,
     punctuated::Punctuated,
-    Attribute, Block, FnArg, Ident, Pat, Path, PathSegment, ReturnType, Stmt, Expr, ExprClosure,
-    Token, Type, Visibility,
+    spanned::Spanned,
+    Attribute,
+    Block,
+    Expr,
+    ExprClosure,
+    FnArg,
+    Ident,
+    Pat,
+    Path,
+    PathSegment,
+    ReturnType,
+    Stmt,
+    Token,
+    Type,
+    Visibility,
 };
-use std::str::FromStr;
+
+use crate::consts::CHECK;
+use crate::util::{Argument, AsOption, IdentExt2, Parenthesised};
 
 #[derive(Debug, PartialEq)]
 pub enum OnlyIn {
@@ -65,7 +79,7 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
                         name,
                         kind: *kind,
                     })
-                }
+                },
                 Pat::Wild(wild) => {
                     let token = wild.underscore_token;
 
@@ -76,33 +90,20 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
                         name,
                         kind: *kind,
                     })
-                }
-                _ => Err(Error::new(
-                    pat.span(),
-                    format_args!("unsupported pattern: {:?}", pat),
-                )),
+                },
+                _ => Err(Error::new(pat.span(), format_args!("unsupported pattern: {:?}", pat))),
             }
-        }
-        FnArg::Receiver(_) => Err(Error::new(
-            arg.span(),
-            format_args!("`self` arguments are prohibited: {:?}", arg),
-        )),
+        },
+        FnArg::Receiver(_) => {
+            Err(Error::new(arg.span(), format_args!("`self` arguments are prohibited: {:?}", arg)))
+        },
     }
 }
 
 /// Test if the attribute is cooked.
 fn is_cooked(attr: &Attribute) -> bool {
-    const COOKED_ATTRIBUTE_NAMES: &[&str] = &[
-        "cfg",
-        "cfg_attr",
-        "doc",
-        "derive",
-        "inline",
-        "allow",
-        "warn",
-        "deny",
-        "forbid",
-    ];
+    const COOKED_ATTRIBUTE_NAMES: &[&str] =
+        &["cfg", "cfg_attr", "doc", "derive", "inline", "allow", "warn", "deny", "forbid"];
 
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
@@ -151,10 +152,8 @@ impl Parse for CommandFun {
         for attr in &mut attributes {
             // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
             if attr.path.is_ident("doc") {
-                attr.path = Path::from(PathSegment::from(Ident::new(
-                    "description",
-                    Span::call_site(),
-                )));
+                attr.path =
+                    Path::from(PathSegment::from(Ident::new("description", Span::call_site())));
             }
         }
 
@@ -175,7 +174,7 @@ impl Parse for CommandFun {
             ReturnType::Default => {
                 return Err(input
                     .error("expected a result type of either `CommandResult` or `CheckResult`"))
-            }
+            },
         };
 
         // { ... }
@@ -183,10 +182,7 @@ impl Parse for CommandFun {
         braced!(bcont in input);
         let body = bcont.call(Block::parse_within)?;
 
-        let args = args
-            .into_iter()
-            .map(parse_argument)
-            .collect::<Result<Vec<_>>>()?;
+        let args = args.into_iter().map(parse_argument).collect::<Result<Vec<_>>>()?;
 
         Ok(Self {
             attributes,
@@ -267,14 +263,13 @@ impl Parse for Hook {
 }
 
 fn is_function(input: ParseStream<'_>) -> bool {
-    input.peek(Token![pub]) ||
-        (input.peek(Token![async]) && input.peek2(Token![fn]))
+    input.peek(Token![pub]) || (input.peek(Token![async]) && input.peek2(Token![fn]))
 }
 
 fn parse_function_hook(
     input: ParseStream<'_>,
     attributes: Vec<Attribute>,
-    cooked: Vec<Attribute>
+    cooked: Vec<Attribute>,
 ) -> Result<FunctionHook> {
     let visibility = input.parse::<Visibility>()?;
 
@@ -288,9 +283,9 @@ fn parse_function_hook(
 
     let ret = match input.parse::<ReturnType>()? {
         ReturnType::Type(_, t) => (*t).clone(),
-        ReturnType::Default => Type::Verbatim(
-            TokenStream2::from_str("()")
-                .expect("Invalid str to create `()`-type")),
+        ReturnType::Default => {
+            Type::Verbatim(TokenStream2::from_str("()").expect("Invalid str to create `()`-type"))
+        },
     };
 
     // { ... }
@@ -298,10 +293,7 @@ fn parse_function_hook(
     braced!(bcont in input);
     let body = bcont.call(Block::parse_within)?;
 
-    let args = args
-        .into_iter()
-        .map(parse_argument)
-        .collect::<Result<Vec<_>>>()?;
+    let args = args.into_iter().map(parse_argument).collect::<Result<Vec<_>>>()?;
 
     Ok(FunctionHook {
         attributes,
@@ -317,7 +309,7 @@ fn parse_function_hook(
 fn parse_closure_hook(
     input: ParseStream<'_>,
     attributes: Vec<Attribute>,
-    cooked: Vec<Attribute>
+    cooked: Vec<Attribute>,
 ) -> Result<ClosureHook> {
     input.parse::<Token![async]>()?;
     let closure = input.parse::<ExprClosure>()?;

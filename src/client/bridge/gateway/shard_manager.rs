@@ -1,14 +1,15 @@
-use crate::internal::prelude::*;
-use crate::CacheAndHttp;
-use tokio::time::timeout;
-use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::{HashMap, VecDeque},
     sync::Arc,
 };
-use futures::channel::mpsc::{self, UnboundedSender as Sender, UnboundedReceiver as Receiver};
+
+use futures::channel::mpsc::{self, UnboundedReceiver as Receiver, UnboundedSender as Sender};
 use futures::StreamExt;
-use crate::client::{EventHandler, RawEventHandler};
+use tokio::sync::{Mutex, RwLock};
+use tokio::time::timeout;
+use tracing::{info, instrument, warn};
+use typemap_rev::TypeMap;
+
 use super::{
     GatewayIntents,
     ShardId,
@@ -18,13 +19,13 @@ use super::{
     ShardQueuerMessage,
     ShardRunnerInfo,
 };
-use tracing::{info, warn, instrument};
-
-use typemap_rev::TypeMap;
-#[cfg(feature = "framework")]
-use crate::framework::Framework;
 #[cfg(feature = "voice")]
 use crate::client::bridge::voice::VoiceGatewayManager;
+use crate::client::{EventHandler, RawEventHandler};
+#[cfg(feature = "framework")]
+use crate::framework::Framework;
+use crate::internal::prelude::*;
+use crate::CacheAndHttp;
 
 /// A manager for handling the status of shards by starting them, restarting
 /// them, and stopping them when required.
@@ -272,19 +273,18 @@ impl ShardManager {
 
         const TIMEOUT: tokio::time::Duration = tokio::time::Duration::from_secs(5);
         match timeout(TIMEOUT, self.shard_shutdown.next()).await {
-            Ok(Some(shutdown_shard_id)) =>
+            Ok(Some(shutdown_shard_id)) => {
                 if shutdown_shard_id != shard_id {
                     warn!(
                         "Failed to cleanly shutdown shard {}: Shutdown channel sent incorrect ID",
                         shard_id,
                     );
-                },
+                }
+            },
             Ok(None) => (),
-            Err(why) => warn!(
-                "Failed to cleanly shutdown shard {}, reached timeout: {:?}",
-                shard_id,
-                why,
-            ),
+            Err(why) => {
+                warn!("Failed to cleanly shutdown shard {}, reached timeout: {:?}", shard_id, why,)
+            },
         }
 
         self.runners.lock().await.remove(&shard_id);

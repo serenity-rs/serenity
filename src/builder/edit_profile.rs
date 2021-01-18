@@ -1,5 +1,6 @@
-use crate::internal::prelude::*;
 use std::collections::HashMap;
+
+use crate::internal::prelude::*;
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].

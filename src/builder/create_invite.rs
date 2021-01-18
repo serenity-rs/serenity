@@ -1,6 +1,8 @@
-use crate::internal::prelude::*;
 use std::collections::HashMap;
+
 use serde_json::Value;
+
+use crate::internal::prelude::*;
 
 /// A builder to create a [`RichInvite`] for use via [`GuildChannel::create_invite`].
 ///
@@ -101,8 +103,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_age(&mut self, max_age: u64) -> &mut Self {
-        self.0
-            .insert("max_age", Value::Number(Number::from(max_age)));
+        self.0.insert("max_age", Value::Number(Number::from(max_age)));
         self
     }
 
@@ -136,8 +137,7 @@ impl CreateInvite {
     /// # }
     /// ```
     pub fn max_uses(&mut self, max_uses: u64) -> &mut Self {
-        self.0
-            .insert("max_uses", Value::Number(Number::from(max_uses)));
+        self.0.insert("max_uses", Value::Number(Number::from(max_uses)));
         self
     }
 

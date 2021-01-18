@@ -1,28 +1,23 @@
 //! Webhook model and implementations.
 
-use super::{
-    id::{
-        ChannelId,
-        GuildId,
-        WebhookId
-    },
-    user::User
-};
-
 use std::fmt;
+#[cfg(feature = "model")]
+use std::mem;
 
+#[cfg(feature = "model")]
+use super::channel::Message;
+use super::{
+    id::{ChannelId, GuildId, WebhookId},
+    user::User,
+};
 #[cfg(feature = "model")]
 use crate::builder::ExecuteWebhook;
 #[cfg(feature = "model")]
+use crate::http::Http;
+#[cfg(feature = "model")]
 use crate::internal::prelude::*;
 #[cfg(feature = "model")]
-use std::mem;
-#[cfg(feature = "model")]
-use super::channel::Message;
-#[cfg(feature = "model")]
 use crate::utils;
-#[cfg(feature = "model")]
-use crate::http::Http;
 
 /// A representation of a webhook, which is a low-effort way to post messages to
 /// channels. They do not necessarily require a bot user or authentication to
@@ -78,7 +73,6 @@ impl Webhook {
         http.as_ref().delete_webhook_with_token(self.id.0, &self.token).await
     }
 
-    ///
     /// Edits the webhook in-place. All fields are optional.
     ///
     /// To nullify the avatar, pass `Some("")`. Otherwise, passing `None` will
@@ -127,7 +121,12 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
-    pub async fn edit(&mut self, http: impl AsRef<Http>, name: Option<&str>, avatar: Option<&str>) -> Result<()> {
+    pub async fn edit(
+        &mut self,
+        http: impl AsRef<Http>,
+        name: Option<&str>,
+        avatar: Option<&str>,
+    ) -> Result<()> {
         if name.is_none() && avatar.is_none() {
             return Ok(());
         }
@@ -137,11 +136,7 @@ impl Webhook {
         if let Some(avatar) = avatar {
             map.insert(
                 "avatar".to_string(),
-                if avatar.is_empty() {
-                    Value::Null
-                } else {
-                    Value::String(avatar.to_string())
-                },
+                if avatar.is_empty() { Value::Null } else { Value::String(avatar.to_string()) },
             );
         }
 
@@ -149,10 +144,7 @@ impl Webhook {
             map.insert("name".to_string(), Value::String(name.to_string()));
         }
 
-        *self = http
-            .as_ref()
-            .edit_webhook_with_token(self.id.0, &self.token, &map)
-            .await?;
+        *self = http.as_ref().edit_webhook_with_token(self.id.0, &self.token, &map).await?;
 
         Ok(())
     }
@@ -220,8 +212,14 @@ impl Webhook {
     /// # }
     /// ```
     #[inline]
-    pub async fn execute<'a, F>(&self, http: impl AsRef<Http>, wait: bool, f: F) -> Result<Option<Message>>
-    where for <'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>
+    pub async fn execute<'a, F>(
+        &self,
+        http: impl AsRef<Http>,
+        wait: bool,
+        f: F,
+    ) -> Result<Option<Message>>
+    where
+        for<'b> F: FnOnce(&'b mut ExecuteWebhook<'a>) -> &'b mut ExecuteWebhook<'a>,
     {
         let mut execute_webhook = ExecuteWebhook::default();
         f(&mut execute_webhook);
@@ -229,7 +227,15 @@ impl Webhook {
         let map = utils::hashmap_to_json_map(execute_webhook.0);
 
         if !execute_webhook.1.is_empty() {
-            http.as_ref().execute_webhook_with_files(self.id.0, &self.token, wait, execute_webhook.1.clone(), map).await
+            http.as_ref()
+                .execute_webhook_with_files(
+                    self.id.0,
+                    &self.token,
+                    wait,
+                    execute_webhook.1.clone(),
+                    map,
+                )
+                .await
         } else {
             http.as_ref().execute_webhook(self.id.0, &self.token, wait, &map).await
         }

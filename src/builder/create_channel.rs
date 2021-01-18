@@ -1,9 +1,9 @@
-use crate::internal::prelude::*;
-use crate::model::prelude::*;
+use std::collections::HashMap;
 
 use serde_json::{json, Value};
 
-use std::collections::HashMap;
+use crate::internal::prelude::*;
+use crate::model::prelude::*;
 
 /// A builder for creating a new [`GuildChannel`] in a [`Guild`].
 ///
@@ -121,21 +121,25 @@ impl CreateChannel {
     /// # }
     /// ```
     pub fn permissions<I>(&mut self, perms: I) -> &mut Self
-        where I: IntoIterator<Item=PermissionOverwrite>
+    where
+        I: IntoIterator<Item = PermissionOverwrite>,
     {
-        let overwrites = perms.into_iter().map(|perm| {
-            let (id, kind) = match perm.kind {
-                PermissionOverwriteType::Member(id) => (id.0, "member"),
-                PermissionOverwriteType::Role(id) => (id.0, "role"),
-            };
+        let overwrites = perms
+            .into_iter()
+            .map(|perm| {
+                let (id, kind) = match perm.kind {
+                    PermissionOverwriteType::Member(id) => (id.0, "member"),
+                    PermissionOverwriteType::Role(id) => (id.0, "role"),
+                };
 
-            json!({
-                "allow": perm.allow.bits(),
-                "deny": perm.deny.bits(),
-                "id": id,
-                "type": kind,
+                json!({
+                    "allow": perm.allow.bits(),
+                    "deny": perm.deny.bits(),
+                    "id": id,
+                    "type": kind,
+                })
             })
-        }).collect();
+            .collect();
 
         self.0.insert("permission_overwrites", Value::Array(overwrites));
 

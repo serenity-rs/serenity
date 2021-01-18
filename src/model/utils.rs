@@ -1,27 +1,24 @@
+use std::{collections::HashMap, hash::Hash};
+
 use serde::de::Error as DeError;
 use serde::de::MapAccess;
-use serde::ser::{SerializeSeq, Serialize, Serializer};
-use std::{
-    collections::HashMap,
-    hash::Hash,
-};
-use super::prelude::*;
-
-#[cfg(feature = "cache")]
-use crate::internal::prelude::*;
+use serde::ser::{Serialize, SerializeSeq, Serializer};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use super::permissions::Permissions;
+use super::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
+#[cfg(feature = "cache")]
+use crate::internal::prelude::*;
 
 pub fn default_true() -> bool {
     true
 }
 
 pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<EmojiId, Emoji>, D::Error> {
     let vec: Vec<Emoji> = Deserialize::deserialize(deserializer)?;
     let mut emojis = HashMap::new();
 
@@ -34,7 +31,8 @@ pub fn deserialize_emojis<'de, D: Deserializer<'de>>(
 
 pub fn serialize_emojis<S: Serializer>(
     emojis: &HashMap<EmojiId, Emoji>,
-    serializer: S) -> StdResult<S::Ok, S::Error> {
+    serializer: S,
+) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(emojis.len()))?;
 
     for emoji in emojis.values() {
@@ -45,8 +43,8 @@ pub fn serialize_emojis<S: Serializer>(
 }
 
 pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, GuildChannel>, D::Error> {
     let vec: Vec<GuildChannel> = Deserialize::deserialize(deserializer)?;
     let mut map = HashMap::new();
 
@@ -57,10 +55,9 @@ pub fn deserialize_guild_channels<'de, D: Deserializer<'de>>(
     Ok(map)
 }
 
-
 pub fn deserialize_members<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, Member>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<UserId, Member>, D::Error> {
     let vec: Vec<Member> = Deserialize::deserialize(deserializer)?;
     let mut members = HashMap::new();
 
@@ -74,8 +71,8 @@ pub fn deserialize_members<'de, D: Deserializer<'de>>(
 }
 
 pub fn deserialize_presences<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, Presence>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<UserId, Presence>, D::Error> {
     let vec: Vec<Presence> = Deserialize::deserialize(deserializer)?;
     let mut presences = HashMap::new();
 
@@ -88,7 +85,7 @@ pub fn deserialize_presences<'de, D: Deserializer<'de>>(
 
 pub fn serialize_presences<S: Serializer>(
     presences: &HashMap<UserId, Presence>,
-    serializer: S
+    serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(presences.len()))?;
 
@@ -100,8 +97,8 @@ pub fn serialize_presences<S: Serializer>(
 }
 
 pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<ChannelId, Channel>, D::Error> {
     let vec: Vec<Channel> = Deserialize::deserialize(deserializer)?;
     let mut private_channels = HashMap::new();
 
@@ -120,7 +117,7 @@ pub fn deserialize_private_channels<'de, D: Deserializer<'de>>(
 
 pub fn serialize_private_channels<S: Serializer>(
     private_channels: &HashMap<ChannelId, Channel>,
-    serializer: S
+    serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(private_channels.len()))?;
 
@@ -132,8 +129,8 @@ pub fn serialize_private_channels<S: Serializer>(
 }
 
 pub fn deserialize_roles<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<RoleId, Role>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<RoleId, Role>, D::Error> {
     let vec: Vec<Role> = Deserialize::deserialize(deserializer)?;
     let mut roles = HashMap::new();
 
@@ -146,7 +143,7 @@ pub fn deserialize_roles<'de, D: Deserializer<'de>>(
 
 pub fn serialize_roles<S: Serializer>(
     roles: &HashMap<RoleId, Role>,
-    serializer: S
+    serializer: S,
 ) -> StdResult<S::Ok, S::Error> {
     let mut seq = serializer.serialize_seq(Some(roles.len()))?;
 
@@ -158,8 +155,8 @@ pub fn serialize_roles<S: Serializer>(
 }
 
 pub fn deserialize_single_recipient<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<User, D::Error> {
+    deserializer: D,
+) -> StdResult<User, D::Error> {
     let mut users: Vec<User> = Deserialize::deserialize(deserializer)?;
     let user = if users.is_empty() {
         return Err(DeError::custom("Expected a single recipient"));
@@ -195,8 +192,8 @@ pub fn serialize_u64<S: Serializer>(data: &u64, ser: S) -> StdResult<S::Ok, S::E
 }
 
 pub fn deserialize_voice_states<'de, D: Deserializer<'de>>(
-    deserializer: D)
-    -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
+    deserializer: D,
+) -> StdResult<HashMap<UserId, VoiceState>, D::Error> {
     let vec: Vec<VoiceState> = Deserialize::deserialize(deserializer)?;
     let mut voice_states = HashMap::new();
 
@@ -225,7 +222,7 @@ pub async fn user_has_perms(
     cache: impl AsRef<Cache>,
     channel_id: ChannelId,
     guild_id: Option<GuildId>,
-    mut permissions: Permissions
+    mut permissions: Permissions,
 ) -> Result<bool> {
     let cache = cache.as_ref();
 
@@ -249,7 +246,7 @@ pub async fn user_has_perms(
         Channel::Private(_) => match guild_id {
             Some(_) => return Err(Error::Model(ModelError::InvalidChannelType)),
             None => return Ok(true),
-        }
+        },
     };
 
     let guild = match cache.guild(guild_id).await {

@@ -39,34 +39,29 @@
 //!
 //! [Taken from]: https://discord.com/developers/docs/topics/rate-limits#rate-limits
 
-pub use super::routing::Route;
-
-use reqwest::{Client, Response};
-use reqwest::{header::HeaderMap, StatusCode};
-use crate::internal::prelude::*;
-use tokio::sync::{Mutex, RwLock};
 use std::{
     collections::HashMap,
-    fmt,
-    sync::Arc,
-    str::{
-        self,
-        FromStr,
-    },
-    time::SystemTime,
-    i64,
     f64,
+    fmt,
+    i64,
+    str::{self, FromStr},
+    sync::Arc,
+    time::SystemTime,
 };
-use tokio::time::{Duration};
 
+use reqwest::{header::HeaderMap, StatusCode};
+use reqwest::{Client, Response};
+use tokio::sync::{Mutex, RwLock};
 #[cfg(all(feature = "tokio_compat", not(feature = "tokio")))]
 use tokio::time::delay_for as sleep;
-
 #[cfg(feature = "tokio")]
 use tokio::time::sleep;
-
-use super::{HttpError, Request};
+use tokio::time::Duration;
 use tracing::{debug, instrument};
+
+pub use super::routing::Route;
+use super::{HttpError, Request};
+use crate::internal::prelude::*;
 
 /// Ratelimiter for requests to the Discord API.
 ///
@@ -158,7 +153,9 @@ impl Ratelimiter {
 
     #[instrument]
     pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {
-        let RatelimitedRequest { req } = req;
+        let RatelimitedRequest {
+            req,
+        } = req;
 
         loop {
             // This will block if another thread hit the global ratelimit.
@@ -183,13 +180,7 @@ impl Ratelimiter {
             // - get the global rate;
             // - sleep if there is 0 remaining
             // - then, perform the request
-            let bucket = Arc::clone(
-                &self.routes
-                    .write()
-                    .await
-                    .entry(route)
-                    .or_default()
-            );
+            let bucket = Arc::clone(&self.routes.write().await.entry(route).or_default());
 
             bucket.lock().await.pre_hook(&route).await;
 
@@ -216,7 +207,9 @@ impl Ratelimiter {
                     let _ = self.global.lock().await;
 
                     Ok(
-                        if let Some(retry_after) = parse_header::<f64>(&response.headers(), "retry-after")? {
+                        if let Some(retry_after) =
+                            parse_header::<f64>(&response.headers(), "retry-after")?
+                        {
                             debug!("Ratelimited on route {:?} for {:?}s", route, retry_after);
                             sleep(Duration::from_secs_f64(retry_after)).await;
 
@@ -273,7 +266,7 @@ impl Ratelimit {
                 self.remaining = self.limit;
 
                 return;
-            }
+            },
         };
 
         let delay = match reset.duration_since(SystemTime::now()) {
@@ -285,16 +278,11 @@ impl Ratelimit {
                     self.remaining -= 1;
                 }
                 return;
-            }
+            },
         };
 
         if self.remaining() == 0 {
-
-            debug!(
-                "Pre-emptive ratelimit on route {:?} for {}ms",
-                route,
-                delay.as_millis(),
-            );
+            debug!("Pre-emptive ratelimit on route {:?} for {}ms", route, delay.as_millis(),);
 
             sleep(delay).await;
 
@@ -319,7 +307,9 @@ impl Ratelimit {
             self.reset = Some(std::time::UNIX_EPOCH + Duration::from_secs_f64(_reset));
         }
 
-        if let Some(reset_after) = parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")? {
+        if let Some(reset_after) =
+            parse_header::<f64>(&response.headers(), "x-ratelimit-reset-after")?
+        {
             #[cfg(not(feature = "absolute_ratelimits"))]
             {
                 self.reset = Some(SystemTime::now() + Duration::from_secs_f64(reset_after));
@@ -370,8 +360,8 @@ impl Default for Ratelimit {
         Self {
             limit: i64::MAX,
             remaining: i64::MAX,
-            reset:  None,
-            reset_after:  None,
+            reset: None,
+            reset_after: None,
         }
     }
 }
@@ -389,7 +379,9 @@ pub struct RatelimitedRequest<'a> {
 
 impl<'a> From<Request<'a>> for RatelimitedRequest<'a> {
     fn from(req: Request<'a>) -> Self {
-        Self { req }
+        Self {
+            req,
+        }
     }
 }
 
@@ -399,50 +391,34 @@ fn parse_header<T: FromStr>(headers: &HeaderMap, header: &str) -> Result<Option<
         None => return Ok(None),
     };
 
-    let unicode = str::from_utf8(&header.as_bytes()).map_err(|_| {
-        Error::from(HttpError::RateLimitUtf8)
-    })?;
+    let unicode =
+        str::from_utf8(&header.as_bytes()).map_err(|_| Error::from(HttpError::RateLimitUtf8))?;
 
-    let num = unicode.parse().map_err(|_| {
-        Error::from(HttpError::RateLimitI64F64)
-    })?;
+    let num = unicode.parse().map_err(|_| Error::from(HttpError::RateLimitI64F64))?;
 
     Ok(Some(num))
 }
 
 #[cfg(test)]
 mod tests {
-    use crate::{
-        error::Error,
-        http::HttpError,
-    };
+    use std::{error::Error as StdError, result::Result as StdResult};
+
     use reqwest::header::{HeaderMap, HeaderName, HeaderValue};
-    use std::{
-        error::Error as StdError,
-        result::Result as StdResult,
-    };
+
     use super::parse_header;
+    use crate::{error::Error, http::HttpError};
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 
     fn headers() -> HeaderMap {
         let pairs = &[
-            (
-                HeaderName::from_static("x-ratelimit-limit"),
-                HeaderValue::from_static("5"),
-            ),
-            (
-                HeaderName::from_static("x-ratelimit-remaining"),
-                HeaderValue::from_static("4"),
-            ),
+            (HeaderName::from_static("x-ratelimit-limit"), HeaderValue::from_static("5")),
+            (HeaderName::from_static("x-ratelimit-remaining"), HeaderValue::from_static("4")),
             (
                 HeaderName::from_static("x-ratelimit-reset"),
                 HeaderValue::from_static("1560704880.423"),
             ),
-            (
-                HeaderName::from_static("x-bad-num"),
-                HeaderValue::from_static("abc"),
-            ),
+            (HeaderName::from_static("x-bad-num"), HeaderValue::from_static("abc")),
             (
                 HeaderName::from_static("x-bad-unicode"),
                 HeaderValue::from_bytes(&[255, 255, 255, 255]).unwrap(),
@@ -451,7 +427,7 @@ mod tests {
 
         let mut map = HeaderMap::with_capacity(pairs.len());
 
-        for (name, val) in pairs.into_iter() {
+        for (name, val) in pairs {
             map.insert(name, val.to_owned());
         }
 
@@ -459,42 +435,33 @@ mod tests {
     }
 
     #[test]
+    #[allow(clippy::float_cmp)]
     fn test_parse_header_good() -> Result<()> {
         let headers = headers();
 
         assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-limit")?.unwrap(), 5);
-        assert_eq!(
-            parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(),
-            4,
-        );
-        assert_eq!(
-            parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(),
-            1_560_704_880.423,
-        );
+        assert_eq!(parse_header::<i64>(&headers, "x-ratelimit-remaining")?.unwrap(), 4,);
+        assert_eq!(parse_header::<f64>(&headers, "x-ratelimit-reset")?.unwrap(), 1_560_704_880.423);
 
         Ok(())
     }
 
     #[test]
-    fn test_parse_header_errors() -> Result<()> {
+    fn test_parse_header_errors() {
         let headers = headers();
 
-        match parse_header::<i64>(&headers, "x-bad-num").unwrap_err() {
-            Error::Http(x) => match *x {
-                HttpError::RateLimitI64F64 => assert!(true),
-                _ => assert!(false),
-            },
-            _ => assert!(false),
+        // This macro wouldn't be needed if `Error::Http` didn't
+        // box its error, or if box patterns were stable.
+        macro_rules! is_err {
+            ($header:expr, $err:pat) => {
+                match parse_header::<i64>(&headers, $header).unwrap_err() {
+                    Error::Http(x) => matches!(*x, $err),
+                    _ => false,
+                }
+            };
         }
 
-        match parse_header::<i64>(&headers, "x-bad-unicode").unwrap_err() {
-            Error::Http(http_err) => match *http_err {
-                HttpError::RateLimitUtf8 => assert!(true),
-                _ => assert!(false),
-            },
-            _ => assert!(false),
-        }
-
-        Ok(())
+        assert!(is_err!("x-bad-num", HttpError::RateLimitI64F64));
+        assert!(is_err!("x-bad-unicode", HttpError::RateLimitUtf8));
     }
 }

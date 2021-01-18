@@ -1,5 +1,6 @@
-use super::Cache;
 use async_trait::async_trait;
+
+use super::Cache;
 
 /// Trait used for updating the cache with a type.
 ///

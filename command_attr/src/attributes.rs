@@ -1,3 +1,5 @@
+use std::fmt::{self, Write};
+
 use proc_macro2::Span;
 use syn::parse::{Error, Result};
 use syn::spanned::Spanned;
@@ -5,8 +7,6 @@ use syn::{Attribute, Ident, Lit, LitStr, Meta, NestedMeta, Path};
 
 use crate::structures::{Checks, Colour, HelpBehaviour, OnlyIn, Permissions};
 use crate::util::{AsOption, LitExt};
-
-use std::fmt::{self, Write};
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum ValueKind {
@@ -36,24 +36,15 @@ impl fmt::Display for ValueKind {
 
 fn to_ident(p: Path) -> Result<Ident> {
     if p.segments.is_empty() {
-        return Err(Error::new(
-            p.span(),
-            "cannot convert an empty path to an identifier",
-        ));
+        return Err(Error::new(p.span(), "cannot convert an empty path to an identifier"));
     }
 
     if p.segments.len() > 1 {
-        return Err(Error::new(
-            p.span(),
-            "the path must not have more than one segment",
-        ));
+        return Err(Error::new(p.span(), "the path must not have more than one segment"));
     }
 
     if !p.segments[0].arguments.is_empty() {
-        return Err(Error::new(
-            p.span(),
-            "the singular path segment must not have any arguments",
-        ));
+        return Err(Error::new(p.span(), "the singular path segment must not have any arguments"));
     }
 
     Ok(p.segments[0].ident.clone())
@@ -87,7 +78,7 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
             let name = to_ident(path)?;
 
             Ok(Values::new(name, ValueKind::Name, Vec::new(), attr.span()))
-        }
+        },
         Meta::List(meta) => {
             let name = to_ident(meta.path)?;
             let nested = meta.nested;
@@ -113,20 +104,16 @@ pub fn parse_values(attr: &Attribute) -> Result<Values> {
                 }
             }
 
-            let kind = if lits.len() == 1 {
-                ValueKind::SingleList
-            } else {
-                ValueKind::List
-            };
+            let kind = if lits.len() == 1 { ValueKind::SingleList } else { ValueKind::List };
 
             Ok(Values::new(name, kind, lits, attr.span()))
-        }
+        },
         Meta::NameValue(meta) => {
             let name = to_ident(meta.path)?;
             let lit = meta.lit;
 
             Ok(Values::new(name, ValueKind::Equals, vec![lit], attr.span()))
-        }
+        },
     }
 }
 
@@ -146,7 +133,7 @@ impl<'a, T: fmt::Display> fmt::Display for DisplaySlice<'a, T> {
                     f.write_char('\n')?;
                     write!(f, "{}: {}", idx, elem)?;
                 }
-            }
+            },
         }
 
         Ok(())
@@ -168,10 +155,7 @@ fn validate(values: &Values, forms: &[ValueKind]) -> Result<()> {
         return Err(Error::new(
             values.span,
             // Using the `_args` version here to avoid an allocation.
-            format_args!(
-                "the attribute must be in of these forms:\n{}",
-                DisplaySlice(forms)
-            ),
+            format_args!("the attribute must be in of these forms:\n{}", DisplaySlice(forms)),
         ));
     }
 
@@ -191,11 +175,7 @@ impl AttributeOption for Vec<String> {
     fn parse(values: Values) -> Result<Self> {
         validate(&values, &[ValueKind::List])?;
 
-        Ok(values
-            .literals
-            .into_iter()
-            .map(|lit| lit.to_str())
-            .collect())
+        Ok(values.literals.into_iter().map(|lit| lit.to_str()).collect())
     }
 }
 

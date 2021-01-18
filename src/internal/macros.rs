@@ -24,26 +24,22 @@ macro_rules! api {
 macro_rules! status {
     ($e:expr) => {
         concat!("https://status.discord.com/api/v2", $e)
-    }
+    };
 }
 
 // Enable check for cache
 #[cfg(all(feature = "cache", feature = "client"))]
 macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {
-        {
-            $enabled
-        }
-    }
+    ($enabled:block else $disabled:block) => {{
+        $enabled
+    }};
 }
 
 #[cfg(all(not(feature = "cache"), feature = "client"))]
 macro_rules! feature_cache {
-    ($enabled:block else $disabled:block) => {
-        {
-            $disabled
-        }
-    }
+    ($enabled:block else $disabled:block) => {{
+        $disabled
+    }};
 }
 
 macro_rules! enum_number {

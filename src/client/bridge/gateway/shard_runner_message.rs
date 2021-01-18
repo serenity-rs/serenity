@@ -1,12 +1,12 @@
+use async_tungstenite::tungstenite::Message;
+
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
 use crate::model::{
     gateway::Activity,
     id::{GuildId, UserId},
     user::OnlineStatus,
 };
-
-#[cfg(feature = "collector")]
-use crate::collector::{MessageFilter, ReactionFilter};
-use async_tungstenite::tungstenite::Message;
 
 #[derive(Clone, Debug)]
 pub enum ChunkGuildFilter {

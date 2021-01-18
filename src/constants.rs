@@ -98,22 +98,20 @@ pub enum OpCode {
     HeartbeatAck = 11,
 }
 
-enum_number!(
-    OpCode {
-        Event,
-        Heartbeat,
-        Identify,
-        StatusUpdate,
-        VoiceStateUpdate,
-        VoiceServerPing,
-        Resume,
-        Reconnect,
-        GetGuildMembers,
-        InvalidSession,
-        Hello,
-        HeartbeatAck,
-    }
-);
+enum_number!(OpCode {
+    Event,
+    Heartbeat,
+    Identify,
+    StatusUpdate,
+    VoiceStateUpdate,
+    VoiceServerPing,
+    Resume,
+    Reconnect,
+    GetGuildMembers,
+    InvalidSession,
+    Hello,
+    HeartbeatAck,
+});
 
 impl OpCode {
     pub fn num(self) -> u64 {

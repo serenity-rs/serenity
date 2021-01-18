@@ -6,10 +6,13 @@ use proc_macro2::Span;
 use quote::quote;
 use syn::{
     parse::{Error, Parse, ParseStream, Result},
-    parse_macro_input, parse_quote,
+    parse_macro_input,
+    parse_quote,
     punctuated::Punctuated,
     spanned::Spanned,
-    Ident, Lit, Token,
+    Ident,
+    Lit,
+    Token,
 };
 
 pub(crate) mod attributes;
@@ -118,12 +121,10 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
 
                 options.min_args = AsOption(Some(args));
                 options.max_args = AsOption(Some(args));
-            }
+            },
             "example" => {
-                options
-                    .examples
-                    .push(propagate_err!(attributes::parse(values)));
-            }
+                options.examples.push(propagate_err!(attributes::parse(values)));
+            },
             "description" => {
                 let mut arg: String = propagate_err!(attributes::parse(values));
                 if arg.starts_with(' ') {
@@ -137,7 +138,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                 } else {
                     options.description = AsOption(Some(arg));
                 }
-            }
+            },
             _ => {
                 match_options!(name, values, options, span => [
                     checks;
@@ -155,7 +156,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
                     owner_privilege;
                     sub_commands
                 ]);
-            }
+            },
         }
     }
 
@@ -186,10 +187,7 @@ pub fn command(attr: TokenStream, input: TokenStream) -> TokenStream {
     let visibility = fun.visibility;
     let name = fun.name.clone();
     let options = name.with_suffix(COMMAND_OPTIONS);
-    let sub_commands = sub_commands
-        .into_iter()
-        .map(|i| i.with_suffix(COMMAND))
-        .collect::<Vec<_>>();
+    let sub_commands = sub_commands.into_iter().map(|i| i.with_suffix(COMMAND)).collect::<Vec<_>>();
     let body = fun.body;
     let ret = fun.ret;
 
@@ -614,7 +612,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         match name {
             "prefix" => {
                 options.prefixes = vec![propagate_err!(attributes::parse(values))];
-            }
+            },
             "description" => {
                 let arg: String = propagate_err!(attributes::parse(values));
 
@@ -625,7 +623,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                 } else {
                     options.description = AsOption(Some(arg));
                 }
-            }
+            },
             "summary" => {
                 let arg: String = propagate_err!(attributes::parse(values));
 
@@ -636,7 +634,7 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                 } else {
                     options.summary = AsOption(Some(arg));
                 }
-            }
+            },
             _ => match_options!(name, values, options, span => [
                 prefixes;
                 only_in;
@@ -679,15 +677,9 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
         quote!(&#i)
     });
 
-    let commands = commands
-        .into_iter()
-        .map(|c| c.with_suffix(COMMAND))
-        .collect::<Vec<_>>();
+    let commands = commands.into_iter().map(|c| c.with_suffix(COMMAND)).collect::<Vec<_>>();
 
-    let sub_groups = sub_groups
-        .into_iter()
-        .map(|c| c.with_suffix(GROUP))
-        .collect::<Vec<_>>();
+    let sub_groups = sub_groups.into_iter().map(|c| c.with_suffix(GROUP)).collect::<Vec<_>>();
 
     let options = group.name.with_suffix(GROUP_OPTIONS);
     let options_path = quote!(serenity::framework::standard::GroupOptions);
@@ -756,7 +748,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
                 return Error::new(span, format_args!("invalid attribute: {:?}", n))
                     .to_compile_error()
                     .into();
-            }
+            },
         }
     }
 
@@ -768,11 +760,7 @@ pub fn check(_attr: TokenStream, input: TokenStream) -> TokenStream {
     let n = fun.name.clone();
     let n2 = name.clone();
     let visibility = fun.visibility;
-    let name = if name == "<fn>" {
-        fun.name.clone()
-    } else {
-        Ident::new(&name, Span::call_site())
-    };
+    let name = if name == "<fn>" { fun.name.clone() } else { Ident::new(&name, Span::call_site()) };
     let name = name.with_suffix(CHECK);
 
     let check = quote!(serenity::framework::standard::Check);
@@ -841,8 +829,8 @@ pub fn hook(_attr: TokenStream, input: TokenStream) -> TokenStream {
 
                     async move { #body }.boxed()
                 }
-            }).into()
+            })
+            .into()
         },
     }
-
 }

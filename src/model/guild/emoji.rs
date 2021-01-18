@@ -1,21 +1,20 @@
-use std::fmt::{
-    Display,
-    Formatter,
-    Result as FmtResult,
-    Write as FmtWrite
-};
-use crate::{http::Http, model::id::{EmojiId, RoleId}};
+use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 
 #[cfg(all(feature = "cache", feature = "model"))]
 use serde_json::json;
+
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::model::ModelError;
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::model::id::GuildId;
 #[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
+use crate::model::ModelError;
+use crate::{
+    http::Http,
+    model::id::{EmojiId, RoleId},
+};
 
 /// Represents a custom guild emoji, which can either be created using the API,
 /// or via an integration. Emojis created using the API only work within the
@@ -89,8 +88,9 @@ impl Emoji {
     #[inline]
     pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
         match self.find_guild_id(&cache_http).await {
-            Some(guild_id) => AsRef::<Http>::as_ref(&cache_http)
-                .delete_emoji(guild_id.0, self.id.0).await,
+            Some(guild_id) => {
+                AsRef::<Http>::as_ref(&cache_http).delete_emoji(guild_id.0, self.id.0).await
+            },
             None => Err(Error::Model(ModelError::ItemMissing)),
         }
     }
@@ -104,7 +104,11 @@ impl Emoji {
     ///
     /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
     #[cfg(feature = "cache")]
-    pub async fn edit<T: AsRef<Cache> + AsRef<Http>>(&mut self, cache_http: T, name: &str) -> Result<()> {
+    pub async fn edit<T: AsRef<Cache> + AsRef<Http>>(
+        &mut self,
+        cache_http: T,
+        name: &str,
+    ) -> Result<()> {
         match self.find_guild_id(&cache_http).await {
             Some(guild_id) => {
                 let map = json!({
@@ -193,7 +197,7 @@ impl Emoji {
     /// ```
     #[inline]
     pub fn url(&self) -> String {
-        let extension = if self.animated {"gif"} else {"png"};
+        let extension = if self.animated { "gif" } else { "png" };
         format!(cdn!("/emojis/{}.{}"), self.id, extension)
     }
 }
@@ -219,10 +223,14 @@ impl Display for Emoji {
 
 impl From<Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
-    fn from(emoji: Emoji) -> EmojiId { emoji.id }
+    fn from(emoji: Emoji) -> EmojiId {
+        emoji.id
+    }
 }
 
 impl<'a> From<&'a Emoji> for EmojiId {
     /// Gets the Id of an `Emoji`.
-    fn from(emoji: &Emoji) -> EmojiId { emoji.id }
+    fn from(emoji: &Emoji) -> EmojiId {
+        emoji.id
+    }
 }

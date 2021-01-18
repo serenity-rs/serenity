@@ -1,6 +1,7 @@
+use std::collections::HashMap;
+
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
-use std::collections::HashMap;
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
@@ -30,13 +31,10 @@ impl EditGuild {
     }
 
     fn _afk_channel(&mut self, channel: Option<ChannelId>) {
-        self.0.insert(
-            "afk_channel_id",
-            match channel {
-                Some(channel) => Value::Number(Number::from(channel.0)),
-                None => Value::Null,
-            },
-        );
+        self.0.insert("afk_channel_id", match channel {
+            Some(channel) => Value::Number(Number::from(channel.0)),
+            None => Value::Null,
+        });
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -
@@ -44,10 +42,7 @@ impl EditGuild {
     ///
     /// [`afk_channel`]: Self::afk_channel
     pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
-        self.0.insert(
-            "afk_timeout",
-            Value::Number(Number::from(timeout)),
-        );
+        self.0.insert("afk_timeout", Value::Number(Number::from(timeout)));
         self
     }
 
@@ -80,10 +75,7 @@ impl EditGuild {
     ///
     /// [`utils::read_image`]: crate::utils::read_image
     pub fn icon(&mut self, icon: Option<&str>) -> &mut Self {
-        self.0.insert(
-            "icon",
-            icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())),
-        );
+        self.0.insert("icon", icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())));
         self
     }
 
@@ -183,7 +175,9 @@ impl EditGuild {
     /// ```
     #[inline]
     pub fn verification_level<V>(&mut self, verification_level: V) -> &mut Self
-        where V: Into<VerificationLevel> {
+    where
+        V: Into<VerificationLevel>,
+    {
         self._verification_level(verification_level.into());
         self
     }

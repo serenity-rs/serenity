@@ -1,18 +1,9 @@
-use reqwest::{
-    header::InvalidHeaderValue,
-    Error as ReqwestError,
-    Response,
-    StatusCode,
-    Url,
-};
 use std::{
     error::Error as StdError,
-    fmt::{
-        Display,
-        Formatter,
-        Result as FmtResult,
-    },
+    fmt::{Display, Formatter, Result as FmtResult},
 };
+
+use reqwest::{header::InvalidHeaderValue, Error as ReqwestError, Response, StatusCode, Url};
 use url::ParseError as UrlError;
 
 #[derive(Clone, Serialize, Deserialize, PartialEq)]
@@ -45,13 +36,14 @@ impl ErrorResponse {
             url: r.url().clone(),
             error: r.json().await.unwrap_or_else(|_| DiscordJsonError {
                 code: -1,
-                message: "[Serenity] Could not decode json when receiving error response from discord!".to_string(),
+                message:
+                    "[Serenity] Could not decode json when receiving error response from discord!"
+                        .to_string(),
                 non_exhaustive: (),
             }),
         }
     }
 }
-
 
 #[derive(Debug)]
 #[non_exhaustive]
@@ -76,9 +68,7 @@ impl Error {
     // We need a freestanding from-function since we cannot implement an async
     // From-trait.
     pub async fn from_response(r: Response) -> Self {
-        ErrorResponse::from_response(r)
-            .await
-            .into()
+        ErrorResponse::from_response(r).await.into()
     }
 
     /// Returns true when the error is caused by an unsuccessful request
@@ -154,9 +144,10 @@ impl StdError for Error {
 
 #[cfg(test)]
 mod test {
-    use super::*;
     use http_crate::response::Builder;
     use reqwest::ResponseBuilderExt;
+
+    use super::*;
 
     #[tokio::test]
     async fn test_error_response_into() {

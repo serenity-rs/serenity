@@ -1,47 +1,39 @@
 //! Models relating to Discord channels.
 
-use chrono::{DateTime, Utc};
-use crate::model::prelude::*;
-use serde_json::Value;
 use std::fmt::Display;
-
-#[cfg(all(feature = "model", feature = "utils"))]
-use crate::builder::{CreateEmbed, EditMessage};
-#[cfg(all(feature = "cache", feature = "model"))]
-use crate::cache::Cache;
 #[cfg(all(feature = "cache", feature = "model"))]
 use std::fmt::Write;
 #[cfg(feature = "model")]
+use std::result::Result as StdResult;
+
+#[cfg(feature = "model")]
 use bitflags::__impl_bitflags;
+use chrono::{DateTime, Utc};
 #[cfg(feature = "model")]
 use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
+use serde_json::Value;
+
+#[cfg(all(feature = "model", feature = "utils"))]
+use crate::builder::{CreateEmbed, EditMessage};
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::cache::Cache;
+#[cfg(feature = "collector")]
+use crate::client::bridge::gateway::ShardMessenger;
+#[cfg(feature = "collector")]
+use crate::collector::{CollectReaction, ReactionCollectorBuilder};
+#[cfg(feature = "model")]
+use crate::http::{CacheHttp, Http};
+use crate::model::prelude::*;
 #[cfg(feature = "model")]
 use crate::model::utils::U64Visitor;
 #[cfg(feature = "model")]
-use std::{
-    result::Result as StdResult,
-};
-#[cfg(feature = "model")]
 use crate::{
     constants,
-    model::id::{
-        ApplicationId,
-        MessageId,
-        GuildId,
-        ChannelId,
-    },
+    model::id::{ApplicationId, ChannelId, GuildId, MessageId},
 };
-#[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
-#[cfg(feature = "collector")]
-use crate::collector::{
-    ReactionCollectorBuilder, CollectReaction,
-};
-#[cfg(feature = "collector")]
-use crate::client::bridge::gateway::ShardMessenger;
 
 /// A representation of a message over a guild's text channel, a group, or a
 /// private channel.
@@ -150,7 +142,8 @@ impl Message {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
                 let is_author = self.author.id == cache.current_user().await.id;
-                let has_perms = utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
+                let has_perms =
+                    utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
 
                 if !is_author && !has_perms {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -201,7 +194,7 @@ impl Message {
     pub async fn delete_reaction_emoji(
         &self,
         cache_http: impl CacheHttp,
-        reaction_type: impl Into<ReactionType>
+        reaction_type: impl Into<ReactionType>,
     ) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -253,7 +246,8 @@ impl Message {
     /// [`the limit`]: crate::builder::EditMessage::content
     #[cfg(feature = "utils")]
     pub async fn edit<F>(&mut self, cache_http: impl CacheHttp, f: F) -> Result<()>
-    where F: FnOnce(&mut EditMessage) -> &mut EditMessage
+    where
+        F: FnOnce(&mut EditMessage) -> &mut EditMessage,
     {
         #[cfg(feature = "cache")]
         {
@@ -272,7 +266,7 @@ impl Message {
 
         if let Some(embed) = self.embeds.get(0) {
             let embed = CreateEmbed::from(embed.clone());
-            builder.embed( |e| {
+            builder.embed(|e| {
                 *e = embed;
                 e
             });
@@ -282,7 +276,10 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(builder.0);
 
-        *self = cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map)).await?;
+        *self = cache_http
+            .http()
+            .edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
+            .await?;
 
         Ok(())
     }
@@ -290,10 +287,8 @@ impl Message {
     pub(crate) fn transform_content(&mut self) {
         match self.kind {
             MessageType::PinsAdd => {
-                self.content = format!(
-                    "{} pinned a message to this channel. See all the pins.",
-                    self.author
-                );
+                self.content =
+                    format!("{} pinned a message to this channel. See all the pins.", self.author);
             },
             MessageType::MemberJoin => {
                 let sec = self.timestamp.timestamp() as usize;
@@ -344,9 +339,7 @@ impl Message {
         }
 
         // And finally replace everyone and here mentions.
-        result
-            .replace("@everyone", "@\u{200B}everyone")
-            .replace("@here", "@\u{200B}here")
+        result.replace("@everyone", "@\u{200B}everyone").replace("@here", "@\u{200B}here")
     }
 
     /// Gets the list of [`User`]s who have reacted to a [`Message`] with a
@@ -383,7 +376,7 @@ impl Message {
     /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
     pub async fn guild(&self, cache: impl AsRef<Cache>) -> Option<Guild> {
-       cache.as_ref().guild(self.guild_id?).await
+        cache.as_ref().guild(self.guild_id?).await
     }
 
     /// Returns a field to the `Guild` for the message if one is in the cache.
@@ -396,13 +389,16 @@ impl Message {
     ///
     /// [`guild_id`]: Self::guild_id
     #[cfg(feature = "cache")]
-    pub async fn guild_field<Ret, Fun>(&self, cache: impl AsRef<Cache>, field_accessor: Fun) -> Option<Ret>
-    where Ret: Clone, Fun: FnOnce(&Guild) -> Ret
+    pub async fn guild_field<Ret, Fun>(
+        &self,
+        cache: impl AsRef<Cache>,
+        field_accessor: Fun,
+    ) -> Option<Ret>
+    where
+        Ret: Clone,
+        Fun: FnOnce(&Guild) -> Ret,
     {
-        cache
-            .as_ref()
-            .guild_field(self.guild_id?, field_accessor)
-            .await
+        cache.as_ref().guild_field(self.guild_id?, field_accessor).await
     }
 
     /// True if message was sent using direct messages.
@@ -499,18 +495,25 @@ impl Message {
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     /// [permissions]: super::permissions
     #[inline]
-    pub async fn react(&self, cache_http: impl CacheHttp, reaction_type: impl Into<ReactionType>) -> Result<Reaction> {
+    pub async fn react(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: impl Into<ReactionType>,
+    ) -> Result<Reaction> {
         self._react(cache_http, &reaction_type.into()).await
     }
 
-    async fn _react(&self, cache_http: impl CacheHttp, reaction_type: &ReactionType) -> Result<Reaction> {
+    async fn _react(
+        &self,
+        cache_http: impl CacheHttp,
+        reaction_type: &ReactionType,
+    ) -> Result<Reaction> {
         #[allow(unused_mut)]
         let mut user_id = None;
 
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
                 if self.guild_id.is_some() {
                     let req = Permissions::ADD_REACTIONS;
 
@@ -554,7 +557,11 @@ impl Message {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
-    pub async fn reply(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+    pub async fn reply(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Display,
+    ) -> Result<Message> {
         self._reply(cache_http, content, Some(false)).await
     }
 
@@ -576,7 +583,11 @@ impl Message {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
-    pub async fn reply_ping(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+    pub async fn reply_ping(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Display,
+    ) -> Result<Message> {
         self._reply(cache_http, content, Some(true)).await
     }
 
@@ -601,35 +612,47 @@ impl Message {
     ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
-    pub async fn reply_mention(&self, cache_http: impl CacheHttp, content: impl Display) -> Result<Message> {
+    pub async fn reply_mention(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Display,
+    ) -> Result<Message> {
         self._reply(cache_http, format!("{} {}", self.author.mention(), content), None).await
     }
 
     /// `inlined` decides whether this reply is inlinded and whether it pings.
-    async fn _reply(&self, cache_http: impl CacheHttp, content: impl Display, inlined: Option<bool>) -> Result<Message> {
+    async fn _reply(
+        &self,
+        cache_http: impl CacheHttp,
+        content: impl Display,
+        inlined: Option<bool>,
+    ) -> Result<Message> {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-
                 if self.guild_id.is_some() {
                     let req = Permissions::SEND_MESSAGES;
 
-                    if !super::utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
+                    if !super::utils::user_has_perms(cache, self.channel_id, self.guild_id, req)
+                        .await?
+                    {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
             }
         }
 
-        self.channel_id.send_message(cache_http.http(), |mut builder| {
-            if let Some(ping_user) = inlined {
-                builder = builder
-                    .reference_message(self)
-                    .allowed_mentions(|f| f.replied_user(ping_user));
-            }
+        self.channel_id
+            .send_message(cache_http.http(), |mut builder| {
+                if let Some(ping_user) = inlined {
+                    builder = builder
+                        .reference_message(self)
+                        .allowed_mentions(|f| f.replied_user(ping_user));
+                }
 
-            builder.content(content)
-        }).await
+                builder.content(content)
+            })
+            .await
     }
 
     /// Delete all embeds in this message
@@ -650,7 +673,9 @@ impl Message {
             if let Some(cache) = cache_http.cache() {
                 let req = Permissions::MANAGE_MESSAGES;
                 let is_author = self.author.id == cache.current_user().await.id;
-                let has_perms = super::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
+                let has_perms =
+                    super::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)
+                        .await?;
 
                 if !is_author && !has_perms {
                     return Err(Error::Model(ModelError::InvalidPermissions(req)));
@@ -663,7 +688,10 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(suppress.0);
 
-        *self = cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::Object(map)).await?;
+        *self = cache_http
+            .http()
+            .edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
+            .await?;
 
         Ok(())
     }
@@ -712,7 +740,9 @@ impl Message {
                 if self.guild_id.is_some() {
                     let req = Permissions::MANAGE_MESSAGES;
 
-                    if !super::utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
+                    if !super::utils::user_has_perms(cache, self.channel_id, self.guild_id, req)
+                        .await?
+                    {
                         return Err(Error::Model(ModelError::InvalidPermissions(req)));
                     }
                 }
@@ -735,20 +765,29 @@ impl Message {
     #[inline]
     pub fn link(&self) -> String {
         match self.guild_id {
-            Some(guild_id) => format!("https://discord.com/channels/{}/{}/{}", guild_id.0, self.channel_id.0, self.id.0),
+            Some(guild_id) => format!(
+                "https://discord.com/channels/{}/{}/{}",
+                guild_id.0, self.channel_id.0, self.id.0
+            ),
             None => format!("https://discord.com/channels/@me/{}/{}", self.channel_id.0, self.id.0),
         }
     }
 
     /// Await a single reaction on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reaction<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> CollectReaction<'a> {
+    pub fn await_reaction<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> CollectReaction<'a> {
         CollectReaction::new(shard_messenger).message_id(self.id.0)
     }
 
     /// Returns a stream builder which can be awaited to obtain a stream of reactions on this message.
     #[cfg(feature = "collector")]
-    pub fn await_reactions<'a>(&self, shard_messenger: &'a impl AsRef<ShardMessenger>) -> ReactionCollectorBuilder<'a> {
+    pub fn await_reactions<'a>(
+        &self,
+        shard_messenger: &'a impl AsRef<ShardMessenger>,
+    ) -> ReactionCollectorBuilder<'a> {
         ReactionCollectorBuilder::new(shard_messenger).message_id(self.id.0)
     }
 
@@ -829,12 +868,16 @@ impl AsRef<MessageId> for Message {
 
 impl From<Message> for MessageId {
     /// Gets the Id of a `Message`.
-    fn from(message: Message) -> MessageId { message.id }
+    fn from(message: Message) -> MessageId {
+        message.id
+    }
 }
 
 impl<'a> From<&'a Message> for MessageId {
     /// Gets the Id of a `Message`.
-    fn from(message: &Message) -> MessageId { message.id }
+    fn from(message: &Message) -> MessageId {
+        message.id
+    }
 }
 
 /// A representation of a reaction to a message.
@@ -891,24 +934,22 @@ pub enum MessageType {
     ApplicationCommand = 20,
 }
 
-enum_number!(
-    MessageType {
-        Regular,
-        GroupRecipientAddition,
-        GroupRecipientRemoval,
-        GroupCallCreation,
-        GroupNameUpdate,
-        GroupIconUpdate,
-        PinsAdd,
-        MemberJoin,
-        NitroBoost,
-        NitroTier1,
-        NitroTier2,
-        NitroTier3,
-        InlineReply,
-        ApplicationCommand,
-    }
-);
+enum_number!(MessageType {
+    Regular,
+    GroupRecipientAddition,
+    GroupRecipientRemoval,
+    GroupCallCreation,
+    GroupNameUpdate,
+    GroupIconUpdate,
+    PinsAdd,
+    MemberJoin,
+    NitroBoost,
+    NitroTier1,
+    NitroTier2,
+    NitroTier3,
+    InlineReply,
+    ApplicationCommand,
+});
 
 impl MessageType {
     pub fn num(self) -> u64 {
@@ -943,14 +984,12 @@ pub enum MessageActivityKind {
     JOIN_REQUEST = 5,
 }
 
-enum_number!(
-    MessageActivityKind {
-        JOIN,
-        SPECTATE,
-        LISTEN,
-        JOIN_REQUEST,
-    }
-);
+enum_number!(MessageActivityKind {
+    JOIN,
+    SPECTATE,
+    LISTEN,
+    JOIN_REQUEST,
+});
 
 impl MessageActivityKind {
     pub fn num(self) -> u64 {
@@ -1060,18 +1099,18 @@ __impl_bitflags! {
 #[cfg(feature = "model")]
 impl<'de> Deserialize<'de> for MessageFlags {
     fn deserialize<D>(deserializer: D) -> StdResult<Self, D::Error>
-    where D: Deserializer<'de>
+    where
+        D: Deserializer<'de>,
     {
-        Ok(MessageFlags::from_bits_truncate(
-            deserializer.deserialize_u64(U64Visitor)?,
-        ))
+        Ok(MessageFlags::from_bits_truncate(deserializer.deserialize_u64(U64Visitor)?))
     }
 }
 
 #[cfg(feature = "model")]
 impl Serialize for MessageFlags {
     fn serialize<S>(&self, serializer: S) -> StdResult<S::Ok, S::Error>
-    where S: Serializer
+    where
+        S: Serializer,
     {
         serializer.serialize_u64(self.bits())
     }

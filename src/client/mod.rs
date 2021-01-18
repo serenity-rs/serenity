@@ -27,46 +27,46 @@ mod event_handler;
 #[cfg(feature = "gateway")]
 mod extras;
 
-pub use self::{
-    context::Context,
-    error::Error as ClientError,
+#[cfg(all(feature = "cache", feature = "gateway"))]
+use std::time::Duration;
+use std::{
+    boxed::Box,
+    future::Future,
+    pin::Pin,
+    sync::Arc,
+    task::{Context as FutContext, Poll},
 };
 
+use futures::future::BoxFuture;
+use tokio::sync::{Mutex, RwLock};
+use tracing::{debug, error, info, instrument};
+use typemap_rev::{TypeMap, TypeMapKey};
+
+#[cfg(feature = "gateway")]
+use self::bridge::gateway::{
+    GatewayIntents,
+    ShardManager,
+    ShardManagerError,
+    ShardManagerMonitor,
+    ShardManagerOptions,
+};
+#[cfg(feature = "voice")]
+use self::bridge::voice::VoiceGatewayManager;
+pub use self::{context::Context, error::Error as ClientError};
 #[cfg(feature = "gateway")]
 pub use self::{
     event_handler::{EventHandler, RawEventHandler},
     extras::Extras,
 };
-
-pub use crate::CacheAndHttp;
-
-#[cfg(feature = "cache")]
-pub use crate::cache::Cache;
-
-use crate::internal::prelude::*;
-use tokio::sync::{Mutex, RwLock};
 #[cfg(feature = "gateway")]
 use super::gateway::GatewayError;
-#[cfg(feature = "gateway")]
-use self::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerMonitor, ShardManagerOptions, ShardManagerError};
-use std::{
-    boxed::Box,
-    sync::Arc,
-    future::Future,
-    pin::Pin,
-    task::{Context as FutContext, Poll},
-};
-#[cfg(all(feature = "cache", feature = "gateway"))]
-use std::time::Duration;
-use tracing::{error, debug, info, instrument};
-
+#[cfg(feature = "cache")]
+pub use crate::cache::Cache;
 #[cfg(feature = "framework")]
 use crate::framework::Framework;
-#[cfg(feature = "voice")]
-use self::bridge::voice::VoiceGatewayManager;
 use crate::http::Http;
-use typemap_rev::{TypeMap, TypeMapKey};
-use futures::future::BoxFuture;
+use crate::internal::prelude::*;
+pub use crate::CacheAndHttp;
 
 /// A builder implementing [`Future`] building a [`Client`] to interact with Discord.
 #[cfg(feature = "gateway")]
@@ -140,11 +140,8 @@ impl<'a> ClientBuilder<'a> {
     pub fn token(mut self, token: impl AsRef<str>) -> Self {
         let token = token.as_ref().trim();
 
-        let token = if token.starts_with("Bot ") {
-            token.to_string()
-        } else {
-            format!("Bot {}", token)
-        };
+        let token =
+            if token.starts_with("Bot ") { token.to_string() } else { format!("Bot {}", token) };
 
         self.http = Some(Http::new_with_token(&token));
 
@@ -204,7 +201,8 @@ impl<'a> ClientBuilder<'a> {
     /// [`framework_arc`]: Self::framework_arc
     #[cfg(feature = "framework")]
     pub fn framework<F>(mut self, framework: F) -> Self
-    where F: Framework + Send + Sync + 'static,
+    where
+        F: Framework + Send + Sync + 'static,
     {
         self.framework = Some(Arc::new(Box::new(framework)));
 
@@ -218,7 +216,10 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// [`framework`]: Self::framework
     #[cfg(feature = "framework")]
-    pub fn framework_arc(mut self, framework: Arc<Box<dyn Framework + Send + Sync + 'static>>) -> Self {
+    pub fn framework_arc(
+        mut self,
+        framework: Arc<Box<dyn Framework + Send + Sync + 'static>>,
+    ) -> Self {
         self.framework = Some(framework);
 
         self
@@ -235,7 +236,8 @@ impl<'a> ClientBuilder<'a> {
     /// [`voice_manager_arc`]: Self::voice_manager_arc
     #[cfg(feature = "voice")]
     pub fn voice_manager<V>(mut self, voice_manager: V) -> Self
-    where V: VoiceGatewayManager + Send + Sync + 'static,
+    where
+        V: VoiceGatewayManager + Send + Sync + 'static,
     {
         self.voice_manager = Some(Arc::new(voice_manager));
 
@@ -249,7 +251,10 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// [`voice_manager`]: #method.voice_manager
     #[cfg(feature = "voice")]
-    pub fn voice_manager_arc(mut self, voice_manager: Arc<dyn VoiceGatewayManager + Send + Sync + 'static>) -> Self {
+    pub fn voice_manager_arc(
+        mut self,
+        voice_manager: Arc<dyn VoiceGatewayManager + Send + Sync + 'static>,
+    ) -> Self {
         self.voice_manager = Some(voice_manager);
 
         self
@@ -329,7 +334,8 @@ impl<'a> Future for ClientBuilder<'a> {
                         ws_url: &url,
                         cache_and_http: &cache_and_http,
                         intents,
-                    }).await
+                    })
+                    .await
                 };
 
                 Ok(Client {
@@ -368,8 +374,8 @@ impl<'a> Future for ClientBuilder<'a> {
 /// receive, acting as a "ping-pong" bot is simple:
 ///
 /// ```no_run
-/// use serenity::prelude::*;
 /// use serenity::model::prelude::*;
+/// use serenity::prelude::*;
 /// use serenity::Client;
 ///
 /// struct Handler;
@@ -876,12 +882,7 @@ impl Client {
 
             manager.set_shards(shard_data[0], init, shard_data[2]).await;
 
-            debug!(
-                "Initializing shard info: {} - {}/{}",
-                shard_data[0],
-                init,
-                shard_data[2],
-            );
+            debug!("Initializing shard info: {} - {}/{}", shard_data[0], init, shard_data[2],);
 
             if let Err(why) = manager.initialize() {
                 error!("Failed to boot a shard: {:?}", why);
@@ -894,8 +895,10 @@ impl Client {
         }
 
         if let Err(why) = self.shard_manager_worker.run().await {
-            let err =  match why {
-                ShardManagerError::DisallowedGatewayIntents => GatewayError::DisallowedGatewayIntents,
+            let err = match why {
+                ShardManagerError::DisallowedGatewayIntents => {
+                    GatewayError::DisallowedGatewayIntents
+                },
                 ShardManagerError::InvalidGatewayIntents => GatewayError::InvalidGatewayIntents,
                 ShardManagerError::InvalidToken => GatewayError::InvalidAuthentication,
             };

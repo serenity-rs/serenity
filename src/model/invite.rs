@@ -5,19 +5,18 @@ use std::ops::Deref;
 use chrono::{DateTime, Utc};
 
 use super::prelude::*;
-
+#[cfg(all(feature = "cache", feature = "model"))]
+use super::{utils as model_utils, Permissions};
 #[cfg(feature = "model")]
 use crate::builder::CreateInvite;
-#[cfg(feature = "model")]
-use crate::internal::prelude::*;
-#[cfg(all(feature = "cache", feature = "model"))]
-use super::{Permissions, utils as model_utils};
-#[cfg(feature = "model")]
-use crate::utils;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 #[cfg(feature = "model")]
-use crate::http::{Http, CacheHttp};
+use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
+use crate::internal::prelude::*;
+#[cfg(feature = "model")]
+use crate::utils;
 
 /// Information about an invite code.
 ///
@@ -71,9 +70,10 @@ impl Invite {
     pub async fn create<F>(
         cache_http: impl CacheHttp,
         channel_id: impl Into<ChannelId>,
-        f: F
+        f: F,
     ) -> Result<RichInvite>
-    where F: FnOnce(CreateInvite) -> CreateInvite
+    where
+        F: FnOnce(CreateInvite) -> CreateInvite,
     {
         let channel_id = channel_id.into();
 
@@ -174,7 +174,9 @@ impl Invite {
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
-    pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
+    }
 }
 
 /// A minimal amount of information about the inviter (person who created the invite).
@@ -182,8 +184,10 @@ impl Invite {
 #[non_exhaustive]
 pub struct InviteUser {
     pub id: UserId,
-    #[serde(rename = "username")] pub name: String,
-    #[serde(deserialize_with = "deserialize_u16")] pub discriminator: u16,
+    #[serde(rename = "username")]
+    pub name: String,
+    #[serde(deserialize_with = "deserialize_u16")]
+    pub discriminator: u16,
     pub avatar: Option<String>,
 }
 
@@ -203,7 +207,8 @@ impl Deref for InviteUser {
 pub struct InviteChannel {
     pub id: ChannelId,
     pub name: String,
-    #[serde(rename = "type")] pub kind: ChannelType,
+    #[serde(rename = "type")]
+    pub kind: ChannelType,
 }
 
 /// A minimal amount of information about the guild an invite points to.
@@ -380,5 +385,7 @@ impl RichInvite {
     /// assert_eq!(invite.url(), "https://discord.gg/WxZumR");
     /// # }
     /// ```
-    pub fn url(&self) -> String { format!("https://discord.gg/{}", self.code) }
+    pub fn url(&self) -> String {
+        format!("https://discord.gg/{}", self.code)
+    }
 }

@@ -1,10 +1,11 @@
+use async_tungstenite::tungstenite::Message;
+use futures::channel::mpsc::{TrySendError, UnboundedSender as Sender};
+
+use super::{ChunkGuildFilter, ShardClientMessage, ShardRunnerMessage};
+#[cfg(feature = "collector")]
+use crate::collector::{MessageFilter, ReactionFilter};
 use crate::gateway::InterMessage;
 use crate::model::prelude::*;
-use super::{ShardClientMessage, ShardRunnerMessage, ChunkGuildFilter};
-use futures::channel::mpsc::{UnboundedSender as Sender, TrySendError};
-use async_tungstenite::tungstenite::Message;
-#[cfg(feature = "collector")]
-use crate::collector::{ReactionFilter, MessageFilter};
 
 /// A lightweight wrapper around an mpsc sender.
 ///
@@ -233,8 +234,7 @@ impl ShardMessenger {
 
     /// Sends a message to the shard.
     #[inline]
-    pub fn send_to_shard(&self, msg: ShardRunnerMessage)
-        -> Result<(), TrySendError<InterMessage>> {
+    pub fn send_to_shard(&self, msg: ShardRunnerMessage) -> Result<(), TrySendError<InterMessage>> {
         self.tx.unbounded_send(InterMessage::Client(Box::new(ShardClientMessage::Runner(msg))))
     }
 
