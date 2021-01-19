@@ -42,11 +42,15 @@ possible, potentially with a code sample of what it might look like.
 
 # Code Style
 
-We always follow rustfmt, and it is enforced in our CI pipeline. Before
+We leave the responsibility of formatting to the rustfmt tool to mitigate
+friction from people's opinions about formatting code in a certain way,
+putting more focus into functionality. Formatting is enforced in our CI pipeline,
+and pull requests won't be accepted if this is not adhered. Before
 committing your changes, always run `cargo fmt --all`.
 
 We have an 80 characters per line soft limit. In case readability would suffer
-and to support descriptive naming, 100 characters is our hard limit.
+and to support descriptive naming, 100 characters is our hard limit, enforced
+by rustfmt.
 
 # Commit style
 
