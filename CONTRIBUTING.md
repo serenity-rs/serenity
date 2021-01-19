@@ -15,6 +15,11 @@ so long as they do not introduce breaking changes.
 example, this would be for the v0.11.x version series. This is where breaking
 changes go.
 
+We have long-term support policy for the previous release series. If the _second
+most recent_ major version is v0.9.4, then the v0.9.x branch will be the place
+for bugfixes. Fixes from `current` may be backported to this branch if needed.
+Occasionally, we might support two past release series for special reasons.
+
 # Testing
 
 Make sure you run tests with the various feature combinations, which you can
