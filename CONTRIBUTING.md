@@ -20,7 +20,8 @@ changes go.
 Make sure you run tests with the various feature combinations, which you can
 find in [our CI pipeline][test_ci]. To run tests with all features, use
 `cargo test --all-features`. Run and update the examples in the `examples`
-directory where applicable.
+directory where applicable. To simplify this procedure, you can use [cargo make][make]
+to build and run examples. You can refer to the list of tasks in the [Makefile](Makefile.toml).
 
 # Issues
 
@@ -68,3 +69,4 @@ The summary should preferably fit into 50 characters. The first letter must
 also be capitalized.
 
 [test_ci]: .github/workflows/ci.yml
+[make]: https://github.com/sagiegurari/cargo-make
