@@ -75,7 +75,7 @@ impl CreateInteractionOption {
     }
 
     fn add_choice(&mut self, value: Value) -> &mut Self {
-        let choices = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
+        let choices = self.0.entry("choices").or_insert_with(|| Value::Array(Vec::new()));
         if let Some(choices_arr) = choices.as_array_mut() {
             choices_arr.push(value);
         };
