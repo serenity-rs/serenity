@@ -149,7 +149,7 @@ impl WebSocketGatewayClientExt for WsStream {
         .await
     }
 
-    #[instrument(skip(self))]
+    #[instrument(skip(self, token))]
     async fn send_resume(
         &mut self,
         shard_info: &[u64; 2],
