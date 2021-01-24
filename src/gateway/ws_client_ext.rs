@@ -64,7 +64,7 @@ impl WebSocketGatewayClientExt for WsStream {
         let mut payload = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": [guild_id.as_ref().0],
+                "guild_id": guild_id.as_ref().0.to_string(),
                 "limit": limit.unwrap_or(0),
                 "nonce": nonce.unwrap_or(""),
             },
