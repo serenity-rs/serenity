@@ -743,6 +743,7 @@ pub async fn content_safe(
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod test {
     use super::*;
     #[cfg(feature = "cache")]

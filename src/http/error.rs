@@ -143,6 +143,7 @@ impl StdError for Error {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod test {
     use http_crate::response::Builder;
     use reqwest::ResponseBuilderExt;
