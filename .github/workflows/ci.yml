@@ -22,7 +22,8 @@ jobs:
           - no cache
           - no gateway
           - unstable Discord API features
-          - tokio 0.2
+          - tokio 0.2 (rustls)
+          - tokio 0.2 (native-ls)
 
         include:
           - name: beta
@@ -39,8 +40,10 @@ jobs:
             features: model http rustls_backend
           - name: unstable Discord API features
             features: default unstable_discord_api
-          - name: tokio 0.2
+          - name: tokio 0.2 (rustls)
             features: default_tokio_0_2
+          - name: tokio 0.2 (native-tls)
+            features: default_native_tls_tokio_0_2
 
     steps:
       - name: Checkout sources
