@@ -68,14 +68,14 @@ Proper examples of a commit summary are:
 - "Fix double sending bug" -- changes fix erroneous behaviour
 - "Increase character limit to 2500" -- changes alter existing behaviour
 
-Improper commit summary are:
+Improper commit summaries are:
 
 - "Removed deprecated items"
 - "Changing default data for user objects"
 - "Misc. changes"
 
-The summary should preferably fit into 50 characters. The first letter must
-also be capitalized.
+The first letter of the summary must be capitalised. The summary should also
+preferably fit into 50 characters, but this is not actively enforced.
 
 [test_ci]: .github/workflows/ci.yml
 [make]: https://github.com/sagiegurari/cargo-make
