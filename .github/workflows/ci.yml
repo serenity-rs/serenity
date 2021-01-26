@@ -89,7 +89,7 @@ jobs:
         run: cargo build --no-default-features --features "${{ matrix.features }}"
 
       - name: Test some features
-        if: !matrix.dont-test && matrix.features
+        if: ${{ !matrix.dont-test && matrix.features }}
         run: cargo test --no-default-features --features "${{ matrix.features }}"
 
   clippy:
