@@ -64,14 +64,14 @@ impl WebSocketGatewayClientExt for WsStream {
         let mut payload = json!({
             "op": OpCode::GetGuildMembers.num(),
             "d": {
-                "guild_id": [guild_id.as_ref().0],
+                "guild_id": guild_id.as_ref().0.to_string(),
                 "limit": limit.unwrap_or(0),
                 "nonce": nonce.unwrap_or(""),
             },
         });
 
         match filter {
-            ChunkGuildFilter::None => {},
+            ChunkGuildFilter::None => payload["d"]["query"] = json!(""),
             ChunkGuildFilter::Query(query) => payload["d"]["query"] = json!(query),
             ChunkGuildFilter::UserIds(user_ids) => {
                 let ids = user_ids.iter().map(|x| x.0).collect::<Vec<u64>>();
