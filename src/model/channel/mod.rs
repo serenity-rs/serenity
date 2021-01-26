@@ -228,8 +228,11 @@ impl<'de> Deserialize<'de> for Channel {
             match kind.as_u64() {
                 Some(kind) => kind,
                 None => {
-                    return Err(DeError::invalid_type(Unexpected::Other("non-positive integer"), &"a positive integer"));
-                }
+                    return Err(DeError::invalid_type(
+                        Unexpected::Other("non-positive integer"),
+                        &"a positive integer",
+                    ));
+                },
             }
         };
 

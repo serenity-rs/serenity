@@ -699,7 +699,8 @@ impl Framework for StandardFramework {
 
                         for delim in command.options.delimiters {
                             if delim.len() == 1 {
-                                #[allow(clippy::unwrap_used)] // Should always be Some() in this case
+                                // Should always be Some() in this case
+                                #[allow(clippy::unwrap_used)]
                                 v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } else {
                                 // This too.

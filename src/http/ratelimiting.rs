@@ -409,7 +409,7 @@ mod tests {
     use crate::{error::Error, http::HttpError};
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
-    
+
     #[allow(clippy::unwrap_used)]
     fn headers() -> HeaderMap {
         let pairs = &[

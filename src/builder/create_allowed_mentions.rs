@@ -73,9 +73,8 @@ impl CreateAllowedMentions {
     /// [`roles`]: Self::roles
     #[inline]
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
-        
         let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
-        
+
         if let Some(arr) = val.as_array_mut() {
             arr.push(json![value]);
         }
@@ -93,7 +92,6 @@ impl CreateAllowedMentions {
     /// [`roles`]: Self::roles
     #[inline]
     pub fn empty_parse(&mut self) -> &mut Self {
-
         let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
 
         if let Some(arr) = val.as_array_mut() {
@@ -119,7 +117,6 @@ impl CreateAllowedMentions {
     /// Makes users unable to be mentioned.
     #[inline]
     pub fn empty_users(&mut self) -> &mut Self {
-        
         let val = self.0.entry("users").or_insert_with(|| Value::Array(Vec::new()));
 
         if let Some(arr) = val.as_array_mut() {
@@ -145,7 +142,6 @@ impl CreateAllowedMentions {
     /// Makes roles unable to be mentioned.
     #[inline]
     pub fn empty_roles(&mut self) -> &mut Self {
-
         let val = self.0.entry("roles").or_insert_with(|| Value::Array(Vec::new()));
 
         if let Some(arr) = val.as_array_mut() {
