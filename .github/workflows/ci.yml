@@ -21,6 +21,8 @@ jobs:
           - Windows
           - no cache
           - no gateway
+          - unstable Discord API features
+          - tokio 0.2
 
         include:
           - name: beta
@@ -35,6 +37,10 @@ jobs:
             features: builder client framework gateway model http standard_framework utils rustls_backend
           - name: no gateway
             features: model http rustls_backend
+          - name: unstable Discord API features
+            features: default unstable_discord_api
+          - name: tokio 0.2
+            features: rustls_tokio_0_2_backend
 
     steps:
       - name: Checkout sources
