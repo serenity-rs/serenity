@@ -461,14 +461,19 @@ impl<'de> Deserialize<'de> for AuditLogs {
                     }
                 }
 
+                let entries = audit_log_entries.ok_or_else(
+                    || de::Error::missing_field("audit_log_entries")
+                )?.into_iter().map(
+                    |entry| (entry.id, entry)
+                ).collect::<HashMap<AuditLogEntryId, AuditLogEntry>>();
+
+                let webhooks = webhooks.ok_or_else(|| de::Error::missing_field("webhooks"))?;
+                let users = users.ok_or_else(|| de::Error::missing_field("users"))?;
+
                 Ok(AuditLogs {
-                    entries: audit_log_entries
-                        .unwrap()
-                        .into_iter()
-                        .map(|entry| (entry.id, entry))
-                        .collect(),
-                    webhooks: webhooks.unwrap(),
-                    users: users.unwrap(),
+                    entries,
+                    webhooks,
+                    users,
                 })
             }
         }

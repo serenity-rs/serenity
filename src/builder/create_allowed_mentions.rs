@@ -73,11 +73,14 @@ impl CreateAllowedMentions {
     /// [`roles`]: Self::roles
     #[inline]
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
-        if let Some(val) = self.0.get_mut("parse") {
-            val.as_array_mut().unwrap().push(json![value]);
-        } else {
-            self.0.insert("parse", Value::Array(vec![json!(value)]));
+        
+        let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
+        
+        if let Some(arr) = val.as_array_mut() {
+            arr.push(json![value]);
         }
+        // Should there be an "else" block that panics?
+
         self
     }
 
@@ -90,11 +93,14 @@ impl CreateAllowedMentions {
     /// [`roles`]: Self::roles
     #[inline]
     pub fn empty_parse(&mut self) -> &mut Self {
-        if let Some(val) = self.0.get_mut("parse") {
-            val.as_array_mut().unwrap().clear();
-        } else {
-            self.0.insert("parse", Value::Array(vec![]));
+
+        let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
+
+        if let Some(arr) = val.as_array_mut() {
+            arr.clear();
         }
+        // Should there be an "else" block that panics?
+
         self
     }
 
@@ -113,11 +119,14 @@ impl CreateAllowedMentions {
     /// Makes users unable to be mentioned.
     #[inline]
     pub fn empty_users(&mut self) -> &mut Self {
-        if let Some(val) = self.0.get_mut("users") {
-            val.as_array_mut().unwrap().clear();
-        } else {
-            self.0.insert("users", Value::Array(vec![]));
+        
+        let val = self.0.entry("users").or_insert_with(|| Value::Array(Vec::new()));
+
+        if let Some(arr) = val.as_array_mut() {
+            arr.clear();
         }
+        // Should there be an "else" block that panics?
+
         self
     }
 
@@ -136,11 +145,14 @@ impl CreateAllowedMentions {
     /// Makes roles unable to be mentioned.
     #[inline]
     pub fn empty_roles(&mut self) -> &mut Self {
-        if let Some(val) = self.0.get_mut("roles") {
-            val.as_array_mut().unwrap().clear();
-        } else {
-            self.0.insert("roles", Value::Array(vec![]));
+
+        let val = self.0.entry("roles").or_insert_with(|| Value::Array(Vec::new()));
+
+        if let Some(arr) = val.as_array_mut() {
+            arr.clear();
         }
+        // Should there be an "else" block that panics?
+
         self
     }
 
