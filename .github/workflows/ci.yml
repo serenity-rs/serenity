@@ -40,7 +40,7 @@ jobs:
           - name: unstable Discord API features
             features: default unstable_discord_api
           - name: tokio 0.2
-            features: rustls_tokio_0_2_backend
+            features: default_tokio_0_2
 
     steps:
       - name: Checkout sources
