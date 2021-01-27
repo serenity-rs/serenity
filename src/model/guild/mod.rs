@@ -1348,7 +1348,7 @@ impl Guild {
         let everyone = match self.roles.get(&RoleId(self.id.0)) {
             Some(everyone) => everyone,
             None => {
-                error!("(╯°□°）╯︵ ┻━┻ @everyone role ({}) missing in '{}'", self.id, self.name,);
+                error!("@everyone role ({}) missing in '{}'", self.id, self.name,);
 
                 return Ok(Permissions::empty());
             },
@@ -1367,7 +1367,7 @@ impl Guild {
                 permissions |= role.permissions;
             } else {
                 warn!(
-                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                    "{} on {} has non-existent role {:?}",
                     member.user.id, self.id, role,
                 );
             }
@@ -1418,7 +1418,7 @@ impl Guild {
         let everyone = match roles.get(&RoleId(guild_id.0)) {
             Some(everyone) => everyone,
             None => {
-                error!("(╯°□°）╯︵ ┻━┻ @everyone role missing in {}", guild_id,);
+                error!("@everyone role missing in {}", guild_id,);
                 return Err(Error::Model(ModelError::RoleNotFound));
             },
         };
@@ -1431,7 +1431,7 @@ impl Guild {
                 permissions |= role.permissions;
             } else {
                 error!(
-                    "(╯°□°）╯︵ ┻━┻ {} on {} has non-existent role {:?}",
+                    "{} on {} has non-existent role {:?}",
                     member.user.id, guild_id, role
                 );
                 return Err(Error::Model(ModelError::RoleNotFound));

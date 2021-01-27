@@ -845,7 +845,7 @@ pub(crate) async fn has_correct_permissions(
             Ok(perms) => perms,
             Err(e) => {
                 tracing::error!(
-                    "(╯°□°）╯︵ ┻━┻ error getting permissions for user {} in channel {}: {}",
+                    "Error getting permissions for user {} in channel {}: {}",
                     member.user.id,
                     channel.id,
                     e
