@@ -289,7 +289,7 @@ impl<'a> ReactionCollectorBuilder<'a> {
 
 impl<'a> Future for ReactionCollectorBuilder<'a> {
     type Output = ReactionCollector;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
@@ -330,7 +330,7 @@ impl<'a> CollectReaction<'a> {
 
 impl<'a> Future for CollectReaction<'a> {
     type Output = Option<Arc<ReactionAction>>;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
