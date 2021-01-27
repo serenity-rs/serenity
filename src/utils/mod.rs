@@ -789,7 +789,6 @@ mod test {
         assert_eq!(parsed, ["a", "b c", "d", "e f", "g"]);
     }
 
-
     #[cfg(feature = "cache")]
     #[allow(clippy::non_ascii_literal)]
     #[tokio::test]
