@@ -1366,10 +1366,7 @@ impl Guild {
 
                 permissions |= role.permissions;
             } else {
-                warn!(
-                    "{} on {} has non-existent role {:?}",
-                    member.user.id, self.id, role,
-                );
+                warn!("{} on {} has non-existent role {:?}", member.user.id, self.id, role,);
             }
         }
 
@@ -1430,10 +1427,7 @@ impl Guild {
             if let Some(role) = roles.get(&role) {
                 permissions |= role.permissions;
             } else {
-                error!(
-                    "{} on {} has non-existent role {:?}",
-                    member.user.id, guild_id, role
-                );
+                error!("{} on {} has non-existent role {:?}", member.user.id, guild_id, role);
                 return Err(Error::Model(ModelError::RoleNotFound));
             }
         }
