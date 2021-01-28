@@ -360,7 +360,8 @@ async fn check_command_behaviour(
 ) -> HelpBehaviour {
     let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
 
-    if behaviour == HelpBehaviour::Nothing && (!options.owner_privilege || !owners.contains(&msg.author.id))
+    if behaviour == HelpBehaviour::Nothing
+        && (!options.owner_privilege || !owners.contains(&msg.author.id))
     {
         for check in group_checks.iter().chain(options.checks) {
             if !check.check_in_help {
