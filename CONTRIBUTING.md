@@ -57,6 +57,31 @@ We have an 80 characters per line soft limit. In case readability would suffer
 and to support descriptive naming, 100 characters is our hard limit, enforced
 by rustfmt.
 
+# Comment / Documentation style
+
+Comments, including documentation comments, ought to be written in British English.
+They should contain proper English sentences. The first word must be capitalised
+and the sentences finished with either a full stop, question mark, or exclamation
+mark.
+
+Comments should always appear before the section they talk about. For example, if you
+add a comment for some peculiar code at line 235, the comment should be placed at line 234.
+
+When writing categories in documentation comments, prepend the name of the category with `#`.
+This will allow to reference the category in links to the API. For example:
+
+```rust
+/// # Error
+///
+/// This function will return an error if the user could not be found in the cache.
+```
+
+When referencing other parts of Serenity's API (modules, structs, functions, etc.)
+in the documentation, the path must be relative written in the form of a Rust path.
+For instance: `[say](crate::model::channel::GuildChannel::say)`.
+These are called [intra-doc links][in-links]. For more information, it is recommended
+to read the linked RFC. Links to external websites are exempt from this guideline.
+
 # Commit style
 
 When creating a commit summary, use the imperative mood. The summary
@@ -79,3 +104,4 @@ preferably fit into 50 characters, but this is not actively enforced.
 
 [test_ci]: .github/workflows/ci.yml
 [make]: https://github.com/sagiegurari/cargo-make
+[in-links]: https://github.com/rust-lang/rfcs/blob/master/text/1946-intra-rustdoc-links.md
