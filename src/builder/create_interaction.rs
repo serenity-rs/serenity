@@ -78,7 +78,7 @@ impl CreateInteractionOption {
         let choices = self.0.entry("choices").or_insert_with(|| Value::Array(Vec::new()));
         let choices_arr = choices.as_array_mut().expect("Must be an array");
         choices_arr.push(value);
-        
+
         self
     }
 
@@ -149,12 +149,11 @@ impl CreateInteraction {
     ///
     /// **Note**: Interactions can only have up to 10 options.
     pub fn add_interaction_option(&mut self, option: CreateInteractionOption) -> &mut Self {
-
         let new_option = utils::hashmap_to_json_map(option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
         opt_arr.push(Value::Object(new_option));
-        
+
         self
     }
 
