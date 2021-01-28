@@ -382,6 +382,7 @@ async fn check_command_behaviour(
 // This function will recursively go through all commands and
 // their sub-commands, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
+#[cfg(all(feature = "cache", feature = "http"))]
 fn nested_commands_search<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
