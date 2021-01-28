@@ -307,38 +307,10 @@ fn starts_with_whole_word(search_on: &str, word: &str) -> bool {
         && search_on.get(word.len()..=word.len()).map_or(false, |slice| slice == " ")
 }
 
-#[inline]
-#[cfg(all(feature = "cache", feature = "http"))]
-fn find_any_command_matches(
-    command: &'static InternalCommand,
-    group: &CommandGroup,
-    name_to_find: &mut String,
-    found_prefix: &mut bool,
-) -> Option<&'static str> {
-    command
-        .options
-        .names
-        .iter()
-        .find(|command_name| {
-            group.options.prefixes.iter().any(|prefix| {
-                if *found_prefix || starts_with_whole_word(&name_to_find, &prefix) {
-                    if !*found_prefix {
-                        *found_prefix = true;
-                        name_to_find.drain(..=prefix.len());
-                    }
-
-                    &name_to_find == command_name
-                } else {
-                    false
-                }
-            })
-        })
-        .cloned()
-}
-
+// Decides how a listed help entry shall be displayed.
 #[cfg(all(feature = "cache", feature = "http"))]
 async fn check_common_behaviour(
-    cache: impl AsRef<Cache>,
+    cache_http: impl CacheHttp + AsRef<Cache>,
     msg: &Message,
     options: &impl CommonOptions,
     owners: &HashSet<UserId>,
@@ -362,11 +334,11 @@ async fn check_common_behaviour(
         return HelpBehaviour::Nothing;
     }
 
-    if !has_correct_permissions(&cache, options, msg).await {
+    if !has_correct_permissions(&cache_http, options, msg).await {
         return help_options.lacking_permissions;
     }
 
-    if let Some(guild) = msg.guild(&cache).await {
+    if let Some(guild) = msg.guild(&cache_http).await {
         if let Some(member) = guild.members.get(&msg.author.id) {
             if !has_correct_roles(options, &guild.roles, &member) {
                 return help_options.lacking_role;
@@ -386,9 +358,9 @@ async fn check_command_behaviour(
     owners: &HashSet<UserId>,
     help_options: &HelpOptions,
 ) -> HelpBehaviour {
-    let b = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
+    let behaviour = check_common_behaviour(&ctx, msg, &options, owners, help_options).await;
 
-    if b == HelpBehaviour::Nothing && (!options.owner_privilege || !owners.contains(&msg.author.id))
+    if behaviour == HelpBehaviour::Nothing && (!options.owner_privilege || !owners.contains(&msg.author.id))
     {
         for check in group_checks.iter().chain(options.checks) {
             if !check.check_in_help {
@@ -403,43 +375,28 @@ async fn check_command_behaviour(
         }
     }
 
-    b
+    behaviour
 }
 
-#[cfg(all(feature = "cache", feature = "http"))]
-#[allow(clippy::too_many_arguments)]
-async fn _nested_group_command_search<'rec, 'a: 'rec>(
+// This function will recursively go through all commands and
+// their sub-commands, trying to find `name`.
+// Similar commands will be collected into `similar_commands`.
+fn nested_commands_search<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
-    groups: &'rec [&'static CommandGroup],
+    group: &'rec CommandGroup,
+    found_group_prefix: &'rec mut bool,
+    commands: &'rec [&'static InternalCommand],
     name: &'rec mut String,
     help_options: &'a HelpOptions,
     similar_commands: &'rec mut Vec<SuggestedCommandName>,
     owners: &'rec HashSet<UserId>,
-) -> Result<CustomisedHelpData<'a>, ()> {
-    for group in groups {
-        let group = *group;
-        let mut found: Option<&'static InternalCommand> = None;
-
-        let group_behaviour =
-            check_common_behaviour(&ctx, msg, &group.options, &owners, &help_options).await;
-
-        match &group_behaviour {
-            HelpBehaviour::Nothing => (),
-            _ => {
-                continue;
-            },
-        }
-
-        let mut found_group_prefix: bool = false;
-        for command in group.options.commands {
+) -> BoxFuture<'rec, Option<&'a InternalCommand>> {
+    async move {
+        for command in commands {
             let mut command = *command;
 
-            let search_command_name_matched = if group.options.prefixes.is_empty() {
-                if starts_with_whole_word(&name, &group.name) {
-                    name.drain(..=group.name.len());
-                }
-
+            let search_command_name_matched = {
                 let command_found = command.options.names.iter().find(|n| **n == name).cloned();
 
                 if command_found.is_some() {
@@ -489,11 +446,24 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                             break;
                         }
                     } else {
-                        None
+                        match nested_commands_search(
+                            ctx,
+                            msg,
+                            group,
+                            found_group_prefix,
+                            command.options.sub_commands,
+                            name,
+                            help_options,
+                            similar_commands,
+                            owners,
+                        )
+                        .await
+                        {
+                            Some(found) => return Some(found),
+                            None => None,
+                        }
                     }
                 }
-            } else {
-                find_any_command_matches(&command, &group, name, &mut found_group_prefix)
             };
 
             if search_command_name_matched.is_some() {
@@ -508,7 +478,7 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     )
                     .await
                 {
-                    found = Some(command);
+                    return Some(command);
                 } else {
                     break;
                 }
@@ -541,28 +511,74 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
             }
         }
 
-        if let Some(command) = found {
-            let options = &command.options;
+        None
+    }
+    .boxed()
+}
 
-            if !options.help_available {
-                return Ok(CustomisedHelpData::NoCommandFound {
-                    help_error_message: &help_options.no_help_available_text,
-                });
+// This function will recursively go through all groups and their groups,
+// trying to find `name`.
+// Similar commands will be collected into `similar_commands`.
+#[cfg(all(feature = "cache", feature = "http"))]
+fn nested_group_command_search<'rec, 'a: 'rec>(
+    ctx: &'rec Context,
+    msg: &'rec Message,
+    groups: &'rec [&'static CommandGroup],
+    name: &'rec mut String,
+    help_options: &'a HelpOptions,
+    similar_commands: &'rec mut Vec<SuggestedCommandName>,
+    owners: &'rec HashSet<UserId>,
+) -> BoxFuture<'rec, Result<CustomisedHelpData<'a>, ()>> {
+    async move {
+        for group in groups {
+            let group = *group;
+            let group_behaviour =
+                check_common_behaviour(&ctx, msg, &group.options, &owners, &help_options).await;
+
+            match &group_behaviour {
+                HelpBehaviour::Nothing => (),
+                _ => {
+                    continue;
+                },
             }
 
-            let available_text = if options.only_in == OnlyIn::Dm {
-                &help_options.dm_only_text
-            } else if options.only_in == OnlyIn::Guild {
-                &help_options.guild_only_text
-            } else {
-                &help_options.dm_and_guild_text
-            };
+            group.options.prefixes.iter().any(|prefix| trim_prefixless_group(prefix, name));
 
-            similar_commands
-                .sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
+            let mut found_group_prefix: bool = false;
+            let found = nested_commands_search(
+                ctx,
+                msg,
+                group,
+                &mut found_group_prefix,
+                group.options.commands,
+                name,
+                help_options,
+                similar_commands,
+                owners,
+            )
+            .await;
 
-            let check_names: Vec<String> =
-                command
+            if let Some(command) = found {
+                let options = &command.options;
+
+                if !options.help_available {
+                    return Ok(CustomisedHelpData::NoCommandFound {
+                        help_error_message: &help_options.no_help_available_text,
+                    });
+                }
+
+                let available_text = if options.only_in == OnlyIn::Dm {
+                    &help_options.dm_only_text
+                } else if options.only_in == OnlyIn::Guild {
+                    &help_options.guild_only_text
+                } else {
+                    &help_options.dm_and_guild_text
+                };
+
+                similar_commands
+                    .sort_unstable_by(|a, b| a.levenshtein_distance.cmp(&b.levenshtein_distance));
+
+                let check_names: Vec<String> = command
                     .options
                     .checks
                     .iter()
@@ -576,65 +592,53 @@ async fn _nested_group_command_search<'rec, 'a: 'rec>(
                     })
                     .collect();
 
-            let sub_command_names: Vec<String> = options
-                .sub_commands
-                .iter()
-                .filter_map(|cmd| {
-                    if (*cmd).options.help_available {
-                        Some((*cmd).options.names[0].to_string())
-                    } else {
-                        None
-                    }
-                })
-                .collect();
+                let sub_command_names: Vec<String> = options
+                    .sub_commands
+                    .iter()
+                    .filter_map(|cmd| {
+                        if (*cmd).options.help_available {
+                            Some((*cmd).options.names[0].to_string())
+                        } else {
+                            None
+                        }
+                    })
+                    .collect();
 
-            return Ok(CustomisedHelpData::SingleCommand {
-                command: Command {
-                    name: options.names[0],
-                    description: options.desc,
-                    group_name: group.name,
-                    group_prefixes: &group.options.prefixes,
-                    checks: check_names,
-                    aliases: options.names[1..].to_vec(),
-                    availability: available_text,
-                    usage: options.usage,
-                    usage_sample: options.examples.to_vec(),
-                    sub_commands: sub_command_names,
-                },
-            });
+                return Ok(CustomisedHelpData::SingleCommand {
+                    command: Command {
+                        name: options.names[0],
+                        description: options.desc,
+                        group_name: group.name,
+                        group_prefixes: &group.options.prefixes,
+                        checks: check_names,
+                        aliases: options.names[1..].to_vec(),
+                        availability: available_text,
+                        usage: options.usage,
+                        usage_sample: options.examples.to_vec(),
+                        sub_commands: sub_command_names,
+                    },
+                });
+            }
+
+            match nested_group_command_search(
+                ctx,
+                msg,
+                &group.options.sub_groups,
+                name,
+                help_options,
+                similar_commands,
+                owners,
+            )
+            .await
+            {
+                Ok(found) => return Ok(found),
+                Err(()) => (),
+            }
         }
 
-        match nested_group_command_search(
-            ctx,
-            msg,
-            &group.options.sub_groups,
-            name,
-            help_options,
-            similar_commands,
-            owners,
-        )
-        .await
-        {
-            Ok(found) => return Ok(found),
-            Err(()) => (),
-        }
+        Err(())
     }
-
-    Err(())
-}
-
-#[cfg(all(feature = "cache", feature = "http"))]
-fn nested_group_command_search<'rec, 'a: 'rec>(
-    ctx: &'rec Context,
-    msg: &'rec Message,
-    groups: &'rec [&'static CommandGroup],
-    name: &'rec mut String,
-    help_options: &'a HelpOptions,
-    similar_commands: &'rec mut Vec<SuggestedCommandName>,
-    owners: &'rec HashSet<UserId>,
-) -> BoxFuture<'rec, Result<CustomisedHelpData<'a>, ()>> {
-    _nested_group_command_search(ctx, msg, groups, name, help_options, similar_commands, owners)
-        .boxed()
+    .boxed()
 }
 
 /// Tries to extract a single command matching searched command name otherwise
@@ -832,7 +836,7 @@ async fn create_single_group(
     group_with_cmds
 }
 
-/// If `searched_group` is exact match on `group_name`,
+/// If `searched_group` is exactly matching `group_name`,
 /// this function returns `true` but does not trim.
 /// Otherwise, it is treated as an optionally passed group-name and ends up
 /// being removed from `searched_group`.
