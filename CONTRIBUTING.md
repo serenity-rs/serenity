@@ -70,9 +70,9 @@ Examples of proper commit summaries are:
 
 Improper commit summaries are:
 
-- "Removed deprecated items"
-- "Changing default data for user objects"
-- "Misc. changes"
+- "Removed deprecated items" -- past tense used
+- "Changing default data for user objects" -- progressive tense used
+- "Misc. changes" -- missing verb
 
 The first letter of the summary must be capitalised. The summary should also
 preferably fit into 50 characters, but this is not actively enforced.
