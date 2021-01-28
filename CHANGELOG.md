@@ -4296,14 +4296,14 @@ Initial commit.
 
 [c:b03df91]: https://github.com/serenity-rs/serenity/commit/b03df91f50a554cd9ab3dcb78d74eba46f2601e8
 
-[c:1cc66b3]: https://github.com/serenity/serenity/commit/1cc66b3d4ba70f75823cb59c5db4e4b0ef162ac7
-[c:1047eac]: https://github.com/serenity/serenity/commit/1047eac908eb28c69691292db8e35e089985a09e
-[c:fac94f2]: https://github.com/serenity/serenity/commit/fac94f2559abe1cfdafe0ca998e011ba08a1e84c
-[c:5399d44]: https://github.com/serenity/serenity/commit/5399d443f4e9962b5a40fd9635eb6e3441600769
-[c:75feff2]: https://github.com/serenity/serenity/commit/75feff2869fcb4a59b19a40794182e497925d37f
-[c:8f5a2e9]: https://github.com/serenity/serenity/commit/8f5a2e9e6073ba85519f531e8f2c6324bc07ca3b
-[c:1dba16a]: https://github.com/serenity/serenity/commit/1dba16a7281a6c367e636f71abd89772ab6d74ab
-[c:8b42790]: https://github.com/serenity/serenity/commit/8b42790306e9165acd3e092c71a3d280353185a4
+[c:1cc66b3]: https://github.com/serenity-rs/serenity/commit/1cc66b3d4ba70f75823cb59c5db4e4b0ef162ac7
+[c:1047eac]: https://github.com/serenity-rs/serenity/commit/1047eac908eb28c69691292db8e35e089985a09e
+[c:fac94f2]: https://github.com/serenity-rs/serenity/commit/fac94f2559abe1cfdafe0ca998e011ba08a1e84c
+[c:5399d44]: https://github.com/serenity-rs/serenity/commit/5399d443f4e9962b5a40fd9635eb6e3441600769
+[c:75feff2]: https://github.com/serenity-rs/serenity/commit/75feff2869fcb4a59b19a40794182e497925d37f
+[c:8f5a2e9]: https://github.com/serenity-rs/serenity/commit/8f5a2e9e6073ba85519f531e8f2c6324bc07ca3b
+[c:1dba16a]: https://github.com/serenity-rs/serenity/commit/1dba16a7281a6c367e636f71abd89772ab6d74ab
+[c:8b42790]: https://github.com/serenity-rs/serenity/commit/8b42790306e9165acd3e092c71a3d280353185a4
 
 [c:bc78991]: https://github.com/serenity-rs/serenity/commit/bc78991f7cdbdeaeba308785a42953423f5e89aa
 [c:85e5722]: https://github.com/serenity-rs/serenity/commit/85e5722c997d5cc024cb3f687a8fda3a368db2cd
