@@ -75,10 +75,8 @@ impl CreateAllowedMentions {
     pub fn parse(&mut self, value: ParseValue) -> &mut Self {
         let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
 
-        if let Some(arr) = val.as_array_mut() {
-            arr.push(json![value]);
-        }
-        // Should there be an "else" block that panics?
+        let arr = val.as_array_mut().expect("Must be an array");
+        arr.push(json![value]);
 
         self
     }
@@ -94,10 +92,8 @@ impl CreateAllowedMentions {
     pub fn empty_parse(&mut self) -> &mut Self {
         let val = self.0.entry("parse").or_insert_with(|| Value::Array(Vec::new()));
 
-        if let Some(arr) = val.as_array_mut() {
-            arr.clear();
-        }
-        // Should there be an "else" block that panics?
+        let arr = val.as_array_mut().expect("Must be an array");
+        arr.clear();
 
         self
     }
@@ -119,10 +115,8 @@ impl CreateAllowedMentions {
     pub fn empty_users(&mut self) -> &mut Self {
         let val = self.0.entry("users").or_insert_with(|| Value::Array(Vec::new()));
 
-        if let Some(arr) = val.as_array_mut() {
-            arr.clear();
-        }
-        // Should there be an "else" block that panics?
+        let arr = val.as_array_mut().expect("Must be an array");
+        arr.clear();
 
         self
     }
@@ -144,10 +138,8 @@ impl CreateAllowedMentions {
     pub fn empty_roles(&mut self) -> &mut Self {
         let val = self.0.entry("roles").or_insert_with(|| Value::Array(Vec::new()));
 
-        if let Some(arr) = val.as_array_mut() {
-            arr.clear();
-        }
-        // Should there be an "else" block that panics?
+        let arr = val.as_array_mut().expect("Must be an array");
+        arr.clear();
 
         self
     }
