@@ -241,14 +241,14 @@
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">payload</span> <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>({
             <span class="string">&quot;op&quot;</span>: <span class="ident">OpCode</span>::<span class="ident">GetGuildMembers</span>.<span class="ident">num</span>(),
             <span class="string">&quot;d&quot;</span>: {
-                <span class="string">&quot;guild_id&quot;</span>: [<span class="ident">guild_id</span>.<span class="ident">as_ref</span>().<span class="number">0</span>],
+                <span class="string">&quot;guild_id&quot;</span>: <span class="ident">guild_id</span>.<span class="ident">as_ref</span>().<span class="number">0</span>.<span class="ident">to_string</span>(),
                 <span class="string">&quot;limit&quot;</span>: <span class="ident">limit</span>.<span class="ident">unwrap_or</span>(<span class="number">0</span>),
                 <span class="string">&quot;nonce&quot;</span>: <span class="ident">nonce</span>.<span class="ident">unwrap_or</span>(<span class="string">&quot;&quot;</span>),
             },
         });
 
         <span class="kw">match</span> <span class="ident">filter</span> {
-            <span class="ident">ChunkGuildFilter</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> {},
+            <span class="ident">ChunkGuildFilter</span>::<span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="string">&quot;&quot;</span>),
             <span class="ident">ChunkGuildFilter</span>::<span class="ident">Query</span>(<span class="ident">query</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">payload</span>[<span class="string">&quot;d&quot;</span>][<span class="string">&quot;query&quot;</span>] <span class="op">=</span> <span class="macro">json</span><span class="macro">!</span>(<span class="ident">query</span>),
             <span class="ident">ChunkGuildFilter</span>::<span class="ident">UserIds</span>(<span class="ident">user_ids</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="kw">let</span> <span class="ident">ids</span> <span class="op">=</span> <span class="ident">user_ids</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span>.<span class="number">0</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">u64</span><span class="op">&gt;</span><span class="op">&gt;</span>();

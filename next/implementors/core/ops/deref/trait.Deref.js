@@ -1,3 +1,3 @@
 (function() {var implementors = {};
-implementors["serenity"] = [{"text":"impl Deref for InviteUser","synthetic":false,"types":[]}];
+implementors["serenity"] = [{"text":"impl <a class=\"trait\" href=\"https://doc.rust-lang.org/nightly/core/ops/deref/trait.Deref.html\" title=\"trait core::ops::deref::Deref\">Deref</a> for <a class=\"struct\" href=\"serenity/model/invite/struct.InviteUser.html\" title=\"struct serenity::model::invite::InviteUser\">InviteUser</a>","synthetic":false,"types":["serenity::model::invite::InviteUser"]}];
 if (window.register_implementors) {window.register_implementors(implementors);} else {window.pending_implementors = implementors;}})()
