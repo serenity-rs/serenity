@@ -62,7 +62,7 @@ by rustfmt.
 When creating a commit summary, use the imperative mood. The summary
 should describe the action that is administered by the commit's changes.
 
-Proper examples of a commit summary are:
+Examples of proper commit summaries are:
 
 - "Add tests for checking permissions" -- changes add new tests
 - "Fix double sending bug" -- changes fix erroneous behaviour
