@@ -57,6 +57,10 @@ We have an 80 characters per line soft limit. In case readability would suffer
 and to support descriptive naming, 100 characters is our hard limit, enforced
 by rustfmt.
 
+Note that our rustfmt configuration uses unstable features! You will have to
+install the nightly toolchain of Rust through [`rustup`] in order to format
+your code.
+
 # Comment / Documentation style
 
 Comments, including documentation comments, ought to be written in British English.
@@ -104,4 +108,5 @@ preferably fit into 50 characters, but this is not actively enforced.
 
 [test_ci]: .github/workflows/ci.yml
 [make]: https://github.com/sagiegurari/cargo-make
+[`rustup`]: https://rustup.rs
 [in-links]: https://github.com/rust-lang/rfcs/blob/master/text/1946-intra-rustdoc-links.md
