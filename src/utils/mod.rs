@@ -330,7 +330,12 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
 /// let image = utils::read_image("./cat.png").expect("Failed to read image");
 /// ```
 ///
+/// # Errors
+///
+/// Returns an [`Error::Io`] if the path does not exist.
+///
 /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
+/// [`Error::Io`]: crate::error::Error::Io
 #[inline]
 pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
     _read_image(path.as_ref())

@@ -59,7 +59,12 @@ impl Typing {
     /// the returned `Typing` object or wait for it to be dropped. Note that on some
     /// clients, typing may persist for a few seconds after stopped.
     ///
+    /// # Errors
+    ///
+    /// Returns an  [`Error::Http`] if there is an error.
+    ///
     /// [`Channel`]: crate::model::channel::Channel
+    /// [`Error::Http`]: crate::error::Error::Http
     pub fn start(http: Arc<Http>, channel_id: u64) -> Result<Self> {
         let (sx, mut rx) = oneshot::channel();
 
