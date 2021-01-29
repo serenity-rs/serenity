@@ -310,6 +310,7 @@
 <span id="307">307</span>
 <span id="308">308</span>
 <span id="309">309</span>
+<span id="310">310</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">boxed</span>::<span class="ident">Box</span>,
@@ -497,6 +498,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// A message is considered *collected*, if the message</span>
     <span class="doccomment">/// passes all the requirements.</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">collect_limit</span>(<span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">limit</span>: <span class="ident">u32</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="self">Self</span> {
         <span class="self">self</span>.<span class="ident">filter</span>.<span class="ident">as_mut</span>().<span class="ident">unwrap</span>().<span class="ident">collect_limit</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">limit</span>);
 
@@ -506,7 +508,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">MessageCollectorBuilder</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="ident">MessageCollector</span>;
-
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();
@@ -547,7 +549,7 @@
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> <span class="ident">Future</span> <span class="kw">for</span> <span class="ident">CollectReply</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span> {
     <span class="kw">type</span> <span class="ident">Output</span> <span class="op">=</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Message</span><span class="op">&gt;</span><span class="op">&gt;</span>;
-
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
     <span class="kw">fn</span> <span class="ident">poll</span>(<span class="kw-2">mut</span> <span class="self">self</span>: <span class="ident">Pin</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span><span class="op">&gt;</span>, <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">FutContext</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">Poll</span><span class="op">&lt;</span><span class="self">Self</span>::<span class="ident">Output</span><span class="op">&gt;</span> {
         <span class="kw">if</span> <span class="self">self</span>.<span class="ident">fut</span>.<span class="ident">is_none</span>() {
             <span class="kw">let</span> <span class="ident">shard_messenger</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shard</span>.<span class="ident">take</span>().<span class="ident">unwrap</span>();

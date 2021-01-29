@@ -1149,6 +1149,7 @@
 <span id="1146">1146</span>
 <span id="1147">1147</span>
 <span id="1148">1148</span>
+<span id="1149">1149</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A cache containing data received from [`Shard`]s.</span>
 <span class="doccomment">//!</span>
@@ -2140,6 +2141,7 @@
     };
 
     <span class="attribute">#[<span class="ident">tokio</span>::<span class="ident">test</span>]</span>
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
     <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">test_cache_messages</span>() {
         <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">settings</span> <span class="op">=</span> <span class="ident">Settings</span>::<span class="ident">new</span>();
         <span class="ident">settings</span>.<span class="ident">max_messages</span>(<span class="number">2</span>);

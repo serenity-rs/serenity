@@ -463,6 +463,7 @@
 <span id="460">460</span>
 <span id="461">461</span>
 <span id="462">462</span>
+<span id="463">463</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
@@ -915,6 +916,7 @@
         }
 
         <span class="attribute">#[<span class="ident">test</span>]</span>
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
         <span class="kw">fn</span> <span class="ident">parse_mentions</span>() {
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;&lt;@1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">UserId</span>(<span class="number">1234</span>));
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="string">&quot;&lt;@&amp;1234&gt;&quot;</span>.<span class="ident">parse</span>::<span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>().<span class="ident">unwrap</span>(), <span class="ident">RoleId</span>(<span class="number">1234</span>));

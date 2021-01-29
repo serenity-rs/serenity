@@ -611,6 +611,7 @@
 <span id="608">608</span>
 <span id="609">609</span>
 <span id="610">610</span>
+<span id="611">611</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">convert</span>::<span class="ident">TryFrom</span>;
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">str</span>::<span class="ident">FromStr</span>;
@@ -858,6 +859,7 @@
 }
 
 <span class="kw">impl</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="ident">Deserialize</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span> <span class="kw">for</span> <span class="ident">ReactionType</span> {
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span> <span class="comment">// allow unwrap here because name being none is unreachable</span>
     <span class="kw">fn</span> <span class="ident">deserialize</span><span class="op">&lt;</span><span class="ident">D</span>: <span class="ident">Deserializer</span><span class="op">&lt;</span><span class="lifetime">&#39;de</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">deserializer</span>: <span class="ident">D</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">StdResult</span><span class="op">&lt;</span><span class="self">Self</span>, <span class="ident">D</span>::<span class="ident">Error</span><span class="op">&gt;</span> {
         <span class="attribute">#[<span class="ident">derive</span>(<span class="ident">Deserialize</span>)]</span>
         <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">field_identifier</span>, <span class="ident">rename_all</span> <span class="op">=</span> <span class="string">&quot;snake_case&quot;</span>)]</span>

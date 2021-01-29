@@ -814,7 +814,7 @@
                 <span class="comment">// Guild not found.</span>
                 <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(()),
             };
-
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span> <span class="comment">// Allowing unwrap because should always return Some()</span>
             <span class="kw">let</span> <span class="ident">roles</span> <span class="op">=</span> <span class="ident">ctx</span>.<span class="ident">cache</span>.<span class="ident">guild_field</span>(<span class="ident">guild_id</span>, <span class="op">|</span><span class="ident">guild</span><span class="op">|</span> <span class="ident">guild</span>.<span class="ident">roles</span>.<span class="ident">clone</span>()).<span class="kw">await</span>.<span class="ident">unwrap</span>();
             <span class="kw">let</span> <span class="ident">perms</span> <span class="op">=</span> <span class="ident">permissions_in</span>(<span class="ident">ctx</span>, <span class="ident">guild_id</span>, <span class="ident">msg</span>.<span class="ident">channel_id</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>, <span class="kw-2">&amp;</span><span class="ident">roles</span>).<span class="kw">await</span>;
 
