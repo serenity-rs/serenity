@@ -96,6 +96,10 @@ impl<'de> Deserialize<'de> for VoiceState {
             nick: Option<String>,
             roles: Vec<RoleId>,
             user: User,
+            #[serde(default)]
+            pending: bool,
+            #[cfg(feature = "unstable_discord_api")]
+            permissions: Option<String>,
         }
 
         struct VoiceStateVisitor;
@@ -166,6 +170,9 @@ impl<'de> Deserialize<'de> for VoiceState {
                                     nick: partial_member.nick,
                                     roles: partial_member.roles,
                                     user: partial_member.user,
+                                    pending: partial_member.pending,
+                                    #[cfg(feature = "unstable_discord_api")]
+                                    permissions: partial_member.permissions,
                                 });
                             }
                         },

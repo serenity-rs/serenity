@@ -2376,6 +2376,9 @@ mod test {
                 nick: Some("aaaa".to_string()),
                 roles: vec1,
                 user: u,
+                pending: false,
+                #[cfg(feature = "unstable_discord_api")]
+                permissions: None,
             }
         }
 

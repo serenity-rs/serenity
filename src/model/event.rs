@@ -515,6 +515,9 @@ impl CacheUpdate for GuildMemberUpdateEvent {
                     nick: self.nick.clone(),
                     roles: self.roles.clone(),
                     user: self.user.clone(),
+                    pending: false,
+                    #[cfg(feature = "unstable_discord_api")]
+                    permissions: None,
                 });
             }
 
@@ -1012,6 +1015,9 @@ impl CacheUpdate for PresenceUpdateEvent {
                             nick: None,
                             user: user.clone(),
                             roles: vec![],
+                            pending: false,
+                            #[cfg(feature = "unstable_discord_api")]
+                            permissions: None,
                         });
                     }
                 }
