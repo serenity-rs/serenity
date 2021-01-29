@@ -159,6 +159,7 @@ impl<'a> CreateMessage<'a> {
     }
 
     /// Set the reference message this message is a reply to.
+    #[allow(clippy::unwrap_used)] // allowing unwrap here because serializing MessageReference should never error
     pub fn reference_message(&mut self, reference: impl Into<MessageReference>) -> &mut Self {
         self.0.insert("message_reference", serde_json::to_value(reference.into()).unwrap());
         self

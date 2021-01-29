@@ -988,6 +988,7 @@ mod test {
     };
 
     #[tokio::test]
+    #[allow(clippy::unwrap_used)]
     async fn test_cache_messages() {
         let mut settings = Settings::new();
         settings.max_messages(2);

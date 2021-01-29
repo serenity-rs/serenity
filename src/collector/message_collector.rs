@@ -184,6 +184,7 @@ impl<'a> MessageCollectorBuilder<'a> {
     ///
     /// A message is considered *collected*, if the message
     /// passes all the requirements.
+    #[allow(clippy::unwrap_used)]
     pub fn collect_limit(mut self, limit: u32) -> Self {
         self.filter.as_mut().unwrap().collect_limit = Some(limit);
 
@@ -193,7 +194,7 @@ impl<'a> MessageCollectorBuilder<'a> {
 
 impl<'a> Future for MessageCollectorBuilder<'a> {
     type Output = MessageCollector;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();
@@ -234,7 +235,7 @@ impl<'a> CollectReply<'a> {
 
 impl<'a> Future for CollectReply<'a> {
     type Output = Option<Arc<Message>>;
-
+    #[allow(clippy::unwrap_used)]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {
             let shard_messenger = self.shard.take().unwrap();

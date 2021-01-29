@@ -958,6 +958,7 @@ fn tag(name: &str, discriminator: u16) -> String {
 }
 
 #[cfg(test)]
+#[allow(clippy::unwrap_used)]
 mod test {
     #[cfg(feature = "model")]
     mod model {

@@ -276,7 +276,7 @@ async fn check_discrepancy(
                 // Guild not found.
                 None => return Ok(()),
             };
-
+            #[allow(clippy::unwrap_used)] // Allowing unwrap because should always return Some()
             let roles = ctx.cache.guild_field(guild_id, |guild| guild.roles.clone()).await.unwrap();
             let perms = permissions_in(ctx, guild_id, msg.channel_id, &member, &roles).await;
 

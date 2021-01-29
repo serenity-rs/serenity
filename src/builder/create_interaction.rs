@@ -76,9 +76,9 @@ impl CreateInteractionOption {
 
     fn add_choice(&mut self, value: Value) -> &mut Self {
         let choices = self.0.entry("choices").or_insert_with(|| Value::Array(Vec::new()));
-        if let Some(choices_arr) = choices.as_array_mut() {
-            choices_arr.push(value);
-        };
+        let choices_arr = choices.as_array_mut().expect("Must be an array");
+        choices_arr.push(value);
+
         self
     }
 
@@ -98,9 +98,9 @@ impl CreateInteractionOption {
     pub fn add_sub_option(&mut self, sub_option: CreateInteractionOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(sub_option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
-        if let Some(opt_arr) = options.as_array_mut() {
-            opt_arr.push(Value::Object(new_option));
-        };
+        let opt_arr = options.as_array_mut().expect("Must be an array");
+        opt_arr.push(Value::Object(new_option));
+
         self
     }
 }
@@ -151,10 +151,9 @@ impl CreateInteraction {
     pub fn add_interaction_option(&mut self, option: CreateInteractionOption) -> &mut Self {
         let new_option = utils::hashmap_to_json_map(option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
-        if let Some(opt_arr) = options.as_array_mut() {
-            opt_arr.push(Value::Object(new_option));
-        };
-        // should this be changed to have None be a panic?
+        let opt_arr = options.as_array_mut().expect("Must be an array");
+        opt_arr.push(Value::Object(new_option));
+
         self
     }
 

@@ -244,6 +244,7 @@ pub enum ReactionType {
 }
 
 impl<'de> Deserialize<'de> for ReactionType {
+    #[allow(clippy::unwrap_used)] // allow unwrap here because name being none is unreachable
     fn deserialize<D: Deserializer<'de>>(deserializer: D) -> StdResult<Self, D::Error> {
         #[derive(Deserialize)]
         #[serde(field_identifier, rename_all = "snake_case")]

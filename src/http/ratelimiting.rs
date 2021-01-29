@@ -410,6 +410,7 @@ mod tests {
 
     type Result<T> = StdResult<T, Box<dyn StdError>>;
 
+    #[allow(clippy::unwrap_used)]
     fn headers() -> HeaderMap {
         let pairs = &[
             (HeaderName::from_static("x-ratelimit-limit"), HeaderValue::from_static("5")),
@@ -435,7 +436,7 @@ mod tests {
     }
 
     #[test]
-    #[allow(clippy::float_cmp)]
+    #[allow(clippy::float_cmp, clippy::unwrap_used)]
     fn test_parse_header_good() -> Result<()> {
         let headers = headers();
 

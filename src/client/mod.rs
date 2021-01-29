@@ -293,6 +293,7 @@ impl<'a> ClientBuilder<'a> {
 impl<'a> Future for ClientBuilder<'a> {
     type Output = Result<Client>;
 
+    #[allow(clippy::unwrap_used)] // Allowing unwrap because all should be Some() by this point
     #[instrument(skip(self))]
     fn poll(mut self: Pin<&mut Self>, ctx: &mut FutContext<'_>) -> Poll<Self::Output> {
         if self.fut.is_none() {

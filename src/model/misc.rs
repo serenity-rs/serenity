@@ -449,6 +449,7 @@ mod test {
         }
 
         #[test]
+        #[allow(clippy::unwrap_used)]
         fn parse_mentions() {
             assert_eq!("<@1234>".parse::<UserId>().unwrap(), UserId(1234));
             assert_eq!("<@&1234>".parse::<RoleId>().unwrap(), RoleId(1234));

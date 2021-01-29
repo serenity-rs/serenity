@@ -668,6 +668,7 @@ impl Framework for StandardFramework {
                 let groups = self.groups.iter().map(|(g, _)| *g).collect::<Vec<_>>();
 
                 // `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.
+                #[allow(clippy::unwrap_used)]
                 let help = self.help.unwrap();
 
                 if let Some(before) = &self.before {
@@ -698,6 +699,8 @@ impl Framework for StandardFramework {
 
                         for delim in command.options.delimiters {
                             if delim.len() == 1 {
+                                // Should always be Some() in this case
+                                #[allow(clippy::unwrap_used)]
                                 v.push(Delimiter::Single(delim.chars().next().unwrap()));
                             } else {
                                 // This too.
@@ -842,7 +845,7 @@ pub(crate) async fn has_correct_permissions(
             Ok(perms) => perms,
             Err(e) => {
                 tracing::error!(
-                    "(╯°□°）╯︵ ┻━┻ error getting permissions for user {} in channel {}: {}",
+                    "Error getting permissions for user {} in channel {}: {}",
                     member.user.id,
                     channel.id,
                     e

@@ -54,6 +54,7 @@
 #![cfg_attr(docsrs, feature(doc_cfg))]
 #![deny(rust_2018_idioms)]
 #![deny(broken_intra_doc_links)]
+#![deny(clippy::unwrap_used, clippy::non_ascii_literal)]
 #![type_length_limit = "3294819"] // needed so ShardRunner::run compiles with instrument.
 
 #[macro_use]

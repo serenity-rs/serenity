@@ -344,8 +344,8 @@ impl Interaction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map).unwrap();
-        Message::check_embed_length(&map).unwrap();
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
 
         http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
     }
@@ -373,8 +373,8 @@ impl Interaction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map).unwrap();
-        Message::check_embed_length(&map).unwrap();
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
 
         http.as_ref()
             .edit_original_interaction_response(application_id, &self.token, &Value::Object(map))
@@ -410,8 +410,8 @@ impl Interaction {
 
         let map = utils::hashmap_to_json_map(interaction_response.0);
 
-        Message::check_content_length(&map).unwrap();
-        Message::check_embed_length(&map).unwrap();
+        Message::check_content_length(&map)?;
+        Message::check_embed_length(&map)?;
 
         http.as_ref().create_followup_message(application_id, &self.token, wait, &map).await
     }

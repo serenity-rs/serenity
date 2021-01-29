@@ -15,7 +15,7 @@ use std::fmt::{Display, Formatter, Result as FmtResult};
 
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use async_trait::async_trait;
-use serde::de::Error as DeError;
+use serde::de::{Error as DeError, Unexpected};
 use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 pub use self::attachment::*;
@@ -225,7 +225,15 @@ impl<'de> Deserialize<'de> for Channel {
         let kind = {
             let kind = v.get("type").ok_or_else(|| DeError::missing_field("type"))?;
 
-            kind.as_u64().unwrap()
+            match kind.as_u64() {
+                Some(kind) => kind,
+                None => {
+                    return Err(DeError::invalid_type(
+                        Unexpected::Other("non-positive integer"),
+                        &"a positive integer",
+                    ));
+                },
+            }
         };
 
         match kind {
