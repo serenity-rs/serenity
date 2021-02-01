@@ -2450,6 +2450,9 @@
 <span id="2447">2447</span>
 <span id="2448">2448</span>
 <span id="2449">2449</span>
+<span id="2450">2450</span>
+<span id="2451">2451</span>
+<span id="2452">2452</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to guilds and types that it owns.</span>
 
@@ -4823,6 +4826,9 @@
                 <span class="ident">nick</span>: <span class="prelude-val">Some</span>(<span class="string">&quot;aaaa&quot;</span>.<span class="ident">to_string</span>()),
                 <span class="ident">roles</span>: <span class="ident">vec1</span>,
                 <span class="ident">user</span>: <span class="ident">u</span>,
+                <span class="ident">pending</span>: <span class="bool-val">false</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
             }
         }
 

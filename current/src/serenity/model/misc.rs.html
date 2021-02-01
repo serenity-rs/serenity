@@ -464,6 +464,9 @@
 <span id="461">461</span>
 <span id="462">462</span>
 <span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Miscellaneous helper traits, enums, and structs for models.</span>
 
@@ -903,6 +906,9 @@
                 <span class="ident">nick</span>: <span class="prelude-val">None</span>,
                 <span class="ident">roles</span>: <span class="macro">vec</span><span class="macro">!</span>[],
                 <span class="ident">user</span>: <span class="ident">user</span>.<span class="ident">clone</span>(),
+                <span class="ident">pending</span>: <span class="bool-val">false</span>,
+                <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                <span class="ident">permissions</span>: <span class="prelude-val">None</span>,
             };
 
             <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">ChannelId</span>(<span class="number">1</span>).<span class="ident">mention</span>().<span class="ident">to_string</span>(), <span class="string">&quot;&lt;#1&gt;&quot;</span>);
