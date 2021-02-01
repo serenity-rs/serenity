@@ -17,7 +17,7 @@ struct Handler;
 #[async_trait]
 impl EventHandler for Handler {
     async fn ready(&self, _: Context, ready: Ready) {
-        // Log at the INFO level. This is a macro from the `log` crate.
+        // Log at the INFO level. This is a macro from the `tracing` crate.
         info!("{} is connected!", ready.user.name);
     }
 
@@ -57,8 +57,8 @@ struct General;
 #[tokio::main]
 #[instrument]
 async fn main() {
-    // Call tracing_subscriber's initialize function, which configures `log` via
-    // environment variables.
+    // Call tracing_subscriber's initialize function, which configures `tracing`
+    // via environment variables.
     //
     // For example, you can say to log all levels INFO and up via setting the
     // environment variable `RUST_LOG` to `INFO`.
