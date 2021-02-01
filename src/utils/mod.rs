@@ -853,6 +853,9 @@ mod test {
             nick: Some("Ferris".to_string()),
             roles: Vec::new(),
             user: user.clone(),
+            pending: false,
+            #[cfg(feature = "unstable_discord_api")]
+            permissions: None,
         };
 
         let role = Role {

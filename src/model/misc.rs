@@ -436,6 +436,9 @@ mod test {
                 nick: None,
                 roles: vec![],
                 user: user.clone(),
+                pending: false,
+                #[cfg(feature = "unstable_discord_api")]
+                permissions: None,
             };
 
             assert_eq!(ChannelId(1).mention().to_string(), "<#1>");

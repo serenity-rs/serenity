@@ -39,6 +39,17 @@ pub struct Member {
     pub roles: Vec<RoleId>,
     /// Attached User struct.
     pub user: User,
+    /// Indicator that the member hasn't accepted the rules of the guild yet.
+    #[serde(default)]
+    pub pending: bool,
+    /// The total permissions of the member in a channel, including overrides.
+    ///
+    /// This is only `Some` when returned in an [`Interaction`] object.
+    ///
+    /// [`Interaction`]: crate::model::interactions::Interaction
+    #[cfg(feature = "unstable_discord_api")]
+    #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    pub permissions: Option<String>,
 }
 
 #[cfg(feature = "model")]
