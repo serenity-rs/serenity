@@ -876,6 +876,9 @@
 <span id="873">873</span>
 <span id="874">874</span>
 <span id="875">875</span>
+<span id="876">876</span>
+<span id="877">877</span>
+<span id="878">878</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">help_commands</span>;
 <span class="kw">pub</span> <span class="kw">mod</span> <span class="ident">macros</span> {
@@ -1547,6 +1550,7 @@
                 <span class="kw">let</span> <span class="ident">groups</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">groups</span>.<span class="ident">iter</span>().<span class="ident">map</span>(<span class="op">|</span>(<span class="ident">g</span>, <span class="kw">_</span>)<span class="op">|</span> <span class="kw-2">*</span><span class="ident">g</span>).<span class="ident">collect</span>::<span class="op">&lt;</span><span class="ident">Vec</span><span class="op">&lt;</span><span class="kw">_</span><span class="op">&gt;</span><span class="op">&gt;</span>();
 
                 <span class="comment">// `parse_command` promises to never return a help invocation if `StandardFramework::help` is `None`.</span>
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
                 <span class="kw">let</span> <span class="ident">help</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">help</span>.<span class="ident">unwrap</span>();
 
                 <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">before</span>) <span class="op">=</span> <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">before</span> {
@@ -1577,6 +1581,8 @@
 
                         <span class="kw">for</span> <span class="ident">delim</span> <span class="kw">in</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">delimiters</span> {
                             <span class="kw">if</span> <span class="ident">delim</span>.<span class="ident">len</span>() <span class="op">=</span><span class="op">=</span> <span class="number">1</span> {
+                                <span class="comment">// Should always be Some() in this case</span>
+                                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>)]</span>
                                 <span class="ident">v</span>.<span class="ident">push</span>(<span class="ident">Delimiter</span>::<span class="ident">Single</span>(<span class="ident">delim</span>.<span class="ident">chars</span>().<span class="ident">next</span>().<span class="ident">unwrap</span>()));
                             } <span class="kw">else</span> {
                                 <span class="comment">// This too.</span>
@@ -1721,7 +1727,7 @@
             <span class="prelude-val">Ok</span>(<span class="ident">perms</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="ident">perms</span>,
             <span class="prelude-val">Err</span>(<span class="ident">e</span>) <span class="op">=</span><span class="op">&gt;</span> {
                 <span class="ident">tracing</span>::<span class="macro">error</span><span class="macro">!</span>(
-                    <span class="string">&quot;(╯°□°）╯︵ ┻━┻ error getting permissions for user {} in channel {}: {}&quot;</span>,
+                    <span class="string">&quot;Error getting permissions for user {} in channel {}: {}&quot;</span>,
                     <span class="ident">member</span>.<span class="ident">user</span>.<span class="ident">id</span>,
                     <span class="ident">channel</span>.<span class="ident">id</span>,
                     <span class="ident">e</span>

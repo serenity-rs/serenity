@@ -281,6 +281,13 @@
 <span id="278">278</span>
 <span id="279">279</span>
 <span id="280">280</span>
+<span id="281">281</span>
+<span id="282">282</span>
+<span id="283">283</span>
+<span id="284">284</span>
+<span id="285">285</span>
+<span id="286">286</span>
+<span id="287">287</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Representations of voice information.</span>
 
@@ -380,6 +387,10 @@
             <span class="ident">nick</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
             <span class="ident">roles</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">RoleId</span><span class="op">&gt;</span>,
             <span class="ident">user</span>: <span class="ident">User</span>,
+            <span class="attribute">#[<span class="ident">serde</span>(<span class="ident">default</span>)]</span>
+            <span class="ident">pending</span>: <span class="ident">bool</span>,
+            <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+            <span class="ident">permissions</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
         }
 
         <span class="kw">struct</span> <span class="ident">VoiceStateVisitor</span>;
@@ -450,6 +461,9 @@
                                     <span class="ident">nick</span>: <span class="ident">partial_member</span>.<span class="ident">nick</span>,
                                     <span class="ident">roles</span>: <span class="ident">partial_member</span>.<span class="ident">roles</span>,
                                     <span class="ident">user</span>: <span class="ident">partial_member</span>.<span class="ident">user</span>,
+                                    <span class="ident">pending</span>: <span class="ident">partial_member</span>.<span class="ident">pending</span>,
+                                    <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;unstable_discord_api&quot;</span>)]</span>
+                                    <span class="ident">permissions</span>: <span class="ident">partial_member</span>.<span class="ident">permissions</span>,
                                 });
                             }
                         },

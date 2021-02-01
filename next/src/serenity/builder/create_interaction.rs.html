@@ -172,7 +172,6 @@
 <span id="169">169</span>
 <span id="170">170</span>
 <span id="171">171</span>
-<span id="172">172</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">collections</span>::<span class="ident">HashMap</span>;
 
@@ -252,9 +251,9 @@
 
     <span class="kw">fn</span> <span class="ident">add_choice</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">value</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">choices</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;choices&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()));
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">choices_arr</span>) <span class="op">=</span> <span class="ident">choices</span>.<span class="ident">as_array_mut</span>() {
-            <span class="ident">choices_arr</span>.<span class="ident">push</span>(<span class="ident">value</span>);
-        };
+        <span class="kw">let</span> <span class="ident">choices_arr</span> <span class="op">=</span> <span class="ident">choices</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
+        <span class="ident">choices_arr</span>.<span class="ident">push</span>(<span class="ident">value</span>);
+
         <span class="self">self</span>
     }
 
@@ -274,9 +273,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_sub_option</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">sub_option</span>: <span class="ident">CreateInteractionOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">sub_option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()));
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opt_arr</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>() {
-            <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">new_option</span>));
-        };
+        <span class="kw">let</span> <span class="ident">opt_arr</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
+        <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">new_option</span>));
+
         <span class="self">self</span>
     }
 }
@@ -327,10 +326,9 @@
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">add_interaction_option</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">option</span>: <span class="ident">CreateInteractionOption</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">Self</span> {
         <span class="kw">let</span> <span class="ident">new_option</span> <span class="op">=</span> <span class="ident">utils</span>::<span class="ident">hashmap_to_json_map</span>(<span class="ident">option</span>.<span class="number">0</span>);
         <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="self">self</span>.<span class="number">0</span>.<span class="ident">entry</span>(<span class="string">&quot;options&quot;</span>).<span class="ident">or_insert_with</span>(<span class="op">|</span><span class="op">|</span> <span class="ident">Value</span>::<span class="ident">Array</span>(<span class="ident">Vec</span>::<span class="ident">new</span>()));
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">opt_arr</span>) <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>() {
-            <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">new_option</span>));
-        };
-        <span class="comment">// should this be changed to have None be a panic?</span>
+        <span class="kw">let</span> <span class="ident">opt_arr</span> <span class="op">=</span> <span class="ident">options</span>.<span class="ident">as_array_mut</span>().<span class="ident">expect</span>(<span class="string">&quot;Must be an array&quot;</span>);
+        <span class="ident">opt_arr</span>.<span class="ident">push</span>(<span class="ident">Value</span>::<span class="ident">Object</span>(<span class="ident">new_option</span>));
+
         <span class="self">self</span>
     }
 
