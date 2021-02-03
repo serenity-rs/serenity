@@ -61,6 +61,13 @@ Note that our rustfmt configuration uses unstable features! You will have to
 install the nightly toolchain of Rust through [`rustup`] in order to format
 your code.
 
+## Unsafe
+
+Code that defines or uses `unsafe` functions must be reasoned with comments.
+`unsafe` code can pose a potential for undefined behaviour related bugs and other
+kinds of bugs to sprout if misused, weakening security. If you commit code containing
+`unsafe`, you should confirm that its usage is necessary and correct.
+
 # Comment / Documentation style
 
 Comments, including documentation comments, ought to be written in British English.
