@@ -502,7 +502,7 @@ impl Configuration {
         self
     }
 
-    /// Sets whether command execution can done without a prefix. Works only in private channels.
+    /// Sets whether command execution can be done without a prefix. Works only in private channels.
     ///
     /// **Note**: Defaults to `false`.
     ///
