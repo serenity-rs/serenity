@@ -286,7 +286,7 @@ pub struct RichInvite {
     /// [`Guild`] being invited to.
     pub guild: Option<InviteGuild>,
     /// The user that created the invite.
-    pub inviter: User,
+    pub inviter: Option<User>,
     /// The maximum age of the invite in seconds, from when it was created.
     pub max_age: u64,
     /// The maximum number of times that an invite may be used before it expires.
