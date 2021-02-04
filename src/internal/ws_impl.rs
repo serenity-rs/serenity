@@ -147,7 +147,10 @@ fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConf
     }
 }
 
-#[cfg(any(feature = "rustls_tokio_0_2_backend", feature = "native_tls_tokio_0_2_backend"))]
+#[cfg(all(
+    any(feature = "rustls_tokio_0_2_backend", feature = "native_tls_tokio_0_2_backend"),
+    not(any(feature = "rustls_backend", feature = "native_tls_backend"))
+))]
 fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConfig {
     async_tungstenite::tungstenite::protocol::WebSocketConfig {
         max_message_size: None,
