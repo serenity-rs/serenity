@@ -1,7 +1,5 @@
 //! Models for server and channel invites.
 
-use std::ops::Deref;
-
 use chrono::{DateTime, Utc};
 
 use super::prelude::*;
@@ -45,7 +43,7 @@ pub struct Invite {
     ///
     /// This can be `None` for invites created by Discord such as invite-widgets
     /// or vanity invite links.
-    pub inviter: Option<InviteUser>,
+    pub inviter: Option<User>,
 }
 
 #[cfg(feature = "model")]
@@ -176,28 +174,6 @@ impl Invite {
     /// ```
     pub fn url(&self) -> String {
         format!("https://discord.gg/{}", self.code)
-    }
-}
-
-/// A minimal amount of information about the inviter (person who created the invite).
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct InviteUser {
-    pub id: UserId,
-    #[serde(rename = "username")]
-    pub name: String,
-    #[serde(deserialize_with = "deserialize_u16")]
-    pub discriminator: u16,
-    pub avatar: Option<String>,
-}
-
-/// InviteUser implements a Deref to UserId so it gains the convenience methods
-/// for converting it into a [`User`] instance.
-impl Deref for InviteUser {
-    type Target = UserId;
-
-    fn deref(&self) -> &Self::Target {
-        &self.id
     }
 }
 
