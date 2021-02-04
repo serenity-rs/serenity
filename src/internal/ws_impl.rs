@@ -137,20 +137,35 @@ impl StdError for RustlsError {
     }
 }
 
+#[cfg(any(feature = "rustls_backend", feature = "native_tls_backend"))]
+fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConfig {
+    async_tungstenite::tungstenite::protocol::WebSocketConfig {
+        max_message_size: None,
+        max_frame_size: None,
+        max_send_queue: None,
+        accept_unmasked_frames: false,
+    }
+}
+
+#[cfg(all(
+    any(feature = "rustls_tokio_0_2_backend", feature = "native_tls_tokio_0_2_backend"),
+    not(any(feature = "rustls_backend", feature = "native_tls_backend"))
+))]
+fn websocket_config() -> async_tungstenite::tungstenite::protocol::WebSocketConfig {
+    async_tungstenite::tungstenite::protocol::WebSocketConfig {
+        max_message_size: None,
+        max_frame_size: None,
+        max_send_queue: None,
+    }
+}
+
 #[cfg(all(feature = "rustls_backend_marker", not(feature = "native_tls_backend_marker")))]
 #[instrument]
 pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
-    let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
-        url,
-        Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
-            max_message_size: None,
-            max_frame_size: None,
-            max_send_queue: None,
-            accept_unmasked_frames: false,
-        }),
-    )
-    .await
-    .map_err(|_| RustlsError::HandshakeError)?;
+    let (stream, _) =
+        async_tungstenite::tokio::connect_async_with_config::<Url>(url, Some(websocket_config()))
+            .await
+            .map_err(|_| RustlsError::HandshakeError)?;
 
     Ok(stream)
 }
@@ -160,12 +175,7 @@ pub(crate) async fn create_rustls_client(url: Url) -> Result<WsStream> {
 pub(crate) async fn create_native_tls_client(url: Url) -> Result<WsStream> {
     let (stream, _) = async_tungstenite::tokio::connect_async_with_config::<Url>(
         url.into(),
-        Some(async_tungstenite::tungstenite::protocol::WebSocketConfig {
-            max_message_size: None,
-            max_frame_size: None,
-            max_send_queue: None,
-            accept_unmasked_frames: false,
-        }),
+        Some(websocket_config()),
     )
     .await?;
 
