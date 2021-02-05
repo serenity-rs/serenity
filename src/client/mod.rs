@@ -487,7 +487,7 @@ pub struct Client {
     /// [`Event::MessageDelete`]: crate::model::event::Event::MessageDelete
     /// [`Event::MessageDeleteBulk`]: crate::model::event::Event::MessageDeleteBulk
     /// [`Event::MessageUpdate`]: crate::model::event::Event::MessageUpdate
-    /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/05_command_framework
+    /// [example 05]: https://github.com/serenity-rs/serenity/tree/current/examples/e05_command_framework
     pub data: Arc<RwLock<TypeMap>>,
     /// A HashMap of all shards instantiated by the Client.
     ///
