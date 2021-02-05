@@ -106,11 +106,11 @@ impl CreateChannel {
     /// use serenity::model::permissions::Permissions;
     ///
     /// // Assuming a guild has already been bound.
-    /// let permissions = Some(PermissionOverwrite {
+    /// let permissions = vec![PermissionOverwrite {
     ///     allow: Permissions::READ_MESSAGES,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
-    /// });
+    /// }];
     ///
     /// guild.create_channel(http, |c| {
     ///     c.name("my_new_cool_channel")
