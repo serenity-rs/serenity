@@ -1,7 +1,5 @@
 //! Models for server and channel invites.
 
-use std::ops::Deref;
-
 use chrono::{DateTime, Utc};
 
 use super::prelude::*;
@@ -45,7 +43,7 @@ pub struct Invite {
     ///
     /// This can be `None` for invites created by Discord such as invite-widgets
     /// or vanity invite links.
-    pub inviter: Option<InviteUser>,
+    pub inviter: Option<User>,
 }
 
 #[cfg(feature = "model")]
@@ -193,28 +191,6 @@ impl Invite {
     }
 }
 
-/// A minimal amount of information about the inviter (person who created the invite).
-#[derive(Clone, Debug, Deserialize, Serialize)]
-#[non_exhaustive]
-pub struct InviteUser {
-    pub id: UserId,
-    #[serde(rename = "username")]
-    pub name: String,
-    #[serde(deserialize_with = "deserialize_u16")]
-    pub discriminator: u16,
-    pub avatar: Option<String>,
-}
-
-/// InviteUser implements a Deref to UserId so it gains the convenience methods
-/// for converting it into a [`User`] instance.
-impl Deref for InviteUser {
-    type Target = UserId;
-
-    fn deref(&self) -> &Self::Target {
-        &self.id
-    }
-}
-
 /// A minimal amount of information about the channel an invite points to.
 #[non_exhaustive]
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -300,7 +276,7 @@ pub struct RichInvite {
     /// [`Guild`] being invited to.
     pub guild: Option<InviteGuild>,
     /// The user that created the invite.
-    pub inviter: User,
+    pub inviter: Option<User>,
     /// The maximum age of the invite in seconds, from when it was created.
     pub max_age: u64,
     /// The maximum number of times that an invite may be used before it expires.
