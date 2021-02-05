@@ -139,11 +139,11 @@ impl EditChannel {
     /// use serenity::model::permissions::Permissions;
     ///
     /// // Assuming a channel has already been bound.
-    /// let permissions = Some(PermissionOverwrite {
+    /// let permissions = vec![PermissionOverwrite {
     ///     allow: Permissions::READ_MESSAGES,
     ///     deny: Permissions::SEND_TTS_MESSAGES,
     ///     kind: PermissionOverwriteType::Member(UserId(1234)),
-    /// });
+    /// }];
     ///
     /// channel.edit(http, |c| {
     ///     c.name("my_edited_cool_channel")
