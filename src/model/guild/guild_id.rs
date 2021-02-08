@@ -75,7 +75,7 @@ impl GuildId {
     ///
     /// # Errors
     ///
-    /// In addition to the reasons `ban` may return an error, may 
+    /// In addition to the reasons `ban` may return an error, may
     /// also return [`Error::ExceededLimit`] if `reason` is too long.
     ///
     /// [`ban`]: Self::ban
@@ -800,7 +800,7 @@ impl GuildId {
     /// Requires the [Move Members] permission.
     ///
     /// # Errors
-    /// 
+    ///
     /// Returns an [`Error::Http`] if the current user
     /// lacks permission, or if the member is not currently
     /// in a voice channel for this `Guild`.

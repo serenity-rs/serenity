@@ -28,7 +28,6 @@ use crate::http::routing::Route;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
-
 /// **Note**: For all member functions that return a `Result`, the
 /// Error kind will be either [`Error::Http`] or [`Error::Json`].
 ///

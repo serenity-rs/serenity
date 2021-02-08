@@ -108,12 +108,12 @@ impl Role {
     ///     r
     /// });
     /// ```
-    ///
+    /// 
     /// # Errors
     ///
     /// Returns [`Error::Http`] if the current user does not
     /// have permission to Manage Roles.
-    /// 
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn edit(

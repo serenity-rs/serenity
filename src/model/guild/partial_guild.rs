@@ -511,7 +511,7 @@ impl PartialGuild {
     /// # Errors
     ///
     /// Returns [`Error::Http`] if an `Emoji` with the given Id does
-    /// not exist for the guild. 
+    /// not exist for the guild.
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         self.id.emoji(http, emoji_id).await

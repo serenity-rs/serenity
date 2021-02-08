@@ -564,7 +564,7 @@ impl Args {
     ///
     /// # Errors
     ///
-    /// May return either [`Error::Parse`] if a parse error occurs, or 
+    /// May return either [`Error::Parse`] if a parse error occurs, or
     /// [`Error::Eos`] if there are no further remaining args.
     ///
     /// [`trimmed`]: Self::trimmed

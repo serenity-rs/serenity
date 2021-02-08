@@ -38,7 +38,7 @@ impl ChannelCategory {
     /// Adds a permission overwrite to the category's channels.
     ///
     /// **Note**: Requires the [Manage Channels] permission.
-    /// 
+    ///
     /// Also requires the [Manage Roles] permission if
     /// not modifying the permissions for only the current user.
     ///

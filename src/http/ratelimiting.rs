@@ -153,7 +153,7 @@ impl Ratelimiter {
 
     #[instrument]
     /// # Errors
-    /// 
+    ///
     /// Only error kind that may be returned is [`Error::Http`].
     /// [`Error::Http`]: crate::error::Error::Http
     pub async fn perform(&self, req: RatelimitedRequest<'_>) -> Result<Response> {

@@ -1536,7 +1536,7 @@ impl Guild {
     /// Requires the [Move Members] permission.
     ///
     /// # Errors
-    /// 
+    ///
     /// Returns an [`Error::Http`] if the current user
     /// lacks permission, or if the member is not currently
     /// in a voice channel for this [`Guild`].

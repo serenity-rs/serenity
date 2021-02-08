@@ -133,7 +133,7 @@ impl Shard {
     /// ```
     ///
     /// # Errors
-    /// On Error, will return either [`Error::Gateway`] or [`Error::Rustls`] 
+    /// On Error, will return either [`Error::Gateway`] or [`Error::Rustls`]
     /// / [`Error::Tungstenite`] depending on if rustls or native_tls is used.
     ///
     /// [`Error::Gateway`]: crate::error::Error::Gateway

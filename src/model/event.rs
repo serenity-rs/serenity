@@ -1,6 +1,5 @@
 //! All the events this library handles.
 
-
 #[cfg(feature = "cache")]
 use std::mem;
 use std::{collections::HashMap, fmt};
