@@ -907,7 +907,7 @@ impl<'a> From<&'a Guild> for GuildId {
 
 /// A helper class returned by [`GuildId::members_iter`]
 #[derive(Clone, Debug)]
-#[cfg(all(feature = "model"))]
+#[cfg(feature = "model")]
 pub struct MembersIter<H: AsRef<Http>> {
     guild_id: GuildId,
     http: H,
@@ -916,7 +916,7 @@ pub struct MembersIter<H: AsRef<Http>> {
     tried_fetch: bool,
 }
 
-#[cfg(all(feature = "model"))]
+#[cfg(feature = "model")]
 impl<H: AsRef<Http>> MembersIter<H> {
     fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
         MembersIter {
