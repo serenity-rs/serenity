@@ -63,6 +63,8 @@ impl GuildId {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
+    /// Also can return [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn ban(self, http: impl AsRef<Http>, user: impl Into<UserId>, dmd: u8) -> Result<()> {
@@ -70,6 +72,11 @@ impl GuildId {
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// # Errors
+    ///
+    /// In addition to the reasons `ban` may return an error, may 
+    /// also return [`Error::ExceededLimit`] if `reason` is too long.
     ///
     /// [`ban`]: Self::ban
     #[inline]
@@ -103,7 +110,11 @@ impl GuildId {
 
     /// Gets a list of the guild's bans.
     ///
-    /// Requires the [Ban Members] permission.
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
@@ -112,6 +123,15 @@ impl GuildId {
     }
 
     /// Gets a list of the guild's audit log entries
+    ///
+    /// **Note**: Requires the [View Audit Log] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value is given.
+    ///
+    /// [View Audit Log]: Permissions::VIEW_AUDIT_LOG
     #[inline]
     pub async fn audit_logs(
         self,
@@ -127,6 +147,11 @@ impl GuildId {
     }
 
     /// Gets all of the guild's channels over the REST API.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not in
+    /// the guild.
     pub async fn channels(
         self,
         http: impl AsRef<Http>,
@@ -166,6 +191,11 @@ impl GuildId {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid values are set.
+    ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn create_channel(
@@ -194,6 +224,11 @@ impl GuildId {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// if the name is too long, or if the image is too big.
+    ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
@@ -214,6 +249,10 @@ impl GuildId {
     /// Creates an integration for the guild.
     ///
     /// Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -238,6 +277,11 @@ impl GuildId {
     ///
     /// **Note**: `application_id` is usually the bot's id, unless it's a very old bot.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if invalid data is given, may also return [`Error::Json`]
+    /// if there is an error in deserializing the API response.
+    ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
@@ -259,6 +303,11 @@ impl GuildId {
     /// See the documentation for [`Guild::create_role`] on how to use this.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid data is given.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -285,6 +334,10 @@ impl GuildId {
     /// Refer to [`Guild::delete`] for more information.
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not the owner of the guild.
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().delete_guild(self.0).await
@@ -292,7 +345,12 @@ impl GuildId {
 
     /// Deletes an [`Emoji`] from the guild.
     ///
-    /// Requires the [Manage Emojis] permission.
+    /// **Note**: Requires the [Manage Emojis] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an Emoji with that Id does not exist.
     ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
@@ -306,7 +364,12 @@ impl GuildId {
 
     /// Deletes an integration by Id from the guild.
     ///
-    /// Requires the [Manage Guild] permission.
+    /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an integration with that Id does not exist.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -320,10 +383,15 @@ impl GuildId {
 
     /// Deletes a [`Role`] by Id from the guild.
     ///
-    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
+    /// Also see [`Role::delete`] if you have the `cache` and `model` features
     /// enabled.
     ///
-    /// Requires the [Manage Roles] permission.
+    /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a role with that Id does not exist.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -341,6 +409,11 @@ impl GuildId {
     ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value is set.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -362,7 +435,12 @@ impl GuildId {
     ///
     /// Requires the [Manage Emojis] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_emoji(
         self,
@@ -380,7 +458,7 @@ impl GuildId {
     /// Edits the properties of member of the guild, such as muting or
     /// nicknaming them.
     ///
-    /// Refer to `EditMember`'s documentation for a full list of methods and
+    /// Refer to [`EditMember`]'s documentation for a full list of methods and
     /// permission restrictions.
     ///
     /// # Examples
@@ -390,6 +468,12 @@ impl GuildId {
     /// ```rust,ignore
     /// guild.edit_member(&context, user_id, |m| m.mute(true).roles(&vec![role_id]));
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks the necessary permissions.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_member<F>(
         self,
@@ -413,7 +497,12 @@ impl GuildId {
     ///
     /// Requires the [Change Nickname] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_nickname(
         self,
@@ -437,7 +526,12 @@ impl GuildId {
     /// GuildId(7).edit_role(&context, RoleId(8), |r| r.hoist(true));
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_role<F>(
         self,
@@ -467,7 +561,12 @@ impl GuildId {
     /// GuildId(7).edit_role_position(&context, RoleId(8), 2);
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn edit_role_position(
         self,
@@ -489,18 +588,36 @@ impl GuildId {
     ///
     /// **Note**: This will not be a [`Guild`], as the REST API does not send
     /// all data with a guild retrieval.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user is not in the guild.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn to_partial_guild(self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         http.as_ref().get_guild(self.0).await
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the guild is unavailable.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
         http.as_ref().get_emojis(self.0).await
     }
 
     /// Gets an [`Emoji`] of this guild by its ID via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if an emoji with that Id does not exist.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         http.as_ref().get_emoji(self.0, emoji_id.0).await
@@ -508,7 +625,17 @@ impl GuildId {
 
     /// Gets all integration of the guild.
     ///
-    /// This performs a request over the REST API.
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user lacks permission,
+    /// also may return [`Error::Json`] if there is an error in deserializing
+    /// the API response.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn integrations(self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
         http.as_ref().get_guild_integrations(self.0).await
@@ -518,7 +645,15 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// also may return [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
         http.as_ref().get_guild_invites(self.0).await
@@ -528,6 +663,12 @@ impl GuildId {
     ///
     /// Requires the [Kick Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the member cannot be kicked by
+    /// the current user.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
@@ -535,6 +676,10 @@ impl GuildId {
     }
 
     #[inline]
+    /// # Errors
+    ///
+    /// In addition to the reasons `kick` may return an error,
+    /// may also return an error if the reason is too long.
     pub async fn kick_with_reason(
         self,
         http: impl AsRef<Http>,
@@ -545,6 +690,13 @@ impl GuildId {
     }
 
     /// Leaves the guild.
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the current user
+    /// cannot leave the guild, or currently is not in the guild.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn leave(self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().leave_guild(self.0).await
@@ -554,6 +706,13 @@ impl GuildId {
     ///
     /// If the cache feature is enabled the cache will be checked
     /// first. If not found it will resort to an http request.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the user is not in the guild,
+    /// or if the guild is otherwise unavailable
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn member(
         self,
@@ -578,10 +737,17 @@ impl GuildId {
     ///
     /// Optionally pass in the `limit` to limit the number of results.
     /// Minimum value is 1, maximum and default value is 1000.
-    /// <br>
+    ///
     /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
     ///
-    /// [`User`]: ../user/struct.User.html
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error, may also
+    /// return [`Error::NotInRange`] if the input is not within range.
+    ///
+    /// [`User`]: crate::model::user::User
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::NotInRange`]: crate::error::Error::NotInRange
     #[inline]
     pub async fn members(
         self,
@@ -633,7 +799,14 @@ impl GuildId {
     ///
     /// Requires the [Move Members] permission.
     ///
+    /// # Errors
+    /// 
+    /// Returns an [`Error::Http`] if the current user
+    /// lacks permission, or if the member is not currently
+    /// in a voice channel for this `Guild`.
+    ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn move_member(
         self,
@@ -658,6 +831,11 @@ impl GuildId {
     ///
     /// Requires the [Move Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if the member is not currently in a voice channel for this guild.
+    ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
     pub async fn disconnect_member(
@@ -674,6 +852,10 @@ impl GuildId {
     /// number of days.
     ///
     /// Requires the [Kick Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
@@ -693,6 +875,14 @@ impl GuildId {
     /// Although not required, you should specify all channels' positions,
     /// regardless of whether they were updated. Otherwise, positioning can
     /// sometimes get weird.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn reorder_channels<It>(self, http: impl AsRef<Http>, channels: It) -> Result<()>
     where
@@ -758,6 +948,11 @@ impl GuildId {
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an `Integration` with that Id does not exist.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn start_integration_sync(
@@ -774,6 +969,10 @@ impl GuildId {
     ///
     /// **Note**: Requires the [Kick Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn start_prune(self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
@@ -786,7 +985,11 @@ impl GuildId {
 
     /// Unbans a [`User`] from the guild.
     ///
-    /// Requires the [Ban Members] permission.
+    /// **Note**: Requires the [Ban Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user does not have permission.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
@@ -797,6 +1000,12 @@ impl GuildId {
     /// Retrieve's the guild's vanity URL.
     ///
     /// **Note**: Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Http`] if the current user lacks permission.
+    /// Can also return [`Error::Json`] if there is an error deserializing
+    /// the API response.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
@@ -809,6 +1018,15 @@ impl GuildId {
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
+    ///
+    /// # Errors
+    ///
+    /// Will return an [`Error::Http`] if the bot is lacking permissions.
+    /// Can also return an [`Error::Json`] if there is an error deserializing
+    /// the API response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn webhooks(self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         http.as_ref().get_guild_webhooks(self.0).await

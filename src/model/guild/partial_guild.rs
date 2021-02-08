@@ -79,6 +79,8 @@ impl PartialGuild {
     /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the number of
     /// days' worth of messages to delete is over the maximum.
     ///
+    /// Also may return [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn ban(
@@ -91,6 +93,11 @@ impl PartialGuild {
     }
 
     /// Ban a [`User`] from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// # Errors
+    ///
+    /// In addition to the reasons `ban` may return an error,
+    /// can also return an error if the reason is too long.
     ///
     /// [`ban`]: Self::ban
     #[inline]
@@ -108,6 +115,10 @@ impl PartialGuild {
     ///
     /// Requires the [Ban Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
     pub async fn bans(&self, http: impl AsRef<Http>) -> Result<Vec<Ban>> {
@@ -115,6 +126,11 @@ impl PartialGuild {
     }
 
     /// Gets all of the guild's channels over the REST API.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not in
+    /// the guild or if the guild is otherwise unavailable.
     #[inline]
     pub async fn channels(
         &self,
@@ -139,6 +155,12 @@ impl PartialGuild {
     /// guild.create_channel(|c| c.name("test").kind(ChannelType::Voice));
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if invalid data was given, such as the channel name being
+    /// too long.
+    ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn create_channel(
@@ -162,6 +184,11 @@ impl PartialGuild {
     /// how to read an image from the filesystem and encode it as base64. Most
     /// of the example can be applied similarly for this method.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// if the emoji name is too long, or if the image is too large.
+    ///
     /// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar
     /// [`utils::read_image`]: crate::utils::read_image
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
@@ -179,9 +206,13 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
-    pub async fn create_integration<I>(
+    pub async fn create_integration(
         &self,
         http: impl AsRef<Http>,
         integration_id: impl Into<IntegrationId>,
@@ -199,6 +230,7 @@ impl PartialGuild {
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     #[cfg(feature = "unstable_discord_api")]
     #[cfg_attr(docsrs, doc(cfg(feature = "unstable_discord_api")))]
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn create_application_command<F>(
         &self,
@@ -220,8 +252,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to perform bans.
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value was set.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -236,6 +268,11 @@ impl PartialGuild {
     /// guild.
     ///
     /// **Note**: Requires the current user to be the owner of the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not the owner of
+    /// the guild.
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<PartialGuild> {
         self.id.delete(&http).await
@@ -244,6 +281,11 @@ impl PartialGuild {
     /// Deletes an [`Emoji`] from the guild.
     ///
     /// Requires the [Manage Emojis] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an emoji with that Id does not exist in the guild.
     ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
@@ -259,6 +301,11 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an integration with that Id does not exist in the guild.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn delete_integration(
@@ -271,10 +318,15 @@ impl PartialGuild {
 
     /// Deletes a [`Role`] by Id from the guild.
     ///
-    /// Also see [`Role::delete`] if you have the `cache` and `methods` features
+    /// Also see [`Role::delete`] if you have the `cache` and `model` features
     /// enabled.
     ///
     /// Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a Role with that Id does not exist in the Guild.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
@@ -290,6 +342,11 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the current user to have the [Manage Guild]
     /// permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if an invalid value is set, or if the current user
+    /// lacks permission to edit the guild.
     ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
@@ -325,6 +382,11 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Emojis] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an emoji with that Id does not exist in the guild.
+    ///
     /// [Manage Emojis]: Permissions::MANAGE_EMOJIS
     #[inline]
     pub async fn edit_emoji(
@@ -351,6 +413,10 @@ impl PartialGuild {
     ///
     /// GuildId(7).edit_member(user_id, |m| m.mute(true).roles(&vec![role_id])).await;
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks the necessary permissions.
     #[inline]
     pub async fn edit_member<F>(
         &self,
@@ -372,9 +438,8 @@ impl PartialGuild {
     ///
     /// # Errors
     ///
-    /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
-    /// if the current user does not have permission to change their own
-    /// nickname.
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to change their nickname.
     ///
     /// [Change Nickname]: Permissions::CHANGE_NICKNAME
     #[inline]
@@ -388,7 +453,10 @@ impl PartialGuild {
 
     /// Gets a partial amount of guild data by its Id.
     ///
-    /// Requires that the current user be in the guild.
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is not
+    /// in the guild.
     #[inline]
     pub async fn get(http: impl AsRef<Http>, guild_id: impl Into<GuildId>) -> Result<PartialGuild> {
         guild_id.into().to_partial_guild(&http).await
@@ -398,6 +466,11 @@ impl PartialGuild {
     ///
     /// Requires the [Kick Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the member cannot be kicked
+    /// by the current user.
+    ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
@@ -405,6 +478,10 @@ impl PartialGuild {
     }
 
     #[inline]
+    /// # Errors
+    ///
+    /// In addition to the reasons `kick` may return an error,
+    /// can also return an error if the reason is too long.
     pub async fn kick_with_reason(
         &self,
         http: impl AsRef<Http>,
@@ -420,12 +497,21 @@ impl PartialGuild {
     }
 
     /// Gets all [`Emoji`]s of this guild via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the guild is unavailable.
     #[inline]
     pub async fn emojis(&self, http: impl AsRef<Http>) -> Result<Vec<Emoji>> {
         self.id.emojis(http).await
     }
 
     /// Gets an [`Emoji`] of this guild by its ID via HTTP.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if an `Emoji` with the given Id does
+    /// not exist for the guild. 
     #[inline]
     pub async fn emoji(&self, http: impl AsRef<Http>, emoji_id: EmojiId) -> Result<Emoji> {
         self.id.emoji(http, emoji_id).await
@@ -433,7 +519,13 @@ impl PartialGuild {
 
     /// Gets all integration of the guild.
     ///
-    /// This performs a request over the REST API.
+    /// Requires the [Manage Guild] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn integrations(&self, http: impl AsRef<Http>) -> Result<Vec<Integration>> {
         self.id.integrations(&http).await
@@ -443,6 +535,10 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     #[inline]
     pub async fn invites(&self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
@@ -450,12 +546,22 @@ impl PartialGuild {
     }
 
     /// Leaves the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user is unable to
+    /// leave the Guild, or currently is not in the guild.
     #[inline]
     pub async fn leave(&self, http: impl AsRef<Http>) -> Result<()> {
         self.id.leave(&http).await
     }
 
     /// Gets a user's [`Member`] for the guild by Id.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the member is not in the Guild,
+    /// or if the Guild is otherwise unavailable.
     #[inline]
     pub async fn member(
         &self,
@@ -469,8 +575,14 @@ impl PartialGuild {
     ///
     /// Optionally pass in the `limit` to limit the number of results.
     /// Minimum value is 1, maximum and default value is 1000.
-    /// <br>
+    ///
     /// Optionally pass in `after` to offset the results by a [`User`]'s Id.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the API returns an error,
+    /// may also return [`Error::NotInRange`] if the input is
+    /// not within range.
     ///
     /// [`User`]: ../user/struct.User.html
     #[inline]
@@ -487,6 +599,11 @@ impl PartialGuild {
     ///
     /// Requires the [Move Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the current user lacks permission,
+    /// or if the member is not currently in a voice channel for this Guild.
+    ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     #[inline]
     pub async fn move_member(
@@ -499,6 +616,11 @@ impl PartialGuild {
     }
 
     /// Calculate a [`Member`]'s permissions in a given channel in the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the Member has a non-existent `Role`
+    /// for some reason.
     #[inline]
     pub fn user_permissions_in(
         &self,
@@ -509,6 +631,10 @@ impl PartialGuild {
     }
 
     /// Calculate a [`Role`]'s permissions in a given channel in the guild.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the `Role` or `Channel` is not from this `Guild`.
     #[inline]
     pub fn role_permissions_in(&self, channel: &GuildChannel, role: &Role) -> Result<Permissions> {
         Guild::_role_permissions_in(channel, role, self.id)
@@ -519,7 +645,14 @@ impl PartialGuild {
     ///
     /// Requires the [Kick Members] permission.
     ///
+    /// See [`Guild::prune_count`].
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
+    /// [`Guild::prune_count`]: crate::model::guild::Guild::prune_count
     #[inline]
     pub async fn prune_count(&self, http: impl AsRef<Http>, days: u16) -> Result<GuildPrune> {
         self.id.prune_count(&http, days).await
@@ -579,7 +712,12 @@ impl PartialGuild {
     ///
     /// Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// See [`Guild::start_integration_sync`].
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
+    /// [`Guild::start_integration_sync`]: crate::model::guild::Guild::start_integration_sync
     #[inline]
     pub async fn start_integration_sync(
         &self,
@@ -593,7 +731,12 @@ impl PartialGuild {
     ///
     /// Requires the [Ban Members] permission.
     ///
+    /// # Errors
+    ///
+    /// See [`Guild::unban`].
+    ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
+    /// [`Guild::unban`]: crate::model::guild::Guild::unban
     #[inline]
     pub async fn unban(&self, http: impl AsRef<Http>, user_id: impl Into<UserId>) -> Result<()> {
         self.id.unban(&http, user_id).await
@@ -603,7 +746,12 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the [Manage Guild] permission.
     ///
+    /// # Errors
+    ///
+    /// See [`Guild::vanity_url`].
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
+    /// [`Guild::vanity_url`]: crate::model::guild::Guild::vanity_url
     #[inline]
     pub async fn vanity_url(&self, http: impl AsRef<Http>) -> Result<String> {
         self.id.vanity_url(&http).await
@@ -613,7 +761,12 @@ impl PartialGuild {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
+    /// # Errors
+    ///
+    /// See [`Guild::webhooks`].
+    ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
+    /// [`Guild::webhooks`]: crate::model::guild::Guild::webhooks
     #[inline]
     pub async fn webhooks(&self, http: impl AsRef<Http>) -> Result<Vec<Webhook>> {
         self.id.webhooks(&http).await

@@ -288,8 +288,20 @@ impl Interaction {
     /// .await;
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,
+    /// such as if more than 10 `choices` are set. See the [API Docs] for further details.
+    ///
+    /// Can also return an [`Error::Json`] if there is an error in deserializing
+    /// the response.
+    ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     /// [`InteractionCreate`]: crate::client::EventHandler::interaction_create
+    /// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_global_application_command<F>(
         http: impl AsRef<Http>,
         application_id: u64,
@@ -305,6 +317,10 @@ impl Interaction {
     /// Creates a guild specific [`ApplicationCommand`]
     ///
     /// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.
+    ///
+    /// # Errors
+    ///
+    /// Returns the same possible errors as `create_global_application_command`.
     ///
     /// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand
     pub async fn create_guild_application_command<F>(
@@ -335,6 +351,19 @@ impl Interaction {
     /// Creates a response to the interaction received.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Model`] if the message content is too long.
+    /// May also return an [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error in deserializing the
+    /// API response.
+    ///
+    /// # Errors
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_interaction_response<F>(&self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
         F: FnOnce(&mut CreateInteractionResponse) -> &mut CreateInteractionResponse,
@@ -359,6 +388,16 @@ impl Interaction {
     /// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.
     ///
     /// [`UserId`]: crate::model::id::UserId
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Model`] if the edited content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or an [`Error::Json`] if there is an error deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit_original_interaction_response<F>(
         &self,
         http: impl AsRef<Http>,
@@ -382,6 +421,11 @@ impl Interaction {
     }
 
     /// Deletes the initial interaction response.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the API returns an error.
+    /// Such as if the response was already deleted.
     pub async fn delete_original_interaction_response(
         &self,
         http: impl AsRef<Http>,
@@ -393,6 +437,16 @@ impl Interaction {
     /// Creates a followup response to the response sent.
     ///
     /// **Note**: Message contents must be under 2000 unicode code points.
+    ///
+    /// # Errors
+    ///
+    /// Will return [`Error::Model`] if the content is too long.
+    /// May also return [`Error::Http`] if the API returns an error,
+    /// or a [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Model`]: crate::error::Error::Model
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_followup_message<'a, F>(
         &self,
         http: impl AsRef<Http>,

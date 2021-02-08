@@ -44,6 +44,11 @@ impl Reaction {
     ///
     /// Requires the [Read Message History] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if the channel no longer exists.
+    ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn channel(&self, cache_http: impl CacheHttp) -> Result<Channel> {
@@ -61,6 +66,8 @@ impl Reaction {
     /// If the `cache` is enabled, then returns a
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
+    ///
+    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: super::permissions
@@ -105,6 +112,8 @@ impl Reaction {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required [permissions].
     ///
+    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     /// [permissions]: super::permissions
     pub async fn delete_all(&self, cache_http: impl CacheHttp) -> Result<()> {
@@ -133,6 +142,11 @@ impl Reaction {
     /// your own message cache or otherwise having the message available if
     /// possible.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission to
+    /// read message history, or if the message was deleted.
+    ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn message(&self, http: impl AsRef<Http>) -> Result<Message> {
@@ -144,6 +158,11 @@ impl Reaction {
     /// If the cache is enabled, this will search for the already-cached user.
     /// If not - or the user was not found - this will perform a request over
     /// the REST API for the user.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the user that made the reaction is unable to be
+    /// retrieved from the API.
     pub async fn user(&self, cache_http: impl CacheHttp) -> Result<User> {
         match self.user_id {
             Some(id) => id.to_user(cache_http).await,

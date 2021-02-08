@@ -562,8 +562,15 @@ impl Args {
     /// assert_eq!(args.current(), Some("4"));
     /// ```
     ///
+    /// # Errors
+    ///
+    /// May return either [`Error::Parse`] if a parse error occurs, or 
+    /// [`Error::Eos`] if there are no further remaining args.
+    ///
     /// [`trimmed`]: Self::trimmed
     /// [`quoted`]: Self::quoted
+    /// [`Error::Parse`]: Error::Parse
+    /// [`Error::Eos`]: Error::Eos
     #[inline]
     pub fn parse<T: FromStr>(&self) -> Result<T, T::Err> {
         T::from_str(self.current().ok_or(Error::Eos)?).map_err(Error::Parse)
@@ -587,6 +594,10 @@ impl Args {
     /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return the same errors as `parse`.
     ///
     /// [`parse`]: Self::parse
     /// [`advance`]: Self::advance
@@ -612,6 +623,12 @@ impl Args {
     /// assert_eq!(args.single_quoted::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return the same errors as [`parse`].
+    ///
+    /// [`parse`]: Self::parse
     #[inline]
     pub fn single_quoted<T: FromStr>(&mut self) -> Result<T, T::Err> {
         let p = self.quoted().parse::<T>()?;
@@ -717,6 +734,12 @@ impl Args {
     /// assert_eq!(args.single::<String>().unwrap(), "c4");
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Eos`] if no argument can be parsed.
+    ///
+    /// [`Error::Eos`]: Error::Eos
     pub fn find<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -759,6 +782,12 @@ impl Args {
     /// assert_eq!(args.single::<u32>().unwrap(), 2);
     /// assert!(args.is_empty());
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Eos`] if no argument can be parsed.
+    ///
+    /// [`Error::Eos`]: Error::Eos
     pub fn find_n<T: FromStr>(&mut self) -> Result<T, T::Err> {
         if self.is_empty() {
             return Err(Error::Eos);
@@ -845,6 +874,7 @@ pub struct Iter<'a, T: FromStr> {
     _marker: PhantomData<T>,
 }
 
+#[allow(clippy::missing_errors_doc)]
 impl<'a, T: FromStr> Iter<'a, T> {
     /// Retrieve the current argument.
     pub fn current(&mut self) -> Option<&str> {

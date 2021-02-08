@@ -78,6 +78,11 @@ impl Role {
     ///
     /// **Note** Requires the [Manage Roles] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the curent user lacks permission to
+    /// delete this role.
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn delete(&mut self, http: impl AsRef<Http>) -> Result<()> {
@@ -103,6 +108,11 @@ impl Role {
     ///     r
     /// });
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user does not
+    /// have permission to Manage Roles.
     /// 
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
