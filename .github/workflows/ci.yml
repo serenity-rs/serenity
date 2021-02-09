@@ -92,6 +92,10 @@ jobs:
         if: ${{ !matrix.dont-test && matrix.features }}
         run: cargo test --no-default-features --features "${{ matrix.features }}"
 
+      - name: Check minimal versions
+        if: matrix.toolchain == 'nightly'
+        run: cargo clean; cargo update -Z minimal-versions; cargo check
+
   clippy:
     name: Run clippy
     runs-on: ubuntu-latest
