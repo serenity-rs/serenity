@@ -13,9 +13,9 @@ edition = "2018"
 include = ["src/**/*", "LICENSE.md", "README.md", "CHANGELOG.md", "build.rs"]
 
 [dependencies]
-bitflags = "1"
+bitflags = "1.1"
 serde_json = "1"
-async-trait = "0.1"
+async-trait = "0.1.9"
 
 [dependencies.tracing]
 version = "0.1.23"
@@ -27,7 +27,7 @@ version = "0.3.3"
 optional = true
 
 [dependencies.serde]
-version = "1"
+version = "1.0.103"
 features = ["derive"]
 
 [dependencies.uwl]
@@ -40,11 +40,11 @@ version = "0.13"
 
 [dependencies.chrono]
 features = ["serde"]
-version = "0.4"
+version = "0.4.10"
 
 [dependencies.flate2]
 optional = true
-version = "1"
+version = "1.0.13"
 
 [dependencies.reqwest]
 default-features = false
