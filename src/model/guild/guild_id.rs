@@ -1,4 +1,3 @@
-#[cfg(feature = "cache")]
 use futures::stream::Stream;
 #[cfg(feature = "model")]
 use serde_json::json;
@@ -624,7 +623,6 @@ impl GuildId {
     /// ```
     ///
     /// [`members`]: Self::members
-    #[cfg(feature = "cache")]
     pub fn members_iter<H: AsRef<Http>>(self, http: H) -> impl Stream<Item = Result<Member>> {
         MembersIter::<H>::stream(http, self)
     }
@@ -909,7 +907,7 @@ impl<'a> From<&'a Guild> for GuildId {
 
 /// A helper class returned by [`GuildId::members_iter`]
 #[derive(Clone, Debug)]
-#[cfg(all(feature = "model", feature = "cache"))]
+#[cfg(feature = "model")]
 pub struct MembersIter<H: AsRef<Http>> {
     guild_id: GuildId,
     http: H,
@@ -918,7 +916,7 @@ pub struct MembersIter<H: AsRef<Http>> {
     tried_fetch: bool,
 }
 
-#[cfg(all(feature = "model", feature = "cache"))]
+#[cfg(feature = "model")]
 impl<H: AsRef<Http>> MembersIter<H> {
     fn new(guild_id: GuildId, http: H) -> MembersIter<H> {
         MembersIter {
