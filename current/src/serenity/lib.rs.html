@@ -132,6 +132,11 @@
 <span id="129">129</span>
 <span id="130">130</span>
 <span id="131">131</span>
+<span id="132">132</span>
+<span id="133">133</span>
+<span id="134">134</span>
+<span id="135">135</span>
+<span id="136">136</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Serenity is a Rust library for the Discord API.</span>
 <span class="doccomment">//!</span>
@@ -189,7 +194,12 @@
 <span class="attribute">#![<span class="ident">cfg_attr</span>(<span class="ident">docsrs</span>, <span class="ident">feature</span>(<span class="ident">doc_cfg</span>))]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
-<span class="attribute">#![<span class="ident">deny</span>(<span class="ident">clippy</span>::<span class="ident">unwrap_used</span>, <span class="ident">clippy</span>::<span class="ident">non_ascii_literal</span>, <span class="ident">clippy</span>::<span class="ident">missing_errors_doc</span>)]</span>
+<span class="attribute">#![<span class="ident">deny</span>(
+    <span class="ident">clippy</span>::<span class="ident">unwrap_used</span>,
+    <span class="ident">clippy</span>::<span class="ident">non_ascii_literal</span>,
+    <span class="ident">clippy</span>::<span class="ident">missing_errors_doc</span>,
+    <span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>
+)]</span>
 <span class="attribute">#![<span class="ident">type_length_limit</span> <span class="op">=</span> <span class="string">&quot;3294819&quot;</span>]</span> <span class="comment">// needed so ShardRunner::run compiles with instrument.</span>
 
 <span class="attribute">#[<span class="ident">macro_use</span>]</span>

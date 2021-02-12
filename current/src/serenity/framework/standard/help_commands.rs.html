@@ -1599,6 +1599,15 @@
 <span id="1596">1596</span>
 <span id="1597">1597</span>
 <span id="1598">1598</span>
+<span id="1599">1599</span>
+<span id="1600">1600</span>
+<span id="1601">1601</span>
+<span id="1602">1602</span>
+<span id="1603">1603</span>
+<span id="1604">1604</span>
+<span id="1605">1605</span>
+<span id="1606">1606</span>
+<span id="1607">1607</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1678,6 +1687,7 @@
     <span class="ident">HelpOptions</span>,
     <span class="ident">OnlyIn</span>,
 };
+<span class="kw">use</span> <span class="kw">crate</span>::<span class="ident">builder</span>;
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">use</span> <span class="kw">crate</span>::{
     <span class="ident">cache</span>::<span class="ident">Cache</span>,
@@ -2606,33 +2616,33 @@
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">GroupCommandsPair</span>,
     <span class="ident">nest_level</span>: <span class="ident">usize</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
-) {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>(), <span class="ident">Error</span><span class="op">&gt;</span> {
     <span class="kw">let</span> <span class="ident">repeated_indent_str</span> <span class="op">=</span> <span class="ident">help_options</span>.<span class="ident">indention_prefix</span>.<span class="ident">repeat</span>(<span class="ident">nest_level</span>);
 
     <span class="kw">if</span> <span class="ident">nest_level</span> <span class="op">&gt;</span> <span class="number">0</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}__**{}**__&quot;</span>, <span class="ident">repeated_indent_str</span>, <span class="ident">group</span>.<span class="ident">name</span>,);
+        <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}__**{}**__&quot;</span>, <span class="ident">repeated_indent_str</span>, <span class="ident">group</span>.<span class="ident">name</span>,)<span class="question-mark">?</span>;
     }
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">summary_or_prefixes</span> <span class="op">=</span> <span class="bool-val">false</span>;
 
     <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">group_summary</span>) <span class="op">=</span> <span class="ident">group</span>.<span class="ident">summary</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}*{}*&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">repeated_indent_str</span>, <span class="ident">group_summary</span>);
+        <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}*{}*&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">repeated_indent_str</span>, <span class="ident">group_summary</span>)<span class="question-mark">?</span>;
         <span class="ident">summary_or_prefixes</span> <span class="op">=</span> <span class="bool-val">true</span>;
     }
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">group</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(
+        <span class="macro">writeln</span><span class="macro">!</span>(
             <span class="ident">group_text</span>,
             <span class="string">&quot;{}{}: `{}`&quot;</span>,
             <span class="kw-2">&amp;</span><span class="ident">repeated_indent_str</span>,
             <span class="ident">help_options</span>.<span class="ident">group_prefix</span>,
             <span class="ident">group</span>.<span class="ident">prefixes</span>.<span class="ident">join</span>(<span class="string">&quot;`, `&quot;</span>),
-        );
+        )<span class="question-mark">?</span>;
         <span class="ident">summary_or_prefixes</span> <span class="op">=</span> <span class="bool-val">true</span>;
     };
 
     <span class="kw">if</span> <span class="ident">summary_or_prefixes</span> {
-        <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>);
+        <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>)<span class="question-mark">?</span>;
     }
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">joined_commands</span> <span class="op">=</span> <span class="ident">group</span>.<span class="ident">command_names</span>.<span class="ident">join</span>(<span class="kw-2">&amp;</span><span class="macro">format</span><span class="macro">!</span>(<span class="string">&quot;\n{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">repeated_indent_str</span>));
@@ -2641,23 +2651,31 @@
         <span class="ident">joined_commands</span>.<span class="ident">insert_str</span>(<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">repeated_indent_str</span>);
     }
 
-    <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">joined_commands</span>);
+    <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">joined_commands</span>)<span class="question-mark">?</span>;
 
     <span class="kw">for</span> <span class="ident">sub_group</span> <span class="kw">in</span> <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">sub_groups</span> {
         <span class="kw">if</span> <span class="op">!</span>(<span class="ident">sub_group</span>.<span class="ident">command_names</span>.<span class="ident">is_empty</span>() <span class="op">&amp;&amp;</span> <span class="ident">sub_group</span>.<span class="ident">sub_groups</span>.<span class="ident">is_empty</span>()) {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">sub_group_text</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">default</span>();
 
-            <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>, <span class="kw-2">&amp;</span><span class="ident">sub_group</span>, <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>);
+            <span class="ident">flatten_group_to_string</span>(
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">sub_group_text</span>,
+                <span class="kw-2">&amp;</span><span class="ident">sub_group</span>,
+                <span class="ident">nest_level</span> <span class="op">+</span> <span class="number">1</span>,
+                <span class="kw-2">&amp;</span><span class="ident">help_options</span>,
+            )<span class="question-mark">?</span>;
 
-            <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sub_group_text</span>);
+            <span class="macro">write</span><span class="macro">!</span>(<span class="ident">group_text</span>, <span class="string">&quot;{}&quot;</span>, <span class="ident">sub_group_text</span>)<span class="question-mark">?</span>;
         }
     }
+
+    <span class="prelude-val">Ok</span>(())
 }
 
 <span class="doccomment">/// Flattens a group with all its nested sub-groups into the passed `group_text`</span>
 <span class="doccomment">/// buffer respecting the plain help format.</span>
 <span class="doccomment">/// If `nest_level` is `0`, this function will skip the group&#39;s name.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
 <span class="kw">fn</span> <span class="ident">flatten_group_to_plain_string</span>(
     <span class="ident">group_text</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
     <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">GroupCommandsPair</span>,
@@ -2709,25 +2727,21 @@
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="ident">GroupCommandsPair</span>],
     <span class="ident">colour</span>: <span class="ident">Colour</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Message</span>, <span class="ident">Error</span><span class="op">&gt;</span> {
-    <span class="ident">channel_id</span>
-        .<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> {
-            <span class="ident">m</span>.<span class="ident">embed</span>(<span class="op">|</span><span class="ident">embed</span><span class="op">|</span> {
-                <span class="ident">embed</span>.<span class="ident">colour</span>(<span class="ident">colour</span>);
-                <span class="ident">embed</span>.<span class="ident">description</span>(<span class="ident">help_description</span>);
+    <span class="comment">// creating embed outside message builder since flatten_group_to_string</span>
+    <span class="comment">// may return an error.</span>
 
-                <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
-                    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed_text</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">default</span>();
+    <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed</span> <span class="op">=</span> <span class="ident">builder</span>::<span class="ident">CreateEmbed</span>::<span class="ident">default</span>();
+    <span class="ident">embed</span>.<span class="ident">colour</span>(<span class="ident">colour</span>);
+    <span class="ident">embed</span>.<span class="ident">description</span>(<span class="ident">help_description</span>);
+    <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
+        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">embed_text</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">default</span>();
 
-                    <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed_text</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>);
+        <span class="ident">flatten_group_to_string</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">embed_text</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>, <span class="number">0</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>)<span class="question-mark">?</span>;
 
-                    <span class="ident">embed</span>.<span class="ident">field</span>(<span class="ident">group</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">embed_text</span>, <span class="bool-val">true</span>);
-                }
+        <span class="ident">embed</span>.<span class="ident">field</span>(<span class="ident">group</span>.<span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">embed_text</span>, <span class="bool-val">true</span>);
+    }
 
-                <span class="ident">embed</span>
-            });
-            <span class="ident">m</span>
-        })
-        .<span class="kw">await</span>
+    <span class="ident">channel_id</span>.<span class="ident">send_message</span>(<span class="kw-2">&amp;</span><span class="ident">http</span>, <span class="op">|</span><span class="ident">m</span><span class="op">|</span> <span class="ident">m</span>.<span class="ident">set_embed</span>(<span class="ident">embed</span>)).<span class="kw">await</span>
 }
 
 <span class="doccomment">/// Sends embed showcasing information about a single command.</span>
@@ -2959,12 +2973,14 @@
 
 <span class="doccomment">/// Turns grouped commands into a `String` taking plain help format into account.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
 <span class="kw">fn</span> <span class="ident">grouped_commands_to_plain_string</span>(
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
     <span class="ident">help_description</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,
     <span class="ident">groups</span>: <span class="kw-2">&amp;</span>[<span class="ident">GroupCommandsPair</span>],
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="string">&quot;__**Commands**__\n&quot;</span>.<span class="ident">to_string</span>();
+
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">result</span>, <span class="string">&quot;{}&quot;</span>, <span class="kw-2">&amp;</span><span class="ident">help_description</span>);
 
     <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
@@ -2978,8 +2994,10 @@
 
 <span class="doccomment">/// Turns a single command into a `String` taking plain help format into account.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
 <span class="kw">fn</span> <span class="ident">single_command_to_plain_string</span>(<span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>, <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="ident">Command</span><span class="op">&lt;</span><span class="lifetime">&#39;_</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">String</span> {
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">result</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">default</span>();
+
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">writeln</span><span class="macro">!</span>(<span class="ident">result</span>, <span class="string">&quot;__**{}**__&quot;</span>, <span class="ident">command</span>.<span class="ident">name</span>);
 
     <span class="kw">if</span> <span class="op">!</span><span class="ident">command</span>.<span class="ident">aliases</span>.<span class="ident">is_empty</span>() {

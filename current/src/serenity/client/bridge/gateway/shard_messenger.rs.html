@@ -263,6 +263,14 @@
 <span id="260">260</span>
 <span id="261">261</span>
 <span id="262">262</span>
+<span id="263">263</span>
+<span id="264">264</span>
+<span id="265">265</span>
+<span id="266">266</span>
+<span id="267">267</span>
+<span id="268">268</span>
+<span id="269">269</span>
+<span id="270">270</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">async_tungstenite</span>::<span class="ident">tungstenite</span>::<span class="ident">Message</span>;
 <span class="kw">use</span> <span class="ident">futures</span>::<span class="ident">channel</span>::<span class="ident">mpsc</span>::{<span class="ident">TrySendError</span>, <span class="ident">UnboundedSender</span> <span class="kw">as</span> <span class="ident">Sender</span>};
@@ -365,6 +373,7 @@
         <span class="ident">filter</span>: <span class="ident">ChunkGuildFilter</span>,
         <span class="ident">nonce</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span>,
     ) {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">ChunkGuild</span> {
             <span class="ident">guild_id</span>,
             <span class="ident">limit</span>,
@@ -399,6 +408,7 @@
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_activity</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">activity</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Activity</span><span class="op">&gt;</span>) {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetActivity</span>(<span class="ident">activity</span>));
     }
 
@@ -435,6 +445,7 @@
             <span class="ident">status</span> <span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>;
         }
 
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetPresence</span>(<span class="ident">status</span>, <span class="ident">activity</span>));
     }
 
@@ -476,12 +487,14 @@
             <span class="ident">online_status</span> <span class="op">=</span> <span class="ident">OnlineStatus</span>::<span class="ident">Invisible</span>;
         }
 
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetStatus</span>(<span class="ident">online_status</span>));
     }
 
     <span class="doccomment">/// Shuts down the websocket by attempting to cleanly close the</span>
     <span class="doccomment">/// connection.</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">shutdown_clean</span>(<span class="kw-2">&amp;</span><span class="self">self</span>) {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Close</span>(<span class="number">1000</span>, <span class="prelude-val">None</span>));
     }
 
@@ -495,6 +508,7 @@
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`set_presence`]: Self::set_presence</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">websocket_message</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">message</span>: <span class="ident">Message</span>) {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">Message</span>(<span class="ident">message</span>));
     }
 
@@ -511,12 +525,14 @@
     <span class="attribute">#[<span class="ident">inline</span>]</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_message_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">collector</span>: <span class="ident">MessageFilter</span>) {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetMessageFilter</span>(<span class="ident">collector</span>));
     }
 
     <span class="doccomment">/// Sets a new filter for a message collector.</span>
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;collector&quot;</span>)]</span>
     <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">set_reaction_filter</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">collector</span>: <span class="ident">ReactionFilter</span>) {
+        <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
         <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">send_to_shard</span>(<span class="ident">ShardRunnerMessage</span>::<span class="ident">SetReactionFilter</span>(<span class="ident">collector</span>));
     }
 }

@@ -119,6 +119,10 @@
 <span id="116">116</span>
 <span id="117">117</span>
 <span id="118">118</span>
+<span id="119">119</span>
+<span id="120">120</span>
+<span id="121">121</span>
+<span id="122">122</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::<span class="ident">sync</span>::<span class="ident">Arc</span>;
 
@@ -185,6 +189,8 @@
             <span class="kw">match</span> <span class="ident">value</span> {
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">Restart</span>(<span class="ident">shard_id</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">restart</span>(<span class="ident">shard_id</span>).<span class="kw">await</span>;
+
+                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShardUpdate</span> {
@@ -202,6 +208,8 @@
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">Shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>) <span class="op">=</span><span class="op">&gt;</span> {
                     <span class="self">self</span>.<span class="ident">manager</span>.<span class="ident">lock</span>().<span class="kw">await</span>.<span class="ident">shutdown</span>(<span class="ident">shard_id</span>, <span class="ident">code</span>).<span class="kw">await</span>;
+
+                    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
                     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">shutdown</span>.<span class="ident">unbounded_send</span>(<span class="ident">shard_id</span>);
                 },
                 <span class="ident">ShardManagerMessage</span>::<span class="ident">ShutdownAll</span> <span class="op">=</span><span class="op">&gt;</span> {

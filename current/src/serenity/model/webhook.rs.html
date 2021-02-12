@@ -325,6 +325,7 @@
 <span id="322">322</span>
 <span id="323">323</span>
 <span id="324">324</span>
+<span id="325">325</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Webhook model and implementations.</span>
 
@@ -611,6 +612,7 @@
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">refresh</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="ident">http</span>.<span class="ident">as_ref</span>().<span class="ident">get_webhook_with_token</span>(<span class="self">self</span>.<span class="ident">id</span>.<span class="number">0</span>, <span class="kw-2">&amp;</span><span class="self">self</span>.<span class="ident">token</span>).<span class="kw">await</span> {
             <span class="prelude-val">Ok</span>(<span class="ident">replacement</span>) <span class="op">=</span><span class="op">&gt;</span> {
+                <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
                 <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">mem</span>::<span class="ident">replace</span>(<span class="self">self</span>, <span class="ident">replacement</span>);
 
                 <span class="prelude-val">Ok</span>(())
