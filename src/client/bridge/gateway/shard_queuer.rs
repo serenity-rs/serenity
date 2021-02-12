@@ -211,6 +211,7 @@ impl ShardQueuer {
         };
 
         tokio::spawn(async move {
+            #[allow(clippy::let_underscore_must_use)]
             let _ = runner.run().await;
             debug!("[ShardRunner {:?}] Stopping", runner.shard.shard_info());
         });

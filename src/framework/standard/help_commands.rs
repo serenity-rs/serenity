@@ -76,6 +76,7 @@ use super::{
     HelpOptions,
     OnlyIn,
 };
+use crate::builder;
 #[cfg(all(feature = "cache", feature = "http"))]
 use crate::{
     cache::Cache,
@@ -1004,33 +1005,33 @@ fn flatten_group_to_string(
     group: &GroupCommandsPair,
     nest_level: usize,
     help_options: &HelpOptions,
-) {
+) -> Result<(), Error> {
     let repeated_indent_str = help_options.indention_prefix.repeat(nest_level);
 
     if nest_level > 0 {
-        let _ = writeln!(group_text, "{}__**{}**__", repeated_indent_str, group.name,);
+        writeln!(group_text, "{}__**{}**__", repeated_indent_str, group.name,)?;
     }
 
     let mut summary_or_prefixes = false;
 
     if let Some(group_summary) = group.summary {
-        let _ = writeln!(group_text, "{}*{}*", &repeated_indent_str, group_summary);
+        writeln!(group_text, "{}*{}*", &repeated_indent_str, group_summary)?;
         summary_or_prefixes = true;
     }
 
     if !group.prefixes.is_empty() {
-        let _ = writeln!(
+        writeln!(
             group_text,
             "{}{}: `{}`",
             &repeated_indent_str,
             help_options.group_prefix,
             group.prefixes.join("`, `"),
-        );
+        )?;
         summary_or_prefixes = true;
     };
 
     if summary_or_prefixes {
-        let _ = writeln!(group_text);
+        writeln!(group_text)?;
     }
 
     let mut joined_commands = group.command_names.join(&format!("\n{}", &repeated_indent_str));
@@ -1039,23 +1040,31 @@ fn flatten_group_to_string(
         joined_commands.insert_str(0, &repeated_indent_str);
     }
 
-    let _ = writeln!(group_text, "{}", joined_commands);
+    writeln!(group_text, "{}", joined_commands)?;
 
     for sub_group in &group.sub_groups {
         if !(sub_group.command_names.is_empty() && sub_group.sub_groups.is_empty()) {
             let mut sub_group_text = String::default();
 
-            flatten_group_to_string(&mut sub_group_text, &sub_group, nest_level + 1, &help_options);
+            flatten_group_to_string(
+                &mut sub_group_text,
+                &sub_group,
+                nest_level + 1,
+                &help_options,
+            )?;
 
-            let _ = write!(group_text, "{}", sub_group_text);
+            write!(group_text, "{}", sub_group_text)?;
         }
     }
+
+    Ok(())
 }
 
 /// Flattens a group with all its nested sub-groups into the passed `group_text`
 /// buffer respecting the plain help format.
 /// If `nest_level` is `0`, this function will skip the group's name.
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::let_underscore_must_use)]
 fn flatten_group_to_plain_string(
     group_text: &mut String,
     group: &GroupCommandsPair,
@@ -1107,25 +1116,21 @@ async fn send_grouped_commands_embed(
     groups: &[GroupCommandsPair],
     colour: Colour,
 ) -> Result<Message, Error> {
-    channel_id
-        .send_message(&http, |m| {
-            m.embed(|embed| {
-                embed.colour(colour);
-                embed.description(help_description);
+    // creating embed outside message builder since flatten_group_to_string
+    // may return an error.
 
-                for group in groups {
-                    let mut embed_text = String::default();
+    let mut embed = builder::CreateEmbed::default();
+    embed.colour(colour);
+    embed.description(help_description);
+    for group in groups {
+        let mut embed_text = String::default();
 
-                    flatten_group_to_string(&mut embed_text, &group, 0, &help_options);
+        flatten_group_to_string(&mut embed_text, &group, 0, &help_options)?;
 
-                    embed.field(group.name, &embed_text, true);
-                }
+        embed.field(group.name, &embed_text, true);
+    }
 
-                embed
-            });
-            m
-        })
-        .await
+    channel_id.send_message(&http, |m| m.set_embed(embed)).await
 }
 
 /// Sends embed showcasing information about a single command.
@@ -1357,12 +1362,14 @@ pub async fn with_embeds(
 
 /// Turns grouped commands into a `String` taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::let_underscore_must_use)]
 fn grouped_commands_to_plain_string(
     help_options: &HelpOptions,
     help_description: &str,
     groups: &[GroupCommandsPair],
 ) -> String {
     let mut result = "__**Commands**__\n".to_string();
+
     let _ = writeln!(result, "{}", &help_description);
 
     for group in groups {
@@ -1376,8 +1383,10 @@ fn grouped_commands_to_plain_string(
 
 /// Turns a single command into a `String` taking plain help format into account.
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::let_underscore_must_use)]
 fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<'_>) -> String {
     let mut result = String::default();
+
     let _ = writeln!(result, "__**{}**__", command.name);
 
     if !command.aliases.is_empty() {

@@ -137,7 +137,9 @@ impl MessageBuilder {
     }
 
     fn _channel(&mut self, channel: ChannelId) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", channel.mention());
+        // should not error, ignoring
 
         self
     }
@@ -178,14 +180,18 @@ impl MessageBuilder {
     ///
     /// [Display implementation]: crate::model::guild::Emoji#impl-Display
     pub fn emoji(&mut self, emoji: &Emoji) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", emoji);
+        // should not error, ignoring
 
         self
     }
 
     /// Mentions something that implements the [`Mentionable`] trait.
     pub fn mention<M: Mentionable>(&mut self, item: &M) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", item.mention());
+        // should not error, ignoring
 
         self
     }
@@ -854,7 +860,9 @@ impl MessageBuilder {
     /// [`Role`]: crate::model::guild::Role
     /// [Display implementation]: RoleId#impl-Display
     pub fn role<R: Into<RoleId>>(&mut self, role: R) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", role.into().mention());
+        // should not error, ignoring
 
         self
     }
@@ -870,7 +878,9 @@ impl MessageBuilder {
     /// [`User`]: crate::model::user::User
     /// [Display implementation]: UserId#impl-Display
     pub fn user<U: Into<UserId>>(&mut self, user: U) -> &mut Self {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "{}", user.into().mention());
+        // should not error, ignoring
 
         self
     }
@@ -983,7 +993,9 @@ impl EmbedMessageBuilding for MessageBuilder {
         let name = name.into().to_string();
         let url = url.into().to_string();
 
+        #[allow(clippy::let_underscore_must_use)]
         let _ = write!(self.0, "[{}]({})", name, url);
+        // error cannot be returned, ignoring instead
 
         self
     }

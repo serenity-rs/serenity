@@ -266,6 +266,7 @@ impl ShardManager {
     /// know it should shut down. This _should never happen_. It may already be
     /// stopped.
     #[instrument(skip(self))]
+    #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown(&mut self, shard_id: ShardId, code: u16) {
         info!("Shutting down shard {}", shard_id);
 
@@ -298,6 +299,7 @@ impl ShardManager {
     ///
     /// [`shutdown`]: Self::shutdown
     #[instrument(skip(self))]
+    #[allow(clippy::let_underscore_must_use)]
     pub async fn shutdown_all(&mut self) {
         let keys = {
             let runners = self.runners.lock().await;
@@ -324,6 +326,8 @@ impl ShardManager {
         info!("Telling shard queuer to start shard {}", shard_info[0]);
 
         let msg = ShardQueuerMessage::Start(shard_info[0], shard_info[1]);
+
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.shard_queuer.unbounded_send(msg);
     }
 }
@@ -335,6 +339,7 @@ impl Drop for ShardManager {
     /// [`ShardQueuer`] to shutdown.
     ///
     /// [`ShardRunner`]: super::ShardRunner
+    #[allow(clippy::let_underscore_must_use)]
     fn drop(&mut self) {
         let _ = self.shard_queuer.unbounded_send(ShardQueuerMessage::Shutdown);
         let _ = self.monitor_tx.unbounded_send(ShardManagerMessage::ShutdownInitiated);

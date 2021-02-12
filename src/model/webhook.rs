@@ -283,6 +283,7 @@ impl Webhook {
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         match http.as_ref().get_webhook_with_token(self.id.0, &self.token).await {
             Ok(replacement) => {
+                #[allow(clippy::let_underscore_must_use)]
                 let _ = mem::replace(self, replacement);
 
                 Ok(())
