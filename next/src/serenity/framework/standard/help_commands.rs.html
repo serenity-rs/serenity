@@ -1593,6 +1593,12 @@
 <span id="1590">1590</span>
 <span id="1591">1591</span>
 <span id="1592">1592</span>
+<span id="1593">1593</span>
+<span id="1594">1594</span>
+<span id="1595">1595</span>
+<span id="1596">1596</span>
+<span id="1597">1597</span>
+<span id="1598">1598</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A collection of default help commands for the framework.</span>
 <span class="doccomment">//!</span>
@@ -1903,38 +1909,10 @@
         <span class="op">&amp;&amp;</span> <span class="ident">search_on</span>.<span class="ident">get</span>(<span class="ident">word</span>.<span class="ident">len</span>()..<span class="op">=</span><span class="ident">word</span>.<span class="ident">len</span>()).<span class="ident">map_or</span>(<span class="bool-val">false</span>, <span class="op">|</span><span class="ident">slice</span><span class="op">|</span> <span class="ident">slice</span> <span class="op">=</span><span class="op">=</span> <span class="string">&quot; &quot;</span>)
 }
 
-<span class="attribute">#[<span class="ident">inline</span>]</span>
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">find_any_command_matches</span>(
-    <span class="ident">command</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">InternalCommand</span>,
-    <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="ident">CommandGroup</span>,
-    <span class="ident">name_to_find</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">String</span>,
-    <span class="ident">found_prefix</span>: <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">bool</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">str</span><span class="op">&gt;</span> {
-    <span class="ident">command</span>
-        .<span class="ident">options</span>
-        .<span class="ident">names</span>
-        .<span class="ident">iter</span>()
-        .<span class="ident">find</span>(<span class="op">|</span><span class="ident">command_name</span><span class="op">|</span> {
-            <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">prefix</span><span class="op">|</span> {
-                <span class="kw">if</span> <span class="kw-2">*</span><span class="ident">found_prefix</span> <span class="op">|</span><span class="op">|</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">name_to_find</span>, <span class="kw-2">&amp;</span><span class="ident">prefix</span>) {
-                    <span class="kw">if</span> <span class="op">!</span><span class="kw-2">*</span><span class="ident">found_prefix</span> {
-                        <span class="kw-2">*</span><span class="ident">found_prefix</span> <span class="op">=</span> <span class="bool-val">true</span>;
-                        <span class="ident">name_to_find</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">prefix</span>.<span class="ident">len</span>());
-                    }
-
-                    <span class="kw-2">&amp;</span><span class="ident">name_to_find</span> <span class="op">=</span><span class="op">=</span> <span class="ident">command_name</span>
-                } <span class="kw">else</span> {
-                    <span class="bool-val">false</span>
-                }
-            })
-        })
-        .<span class="ident">cloned</span>()
-}
-
+<span class="comment">// Decides how a listed help entry shall be displayed.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
 <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">check_common_behaviour</span>(
-    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+    <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span> <span class="op">+</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="ident">Message</span>,
     <span class="ident">options</span>: <span class="kw-2">&amp;</span><span class="kw">impl</span> <span class="ident">CommonOptions</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
@@ -1958,11 +1936,11 @@
         <span class="kw">return</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>;
     }
 
-    <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="ident">options</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
+    <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_permissions</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>, <span class="ident">options</span>, <span class="ident">msg</span>).<span class="kw">await</span> {
         <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_permissions</span>;
     }
 
-    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>).<span class="kw">await</span> {
+    <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">guild</span>) <span class="op">=</span> <span class="ident">msg</span>.<span class="ident">guild</span>(<span class="kw-2">&amp;</span><span class="ident">cache_http</span>).<span class="kw">await</span> {
         <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">member</span>) <span class="op">=</span> <span class="ident">guild</span>.<span class="ident">members</span>.<span class="ident">get</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>) {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">has_correct_roles</span>(<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">guild</span>.<span class="ident">roles</span>, <span class="kw-2">&amp;</span><span class="ident">member</span>) {
                 <span class="kw">return</span> <span class="ident">help_options</span>.<span class="ident">lacking_role</span>;
@@ -1982,9 +1960,10 @@
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="ident">HelpOptions</span>,
 ) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">HelpBehaviour</span> {
-    <span class="kw">let</span> <span class="ident">b</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
+    <span class="kw">let</span> <span class="ident">behaviour</span> <span class="op">=</span> <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">options</span>, <span class="ident">owners</span>, <span class="ident">help_options</span>).<span class="kw">await</span>;
 
-    <span class="kw">if</span> <span class="ident">b</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span> <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">options</span>.<span class="ident">owner_privilege</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>))
+    <span class="kw">if</span> <span class="ident">behaviour</span> <span class="op">=</span><span class="op">=</span> <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span>
+        <span class="op">&amp;&amp;</span> (<span class="op">!</span><span class="ident">options</span>.<span class="ident">owner_privilege</span> <span class="op">|</span><span class="op">|</span> <span class="op">!</span><span class="ident">owners</span>.<span class="ident">contains</span>(<span class="kw-2">&amp;</span><span class="ident">msg</span>.<span class="ident">author</span>.<span class="ident">id</span>))
     {
         <span class="kw">for</span> <span class="ident">check</span> <span class="kw">in</span> <span class="ident">group_checks</span>.<span class="ident">iter</span>().<span class="ident">chain</span>(<span class="ident">options</span>.<span class="ident">checks</span>) {
             <span class="kw">if</span> <span class="op">!</span><span class="ident">check</span>.<span class="ident">check_in_help</span> {
@@ -1999,43 +1978,29 @@
         }
     }
 
-    <span class="ident">b</span>
+    <span class="ident">behaviour</span>
 }
 
+<span class="comment">// This function will recursively go through all commands and</span>
+<span class="comment">// their sub-commands, trying to find `name`.</span>
+<span class="comment">// Similar commands will be collected into `similar_commands`.</span>
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">too_many_arguments</span>)]</span>
-<span class="kw">async</span> <span class="kw">fn</span> <span class="ident">_nested_group_command_search</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span><span class="op">&gt;</span>(
+<span class="kw">fn</span> <span class="ident">nested_commands_search</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span><span class="op">&gt;</span>(
     <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Context</span>,
     <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Message</span>,
-    <span class="ident">groups</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
+    <span class="ident">group</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">CommandGroup</span>,
+    <span class="ident">found_group_prefix</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">bool</span>,
+    <span class="ident">commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">InternalCommand</span>],
     <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">String</span>,
     <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
     <span class="ident">similar_commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span>,
     <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span> {
-    <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
-        <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">InternalCommand</span><span class="op">&gt;</span> <span class="op">=</span> <span class="prelude-val">None</span>;
-
-        <span class="kw">let</span> <span class="ident">group_behaviour</span> <span class="op">=</span>
-            <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>).<span class="kw">await</span>;
-
-        <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
-            <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span> <span class="op">=</span><span class="op">&gt;</span> (),
-            <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
-                <span class="kw">continue</span>;
-            },
-        }
-
-        <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
-        <span class="kw">for</span> <span class="ident">command</span> <span class="kw">in</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span> {
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">InternalCommand</span><span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">move</span> {
+        <span class="kw">for</span> <span class="ident">command</span> <span class="kw">in</span> <span class="ident">commands</span> {
             <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">command</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">command</span>;
 
-            <span class="kw">let</span> <span class="ident">search_command_name_matched</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">is_empty</span>() {
-                <span class="kw">if</span> <span class="ident">starts_with_whole_word</span>(<span class="kw-2">&amp;</span><span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">name</span>) {
-                    <span class="ident">name</span>.<span class="ident">drain</span>(..<span class="op">=</span><span class="ident">group</span>.<span class="ident">name</span>.<span class="ident">len</span>());
-                }
-
+            <span class="kw">let</span> <span class="ident">search_command_name_matched</span> <span class="op">=</span> {
                 <span class="kw">let</span> <span class="ident">command_found</span> <span class="op">=</span> <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">names</span>.<span class="ident">iter</span>().<span class="ident">find</span>(<span class="op">|</span><span class="ident">n</span><span class="op">|</span> <span class="kw-2">*</span><span class="kw-2">*</span><span class="ident">n</span> <span class="op">=</span><span class="op">=</span> <span class="ident">name</span>).<span class="ident">cloned</span>();
 
                 <span class="kw">if</span> <span class="ident">command_found</span>.<span class="ident">is_some</span>() {
@@ -2085,11 +2050,24 @@
                             <span class="kw">break</span>;
                         }
                     } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
+                        <span class="kw">match</span> <span class="ident">nested_commands_search</span>(
+                            <span class="ident">ctx</span>,
+                            <span class="ident">msg</span>,
+                            <span class="ident">group</span>,
+                            <span class="ident">found_group_prefix</span>,
+                            <span class="ident">command</span>.<span class="ident">options</span>.<span class="ident">sub_commands</span>,
+                            <span class="ident">name</span>,
+                            <span class="ident">help_options</span>,
+                            <span class="ident">similar_commands</span>,
+                            <span class="ident">owners</span>,
+                        )
+                        .<span class="kw">await</span>
+                        {
+                            <span class="prelude-val">Some</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">found</span>),
+                            <span class="prelude-val">None</span> <span class="op">=</span><span class="op">&gt;</span> <span class="prelude-val">None</span>,
+                        }
                     }
                 }
-            } <span class="kw">else</span> {
-                <span class="ident">find_any_command_matches</span>(<span class="kw-2">&amp;</span><span class="ident">command</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>, <span class="ident">name</span>, <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>)
             };
 
             <span class="kw">if</span> <span class="ident">search_command_name_matched</span>.<span class="ident">is_some</span>() {
@@ -2104,7 +2082,7 @@
                     )
                     .<span class="kw">await</span>
                 {
-                    <span class="ident">found</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">command</span>);
+                    <span class="kw">return</span> <span class="prelude-val">Some</span>(<span class="ident">command</span>);
                 } <span class="kw">else</span> {
                     <span class="kw">break</span>;
                 }
@@ -2137,28 +2115,74 @@
             }
         }
 
-        <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">command</span>) <span class="op">=</span> <span class="ident">found</span> {
-            <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>;
+        <span class="prelude-val">None</span>
+    }
+    .<span class="ident">boxed</span>()
+}
 
-            <span class="kw">if</span> <span class="op">!</span><span class="ident">options</span>.<span class="ident">help_available</span> {
-                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">CustomisedHelpData</span>::<span class="ident">NoCommandFound</span> {
-                    <span class="ident">help_error_message</span>: <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
-                });
+<span class="comment">// This function will recursively go through all groups and their groups,</span>
+<span class="comment">// trying to find `name`.</span>
+<span class="comment">// Similar commands will be collected into `similar_commands`.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
+<span class="kw">fn</span> <span class="ident">nested_group_command_search</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span><span class="op">&gt;</span>(
+    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Context</span>,
+    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Message</span>,
+    <span class="ident">groups</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
+    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">String</span>,
+    <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
+    <span class="ident">similar_commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span>,
+    <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
+    <span class="kw">async</span> <span class="kw">move</span> {
+        <span class="kw">for</span> <span class="ident">group</span> <span class="kw">in</span> <span class="ident">groups</span> {
+            <span class="kw">let</span> <span class="ident">group</span> <span class="op">=</span> <span class="kw-2">*</span><span class="ident">group</span>;
+            <span class="kw">let</span> <span class="ident">group_behaviour</span> <span class="op">=</span>
+                <span class="ident">check_common_behaviour</span>(<span class="kw-2">&amp;</span><span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>, <span class="kw-2">&amp;</span><span class="ident">owners</span>, <span class="kw-2">&amp;</span><span class="ident">help_options</span>).<span class="kw">await</span>;
+
+            <span class="kw">match</span> <span class="kw-2">&amp;</span><span class="ident">group_behaviour</span> {
+                <span class="ident">HelpBehaviour</span>::<span class="ident">Nothing</span> <span class="op">=</span><span class="op">&gt;</span> (),
+                <span class="kw">_</span> <span class="op">=</span><span class="op">&gt;</span> {
+                    <span class="kw">continue</span>;
+                },
             }
 
-            <span class="kw">let</span> <span class="ident">available_text</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn</span>::<span class="ident">Dm</span> {
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_only_text</span>
-            } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn</span>::<span class="ident">Guild</span> {
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">guild_only_text</span>
-            } <span class="kw">else</span> {
-                <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_and_guild_text</span>
-            };
+            <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>.<span class="ident">iter</span>().<span class="ident">any</span>(<span class="op">|</span><span class="ident">prefix</span><span class="op">|</span> <span class="ident">trim_prefixless_group</span>(<span class="ident">prefix</span>, <span class="ident">name</span>));
 
-            <span class="ident">similar_commands</span>
-                .<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">levenshtein_distance</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">levenshtein_distance</span>));
+            <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>: <span class="ident">bool</span> <span class="op">=</span> <span class="bool-val">false</span>;
+            <span class="kw">let</span> <span class="ident">found</span> <span class="op">=</span> <span class="ident">nested_commands_search</span>(
+                <span class="ident">ctx</span>,
+                <span class="ident">msg</span>,
+                <span class="ident">group</span>,
+                <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">found_group_prefix</span>,
+                <span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">commands</span>,
+                <span class="ident">name</span>,
+                <span class="ident">help_options</span>,
+                <span class="ident">similar_commands</span>,
+                <span class="ident">owners</span>,
+            )
+            .<span class="kw">await</span>;
 
-            <span class="kw">let</span> <span class="ident">check_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span>
-                <span class="ident">command</span>
+            <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">command</span>) <span class="op">=</span> <span class="ident">found</span> {
+                <span class="kw">let</span> <span class="ident">options</span> <span class="op">=</span> <span class="kw-2">&amp;</span><span class="ident">command</span>.<span class="ident">options</span>;
+
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">options</span>.<span class="ident">help_available</span> {
+                    <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">CustomisedHelpData</span>::<span class="ident">NoCommandFound</span> {
+                        <span class="ident">help_error_message</span>: <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">no_help_available_text</span>,
+                    });
+                }
+
+                <span class="kw">let</span> <span class="ident">available_text</span> <span class="op">=</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn</span>::<span class="ident">Dm</span> {
+                    <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_only_text</span>
+                } <span class="kw">else</span> <span class="kw">if</span> <span class="ident">options</span>.<span class="ident">only_in</span> <span class="op">=</span><span class="op">=</span> <span class="ident">OnlyIn</span>::<span class="ident">Guild</span> {
+                    <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">guild_only_text</span>
+                } <span class="kw">else</span> {
+                    <span class="kw-2">&amp;</span><span class="ident">help_options</span>.<span class="ident">dm_and_guild_text</span>
+                };
+
+                <span class="ident">similar_commands</span>
+                    .<span class="ident">sort_unstable_by</span>(<span class="op">|</span><span class="ident">a</span>, <span class="ident">b</span><span class="op">|</span> <span class="ident">a</span>.<span class="ident">levenshtein_distance</span>.<span class="ident">cmp</span>(<span class="kw-2">&amp;</span><span class="ident">b</span>.<span class="ident">levenshtein_distance</span>));
+
+                <span class="kw">let</span> <span class="ident">check_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">command</span>
                     .<span class="ident">options</span>
                     .<span class="ident">checks</span>
                     .<span class="ident">iter</span>()
@@ -2172,65 +2196,53 @@
                     })
                     .<span class="ident">collect</span>();
 
-            <span class="kw">let</span> <span class="ident">sub_command_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>
-                .<span class="ident">sub_commands</span>
-                .<span class="ident">iter</span>()
-                .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cmd</span><span class="op">|</span> {
-                    <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">cmd</span>).<span class="ident">options</span>.<span class="ident">help_available</span> {
-                        <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">cmd</span>).<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>].<span class="ident">to_string</span>())
-                    } <span class="kw">else</span> {
-                        <span class="prelude-val">None</span>
-                    }
-                })
-                .<span class="ident">collect</span>();
+                <span class="kw">let</span> <span class="ident">sub_command_names</span>: <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> <span class="op">=</span> <span class="ident">options</span>
+                    .<span class="ident">sub_commands</span>
+                    .<span class="ident">iter</span>()
+                    .<span class="ident">filter_map</span>(<span class="op">|</span><span class="ident">cmd</span><span class="op">|</span> {
+                        <span class="kw">if</span> (<span class="kw-2">*</span><span class="ident">cmd</span>).<span class="ident">options</span>.<span class="ident">help_available</span> {
+                            <span class="prelude-val">Some</span>((<span class="kw-2">*</span><span class="ident">cmd</span>).<span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>].<span class="ident">to_string</span>())
+                        } <span class="kw">else</span> {
+                            <span class="prelude-val">None</span>
+                        }
+                    })
+                    .<span class="ident">collect</span>();
 
-            <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">CustomisedHelpData</span>::<span class="ident">SingleCommand</span> {
-                <span class="ident">command</span>: <span class="ident">Command</span> {
-                    <span class="ident">name</span>: <span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>],
-                    <span class="ident">description</span>: <span class="ident">options</span>.<span class="ident">desc</span>,
-                    <span class="ident">group_name</span>: <span class="ident">group</span>.<span class="ident">name</span>,
-                    <span class="ident">group_prefixes</span>: <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>,
-                    <span class="ident">checks</span>: <span class="ident">check_names</span>,
-                    <span class="ident">aliases</span>: <span class="ident">options</span>.<span class="ident">names</span>[<span class="number">1</span>..].<span class="ident">to_vec</span>(),
-                    <span class="ident">availability</span>: <span class="ident">available_text</span>,
-                    <span class="ident">usage</span>: <span class="ident">options</span>.<span class="ident">usage</span>,
-                    <span class="ident">usage_sample</span>: <span class="ident">options</span>.<span class="ident">examples</span>.<span class="ident">to_vec</span>(),
-                    <span class="ident">sub_commands</span>: <span class="ident">sub_command_names</span>,
-                },
-            });
+                <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">CustomisedHelpData</span>::<span class="ident">SingleCommand</span> {
+                    <span class="ident">command</span>: <span class="ident">Command</span> {
+                        <span class="ident">name</span>: <span class="ident">options</span>.<span class="ident">names</span>[<span class="number">0</span>],
+                        <span class="ident">description</span>: <span class="ident">options</span>.<span class="ident">desc</span>,
+                        <span class="ident">group_name</span>: <span class="ident">group</span>.<span class="ident">name</span>,
+                        <span class="ident">group_prefixes</span>: <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">prefixes</span>,
+                        <span class="ident">checks</span>: <span class="ident">check_names</span>,
+                        <span class="ident">aliases</span>: <span class="ident">options</span>.<span class="ident">names</span>[<span class="number">1</span>..].<span class="ident">to_vec</span>(),
+                        <span class="ident">availability</span>: <span class="ident">available_text</span>,
+                        <span class="ident">usage</span>: <span class="ident">options</span>.<span class="ident">usage</span>,
+                        <span class="ident">usage_sample</span>: <span class="ident">options</span>.<span class="ident">examples</span>.<span class="ident">to_vec</span>(),
+                        <span class="ident">sub_commands</span>: <span class="ident">sub_command_names</span>,
+                    },
+                });
+            }
+
+            <span class="kw">match</span> <span class="ident">nested_group_command_search</span>(
+                <span class="ident">ctx</span>,
+                <span class="ident">msg</span>,
+                <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>,
+                <span class="ident">name</span>,
+                <span class="ident">help_options</span>,
+                <span class="ident">similar_commands</span>,
+                <span class="ident">owners</span>,
+            )
+            .<span class="kw">await</span>
+            {
+                <span class="prelude-val">Ok</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
+                <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> (),
+            }
         }
 
-        <span class="kw">match</span> <span class="ident">nested_group_command_search</span>(
-            <span class="ident">ctx</span>,
-            <span class="ident">msg</span>,
-            <span class="kw-2">&amp;</span><span class="ident">group</span>.<span class="ident">options</span>.<span class="ident">sub_groups</span>,
-            <span class="ident">name</span>,
-            <span class="ident">help_options</span>,
-            <span class="ident">similar_commands</span>,
-            <span class="ident">owners</span>,
-        )
-        .<span class="kw">await</span>
-        {
-            <span class="prelude-val">Ok</span>(<span class="ident">found</span>) <span class="op">=</span><span class="op">&gt;</span> <span class="kw">return</span> <span class="prelude-val">Ok</span>(<span class="ident">found</span>),
-            <span class="prelude-val">Err</span>(()) <span class="op">=</span><span class="op">&gt;</span> (),
-        }
+        <span class="prelude-val">Err</span>(())
     }
-
-    <span class="prelude-val">Err</span>(())
-}
-
-<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;http&quot;</span>))]</span>
-<span class="kw">fn</span> <span class="ident">nested_group_command_search</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="lifetime">&#39;a</span>: <span class="lifetime">&#39;rec</span><span class="op">&gt;</span>(
-    <span class="ident">ctx</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Context</span>,
-    <span class="ident">msg</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">Message</span>,
-    <span class="ident">groups</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> [<span class="kw-2">&amp;</span><span class="lifetime">&#39;static</span> <span class="ident">CommandGroup</span>],
-    <span class="ident">name</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">String</span>,
-    <span class="ident">help_options</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">HelpOptions</span>,
-    <span class="ident">similar_commands</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="kw-2">mut</span> <span class="ident">Vec</span><span class="op">&lt;</span><span class="ident">SuggestedCommandName</span><span class="op">&gt;</span>,
-    <span class="ident">owners</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;rec</span> <span class="ident">HashSet</span><span class="op">&lt;</span><span class="ident">UserId</span><span class="op">&gt;</span>,
-) <span class="op">-</span><span class="op">&gt;</span> <span class="ident">BoxFuture</span><span class="op">&lt;</span><span class="lifetime">&#39;rec</span>, <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">CustomisedHelpData</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span><span class="op">&gt;</span>, ()<span class="op">&gt;</span><span class="op">&gt;</span> {
-    <span class="ident">_nested_group_command_search</span>(<span class="ident">ctx</span>, <span class="ident">msg</span>, <span class="ident">groups</span>, <span class="ident">name</span>, <span class="ident">help_options</span>, <span class="ident">similar_commands</span>, <span class="ident">owners</span>)
-        .<span class="ident">boxed</span>()
+    .<span class="ident">boxed</span>()
 }
 
 <span class="doccomment">/// Tries to extract a single command matching searched command name otherwise</span>
@@ -2428,7 +2440,7 @@
     <span class="ident">group_with_cmds</span>
 }
 
-<span class="doccomment">/// If `searched_group` is exact match on `group_name`,</span>
+<span class="doccomment">/// If `searched_group` is exactly matching `group_name`,</span>
 <span class="doccomment">/// this function returns `true` but does not trim.</span>
 <span class="doccomment">/// Otherwise, it is treated as an optionally passed group-name and ends up</span>
 <span class="doccomment">/// being removed from `searched_group`.</span>

@@ -419,6 +419,60 @@
 <span id="416">416</span>
 <span id="417">417</span>
 <span id="418">418</span>
+<span id="419">419</span>
+<span id="420">420</span>
+<span id="421">421</span>
+<span id="422">422</span>
+<span id="423">423</span>
+<span id="424">424</span>
+<span id="425">425</span>
+<span id="426">426</span>
+<span id="427">427</span>
+<span id="428">428</span>
+<span id="429">429</span>
+<span id="430">430</span>
+<span id="431">431</span>
+<span id="432">432</span>
+<span id="433">433</span>
+<span id="434">434</span>
+<span id="435">435</span>
+<span id="436">436</span>
+<span id="437">437</span>
+<span id="438">438</span>
+<span id="439">439</span>
+<span id="440">440</span>
+<span id="441">441</span>
+<span id="442">442</span>
+<span id="443">443</span>
+<span id="444">444</span>
+<span id="445">445</span>
+<span id="446">446</span>
+<span id="447">447</span>
+<span id="448">448</span>
+<span id="449">449</span>
+<span id="450">450</span>
+<span id="451">451</span>
+<span id="452">452</span>
+<span id="453">453</span>
+<span id="454">454</span>
+<span id="455">455</span>
+<span id="456">456</span>
+<span id="457">457</span>
+<span id="458">458</span>
+<span id="459">459</span>
+<span id="460">460</span>
+<span id="461">461</span>
+<span id="462">462</span>
+<span id="463">463</span>
+<span id="464">464</span>
+<span id="465">465</span>
+<span id="466">466</span>
+<span id="467">467</span>
+<span id="468">468</span>
+<span id="469">469</span>
+<span id="470">470</span>
+<span id="471">471</span>
+<span id="472">472</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Interactions information-related models.</span>
 
@@ -710,8 +764,20 @@
     <span class="doccomment">/// .await;</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May return an [`Error::Http`] if the `ApplicationCommand` is illformed,</span>
+    <span class="doccomment">/// such as if more than 10 `choices` are set. See the [API Docs] for further details.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Can also return an [`Error::Json`] if there is an error in deserializing</span>
+    <span class="doccomment">/// the response.</span>
+    <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
     <span class="doccomment">/// [`InteractionCreate`]: crate::client::EventHandler::interaction_create</span>
+    <span class="doccomment">/// [API Docs]: https://discord.com/developers/docs/interactions/slash-commands</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_global_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
         <span class="ident">application_id</span>: <span class="ident">u64</span>,
@@ -727,6 +793,10 @@
     <span class="doccomment">/// Creates a guild specific [`ApplicationCommand`]</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Unlike global `ApplicationCommand`s, guild commands will update instantly.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns the same possible errors as `create_global_application_command`.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`ApplicationCommand`]: crate::model::interactions::ApplicationCommand</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_guild_application_command</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
@@ -757,6 +827,19 @@
     <span class="doccomment">/// Creates a response to the interaction received.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns an [`Error::Model`] if the message content is too long.</span>
+    <span class="doccomment">/// May also return an [`Error::Http`] if the API returns an error,</span>
+    <span class="doccomment">/// or an [`Error::Json`] if there is an error in deserializing the</span>
+    <span class="doccomment">/// API response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>, <span class="ident">f</span>: <span class="ident">F</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span>
     <span class="kw">where</span>
         <span class="ident">F</span>: <span class="ident">FnOnce</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">CreateInteractionResponse</span>,
@@ -781,6 +864,16 @@
     <span class="doccomment">/// **Note**:   Message contents must be under 2000 unicode code points, does not work on ephemeral messages.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// [`UserId`]: crate::model::id::UserId</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Returns [`Error::Model`] if the edited content is too long.</span>
+    <span class="doccomment">/// May also return [`Error::Http`] if the API returns an error,</span>
+    <span class="doccomment">/// or an [`Error::Json`] if there is an error deserializing the response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">edit_original_interaction_response</span><span class="op">&lt;</span><span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -804,6 +897,11 @@
     }
 
     <span class="doccomment">/// Deletes the initial interaction response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// May return [`Error::Http`] if the API returns an error.</span>
+    <span class="doccomment">/// Such as if the response was already deleted.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete_original_interaction_response</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
@@ -815,6 +913,16 @@
     <span class="doccomment">/// Creates a followup response to the response sent.</span>
     <span class="doccomment">///</span>
     <span class="doccomment">/// **Note**: Message contents must be under 2000 unicode code points.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Will return [`Error::Model`] if the content is too long.</span>
+    <span class="doccomment">/// May also return [`Error::Http`] if the API returns an error,</span>
+    <span class="doccomment">/// or a [`Error::Json`] if there is an error in deserializing the response.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Model`]: crate::error::Error::Model</span>
+    <span class="doccomment">/// [`Error::Http`]: crate::error::Error::Http</span>
+    <span class="doccomment">/// [`Error::Json`]: crate::error::Error::Json</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">create_followup_message</span><span class="op">&lt;</span><span class="lifetime">&#39;a</span>, <span class="ident">F</span><span class="op">&gt;</span>(
         <span class="kw-2">&amp;</span><span class="self">self</span>,
         <span class="ident">http</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Http</span><span class="op">&gt;</span>,
