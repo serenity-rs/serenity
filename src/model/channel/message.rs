@@ -354,6 +354,10 @@ impl Message {
     ///
     /// **Note**: Requires the [Read Message History] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn reaction_users(
@@ -665,6 +669,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
+    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[cfg(feature = "utils")]
     pub async fn suppress_embeds(&mut self, cache_http: impl CacheHttp) -> Result<()> {
@@ -710,6 +716,11 @@ impl Message {
     }
 
     /// Checks whether the message mentions the current user.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the `cache` feature is not enabled,
+    /// or if the cache is otherwise unavailable.
     pub async fn mentions_me(&self, cache_http: impl CacheHttp) -> Result<bool> {
         #[cfg(feature = "cache")]
         {

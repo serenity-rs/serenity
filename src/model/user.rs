@@ -113,6 +113,15 @@ impl CurrentUser {
     /// ```
     ///
     /// [`EditProfile`]: crate::builder::EditProfile
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if an invalid value is set.
+    /// May also return an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit<F>(&mut self, http: impl AsRef<Http>, f: F) -> Result<()>
     where
         F: FnOnce(&mut EditProfile) -> &mut EditProfile,
@@ -168,6 +177,15 @@ impl CurrentUser {
     /// }
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the Discord API returns an error.
+    /// Also can return [`Error::Json`] if there is an error in deserializing
+    /// the data returned by the API.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn guilds(&self, http: impl AsRef<Http>) -> Result<Vec<GuildInfo>> {
         let mut guilds = Vec::new();
         loop {
@@ -353,6 +371,12 @@ pub enum DefaultAvatar {
 
 impl DefaultAvatar {
     /// Retrieves the String hash of the default avatar.
+    ///
+    /// # Errors
+    ///
+    /// May return a [`Error::Json`] if there is a serialization error.
+    ///
+    /// [`Error::Json`]: crate::error::Error::Json
     pub fn name(self) -> Result<String> {
         serde_json::to_string(&self).map_err(From::from)
     }
@@ -475,6 +499,12 @@ impl User {
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: CurrentUser
+    ///
+    /// # Errors
+    ///
+    /// See [`UserId::create_dm_channel`] for what errors may be returned.
+    ///
+    /// [`UserId::create_dm_channel`]: crate::model::id::UserId::create_dm_channel
     #[inline]
     pub async fn create_dm_channel(&self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         if self.bot {
@@ -560,10 +590,19 @@ impl User {
     /// # }
     /// ```
     ///
-    /// # Examples
+    /// # Errors
     ///
     /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
     /// is a bot user.
+    ///
+    /// May also return an [`Error::Http`] if the message was illformed, or if the
+    /// user cannot be sent a direct message.
+    ///
+    /// [`Error::Json`] can also be returned if there is an error deserializing
+    /// the API response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn direct_message<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where
         for<'a, 'b> F: FnOnce(&'b mut CreateMessage<'a>) -> &'b mut CreateMessage<'a>,
@@ -573,22 +612,8 @@ impl User {
 
     /// This is an alias of [direct_message].
     ///
-    /// # Examples
-    ///
-    /// Sending a message:
-    ///
-    /// ```rust,ignore
-    /// // assuming you are in a context
-    ///
-    /// let _ = message.author.dm("Hello!");
-    /// ```
-    ///
-    /// # Examples
-    ///
-    /// Returns a [`ModelError::MessagingBot`] if the user being direct messaged
-    /// is a bot user.
-    ///
     /// [direct_message]: Self::direct_message
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn dm<F>(&self, cache_http: impl CacheHttp, f: F) -> Result<Message>
     where
@@ -626,6 +651,18 @@ impl User {
     /// ```
     ///
     /// [`Cache`]: crate::cache::Cache
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the given `Guild` is unavailable,
+    /// if that `Role` does not exist in the given `Guild`, or if the
+    /// given `User` is not in that `Guild`.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in
+    /// deserializing the API response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn has_role(
         &self,
@@ -679,6 +716,12 @@ impl User {
     /// Refreshes the information about the user.
     ///
     /// Replaces the instance with the data retrieved over the REST API.
+    ///
+    /// # Errors
+    ///
+    /// See [`UserId::to_user`] for what errors may be returned.
+    ///
+    /// [`UserId::to_user`]: crate::model::id::UserId::to_user
     #[inline]
     pub async fn refresh(&mut self, cache_http: impl CacheHttp) -> Result<()> {
         *self = self.id.to_user(cache_http).await?;
@@ -813,6 +856,17 @@ impl UserId {
     /// user. This can also retrieve the channel if one already exists.
     ///
     /// [current user]: CurrentUser
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a `User` with that `UserId` does not exist,
+    /// or is otherwise unavailable.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in deserializing
+    /// the channel data returned by the Discord API.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn create_dm_channel(self, cache_http: impl CacheHttp) -> Result<PrivateChannel> {
         #[cfg(feature = "cache")]
         {
@@ -844,6 +898,17 @@ impl UserId {
     ///
     /// **Note**: If the cache is not enabled,
     /// REST API will be used only.
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if a `User` with that `UserId` does not exist,
+    /// or otherwise cannot be fetched.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in
+    /// deserializing the user.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn to_user(self, cache_http: impl CacheHttp) -> Result<User> {
         #[cfg(feature = "cache")]

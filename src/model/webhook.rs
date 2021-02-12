@@ -68,6 +68,14 @@ impl Webhook {
     ///
     /// As this calls the [`Http::delete_webhook_with_token`] function,
     /// authentication is not required.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the webhook does not exist,
+    /// the token is invalid, or if the webhook could not otherwise
+    /// be deleted.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
     #[inline]
     pub async fn delete(&self, http: impl AsRef<Http>) -> Result<()> {
         http.as_ref().delete_webhook_with_token(self.id.0, &self.token).await
@@ -121,6 +129,14 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the content is illformed, or if the token is invalid.
+    /// May also return an [`Error::Json`] if there is an error in deserializing Discord's response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn edit(
         &mut self,
         http: impl AsRef<Http>,
@@ -211,6 +227,14 @@ impl Webhook {
     /// #     Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the content is illformed, or if the webhook's token is invalid.
+    /// Also, may return an [`Error::Json`] if there is an error deserializing Discord's response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn execute<'a, F>(
         &self,
@@ -246,6 +270,16 @@ impl Webhook {
     ///
     /// As this calls the [`Http::get_webhook_with_token`] function,
     /// authentication is not required.
+    ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.
+    /// Such as if the `Webhook` was deleted.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in deserializing the response.
+    ///
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn refresh(&mut self, http: impl AsRef<Http>) -> Result<()> {
         match http.as_ref().get_webhook_with_token(self.id.0, &self.token).await {
             Ok(replacement) => {
@@ -273,7 +307,16 @@ impl WebhookId {
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns an [`Error::Http`] if the http client errors or if Discord returns an error.
+    /// Such as if the `WebhookId` does not exist.
+    ///
+    /// May also return an [`Error::Json`] if there is an error in deserializing the response.
+    ///
     /// [Manage Webhooks]: super::permissions::Permissions::MANAGE_WEBHOOKS
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     #[inline]
     pub async fn to_webhook(self, http: impl AsRef<Http>) -> Result<Webhook> {
         http.as_ref().get_webhook(self.0).await

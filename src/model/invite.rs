@@ -102,8 +102,12 @@ impl Invite {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have the required [permission].
     ///
+    /// Otherwise may return [`Error::Http`] if permissions are lacking,
+    /// or if the invite is invalid.
+    ///
     /// [Manage Guild]: Permissions::MANAGE_GUILD
     /// [permission]: super::permissions
+    /// [`Error::Http`]: crate::error::Error::Http
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<Invite> {
         #[cfg(feature = "cache")]
         {
@@ -121,6 +125,12 @@ impl Invite {
     }
 
     /// Gets the information about an invite.
+    ///
+    /// # Errors
+    ///
+    /// May return an [`Error::Http`] if the invite is invalid.
+    /// Can also return an [`Error::Json`] if there is an error
+    /// deserializing the API response.
     pub async fn get(http: impl AsRef<Http>, code: &str, stats: bool) -> Result<Invite> {
         let mut invite = code;
 

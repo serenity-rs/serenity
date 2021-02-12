@@ -51,9 +51,6 @@ impl Emoji {
     ///
     /// **Note**: The [Manage Emojis] permission is required.
     ///
-    /// **Note**: Only user accounts may use this method.
-    ///
-    /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
     ///
     /// # Examples
     ///
@@ -84,6 +81,14 @@ impl Emoji {
     /// #    Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or may return [`ModelError::ItemMissing`] if the emoji is not
+    /// in the cache.
+    ///
+    /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
     #[cfg(feature = "cache")]
     #[inline]
     pub async fn delete<T: AsRef<Cache> + AsRef<Http>>(&self, cache_http: T) -> Result<()> {
@@ -100,7 +105,10 @@ impl Emoji {
     ///
     /// **Note**: The [Manage Emojis] permission is required.
     ///
-    /// **Note**: Only user accounts may use this method.
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid name is given.
     ///
     /// [Manage Emojis]: crate::model::permissions::Permissions::MANAGE_EMOJIS
     #[cfg(feature = "cache")]
