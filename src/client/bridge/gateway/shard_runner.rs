@@ -136,6 +136,7 @@ impl ShardRunner {
                     return self.request_restart().await;
                 },
                 Some(other) => {
+                    #[allow(clippy::let_underscore_must_use)]
                     let _ = self.action(&other).await;
                 },
                 None => {},
@@ -252,6 +253,7 @@ impl ShardRunner {
         }
 
         // Send a Close Frame to Discord, which allows a bot to "log off"
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self
             .shard
             .client
@@ -469,6 +471,7 @@ impl ShardRunner {
                         self.shard.shard_info(),
                     );
 
+                    #[allow(clippy::let_underscore_must_use)]
                     let _ = self.request_restart().await;
 
                     return Ok(false);
@@ -604,6 +607,7 @@ impl ShardRunner {
 
     #[instrument(skip(self))]
     fn update_manager(&self) {
+        #[allow(clippy::let_underscore_must_use)]
         let _ = self.manager_tx.unbounded_send(ShardManagerMessage::ShardUpdate {
             id: ShardId(self.shard.shard_info()[0]),
             latency: self.shard.latency(),

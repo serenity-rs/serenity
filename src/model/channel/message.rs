@@ -316,7 +316,10 @@ impl Message {
             at_distinct.push('@');
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
+
+            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(at_distinct, "{:04}", u.discriminator);
+
             let mut m = u.mention().to_string();
             // Check whether we're replacing a nickname mention or a normal mention.
             // `UserId::mention` returns a normal mention. If it isn't present in the message, it's a nickname mention.

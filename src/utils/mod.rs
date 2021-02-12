@@ -344,6 +344,9 @@ pub fn read_image<P: AsRef<Path>>(path: P) -> Result<String> {
 fn _read_image(path: &Path) -> Result<String> {
     let mut v = Vec::default();
     let mut f = File::open(path)?;
+
+    // errors here are intentionally ignored
+    #[allow(clippy::let_underscore_must_use)]
     let _ = f.read_to_end(&mut v);
 
     let b64 = base64::encode(&v);

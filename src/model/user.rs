@@ -1017,6 +1017,8 @@ fn tag(name: &str, discriminator: u16) -> String {
     let mut tag = String::with_capacity(37);
     tag.push_str(name);
     tag.push('#');
+
+    #[allow(clippy::let_underscore_must_use)]
     let _ = write!(tag, "{:04}", discriminator);
 
     tag
