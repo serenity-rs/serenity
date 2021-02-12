@@ -502,6 +502,11 @@
 <span id="499">499</span>
 <span id="500">500</span>
 <span id="501">501</span>
+<span id="502">502</span>
+<span id="503">503</span>
+<span id="504">504</span>
+<span id="505">505</span>
+<span id="506">506</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to channels and types within channels.</span>
 
@@ -671,8 +676,13 @@
 
     <span class="doccomment">/// Deletes the inner channel.</span>
     <span class="doccomment">///</span>
-    <span class="doccomment">/// **Note**: If the `cache`-feature is enabled permissions will be checked and upon</span>
-    <span class="doccomment">/// owning the required permissions the HTTP-request will be issued.</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`],</span>
+    <span class="doccomment">/// if the current user lacks permission.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// Otherwise will return [`Error::Http`] if the current user does not</span>
+    <span class="doccomment">/// have permission.</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">delete</span>(<span class="kw-2">&amp;</span><span class="self">self</span>, <span class="ident">cache_http</span>: <span class="kw">impl</span> <span class="ident">CacheHttp</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
         <span class="kw">match</span> <span class="self">self</span> {
             <span class="ident">Channel</span>::<span class="ident">Guild</span>(<span class="ident">public_channel</span>) <span class="op">=</span><span class="op">&gt;</span> {

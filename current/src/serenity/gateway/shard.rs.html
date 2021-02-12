@@ -835,6 +835,14 @@
 <span id="832">832</span>
 <span id="833">833</span>
 <span id="834">834</span>
+<span id="835">835</span>
+<span id="836">836</span>
+<span id="837">837</span>
+<span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">sync</span>::<span class="ident">Arc</span>,
@@ -969,6 +977,14 @@
     <span class="doccomment">/// #     Ok(())</span>
     <span class="doccomment">/// # }</span>
     <span class="doccomment">/// ```</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// # Errors</span>
+    <span class="doccomment">/// On Error, will return either [`Error::Gateway`] or [`Error::Rustls`]</span>
+    <span class="doccomment">/// / [`Error::Tungstenite`] depending on if rustls or native_tls is used.</span>
+    <span class="doccomment">///</span>
+    <span class="doccomment">/// [`Error::Gateway`]: crate::error::Error::Gateway</span>
+    <span class="doccomment">/// [`Error::Rustls`]: crate::error::Error::Rustls</span>
+    <span class="doccomment">/// [`Error::Tungstenite`]: crate::error::Error::Tungstenite</span>
     <span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">new</span>(
         <span class="ident">ws_url</span>: <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Mutex</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span><span class="op">&gt;</span>,
         <span class="ident">token</span>: <span class="kw-2">&amp;</span><span class="ident">str</span>,

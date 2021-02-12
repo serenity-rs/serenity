@@ -1006,6 +1006,11 @@
 <span id="1003">1003</span>
 <span id="1004">1004</span>
 <span id="1005">1005</span>
+<span id="1006">1006</span>
+<span id="1007">1007</span>
+<span id="1008">1008</span>
+<span id="1009">1009</span>
+<span id="1010">1010</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! A set of utilities to help with common use cases that are not required to</span>
 <span class="doccomment">//! fully use the library.</span>
@@ -1339,7 +1344,12 @@
 <span class="doccomment">/// let image = utils::read_image(&quot;./cat.png&quot;).expect(&quot;Failed to read image&quot;);</span>
 <span class="doccomment">/// ```</span>
 <span class="doccomment">///</span>
+<span class="doccomment">/// # Errors</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns an [`Error::Io`] if the path does not exist.</span>
+<span class="doccomment">///</span>
 <span class="doccomment">/// [`EditProfile::avatar`]: crate::builder::EditProfile::avatar</span>
+<span class="doccomment">/// [`Error::Io`]: crate::error::Error::Io</span>
 <span class="attribute">#[<span class="ident">inline</span>]</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">read_image</span><span class="op">&lt;</span><span class="ident">P</span>: <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Path</span><span class="op">&gt;</span><span class="op">&gt;</span>(<span class="ident">path</span>: <span class="ident">P</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">String</span><span class="op">&gt;</span> {
     <span class="ident">_read_image</span>(<span class="ident">path</span>.<span class="ident">as_ref</span>())

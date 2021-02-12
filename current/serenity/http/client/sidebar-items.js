@@ -1,1 +1,1 @@
-initSidebarItems({"struct":[["Http",""]]});
+initSidebarItems({"struct":[["Http","Note: For all member functions that return a `Result`, the Error kind will be either `Error::Http` or `Error::Json`."]]});

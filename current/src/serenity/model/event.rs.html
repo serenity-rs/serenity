@@ -2030,6 +2030,10 @@
 <span id="2027">2027</span>
 <span id="2028">2028</span>
 <span id="2029">2029</span>
+<span id="2030">2030</span>
+<span id="2031">2031</span>
+<span id="2032">2032</span>
+<span id="2033">2033</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! All the events this library handles.</span>
 
@@ -3653,6 +3657,10 @@
 <span class="doccomment">/// present and containing a value of `true`, will cause a</span>
 <span class="doccomment">/// [`GuildUnavailableEvent`] to be returned. Otherwise, all other event types</span>
 <span class="doccomment">/// correlate to the deserialization of their appropriate event.</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// # Errors</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// Returns [`Error::Json`] if there is an error in deserializing the event data.</span>
 <span class="kw">pub</span> <span class="kw">fn</span> <span class="ident">deserialize_event_with_type</span>(<span class="ident">kind</span>: <span class="ident">EventType</span>, <span class="ident">v</span>: <span class="ident">Value</span>) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span><span class="ident">Event</span><span class="op">&gt;</span> {
     <span class="prelude-val">Ok</span>(<span class="kw">match</span> <span class="ident">kind</span> {
         <span class="ident">EventType</span>::<span class="ident">ChannelCreate</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">Event</span>::<span class="ident">ChannelCreate</span>(<span class="ident">serde_json</span>::<span class="ident">from_value</span>(<span class="ident">v</span>)<span class="question-mark">?</span>),
