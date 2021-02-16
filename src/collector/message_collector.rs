@@ -270,7 +270,7 @@ impl std::fmt::Debug for FilterOptions {
     }
 }
 
-/// A message collector receives messages matching a the given filter for a
+/// A message collector receives messages matching the given filter for a
 /// set duration.
 pub struct MessageCollector {
     receiver: Pin<Box<Receiver<Arc<Message>>>>,
