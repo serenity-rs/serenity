@@ -15,8 +15,6 @@ use syn::{
     FnArg,
     Ident,
     Pat,
-    Path,
-    PathSegment,
     ReturnType,
     Stmt,
     Token,
