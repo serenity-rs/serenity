@@ -301,6 +301,10 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
         vec!["help".to_string()]
     };
 
+    // Revert the change for the names of documentation attributes done when
+    // parsing the function input with `CommandFun`.
+    util::rename_attributes(&mut fun.attributes, "description", "doc");
+
     let mut options = HelpOptions::default();
 
     for attribute in &fun.attributes {
