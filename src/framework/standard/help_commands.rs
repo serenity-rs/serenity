@@ -404,7 +404,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
 
                 for command_name in command.options.names {
                     if name == *command_name {
-                        command_found = Some(&(*command_name).clone());
+                        command_found = Some((*command_name).clone());
 
                         break;
                     }
