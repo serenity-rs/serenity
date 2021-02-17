@@ -427,16 +427,16 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                             let levenshtein_distance = levenshtein_distance(&command_name, &name);
 
                             if levenshtein_distance <= help_options.max_levenshtein_distance
-                            && HelpBehaviour::Nothing
-                                == check_command_behaviour(
-                                    ctx,
-                                    msg,
-                                    &command.options,
-                                    group.options.checks,
-                                    &owners,
-                                    &help_options,
-                                )
-                                .await
+                                && HelpBehaviour::Nothing
+                                    == check_command_behaviour(
+                                        ctx,
+                                        msg,
+                                        &command.options,
+                                        group.options.checks,
+                                        &owners,
+                                        &help_options,
+                                    )
+                                    .await
                             {
                                 similar_commands.push(SuggestedCommandName {
                                     name: command_name.to_string(),
@@ -549,8 +549,9 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 },
             }
 
-            if !group.options.prefixes.is_empty() &&
-                !group.options.prefixes.iter().any(|prefix| trim_prefixless_group(prefix, name)) {
+            if !group.options.prefixes.is_empty()
+                && !group.options.prefixes.iter().any(|prefix| trim_prefixless_group(prefix, name))
+            {
                 continue;
             }
 
