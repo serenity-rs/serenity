@@ -305,6 +305,14 @@ pub fn help(attr: TokenStream, input: TokenStream) -> TokenStream {
     // parsing the function input with `CommandFun`.
     util::rename_attributes(&mut fun.attributes, "description", "doc");
 
+    // Additionally, place the documentation attributes to the `cooked` list
+    // to prevent the macro from rejecting them as invalid attributes.
+    for i in 0..fun.attributes.len() {
+        if fun.attributes[i].path.is_ident("doc") {
+            fun.cooked.push(fun.attributes.remove(i));
+        }
+    }
+
     let mut options = HelpOptions::default();
 
     for attribute in &fun.attributes {
