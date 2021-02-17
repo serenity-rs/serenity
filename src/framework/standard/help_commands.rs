@@ -384,6 +384,7 @@ async fn check_command_behaviour(
 // their sub-commands, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::too_many_arguments)]
 fn nested_commands_search<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
@@ -404,7 +405,7 @@ fn nested_commands_search<'rec, 'a: 'rec>(
 
                 for command_name in command.options.names {
                     if name == *command_name {
-                        command_found = Some((*command_name).clone());
+                        command_found = Some(*command_name);
 
                         break;
                     }
