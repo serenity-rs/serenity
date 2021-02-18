@@ -384,6 +384,7 @@ async fn check_command_behaviour(
 // their sub-commands, trying to find `name`.
 // Similar commands will be collected into `similar_commands`.
 #[cfg(all(feature = "cache", feature = "http"))]
+#[allow(clippy::too_many_arguments)]
 fn nested_commands_search<'rec, 'a: 'rec>(
     ctx: &'rec Context,
     msg: &'rec Message,
@@ -400,7 +401,15 @@ fn nested_commands_search<'rec, 'a: 'rec>(
             let mut command = *command;
 
             let search_command_name_matched = {
-                let command_found = command.options.names.iter().find(|n| **n == name).cloned();
+                let mut command_found = None;
+
+                for command_name in command.options.names {
+                    if name == *command_name {
+                        command_found = Some(*command_name);
+
+                        break;
+                    }
+                }
 
                 if command_found.is_some() {
                     command_found
@@ -413,6 +422,28 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                         if starts_with_whole_word(&name, &command_name) {
                             name.drain(..=command_name.len());
                             break;
+                        }
+
+                        if help_options.max_levenshtein_distance > 0 {
+                            let levenshtein_distance = levenshtein_distance(&command_name, &name);
+
+                            if levenshtein_distance <= help_options.max_levenshtein_distance
+                                && HelpBehaviour::Nothing
+                                    == check_command_behaviour(
+                                        ctx,
+                                        msg,
+                                        &command.options,
+                                        group.options.checks,
+                                        &owners,
+                                        &help_options,
+                                    )
+                                    .await
+                            {
+                                similar_commands.push(SuggestedCommandName {
+                                    name: command_name.to_string(),
+                                    levenshtein_distance,
+                                });
+                            }
                         }
                     }
 
@@ -485,32 +516,6 @@ fn nested_commands_search<'rec, 'a: 'rec>(
                 } else {
                     break;
                 }
-            } else if help_options.max_levenshtein_distance > 0 {
-                let command_name = if let Some(first_prefix) = group.options.prefixes.get(0) {
-                    format!("{} {}", &first_prefix, &command.options.names[0])
-                } else {
-                    command.options.names[0].to_string()
-                };
-
-                let levenshtein_distance = levenshtein_distance(&command_name, &name);
-
-                if levenshtein_distance <= help_options.max_levenshtein_distance
-                    && HelpBehaviour::Nothing
-                        == check_command_behaviour(
-                            ctx,
-                            msg,
-                            &command.options,
-                            group.options.checks,
-                            &owners,
-                            &help_options,
-                        )
-                        .await
-                {
-                    similar_commands.push(SuggestedCommandName {
-                        name: command_name,
-                        levenshtein_distance,
-                    });
-                }
             }
         }
 
@@ -545,7 +550,11 @@ fn nested_group_command_search<'rec, 'a: 'rec>(
                 },
             }
 
-            group.options.prefixes.iter().any(|prefix| trim_prefixless_group(prefix, name));
+            if !group.options.prefixes.is_empty()
+                && !group.options.prefixes.iter().any(|prefix| trim_prefixless_group(prefix, name))
+            {
+                continue;
+            }
 
             let mut found_group_prefix: bool = false;
             let found = nested_commands_search(
@@ -852,6 +861,7 @@ fn trim_prefixless_group(group_name: &str, searched_group: &mut String) -> bool 
         return true;
     } else if starts_with_whole_word(&searched_group, &group_name) {
         searched_group.drain(..=group_name.len());
+        return true;
     }
 
     false
