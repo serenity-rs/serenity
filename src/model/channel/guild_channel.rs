@@ -152,11 +152,13 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::CREATE_INVITE;
-
-                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.id,
+                    Some(self.guild_id),
+                    Permissions::CREATE_INVITE,
+                )
+                .await?;
             }
         }
 
@@ -286,11 +288,13 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_CHANNELS;
-
-                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.id,
+                    Some(self.guild_id),
+                    Permissions::MANAGE_CHANNELS,
+                )
+                .await?;
             }
         }
 
@@ -390,11 +394,13 @@ impl GuildChannel {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_CHANNELS;
-
-                if !utils::user_has_perms(&cache, self.id, Some(self.guild_id), req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.id,
+                    Some(self.guild_id),
+                    Permissions::MANAGE_CHANNELS,
+                )
+                .await?;
             }
         }
 

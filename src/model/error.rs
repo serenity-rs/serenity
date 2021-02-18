@@ -145,6 +145,23 @@ pub enum Error {
     NameTooShort,
     /// Indicates that the webhook name is over the 100 characters limit.
     NameTooLong,
+    /// Indicates that the bot is not author of the message.
+    NotAuthor,
+}
+
+impl Error {
+    /// Return `true` if the model error is related to an item missing in the
+    /// cache.
+    pub fn is_cache_err(&self) -> bool {
+        match self {
+            Self::ItemMissing
+            | Self::ChannelNotFound
+            | Self::RoleNotFound
+            | Self::GuildNotFound
+            | Self::MemberNotFound => true,
+            _ => false,
+        }
+    }
 }
 
 impl Display for Error {
@@ -167,6 +184,7 @@ impl Display for Error {
             Error::MessagingBot => f.write_str("Attempted to message another bot user."),
             Error::NameTooShort => f.write_str("Name is under the character limit."),
             Error::NameTooLong => f.write_str("Name is over the character limit."),
+            Error::NotAuthor => f.write_str("The bot is not author of this message."),
         }
     }
 }

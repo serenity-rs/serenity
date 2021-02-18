@@ -217,6 +217,27 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
     seq.end()
 }
 
+/// Tries to find a user's permissions using the cache.
+/// Unline [`user_has_perms`], this function will return `true` even when
+/// the permissions are not in the cache.
+#[cfg(all(feature = "cache", feature = "model"))]
+#[inline]
+pub async fn user_has_perms_cache(
+    cache: impl AsRef<Cache>,
+    channel_id: ChannelId,
+    guild_id: Option<GuildId>,
+    permissions: Permissions,
+) -> Result<()> {
+    if match user_has_perms(cache, channel_id, guild_id, permissions).await {
+        Err(Error::Model(err)) => !err.is_cache_err(),
+        result => result?,
+    } {
+        Ok(())
+    } else {
+        Err(Error::Model(ModelError::InvalidPermissions(permissions)))
+    }
+}
+
 #[cfg(all(feature = "cache", feature = "model"))]
 pub async fn user_has_perms(
     cache: impl AsRef<Cache>,

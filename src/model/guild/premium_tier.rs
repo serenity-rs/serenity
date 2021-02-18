@@ -13,7 +13,7 @@ enum_number!(PremiumTier {
     Tier0,
     Tier1,
     Tier2,
-    Tier3,
+    Tier3
 });
 
 impl PremiumTier {

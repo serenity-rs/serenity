@@ -2394,7 +2394,7 @@ pub enum DefaultMessageNotificationLevel {
 
 enum_number!(DefaultMessageNotificationLevel {
     All,
-    Mentions,
+    Mentions
 });
 
 impl DefaultMessageNotificationLevel {
@@ -2421,7 +2421,7 @@ pub enum ExplicitContentFilter {
 enum_number!(ExplicitContentFilter {
     None,
     WithoutRole,
-    All,
+    All
 });
 
 impl ExplicitContentFilter {
@@ -2446,7 +2446,7 @@ pub enum MfaLevel {
 
 enum_number!(MfaLevel {
     None,
-    Elevated,
+    Elevated
 });
 
 impl MfaLevel {
@@ -2547,7 +2547,7 @@ enum_number!(VerificationLevel {
     Low,
     Medium,
     High,
-    Higher,
+    Higher
 });
 
 impl VerificationLevel {

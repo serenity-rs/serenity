@@ -170,5 +170,5 @@ pub enum MembershipState {
 
 enum_number!(MembershipState {
     Invited,
-    Accepted,
+    Accepted
 });
