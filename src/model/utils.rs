@@ -218,7 +218,7 @@ pub fn serialize_gen_map<K: Eq + Hash, S: Serializer, V: Serialize>(
 }
 
 /// Tries to find a user's permissions using the cache.
-/// Unline [`user_has_perms`], this function will return `true` even when
+/// Unlike [`user_has_perms`], this function will return `true` even when
 /// the permissions are not in the cache.
 #[cfg(all(feature = "cache", feature = "model"))]
 #[inline]
