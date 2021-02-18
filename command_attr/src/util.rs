@@ -11,9 +11,12 @@ use syn::{
     punctuated::Punctuated,
     spanned::Spanned,
     token::{Comma, Mut},
+    Attribute,
     Ident,
     Lifetime,
     Lit,
+    Path,
+    PathSegment,
     Type,
 };
 
@@ -248,6 +251,15 @@ pub fn populate_fut_lifetimes_on_refs(args: &mut Vec<Argument>) {
     for arg in args {
         if let Type::Reference(reference) = &mut arg.kind {
             reference.lifetime = Some(Lifetime::new("'fut", Span::call_site()));
+        }
+    }
+}
+
+/// Renames all attributes that have a specific `name` to the `target`.
+pub fn rename_attributes(attributes: &mut Vec<Attribute>, name: &str, target: &str) {
+    for attr in attributes {
+        if attr.path.is_ident(name) {
+            attr.path = Path::from(PathSegment::from(Ident::new(target, Span::call_site())));
         }
     }
 }
