@@ -839,6 +839,18 @@
 <span id="836">836</span>
 <span id="837">837</span>
 <span id="838">838</span>
+<span id="839">839</span>
+<span id="840">840</span>
+<span id="841">841</span>
+<span id="842">842</span>
+<span id="843">843</span>
+<span id="844">844</span>
+<span id="845">845</span>
+<span id="846">846</span>
+<span id="847">847</span>
+<span id="848">848</span>
+<span id="849">849</span>
+<span id="850">850</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">rust_2018_idioms</span>)]</span>
 <span class="attribute">#![<span class="ident">deny</span>(<span class="ident">broken_intra_doc_links</span>)]</span>
@@ -1142,6 +1154,18 @@
     } <span class="kw">else</span> {
         <span class="macro">vec</span><span class="macro">!</span>[<span class="string">&quot;help&quot;</span>.<span class="ident">to_string</span>()]
     };
+
+    <span class="comment">// Revert the change for the names of documentation attributes done when</span>
+    <span class="comment">// parsing the function input with `CommandFun`.</span>
+    <span class="ident">util</span>::<span class="ident">rename_attributes</span>(<span class="kw-2">&amp;</span><span class="kw-2">mut</span> <span class="ident">fun</span>.<span class="ident">attributes</span>, <span class="string">&quot;description&quot;</span>, <span class="string">&quot;doc&quot;</span>);
+
+    <span class="comment">// Additionally, place the documentation attributes to the `cooked` list</span>
+    <span class="comment">// to prevent the macro from rejecting them as invalid attributes.</span>
+    <span class="kw">for</span> <span class="ident">i</span> <span class="kw">in</span> <span class="number">0</span>..<span class="ident">fun</span>.<span class="ident">attributes</span>.<span class="ident">len</span>() {
+        <span class="kw">if</span> <span class="ident">fun</span>.<span class="ident">attributes</span>[<span class="ident">i</span>].<span class="ident">path</span>.<span class="ident">is_ident</span>(<span class="string">&quot;doc&quot;</span>) {
+            <span class="ident">fun</span>.<span class="ident">cooked</span>.<span class="ident">push</span>(<span class="ident">fun</span>.<span class="ident">attributes</span>.<span class="ident">remove</span>(<span class="ident">i</span>));
+        }
+    }
 
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">options</span> <span class="op">=</span> <span class="ident">HelpOptions</span>::<span class="ident">default</span>();
 
