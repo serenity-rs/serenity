@@ -1009,6 +1009,7 @@ mod test {
                     bot: false,
                     discriminator: 1,
                     name: "user 1".to_owned(),
+                    public_flags: 0,
                 },
                 channel_id: ChannelId(2),
                 guild_id: Some(GuildId(1)),

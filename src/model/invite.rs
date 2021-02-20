@@ -385,6 +385,7 @@ impl RichInvite {
     /// #         "discriminator": 3,
     /// #         "id": UserId(4),
     /// #         "username": "qux",
+    /// #         "public_flags": 0,
     /// #     },
     /// #     "max_age": 5,
     /// #     "max_uses": 6,

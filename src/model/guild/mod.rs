@@ -2579,6 +2579,7 @@ mod test {
                 bot: true,
                 discriminator: 1432,
                 name: "test".to_string(),
+                public_flags: 0,
             }
         }
 

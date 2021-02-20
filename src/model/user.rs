@@ -46,6 +46,7 @@ pub struct CurrentUser {
     #[serde(rename = "username")]
     pub name: String,
     pub verified: Option<bool>,
+    pub public_flags: u8,
 }
 
 #[cfg(feature = "model")]
@@ -446,6 +447,8 @@ pub struct User {
     /// change if the username+discriminator pair becomes non-unique.
     #[serde(rename = "username")]
     pub name: String,
+    /// the public flags on a user's account
+    pub public_flags: u8,
 }
 
 impl Default for User {
@@ -455,6 +458,7 @@ impl Default for User {
     /// - **bot** to `true`.
     /// - **discriminator** to `1432`.
     /// - **name** to `"test"`.
+    /// - **public_flags** to `0`.
     fn default() -> Self {
         User {
             id: UserId(210),
@@ -462,6 +466,7 @@ impl Default for User {
             bot: true,
             discriminator: 1432,
             name: "test".to_string(),
+            public_flags: 0,
         }
     }
 }
@@ -932,6 +937,7 @@ impl From<CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name,
+            public_flags: user.public_flags,
         }
     }
 }
@@ -944,6 +950,7 @@ impl<'a> From<&'a CurrentUser> for User {
             discriminator: user.discriminator,
             id: user.id,
             name: user.name.clone(),
+            public_flags: user.public_flags,
         }
     }
 }
