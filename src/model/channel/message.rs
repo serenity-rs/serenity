@@ -316,7 +316,10 @@ impl Message {
             at_distinct.push('@');
             at_distinct.push_str(&u.name);
             at_distinct.push('#');
+
+            #[allow(clippy::let_underscore_must_use)]
             let _ = write!(at_distinct, "{:04}", u.discriminator);
+
             let mut m = u.mention().to_string();
             // Check whether we're replacing a nickname mention or a normal mention.
             // `UserId::mention` returns a normal mention. If it isn't present in the message, it's a nickname mention.
@@ -353,6 +356,10 @@ impl Message {
     /// user. This is useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -665,6 +672,8 @@ impl Message {
     /// [`ModelError::InvalidPermissions`] if the current user does not have
     /// the required permissions.
     ///
+    /// Otherwise returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[cfg(feature = "utils")]
     pub async fn suppress_embeds(&mut self, cache_http: impl CacheHttp) -> Result<()> {
@@ -710,6 +719,11 @@ impl Message {
     }
 
     /// Checks whether the message mentions the current user.
+    ///
+    /// # Errors
+    ///
+    /// May return [`Error::Http`] if the `cache` feature is not enabled,
+    /// or if the cache is otherwise unavailable.
     pub async fn mentions_me(&self, cache_http: impl CacheHttp) -> Result<bool> {
         #[cfg(feature = "cache")]
         {

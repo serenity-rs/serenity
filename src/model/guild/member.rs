@@ -59,6 +59,11 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a role with the given Id does not exist.
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     #[inline]
     pub async fn add_role(
@@ -89,6 +94,11 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if a role with a given Id does not exist.
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn add_roles(
         &mut self,
@@ -118,8 +128,9 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Returns a [`ModelError::GuildNotFound`] if the guild could not be
-    /// found.
+    /// Returns a [`ModelError::DeleteMessageDaysAmount`] if the `dmd` is greater than 7.
+    /// Can also return [`Error::Http`] if the current user lacks permission to ban
+    /// this member.
     ///
     /// [Ban Members]: Permissions::BAN_MEMBERS
     #[inline]
@@ -128,6 +139,11 @@ impl Member {
     }
 
     /// Ban the member from the guild with a reason. Refer to [`ban`] to further documentation.
+    ///
+    /// # Errors
+    ///
+    /// In addition to the errors `ban` may return, can also return [`Error::ExceededLimit`]
+    /// if the length of the reason is greater than 512.
     ///
     /// [`ban`]: Self::ban
     #[inline]
@@ -195,6 +211,10 @@ impl Member {
     ///
     /// See [`EditMember`] for the permission(s) required for separate builder
     /// methods, as well as usage of this.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks necessary permissions.
     ///
     /// [`EditMember`]: crate::builder::EditMember
     pub async fn edit<F>(&self, http: impl AsRef<Http>, f: F) -> Result<Member>
@@ -275,6 +295,8 @@ impl Member {
     /// If the `cache` is enabled, returns a [`ModelError::InvalidPermissions`]
     /// if the current user does not have permission to perform the kick.
     ///
+    /// Otherwise will return [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Kick Members]: Permissions::KICK_MEMBERS
     #[inline]
     pub async fn kick(&self, cache_http: impl CacheHttp) -> Result<()> {
@@ -304,9 +326,10 @@ impl Member {
     ///
     /// # Errors
     ///
-    /// Same as [`kick`]
+    /// In addition to the reasons `kick` may return an error,
+    /// can also return an error if the given reason is too long.
     ///
-    /// [`kick`]: Self::kick
+    /// [Kick Members]: Permissions::KICK_MEMBERS
     pub async fn kick_with_reason(&self, cache_http: impl CacheHttp, reason: &str) -> Result<()> {
         #[cfg(feature = "cache")]
         {
@@ -330,6 +353,11 @@ impl Member {
     ///
     /// Requires the [Move Members] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the member is not currently in a
+    /// voice channel, or if the current user lacks permission.
+    ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn move_to_voice_channel(
         &self,
@@ -342,6 +370,11 @@ impl Member {
     /// Disconnects the member from their voice channel if any.
     ///
     /// Requires the [Move Members] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the member is not currently in a
+    /// voice channel, or if the current user lacks permission.
     ///
     /// [Move Members]: Permissions::MOVE_MEMBERS
     pub async fn disconnect_from_voice(&self, http: impl AsRef<Http>) -> Result<Member> {
@@ -383,6 +416,11 @@ impl Member {
     ///
     /// **Note**: Requires the [Manage Roles] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a role with the given Id does not exist,
+    /// or if the current user lacks permission.
+    ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_role(
         &mut self,
@@ -409,6 +447,11 @@ impl Member {
     /// new roles.
     ///
     /// **Note**: Requires the [Manage Roles] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if a role with a given Id does not exist,
+    /// or if the current user lacks permission.
     ///
     /// [Manage Roles]: Permissions::MANAGE_ROLES
     pub async fn remove_roles(

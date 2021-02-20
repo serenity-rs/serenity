@@ -52,6 +52,11 @@ impl ChannelId {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks
+    /// permission to send messages to this channel.
+    ///
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[inline]
     pub async fn broadcast_typing(self, http: impl AsRef<Http>) -> Result<()> {
@@ -59,6 +64,14 @@ impl ChannelId {
     }
 
     /// Creates an invite leading to the given channel.
+    ///
+    /// **Note**: Requres the [Create Invite] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Create Invite]: Permissions::CREATE_INVITE
     #[cfg(feature = "utils")]
     pub async fn create_invite<F>(&self, http: impl AsRef<Http>, f: F) -> Result<RichInvite>
     where
@@ -79,6 +92,11 @@ impl ChannelId {
     /// more information.
     ///
     /// Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value is set.
     ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     pub async fn create_permission(
@@ -109,6 +127,10 @@ impl ChannelId {
     /// Requires the [Add Reactions] permission, _if_ the current user is the
     /// first user to perform a react with a certain emoji.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Add Reactions]: Permissions::ADD_REACTIONS
     #[inline]
     pub async fn create_reaction(
@@ -121,6 +143,14 @@ impl ChannelId {
     }
 
     /// Deletes this channel, returning the channel on a successful deletion.
+    ///
+    /// **Note**: Requires the [Manage Channels] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
+    /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn delete(self, http: impl AsRef<Http>) -> Result<Channel> {
         http.as_ref().delete_channel(self.0).await
@@ -132,6 +162,11 @@ impl ChannelId {
     ///
     /// Requires the [Manage Messages] permission, if the current user is not
     /// the author of the message.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission to
+    /// delete the message.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -156,6 +191,9 @@ impl ChannelId {
     ///
     /// Returns [`ModelError::BulkDeleteAmount`] if an attempt was made to
     /// delete either 0 or more than 100 messages.
+    ///
+    /// Also will return [`Error::Http`] if the current user lacks permission
+    /// to delete messages.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     pub async fn delete_messages<T, It>(self, http: impl AsRef<Http>, message_ids: It) -> Result<()>
@@ -185,6 +223,10 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Channel] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     pub async fn delete_permission(
         self,
@@ -203,6 +245,11 @@ impl ChannelId {
     ///
     /// **Note**: Requires the [Manage Messages] permission, _if_ the current
     /// user did not perform the reaction.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user did not perform the reaction,
+    /// and lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -226,6 +273,10 @@ impl ChannelId {
     /// Deletes all [`Reaction`]s of the given emoji to a message within the channel.
     ///
     /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -261,6 +312,11 @@ impl ChannelId {
     /// channel_id.edit(&http, |c| c.name("test").bitrate(64000)).await;
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if an invalid value is set.
     ///
     /// [Manage Channel]: Permissions::MANAGE_CHANNELS
     #[cfg(feature = "utils")]
@@ -333,6 +389,7 @@ impl ChannelId {
     ///
     /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
     /// owning the required permissions the HTTP-request will be issued.
+    #[allow(clippy::missing_errors_doc)]
     #[inline]
     pub async fn to_channel(self, cache_http: impl CacheHttp) -> Result<Channel> {
         #[cfg(feature = "cache")]
@@ -351,6 +408,10 @@ impl ChannelId {
     ///
     /// Requires the [Manage Channels] permission.
     ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
+    ///
     /// [Manage Channels]: Permissions::MANAGE_CHANNELS
     #[inline]
     pub async fn invites(self, http: impl AsRef<Http>) -> Result<Vec<RichInvite>> {
@@ -360,6 +421,10 @@ impl ChannelId {
     /// Gets a message from the channel.
     ///
     /// Requires the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
@@ -379,7 +444,13 @@ impl ChannelId {
     ///
     /// Refer to [`GetMessages`] for more information on how to use `builder`.
     ///
-    /// Requires the [Read Message History] permission.
+    /// **Note**: Returns an empty `Vec` if the current user
+    /// does not have the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user does not have
+    /// permission to view the channel.
     ///
     /// [`GetMessages`]: crate::builder::GetMessages
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
@@ -463,12 +534,31 @@ impl ChannelId {
     }
 
     /// Pins a [`Message`] to the channel.
+    ///
+    /// **Note**: Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission,
+    /// or if the channel has too many pinned messages.
+    ///
+    /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
     pub async fn pin(self, http: impl AsRef<Http>, message_id: impl Into<MessageId>) -> Result<()> {
         http.as_ref().pin_message(self.0, message_id.into().0).await
     }
 
     /// Gets the list of [`Message`]s which are pinned to the channel.
+    ///
+    /// **Note**: Returns an empty `Vec` if the current user does not
+    /// have the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to view the channel.
+    ///
+    /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     #[inline]
     pub async fn pins(self, http: impl AsRef<Http>) -> Result<Vec<Message>> {
         http.as_ref().get_pins(self.0).await
@@ -485,6 +575,11 @@ impl ChannelId {
     /// user. This is useful for pagination.
     ///
     /// **Note**: Requires the [Read Message History] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to read messages in the channel.
     ///
     /// [Read Message History]: Permissions::READ_MESSAGE_HISTORY
     pub async fn reaction_users(
@@ -635,6 +730,9 @@ impl ChannelId {
     /// is over the above limit, containing the number of unicode code points
     /// over the limit.
     ///
+    /// Returns [`Error::Http`] if the current user lacks permission to
+    /// send a message in this channel.
+    ///
     /// [`CreateMessage`]: crate::builder::CreateMessage
     /// [Send Messages]: Permissions::SEND_MESSAGES
     #[cfg(feature = "utils")]
@@ -699,6 +797,11 @@ impl ChannelId {
     /// # Ok(())
     /// # }
     /// ```
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission
+    /// to send messages in this channel.
     pub fn start_typing(self, http: &Arc<Http>) -> Result<Typing> {
         http.start_typing(self.0)
     }
@@ -706,6 +809,10 @@ impl ChannelId {
     /// Unpins a [`Message`] in the channel given by its Id.
     ///
     /// Requires the [Manage Messages] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Messages]: Permissions::MANAGE_MESSAGES
     #[inline]
@@ -720,6 +827,10 @@ impl ChannelId {
     /// Retrieves the channel's webhooks.
     ///
     /// **Note**: Requires the [Manage Webhooks] permission.
+    ///
+    /// # Errors
+    ///
+    /// Returns [`Error::Http`] if the current user lacks permission.
     ///
     /// [Manage Webhooks]: Permissions::MANAGE_WEBHOOKS
     #[inline]

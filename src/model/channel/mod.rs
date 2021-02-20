@@ -166,8 +166,13 @@ impl Channel {
 
     /// Deletes the inner channel.
     ///
-    /// **Note**: If the `cache`-feature is enabled permissions will be checked and upon
-    /// owning the required permissions the HTTP-request will be issued.
+    /// # Errors
+    ///
+    /// If the `cache` is enabled, returns [`ModelError::InvalidPermissions`],
+    /// if the current user lacks permission.
+    ///
+    /// Otherwise will return [`Error::Http`] if the current user does not
+    /// have permission.
     pub async fn delete(&self, cache_http: impl CacheHttp) -> Result<()> {
         match self {
             Channel::Guild(public_channel) => {

@@ -1,3 +1,4 @@
+#![allow(clippy::missing_errors_doc)]
 use std::{collections::BTreeMap, fmt, sync::Arc};
 
 use bytes::buf::Buf;
@@ -27,6 +28,11 @@ use crate::http::routing::Route;
 use crate::internal::prelude::*;
 use crate::model::prelude::*;
 
+/// **Note**: For all member functions that return a `Result`, the
+/// Error kind will be either [`Error::Http`] or [`Error::Json`].
+///
+/// [`Error::Http`]: crate::error::Error::Http
+/// [`Error::Json`]: crate::error::Error::Json
 pub struct Http {
     pub(crate) client: Arc<Client>,
     pub ratelimiter: Ratelimiter,
@@ -2428,7 +2434,13 @@ impl Http {
     /// # }
     /// ```
     ///
+    /// # Errors
+    ///
+    /// If there is an error, it will be either [`Error::Http`] or [`Error::Json`].
+    ///
     /// [`request`]: Self::request
+    /// [`Error::Http`]: crate::error::Error::Http
+    /// [`Error::Json`]: crate::error::Error::Json
     pub async fn fire<T: DeserializeOwned>(&self, req: Request<'_>) -> Result<T> {
         let response = self.request(req).await?;
 

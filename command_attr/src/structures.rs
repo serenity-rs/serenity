@@ -15,8 +15,6 @@ use syn::{
     FnArg,
     Ident,
     Pat,
-    Path,
-    PathSegment,
     ReturnType,
     Stmt,
     Token,
@@ -25,7 +23,7 @@ use syn::{
 };
 
 use crate::consts::CHECK;
-use crate::util::{Argument, AsOption, IdentExt2, Parenthesised};
+use crate::util::{self, Argument, AsOption, IdentExt2, Parenthesised};
 
 #[derive(Debug, PartialEq)]
 pub enum OnlyIn {
@@ -103,7 +101,7 @@ fn parse_argument(arg: FnArg) -> Result<Argument> {
 /// Test if the attribute is cooked.
 fn is_cooked(attr: &Attribute) -> bool {
     const COOKED_ATTRIBUTE_NAMES: &[&str] =
-        &["cfg", "cfg_attr", "doc", "derive", "inline", "allow", "warn", "deny", "forbid"];
+        &["cfg", "cfg_attr", "derive", "inline", "allow", "warn", "deny", "forbid"];
 
     COOKED_ATTRIBUTE_NAMES.iter().any(|n| attr.path.is_ident(n))
 }
@@ -148,14 +146,8 @@ impl Parse for CommandFun {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut attributes = input.call(Attribute::parse_outer)?;
 
-        // `#[doc = "..."]` is a cooked attribute but it is special-cased for commands.
-        for attr in &mut attributes {
-            // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
-            if attr.path.is_ident("doc") {
-                attr.path =
-                    Path::from(PathSegment::from(Ident::new("description", Span::call_site())));
-            }
-        }
+        // Rename documentation comment attributes (`#[doc = "..."]`) to `#[description = "..."]`.
+        util::rename_attributes(&mut attributes, "doc", "description");
 
         let cooked = remove_cooked(&mut attributes);
 

@@ -1620,6 +1620,10 @@ impl Event {
 /// present and containing a value of `true`, will cause a
 /// [`GuildUnavailableEvent`] to be returned. Otherwise, all other event types
 /// correlate to the deserialization of their appropriate event.
+///
+/// # Errors
+///
+/// Returns [`Error::Json`] if there is an error in deserializing the event data.
 pub fn deserialize_event_with_type(kind: EventType, v: Value) -> Result<Event> {
     Ok(match kind {
         EventType::ChannelCreate => Event::ChannelCreate(serde_json::from_value(v)?),
