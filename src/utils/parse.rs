@@ -1,0 +1,173 @@
+use crate::{model::prelude::*, prelude::*};
+
+// Questions:
+// - Should the error enums be #[non_exhaustive]?
+// - Should the MessageParseError implement source()? It may be too much boilerplate (maybe add thiserror dependency?)
+
+/// Parse a value from a string in context of a received message.
+///
+/// This trait is a superset of [`std::str::FromStr`] (the trait used in `str::parse`). The
+/// difference is that this trait supports serenity-specific Discord types like [`Member`], `Role`],
+/// or [`Emoji`].
+///
+/// Trait implementations may do network requests as part of their parsing procedure.
+///
+/// Useful for implementing command argument parsing frameworks.
+#[async_trait::async_trait]
+pub trait Parse: Sized {
+    /// The associated error which can be returned from parsing.
+    type Err;
+
+    /// Parses a string `s` as a command parameter of this type.
+    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err>;
+}
+
+#[async_trait::async_trait]
+impl<T: std::str::FromStr> Parse for T {
+    type Err = <T as std::str::FromStr>::Err;
+
+    async fn parse(_: &Context, _: &Message, s: &str) -> Result<Self, Self::Err> {
+        T::from_str(s)
+    }
+}
+
+/// Error that can be returned from [`Member::parse`].
+#[derive(Copy, Clone, Debug, Eq, Hash, PartialEq)]
+pub enum MemberParseError {
+    GuildNotInCache,
+    NotFoundOrMalformed,
+}
+
+impl std::error::Error for MemberParseError {}
+
+impl std::fmt::Display for MemberParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+			Self::GuildNotInCache => write!(f, "guild is not in cache"),
+			Self::NotFoundOrMalformed => write!(f, "provided member was not found or provided string did not adhere to any known guild member format"),
+		}
+    }
+}
+
+/// Look up a guild member by a string case-insensitively.
+///
+/// The lookup strategy is as follows (in order):
+/// 1. Lookup by ID.
+/// 2. Lookup by mention.
+/// 3. Lookup by name#discrim
+/// 4. Lookup by name
+/// 5. Lookup by nickname
+#[async_trait::async_trait]
+impl Parse for Member {
+    type Err = MemberParseError;
+
+    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
+        let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
+
+        let lookup_by_id = || guild.members.get(&UserId(s.parse().ok()?));
+
+        let lookup_by_mention = || {
+            guild.members.get(&UserId(
+                s.strip_prefix("<@!")
+                    .or_else(|| s.strip_prefix("<@"))?
+                    .strip_suffix(">")?
+                    .parse()
+                    .ok()?,
+            ))
+        };
+
+        let lookup_by_name_and_discrim = || {
+            let pound_sign = s.find('#')?;
+            let name = &s[..pound_sign];
+            let discrim = s[(pound_sign + 1)..].parse::<u16>().ok()?;
+            guild.members.values().find(|member| {
+                member.user.discriminator == discrim && member.user.name.eq_ignore_ascii_case(name)
+            })
+        };
+
+        let lookup_by_name = || guild.members.values().find(|member| member.user.name == s);
+
+        let lookup_by_nickname = || {
+            guild.members.values().find(|member| match &member.nick {
+                Some(nick) => nick.eq_ignore_ascii_case(s),
+                None => false,
+            })
+        };
+
+        lookup_by_id()
+            .or_else(lookup_by_mention)
+            .or_else(lookup_by_name_and_discrim)
+            .or_else(lookup_by_name)
+            .or_else(lookup_by_nickname)
+            .cloned()
+            .ok_or(MemberParseError::NotFoundOrMalformed)
+    }
+}
+
+/// Error that can be returned from [`Message::parse`].
+#[derive(Debug)]
+pub enum MessageParseError {
+    Malformed,
+    Http(SerenityError),
+}
+
+impl std::error::Error for MessageParseError {
+    fn source(&self) -> Option<&(dyn std::error::Error + 'static)> {
+        match self {
+            Self::Malformed => None,
+            Self::Http(e) => Some(e),
+        }
+    }
+}
+
+impl std::fmt::Display for MessageParseError {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        match self {
+            Self::Malformed => {
+                write!(f, "provided string did not adhere to any known guild message format")
+            }
+            Self::Http(e) => write!(f, "failed to request message data via HTTP: {}", e),
+        }
+    }
+}
+
+/// Look up a message by a string.
+///
+/// The lookup strategy is as follows (in order):
+/// 1. Lookup by "{channel ID}-{message ID}"" (retrieved by shift-clicking on "Copy ID")
+/// 2. Lookup by message ID (the message must be in the context channel)
+/// 3. Lookup by message URL
+#[async_trait::async_trait]
+impl Parse for Message {
+    type Err = MessageParseError;
+
+    async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
+        let extract_from_channel_hyphen_message_id = || {
+            let mut parts = s.splitn(2, '-');
+            let channel_id = ChannelId(parts.next()?.parse().ok()?);
+            let message_id = MessageId(parts.next()?.parse().ok()?);
+            Some((channel_id, message_id))
+        };
+
+        let extract_from_message_id = || Some((msg.channel_id, MessageId(s.parse().ok()?)));
+
+        let extract_from_message_url = || {
+            let mut parts = s.strip_prefix("https://discord.com/channels/")?.splitn(3, '/');
+            let _guild_id = GuildId(parts.next()?.parse().ok()?);
+            let channel_id = ChannelId(parts.next()?.parse().ok()?);
+            let message_id = MessageId(parts.next()?.parse().ok()?);
+            Some((channel_id, message_id))
+        };
+
+        let (channel_id, message_id) = extract_from_channel_hyphen_message_id()
+            .or_else(extract_from_message_id)
+            .or_else(extract_from_message_url)
+            .ok_or(MessageParseError::Malformed)?;
+
+        if let Some(msg) = ctx.cache.message(channel_id, message_id).await {
+            Ok(msg)
+        } else {
+            ctx.http.get_message(channel_id.0, message_id.0).await.map_err(MessageParseError::Http)
+        }
+    }
+}

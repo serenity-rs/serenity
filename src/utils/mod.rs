@@ -4,11 +4,13 @@
 mod colour;
 mod custom_message;
 mod message_builder;
+mod parse;
 
 pub use self::{
     colour::Colour,
     custom_message::CustomMessage,
     message_builder::{Content, ContentModifier, EmbedMessageBuilding, MessageBuilder},
+    parse::*, // export all public items
 };
 pub type Color = Colour;
 
@@ -304,11 +306,7 @@ pub fn parse_emoji(mention: impl AsRef<str>) -> Option<EmojiIdentifier> {
         }
 
         match id.parse::<u64>() {
-            Ok(x) => Some(EmojiIdentifier {
-                animated,
-                name,
-                id: EmojiId(x),
-            }),
+            Ok(x) => Some(EmojiIdentifier { animated, name, id: EmojiId(x) }),
             _ => None,
         }
     } else {
