@@ -6,9 +6,9 @@ use crate::{model::prelude::*, prelude::*};
 
 /// Parse a value from a string in context of a received message.
 ///
-/// This trait is a superset of [`std::str::FromStr`] (the trait used in `str::parse`). The
+/// This trait is a superset of [`std::str::FromStr`] (the trait used in [`str::parse`]). The
 /// difference is that this trait supports serenity-specific Discord types like [`Member`],
-/// [`Role`], or [`Emoji`].
+/// [`Role`] (soon), or [`Emoji`] (soon).
 ///
 /// Trait implementations may do network requests as part of their parsing procedure.
 ///
@@ -51,22 +51,20 @@ impl std::fmt::Display for MemberParseError {
 
 /// Look up a guild member by a string case-insensitively.
 ///
+/// Requires the cache feature to be enabled.
+///
 /// The lookup strategy is as follows (in order):
 /// 1. Lookup by ID.
 /// 2. Lookup by mention.
 /// 3. Lookup by name#discrim
 /// 4. Lookup by name
 /// 5. Lookup by nickname
+#[cfg(feature = "cache")]
 #[async_trait::async_trait]
 impl Parse for Member {
     type Err = MemberParseError;
 
-    #[cfg(not(feature = "cache"))]
-    async fn parse(_: &sconteContext, _: &Message, _: &str) -> Result<Self, Self::Err> {
-        Err(MemberParseError::GuildNotInCache)
-    }
-
-    #[cfg(feature = "cache")]
+    #[doc = ""] // to get impl documentation to show
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
 
@@ -74,11 +72,7 @@ impl Parse for Member {
 
         let lookup_by_mention = || {
             guild.members.get(&UserId(
-                s.strip_prefix("<@!")
-                    .or_else(|| s.strip_prefix("<@"))?
-                    .strip_suffix(">")?
-                    .parse()
-                    .ok()?,
+                s.strip_prefix("<@")?.trim_start_matches('!').strip_suffix(">")?.parse().ok()?,
             ))
         };
 
@@ -147,15 +141,16 @@ impl std::fmt::Display for MessageParseError {
 /// Look up a message by a string.
 ///
 /// The lookup strategy is as follows (in order):
-/// 1. Lookup by "{channel ID}-{message ID}"" (retrieved by shift-clicking on "Copy ID")
+/// 1. Lookup by "{channel ID}-{message ID}" (retrieved by shift-clicking on "Copy ID")
 /// 2. Lookup by message ID (the message must be in the context channel)
 /// 3. Lookup by message URL
 #[async_trait::async_trait]
 impl Parse for Message {
     type Err = MessageParseError;
 
+    #[doc = ""] // to get impl documentation to show
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
-        let extract_from_channel_hyphen_message_id = || {
+        let extract_from_id_pair = || {
             let mut parts = s.splitn(2, '-');
             let channel_id = ChannelId(parts.next()?.parse().ok()?);
             let message_id = MessageId(parts.next()?.parse().ok()?);
@@ -172,7 +167,7 @@ impl Parse for Message {
             Some((channel_id, message_id))
         };
 
-        let (channel_id, message_id) = extract_from_channel_hyphen_message_id()
+        let (channel_id, message_id) = extract_from_id_pair()
             .or_else(extract_from_message_id)
             .or_else(extract_from_message_url)
             .ok_or(MessageParseError::Malformed)?;
