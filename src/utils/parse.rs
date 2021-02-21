@@ -177,7 +177,7 @@ impl Parse for Message {
             return Ok(msg);
         }
 
-        if cfg!(feature = "gateway") {
+        if cfg!(feature = "http") {
             ctx.http.get_message(channel_id.0, message_id.0).await.map_err(MessageParseError::Http)
         } else {
             Err(MessageParseError::HttpNotAvailable)
