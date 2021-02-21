@@ -7,8 +7,8 @@ use crate::{model::prelude::*, prelude::*};
 /// Parse a value from a string in context of a received message.
 ///
 /// This trait is a superset of [`std::str::FromStr`] (the trait used in `str::parse`). The
-/// difference is that this trait supports serenity-specific Discord types like [`Member`], `Role`],
-/// or [`Emoji`].
+/// difference is that this trait supports serenity-specific Discord types like [`Member`],
+/// [`Role`], or [`Emoji`].
 ///
 /// Trait implementations may do network requests as part of their parsing procedure.
 ///
@@ -61,6 +61,12 @@ impl std::fmt::Display for MemberParseError {
 impl Parse for Member {
     type Err = MemberParseError;
 
+    #[cfg(not(feature = "cache"))]
+    async fn parse(_: &sconteContext, _: &Message, _: &str) -> Result<Self, Self::Err> {
+        Err(MemberParseError::GuildNotInCache)
+    }
+
+    #[cfg(feature = "cache")]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
 
@@ -109,6 +115,8 @@ impl Parse for Member {
 pub enum MessageParseError {
     Malformed,
     Http(SerenityError),
+    /// When the `gateway` feature is disabled and the required information was not in cache
+    HttpNotAvailable,
 }
 
 impl std::error::Error for MessageParseError {
@@ -116,6 +124,7 @@ impl std::error::Error for MessageParseError {
         match self {
             Self::Malformed => None,
             Self::Http(e) => Some(e),
+            Self::HttpNotAvailable => None,
         }
     }
 }
@@ -125,8 +134,12 @@ impl std::fmt::Display for MessageParseError {
         match self {
             Self::Malformed => {
                 write!(f, "provided string did not adhere to any known guild message format")
-            }
+            },
             Self::Http(e) => write!(f, "failed to request message data via HTTP: {}", e),
+            Self::HttpNotAvailable => write!(
+                f,
+                "gateway feature is disabled and the required information was not in cache"
+            ),
         }
     }
 }
@@ -164,10 +177,15 @@ impl Parse for Message {
             .or_else(extract_from_message_url)
             .ok_or(MessageParseError::Malformed)?;
 
+        #[cfg(feature = "cache")]
         if let Some(msg) = ctx.cache.message(channel_id, message_id).await {
-            Ok(msg)
-        } else {
+            return Ok(msg);
+        }
+
+        if cfg!(feature = "gateway") {
             ctx.http.get_message(channel_id.0, message_id.0).await.map_err(MessageParseError::Http)
+        } else {
+            Err(MessageParseError::HttpNotAvailable)
         }
     }
 }
