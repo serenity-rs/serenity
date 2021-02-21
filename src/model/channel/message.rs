@@ -14,7 +14,6 @@ use serde::{
     de::{Deserialize, Deserializer},
     ser::{Serialize, Serializer},
 };
-use serde_json::Value;
 
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::builder::{CreateEmbed, EditMessage};
@@ -26,6 +25,7 @@ use crate::client::bridge::gateway::ShardMessenger;
 use crate::collector::{CollectReaction, ReactionCollectorBuilder};
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+use crate::json::Value;
 #[cfg(feature = "unstable_discord_api")]
 use crate::model::interactions::MessageInteraction;
 use crate::model::prelude::*;
@@ -353,10 +353,8 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(builder.0);
 
-        *self = cache_http
-            .http()
-            .edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
-            .await?;
+        *self =
+            cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
 
         Ok(())
     }
@@ -366,7 +364,7 @@ impl Message {
             MessageType::PinsAdd => {
                 self.content =
                     format!("{} pinned a message to this channel. See all the pins.", self.author);
-            },
+            }
             MessageType::MemberJoin => {
                 let sec = self.timestamp.timestamp() as usize;
                 let chosen = constants::JOIN_MESSAGES[sec % constants::JOIN_MESSAGES.len()];
@@ -376,8 +374,8 @@ impl Message {
                 } else {
                     chosen.to_string()
                 };
-            },
-            _ => {},
+            }
+            _ => {}
         }
     }
 
@@ -780,10 +778,8 @@ impl Message {
 
         let map = crate::utils::hashmap_to_json_map(suppress.0);
 
-        *self = cache_http
-            .http()
-            .edit_message(self.channel_id.0, self.id.0, &Value::Object(map))
-            .await?;
+        *self =
+            cache_http.http().edit_message(self.channel_id.0, self.id.0, &Value::from(map)).await?;
 
         Ok(())
     }
@@ -1098,12 +1094,7 @@ pub enum MessageActivityKind {
     JOIN_REQUEST = 5,
 }
 
-enum_number!(MessageActivityKind {
-    JOIN,
-    SPECTATE,
-    LISTEN,
-    JOIN_REQUEST
-});
+enum_number!(MessageActivityKind { JOIN, SPECTATE, LISTEN, JOIN_REQUEST });
 
 impl MessageActivityKind {
     pub fn num(self) -> u64 {
@@ -1159,21 +1150,13 @@ pub struct MessageReference {
 
 impl From<&Message> for MessageReference {
     fn from(m: &Message) -> Self {
-        Self {
-            message_id: Some(m.id),
-            channel_id: m.channel_id,
-            guild_id: m.guild_id,
-        }
+        Self { message_id: Some(m.id), channel_id: m.channel_id, guild_id: m.guild_id }
     }
 }
 
 impl From<(ChannelId, MessageId)> for MessageReference {
     fn from(pair: (ChannelId, MessageId)) -> Self {
-        Self {
-            message_id: Some(pair.1),
-            channel_id: pair.0,
-            guild_id: None,
-        }
+        Self { message_id: Some(pair.1), channel_id: pair.0, guild_id: None }
     }
 }
 

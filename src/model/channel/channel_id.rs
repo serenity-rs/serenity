@@ -4,8 +4,6 @@ use std::fmt::Write as FmtWrite;
 use std::sync::Arc;
 
 use futures::stream::Stream;
-#[cfg(feature = "model")]
-use serde_json::json;
 
 #[cfg(feature = "model")]
 use crate::builder::{CreateInvite, CreateMessage, EditChannel, EditMessage, GetMessages};
@@ -24,6 +22,8 @@ use crate::collector::{
 use crate::http::AttachmentType;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http, Typing};
+#[cfg(feature = "model")]
+use crate::json::json;
 use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils;
@@ -374,7 +374,7 @@ impl ChannelId {
 
         let map = utils::hashmap_to_json_map(msg.0);
 
-        http.as_ref().edit_message(self.0, message_id.into().0, &Value::Object(map)).await
+        http.as_ref().edit_message(self.0, message_id.into().0, &Value::from(map)).await
     }
 
     /// Attempts to find a [`Channel`] by its Id in the cache.
@@ -767,7 +767,7 @@ impl ChannelId {
         Message::check_embed_length(&map)?;
 
         let message = if msg.2.is_empty() {
-            http.as_ref().send_message(self.0, &Value::Object(map)).await?
+            http.as_ref().send_message(self.0, &Value::from(map)).await?
         } else {
             http.as_ref().send_files(self.0, msg.2.clone(), map).await?
         };

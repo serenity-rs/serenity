@@ -16,6 +16,7 @@ use crate::builder::{EditWebhookMessage, ExecuteWebhook};
 use crate::http::Http;
 #[cfg(feature = "model")]
 use crate::internal::prelude::*;
+use crate::json::NULL;
 #[cfg(feature = "model")]
 use crate::model::prelude::*;
 #[cfg(feature = "model")]
@@ -35,10 +36,7 @@ pub enum WebhookType {
     ChannelFollower = 2,
 }
 
-enum_number!(WebhookType {
-    Incoming,
-    ChannelFollower
-});
+enum_number!(WebhookType { Incoming, ChannelFollower });
 
 impl WebhookType {
     #[inline]
@@ -202,12 +200,12 @@ impl Webhook {
 
         let token = self.token.as_ref().ok_or(ModelError::NoTokenSet)?;
 
-        let mut map = Map::new();
+        let mut map = JsonMap::new();
 
         if let Some(avatar) = avatar {
             map.insert(
                 "avatar".to_string(),
-                if avatar.is_empty() { Value::Null } else { Value::String(avatar.to_string()) },
+                if avatar.is_empty() { NULL } else { Value::String(avatar.to_string()) },
             );
         }
 
@@ -401,7 +399,7 @@ impl Webhook {
                 let _ = mem::replace(self, replacement);
 
                 Ok(())
-            },
+            }
             Err(why) => Err(why),
         }
     }

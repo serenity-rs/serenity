@@ -4,6 +4,7 @@ use super::CreateAllowedMentions;
 use super::CreateEmbed;
 use crate::http::AttachmentType;
 use crate::internal::prelude::*;
+use crate::json::to_value;
 use crate::model::channel::{MessageReference, ReactionType};
 use crate::utils;
 
@@ -87,7 +88,7 @@ impl<'a> CreateMessage<'a> {
     /// Set an embed for the message.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
         self.0.insert("embed", embed);
         self
@@ -99,7 +100,7 @@ impl<'a> CreateMessage<'a> {
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::Bool(tts));
+        self.0.insert("tts", Value::from(tts));
         self
     }
 
@@ -152,7 +153,7 @@ impl<'a> CreateMessage<'a> {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self
@@ -161,7 +162,7 @@ impl<'a> CreateMessage<'a> {
     /// Set the reference message this message is a reply to.
     #[allow(clippy::unwrap_used)] // allowing unwrap here because serializing MessageReference should never error
     pub fn reference_message(&mut self, reference: impl Into<MessageReference>) -> &mut Self {
-        self.0.insert("message_reference", serde_json::to_value(reference.into()).unwrap());
+        self.0.insert("message_reference", to_value(reference.into()).unwrap());
         self
     }
 }
@@ -174,7 +175,7 @@ impl<'a> Default for CreateMessage<'a> {
     /// [`tts`]: Self::tts
     fn default() -> CreateMessage<'a> {
         let mut map = HashMap::new();
-        map.insert("tts", Value::Bool(false));
+        map.insert("tts", Value::from(false));
 
         CreateMessage(map, None, Vec::new())
     }

@@ -7,8 +7,6 @@ use std::fmt::Write;
 use bitflags::__impl_bitflags;
 use futures::future::{BoxFuture, FutureExt};
 use serde::{Deserialize, Deserializer, Serialize, Serializer};
-#[cfg(feature = "model")]
-use serde_json::json;
 
 use super::prelude::*;
 use super::utils::deserialize_u16;
@@ -20,15 +18,15 @@ use crate::cache::Cache;
 use crate::client::bridge::gateway::ShardMessenger;
 #[cfg(feature = "collector")]
 use crate::collector::{
-    CollectReaction,
-    CollectReply,
-    MessageCollectorBuilder,
-    ReactionCollectorBuilder,
+    CollectReaction, CollectReply, MessageCollectorBuilder, ReactionCollectorBuilder,
 };
 #[cfg(feature = "model")]
 use crate::http::GuildPagination;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
+#[cfg(feature = "model")]
+use crate::json::json;
+use crate::json::to_string;
 #[cfg(feature = "model")]
 use crate::utils;
 use crate::{internal::prelude::*, model::misc::Mentionable};
@@ -381,7 +379,7 @@ impl DefaultAvatar {
     ///
     /// [`Error::Json`]: crate::error::Error::Json
     pub fn name(self) -> Result<String> {
-        serde_json::to_string(&self).map_err(From::from)
+        to_string(&self).map_err(From::from)
     }
 }
 
@@ -745,7 +743,7 @@ impl User {
             match guild {
                 GuildContainer::Guild(partial_guild) => {
                     self._has_role(cache_http, GuildContainer::Id(partial_guild.id), role).await
-                },
+                }
                 GuildContainer::Id(guild_id) => {
                     // Silences a warning when compiling without the `cache` feature.
                     #[allow(unused_mut)]
@@ -769,7 +767,7 @@ impl User {
                             .await
                             .map(|m| m.roles.contains(&role))
                     }
-                },
+                }
             }
         }
         .boxed()
@@ -1121,10 +1119,7 @@ mod test {
 
         #[test]
         fn default_avatars() {
-            let mut user = User {
-                discriminator: 0,
-                ..Default::default()
-            };
+            let mut user = User { discriminator: 0, ..Default::default() };
 
             assert!(user.default_avatar_url().ends_with("0.png"));
             user.discriminator = 1;

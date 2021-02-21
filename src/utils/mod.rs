@@ -38,12 +38,12 @@ use crate::model::id::{ChannelId, GuildId, RoleId, UserId};
 use crate::model::{id::EmojiId, misc::EmojiIdentifier};
 
 /// Converts a HashMap into a final `serde_json::Map` representation.
-pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> Map<String, Value>
+pub fn hashmap_to_json_map<H, T>(map: HashMap<T, Value, H>) -> JsonMap
 where
     H: BuildHasher,
     T: Eq + Hash + ToString,
 {
-    let mut json_map = Map::new();
+    let mut json_map = JsonMap::new();
 
     for (key, value) in map {
         json_map.insert(key.to_string(), value);

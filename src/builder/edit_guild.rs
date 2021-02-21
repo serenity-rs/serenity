@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
-use crate::internal::prelude::*;
 use crate::model::prelude::*;
+use crate::{
+    internal::prelude::*,
+    json::{from_number, NULL},
+};
 
 /// A builder to optionally edit certain fields of a [`Guild`]. This is meant
 /// for usage with [`Guild::edit`].
@@ -31,10 +34,13 @@ impl EditGuild {
     }
 
     fn _afk_channel(&mut self, channel: Option<ChannelId>) {
-        self.0.insert("afk_channel_id", match channel {
-            Some(channel) => Value::Number(Number::from(channel.0)),
-            None => Value::Null,
-        });
+        self.0.insert(
+            "afk_channel_id",
+            match channel {
+                Some(channel) => from_number(channel.0),
+                None => NULL,
+            },
+        );
     }
 
     /// Set the amount of time a user is to be moved to the AFK channel -
@@ -42,7 +48,7 @@ impl EditGuild {
     ///
     /// [`afk_channel`]: Self::afk_channel
     pub fn afk_timeout(&mut self, timeout: u64) -> &mut Self {
-        self.0.insert("afk_timeout", Value::Number(Number::from(timeout)));
+        self.0.insert("afk_timeout", from_number(timeout));
         self
     }
 
@@ -75,7 +81,7 @@ impl EditGuild {
     ///
     /// [`utils::read_image`]: crate::utils::read_image
     pub fn icon(&mut self, icon: Option<&str>) -> &mut Self {
-        self.0.insert("icon", icon.map_or_else(|| Value::Null, |x| Value::String(x.to_string())));
+        self.0.insert("icon", icon.map_or_else(|| NULL, |x| Value::String(x.to_string())));
         self
     }
 
@@ -97,7 +103,7 @@ impl EditGuild {
     }
 
     fn _owner(&mut self, user_id: UserId) {
-        let id = Value::Number(Number::from(user_id.0));
+        let id = from_number(user_id.0);
         self.0.insert("owner_id", id);
     }
 
@@ -138,7 +144,7 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn splash(&mut self, splash: Option<&str>) -> &mut Self {
-        let splash = splash.map_or(Value::Null, |x| Value::String(x.to_string()));
+        let splash = splash.map_or(NULL, |x| Value::String(x.to_string()));
         self.0.insert("splash", splash);
         self
     }
@@ -152,7 +158,7 @@ impl EditGuild {
     ///
     /// [`features`]: crate::model::guild::Guild::features
     pub fn banner(&mut self, banner: Option<&str>) -> &mut Self {
-        let banner = banner.map_or(Value::Null, |x| Value::String(x.to_string()));
+        let banner = banner.map_or(NULL, |x| Value::String(x.to_string()));
         self.0.insert("banner", banner);
         self
     }
@@ -163,7 +169,7 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn system_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
-        let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
+        let channel_id = channel_id.map_or(NULL, |x| Value::from(x.0));
         self.0.insert("system_channel_id", channel_id);
         self
     }
@@ -173,7 +179,7 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn rules_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
-        let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
+        let channel_id = channel_id.map_or(NULL, |x| Value::from(x.0));
         self.0.insert("rules_channel_id", channel_id);
         self
     }
@@ -184,7 +190,7 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn public_updates_channel_id(&mut self, channel_id: Option<ChannelId>) -> &mut Self {
-        let channel_id = channel_id.map_or(Value::Null, |x| Value::from(x.0));
+        let channel_id = channel_id.map_or(NULL, |x| Value::from(x.0));
         self.0.insert("public_updates_channel_id", channel_id);
         self
     }
@@ -197,14 +203,14 @@ impl EditGuild {
     /// **Note**:
     /// This feature is for Community guilds only.
     pub fn preferred_locale(&mut self, locale: Option<&str>) -> &mut Self {
-        let locale = locale.map_or(Value::Null, |x| Value::String(x.to_string()));
+        let locale = locale.map_or(NULL, |x| Value::String(x.to_string()));
         self.0.insert("preferred_locale", locale);
         self
     }
 
     /// Set the content filter level.
     pub fn explicit_content_filter(&mut self, level: Option<ExplicitContentFilter>) -> &mut Self {
-        let level = level.map_or(Value::Null, |x| Value::from(x as u8));
+        let level = level.map_or(NULL, |x| Value::from(x as u8));
         self.0.insert("explicit_content_filter", level);
         self
     }
@@ -214,7 +220,7 @@ impl EditGuild {
         &mut self,
         level: Option<DefaultMessageNotificationLevel>,
     ) -> &mut Self {
-        let level = level.map_or(Value::Null, |x| Value::from(x as u8));
+        let level = level.map_or(NULL, |x| Value::from(x as u8));
         self.0.insert("default_message_notifications", level);
         self
     }
@@ -261,7 +267,7 @@ impl EditGuild {
     }
 
     fn _verification_level(&mut self, verification_level: VerificationLevel) {
-        let num = Value::Number(Number::from(verification_level.num()));
+        let num = from_number(verification_level.num());
         self.0.insert("verification_level", num);
     }
 

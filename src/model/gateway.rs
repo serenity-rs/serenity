@@ -6,6 +6,7 @@ use serde::ser::{Serialize, SerializeStruct, Serializer};
 
 use super::prelude::*;
 use super::utils::*;
+use crate::json::from_value;
 
 /// A representation of the data retrieved from the bot gateway endpoint.
 ///
@@ -334,29 +335,29 @@ impl<'de> Deserialize<'de> for Activity {
         let mut map = JsonMap::deserialize(deserializer)?;
 
         let application_id = match map.remove("application_id") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let assets = match map.remove("assets") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let details = match map.remove("details") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let flags = match map.remove("flags") {
-            Some(v) => serde_json::from_value::<Option<u64>>(v)
+            Some(v) => from_value::<Option<u64>>(v)
                 .map_err(DeError::custom)?
                 .map(ActivityFlags::from_bits_truncate),
             None => None,
         };
 
         let instance = match map.remove("instance") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
@@ -371,43 +372,43 @@ impl<'de> Deserialize<'de> for Activity {
             .unwrap_or_else(String::new);
 
         let party = match map.remove("party") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let secrets = match map.remove("secrets") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let state = match map.remove("state") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let emoji = match map.remove("emoji") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let timestamps = match map.remove("timestamps") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         #[cfg(feature = "unstable_discord_api")]
         let sync_id = match map.remove("sync_id") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         #[cfg(feature = "unstable_discord_api")]
         let session_id = match map.remove("session_id") {
-            Some(v) => serde_json::from_value::<Option<_>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<_>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
-        let url = map.remove("url").and_then(|v| serde_json::from_value::<String>(v).ok());
+        let url = map.remove("url").and_then(|v| from_value::<String>(v).ok());
 
         Ok(Activity {
             application_id,
@@ -592,7 +593,7 @@ impl<'de> Deserialize<'de> for Presence {
             .map_err(DeError::custom)?;
 
         let (user_id, user) = if user_map.len() > 1 {
-            let user = User::deserialize(Value::Object(user_map)).map_err(DeError::custom)?;
+            let user = User::deserialize(Value::from(user_map)).map_err(DeError::custom)?;
 
             (user.id, Some(user))
         } else {
@@ -606,19 +607,17 @@ impl<'de> Deserialize<'de> for Presence {
         };
 
         let activities = match map.remove("activities") {
-            Some(v) => serde_json::from_value::<Vec<Activity>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Vec<Activity>>(v).map_err(DeError::custom)?,
             None => Vec::new(),
         };
 
         let client_status = match map.remove("client_status") {
-            Some(v) => {
-                serde_json::from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?
-            },
+            Some(v) => from_value::<Option<ClientStatus>>(v).map_err(DeError::custom)?,
             None => None,
         };
 
         let last_modified = match map.remove("last_modified") {
-            Some(v) => serde_json::from_value::<Option<u64>>(v).map_err(DeError::custom)?,
+            Some(v) => from_value::<Option<u64>>(v).map_err(DeError::custom)?,
             None => None,
         };
 

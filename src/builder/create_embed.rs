@@ -18,9 +18,9 @@ use std::collections::HashMap;
 use std::fmt::Display;
 
 use chrono::{DateTime, TimeZone};
-use serde_json::{json, Value};
 
-use crate::internal::prelude::*;
+use crate::json::Value;
+use crate::json::{from_number, json};
 use crate::model::channel::Embed;
 use crate::utils;
 #[cfg(feature = "utils")]
@@ -58,7 +58,7 @@ impl CreateEmbed {
     pub fn set_author(&mut self, author: CreateEmbedAuthor) -> &mut Self {
         let map = utils::hashmap_to_json_map(author.0);
 
-        self.0.insert("author", Value::Object(map));
+        self.0.insert("author", Value::from(map));
         self
     }
 
@@ -84,7 +84,7 @@ impl CreateEmbed {
 
     #[cfg(feature = "utils")]
     fn _colour(&mut self, colour: Colour) {
-        self.0.insert("color", Value::Number(Number::from(u64::from(colour.0))));
+        self.0.insert("color", from_number(u64::from(colour.0)));
     }
 
     /// Set the colour of the left-hand side of the embed.
@@ -180,7 +180,7 @@ impl CreateEmbed {
         let footer = create_embed_footer.0;
         let map = utils::hashmap_to_json_map(footer);
 
-        self.0.insert("footer", Value::Object(map));
+        self.0.insert("footer", Value::from(map));
         self
     }
 
@@ -516,9 +516,9 @@ where
 
 #[cfg(test)]
 mod test {
-    use serde_json::{json, Value};
-
     use super::CreateEmbed;
+    use crate::json::json;
+    use crate::json::Value;
     use crate::{
         model::channel::{Embed, EmbedField, EmbedFooter, EmbedImage, EmbedVideo},
         utils::{self, Colour},
@@ -573,7 +573,7 @@ mod test {
         builder.title("still a hakase");
         builder.url("https://i.imgur.com/XfWpfCV.gif");
 
-        let built = Value::Object(utils::hashmap_to_json_map(builder.0));
+        let built = Value::from(utils::hashmap_to_json_map(builder.0));
 
         let obj = json!({
             "color": 0xFF0011,

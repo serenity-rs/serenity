@@ -100,7 +100,7 @@ impl Embed {
         f(&mut create_embed);
         let map = utils::hashmap_to_json_map(create_embed.0);
 
-        Value::Object(map)
+        Value::from(map)
     }
 }
 

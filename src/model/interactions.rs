@@ -2,7 +2,6 @@
 
 use bitflags::__impl_bitflags;
 use serde::de::{Deserialize, Deserializer, Error as DeError};
-use serde_json::{Map, Number, Value};
 
 use super::prelude::*;
 use crate::builder::{
@@ -13,6 +12,7 @@ use crate::builder::{
 };
 use crate::http::Http;
 use crate::internal::prelude::*;
+use crate::json::{from_number, from_value, JsonMap, Value};
 use crate::utils;
 
 /// Information about an interaction.
@@ -41,7 +41,7 @@ impl<'de> Deserialize<'de> for Interaction {
 
         if let Some(guild_id) = id {
             if let Some(member) = map.get_mut("member").and_then(|x| x.as_object_mut()) {
-                member.insert("guild_id".to_string(), Value::Number(Number::from(guild_id)));
+                member.insert("guild_id".to_string(), from_number(guild_id));
             }
         }
 
@@ -58,7 +58,7 @@ impl<'de> Deserialize<'de> for Interaction {
             .map_err(DeError::custom)?;
 
         let data = match map.remove("data") {
-            Some(v) => serde_json::from_value::<Option<ApplicationCommandInteractionData>>(v)
+            Some(v) => from_value::<Option<ApplicationCommandInteractionData>>(v)
                 .map_err(DeError::custom)?,
             None => None,
         };
@@ -321,7 +321,7 @@ impl Interaction {
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
         let map = Interaction::build_interaction(f);
-        http.as_ref().create_global_application_command(application_id, &Value::Object(map)).await
+        http.as_ref().create_global_application_command(application_id, &Value::from(map)).await
     }
 
     /// Creates a guild specific [`ApplicationCommand`]
@@ -344,12 +344,12 @@ impl Interaction {
     {
         let map = Interaction::build_interaction(f);
         http.as_ref()
-            .create_guild_application_command(application_id, guild_id.0, &Value::Object(map))
+            .create_guild_application_command(application_id, guild_id.0, &Value::from(map))
             .await
     }
 
     #[inline]
-    fn build_interaction<F>(f: F) -> Map<String, Value>
+    fn build_interaction<F>(f: F) -> JsonMap
     where
         F: FnOnce(&mut CreateInteraction) -> &mut CreateInteraction,
     {
@@ -386,7 +386,7 @@ impl Interaction {
         Message::check_content_length(&map)?;
         Message::check_embed_length(&map)?;
 
-        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::Object(map)).await
+        http.as_ref().create_interaction_response(self.id.0, &self.token, &Value::from(map)).await
     }
 
     /// Edits the initial interaction response.
@@ -426,7 +426,7 @@ impl Interaction {
         Message::check_embed_length(&map)?;
 
         http.as_ref()
-            .edit_original_interaction_response(application_id, &self.token, &Value::Object(map))
+            .edit_original_interaction_response(application_id, &self.token, &Value::from(map))
             .await
     }
 

@@ -1,7 +1,10 @@
 use std::collections::HashMap;
 
-use crate::internal::prelude::*;
-use crate::model::id::{ChannelId, RoleId};
+use crate::{internal::prelude::*, json::from_number};
+use crate::{
+    json::NULL,
+    model::id::{ChannelId, RoleId},
+};
 
 /// A builder which edits the properties of a [`Member`], to be used in
 /// conjunction with [`Member::edit`].
@@ -18,7 +21,7 @@ impl EditMember {
     ///
     /// [Deafen Members]: crate::model::permissions::Permissions::DEAFEN_MEMBERS
     pub fn deafen(&mut self, deafen: bool) -> &mut Self {
-        self.0.insert("deaf", Value::Bool(deafen));
+        self.0.insert("deaf", Value::from(deafen));
         self
     }
 
@@ -28,7 +31,7 @@ impl EditMember {
     ///
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     pub fn mute(&mut self, mute: bool) -> &mut Self {
-        self.0.insert("mute", Value::Bool(mute));
+        self.0.insert("mute", Value::from(mute));
         self
     }
 
@@ -49,8 +52,7 @@ impl EditMember {
     ///
     /// [Manage Roles]: crate::model::permissions::Permissions::MANAGE_ROLES
     pub fn roles<T: AsRef<RoleId>, It: IntoIterator<Item = T>>(&mut self, roles: It) -> &mut Self {
-        let role_ids =
-            roles.into_iter().map(|x| Value::Number(Number::from(x.as_ref().0))).collect();
+        let role_ids = roles.into_iter().map(|x| from_number(x.as_ref().0)).collect();
 
         self._roles(role_ids);
         self
@@ -73,7 +75,7 @@ impl EditMember {
     }
 
     fn _voice_channel(&mut self, channel_id: ChannelId) {
-        let num = Value::Number(Number::from(channel_id.0));
+        let num = from_number(channel_id.0);
         self.0.insert("channel_id", num);
     }
 
@@ -83,7 +85,7 @@ impl EditMember {
     ///
     /// [Move Members]: crate::model::permissions::Permissions::MOVE_MEMBERS
     pub fn disconnect_member(&mut self) -> &mut Self {
-        self.0.insert("channel_id", Value::Null);
+        self.0.insert("channel_id", NULL);
 
         self
     }

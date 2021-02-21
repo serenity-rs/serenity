@@ -1,13 +1,12 @@
 use std::fmt::{Display, Formatter, Result as FmtResult, Write as FmtWrite};
 
 #[cfg(all(feature = "cache", feature = "model"))]
-use serde_json::json;
-
-#[cfg(all(feature = "cache", feature = "model"))]
 use crate::cache::Cache;
 use crate::http::Http;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
+#[cfg(all(feature = "cache", feature = "model"))]
+use crate::json::json;
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::model::id::GuildId;
 use crate::model::id::{EmojiId, RoleId};

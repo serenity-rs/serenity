@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
-
 use crate::http::AttachmentType;
+use crate::json::Value;
 
 /// A builder to create the inner content of a [`Webhook`]'s execution.
 ///
@@ -187,7 +186,7 @@ impl<'a> ExecuteWebhook<'a> {
     /// # }
     /// ```
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::Bool(tts));
+        self.0.insert("tts", Value::from(tts));
         self
     }
 
@@ -240,7 +239,7 @@ impl<'a> Default for ExecuteWebhook<'a> {
     /// [`tts`]: Self::tts
     fn default() -> ExecuteWebhook<'a> {
         let mut map = HashMap::new();
-        map.insert("tts", Value::Bool(false));
+        map.insert("tts", Value::from(false));
 
         ExecuteWebhook(map, vec![])
     }

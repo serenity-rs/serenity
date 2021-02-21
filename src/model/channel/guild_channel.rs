@@ -31,9 +31,9 @@ use crate::http::AttachmentType;
 use crate::http::{CacheHttp, Http, Typing};
 #[cfg(all(feature = "cache", feature = "model"))]
 use crate::internal::prelude::*;
-use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
+use crate::{json::from_number, model::prelude::*};
 
 /// Represents a guild's text, news, or voice channel. Some methods are available
 /// only for voice channels and some are only available for text channels.
@@ -413,7 +413,7 @@ impl GuildChannel {
 
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
-        map.insert("position", Value::Number(Number::from(self.position)));
+        map.insert("position", from_number(self.position));
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);
@@ -1140,7 +1140,7 @@ impl GuildChannel {
             return Err(Error::Model(ModelError::InvalidChannelType));
         }
 
-        let map = serde_json::json!({
+        let map = crate::json::json!({
             "name": name,
         });
 
@@ -1202,7 +1202,7 @@ impl GuildChannel {
             },
         };
 
-        let map = serde_json::json!({
+        let map = crate::json::json!({
             "name": name,
             "avatar": avatar
         });

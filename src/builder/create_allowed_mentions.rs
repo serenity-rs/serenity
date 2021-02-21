@@ -1,8 +1,11 @@
 use std::collections::HashMap;
 
 use serde::{Deserialize, Serialize};
-use serde_json::{json, Value};
+#[cfg(feature = "simd-json")]
+use simd_json::Mutable;
 
+use crate::json::json;
+use crate::json::Value;
 use crate::model::id::{RoleId, UserId};
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
@@ -147,7 +150,7 @@ impl CreateAllowedMentions {
     /// Makes the reply mention/ping the user.
     #[inline]
     pub fn replied_user(&mut self, mention_user: bool) -> &mut Self {
-        self.0.insert("replied_user", Value::Bool(mention_user));
+        self.0.insert("replied_user", Value::from(mention_user));
 
         self
     }

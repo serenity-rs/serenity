@@ -453,7 +453,7 @@ impl<'de> Deserialize<'de> for AuditLogs {
                                 // using a proper Error num, the best we can do here is to check if the string contains
                                 // this error. This was added because Discord randomly started sending new fields.
                                 // But no JSON deserializer should ever error over this.
-                                map.next_value::<serde_json::Value>()?; // Actually read the value to avoid syntax errors
+                                map.next_value::<crate::json::Value>()?; // Actually read the value to avoid syntax errors
                             } else {
                                 return Err(e);
                             }

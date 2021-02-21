@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
-
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::json::Value;
 use crate::{http::AttachmentType, utils};
 
 #[derive(Clone, Debug, Default)]
@@ -52,7 +51,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     ///
     /// Defaults to `false`.
     pub fn tts(&mut self, tts: bool) -> &mut Self {
-        self.0.insert("tts", Value::Bool(tts));
+        self.0.insert("tts", Value::from(tts));
         self
     }
 
@@ -96,7 +95,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
     /// Set an embed for the message.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
         self.0.insert("embed", embed);
         self
@@ -110,7 +109,7 @@ impl<'a> CreateInteractionResponseFollowup<'a> {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self

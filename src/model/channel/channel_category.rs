@@ -2,9 +2,9 @@
 use crate::builder::EditChannel;
 #[cfg(feature = "model")]
 use crate::http::{CacheHttp, Http};
-use crate::model::prelude::*;
 #[cfg(all(feature = "model", feature = "utils"))]
 use crate::utils as serenity_utils;
+use crate::{json::from_number, model::prelude::*};
 
 /// A category of [`GuildChannel`]s.
 #[derive(Clone, Debug, Deserialize, Serialize)]
@@ -126,7 +126,7 @@ impl ChannelCategory {
     {
         let mut map = HashMap::new();
         map.insert("name", Value::String(self.name.clone()));
-        map.insert("position", Value::Number(Number::from(self.position)));
+        map.insert("position", from_number(self.position));
 
         let mut edit_channel = EditChannel::default();
         f(&mut edit_channel);

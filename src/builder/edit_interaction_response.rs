@@ -1,8 +1,7 @@
 use std::collections::HashMap;
 
-use serde_json::Value;
-
 use super::{CreateAllowedMentions, CreateEmbed};
+use crate::json::Value;
 use crate::utils;
 
 #[derive(Clone, Debug, Default)]
@@ -37,7 +36,7 @@ impl EditInteractionResponse {
     /// Set an embed for the message.
     pub fn set_embed(&mut self, embed: CreateEmbed) -> &mut Self {
         let map = utils::hashmap_to_json_map(embed.0);
-        let embed = Value::Object(map);
+        let embed = Value::from(map);
 
         let embeds = self.0.entry("embeds").or_insert_with(|| Value::Array(vec![]));
 
@@ -56,7 +55,7 @@ impl EditInteractionResponse {
         let mut allowed_mentions = CreateAllowedMentions::default();
         f(&mut allowed_mentions);
         let map = utils::hashmap_to_json_map(allowed_mentions.0);
-        let allowed_mentions = Value::Object(map);
+        let allowed_mentions = Value::from(map);
 
         self.0.insert("allowed_mentions", allowed_mentions);
         self

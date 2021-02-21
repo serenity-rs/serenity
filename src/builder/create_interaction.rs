@@ -1,7 +1,8 @@
 use std::collections::HashMap;
 
-use serde_json::{json, Value};
-
+use crate::json::from_number;
+use crate::json::prelude::*;
+use crate::json::Value;
 use crate::{model::interactions::ApplicationCommandOptionType, utils};
 
 /// A builder for creating a new [`ApplicationCommandInteractionDataOption`].
@@ -18,7 +19,7 @@ pub struct CreateInteractionOption(pub HashMap<&'static str, Value>);
 impl CreateInteractionOption {
     /// Set the ApplicationCommandOptionType for the InteractionOption.
     pub fn kind(&mut self, kind: ApplicationCommandOptionType) -> &mut Self {
-        self.0.insert("type", Value::Number(serde_json::Number::from(kind as u8)));
+        self.0.insert("type", from_number(kind as u8));
         self
     }
 
@@ -42,7 +43,7 @@ impl CreateInteractionOption {
     ///
     /// **Note**: Only one option can be `default`.
     pub fn default_option(&mut self, default: bool) -> &mut Self {
-        self.0.insert("default", Value::Bool(default));
+        self.0.insert("default", Value::from(default));
         self
     }
 
@@ -50,7 +51,7 @@ impl CreateInteractionOption {
     ///
     /// **Note**: This defaults to `false`.
     pub fn required(&mut self, required: bool) -> &mut Self {
-        self.0.insert("required", Value::Bool(required));
+        self.0.insert("required", Value::from(required));
         self
     }
 
@@ -99,7 +100,7 @@ impl CreateInteractionOption {
         let new_option = utils::hashmap_to_json_map(sub_option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
-        opt_arr.push(Value::Object(new_option));
+        opt_arr.push(Value::from(new_option));
 
         self
     }
@@ -152,7 +153,7 @@ impl CreateInteraction {
         let new_option = utils::hashmap_to_json_map(option.0);
         let options = self.0.entry("options").or_insert_with(|| Value::Array(Vec::new()));
         let opt_arr = options.as_array_mut().expect("Must be an array");
-        opt_arr.push(Value::Object(new_option));
+        opt_arr.push(Value::from(new_option));
 
         self
     }
@@ -163,7 +164,7 @@ impl CreateInteraction {
     pub fn set_interaction_options(&mut self, options: Vec<CreateInteractionOption>) -> &mut Self {
         let new_options = options
             .into_iter()
-            .map(|f| Value::Object(utils::hashmap_to_json_map(f.0)))
+            .map(|f| Value::from(utils::hashmap_to_json_map(f.0)))
             .collect::<Vec<Value>>();
         self.0.insert("options", Value::Array(new_options));
         self

@@ -1,6 +1,6 @@
 use std::collections::HashMap;
 
-use crate::internal::prelude::*;
+use crate::{internal::prelude::*, json::NULL};
 
 /// A builder to edit the current user's settings, to be used in conjunction
 /// with [`CurrentUser::edit`].
@@ -49,7 +49,7 @@ impl EditProfile {
     ///
     /// [`utils::read_image`]: crate::utils::read_image
     pub fn avatar(&mut self, avatar: Option<&str>) -> &mut Self {
-        let avatar = avatar.map_or(Value::Null, |x| Value::String(x.to_string()));
+        let avatar = avatar.map_or(NULL, |x| Value::String(x.to_string()));
 
         self.0.insert("avatar", avatar);
         self

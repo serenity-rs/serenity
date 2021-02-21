@@ -4,6 +4,7 @@ use chrono::{DateTime, Utc};
 
 use super::create_embed::Timestamp;
 use crate::internal::prelude::*;
+use crate::json;
 
 /// A builder which edits a user's voice state, to be used in conjunction with
 /// [`GuildChannel::edit_voice_state`].
@@ -22,7 +23,7 @@ impl EditVoiceState {
     ///
     /// [Mute Members]: crate::model::permissions::Permissions::MUTE_MEMBERS
     pub fn suppress(&mut self, deafen: bool) -> &mut Self {
-        self.0.insert("suppress", Value::Bool(deafen));
+        self.0.insert("suppress", Value::from(deafen));
         self
     }
 
@@ -55,7 +56,7 @@ impl EditVoiceState {
         if let Some(timestamp) = timestamp {
             self.0.insert("request_to_speak_timestamp", Value::String(timestamp.into().ts));
         } else {
-            self.0.insert("request_to_speak_timestamp", Value::Null);
+            self.0.insert("request_to_speak_timestamp", json::NULL);
         }
 
         self

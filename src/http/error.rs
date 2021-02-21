@@ -155,6 +155,7 @@ mod test {
     use reqwest::ResponseBuilderExt;
 
     use super::*;
+    use crate::json::to_string;
 
     #[tokio::test]
     async fn test_error_response_into() {
@@ -167,7 +168,7 @@ mod test {
         let mut builder = Builder::new();
         builder = builder.status(403);
         builder = builder.url(String::from("https://ferris.crab").parse().unwrap());
-        let body_string = serde_json::to_string(&error).unwrap();
+        let body_string = to_string(&error).unwrap();
         let response = builder.body(body_string.into_bytes()).unwrap();
 
         let reqwest_response: reqwest::Response = response.into();

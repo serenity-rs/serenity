@@ -36,9 +36,9 @@ use crate::cache::FromStrAndCache;
 use crate::http::CacheHttp;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::model::misc::ChannelParseError;
-use crate::model::prelude::*;
 #[cfg(all(feature = "cache", feature = "model", feature = "utils"))]
 use crate::utils::parse_channel;
+use crate::{json::from_value, model::prelude::*};
 
 /// A container for any channel.
 #[derive(Clone, Debug)]
@@ -178,13 +178,13 @@ impl Channel {
         match self {
             Channel::Guild(public_channel) => {
                 public_channel.delete(cache_http).await?;
-            },
+            }
             Channel::Private(private_channel) => {
                 private_channel.delete(cache_http.http()).await?;
-            },
+            }
             Channel::Category(category) => {
                 category.delete(cache_http).await?;
-            },
+            }
         }
 
         Ok(())
@@ -238,18 +238,18 @@ impl<'de> Deserialize<'de> for Channel {
                         Unexpected::Other("non-positive integer"),
                         &"a positive integer",
                     ));
-                },
+                }
             }
         };
 
         match kind {
-            0 | 2 | 5 | 6 | 13 => serde_json::from_value::<GuildChannel>(Value::Object(v))
+            0 | 2 | 5 | 6 | 13 => from_value::<GuildChannel>(Value::from(v))
                 .map(Channel::Guild)
                 .map_err(DeError::custom),
-            1 => serde_json::from_value::<PrivateChannel>(Value::Object(v))
+            1 => from_value::<PrivateChannel>(Value::from(v))
                 .map(Channel::Private)
                 .map_err(DeError::custom),
-            4 => serde_json::from_value::<ChannelCategory>(Value::Object(v))
+            4 => from_value::<ChannelCategory>(Value::from(v))
                 .map(Channel::Category)
                 .map_err(DeError::custom),
             _ => Err(DeError::custom("Unknown channel type")),
@@ -311,15 +311,7 @@ pub enum ChannelType {
     Stage = 13,
 }
 
-enum_number!(ChannelType {
-    Text,
-    Private,
-    Voice,
-    Category,
-    News,
-    Store,
-    Stage
-});
+enum_number!(ChannelType { Text, Private, Voice, Category, News, Store, Stage });
 
 impl ChannelType {
     #[inline]
@@ -379,11 +371,7 @@ impl<'de> Deserialize<'de> for PermissionOverwrite {
             _ => return Err(DeError::custom("Unknown PermissionOverwriteType")),
         };
 
-        Ok(PermissionOverwrite {
-            allow: data.allow,
-            deny: data.deny,
-            kind,
-        })
+        Ok(PermissionOverwrite { allow: data.allow, deny: data.deny, kind })
     }
 }
 
@@ -430,10 +418,7 @@ pub enum VideoQualityMode {
     Full = 2,
 }
 
-enum_number!(VideoQualityMode {
-    Auto,
-    Full
-});
+enum_number!(VideoQualityMode { Auto, Full });
 
 #[cfg(test)]
 mod test {
