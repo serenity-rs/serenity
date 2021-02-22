@@ -157,6 +157,9 @@ unstable_discord_api = []
 utils = ["base64"]
 voice = ["client", "model"]
 
+# Enables simd accelerated parsing
+simdjson = ["simd-json"]
+
 # Backends to pick from:
 # - Rustls Backends
 rustls_backend = ["reqwest/rustls-tls", "async-tungstenite/tokio-rustls", "tokio", "rustls_backend_marker", "bytes"]
