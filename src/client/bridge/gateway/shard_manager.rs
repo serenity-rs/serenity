@@ -38,7 +38,7 @@ use crate::CacheAndHttp;
 /// Initialize a shard manager with a framework responsible for shards 0 through
 /// 2, of 5 total shards:
 ///
-/// ```rust,no_run
+/// ```rust
 /// # use std::error::Error;
 /// #
 /// # #[cfg(feature = "voice")]
@@ -69,7 +69,7 @@ use crate::CacheAndHttp;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
-/// let framework = Arc::new(StandardFramework::new() as Box<dyn Framework + 'static + Send + Sync>);
+/// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + Send + Sync + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
