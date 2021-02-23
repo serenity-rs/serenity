@@ -39,7 +39,7 @@ pub enum StickerFormatType {
 enum_number!(StickerFormatType {
     Png,
     Apng,
-    Lottie,
+    Lottie
 });
 
 impl StickerFormatType {

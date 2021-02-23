@@ -117,7 +117,7 @@ pub enum InteractionType {
 
 enum_number!(InteractionType {
     Ping,
-    ApplicationCommand,
+    ApplicationCommand
 });
 
 /// The command data payload.

@@ -455,7 +455,7 @@ enum_number!(ActivityType {
     Streaming,
     Listening,
     Custom,
-    Competing,
+    Competing
 });
 
 impl ActivityType {

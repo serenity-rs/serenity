@@ -314,7 +314,7 @@ enum_number!(ChannelType {
     Voice,
     Category,
     News,
-    Store,
+    Store
 });
 
 impl ChannelType {

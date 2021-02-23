@@ -80,11 +80,13 @@ impl Invite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::CREATE_INVITE;
-
-                if !model_utils::user_has_perms(cache, channel_id, None, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                model_utils::user_has_perms_cache(
+                    cache,
+                    channel_id,
+                    None,
+                    Permissions::CREATE_INVITE,
+                )
+                .await?;
             }
         }
 
@@ -112,12 +114,14 @@ impl Invite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_GUILD;
-
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                model_utils::user_has_perms_cache(
+                    cache,
+                    self.channel.id,
+                    guild_id,
+                    Permissions::MANAGE_GUILD,
+                )
+                .await?;
             }
         }
 
@@ -337,12 +341,15 @@ impl RichInvite {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_GUILD;
-
                 let guild_id = self.guild.as_ref().map(|g| g.id);
-                if !model_utils::user_has_perms(cache, self.channel.id, guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+
+                model_utils::user_has_perms_cache(
+                    cache,
+                    self.channel.id,
+                    guild_id,
+                    Permissions::MANAGE_GUILD,
+                )
+                .await?;
             }
         }
 

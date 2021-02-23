@@ -84,14 +84,13 @@ impl Reaction {
                 }
 
                 if user_id.is_some() {
-                    let req = Permissions::MANAGE_MESSAGES;
-
-                    if !utils::user_has_perms(cache, self.channel_id, None, req)
-                        .await
-                        .unwrap_or(true)
-                    {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                    .await?;
                 }
             }
         }
@@ -120,11 +119,13 @@ impl Reaction {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_MESSAGES;
-
-                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.channel_id,
+                    self.guild_id,
+                    Permissions::MANAGE_MESSAGES,
+                )
+                .await?;
             }
         }
         cache_http
@@ -379,7 +380,9 @@ impl ReactionType {
                 id,
                 ref name,
                 ..
-            } => format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id),
+            } => {
+                format!("{}:{}", name.as_ref().map_or("", |s| s.as_str()), id)
+            },
             ReactionType::Unicode(ref unicode) => unicode.clone(),
         }
     }

@@ -140,13 +140,14 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_MESSAGES;
+                let permissions = Permissions::MANAGE_MESSAGES;
                 let is_author = self.author.id == cache.current_user().await.id;
-                let has_perms =
-                    utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await?;
 
-                if !is_author && !has_perms {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                utils::user_has_perms_cache(cache, self.channel_id, self.guild_id, permissions)
+                    .await?;
+
+                if !is_author {
+                    return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
         }
@@ -169,11 +170,13 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_MESSAGES;
-
-                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.channel_id,
+                    self.guild_id,
+                    Permissions::MANAGE_MESSAGES,
+                )
+                .await?;
             }
         }
 
@@ -199,11 +202,13 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_MESSAGES;
-
-                if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                }
+                utils::user_has_perms_cache(
+                    cache,
+                    self.channel_id,
+                    self.guild_id,
+                    Permissions::MANAGE_MESSAGES,
+                )
+                .await?;
             }
         }
 
@@ -477,11 +482,13 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.guild_id.is_some() {
-                    let req = Permissions::MANAGE_MESSAGES;
-
-                    if !utils::user_has_perms(&cache, self.channel_id, self.guild_id, req).await? {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                    .await?;
                 }
             }
         }
@@ -522,11 +529,13 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.guild_id.is_some() {
-                    let req = Permissions::ADD_REACTIONS;
-
-                    if !utils::user_has_perms(cache, self.channel_id, self.guild_id, req).await? {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::ADD_REACTIONS,
+                    )
+                    .await?;
                 }
 
                 user_id = Some(cache.current_user().await.id);
@@ -638,13 +647,13 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.guild_id.is_some() {
-                    let req = Permissions::SEND_MESSAGES;
-
-                    if !super::utils::user_has_perms(cache, self.channel_id, self.guild_id, req)
-                        .await?
-                    {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::SEND_MESSAGES,
+                    )
+                    .await?;
                 }
             }
         }
@@ -680,14 +689,16 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let req = Permissions::MANAGE_MESSAGES;
-                let is_author = self.author.id == cache.current_user().await.id;
-                let has_perms =
-                    super::utils::user_has_perms(&cache, self.channel_id, self.guild_id, req)
-                        .await?;
+                utils::user_has_perms_cache(
+                    cache,
+                    self.channel_id,
+                    self.guild_id,
+                    Permissions::MANAGE_MESSAGES,
+                )
+                .await?;
 
-                if !is_author && !has_perms {
-                    return Err(Error::Model(ModelError::InvalidPermissions(req)));
+                if !(self.author.id == cache.current_user().await.id) {
+                    return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
         }
@@ -752,13 +763,13 @@ impl Message {
         {
             if let Some(cache) = cache_http.cache() {
                 if self.guild_id.is_some() {
-                    let req = Permissions::MANAGE_MESSAGES;
-
-                    if !super::utils::user_has_perms(cache, self.channel_id, self.guild_id, req)
-                        .await?
-                    {
-                        return Err(Error::Model(ModelError::InvalidPermissions(req)));
-                    }
+                    utils::user_has_perms_cache(
+                        cache,
+                        self.channel_id,
+                        self.guild_id,
+                        Permissions::MANAGE_MESSAGES,
+                    )
+                    .await?;
                 }
             }
         }
@@ -1002,7 +1013,7 @@ enum_number!(MessageActivityKind {
     JOIN,
     SPECTATE,
     LISTEN,
-    JOIN_REQUEST,
+    JOIN_REQUEST
 });
 
 impl MessageActivityKind {
