@@ -49,27 +49,29 @@ use crate::CacheAndHttp;
 /// # #[cfg(feature = "framework")]
 /// # async fn run() -> Result<(), Box<dyn Error>> {
 /// #
-/// use tokio::sync::{Mutex, RwLock};
-/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions, GatewayIntents};
-/// use serenity::client::{EventHandler, RawEventHandler};
-/// use serenity::http::Http;
-/// use serenity::CacheAndHttp;
-/// use serenity::prelude::*;
-/// use serenity::framework::{Framework, StandardFramework};
-/// use std::sync::Arc;
 /// use std::env;
+/// use std::sync::Arc;
+///
+/// use serenity::client::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerOptions};
+/// use serenity::client::{EventHandler, RawEventHandler};
+/// use serenity::framework::{Framework, StandardFramework};
+/// use serenity::http::Http;
+/// use serenity::prelude::*;
+/// use serenity::CacheAndHttp;
+/// use tokio::sync::{Mutex, RwLock};
 ///
 /// struct Handler;
 ///
-/// impl EventHandler for Handler { }
-/// impl RawEventHandler for Handler { }
+/// impl EventHandler for Handler {}
+/// impl RawEventHandler for Handler {}
 ///
 /// # let cache_and_http = Arc::new(CacheAndHttp::default());
 /// # let http = &cache_and_http.http;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
-/// let framework = Arc::new(StandardFramework::new()) as Arc<dyn Framework + Send + Sync + 'static>;
+/// let framework =
+///     Arc::new(StandardFramework::new()) as Arc<dyn Framework + Send + Sync + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
