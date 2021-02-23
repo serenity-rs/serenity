@@ -1,14 +1,10 @@
 use crate::{model::prelude::*, prelude::*};
 
-// Questions:
-// - Should the error enums be #[non_exhaustive]?
-// - Should the MessageParseError implement source()? It may be too much boilerplate (maybe add thiserror dependency?)
-
 /// Parse a value from a string in context of a received message.
 ///
 /// This trait is a superset of [`std::str::FromStr`] (the trait used in [`str::parse`]). The
-/// difference is that this trait supports serenity-specific Discord types like [`Member`],
-/// [`Role`] (soon), or [`Emoji`] (soon).
+/// difference is that this trait aims to support serenity-specific Discord types like [`Member`]
+/// or [`Message`].
 ///
 /// Trait implementations may do network requests as part of their parsing procedure.
 ///
@@ -64,7 +60,8 @@ impl std::fmt::Display for MemberParseError {
 impl Parse for Member {
     type Err = MemberParseError;
 
-    #[doc = ""] // to get impl documentation to show
+    // to get impl documentation to show
+    #[doc = ""]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
 
@@ -109,7 +106,7 @@ impl Parse for Member {
 pub enum MessageParseError {
     Malformed,
     Http(SerenityError),
-    /// When the `gateway` feature is disabled and the required information was not in cache
+    /// When the `gateway` feature is disabled and the required information was not in cache.
     HttpNotAvailable,
 }
 
@@ -148,7 +145,8 @@ impl std::fmt::Display for MessageParseError {
 impl Parse for Message {
     type Err = MessageParseError;
 
-    #[doc = ""] // to get impl documentation to show
+    // to get impl documentation to show
+    #[doc = ""]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let extract_from_id_pair = || {
             let mut parts = s.splitn(2, '-');
