@@ -1132,6 +1132,17 @@
 <span id="1129">1129</span>
 <span id="1130">1130</span>
 <span id="1131">1131</span>
+<span id="1132">1132</span>
+<span id="1133">1133</span>
+<span id="1134">1134</span>
+<span id="1135">1135</span>
+<span id="1136">1136</span>
+<span id="1137">1137</span>
+<span id="1138">1138</span>
+<span id="1139">1139</span>
+<span id="1140">1140</span>
+<span id="1141">1141</span>
+<span id="1142">1142</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1275,13 +1286,14 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
+                <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
                 <span class="kw">let</span> <span class="ident">is_author</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>;
-                <span class="kw">let</span> <span class="ident">has_perms</span> <span class="op">=</span>
-                    <span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_author</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_perms</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
+                <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">permissions</span>)
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
+
+                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_author</span> {
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">NotAuthor</span>));
                 }
             }
         }
@@ -1304,11 +1316,13 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
-                }
+                <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                    <span class="ident">cache</span>,
+                    <span class="self">self</span>.<span class="ident">channel_id</span>,
+                    <span class="self">self</span>.<span class="ident">guild_id</span>,
+                    <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>,
+                )
+                .<span class="kw">await</span><span class="question-mark">?</span>;
             }
         }
 
@@ -1334,11 +1348,13 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
-                }
+                <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                    <span class="ident">cache</span>,
+                    <span class="self">self</span>.<span class="ident">channel_id</span>,
+                    <span class="self">self</span>.<span class="ident">guild_id</span>,
+                    <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>,
+                )
+                .<span class="kw">await</span><span class="question-mark">?</span>;
             }
         }
 
@@ -1612,11 +1628,13 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
-
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
-                    }
+                    <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                        <span class="ident">cache</span>,
+                        <span class="self">self</span>.<span class="ident">channel_id</span>,
+                        <span class="self">self</span>.<span class="ident">guild_id</span>,
+                        <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>,
+                    )
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
                 }
             }
         }
@@ -1657,11 +1675,13 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">ADD_REACTIONS</span>;
-
-                    <span class="kw">if</span> <span class="op">!</span><span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>).<span class="kw">await</span><span class="question-mark">?</span> {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
-                    }
+                    <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                        <span class="ident">cache</span>,
+                        <span class="self">self</span>.<span class="ident">channel_id</span>,
+                        <span class="self">self</span>.<span class="ident">guild_id</span>,
+                        <span class="ident">Permissions</span>::<span class="ident">ADD_REACTIONS</span>,
+                    )
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
                 }
 
                 <span class="ident">user_id</span> <span class="op">=</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>);
@@ -1773,13 +1793,13 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">SEND_MESSAGES</span>;
-
-                    <span class="kw">if</span> <span class="op">!</span><span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>)
-                        .<span class="kw">await</span><span class="question-mark">?</span>
-                    {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
-                    }
+                    <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                        <span class="ident">cache</span>,
+                        <span class="self">self</span>.<span class="ident">channel_id</span>,
+                        <span class="self">self</span>.<span class="ident">guild_id</span>,
+                        <span class="ident">Permissions</span>::<span class="ident">SEND_MESSAGES</span>,
+                    )
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
                 }
             }
         }
@@ -1815,14 +1835,16 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
-                <span class="kw">let</span> <span class="ident">is_author</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>;
-                <span class="kw">let</span> <span class="ident">has_perms</span> <span class="op">=</span>
-                    <span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="kw-2">&amp;</span><span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>)
-                        .<span class="kw">await</span><span class="question-mark">?</span>;
+                <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                    <span class="ident">cache</span>,
+                    <span class="self">self</span>.<span class="ident">channel_id</span>,
+                    <span class="self">self</span>.<span class="ident">guild_id</span>,
+                    <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>,
+                )
+                .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_author</span> <span class="op">&amp;&amp;</span> <span class="op">!</span><span class="ident">has_perms</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
+                <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>) {
+                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">NotAuthor</span>));
                 }
             }
         }
@@ -1887,13 +1909,13 @@
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
                 <span class="kw">if</span> <span class="self">self</span>.<span class="ident">guild_id</span>.<span class="ident">is_some</span>() {
-                    <span class="kw">let</span> <span class="ident">req</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
-
-                    <span class="kw">if</span> <span class="op">!</span><span class="kw">super</span>::<span class="ident">utils</span>::<span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">req</span>)
-                        .<span class="kw">await</span><span class="question-mark">?</span>
-                    {
-                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">req</span>)));
-                    }
+                    <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                        <span class="ident">cache</span>,
+                        <span class="self">self</span>.<span class="ident">channel_id</span>,
+                        <span class="self">self</span>.<span class="ident">guild_id</span>,
+                        <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>,
+                    )
+                    .<span class="kw">await</span><span class="question-mark">?</span>;
                 }
             }
         }
@@ -2137,7 +2159,7 @@
     <span class="ident">JOIN</span>,
     <span class="ident">SPECTATE</span>,
     <span class="ident">LISTEN</span>,
-    <span class="ident">JOIN_REQUEST</span>,
+    <span class="ident">JOIN_REQUEST</span>
 });
 
 <span class="kw">impl</span> <span class="ident">MessageActivityKind</span> {

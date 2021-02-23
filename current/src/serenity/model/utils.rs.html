@@ -331,6 +331,27 @@
 <span id="328">328</span>
 <span id="329">329</span>
 <span id="330">330</span>
+<span id="331">331</span>
+<span id="332">332</span>
+<span id="333">333</span>
+<span id="334">334</span>
+<span id="335">335</span>
+<span id="336">336</span>
+<span id="337">337</span>
+<span id="338">338</span>
+<span id="339">339</span>
+<span id="340">340</span>
+<span id="341">341</span>
+<span id="342">342</span>
+<span id="343">343</span>
+<span id="344">344</span>
+<span id="345">345</span>
+<span id="346">346</span>
+<span id="347">347</span>
+<span id="348">348</span>
+<span id="349">349</span>
+<span id="350">350</span>
+<span id="351">351</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{<span class="ident">collections</span>::<span class="ident">HashMap</span>, <span class="ident">hash</span>::<span class="ident">Hash</span>};
 
@@ -549,6 +570,27 @@
     }
 
     <span class="ident">seq</span>.<span class="ident">end</span>()
+}
+
+<span class="doccomment">/// Tries to find a user&#39;s permissions using the cache.</span>
+<span class="doccomment">/// Unlike [`user_has_perms`], this function will return `true` even when</span>
+<span class="doccomment">/// the permissions are not in the cache.</span>
+<span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
+<span class="attribute">#[<span class="ident">inline</span>]</span>
+<span class="kw">pub</span> <span class="kw">async</span> <span class="kw">fn</span> <span class="ident">user_has_perms_cache</span>(
+    <span class="ident">cache</span>: <span class="kw">impl</span> <span class="ident">AsRef</span><span class="op">&lt;</span><span class="ident">Cache</span><span class="op">&gt;</span>,
+    <span class="ident">channel_id</span>: <span class="ident">ChannelId</span>,
+    <span class="ident">guild_id</span>: <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">GuildId</span><span class="op">&gt;</span>,
+    <span class="ident">permissions</span>: <span class="ident">Permissions</span>,
+) <span class="op">-</span><span class="op">&gt;</span> <span class="prelude-ty">Result</span><span class="op">&lt;</span>()<span class="op">&gt;</span> {
+    <span class="kw">if</span> <span class="kw">match</span> <span class="ident">user_has_perms</span>(<span class="ident">cache</span>, <span class="ident">channel_id</span>, <span class="ident">guild_id</span>, <span class="ident">permissions</span>).<span class="kw">await</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">err</span>)) <span class="op">=</span><span class="op">&gt;</span> <span class="op">!</span><span class="ident">err</span>.<span class="ident">is_cache_err</span>(),
+        <span class="ident">result</span> <span class="op">=</span><span class="op">&gt;</span> <span class="ident">result</span><span class="question-mark">?</span>,
+    } {
+        <span class="prelude-val">Ok</span>(())
+    } <span class="kw">else</span> {
+        <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidPermissions</span>(<span class="ident">permissions</span>)))
+    }
 }
 
 <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">all</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>, <span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;model&quot;</span>))]</span>
