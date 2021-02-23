@@ -346,7 +346,7 @@ pub struct ShardManagerOptions<'a> {
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: &'a Arc<Box<dyn Framework + Send + Sync>>,
+    pub framework: &'a Arc<dyn Framework + Send + Sync>,
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
