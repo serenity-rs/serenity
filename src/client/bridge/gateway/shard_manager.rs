@@ -69,7 +69,7 @@ use crate::CacheAndHttp;
 /// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
-/// let framework = Arc::new(Box::new(StandardFramework::new()) as Box<dyn Framework + 'static + Send + Sync>);
+/// let framework = Arc::new(StandardFramework::new() as Box<dyn Framework + 'static + Send + Sync>);
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
