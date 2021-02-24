@@ -38,7 +38,7 @@ use crate::CacheAndHttp;
 /// Initialize a shard manager with a framework responsible for shards 0 through
 /// 2, of 5 total shards:
 ///
-/// ```rust
+/// ```rust,no_run
 /// # use std::error::Error;
 /// #
 /// # #[cfg(feature = "voice")]
