@@ -150,7 +150,7 @@ impl DispatchEvent {
 pub(crate) fn dispatch<'rec>(
     // #[allow(unused_variables)]
     mut event: DispatchEvent,
-    #[cfg(feature = "framework")] framework: &'rec Arc<Box<dyn Framework + Send + Sync>>,
+    #[cfg(feature = "framework")] framework: &'rec Arc<dyn Framework + Send + Sync>,
     data: &'rec Arc<RwLock<TypeMap>>,
     event_handler: &'rec Option<Arc<dyn EventHandler>>,
     raw_event_handler: &'rec Option<Arc<dyn RawEventHandler>>,
