@@ -72,7 +72,7 @@ use crate::CacheAndHttp;
 /// let data = Arc::new(RwLock::new(TypeMap::new()));
 /// let event_handler = Arc::new(Handler) as Arc<dyn EventHandler>;
 /// let framework =
-///     Arc::new(Box::new(StandardFramework::new()) as Box<dyn Framework + 'static + Send + Sync>);
+///     Arc::new(StandardFramework::new()) as Arc<dyn Framework + Send + Sync + 'static>;
 ///
 /// ShardManager::new(ShardManagerOptions {
 ///     data: &data,
@@ -352,7 +352,7 @@ pub struct ShardManagerOptions<'a> {
     pub event_handler: &'a Option<Arc<dyn EventHandler>>,
     pub raw_event_handler: &'a Option<Arc<dyn RawEventHandler>>,
     #[cfg(feature = "framework")]
-    pub framework: &'a Arc<Box<dyn Framework + Send + Sync>>,
+    pub framework: &'a Arc<dyn Framework + Send + Sync>,
     pub shard_index: u64,
     pub shard_init: u64,
     pub shard_total: u64,
