@@ -39,8 +39,8 @@ impl std::error::Error for MemberParseError {}
 impl std::fmt::Display for MemberParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
-			Self::GuildNotInCache => write!(f, "guild is not in cache"),
-			Self::NotFoundOrMalformed => write!(f, "provided member was not found or provided string did not adhere to any known guild member format"),
+			Self::GuildNotInCache => write!(f, "Guild is not in cache"),
+			Self::NotFoundOrMalformed => write!(f, "Provided member was not found or provided string did not adhere to any known guild member format"),
 		}
     }
 }
@@ -60,7 +60,7 @@ impl std::fmt::Display for MemberParseError {
 impl Parse for Member {
     type Err = MemberParseError;
 
-    // to get impl documentation to show
+    // To get impl documentation to show.
     #[doc = ""]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let guild = msg.guild(&ctx.cache).await.ok_or(MemberParseError::GuildNotInCache)?;
@@ -124,12 +124,12 @@ impl std::fmt::Display for MessageParseError {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
         match self {
             Self::Malformed => {
-                write!(f, "provided string did not adhere to any known guild message format")
+                write!(f, "Provided string did not adhere to any known guild message format")
             },
-            Self::Http(e) => write!(f, "failed to request message data via HTTP: {}", e),
+            Self::Http(e) => write!(f, "Failed to request message data via HTTP: {}", e),
             Self::HttpNotAvailable => write!(
                 f,
-                "gateway feature is disabled and the required information was not in cache"
+                "Gateway feature is disabled and the required information was not in cache"
             ),
         }
     }
@@ -145,7 +145,7 @@ impl std::fmt::Display for MessageParseError {
 impl Parse for Message {
     type Err = MessageParseError;
 
-    // to get impl documentation to show
+    // To get impl documentation to show.
     #[doc = ""]
     async fn parse(ctx: &Context, msg: &Message, s: &str) -> Result<Self, Self::Err> {
         let extract_from_id_pair = || {
