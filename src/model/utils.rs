@@ -229,7 +229,7 @@ pub async fn user_has_perms_cache(
     permissions: Permissions,
 ) -> Result<()> {
     if match user_has_perms(cache, channel_id, guild_id, permissions).await {
-        Err(Error::Model(err)) => !err.is_cache_err(),
+        Err(Error::Model(err)) => err.is_cache_err(),
         result => result?,
     } {
         Ok(())
