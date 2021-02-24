@@ -132,8 +132,8 @@ pub struct Guild {
     pub owner_id: UserId,
     /// A mapping of [`User`]s' Ids to their current presences.
     ///
-    /// This will be empty unless the "guild presences" privileged intent is
-    /// enabled.
+    /// **Note**: This will be empty unless the "guild presences" privileged
+    /// intent is enabled.
     #[serde(serialize_with = "serialize_gen_map")]
     pub presences: HashMap<UserId, Presence>,
     /// The region that the voice servers that the guild uses are located in.
