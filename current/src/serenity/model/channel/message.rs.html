@@ -1143,6 +1143,15 @@
 <span id="1140">1140</span>
 <span id="1141">1141</span>
 <span id="1142">1142</span>
+<span id="1143">1143</span>
+<span id="1144">1144</span>
+<span id="1145">1145</span>
+<span id="1146">1146</span>
+<span id="1147">1147</span>
+<span id="1148">1148</span>
+<span id="1149">1149</span>
+<span id="1150">1150</span>
+<span id="1151">1151</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -2099,6 +2108,12 @@
     <span class="ident">NitroTier2</span> <span class="op">=</span> <span class="number">10</span>,
     <span class="doccomment">/// An indicator that the guild has reached nitro tier 3</span>
     <span class="ident">NitroTier3</span> <span class="op">=</span> <span class="number">11</span>,
+    <span class="doccomment">/// An indicator that the channel is now following an announcement channel</span>
+    <span class="ident">ChannelFollowAdd</span> <span class="op">=</span> <span class="number">12</span>,
+    <span class="doccomment">/// An indicator that the guild is disqualified for Discovery Feature</span>
+    <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span> <span class="number">14</span>,
+    <span class="doccomment">/// An indicator that the guild is requalified for Discovery Feature</span>
+    <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span> <span class="number">15</span>,
     <span class="doccomment">/// A message reply.</span>
     <span class="ident">InlineReply</span> <span class="op">=</span> <span class="number">19</span>,
     <span class="doccomment">/// A slash command</span>
@@ -2139,6 +2154,9 @@
             <span class="ident">NitroTier1</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">9</span>,
             <span class="ident">NitroTier2</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">10</span>,
             <span class="ident">NitroTier3</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">11</span>,
+            <span class="ident">ChannelFollowAdd</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">12</span>,
+            <span class="ident">GuildDiscoveryDisqualified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">14</span>,
+            <span class="ident">GuildDiscoveryRequalified</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">15</span>,
             <span class="ident">InlineReply</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">19</span>,
             <span class="ident">ApplicationCommand</span> <span class="op">=</span><span class="op">&gt;</span> <span class="number">20</span>,
         }
