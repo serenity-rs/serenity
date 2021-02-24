@@ -955,6 +955,10 @@ pub enum MessageType {
     NitroTier3 = 11,
     /// An indicator that the channel is now following an announcement channel
     ChannelFollowAdd = 12,
+    /// An indicator that the guild is disqualified for Discovery Feature
+    GuildDiscoveryDisqualified = 14,
+    /// An indicator that the guild is requalified for Discovery Feature
+    GuildDiscoveryRequalified = 15,
     /// A message reply.
     InlineReply = 19,
     /// A slash command
@@ -996,6 +1000,8 @@ impl MessageType {
             NitroTier2 => 10,
             NitroTier3 => 11,
             ChannelFollowAdd => 12,
+            GuildDiscoveryDisqualified => 14,
+            GuildDiscoveryRequalified => 15,
             InlineReply => 19,
             ApplicationCommand => 20,
         }
