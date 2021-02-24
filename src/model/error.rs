@@ -146,6 +146,7 @@ pub enum Error {
     /// Indicates that the webhook name is over the 100 characters limit.
     NameTooLong,
     /// Indicates that the bot is not author of the message.
+    /// This error is returnend in private/direct channels.
     NotAuthor,
 }
 
