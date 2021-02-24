@@ -4,9 +4,9 @@
                 <a id="settings-menu" href="../settings.html"><img src="../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Attribute Macro <a href="index.html">command_attr</a>::<wbr><a class="attr" href="">help</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../src/command_attr/lib.rs.html#285-528" title="goto source code">[src]</a></span></h1><pre class="rust attr">#[help]</pre><div class="docblock"><p>A brother macro to <a href="../command_attr/attr.command.html"><code>command</code></a>, but for the help command.
 An interface for simple browsing of all the available commands the bot provides,
 and reading through specific information regarding a command.</p>
-<p>As such, the options here will pertain in the help command's <strong>layout</strong> than its functionality.</p>
+<p>As such, the options here will pertain in the help command’s <strong>layout</strong> than its functionality.</p>
 <h2 id="options" class="section-header"><a href="#options">Options</a></h2><table><thead><tr><th>Syntax</th><th>Description</th><th>Argument explanation</th></tr></thead><tbody>
-<tr><td><code>#[suggestion_text(s)]</code> </br> <code>#[suggestion_text = s]</code></td><td>When suggesting a command's name</td><td><code>s</code> is a string</td></tr>
+<tr><td><code>#[suggestion_text(s)]</code> </br> <code>#[suggestion_text = s]</code></td><td>When suggesting a command’s name</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[no_help_available_text(s)]</code> </br> <code>#[no_help_available_text = s]</code></td><td>When help is unavailable for a command.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[usage_label(s)]</code> </br> <code>#[usage_label = s]</code></td><td>How should the command be used.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[usage_sample_label(s)]</code> </br> <code>#[usage_sample_label = s]</code></td><td>Actual sample label.</td><td><code>s</code> is a string</td></tr>
@@ -14,17 +14,17 @@ and reading through specific information regarding a command.</p>
 <tr><td><code>#[grouped_label(s)]</code> </br> <code>#[grouped_label = s]</code></td><td>Grouped commands label.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[sub_commands_label(s)]</code> </br> <code>#[sub_commands_label = s]</code></td><td>Sub commands label.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[description_label(s)]</code> </br> <code>#[description_label = s]</code></td><td>Label at the start of the description.</td><td><code>s</code> is a string</td></tr>
-<tr><td><code>#[aliases_label(s)]</code> </br> <code>#[aliases_label= s]</code></td><td>Label for a command's aliases.</td><td><code>s</code> is a string</td></tr>
+<tr><td><code>#[aliases_label(s)]</code> </br> <code>#[aliases_label= s]</code></td><td>Label for a command’s aliases.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[guild_only_text(s)]</code> </br> <code>#[guild_only_text = s]</code></td><td>When a command is specific to guilds only.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[checks_label(s)]</code> </br> <code>#[checks_label = s]</code></td><td>The header text when showing checks in the help command.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[dm_only_text(s)]</code> </br> <code>#[dm_only_text = s]</code></td><td>When a command is specific to dms only.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[dm_and_guild_text(s)]</code> </br> <code>#[dm_and_guild_text = s]</code></td><td>When a command is usable in both guilds and dms.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[available_text(s)]</code> </br> <code>#[available_text = s]</code></td><td>When a command is available.</td><td><code>s</code> is a string</td></tr>
-<tr><td><code>#[command_not_found_text(s)]</code> </br> <code>#[command_not_found_text = s]</code></td><td>When a command wasn't found.</td><td><code>s</code> is a string</td></tr>
-<tr><td><code>#[individual_command_tip(s)]</code> </br> <code>#[individual_command_tip = s]</code></td><td>How the user should access a command's details.</td><td><code>s</code> is a string</td></tr>
+<tr><td><code>#[command_not_found_text(s)]</code> </br> <code>#[command_not_found_text = s]</code></td><td>When a command wasn’t found.</td><td><code>s</code> is a string</td></tr>
+<tr><td><code>#[individual_command_tip(s)]</code> </br> <code>#[individual_command_tip = s]</code></td><td>How the user should access a command’s details.</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[strikethrough_commands_tip_in_dm(s)]</code> </br>  <code>#[strikethrough_commands_tip_in_dm = s]</code></td><td>Reasoning behind strikethrough-commands.</br> <em>Only used in dms.</em></td><td><code>s</code> is a string. If not provided, default text will be used instead.</td></tr>
 <tr><td><code>#[strikethrough_commands_tip_in_guild(s)]</code> </br> <code>#[strikethrough_commands_tip_in_guild = s]</code></td><td>Reasoning behind strikethrough-commands.</br> <em>Only used in guilds.</em></td><td><code>s</code> is a string. If not provided, default text will be used instead.</td></tr>
-<tr><td><code>#[group_prefix(s)]</code> </br> <code>#[group_prefix = s]</code></td><td>For introducing a group's prefix</td><td><code>s</code> is a string</td></tr>
+<tr><td><code>#[group_prefix(s)]</code> </br> <code>#[group_prefix = s]</code></td><td>For introducing a group’s prefix</td><td><code>s</code> is a string</td></tr>
 <tr><td><code>#[lacking_role(s)]</code> </br> <code>#[lacking_role = s]</code></td><td>If a user lacks required roles, this will treat how commands will be displayed.</td><td><code>s</code> is a string. Accepts <code>strike</code> (strikethroughs), <code>hide</code> (will not be listed) or <code>nothing</code>(leave be).</td></tr>
 <tr><td><code>#[lacking_ownership(s)]</code> </br> <code>#[lacking_ownership = s]</code></td><td>If a user lacks ownership, this will treat how these commands will be displayed.</td><td><code>s</code> is a string. Accepts <code>strike</code> (strikethroughs), <code>hide</code> (will not be listed) or <code>nothing</code>(leave be).</td></tr>
 <tr><td><code>#[lacking_permissions(s)]</code> </br> <code>#[lacking_permissions = s]</code></td><td>If a user lacks permissions, this will treat how commands will be displayed.</td><td><code>s</code> is a string. Accepts <code>strike</code> (strikethroughs), <code>hide</code> (will not be listed) or <code>nothing</code>(leave be).</td></tr>

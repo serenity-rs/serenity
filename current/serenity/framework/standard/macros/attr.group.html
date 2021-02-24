@@ -5,7 +5,7 @@
 <p>It is a prerequisite for all commands to be assigned under a common group,
 before they may be executed by a user.</p>
 <p>A group might have one or more <em>prefixes</em> set. This will necessitate for
-one of the prefixes to appear before the group's command.
+one of the prefixes to appear before the group’s command.
 For example, for a general prefix <code>!</code>, a group prefix <code>foo</code> and a command <code>bar</code>,
 the invocation would be <code>!foo bar</code>.</p>
 <p>It might have some options apply to <em>all</em> of its commands. E.g. guild or dm only.</p>
@@ -53,15 +53,15 @@ the invocation would be <code>!foo bar</code>.</p>
 <tr><td><code>#[owners_only]</code> </br> <code>#[owners_only(b)]</code></td><td>If this command is exclusive to owners.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
 <tr><td><code>#[owner_privilege]</code> </br> <code>#[owner_privilege(b)]</code></td><td>If owners can bypass certain options.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
 <tr><td><code>#[help_available]</code> </br> <code>#[help_available(b)]</code></td><td>If the group should be displayed in the help message.</td><td><code>b</code> is a boolean. If no boolean is provided, the value is assumed to be <code>true</code>.</td></tr>
-<tr><td><code>#[checks(identifiers)]</code></td><td>Preconditions that must met before the command's execution.</td><td><code>identifiers</code> is a comma separated list of identifiers referencing functions marked by the <code>#[check]</code> macro</td></tr>
-<tr><td><code>#[required_permissions(perms)]</code></td><td>Set of permissions the user must possess.</td><td><code>perms</code> is a comma separated list of permission names.</br> These can be found at <a href="https://discord.com/developers/docs/topics/permissions">Discord's official documentation</a>.</td></tr>
-<tr><td><code>#[default_command(cmd)]</code></td><td>A command to execute if none of the group's prefixes are given.</td><td><code>cmd</code> is an identifier referencing a function marked by the <code>#[command]</code> macro</td></tr>
-<tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The group's description or summary.</td><td><code>desc</code> is a string describing the group.</td></tr>
+<tr><td><code>#[checks(identifiers)]</code></td><td>Preconditions that must met before the command’s execution.</td><td><code>identifiers</code> is a comma separated list of identifiers referencing functions marked by the <code>#[check]</code> macro</td></tr>
+<tr><td><code>#[required_permissions(perms)]</code></td><td>Set of permissions the user must possess.</td><td><code>perms</code> is a comma separated list of permission names.</br> These can be found at <a href="https://discord.com/developers/docs/topics/permissions">Discord’s official documentation</a>.</td></tr>
+<tr><td><code>#[default_command(cmd)]</code></td><td>A command to execute if none of the group’s prefixes are given.</td><td><code>cmd</code> is an identifier referencing a function marked by the <code>#[command]</code> macro</td></tr>
+<tr><td><code>#[description(desc)]</code> </br> <code>#[description = desc]</code></td><td>The group’s description or summary.</td><td><code>desc</code> is a string describing the group.</td></tr>
 <tr><td><code>#[summary(desc)]</code> </br> <code>#[summary = desc]</code></td><td>A summary group description displayed when shown multiple groups.</td><td><code>desc</code> is a string summaryly describing the group.</td></tr>
 </tbody></table>
 <p>Similarly to <a href="../../../../serenity/framework/standard/macros/attr.command.html"><code>command</code></a>, this macro generates static instances of the group
 and its options. The identifiers of these instances are based off the name of the struct to differentiate
-this group from others. This name is given as the default value of the group's <code>name</code> field,
+this group from others. This name is given as the default value of the group’s <code>name</code> field,
 used in the help command for display and browsing of the group.
 It may also be passed as an argument to the macro. For example: <code>#[group(&quot;Banana Phone&quot;)]</code>.</p>
 </div></section><section id="search" class="content hidden"></section><section class="footer"></section><div id="rustdoc-vars" data-root-path="../../../../" data-current-crate="serenity"></div>

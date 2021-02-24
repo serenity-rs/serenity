@@ -12,17 +12,17 @@ or <a href="../../serenity/model/guild/struct.Emoji.html" title="Emoji"><code>Em
 feature is only compiled if the <code>methods</code> feature is enabled. An example of
 this is <a href="../../serenity/model/guild/struct.Guild.html#method.edit" title="Guild::edit"><code>Guild::edit</code></a>, which performs a check to ensure that the current
 user is the owner of the guild, prior to actually performing the HTTP
-request. The cache is involved due to the function's use of unlocking the
+request. The cache is involved due to the function’s use of unlocking the
 cache and retrieving the Id of the current user, and comparing it to the Id
 of the user that owns the guild. This is an inexpensive method of being able
 to access data required by these sugary methods.</p>
 <h1 id="do-i-need-the-cache" class="section-header"><a href="#do-i-need-the-cache">Do I need the Cache?</a></h1>
-<p>If you're asking this, the answer is likely &quot;definitely yes&quot; or
-&quot;definitely no&quot;; any in-between tends to be &quot;yes&quot;. If you are low on RAM,
-and need to run on only a couple MB, then the answer is &quot;definitely no&quot;. If
+<p>If you’re asking this, the answer is likely “definitely yes” or
+“definitely no”; any in-between tends to be “yes”. If you are low on RAM,
+and need to run on only a couple MB, then the answer is “definitely no”. If
 you do not care about RAM and want your bot to be able to access data
 while needing to hit the REST API as little as possible, then the answer
-is &quot;yes&quot;.</p>
+is “yes”.</p>
 </div><h2 id="structs" class="section-header"><a href="#structs">Structs</a></h2>
 <table><tr class="module-item"><td><a class="struct" href="struct.Cache.html" title="serenity::cache::Cache struct">Cache</a></td><td class="docblock-short"><p>A cache containing data received from <a href="../../serenity/gateway/struct.Shard.html"><code>Shard</code></a>s.</p>
 </td></tr><tr class="module-item"><td><a class="struct" href="struct.Settings.html" title="serenity::cache::Settings struct">Settings</a></td><td class="docblock-short"><p>Settings for the cache.</p>

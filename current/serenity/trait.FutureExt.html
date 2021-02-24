@@ -36,7 +36,7 @@
 <div class="item-spacer"></div>    pub fn <a href="#method.now_or_never" class="fnname">now_or_never</a>(self) -&gt; <a class="enum" href="https://doc.rust-lang.org/nightly/core/option/enum.Option.html" title="enum core::option::Option">Option</a>&lt;Self::<a class="type" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" title="type core::future::future::Future::Output">Output</a>&gt; { ... }
 }</pre></div><div class="docblock"><p>An extension trait for <code>Future</code>s that provides a variety of convenient
 adapters.</p>
-</div><h2 id="provided-methods" class="small-section-header">Provided methods<a href="#provided-methods" class="anchor"></a></h2><div class="methods"><h3 id="method.map" class="method"><code>pub fn <a href="#method.map" class="fnname">map</a>&lt;U, F&gt;(self, f: F) -&gt; Map&lt;Self, F&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(Self::<a class="type" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" title="type core::future::future::Future::Output">Output</a>) -&gt; U,&nbsp;</span></code></h3><div class="docblock"><p>Map this future's output to a different type, returning a new future of
+</div><h2 id="provided-methods" class="small-section-header">Provided methods<a href="#provided-methods" class="anchor"></a></h2><div class="methods"><h3 id="method.map" class="method"><code>pub fn <a href="#method.map" class="fnname">map</a>&lt;U, F&gt;(self, f: F) -&gt; Map&lt;Self, F&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(Self::<a class="type" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" title="type core::future::future::Future::Output">Output</a>) -&gt; U,&nbsp;</span></code></h3><div class="docblock"><p>Map this future’s output to a different type, returning a new future of
 the resulting type.</p>
 <p>This function is similar to the <code>Option::map</code> or <code>Iterator::map</code> where
 it will change the type of the underlying future. This is useful to
@@ -51,7 +51,7 @@ standard library.</p>
 <span class="kw">let</span> <span class="ident">future</span> <span class="op">=</span> <span class="kw">async</span> { <span class="number">1</span> };
 <span class="kw">let</span> <span class="ident">new_future</span> <span class="op">=</span> <span class="ident">future</span>.<span class="ident">map</span>(<span class="op">|</span><span class="ident">x</span><span class="op">|</span> <span class="ident">x</span> <span class="op">+</span> <span class="number">3</span>);
 <span class="macro">assert_eq</span><span class="macro">!</span>(<span class="ident">new_future</span>.<span class="kw">await</span>, <span class="number">4</span>);</pre></div>
-</div><h3 id="method.map_into" class="method"><code>pub fn <a href="#method.map_into" class="fnname">map_into</a>&lt;U&gt;(self) -&gt; MapInto&lt;Self, U&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self::<a class="type" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" title="type core::future::future::Future::Output">Output</a>: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;U&gt;,&nbsp;</span></code></h3><div class="docblock"><p>Map this future's output to a different type, returning a new future of
+</div><h3 id="method.map_into" class="method"><code>pub fn <a href="#method.map_into" class="fnname">map_into</a>&lt;U&gt;(self) -&gt; MapInto&lt;Self, U&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self::<a class="type" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" title="type core::future::future::Future::Output">Output</a>: <a class="trait" href="https://doc.rust-lang.org/nightly/core/convert/trait.Into.html" title="trait core::convert::Into">Into</a>&lt;U&gt;,&nbsp;</span></code></h3><div class="docblock"><p>Map this future’s output to a different type, returning a new future of
 the resulting type.</p>
 <p>This function is equivalent to calling <code>map(Into::into)</code> but allows naming
 the return type.</p>
@@ -161,8 +161,8 @@ continue to do so for all future calls to <code>poll</code>).</p>
 <p>This combinator will drop the underlying future as soon as it has been
 completed to ensure resources are reclaimed as soon as possible.</p>
 </div><h3 id="method.inspect" class="method"><code>pub fn <a href="#method.inspect" class="fnname">inspect</a>&lt;F&gt;(self, f: F) -&gt; Inspect&lt;Self, F&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;F: <a class="trait" href="https://doc.rust-lang.org/nightly/core/ops/function/trait.FnOnce.html" title="trait core::ops::function::FnOnce">FnOnce</a>(&amp;Self::<a class="type" href="https://doc.rust-lang.org/nightly/core/future/future/trait.Future.html#associatedtype.Output" title="type core::future::future::Future::Output">Output</a>),&nbsp;</span></code></h3><div class="docblock"><p>Do something with the output of a future before passing it on.</p>
-<p>When using futures, you'll often chain several of them together.  While
-working on such code, you might want to check out what's happening at
+<p>When using futures, you’ll often chain several of them together.  While
+working on such code, you might want to check out what’s happening at
 various parts in the pipeline, without consuming the intermediate
 value. To do that, insert a call to <code>inspect</code>.</p>
 <h1 id="examples-7" class="section-header"><a href="#examples-7">Examples</a></h1>
@@ -175,10 +175,10 @@ value. To do that, insert a call to <code>inspect</code>.</p>
 </div><h3 id="method.catch_unwind" class="method"><code>pub fn <a href="#method.catch_unwind" class="fnname">catch_unwind</a>(self) -&gt; CatchUnwind&lt;Self&gt; <span class="where fmt-newline">where<br>&nbsp;&nbsp;&nbsp;&nbsp;Self: <a class="trait" href="https://doc.rust-lang.org/nightly/std/panic/trait.UnwindSafe.html" title="trait std::panic::UnwindSafe">UnwindSafe</a>,&nbsp;</span></code></h3><div class="docblock"><p>Catches unwinding panics while polling the future.</p>
 <p>In general, panics within a future can propagate all the way out to the
 task level. This combinator makes it possible to halt unwinding within
-the future itself. It's most commonly used within task executors. It's
+the future itself. It’s most commonly used within task executors. It’s
 not recommended to use this for error handling.</p>
 <p>Note that this method requires the <code>UnwindSafe</code> bound from the standard
-library. This isn't always applied automatically, and the standard
+library. This isn’t always applied automatically, and the standard
 library provides an <code>AssertUnwindSafe</code> wrapper type to apply it
 after-the fact. To assist using this method, the <code>Future</code> trait is also
 implemented for <code>AssertUnwindSafe&lt;F&gt;</code> where <code>F</code> implements <code>Future</code>.</p>
