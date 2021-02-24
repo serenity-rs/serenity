@@ -359,6 +359,8 @@
 <span id="356">356</span>
 <span id="357">357</span>
 <span id="358">358</span>
+<span id="359">359</span>
+<span id="360">360</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
@@ -411,27 +413,29 @@
 <span class="doccomment">/// # #[cfg(feature = &quot;framework&quot;)]</span>
 <span class="doccomment">/// # async fn run() -&gt; Result&lt;(), Box&lt;dyn Error&gt;&gt; {</span>
 <span class="doccomment">/// #</span>
-<span class="doccomment">/// use tokio::sync::{Mutex, RwLock};</span>
-<span class="doccomment">/// use serenity::client::bridge::gateway::{ShardManager, ShardManagerOptions, GatewayIntents};</span>
-<span class="doccomment">/// use serenity::client::{EventHandler, RawEventHandler};</span>
-<span class="doccomment">/// use serenity::http::Http;</span>
-<span class="doccomment">/// use serenity::CacheAndHttp;</span>
-<span class="doccomment">/// use serenity::prelude::*;</span>
-<span class="doccomment">/// use serenity::framework::{Framework, StandardFramework};</span>
-<span class="doccomment">/// use std::sync::Arc;</span>
 <span class="doccomment">/// use std::env;</span>
+<span class="doccomment">/// use std::sync::Arc;</span>
+<span class="doccomment">///</span>
+<span class="doccomment">/// use serenity::client::bridge::gateway::{GatewayIntents, ShardManager, ShardManagerOptions};</span>
+<span class="doccomment">/// use serenity::client::{EventHandler, RawEventHandler};</span>
+<span class="doccomment">/// use serenity::framework::{Framework, StandardFramework};</span>
+<span class="doccomment">/// use serenity::http::Http;</span>
+<span class="doccomment">/// use serenity::prelude::*;</span>
+<span class="doccomment">/// use serenity::CacheAndHttp;</span>
+<span class="doccomment">/// use tokio::sync::{Mutex, RwLock};</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// struct Handler;</span>
 <span class="doccomment">///</span>
-<span class="doccomment">/// impl EventHandler for Handler { }</span>
-<span class="doccomment">/// impl RawEventHandler for Handler { }</span>
+<span class="doccomment">/// impl EventHandler for Handler {}</span>
+<span class="doccomment">/// impl RawEventHandler for Handler {}</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// # let cache_and_http = Arc::new(CacheAndHttp::default());</span>
 <span class="doccomment">/// # let http = &amp;cache_and_http.http;</span>
 <span class="doccomment">/// let gateway_url = Arc::new(Mutex::new(http.get_gateway().await?.url));</span>
 <span class="doccomment">/// let data = Arc::new(RwLock::new(TypeMap::new()));</span>
 <span class="doccomment">/// let event_handler = Arc::new(Handler) as Arc&lt;dyn EventHandler&gt;;</span>
-<span class="doccomment">/// let framework = Arc::new(Box::new(StandardFramework::new()) as Box&lt;dyn Framework + &#39;static + Send + Sync&gt;);</span>
+<span class="doccomment">/// let framework =</span>
+<span class="doccomment">///     Arc::new(StandardFramework::new()) as Arc&lt;dyn Framework + Send + Sync + &#39;static&gt;;</span>
 <span class="doccomment">///</span>
 <span class="doccomment">/// ShardManager::new(ShardManagerOptions {</span>
 <span class="doccomment">///     data: &amp;data,</span>
@@ -708,7 +712,7 @@
     <span class="kw">pub</span> <span class="ident">event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">EventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">raw_event_handler</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="prelude-ty">Option</span><span class="op">&lt;</span><span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">RawEventHandler</span><span class="op">&gt;</span><span class="op">&gt;</span>,
     <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;framework&quot;</span>)]</span>
-    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="ident">Box</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span><span class="op">&gt;</span>,
+    <span class="kw">pub</span> <span class="ident">framework</span>: <span class="kw-2">&amp;</span><span class="lifetime">&#39;a</span> <span class="ident">Arc</span><span class="op">&lt;</span><span class="kw">dyn</span> <span class="ident">Framework</span> <span class="op">+</span> <span class="ident">Send</span> <span class="op">+</span> <span class="ident">Sync</span><span class="op">&gt;</span>,
     <span class="kw">pub</span> <span class="ident">shard_index</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_init</span>: <span class="ident">u64</span>,
     <span class="kw">pub</span> <span class="ident">shard_total</span>: <span class="ident">u64</span>,

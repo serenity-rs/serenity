@@ -1,22 +1,22 @@
-<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="API documentation for the Rust `ratelimiting` mod in crate `serenity`."><meta name="keywords" content="rust, rustlang, rust-lang, ratelimiting"><title>serenity::http::ratelimiting - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1.0"><meta name="generator" content="rustdoc"><meta name="description" content="Routes are used for ratelimiting. These are to differentiate between the different types of routes - such as getting the current user’s channels - for the most part, with the exception being major parameters."><meta name="keywords" content="rust, rustlang, rust-lang, ratelimiting"><title>serenity::http::ratelimiting - Rust</title><link rel="stylesheet" type="text/css" href="../../../normalize.css"><link rel="stylesheet" type="text/css" href="../../../rustdoc.css" id="mainThemeStyle"><link rel="stylesheet" type="text/css" href="../../../light.css"  id="themeStyle"><link rel="stylesheet" type="text/css" href="../../../dark.css" disabled ><link rel="stylesheet" type="text/css" href="../../../ayu.css" disabled ><script id="default-settings"></script><script src="../../../storage.js"></script><noscript><link rel="stylesheet" href="../../../noscript.css"></noscript><link rel="icon" type="image/svg+xml" href="../../../favicon.svg">
 <link rel="alternate icon" type="image/png" href="../../../favicon-16x16.png">
 <link rel="alternate icon" type="image/png" href="../../../favicon-32x32.png"><style type="text/css">#crate-search{background-image:url("../../../down-arrow.svg");}</style></head><body class="rustdoc mod"><!--[if lte IE 8]><div class="warning">This old browser is unsupported and will most likely display funky things.</div><![endif]--><nav class="sidebar"><div class="sidebar-menu">&#9776;</div><a href='../../../serenity/index.html'><div class='logo-container rust-logo'><img src='../../../rust-logo.png' alt='logo'></div></a><p class="location">Module ratelimiting</p><div class="sidebar-elems"><div class="block items"><ul><li><a href="#reexports">Re-exports</a></li><li><a href="#structs">Structs</a></li></ul></div><p class="location"><a href="../../index.html">serenity</a>::<wbr><a href="../index.html">http</a></p><div id="sidebar-vars" data-name="ratelimiting" data-ty="mod" data-relpath="../"></div><script defer src="../sidebar-items.js"></script></div></nav><div class="theme-picker"><button id="theme-picker" aria-label="Pick another theme!" aria-haspopup="menu"><img src="../../../brush.svg" width="18" alt="Pick another theme!"></button><div id="theme-choices" role="menu"></div></div><script src="../../../theme.js"></script><nav class="sub"><form class="search-form"><div class="search-container"><div><select id="crate-search"><option value="All crates">All crates</option></select><input class="search-input" name="search" disabled autocomplete="off" spellcheck="false" placeholder="Click or press ‘S’ to search, ‘?’ for more options…" type="search"></div><button type="button" class="help-button">?</button>
                 <a id="settings-menu" href="../../../settings.html"><img src="../../../wheel.svg" width="18" alt="Change settings"></a></div></form></nav><section id="main" class="content"><h1 class="fqn"><span class="in-band">Module <a href="../../index.html">serenity</a>::<wbr><a href="../index.html">http</a>::<wbr><a class="mod" href="">ratelimiting</a></span><span class="out-of-band"><span id="render-detail"><a id="toggle-all-docs" href="javascript:void(0)" title="collapse all docs">[<span class="inner">&#x2212;</span>]</a></span><a class="srclink" href="../../../src/serenity/http/ratelimiting.rs.html#1-472" title="goto source code">[src]</a></span></h1><div class="docblock"><p>Routes are used for ratelimiting. These are to differentiate between the
-different <em>types</em> of routes - such as getting the current user's channels -
+different <em>types</em> of routes - such as getting the current user’s channels -
 for the most part, with the exception being major parameters.</p>
 <p><a href="https://discord.com/developers/docs/topics/rate-limits#rate-limits">Taken from</a> the Discord docs, major parameters are:</p>
 <blockquote>
 <p>Additionally, rate limits take into account major parameters in the URL.
 For example, <code>/channels/:channel_id</code> and
 <code>/channels/:channel_id/messages/:message_id</code> both take <code>channel_id</code> into
-account when generating rate limits since it's the major parameter. The
+account when generating rate limits since it’s the major parameter. The
 only current major parameters are <code>channel_id</code>, <code>guild_id</code> and <code>webhook_id</code>.</p>
 </blockquote>
 <p>This results in the two URIs of <code>GET /channels/4/messages/7</code> and
 <code>GET /channels/5/messages/8</code> being rate limited <em>separately</em>. However, the
 two URIs of <code>GET /channels/10/messages/11</code> and
-<code>GET /channels/10/messages/12</code> will count towards the &quot;same ratelimit&quot;, as
-the major parameter - <code>10</code> is equivalent in both URIs' format.</p>
+<code>GET /channels/10/messages/12</code> will count towards the “same ratelimit”, as
+the major parameter - <code>10</code> is equivalent in both URIs’ format.</p>
 <h1 id="examples" class="section-header"><a href="#examples">Examples</a></h1>
 <p>First: taking the first two URIs - <code>GET /channels/4/messages/7</code> and
 <code>GET /channels/5/messages/8</code> - and assuming both buckets have a <code>limit</code> of
@@ -25,7 +25,7 @@ the major parameter - <code>10</code> is equivalent in both URIs' format.</p>
 performing a request to the <em>second</em> URI will also contain a <code>remaining</code> of
 <code>9</code> in the response, as the major parameter - <code>channel_id</code> - is different
 in the two requests (<code>4</code> and <code>5</code>).</p>
-<p>Second: take for example the last two URIs. Assuming the bucket's <code>limit</code> is
+<p>Second: take for example the last two URIs. Assuming the bucket’s <code>limit</code> is
 <code>10</code>, requesting the first URI will return a <code>remaining</code> of <code>9</code> in the
 response. Immediately after - prior to buckets resetting - performing a
 request to the <em>second</em> URI will return a <code>remaining</code> of <code>8</code> in the
