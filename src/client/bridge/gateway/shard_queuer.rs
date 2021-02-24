@@ -63,7 +63,7 @@ pub struct ShardQueuer {
     pub raw_event_handler: Option<Arc<dyn RawEventHandler>>,
     /// A copy of the framework
     #[cfg(feature = "framework")]
-    pub framework: Arc<Box<dyn Framework + Send + Sync>>,
+    pub framework: Arc<dyn Framework + Send + Sync>,
     /// The instant that a shard was last started.
     ///
     /// This is used to determine how long to wait between shard IDENTIFYs.

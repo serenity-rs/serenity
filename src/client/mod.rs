@@ -78,7 +78,7 @@ pub struct ClientBuilder<'a> {
     #[cfg(feature = "cache")]
     timeout: Option<Duration>,
     #[cfg(feature = "framework")]
-    framework: Option<Arc<Box<dyn Framework + Send + Sync + 'static>>>,
+    framework: Option<Arc<dyn Framework + Send + Sync + 'static>>,
     #[cfg(feature = "voice")]
     voice_manager: Option<Arc<dyn VoiceGatewayManager + Send + Sync + 'static>>,
     event_handler: Option<Arc<dyn EventHandler>>,
@@ -216,11 +216,11 @@ impl<'a> ClientBuilder<'a> {
     ///
     /// [`framework`]: Self::framework
     #[cfg(feature = "framework")]
-    pub fn framework_arc(
+    pub fn framework_arc<T: Framework + Send + Sync + 'static>(
         mut self,
-        framework: Arc<Box<dyn Framework + Send + Sync + 'static>>,
+        framework: Arc<T>,
     ) -> Self {
-        self.framework = Some(framework);
+        self.framework = Some(framework as Arc<dyn Framework + Send + Sync + 'static>);
 
         self
     }
