@@ -140,7 +140,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user().await.id {
+                if self.author.id != cache.current_user_id().await {
                     if self.is_private() {
                         return Err(Error::Model(ModelError::NotAuthor));
                     } else {
