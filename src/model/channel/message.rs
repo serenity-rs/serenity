@@ -701,7 +701,7 @@ impl Message {
                 )
                 .await?;
 
-                if !(self.author.id == cache.current_user().await.id) {
+                if !(self.author.id == cache.current_user_id().await) {
                     return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
