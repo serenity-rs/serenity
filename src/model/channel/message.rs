@@ -978,6 +978,9 @@ enum_number!(MessageType {
     NitroTier1,
     NitroTier2,
     NitroTier3,
+    ChannelFollowAdd,
+    GuildDiscoveryDisqualified,
+    GuildDiscoveryRequalified,
     InlineReply,
     ApplicationCommand,
 });
