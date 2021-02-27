@@ -140,14 +140,18 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                let permissions = Permissions::MANAGE_MESSAGES;
-                let is_author = self.author.id == cache.current_user().await.id;
-
-                utils::user_has_perms_cache(cache, self.channel_id, self.guild_id, permissions)
-                    .await?;
-
-                if !is_author {
-                    return Err(Error::Model(ModelError::NotAuthor));
+                if self.author.id != cache.current_user_id().await {
+                    if self.is_private() {
+                        return Err(Error::Model(ModelError::NotAuthor));
+                    } else {
+                        utils::user_has_perms_cache(
+                            cache,
+                            self.channel_id,
+                            self.guild_id,
+                            Permissions::MANAGE_MESSAGES,
+                        )
+                        .await?;
+                    }
                 }
             }
         }
@@ -257,7 +261,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user().await.id {
+                if self.author.id != cache.current_user_id().await {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -697,7 +701,7 @@ impl Message {
                 )
                 .await?;
 
-                if !(self.author.id == cache.current_user().await.id) {
+                if self.author.id != cache.current_user_id().await {
                     return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
