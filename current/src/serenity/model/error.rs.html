@@ -193,6 +193,7 @@
 <span id="190">190</span>
 <span id="191">191</span>
 <span id="192">192</span>
+<span id="193">193</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Error enum definition wrapping potential model implementation errors.</span>
 
@@ -342,6 +343,7 @@
     <span class="doccomment">/// Indicates that the webhook name is over the 100 characters limit.</span>
     <span class="ident">NameTooLong</span>,
     <span class="doccomment">/// Indicates that the bot is not author of the message.</span>
+    <span class="doccomment">/// This error is returned in private/direct channels.</span>
     <span class="ident">NotAuthor</span>,
 }
 

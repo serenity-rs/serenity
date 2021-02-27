@@ -1155,6 +1155,10 @@
 <span id="1152">1152</span>
 <span id="1153">1153</span>
 <span id="1154">1154</span>
+<span id="1155">1155</span>
+<span id="1156">1156</span>
+<span id="1157">1157</span>
+<span id="1158">1158</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! Models relating to Discord channels.</span>
 
@@ -1298,14 +1302,18 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">let</span> <span class="ident">permissions</span> <span class="op">=</span> <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>;
-                <span class="kw">let</span> <span class="ident">is_author</span> <span class="op">=</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>;
-
-                <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(<span class="ident">cache</span>, <span class="self">self</span>.<span class="ident">channel_id</span>, <span class="self">self</span>.<span class="ident">guild_id</span>, <span class="ident">permissions</span>)
-                    .<span class="kw">await</span><span class="question-mark">?</span>;
-
-                <span class="kw">if</span> <span class="op">!</span><span class="ident">is_author</span> {
-                    <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">NotAuthor</span>));
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>().<span class="kw">await</span> {
+                    <span class="kw">if</span> <span class="self">self</span>.<span class="ident">is_private</span>() {
+                        <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">NotAuthor</span>));
+                    } <span class="kw">else</span> {
+                        <span class="ident">utils</span>::<span class="ident">user_has_perms_cache</span>(
+                            <span class="ident">cache</span>,
+                            <span class="self">self</span>.<span class="ident">channel_id</span>,
+                            <span class="self">self</span>.<span class="ident">guild_id</span>,
+                            <span class="ident">Permissions</span>::<span class="ident">MANAGE_MESSAGES</span>,
+                        )
+                        .<span class="kw">await</span><span class="question-mark">?</span>;
+                    }
                 }
             }
         }
@@ -1415,7 +1423,7 @@
         <span class="attribute">#[<span class="ident">cfg</span>(<span class="ident">feature</span> <span class="op">=</span> <span class="string">&quot;cache&quot;</span>)]</span>
         {
             <span class="kw">if</span> <span class="kw">let</span> <span class="prelude-val">Some</span>(<span class="ident">cache</span>) <span class="op">=</span> <span class="ident">cache_http</span>.<span class="ident">cache</span>() {
-                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span> {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>().<span class="kw">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">InvalidUser</span>));
                 }
             }
@@ -1855,7 +1863,7 @@
                 )
                 .<span class="kw">await</span><span class="question-mark">?</span>;
 
-                <span class="kw">if</span> <span class="op">!</span>(<span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">=</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user</span>().<span class="kw">await</span>.<span class="ident">id</span>) {
+                <span class="kw">if</span> <span class="self">self</span>.<span class="ident">author</span>.<span class="ident">id</span> <span class="op">!</span><span class="op">=</span> <span class="ident">cache</span>.<span class="ident">current_user_id</span>().<span class="kw">await</span> {
                     <span class="kw">return</span> <span class="prelude-val">Err</span>(<span class="ident">Error</span>::<span class="ident">Model</span>(<span class="ident">ModelError</span>::<span class="ident">NotAuthor</span>));
                 }
             }
