@@ -261,7 +261,7 @@ impl Message {
         #[cfg(feature = "cache")]
         {
             if let Some(cache) = cache_http.cache() {
-                if self.author.id != cache.current_user().await.id {
+                if self.author.id != cache.current_user_id().await {
                     return Err(Error::Model(ModelError::InvalidUser));
                 }
             }
@@ -701,7 +701,7 @@ impl Message {
                 )
                 .await?;
 
-                if !(self.author.id == cache.current_user_id().await) {
+                if self.author.id != cache.current_user_id().await {
                     return Err(Error::Model(ModelError::NotAuthor));
                 }
             }
