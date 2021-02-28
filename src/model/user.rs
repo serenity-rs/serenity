@@ -1,11 +1,10 @@
 //! User information-related models.
 
-use bitflags::bitflags;
-
 use std::fmt;
 #[cfg(feature = "model")]
 use std::fmt::Write;
 
+use bitflags::bitflags;
 use futures::future::{BoxFuture, FutureExt};
 #[cfg(feature = "model")]
 use serde_json::json;
