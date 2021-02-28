@@ -485,7 +485,7 @@ bitflags! {
         const VERIFIED_BOT = 0b00000000_00000001_00000000_00000000;
         /// User's flag as early verified bot developer
         const EARLY_VERIFIED_BOT_DEVELOPER = 0b00000000_00000010_00000000_00000000;
-    }  
+    }
 }
 
 impl Default for User {
