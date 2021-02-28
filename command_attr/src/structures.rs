@@ -581,6 +581,8 @@ impl Parse for GroupStruct {
     fn parse(input: ParseStream<'_>) -> Result<Self> {
         let mut attributes = input.call(Attribute::parse_outer)?;
 
+        util::rename_attributes(&mut attributes, "doc", "description");
+
         let cooked = remove_cooked(&mut attributes);
 
         let visibility = input.parse()?;
