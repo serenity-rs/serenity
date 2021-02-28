@@ -1071,6 +1071,8 @@
 <span id="1068">1068</span>
 <span id="1069">1069</span>
 <span id="1070">1070</span>
+<span id="1071">1071</span>
+<span id="1072">1072</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="doccomment">//! User information-related models.</span>
 
@@ -2091,6 +2093,8 @@
     <span class="kw">let</span> <span class="kw-2">mut</span> <span class="ident">tag</span> <span class="op">=</span> <span class="ident">String</span>::<span class="ident">with_capacity</span>(<span class="number">37</span>);
     <span class="ident">tag</span>.<span class="ident">push_str</span>(<span class="ident">name</span>);
     <span class="ident">tag</span>.<span class="ident">push</span>(<span class="string">&#39;#&#39;</span>);
+
+    <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
     <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="macro">write</span><span class="macro">!</span>(<span class="ident">tag</span>, <span class="string">&quot;{:04}&quot;</span>, <span class="ident">discriminator</span>);
 
     <span class="ident">tag</span>

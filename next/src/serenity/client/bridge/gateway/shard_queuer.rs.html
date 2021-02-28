@@ -267,6 +267,7 @@
 <span id="264">264</span>
 <span id="265">265</span>
 <span id="266">266</span>
+<span id="267">267</span>
 </pre><div class="example-wrap"><pre class="rust ">
 <span class="kw">use</span> <span class="ident">std</span>::{
     <span class="ident">collections</span>::{<span class="ident">HashMap</span>, <span class="ident">VecDeque</span>},
@@ -481,6 +482,7 @@
         };
 
         <span class="ident">tokio</span>::<span class="ident">spawn</span>(<span class="kw">async</span> <span class="kw">move</span> {
+            <span class="attribute">#[<span class="ident">allow</span>(<span class="ident">clippy</span>::<span class="ident">let_underscore_must_use</span>)]</span>
             <span class="kw">let</span> <span class="kw">_</span> <span class="op">=</span> <span class="ident">runner</span>.<span class="ident">run</span>().<span class="kw">await</span>;
             <span class="macro">debug</span><span class="macro">!</span>(<span class="string">&quot;[ShardRunner {:?}] Stopping&quot;</span>, <span class="ident">runner</span>.<span class="ident">shard</span>.<span class="ident">shard_info</span>());
         });
