@@ -1197,7 +1197,9 @@ async fn send_single_command_embed(
                     );
                 }
 
-                embed.field(&help_options.available_text, &command.availability, true);
+                if !help_options.available_text.is_empty() && !command.availability.is_empty() {
+                    embed.field(&help_options.available_text, &command.availability, true);
+                }
 
                 if !command.checks.is_empty() {
                     embed.field(
@@ -1449,7 +1451,9 @@ fn single_command_to_plain_string(help_options: &HelpOptions, command: &Command<
 
     let _ = writeln!(result, "**{}**: {}", help_options.grouped_label, command.group_name);
 
-    let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
+    if !help_options.available_text.is_empty() && !command.availability.is_empty() {
+        let _ = writeln!(result, "**{}**: {}", help_options.available_text, command.availability);
+    }
 
     if !command.sub_commands.is_empty() {
         let _ = writeln!(
