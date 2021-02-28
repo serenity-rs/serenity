@@ -628,7 +628,10 @@ pub fn group(attr: TokenStream, input: TokenStream) -> TokenStream {
                 options.prefixes = vec![propagate_err!(attributes::parse(values))];
             },
             "description" => {
-                let arg: String = propagate_err!(attributes::parse(values));
+                let mut arg: String = propagate_err!(attributes::parse(values));
+                if arg.starts_with(' ') {
+                    arg.remove(0);
+                }
 
                 if let Some(desc) = &mut options.description.0 {
                     use std::fmt::Write;
